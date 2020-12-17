@@ -105,7 +105,8 @@ namespace tags
 		These functions shouldn't be called while a new cache is being loaded and as such it's not recommended you call them from any thread other than the main one.
 		If you want to run code just after a map load register a callback using tags::on_map_load
 	*/
-
+	/* returns the tag datum name map */
+	std::map<uint32_t, const char *> get_tag_datum_name_map();
 	/* Run callbacks after the cache file has been loaded */
 	void run_callbacks();
 
@@ -219,6 +220,7 @@ namespace tags
 		debug names must be loaded or it will fail
 	*/
 	std::string get_tag_name(datum tag);
+	std::string get_tag_name(int index);
 
 	/* 
 		Returns a pointer to a tag, if type is set in template it checks if the real type matches the requested type.
@@ -263,6 +265,8 @@ namespace tags
 	*/
 	datum find_tag(blam_tag type, const std::string &name);
 	std::map<datum, std::string> find_tags(blam_tag type);
+
+
 
 	struct ilterator
 	{

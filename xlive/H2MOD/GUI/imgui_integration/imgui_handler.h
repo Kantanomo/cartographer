@@ -164,4 +164,10 @@ namespace imgui_handler
 		void Open();
 		void Close();
 	}
+	namespace BudgetSapien
+	{
+		void Render(bool* p_open);
+		void Open();
+		void Close();
+	}
 }

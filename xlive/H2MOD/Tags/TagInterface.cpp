@@ -35,6 +35,11 @@ bool tags::cache_file_loaded()
 static char *tag_debug_names = nullptr;
 static std::map<uint32_t, const char *> tag_datum_name_map;
 
+std::map<uint32_t, const char *> tags::get_tag_datum_name_map()
+{
+	return std::map<uint32_t, const char *>(tag_datum_name_map);
+}
+
 void clear_tag_debug_names()
 {
 	tag_datum_name_map.clear();
@@ -113,6 +118,14 @@ std::string tags::get_tag_name(datum tag)
 	auto ilter = tag_datum_name_map.find(tag.Index);
 	if (ilter != tag_datum_name_map.end())
 		return ilter->second;
+	LOG_INFO_FUNC("Tag name not found?, this shouldn't happen.");
+	return "tag name lost"; // tool does something similar if it can't find the name of a tag from the shared cache
+}
+std::string tags::get_tag_name(int index)
+{
+	auto iter = tag_datum_name_map.find(index);
+	if (iter != tag_datum_name_map.end())
+		return iter->second;
 	LOG_INFO_FUNC("Tag name not found?, this shouldn't happen.");
 	return "tag name lost"; // tool does something similar if it can't find the name of a tag from the shared cache
 }

@@ -221,6 +221,7 @@ namespace imgui_handler
 	{
 		windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
 		windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
+		windows.emplace_back("Budget Sapien", false, BudgetSapien::Render, BudgetSapien::Open, BudgetSapien::Close);
 		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();

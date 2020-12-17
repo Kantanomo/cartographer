@@ -249,7 +249,7 @@ void hotkeyFuncGuide() {
 	imgui_handler::ToggleWindow("Advanced Settings");
 }
 
-
+int insert = VK_INSERT;
 void KeyboardInput::Initialize()
 {
 	
@@ -268,6 +268,10 @@ void KeyboardInput::Initialize()
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
+	KeyboardInput::RegisterHotkey(&insert, []
+	{
+		imgui_handler::ToggleWindow("Budget Sapien");
+	});
 }
 
 
