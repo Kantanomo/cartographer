@@ -37,6 +37,7 @@
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/HitFix/MeleeFix.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Modules/ServerPlaylist/PlaylistLoader.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1761,8 +1762,10 @@ void H2MOD::Initialize()
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
-		
-		
+	}
+	else
+	{
+		PlaylistLoader::Initialize();
 	}
 	TagFixes::Initalize();
 	MapSlots::Initialize();
