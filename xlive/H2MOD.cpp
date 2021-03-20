@@ -38,6 +38,7 @@
 #include "H2MOD/Modules/HitFix/MeleeFix.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/ServerPlaylist/PlaylistLoader.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
@@ -1770,6 +1771,7 @@ void H2MOD::Initialize()
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
+	CustomVariantSettings::Initialize();
 	LOG_TRACE_GAME("H2MOD - Initialized v0.6.2.0");
 	LOG_TRACE_GAME("H2MOD - BASE ADDR {:x}", this->GetBase());
 	//WriteValue(GetAddress(0xC25EA + 8), 100);

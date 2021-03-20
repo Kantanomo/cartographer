@@ -2,11 +2,28 @@
 #include "Util/Hooks/Hook.h"
 #include "H2MOD.h"
 #include "H2MOD/Modules/Startup/Startup.h"
+#include "H2MOD/Modules/Utils/Utils.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 namespace PlaylistLoader
 {
 
+	
 
+	enum e_custom_setting
+	{
+		None = -1,
+		Gravity,
+		InfiniteAmmo
+	};
+	std::map<std::wstring, e_custom_setting> Custom_Settings;
+	e_custom_setting GetCustomSettingIndex(wchar_t* Name)
+	{
+		for (const auto custom_setting : Custom_Settings)
+			if (_wcsicmp(custom_setting.first.c_str(), Name) == 0)
+				return custom_setting.second;
+		return None;
+	}
 	bool ProcessCustomSetting(playlist_entry* playlist_entry)
 	{
 		//Section Type must be Variant
@@ -14,45 +31,136 @@ namespace PlaylistLoader
 			return false;
 
 		wchar_t* propertyName = (wchar_t*)calloc(64, 1);
+		wchar_t* propertyValue = (wchar_t*)calloc(64, 1);
+		wchar_t* tempName = (wchar_t*)calloc(64, 1);
+		wchar_t* variant = (wchar_t*)calloc(64, 1);
+
+		//Pull the current property name from the buffer.
 		for (auto i = 0; i < 32; i++)
 		{
 			propertyName[i] = playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + i];
 			if (propertyName[i] == 0) break;
 		}
-		wchar_t* propertyValue = (wchar_t*)calloc(64, 1);
+		//Pull the current property value from  the buffer.
 		for (auto i = 0; i < playlist_entry->reader_current_char_index; i++)
 		{
 			propertyValue[i] = playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32 + i];
 			if (propertyValue[i] == 0) break;
 		}
-		//wchar_t* propertyValue = playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32];
-		
-		if (_wcsicmp(propertyName, L"teSt") == 0)
+		//Scan the section buffer for the current variant name to associate it with the custom 
+		//setting as the property can be anywhere in the section buffer
+		for (auto i = 0; i < playlist_entry->section_buffer_current_index; i++)
 		{
-			//the custom setting does not need to be stored in the section buffer, so remove one from the index so it gets overwritten by the next base setting.
-			playlist_entry->section_buffer_current_index--;
-			wchar_t* tempName = (wchar_t*)calloc(64, 1);
-			wchar_t* variant = (wchar_t*)calloc(64, 1);
-			for (auto i = 0; i < playlist_entry->section_buffer_current_index; i++)
+			for (auto j = 0; j < 32; j++)
+				tempName[j] = playlist_entry->section_buffer[68 * i + j];
+			if (_wcsicmp(tempName, L"name") == 0)
 			{
 				for (auto j = 0; j < 32; j++)
-					tempName[j] = playlist_entry->section_buffer[68 * i + j];
-				if (_wcsicmp(tempName, L"name") == 0)
-				{
-					for (auto j = 0; j < 32; j++)
-						variant[j] = playlist_entry->section_buffer[68 * i + 32 + j];
-					break;
-				}
+					variant[j] = playlist_entry->section_buffer[68 * i + 32 + j];
+				break;
 			}
-			if (_wcsicmp(variant, L"") != 0)
+		}
+		const auto custom_setting_type = GetCustomSettingIndex(propertyName);
+		if (_wcsicmp(variant, L"") != 0 && custom_setting_type != -1) {
+			//playlist_entry->section_buffer_current_index--;
+			CustomVariantSettings::s_variantSettings* settings;
+			const auto variant_string = std::wstring(variant);
+			if (CustomVariantSettingsMap.count(variant_string) > 0)
+				settings = &CustomVariantSettingsMap.at(variant_string);
+			else
 			{
-				LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Processing Variant: {}", variant);
-				LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Custom Setting Detected: {} = {}", propertyName, propertyValue);
+				CustomVariantSettingsMap[variant_string] = CustomVariantSettings::s_variantSettings();
+				settings = &CustomVariantSettingsMap.at(variant_string);
+			}
+			LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Variant: {} Custom Setting Detected: {} = {}", variant, propertyName, propertyValue);
+			switch (custom_setting_type)
+			{
+				case Gravity:
+					if (isFloat(propertyValue)) {
+						settings->Gravity = std::stof(propertyValue);
+						LOG_INFO_GAME("{}", IntToString<int>(settings->Gravity));
+					}
+					break;
+				case InfiniteAmmo:
+					settings->InfiniteAmmo = _wcsicmp(propertyValue, L"on") == 0;
+					LOG_INFO_GAME("{}", settings->InfiniteAmmo);
+					break;
+				case None:
+				default: break;
 			}
 			return true;
 		}
-		//LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Base Setting Detected {} = {}", propertyName, propertyValue);
+		free(propertyName);
+		free(propertyValue);
+		free(tempName);
+		free(variant);
 		return false;
+		//for (auto custom_setting : CustomSettings)
+		//{
+		//	if(_wcsicmp(propertyName, custom_setting.SettingName) == 0)
+		//	{
+		//		//the custom setting does not need to be stored in the section buffer, 
+		//		//so remove one from the index so it gets overwritten by the next base setting.
+		//		playlist_entry->section_buffer_current_index--;
+		//		wchar_t* tempName = (wchar_t*)calloc(64, 1);
+		//		wchar_t* variant = (wchar_t*)calloc(64, 1);
+		//		//Scan the section buffer for the current variant name to associate it with the custom 
+		//		//setting as the property can be anywhere in the section buffer
+		//		for (auto i = 0; i < playlist_entry->section_buffer_current_index; i++)
+		//		{
+		//			for (auto j = 0; j < 32; j++)
+		//				tempName[j] = playlist_entry->section_buffer[68 * i + j];
+		//			if (_wcsicmp(tempName, L"name") == 0)
+		//			{
+		//				for (auto j = 0; j < 32; j++)
+		//					variant[j] = playlist_entry->section_buffer[68 * i + 32 + j];
+		//				break;
+		//			}
+		//		}
+		//		if (_wcsicmp(variant, L"") != 0)
+		//		{
+		//			LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Processing Variant: {}", variant);
+		//			LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Custom Setting Detected: {} = {}", propertyName, propertyValue);
+		//		}
+		//		free(propertyName);
+		//		free(propertyValue);
+		//		free(tempName);
+		//		free(variant);
+		//		return true;
+		//	}
+		//}
+		//if (_wcsicmp(propertyName, L"teSt") == 0)
+		//{
+		//	//the custom setting does not need to be stored in the section buffer, so remove one from the index so it gets overwritten by the next base setting.
+		//	playlist_entry->section_buffer_current_index--;
+
+		//	//Scan the section buffer for the current variant name to associate it with the custom setting as the property can be anywhere in the section buffer
+		//	wchar_t* tempName = (wchar_t*)calloc(64, 1);
+		//	wchar_t* variant = (wchar_t*)calloc(64, 1);
+		//	for (auto i = 0; i < playlist_entry->section_buffer_current_index; i++)
+		//	{
+		//		for (auto j = 0; j < 32; j++)
+		//			tempName[j] = playlist_entry->section_buffer[68 * i + j];
+		//		if (_wcsicmp(tempName, L"name") == 0)
+		//		{
+		//			for (auto j = 0; j < 32; j++)
+		//				variant[j] = playlist_entry->section_buffer[68 * i + 32 + j];
+		//			break;
+		//		}
+		//	}
+		//	if (_wcsicmp(variant, L"") != 0)
+		//	{
+		//		LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Processing Variant: {}", variant);
+		//		LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Custom Setting Detected: {} = {}", propertyName, propertyValue);
+		//	}
+		//	free(propertyName);
+		//	free(propertyValue);
+		//	free(tempName);
+		//	free(variant);
+		//	return true;
+		//}
+		//LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Base Setting Detected {} = {}", propertyName, propertyValue);
+		
 	}
 
 
@@ -261,5 +369,7 @@ namespace PlaylistLoader
 	void Initialize()
 	{
 		ApplyHooks();
+		Custom_Settings.emplace(L"Gravity", e_custom_setting::Gravity);
+		Custom_Settings.emplace(L"Infinite Ammo", e_custom_setting::InfiniteAmmo);
 	}
 }

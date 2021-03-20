@@ -62,6 +62,7 @@ enum e_network_message_types : int
 	team_change,
 	rank_change,
 	anti_cheat,
+	custom_variant_settings,
 
 	end
 };
@@ -122,7 +123,8 @@ static const char* network_message_name[] = {
 	"map_file_name"
 	"team_change"
 	"rank_change"
-	"anti_cheat"
+	"anti_cheat",
+	"custom_variant_settings"
 };
 
 struct __declspec(align(8)) s_custom_map_filename

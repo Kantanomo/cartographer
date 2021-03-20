@@ -1,6 +1,7 @@
 #pragma once
 namespace PlaylistLoader
 {
+
 	enum e_playlist_reader_seek_mode
 	{
 		newLine = 0x0,
