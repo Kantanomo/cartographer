@@ -25,6 +25,10 @@ namespace PlaylistLoader
 		DWORD Pregame_Delay;
 		DWORD Postgame_Delay;
 		VariantMatch Matches[100];
+		DWORD match_count;
+		DWORD data2[7600];
+		DWORD unk2;
+		DWORD data3[10002];
 	};
 	struct playlist_match
 	{
@@ -52,7 +56,6 @@ namespace PlaylistLoader
 		VariantMatches *VariantMatches;
 		playlist_match PlaylistMatches[100];
 		DWORD MatchCount;
-		//setting_buffer_item section_buffer[224];
 		wchar_t section_buffer[7616];
 		DWORD section_buffer_current_index;
 		wchar_t header_buffer[32];

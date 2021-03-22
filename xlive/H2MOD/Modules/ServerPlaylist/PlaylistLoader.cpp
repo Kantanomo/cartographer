@@ -7,9 +7,6 @@
 
 namespace PlaylistLoader
 {
-
-	
-
 	enum e_custom_setting
 	{
 		None = -1,
@@ -24,12 +21,53 @@ namespace PlaylistLoader
 				return custom_setting.second;
 		return None;
 	}
+	void PlaylistInvalidItemHook(playlist_entry* playlist_entry, int a2, int a3, int a4, wchar_t *a5, wchar_t *a6, unsigned __int16 *a7)
+	{
+
+		//VariantMatches *v8; // ecx
+		//int v9; // eax
+
+		//v8 = playlist_entry->VariantMatches;
+
+		//if (!LOBYTE(v8->data3[10001]))
+		//{
+		//	v9 = v8->data3[10000];
+		//	if (v9 == 200)
+		//	{
+		//		(*(__int16*)(&playlist_entry->VariantMatches->data3[10001] + 2)) = 1;
+		//	}
+		//	else
+		//	{
+		//		v8->data3[50 * v9] = a3;
+		//		playlist_entry->VariantMatches->data3[50 * playlist_entry->VariantMatches->data3[10000] + 1] = a4;
+		//		sub_63434A(a2, &playlist_entry->VariantMatches->data3[50 * playlist_entry->VariantMatches->data3[10000] + 2], 0x20u, a5, -1);
+		//		sub_63434A(a2, &playlist_entry->VariantMatches->data3[50 * playlist_entry->VariantMatches->data3[10000] + 18], 0x20u, a6, -1);
+		//		sub_63434A(a2, &playlist_entry->VariantMatches->data3[50 * playlist_entry->VariantMatches->data3[10000] + 34], 0x20u, a7, -1);
+		//		++playlist_entry->VariantMatches->data3[10000];
+		//	}
+		//}
+		__asm
+		{
+			push a7
+			push a6
+			push a5
+			push a4
+			push a3
+			mov ebx, a2
+			mov ecx, [playlist_entry]
+			mov eax, [0xED2E]
+			add eax, [H2BaseAddr]
+			call eax
+			add esp, 20
+		}
+	}
 	bool ProcessCustomSetting(playlist_entry* playlist_entry)
 	{
 		//Section Type must be Variant
 		if (playlist_entry->current_section_type != 1)
 			return false;
 
+		bool result = false;
 		wchar_t* propertyName = (wchar_t*)calloc(64, 1);
 		wchar_t* propertyValue = (wchar_t*)calloc(64, 1);
 		wchar_t* tempName = (wchar_t*)calloc(64, 1);
@@ -47,22 +85,35 @@ namespace PlaylistLoader
 			propertyValue[i] = playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32 + i];
 			if (propertyValue[i] == 0) break;
 		}
+
+		//Trim the end of the value incase there is extra whitespace
+		for(auto i = playlist_entry->reader_current_char_index; i > 0; i--)
+		{
+			if (propertyValue[i] != ' ' || propertyValue[i] != '\n')
+				break;
+			propertyValue[i] = 0;
+		}
+
 		//Scan the section buffer for the current variant name to associate it with the custom 
 		//setting as the property can be anywhere in the section buffer
 		for (auto i = 0; i < playlist_entry->section_buffer_current_index; i++)
 		{
 			for (auto j = 0; j < 32; j++)
 				tempName[j] = playlist_entry->section_buffer[68 * i + j];
+
 			if (_wcsicmp(tempName, L"name") == 0)
 			{
 				for (auto j = 0; j < 32; j++)
 					variant[j] = playlist_entry->section_buffer[68 * i + 32 + j];
+
 				break;
 			}
 		}
 		const auto custom_setting_type = GetCustomSettingIndex(propertyName);
+
 		if (_wcsicmp(variant, L"") != 0 && custom_setting_type != -1) {
-			//playlist_entry->section_buffer_current_index--;
+			
+			//Grab or create the Custom Settings for the current variant.
 			CustomVariantSettings::s_variantSettings* settings;
 			const auto variant_string = std::wstring(variant);
 			if (CustomVariantSettingsMap.count(variant_string) > 0)
@@ -72,6 +123,7 @@ namespace PlaylistLoader
 				CustomVariantSettingsMap[variant_string] = CustomVariantSettings::s_variantSettings();
 				settings = &CustomVariantSettingsMap.at(variant_string);
 			}
+
 			LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Variant: {} Custom Setting Detected: {} = {}", variant, propertyName, propertyValue);
 			switch (custom_setting_type)
 			{
@@ -79,6 +131,17 @@ namespace PlaylistLoader
 					if (isFloat(propertyValue)) {
 						settings->Gravity = std::stof(propertyValue);
 						LOG_INFO_GAME("{}", IntToString<int>(settings->Gravity));
+					} 
+					else
+					{
+						PlaylistInvalidItemHook(
+							playlist_entry,
+							(int)playlist_entry,
+							0xC,
+							playlist_entry->reader_current_line,
+							propertyValue,
+							0,
+							0);
 					}
 					break;
 				case InfiniteAmmo:
@@ -88,79 +151,13 @@ namespace PlaylistLoader
 				case None:
 				default: break;
 			}
-			return true;
+			result = true;
 		}
 		free(propertyName);
 		free(propertyValue);
 		free(tempName);
 		free(variant);
-		return false;
-		//for (auto custom_setting : CustomSettings)
-		//{
-		//	if(_wcsicmp(propertyName, custom_setting.SettingName) == 0)
-		//	{
-		//		//the custom setting does not need to be stored in the section buffer, 
-		//		//so remove one from the index so it gets overwritten by the next base setting.
-		//		playlist_entry->section_buffer_current_index--;
-		//		wchar_t* tempName = (wchar_t*)calloc(64, 1);
-		//		wchar_t* variant = (wchar_t*)calloc(64, 1);
-		//		//Scan the section buffer for the current variant name to associate it with the custom 
-		//		//setting as the property can be anywhere in the section buffer
-		//		for (auto i = 0; i < playlist_entry->section_buffer_current_index; i++)
-		//		{
-		//			for (auto j = 0; j < 32; j++)
-		//				tempName[j] = playlist_entry->section_buffer[68 * i + j];
-		//			if (_wcsicmp(tempName, L"name") == 0)
-		//			{
-		//				for (auto j = 0; j < 32; j++)
-		//					variant[j] = playlist_entry->section_buffer[68 * i + 32 + j];
-		//				break;
-		//			}
-		//		}
-		//		if (_wcsicmp(variant, L"") != 0)
-		//		{
-		//			LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Processing Variant: {}", variant);
-		//			LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Custom Setting Detected: {} = {}", propertyName, propertyValue);
-		//		}
-		//		free(propertyName);
-		//		free(propertyValue);
-		//		free(tempName);
-		//		free(variant);
-		//		return true;
-		//	}
-		//}
-		//if (_wcsicmp(propertyName, L"teSt") == 0)
-		//{
-		//	//the custom setting does not need to be stored in the section buffer, so remove one from the index so it gets overwritten by the next base setting.
-		//	playlist_entry->section_buffer_current_index--;
-
-		//	//Scan the section buffer for the current variant name to associate it with the custom setting as the property can be anywhere in the section buffer
-		//	wchar_t* tempName = (wchar_t*)calloc(64, 1);
-		//	wchar_t* variant = (wchar_t*)calloc(64, 1);
-		//	for (auto i = 0; i < playlist_entry->section_buffer_current_index; i++)
-		//	{
-		//		for (auto j = 0; j < 32; j++)
-		//			tempName[j] = playlist_entry->section_buffer[68 * i + j];
-		//		if (_wcsicmp(tempName, L"name") == 0)
-		//		{
-		//			for (auto j = 0; j < 32; j++)
-		//				variant[j] = playlist_entry->section_buffer[68 * i + 32 + j];
-		//			break;
-		//		}
-		//	}
-		//	if (_wcsicmp(variant, L"") != 0)
-		//	{
-		//		LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Processing Variant: {}", variant);
-		//		LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Custom Setting Detected: {} = {}", propertyName, propertyValue);
-		//	}
-		//	free(propertyName);
-		//	free(propertyValue);
-		//	free(tempName);
-		//	free(variant);
-		//	return true;
-		//}
-		//LOG_INFO_GAME(L"[PlaylistLoader::ProcessCustomSetting] Base Setting Detected {} = {}", propertyName, propertyValue);
-		
+		return result;
 	}
 
 
@@ -175,6 +172,8 @@ namespace PlaylistLoader
 			call eax
 		}
 	}
+
+
 
 	void  CurrentItemNameTrimEnd(playlist_entry *pThis)
 	{
@@ -255,14 +254,14 @@ namespace PlaylistLoader
 						if (playlist_entry->reader_current_char_index >= 31)
 						{
 							playlist_entry->header_buffer[playlist_entry->reader_current_char_index] = 0;
-							/*playlist_item_invalid_unk(
+							PlaylistInvalidItemHook(
 								playlist_entry,
 								0,
 								3,
 								playlist_entry->reader_current_line,
 								playlist_entry->header_buffer,
-								byte_752CA8,
-								byte_752CA8);*/
+								0,
+								0);
 							playlist_entry->reader_current_mode = seekToNextLine;
 						}
 						else
@@ -289,14 +288,14 @@ namespace PlaylistLoader
 							if (playlist_entry->reader_current_char_index >= 31)
 							{
 								playlist_entry->section_buffer[playlist_entry->reader_current_char_index + 68 * playlist_entry->section_buffer_current_index] = 0;
-								/*playlist_item_invalid_unk(
+								PlaylistInvalidItemHook(
 									playlist_entry,
 									0,
 									2,
 									playlist_entry->reader_current_line,
 									&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
-									byte_752CA8,
-									byte_752CA8);*/
+									0,
+									0);
 								playlist_entry->reader_current_mode = seekToNextLine;
 							}
 							else
@@ -327,14 +326,14 @@ namespace PlaylistLoader
 					if (playlist_entry->reader_current_char_index >= 31)
 					{
 						playlist_entry->section_buffer[playlist_entry->reader_current_char_index + 68 * playlist_entry->section_buffer_current_index + 32] = 0;
-					/*	playlist_item_invalid_unk(
+						PlaylistInvalidItemHook(
 							playlist_entry,
 							0,
 							4,
 							playlist_entry->reader_current_line,
 							&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
 							&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-							byte_752CA8);*/
+							0);
 						playlist_entry->reader_current_mode = seekToNextLine;
 					}
 					else

@@ -60,15 +60,14 @@ namespace CustomVariantSettings
 	void OnIngame()
 	{
 		**gravity = CurrentVariantSettings.Gravity;
-		if(CurrentVariantSettings.InfiniteAmmo)
+		/*if(CurrentVariantSettings.InfiniteAmmo)
 		{
 			auto weapons = tags::find_tags(blam_tag::tag_group_type::weapon);
 			for(auto &weapon : weapons)
 			{
 				auto s_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(weapon.first);
-				for()
 			}
-		}
+		}*/
 	}
 
 	void OnLobby()
