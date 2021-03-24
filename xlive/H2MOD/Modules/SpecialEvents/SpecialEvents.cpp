@@ -72,7 +72,7 @@ namespace SpecialEvents
 	{
 		if (h2mod->GetMapType() == scnr_type::Multiplayer)
 		{
-			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", "carto_shared");
+			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenario, "carto_shared");
 			if (!santa_hat_datum.IsNull()) {
 				tag_loader::Load_tag(santa_hat_datum.ToInt(), true, "carto_shared");
 				tag_loader::Push_Back();
@@ -106,9 +106,9 @@ namespace SpecialEvents
 		{
 			if(tag_loader::Map_exists("carto_shared"))
 			{
-				paddy_hat_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\stpat_hat", "carto_shared");
-				paddy_beard_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\beard\\beard", "carto_shared");
-				paddy_pot_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", "carto_shared");
+				paddy_hat_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\stpat_hat", blam_tag::tag_group_type::scenario, "carto_shared");
+				paddy_beard_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\beard\\beard", blam_tag::tag_group_type::scenario, "carto_shared");
+				paddy_pot_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", blam_tag::tag_group_type::scenario, "carto_shared");
 				if (!paddy_hat_datum.IsNull() && !paddy_beard_datum.IsNull() && !paddy_pot_datum.IsNull())
 				{
 					tag_loader::Load_tag(paddy_hat_datum.ToInt(), true, "carto_shared");

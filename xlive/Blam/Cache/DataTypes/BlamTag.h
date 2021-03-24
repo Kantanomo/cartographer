@@ -152,6 +152,20 @@ struct blam_tag
 		return out;
 	}
 
+	static blam_tag from_string(std::string string)
+	{
+		if (string.length() != 4)
+			return tag_group_type::none;
+		char* a = (char*)calloc(4, 1);
+		a[0] = string[3];
+		a[1] = string[2];
+		a[2] = string[1];
+		a[3] = string[0];
+		auto result = blam_tag(tag_group_type(*(int*)a));
+		free(a);
+		return result;
+	}
+
 	constexpr int as_int() const
 	{
 		return static_cast<int>(tag_type);

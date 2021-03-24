@@ -147,7 +147,7 @@ namespace tag_loader
 
 	}
 
-	datum Get_tag_datum(std::string tag_name, std::string map)
+	datum Get_tag_datum(std::string tag_name, blam_tag type, std::string map)
 	{
 		std::ifstream* fin;
 		std::string map_loc;
@@ -189,6 +189,20 @@ namespace tag_loader
 			fin->read((char*)&tag_count, 4);
 			fin->read((char*)&file_table_offset, 4);
 
+			int table_off, table_size = 0;
+
+			fin->seekg(0x10);
+			fin->read((char*)&table_off, 4);
+			fin->read((char*)&table_size, 4);
+
+			fin->seekg(table_off + 4);
+			int temp;
+			fin->read((char*)&temp, 4);
+
+			int table_start = table_off + 0xC * temp + 0x20;
+
+			tags::tag_instance tag_info;
+
 			fin->seekg(file_table_offset);
 			char ch = ' ';
 			std::string input;
@@ -197,14 +211,19 @@ namespace tag_loader
 				std::getline(*fin, input, '\0');
 				if(input == tag_name)
 				{
-					tag_index = i;
-					found_index = true;
+					fin->seekg(table_start + i * sizeof(tags::tag_instance));
+					fin->read((char*)&tag_info, sizeof(tags::tag_instance));
+					if(tag_info.type == type)
+					{
+						delete fin;
+						return tag_info.datum_index;
+					}
 					break;
 				}
 			}
 		}
 
-		if(found_index)
+		/*if(found_index)
 		{
 			int table_off, table_size = 0;
 
@@ -225,7 +244,7 @@ namespace tag_loader
 			fin->close();
 			delete fin;
 			return tag_info.datum_index;
-		}
+		}*/
 		fin->close();
 		delete fin;
 		return datum::Null;

@@ -19,6 +19,7 @@
 #include "Util\ClipboardAPI.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
 
@@ -423,6 +424,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(L"mouse_sens");
 			output(L"warpfix");
 			output(L"maingamelooppatches");
+			output(L"injecttag (tag_name) (tag_type) (map_name)");
 			return;
 		}
 		else if (firstCommand == "$mapfilename")
@@ -534,7 +536,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost())
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() != scnr_type::SinglePlayer)
 			{
 				output(L"Can only be used by the session host!");
 				return;
@@ -571,7 +573,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				LOG_TRACE_GAME("Error converting string to int");
 				return;
 			}
-			
+
 			real_point3d* localPlayerPosition = h2mod->get_player_unit_coords(h2mod->get_player_datum_index_from_controller_index(0).Index);
 			this->spawn(object_datum, count, localPlayerPosition->x + 0.5f, localPlayerPosition->y + 0.5f, localPlayerPosition->z + 0.5f, randomMultiplier, false);
 			return;
@@ -725,7 +727,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage d3dex true/false");
 			}
 			return;
-        }
+		}
 		else if (firstCommand == "$maingamelooppatches") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
 				output(L"Invalid command, usage maingamelooppatches true/false");
@@ -744,6 +746,34 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage maingamelooppatches true/false");
 			}
 			return;
+		}
+		else if (firstCommand == "$injecttag")
+		{
+			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetMapType() != scnr_type::SinglePlayer)
+			{
+				output(L"Can only be used by the session host!");
+				return;
+			}
+
+			if (splitCommands.size() != 4) {
+				output(L"Invalid paramters");
+				return;
+			}
+			std::string tagName = splitCommands[1];
+
+			blam_tag tagType = blam_tag::from_string(splitCommands[2]);
+
+			std::string mapName = splitCommands[3];
+
+			auto tagDatum = tag_loader::Get_tag_datum(tagName, tagType, mapName);
+			tag_loader::Load_tag(tagDatum.ToInt(), true, mapName);
+			tag_loader::Push_Back();
+			std::wstring result = L"Loaded Tag Datum: ";
+			result += IntToWString<int>(tag_loader::ResolveNewDatum(tagDatum.ToInt()).ToInt(), std::hex);
+			output(result);
+
+			LOG_INFO_GAME("{} {} {}", tagName, tagType.as_string(), mapName);
+
 		}
 		else {
 			output(L"Unknown command.");

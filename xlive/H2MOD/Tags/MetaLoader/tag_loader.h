@@ -23,7 +23,7 @@ namespace tag_loader
 	//Checks if the map file exists
 	bool Map_exists(std::string map);
 	//Find tag datum based off of tag name
-	datum Get_tag_datum(std::string tag_name, std::string map);
+	datum Get_tag_datum(std::string tag_name, blam_tag type, std::string map);
 	//Loads a tag from specified map in accordance with the datum index supplied
 	void Load_tag(int datum_index, bool recursive, std::string map, bool custom = false);
 	//Return the size of the meta that is currently in the que
