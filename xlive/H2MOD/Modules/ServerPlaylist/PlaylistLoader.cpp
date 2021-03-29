@@ -7,11 +7,13 @@
 
 namespace PlaylistLoader
 {
+	static wchar_t EmptyChar = '\0';
 	enum e_custom_setting
 	{
 		None = -1,
 		Gravity,
-		InfiniteAmmo
+		InfiniteAmmo,
+		PlayerSpeed
 	};
 	std::map<std::wstring, e_custom_setting> Custom_Settings;
 	e_custom_setting GetCustomSettingIndex(wchar_t* Name)
@@ -21,31 +23,8 @@ namespace PlaylistLoader
 				return custom_setting.second;
 		return None;
 	}
-	void PlaylistInvalidItemHook(playlist_entry* playlist_entry, int a2, int a3, int a4, wchar_t *a5, wchar_t *a6, unsigned __int16 *a7)
+	void PlaylistInvalidItemHook(playlist_entry* playlist_entry, int a2, int a3, int a4, wchar_t *a5, wchar_t *a6, wchar_t *a7)
 	{
-
-		//VariantMatches *v8; // ecx
-		//int v9; // eax
-
-		//v8 = playlist_entry->VariantMatches;
-
-		//if (!LOBYTE(v8->data3[10001]))
-		//{
-		//	v9 = v8->data3[10000];
-		//	if (v9 == 200)
-		//	{
-		//		(*(__int16*)(&playlist_entry->VariantMatches->data3[10001] + 2)) = 1;
-		//	}
-		//	else
-		//	{
-		//		v8->data3[50 * v9] = a3;
-		//		playlist_entry->VariantMatches->data3[50 * playlist_entry->VariantMatches->data3[10000] + 1] = a4;
-		//		sub_63434A(a2, &playlist_entry->VariantMatches->data3[50 * playlist_entry->VariantMatches->data3[10000] + 2], 0x20u, a5, -1);
-		//		sub_63434A(a2, &playlist_entry->VariantMatches->data3[50 * playlist_entry->VariantMatches->data3[10000] + 18], 0x20u, a6, -1);
-		//		sub_63434A(a2, &playlist_entry->VariantMatches->data3[50 * playlist_entry->VariantMatches->data3[10000] + 34], 0x20u, a7, -1);
-		//		++playlist_entry->VariantMatches->data3[10000];
-		//	}
-		//}
 		__asm
 		{
 			push a7
@@ -54,13 +33,31 @@ namespace PlaylistLoader
 			push a4
 			push a3
 			mov ebx, a2
-			mov ecx, [playlist_entry]
+			mov ecx, playlist_entry
 			mov eax, [0xED2E]
 			add eax, [H2BaseAddr]
 			call eax
 			add esp, 20
 		}
 	}
+
+	bool CustomSettingBooleanCheck(playlist_entry* playlist_entry, wchar_t* value)
+	{
+		if (_wcsicmp(value, L"on") == 0 || _wcsicmp(value, L"true") == 0)
+			return true;
+		if (_wcsicmp(value, L"off") == 0 || _wcsicmp(value, L"false") == 0)
+			return false;
+		PlaylistInvalidItemHook(
+			playlist_entry,
+			0,
+			4,
+			playlist_entry->reader_current_line,
+			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
+			&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
+			&EmptyChar);
+		return false;
+	}
+
 	bool ProcessCustomSetting(playlist_entry* playlist_entry)
 	{
 		//Section Type must be Variant
@@ -129,24 +126,22 @@ namespace PlaylistLoader
 			{
 				case Gravity:
 					if (isFloat(propertyValue)) {
-						settings->Gravity = std::stof(propertyValue);
-						LOG_INFO_GAME("{}", IntToString<int>(settings->Gravity));
+						settings->Gravity = std::stod(propertyValue);
 					} 
 					else
 					{
 						PlaylistInvalidItemHook(
 							playlist_entry,
-							(int)playlist_entry,
-							0xC,
-							playlist_entry->reader_current_line,
-							propertyValue,
 							0,
-							0);
+							4,
+							playlist_entry->reader_current_line,
+							&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
+							&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
+							&EmptyChar);
 					}
 					break;
 				case InfiniteAmmo:
-					settings->InfiniteAmmo = _wcsicmp(propertyValue, L"on") == 0;
-					LOG_INFO_GAME("{}", settings->InfiniteAmmo);
+					settings->InfiniteAmmo = CustomSettingBooleanCheck(playlist_entry, propertyValue);
 					break;
 				case None:
 				default: break;
@@ -260,8 +255,8 @@ namespace PlaylistLoader
 								3,
 								playlist_entry->reader_current_line,
 								playlist_entry->header_buffer,
-								0,
-								0);
+								&EmptyChar,
+								&EmptyChar);
 							playlist_entry->reader_current_mode = seekToNextLine;
 						}
 						else
@@ -294,8 +289,8 @@ namespace PlaylistLoader
 									2,
 									playlist_entry->reader_current_line,
 									&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
-									0,
-									0);
+									&EmptyChar,
+									&EmptyChar);
 								playlist_entry->reader_current_mode = seekToNextLine;
 							}
 							else
@@ -333,7 +328,7 @@ namespace PlaylistLoader
 							playlist_entry->reader_current_line,
 							&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index],
 							&playlist_entry->section_buffer[68 * playlist_entry->section_buffer_current_index + 32],
-							0);
+							&EmptyChar);
 						playlist_entry->reader_current_mode = seekToNextLine;
 					}
 					else
@@ -370,5 +365,6 @@ namespace PlaylistLoader
 		ApplyHooks();
 		Custom_Settings.emplace(L"Gravity", e_custom_setting::Gravity);
 		Custom_Settings.emplace(L"Infinite Ammo", e_custom_setting::InfiniteAmmo);
+		Custom_Settings.emplace(L"Player Speed", e_custom_setting::PlayerSpeed);
 	}
 }

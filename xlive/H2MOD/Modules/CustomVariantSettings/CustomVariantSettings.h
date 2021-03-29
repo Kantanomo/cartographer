@@ -5,7 +5,7 @@ namespace CustomVariantSettings
 {
 	struct s_variantSettings
 	{
-		float Gravity = 4.171259403f;
+		double Gravity = 4.171259403f;
 		bool InfiniteAmmo = false;
 	};
 	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);

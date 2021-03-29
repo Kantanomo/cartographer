@@ -98,7 +98,7 @@ void register_custom_packets(void* network_messages)
 	register_packet_impl(network_messages, anti_cheat, "anti-cheat", 0, sizeof(s_anti_cheat), sizeof(s_anti_cheat),
 		(void*)encode_anti_cheat_packet, (void*)decode_anti_cheat_packet, NULL);
 
-	register_packet_impl(network_messages, custom_variant_settings, "variant-settings", 0, sizeof(CustomVariantSettings::s_variantSettings), sizeof(CustomVariantSettings::s_variantSettings),
+	register_packet_impl(network_messages, custom_variant_settings, "variant-settings", 0, 13, 13,
 		(void*)CustomVariantSettings::EncodeVariantSettings, (void*)CustomVariantSettings::DecodeVariantSettings, NULL);
 }
 
