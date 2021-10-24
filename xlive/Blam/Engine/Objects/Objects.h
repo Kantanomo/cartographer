@@ -260,3 +260,9 @@ static T* object_try_and_get_and_verify_type(datum object_index, int object_type
 	auto p_object_try_and_get_and_verify_type = Memory::GetAddress<char* (__cdecl*)(datum, int)>(0x1304E3, 0x11F3A6);
 	return (T*)p_object_try_and_get_and_verify_type(object_index, object_type_flags);
 }
+
+static void object_set_position(datum object_index, real_vector3d* up, real_vector3d* position, real_vector3d* forward, int a5)
+{
+	auto p_object_set_position = Memory::GetAddress<int(__cdecl*)(datum, real_vector3d*, real_vector3d*, real_vector3d*, int)>(0x136B7F);
+	p_object_set_position(object_index, up, position, forward, a5);
+}

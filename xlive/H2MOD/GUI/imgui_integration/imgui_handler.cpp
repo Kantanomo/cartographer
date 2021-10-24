@@ -3,6 +3,7 @@
 #include "H2MOD\Modules\Input\PlayerControl.h"
 #include "imgui.h"
 #include "imgui_impl_dx9.h"
+#include "Forge/ForgeUI.h"
 #include "Util\Hooks\Hook.h"
 
 namespace imgui_handler
@@ -231,7 +232,8 @@ namespace imgui_handler
 		windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
 		windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
 		windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
-		
+		windows.emplace_back("forge", false, forge_ui::render_main, forge_ui::open, forge_ui::close);
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;

@@ -111,6 +111,8 @@ std::string tags::get_tag_name(datum tag_index)
 	auto ilter = tag_datum_name_map.find(DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index));
 	if (ilter != tag_datum_name_map.end())
 		return ilter->second;
+	if (DATUM_INDEX_TO_IDENTIFIER(tag_index) == 0x0)
+		return "Injected Tag";
 	LOG_INFO_FUNC("Tag name not found?, this shouldn't happen.");
 	return "tag name lost"; // tool does something similar if it can't find the name of a tag from the shared cache
 }
