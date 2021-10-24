@@ -15,6 +15,13 @@ namespace forge_ui
 	{
 		datum selectedObject;
 
+		std::map<std::string, std::string> IdMap;
+
+		char* getLabelWithId(char* label)
+		{
+			
+		}
+
 		void updateSelectedObject(datum index)
 		{
 			if (selectedObject == index)
@@ -46,48 +53,46 @@ namespace forge_ui
 
 			return Width * (percent / 100.0f);
 		}
-		void update_object()
+		void update_position()
 		{
-			object_set_position(selectedObject, &getSelectedObject()->position, &getSelectedObject()->up, &getSelectedObject()->orientation, 0);
+			object_set_position(selectedObject, &getSelectedObject()->position, 0, 0, 0);
 		}
-		void render_real_vector_3d(real_point3d* vector, char* title, char* label1, char* label2, char* label3)
+		void render_real_vector_3d(real_point3d* vector, char* title, char* label1, char* label2, char* label3, void* update_method)
 		{
-			auto object = getSelectedObject();
-
-			ImGui::BeginGroupPanel(title, ImVec2(350, ImGui::GetContentRegionAvail().y));
+			ImGui::BeginGroupPanel(title, ImVec2(400, ImGui::GetContentRegionAvail().y));
 
 			ImGui::PushItemWidth(WidthPercentage(75));
 			ImGui::SliderFloat(label1, &vector->x, -500, 500, "");
 			if (ImGui::IsItemEdited())
-				update_object();
+				static_cast<void(*)()>(update_method)();
 
 			ImGui::SameLine();
 			ImGui::PushItemWidth(WidthPercentage(13));
 			ImGui::InputFloat("##PX", &vector->x, 0, 3);
 			if (ImGui::IsItemEdited())
-				update_object();
+				static_cast<void(*)()>(update_method)();
 
 			ImGui::PushItemWidth(WidthPercentage(75));
 			ImGui::SliderFloat(label2, &vector->y, -500, 500, "");
 			if (ImGui::IsItemEdited())
-				update_object();
+				static_cast<void(*)()>(update_method)();
 
 			ImGui::SameLine();
 			ImGui::PushItemWidth(WidthPercentage(13));
 			ImGui::InputFloat("##PY", &vector->y, 0, 3);
 			if (ImGui::IsItemEdited())
-				update_object();
+				static_cast<void(*)()>(update_method)();
 
 			ImGui::PushItemWidth(WidthPercentage(75));
 			ImGui::SliderFloat(label3, &vector->z, -500, 500, "");
 			if (ImGui::IsItemEdited())
-				update_object();
+				static_cast<void(*)()>(update_method)();
 
 			ImGui::SameLine();
 			ImGui::PushItemWidth(WidthPercentage(13));
 			ImGui::InputFloat("##PZ", &vector->z, 0, 3);
 			if (ImGui::IsItemEdited())
-				update_object();
+				static_cast<void(*)()>(update_method)();
 
 			ImGui::EndGroupPanel();
 		}
@@ -119,6 +124,12 @@ namespace forge_ui
 					selectedObject = i_datum;
 					LOG_INFO_GAME("[{}] Selected Item {:x} {}", __FUNCSIG__, selectedObject, t_name);
 				}
+
+				if(ImGui::IsItemHovered())
+				{
+					auto tooltip = IntToString<datum>(i_datum, std::hex);
+					ImGui::SetTooltip(tooltip.c_str());
+				}
 			//}
 		}
 
@@ -129,7 +140,7 @@ namespace forge_ui
 		auto object = getSelectedObject();
 		if(object != nullptr)
 		{
-			render_real_vector_3d(&object->position, "Position", "X", "Y", "Z");
+			render_real_vector_3d(&object->position, "Position", "X", "Y", "Z", update_position);
 		}
 	}
 
@@ -162,7 +173,7 @@ namespace forge_ui
 			render_objects();
 			ImGui::EndChild();
 
-			ImGui::SameLine(400);
+			ImGui::SameLine(375);
 
 			ImGui::BeginChild("Properties");
 			render_properties();
