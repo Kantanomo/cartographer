@@ -29,12 +29,11 @@ namespace forge_ui
 
 		s_object_data_definition* getSelectedObject()
 		{
+			//return object_get_fast_unsafe(selectedObject);
 			auto it = new s_data_iterator<s_object_header>(get_objects_header());
 			while (it->get_next_datum()) {
-				auto i = it->get_current_datum();
-				datum i_datum = i->datum_salt << 16;
-				i_datum += *(short*)&i->flags;
-				if (i_datum == selectedObject)
+				auto i = it->get_current_datum_index();
+				if (i == selectedObject)
 					return reinterpret_cast<s_object_data_definition*>(it->get_current_datum()->object);
 			}
 			return nullptr;
@@ -47,29 +46,48 @@ namespace forge_ui
 
 			return Width * (percent / 100.0f);
 		}
-		void render_real_vector_3d(real_point3d* vector, char* title)
+		void update_object()
 		{
+			object_set_position(selectedObject, &getSelectedObject()->position, &getSelectedObject()->up, &getSelectedObject()->orientation, 0);
+		}
+		void render_real_vector_3d(real_point3d* vector, char* title, char* label1, char* label2, char* label3)
+		{
+			auto object = getSelectedObject();
+
 			ImGui::BeginGroupPanel(title, ImVec2(350, ImGui::GetContentRegionAvail().y));
 
 			ImGui::PushItemWidth(WidthPercentage(75));
-			ImGui::SliderFloat("Position X", &vector->x, -500, 500, "");
+			ImGui::SliderFloat(label1, &vector->x, -500, 500, "");
+			if (ImGui::IsItemEdited())
+				update_object();
+
+			ImGui::SameLine();
 			ImGui::PushItemWidth(WidthPercentage(13));
 			ImGui::InputFloat("##PX", &vector->x, 0, 3);
+			if (ImGui::IsItemEdited())
+				update_object();
 
 			ImGui::PushItemWidth(WidthPercentage(75));
-			ImGui::SliderFloat("Position Y", &vector->y, -500, 500, "");
+			ImGui::SliderFloat(label2, &vector->y, -500, 500, "");
+			if (ImGui::IsItemEdited())
+				update_object();
+
+			ImGui::SameLine();
 			ImGui::PushItemWidth(WidthPercentage(13));
 			ImGui::InputFloat("##PY", &vector->y, 0, 3);
+			if (ImGui::IsItemEdited())
+				update_object();
 
 			ImGui::PushItemWidth(WidthPercentage(75));
-			ImGui::SliderFloat("Position Z", &vector->z, -500, 500, "");
+			ImGui::SliderFloat(label3, &vector->z, -500, 500, "");
+			if (ImGui::IsItemEdited())
+				update_object();
+
+			ImGui::SameLine();
 			ImGui::PushItemWidth(WidthPercentage(13));
 			ImGui::InputFloat("##PZ", &vector->z, 0, 3);
-			real_vector3d u = getSelectedObject()->up;
-			real_vector3d f = getSelectedObject()->orientation;
-			real_vector3d p = getSelectedObject()->position;
-			
-			//object_set_position(selectedObject, 0, &p, 0, 0);
+			if (ImGui::IsItemEdited())
+				update_object();
 
 			ImGui::EndGroupPanel();
 		}
@@ -82,8 +100,7 @@ namespace forge_ui
 			auto i = it->get_current_datum();
 			//if (!(i->type & FLAG(e_object_type::biped)))
 			//{
-				datum i_datum = i->datum_salt << 16;
-				i_datum += *(short*)&i->flags;
+				datum i_datum = it->get_current_datum_index();
 				auto object = reinterpret_cast<s_object_data_definition*>(i->object);
 				auto t_name = tags::get_tag_name(object->tag_definition_index);
 				auto t_instance = tags::datum_to_instance(object->tag_definition_index);
@@ -112,7 +129,7 @@ namespace forge_ui
 		auto object = getSelectedObject();
 		if(object != nullptr)
 		{
-			render_real_vector_3d(&object->position, "Position");
+			render_real_vector_3d(&object->position, "Position", "X", "Y", "Z");
 		}
 	}
 
