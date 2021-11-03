@@ -1,6 +1,6 @@
 #pragma once
 #include "item_definition.hpp"
-
+#include "refl-cpp/refl-cpp.hpp"
 /*********************************************************************
 * name: equipment
 * group_tag : eqip
@@ -34,3 +34,15 @@ struct s_equipment_group_definition :TagGroup<'eqip'>
 TAG_GROUP_SIZE_ASSERT(s_equipment_group_definition, 0x13C);
 #pragma pack(pop)
 
+void debug_equipment(std::ostream& os, const s_equipment_group_definition& pt)
+{
+	
+}
+
+REFL_TYPE(s_equipment_group_definition, refl_impl::metadata::debug(debug_equipment), bases<>)
+	REFL_FIELD(itemTag)
+	REFL_FIELD(powerup_type, refl::attr::usage::field())
+	REFL_FIELD(grenade_type, refl::attr::usage::field())
+	REFL_FIELD(powerup_time, refl::attr::usage::field())
+	REFL_FIELD(pickup_sound)
+REFL_END

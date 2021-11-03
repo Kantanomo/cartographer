@@ -429,6 +429,8 @@
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameObjects.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h" />
+    <ClInclude Include="3rdparty\refl-cpp\refl-cpp.hpp" />
+    <ClInclude Include="3rdparty\magicenum\magic_enum.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
