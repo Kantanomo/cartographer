@@ -1918,12 +1918,6 @@ namespace refl
              */
             struct field {};
 
-            /*
-			 * Specifies that an attribute type inheriting from this type can
-			 * only be used with REFL_FIELD()
-			 */
-            struct enum_class {};
-
             /**
              * Specifies that an attribute type inheriting from this type can
              * only be used with REFL_FUNC or REFL_FIELD.

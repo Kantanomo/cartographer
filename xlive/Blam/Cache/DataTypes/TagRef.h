@@ -1,7 +1,5 @@
 #pragma once
-
 #include "BlamTag.h"
-
 /*********************************************************************
 * Blam::Cache::DataTypes::tag_reference
 * 8 BYTE Tag Structure for any Tag Reference Field

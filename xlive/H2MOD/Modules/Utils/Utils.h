@@ -1,4 +1,6 @@
 #pragma once
+#include "Blam/Cache/DataTypes/BlamTag.h"
+#include "Blam/Cache/DataTypes/StringID.h"
 #include "magicenum/magic_enum.hpp"
 
 
@@ -151,7 +153,6 @@ public:
 private:
 	time::time_point lastTime;
 };
-
 namespace std
 {
 	template<typename T, std::enable_if_t<std::is_enum_v<T>>* = nullptr>
@@ -159,6 +160,7 @@ namespace std
 	{
 		return std::string(magic_enum::enum_name(c).begin(), magic_enum::enum_name(c).end());
 	}
+
 }
 
 // curl errors

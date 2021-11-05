@@ -2,6 +2,7 @@
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Math\BlamMath.h"
+#include "refl-cpp/refl-exentended.hpp"
 
 /*********************************************************************
 * name: object
@@ -215,3 +216,97 @@ struct s_object_group_definition :TagGroup<'obje'>
 TAG_GROUP_SIZE_ASSERT(s_object_group_definition, 0xBC);
 #pragma pack(pop)
 
+TAG_REFL(s_object_group_definition)
+	TAG_REFL_PROPERTY(object_flags)
+	TAG_REFL_PROPERTY(bounding_radius)
+	TAG_REFL_PROPERTY(bounding_offset_x)
+	TAG_REFL_PROPERTY(bounding_offset_y)
+	TAG_REFL_PROPERTY(bounding_offset_y)
+	TAG_REFL_PROPERTY(acceleration_scale)
+	TAG_REFL_PROPERTY(lightmap_shadow_mode)
+	TAG_REFL_PROPERTY(sweetener_size)
+	TAG_REFL_PROPERTY(dynamic_light_sphere_radius)
+	TAG_REFL_REAL_POINT3D(dynamic_light_sphere_offset)
+	TAG_REFL_STRING_ID(default_model_variant)
+	TAG_REFL_TAG_REFERENCE(model)
+	TAG_REFL_TAG_REFERENCE(crate_object)
+	TAG_REFL_TAG_REFERENCE(modifier_shader)
+	TAG_REFL_TAG_REFERENCE(creation_effect)
+	TAG_REFL_TAG_REFERENCE(material_effects)
+	TAG_REFL_TAG_BLOCK(ai_properties)
+	TAG_REFL_TAG_BLOCK(functions)
+	TAG_REFL_PROPERTY(apply_collision_damage_scale)
+	TAG_REFL_PROPERTY(min_game_acc_default)
+	TAG_REFL_PROPERTY(max_game_acc_default)
+	TAG_REFL_PROPERTY(min_game_scale_default)
+	TAG_REFL_PROPERTY(max_game_scale_default)
+	TAG_REFL_PROPERTY(min_abs_acc_default)
+	TAG_REFL_PROPERTY(max_abs_acc_default)
+	TAG_REFL_PROPERTY(min_abs_scale_default)
+	TAG_REFL_PROPERTY(max_abs_scale_default)
+	TAG_REFL_PROPERTY(hud_text_message_index)
+	TAG_REFL_TAG_BLOCK(attachments)
+	TAG_REFL_TAG_BLOCK(widgets)
+	TAG_REFL_TAG_BLOCK(old_functions)
+	TAG_REFL_TAG_BLOCK(change_colors)
+	TAG_REFL_TAG_BLOCK(predicted_resources)
+REFL_END
+
+//TAG_REFL(s_object_group_definition::s_ai_properties_block)
+//	TAG_REFL_PROPERTY(ai_flags)
+//	TAG_REFL_STRING_ID(ai_type_name)
+//	TAG_REFL_PROPERTY(ai_size)
+//	TAG_REFL_PROPERTY(leap_jump_speed)
+//REFL_END
+//
+//TAG_REFL(s_object_group_definition::s_functions_block)
+//	TAG_REFL_PROPERTY(flags)
+//	TAG_REFL_STRING_ID(import_name)
+//	TAG_REFL_STRING_ID(export_name)
+//	TAG_REFL_STRING_ID(turn_off_with)
+//	TAG_REFL_PROPERTY(min_value)
+//	TAG_REFL_DATA_BLOCK(data)
+//	TAG_REFL_STRING_ID(scale_by)
+//REFL_END
+//
+//TAG_REFL(s_object_group_definition::s_attachments_block)
+//	TAG_REFL_TAG_REFERENCE(type)
+//	TAG_REFL_STRING_ID(marker_old_string_id)
+//	TAG_REFL_PROPERTY(change_color)
+//	TAG_REFL_STRING_ID(primary_scale)
+//	TAG_REFL_STRING_ID(secondary_scale)
+//REFL_END
+//
+//TAG_REFL(s_object_group_definition::s_widgets_block)
+//	TAG_REFL_TAG_REFERENCE(type)
+//REFL_END
+//
+//TAG_REFL(s_object_group_definition::s_old_functions_block)
+//	TAG_REFL_STRING_ID(old_string_id)
+//REFL_END
+//
+//TAG_REFL(s_object_group_definition::s_change_colors_block)
+//	TAG_REFL_TAG_BLOCK(initial_permutations)
+//	TAG_REFL_TAG_BLOCK(functions)
+//REFL_END
+//
+//TAG_REFL(s_object_group_definition::s_change_colors_block::s_change_colors_block_initial_permutations_block)
+//	TAG_REFL_PROPERTY(weight)
+//	TAG_REFL_REAL_COLOR_RGB(color_lower_bound)
+//	TAG_REFL_REAL_COLOR_RGB(color_upper_bound)
+//	TAG_REFL_STRING_ID(variant_name)
+//REFL_END
+//
+//TAG_REFL(s_object_group_definition::s_change_colors_block::s_change_colors_functions_block)
+//	TAG_REFL_PROPERTY(scale_flags)
+//	TAG_REFL_REAL_COLOR_RGB(color_lower_bound)
+//	TAG_REFL_REAL_COLOR_RGB(color_upper_bound)
+//	TAG_REFL_STRING_ID(darken_by)
+//	TAG_REFL_STRING_ID(scale_by)
+//REFL_END
+//
+//TAG_REFL(s_object_group_definition::s_predicted_resources_block)
+//	TAG_REFL_PROPERTY(type)
+//	TAG_REFL_PROPERTY(resource_index)
+//	TAG_REFL_PROPERTY(tag_index)
+//REFL_END

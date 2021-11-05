@@ -1,6 +1,5 @@
 #pragma once
 #include "object_definition.hpp"
-
 /*********************************************************************
 * name: item
 * group_tag : item
@@ -49,4 +48,31 @@ struct s_item_group_definition :TagGroup<'item'>
 TAG_GROUP_SIZE_ASSERT(s_item_group_definition, 0x12C);
 #pragma pack(pop)
 
+TAG_REFL(s_item_group_definition)
+	TAG_REFL_BASE_STRUCT(objectTag)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(old_message_index)
+	TAG_REFL_PROPERTY(sort_order)
+	TAG_REFL_PROPERTY(multiplayer_onground_scale)
+	TAG_REFL_PROPERTY(campaign_onground_scale)
+	TAG_REFL_STRING_ID(pickup_message)
+	TAG_REFL_STRING_ID(swap_message)
+	TAG_REFL_STRING_ID(pickup_or_dual_msg)
+	TAG_REFL_STRING_ID(dualonly_msg)
+	TAG_REFL_STRING_ID(picked_up_msg)
+	TAG_REFL_STRING_ID(singluar_quantity_msg)
+	TAG_REFL_STRING_ID(plural_quantity_msg)
+	TAG_REFL_STRING_ID(switchto_msg)
+	TAG_REFL_STRING_ID(switchto_from_ai_msg)
+	TAG_REFL_TAG_REFERENCE(unused)
+	TAG_REFL_TAG_REFERENCE(collision_sound)
+	TAG_REFL_TAG_BLOCK(predicted_bitmaps)
+	TAG_REFL_TAG_BLOCK(detonation_damage_effect)
+	TAG_REFL_REAL_BOUNDS(detonation_delay)
+	TAG_REFL_TAG_REFERENCE(detonating_effect)
+	TAG_REFL_TAG_REFERENCE(detonation_effect)
+REFL_END
 
+TAG_REFL(s_item_group_definition::s_predicted_bitmaps_block)
+	TAG_REFL_TAG_REFERENCE(bitmap)
+REFL_END

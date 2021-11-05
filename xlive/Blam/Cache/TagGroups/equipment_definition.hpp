@@ -1,6 +1,5 @@
 #pragma once
 #include "item_definition.hpp"
-#include "refl-cpp/refl-cpp.hpp"
 /*********************************************************************
 * name: equipment
 * group_tag : eqip
@@ -40,9 +39,9 @@ void debug_equipment(std::ostream& os, const s_equipment_group_definition& pt)
 }
 
 REFL_TYPE(s_equipment_group_definition, refl_impl::metadata::debug(debug_equipment), bases<>)
-	REFL_FIELD(itemTag)
-	REFL_FIELD(powerup_type, refl::attr::usage::field())
-	REFL_FIELD(grenade_type, refl::attr::usage::field())
-	REFL_FIELD(powerup_time, refl::attr::usage::field())
-	REFL_FIELD(pickup_sound)
+	TAG_REFL_BASE_STRUCT(itemTag)
+	TAG_REFL_PROPERTY(powerup_type)
+	TAG_REFL_PROPERTY(grenade_type)
+	TAG_REFL_PROPERTY(powerup_time)
+	TAG_REFL_TAG_REFERENCE(pickup_sound)
 REFL_END
