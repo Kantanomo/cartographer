@@ -1,5 +1,6 @@
 #pragma once
 #include "refl-cpp.hpp"
+#include "refl-exentended.hpp"
 #include "magicenum/magic_enum.hpp"
 
 
@@ -10,9 +11,12 @@ namespace tag_refl
 	struct refl_tag_block : refl::attr::usage::member {};
 	struct refl_real_bounds : refl::attr::usage::member{};
 	struct refl_real_point3d : refl::attr::usage::member{};
+	struct refl_real_vector3d : refl::attr::usage::member {};
 	struct refl_data_block : refl::attr::usage::member{};
 	struct refl_real_color_rgb : refl::attr::usage::member{};
+	struct refl_real_color_argb : refl::attr::usage::member {};
 	struct refl_blam_tag : refl::attr::usage::member{};
+	struct refl_angle : refl::attr::usage::member{};
 
 	struct property : refl::attr::usage::field{};
 	struct refl_string_id : refl::attr::usage::field {};
@@ -24,9 +28,12 @@ namespace tag_refl
 #define TAG_REFL_TAG_BLOCK(property_name) REFL_FIELD(property_name, tag_refl::refl_tag_block())
 #define TAG_REFL_REAL_BOUNDS(property_name) REFL_FIELD(property_name, tag_refl::refl_real_bounds())
 #define TAG_REFL_REAL_POINT3D(property_name) REFL_FIELD(property_name, tag_refl::refl_real_point3d())
+#define TAG_REFL_REAL_VECTOR3D(property_name) REFL_FIELD(property_name, tag_refl::refl_real_vector3d())
 #define TAG_REFL_DATA_BLOCK(property_name) REFL_FIELD(property_name, tag_refl::refl_data_block())
 #define TAG_REFL_REAL_COLOR_RGB(property_name) REFL_FIELD(property_name, tag_refl::refl_real_color_rgb())
+#define TAG_REFL_REAL_COLOR_ARGB(property_name) REFL_FIELD(property_name, tag_refl::refl_real_color_argb())
 #define TAG_REFL_BLAM_TAG(property_name) REFL_FIELD(property_name, tag_refl::refl_blam_tag())
+#define TAG_REFL_ANGLE(property_name) REFL_FIELD(property_name, tag_refl::refl_angle())
 
 #define TAG_REFL(struct_name) REFL_TYPE(struct_name, refl_impl::metadata::debug(debug_generic_discard<struct_name>), bases<>)
 #define TAG_REFL_TAG_BLOCK_DEF(struct_name) \
@@ -67,6 +74,13 @@ TAG_REFL(real_color_rgb)
 	REFL_FIELD(blue, tag_refl::property())
 REFL_END
 
+TAG_REFL(real_color_argb)
+	REFL_FIELD(alpha, tag_refl::property())
+	REFL_FIELD(red, tag_refl::property())
+	REFL_FIELD(green, tag_refl::property())
+	REFL_FIELD(blue, tag_refl::property())
+REFL_END
+
 TAG_REFL(blam_tag)
 	REFL_FIELD(tag_type, tag_refl::property())
 REFL_END
@@ -74,6 +88,10 @@ REFL_END
 TAG_REFL(data_block)
 	REFL_FIELD(block_size, tag_refl::property())
 	REFL_FIELD(block_offset, tag_refl::property())
+REFL_END
+
+TAG_REFL(angle)
+	REFL_FIELD(rad, tag_refl::property())
 REFL_END
 
 //REFL_TEMPLATE((typename T), (tag_block<T>))

@@ -38,7 +38,7 @@ void debug_equipment(std::ostream& os, const s_equipment_group_definition& pt)
 	
 }
 
-REFL_TYPE(s_equipment_group_definition, refl_impl::metadata::debug(debug_equipment), bases<>)
+TAG_REFL(s_equipment_group_definition)
 	TAG_REFL_BASE_STRUCT(itemTag)
 	TAG_REFL_PROPERTY(powerup_type)
 	TAG_REFL_PROPERTY(grenade_type)

@@ -113,7 +113,7 @@ struct s_unit_group_definition :TagGroup<'unit'>
 	angle looking_acceleration_maximum;//0x154
 	string_id right_hand_node;//0x158
 	string_id left_hand_node;//0x15C
-	string_id preferred_gun_noder;//0x160
+	string_id preferred_gun_node;//0x160
 	tag_reference melee_damage;//0x164
 	tag_reference boarding_melee_damage;//0x16C
 	tag_reference boarding_melee_response;//0x174
@@ -131,7 +131,7 @@ struct s_unit_group_definition :TagGroup<'unit'>
 	struct s_postures_block
 	{
 		string_id name;//0x0
-		PAD(0xC);//0x4
+		real_vector3d pill_offset;
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_postures_block, 0x10);
 	tag_block<s_postures_block> postures;//0x198
@@ -268,3 +268,145 @@ struct s_unit_group_definition :TagGroup<'unit'>
 TAG_GROUP_SIZE_ASSERT(s_unit_group_definition, 0x1EC);
 #pragma pack(pop)
 
+TAG_REFL(s_unit_group_definition)
+	TAG_REFL_PROPERTY(unit_flags)
+	TAG_REFL_PROPERTY(default_team)
+	TAG_REFL_PROPERTY(constant_sound_volume)
+	TAG_REFL_TAG_REFERENCE(integrated_light_toggle)
+	TAG_REFL_ANGLE(camera_field_of_view)
+	TAG_REFL_PROPERTY(camera_stiffness)
+	TAG_REFL_STRING_ID(camera_marker_name_old_string_id)
+	TAG_REFL_STRING_ID(camera_submerged_marker_name_old_string_id)
+	TAG_REFL_ANGLE(pitch_autolevel)
+	TAG_REFL_ANGLE(pitch_range_lower)
+	TAG_REFL_ANGLE(pitch_range_upper)
+	TAG_REFL_TAG_BLOCK(camera_tracks)
+	TAG_REFL_REAL_VECTOR3D(accel_range)
+	TAG_REFL_PROPERTY(accel_action_scale)
+	TAG_REFL_PROPERTY(accel_attach_scale)
+	TAG_REFL_PROPERTY(soft_ping_threshold)
+	TAG_REFL_PROPERTY(soft_ping_interrupt_time)
+	TAG_REFL_PROPERTY(hard_ping_threshold)
+	TAG_REFL_PROPERTY(hard_ping_interrupt_time)
+	TAG_REFL_PROPERTY(hard_death_threshold)
+	TAG_REFL_PROPERTY(feign_death_threshold)
+	TAG_REFL_PROPERTY(feign_death_time)
+	TAG_REFL_PROPERTY(distance_of_evade_anim)
+	TAG_REFL_PROPERTY(distance_of_dive_anim)
+	TAG_REFL_PROPERTY(stunned_movement_threshold)
+	TAG_REFL_PROPERTY(feign_death_chance)
+	TAG_REFL_PROPERTY(feign_repeat_chance)
+	TAG_REFL_TAG_REFERENCE(spawned_turret_character)
+	TAG_REFL_PROPERTY(spawned_actor_count_lower)
+	TAG_REFL_PROPERTY(spawned_actor_count_upper)
+	TAG_REFL_PROPERTY(spawned_velocity)
+	TAG_REFL_ANGLE(aiming_velocity_maximum)
+	TAG_REFL_ANGLE(aiming_acceleration_maximum)
+	TAG_REFL_PROPERTY(casual_aiming_modifier)
+	TAG_REFL_ANGLE(looking_velocity_maximum)
+	TAG_REFL_ANGLE(looking_acceleration_maximum)
+	TAG_REFL_STRING_ID(right_hand_node)
+	TAG_REFL_STRING_ID(left_hand_node)
+	TAG_REFL_STRING_ID(preferred_gun_node)
+	TAG_REFL_TAG_REFERENCE(melee_damage)
+	TAG_REFL_TAG_REFERENCE(boarding_melee_damage)
+	TAG_REFL_TAG_REFERENCE(boarding_melee_response)
+	TAG_REFL_TAG_REFERENCE(landing_melee_damage)
+	TAG_REFL_TAG_REFERENCE(flurry_melee_damage)
+	TAG_REFL_TAG_REFERENCE(obstacle_smash_damage)
+	TAG_REFL_PROPERTY(motion_sensor_blip_size)
+	TAG_REFL_TAG_BLOCK(postures)
+	TAG_REFL_TAG_BLOCK(new_hud_interfaces)
+	TAG_REFL_TAG_BLOCK(dialogue_variants)
+	TAG_REFL_PROPERTY(grenade_velocity)
+	TAG_REFL_PROPERTY(grenade_type)
+	TAG_REFL_PROPERTY(grenade_count)
+	TAG_REFL_TAG_BLOCK(powered_seats)
+	TAG_REFL_TAG_BLOCK(weapons)
+	TAG_REFL_TAG_BLOCK(seats)
+	TAG_REFL_PROPERTY(boost_peak_power)
+	TAG_REFL_PROPERTY(boost_rise_power)
+	TAG_REFL_PROPERTY(boost_peak_time)
+	TAG_REFL_PROPERTY(boost_fall_power)
+	TAG_REFL_PROPERTY(dead_time)
+	TAG_REFL_PROPERTY(attack_weight)
+	TAG_REFL_PROPERTY(decay_weight)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_unit_group_definition::s_camera_tracks_block)
+	TAG_REFL_TAG_REFERENCE(track)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_unit_group_definition::s_postures_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_REAL_VECTOR3D(pill_offset)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_unit_group_definition::s_new_hud_interfaces_block)
+	TAG_REFL_TAG_REFERENCE(new_unit_hud_interface)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_unit_group_definition::s_dialogue_variants_block)
+	TAG_REFL_PROPERTY(variant_number)
+	TAG_REFL_TAG_REFERENCE(dialogue)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_unit_group_definition::s_powered_seats_block)
+	TAG_REFL_PROPERTY(driver_powerup_time)
+	TAG_REFL_PROPERTY(driver_powerdown_time)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_unit_group_definition::s_unit_weapons_block)
+	TAG_REFL_TAG_REFERENCE(weapon)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_unit_group_definition::s_seats_block)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_STRING_ID(label_old_string_id)
+	TAG_REFL_STRING_ID(marker_name_old_string_id)
+	TAG_REFL_STRING_ID(entry_markers_name)
+	TAG_REFL_STRING_ID(boarding_grenade_marker)
+	TAG_REFL_STRING_ID(boarding_grenade_string)
+	TAG_REFL_STRING_ID(boarding_melee_string)
+	TAG_REFL_PROPERTY(ping_scale)
+	TAG_REFL_PROPERTY(turnover_time)
+	TAG_REFL_REAL_VECTOR3D(accel_range)
+	TAG_REFL_PROPERTY(accel_action_scale)
+	TAG_REFL_PROPERTY(accel_attach_scale)
+	TAG_REFL_PROPERTY(ai_scariness)
+	TAG_REFL_PROPERTY(ai_seat_type)
+	TAG_REFL_PROPERTY(boarding_seat)
+	TAG_REFL_PROPERTY(listener_interpolation_factor)
+	TAG_REFL_PROPERTY(yaw_rate_bounds_lower)
+	TAG_REFL_PROPERTY(yaw_rate_bounds_upper)
+	TAG_REFL_PROPERTY(pitch_rate_bounds_lower)
+	TAG_REFL_PROPERTY(pitch_rate_bounds_upper)
+	TAG_REFL_PROPERTY(min_speed_reference)
+	TAG_REFL_PROPERTY(max_speed_reference)
+	TAG_REFL_PROPERTY(speed_exponent)
+	TAG_REFL_STRING_ID(camera_marker_name_old_string_id)
+	TAG_REFL_STRING_ID(camera_submerged_marker_name_old_string_id)
+	TAG_REFL_ANGLE(pitch_autolevel)
+	TAG_REFL_ANGLE(pitch_range_lower)
+	TAG_REFL_ANGLE(pitch_range_upper)
+	TAG_REFL_TAG_BLOCK(camera_tracks)
+	TAG_REFL_TAG_BLOCK(unit_hud_interface)
+	TAG_REFL_STRING_ID(enter_seat_string)
+	TAG_REFL_ANGLE(yaw_minimum)
+	TAG_REFL_ANGLE(yaw_maximum)
+	TAG_REFL_TAG_REFERENCE(builtin_gunner)
+	TAG_REFL_PROPERTY(entry_radius)
+	TAG_REFL_ANGLE(entry_marker_cone_angle)
+	TAG_REFL_ANGLE(entry_marker_facing_angle)
+	TAG_REFL_PROPERTY(maximum_relative_velocity)
+	TAG_REFL_STRING_ID(invisible_seat_region)
+	TAG_REFL_PROPERTY(runtime_invisible_seat_region_index)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_unit_group_definition::s_seats_block::s_camera_tracks_block)
+	TAG_REFL_TAG_REFERENCE(track)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_unit_group_definition::s_seats_block::s_unit_hud_interface_block)
+	TAG_REFL_TAG_REFERENCE(new_unit_hud_interface)
+REFL_END

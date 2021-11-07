@@ -3,6 +3,9 @@
 #include "Blam/Cache/TagGroups/equipment_definition.hpp"
 #include "H2MOD/Modules/Utils/Utils.h"
 #include <string>
+
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
+
 namespace KantTesting
 {
 	template<typename T>
@@ -59,7 +62,7 @@ namespace KantTesting
 						{
 							std::ostringstream stream;
 							stream << refl::descriptor::get_display_name(member) << " = " << std::to_string(member.get(item));
-							LOG_INFO_GAME("[{}] {}", __FUNCTION__, stream.str());
+							LOG_INFO_GAME("{}", stream.str());
 						}
 						if constexpr (refl::descriptor::has_attribute<tag_refl::refl_tag_block>(member))
 						{
@@ -68,18 +71,18 @@ namespace KantTesting
 							{
 								if(block.size > 0 && block.data > 0)
 								{
-									LOG_ERROR_GAME("[{}] START {}", __FUNCTION__, refl::descriptor::get_display_name(member));
+									LOG_ERROR_GAME("START {}", refl::descriptor::get_display_name(member));
 									for(auto i = 0; i < block.size; i++)
 										reflect(*block[i]);
-									LOG_ERROR_GAME("[{}] END {}", __FUNCTION__, refl::descriptor::get_display_name(member));
+									LOG_ERROR_GAME("END {}", refl::descriptor::get_display_name(member));
 								}
 							}
 						}
 						else if constexpr (refl::descriptor::has_attribute<refl::attr::usage::member>(member))
 						{
-							LOG_INFO_GAME("[{}] START {}", __FUNCTION__, refl::descriptor::get_display_name(member));
+							LOG_INFO_GAME("START {}", refl::descriptor::get_display_name(member));
 							reflect(member(item));
-							LOG_INFO_GAME("[{}] END {}", __FUNCTION__, refl::descriptor::get_display_name(member));
+							LOG_INFO_GAME("END {}", refl::descriptor::get_display_name(member));
 						}
 					}
 				});
@@ -89,14 +92,16 @@ namespace KantTesting
 	{
 		//if(h2mod->GetEngineType() == Multiplayer)
 		//{
-		auto equip_datums = tags::find_tags(blam_tag::tag_group_type::equipment);
-		std::vector<s_equipment_group_definition*> equips;
+		auto equip_datums = tags::find_tags(blam_tag::tag_group_type::biped);
+		std::vector<s_biped_group_definition*> equips;
 		for (auto equip_datum : equip_datums)
 		{
-			auto equip = tags::get_tag<blam_tag::tag_group_type::equipment, s_equipment_group_definition>(equip_datum.first);
+			auto equip = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(equip_datum.first);
 			if (equip)
 			{
+				LOG_INFO_GAME("REFLECT {}", equip_datum.second);
 				reflect(*equip);
+				LOG_INFO_GAME("END REFLECT {}", equip_datum.second);
 				//reflect_tag_block(equip->itemTag.predicted_bitmaps);
 				//refl::util::for_each(refl::reflect<s_equipment_group_definition>(*equip).members, [&](auto member)
 				//	{

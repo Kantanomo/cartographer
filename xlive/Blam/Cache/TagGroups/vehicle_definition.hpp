@@ -107,11 +107,11 @@ struct s_vehicle_group_definition :TagGroup<'vehi'>
 	float overdampen_exponent;//0x254
 	float crouch_transition_time;//0x258
 	PAD(0x4);//0x25C
-	float engine_moment;//0x260
+	float engine_momentum;//0x260
 	float engine_max_angular_velocity;//0x264
 	struct s_gears_block
 	{
-		struct
+		struct s_torque
 		{
 			float min_torque;//0x0
 			float max_torque;//0x4
@@ -119,35 +119,22 @@ struct s_vehicle_group_definition :TagGroup<'vehi'>
 			float past_peak_torque_exponent;//0xC
 			float torque_at_max_angular_velocity;//0x10
 			float torque_at_2x_max_angular_velocity;//0x14
+		};
+		s_torque loaded_torque;
 
-		}loaded_torque;
-
-		struct
-		{
-			float min_torque;//0x18
-			float max_torque;//0x1C
-			float peak_torque_scale;//0x20
-			float past_peak_torque_exponent;//0x24
-			float torque_at_max_angular_velocity;//0x28
-			float torque_at_2x_max_angular_velocity;//0x2C
-		}cruising_torque;
-
-		struct
-		{
-			float min_time_to_upshift;//0x30
-			float engine_upshift_scale;//0x34
-			float gear_ratio;//0x38
-			float min_time_to_downshift;//0x3C
-			float engine_downshift_scale;//0x40
-		}gearing;
-
+		s_torque cruising_torque;
+		float min_time_to_upshift;//0x30
+		float engine_upshift_scale;//0x34
+		float gear_ratio;//0x38
+		float min_time_to_downshift;//0x3C
+		float engine_downshift_scale;//0x40
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_gears_block, 0x44);
 	tag_block<s_gears_block> gears;//0x268
 
 	float flying_torque_scale;//0x270
 	float seat_enterance_acceleration_scale;//0x274
-	float seat_exit_accelersation_scale;//0x278
+	float seat_exit_acceleration_scale;//0x278
 	float air_friction_deceleration;//0x27C
 	float thrust_scale;//0x280
 
@@ -157,25 +144,23 @@ struct s_vehicle_group_definition :TagGroup<'vehi'>
 	tag_reference special_effect;//0x29C
 	tag_reference unused_effect;//0x2A4
 
-	struct
+	enum class e_physics_flags : __int32
 	{
-		enum class e_flags : __int32
-		{
-			invalid = FLAG(0),
-		};
-		e_flags flags;//0x2AC
-		float ground_friction;//0x2B0
-		float ground_depth;//0x2B4
-		float ground_damp_factor;//0x2B8
-		float ground_moving_friction;//0x2BC
-		float ground_maximum_slope_0;//0x2C0
-		float ground_maximum_slope_1;//0x2C4
-		PAD(0x10);//0x2C8
-		float anti_gravity_bank_lift;//0x2D8
-		float steering_bank_reaction_scale;//0x2DC
-		float gravity_scale;//0x2E0
-		float radius;//0x2E4
-	}physics;
+		invalid = FLAG(0),
+	};
+	e_physics_flags physics_flags;//0x2AC
+	float ground_friction;//0x2B0
+	float ground_depth;//0x2B4
+	float ground_damp_factor;//0x2B8
+	float ground_moving_friction;//0x2BC
+	float ground_maximum_slope_0;//0x2C0
+	float ground_maximum_slope_1;//0x2C4
+	PAD(0x10);//0x2C8
+	float anti_gravity_bank_lift;//0x2D8
+	float steering_bank_reaction_scale;//0x2DC
+	float gravity_scale;//0x2E0
+	float radius;//0x2E4
+
 
 
 	struct s_anti_gravity_points_block
@@ -233,7 +218,7 @@ struct s_vehicle_group_definition :TagGroup<'vehi'>
 		float ebrake_moving_friction_vel_diff;//0x24
 		PAD(0x14);//0x28
 		string_id collision_global_material_name;//0x3C
-		PAD(0x2);//0x40
+		__int16 collision_global_material_index;
 		enum class e_model_state_destroyed : __int16
 		{
 			default = 0,
@@ -334,3 +319,147 @@ struct s_vehicle_group_definition :TagGroup<'vehi'>
 TAG_GROUP_SIZE_ASSERT(s_vehicle_group_definition, 0x300);
 #pragma pack(pop)
 
+TAG_REFL(s_vehicle_group_definition)
+	TAG_REFL_BASE_STRUCT(unitTag)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(control)
+	TAG_REFL_PROPERTY(maximum_forward_speed)
+	TAG_REFL_PROPERTY(maximum_reverse_speed)
+	TAG_REFL_PROPERTY(speed_acceleration)
+	TAG_REFL_PROPERTY(speed_deceleration)
+	TAG_REFL_PROPERTY(maximum_left_turn)
+	TAG_REFL_PROPERTY(maximum_right_turn_negative)
+	TAG_REFL_PROPERTY(wheel_circumference)
+	TAG_REFL_PROPERTY(turn_rate)
+	TAG_REFL_PROPERTY(blur_speed)
+	TAG_REFL_PROPERTY(specific_type)
+	TAG_REFL_PROPERTY(player_training_vehicle_type)
+	TAG_REFL_STRING_ID(flip_message)
+	TAG_REFL_PROPERTY(turn_scale)
+	TAG_REFL_PROPERTY(speed_turn_penalty_power)
+	TAG_REFL_PROPERTY(speed_turn_penalty)
+	TAG_REFL_PROPERTY(maximum_left_slide)
+	TAG_REFL_PROPERTY(maximum_right_slide)
+	TAG_REFL_PROPERTY(slide_acceleration)
+	TAG_REFL_PROPERTY(slide_deceleration)
+	TAG_REFL_PROPERTY(minimum_flipping_angular_velocity)
+	TAG_REFL_PROPERTY(maximum_flipping_angular_velocity)
+	TAG_REFL_PROPERTY(vehicle_size)
+	TAG_REFL_PROPERTY(fixed_gun_yaw)
+	TAG_REFL_PROPERTY(fixed_gun_pitch)
+	TAG_REFL_PROPERTY(overdampen_cusp_angle)
+	TAG_REFL_PROPERTY(overdampen_exponent)
+	TAG_REFL_PROPERTY(crouch_transition_time)
+	TAG_REFL_PROPERTY(engine_momentum)
+	TAG_REFL_PROPERTY(engine_max_angular_velocity)
+	TAG_REFL_TAG_BLOCK(gears)
+	TAG_REFL_PROPERTY(flying_torque_scale)
+	TAG_REFL_PROPERTY(seat_enterance_acceleration_scale)
+	TAG_REFL_PROPERTY(seat_exit_acceleration_scale)
+	TAG_REFL_PROPERTY(air_friction_deceleration)
+	TAG_REFL_PROPERTY(thrust_scale)
+	TAG_REFL_TAG_REFERENCE(suspension_sound)
+	TAG_REFL_TAG_REFERENCE(crash_sound)
+	TAG_REFL_TAG_REFERENCE(unused)
+	TAG_REFL_TAG_REFERENCE(special_effect)
+	TAG_REFL_TAG_REFERENCE(unused_effect)
+	TAG_REFL_PROPERTY(physics_flags)
+	TAG_REFL_PROPERTY(ground_friction)
+	TAG_REFL_PROPERTY(ground_depth)
+	TAG_REFL_PROPERTY(ground_damp_factor)
+	TAG_REFL_PROPERTY(ground_moving_friction)
+	TAG_REFL_PROPERTY(ground_maximum_slope_0)
+	TAG_REFL_PROPERTY(ground_maximum_slope_1)
+	TAG_REFL_PROPERTY(anti_gravity_bank_lift)
+	TAG_REFL_PROPERTY(steering_bank_reaction_scale)
+	TAG_REFL_PROPERTY(gravity_scale)
+	TAG_REFL_PROPERTY(radius)
+	TAG_REFL_TAG_BLOCK(anti_gravity_points)
+	TAG_REFL_TAG_BLOCK(friction_points)
+	TAG_REFL_TAG_BLOCK(shape_phantom_shape)
+REFL_END
+
+TAG_REFL(s_vehicle_group_definition::s_gears_block::s_torque)
+	TAG_REFL_PROPERTY(min_torque)
+	TAG_REFL_PROPERTY(max_torque)
+	TAG_REFL_PROPERTY(peak_torque_scale)
+	TAG_REFL_PROPERTY(past_peak_torque_exponent)
+	TAG_REFL_PROPERTY(torque_at_max_angular_velocity)
+	TAG_REFL_PROPERTY(torque_at_2x_max_angular_velocity)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_vehicle_group_definition::s_gears_block)
+	TAG_REFL_BASE_STRUCT(loaded_torque)
+	TAG_REFL_BASE_STRUCT(cruising_torque)
+	TAG_REFL_PROPERTY(min_time_to_upshift)
+	TAG_REFL_PROPERTY(engine_upshift_scale)
+	TAG_REFL_PROPERTY(gear_ratio)
+	TAG_REFL_PROPERTY(min_time_to_downshift)
+	TAG_REFL_PROPERTY(engine_downshift_scale)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_vehicle_group_definition::s_anti_gravity_points_block)
+	TAG_REFL_STRING_ID(marker_name)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(antigrav_strength)
+	TAG_REFL_PROPERTY(antigrav_offset)
+	TAG_REFL_PROPERTY(antigrav_height)
+	TAG_REFL_PROPERTY(antigrav_damp_factor)
+	TAG_REFL_PROPERTY(antigrav_normal_k1)
+	TAG_REFL_PROPERTY(antigrav_normal_k0)
+	TAG_REFL_PROPERTY(radius)
+	TAG_REFL_STRING_ID(damage_source_region_name)
+	TAG_REFL_PROPERTY(default_state_error)
+	TAG_REFL_PROPERTY(minor_damage_error)
+	TAG_REFL_PROPERTY(medium_damage_error)
+	TAG_REFL_PROPERTY(major_damage_error)
+	TAG_REFL_PROPERTY(destroyed_state_error)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_vehicle_group_definition::s_friction_points_block)
+	TAG_REFL_STRING_ID(marker_name)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(fraction_of_total_mass)
+	TAG_REFL_PROPERTY(radius)
+	TAG_REFL_PROPERTY(damaged_radius)
+	TAG_REFL_PROPERTY(friction_type)
+	TAG_REFL_PROPERTY(moving_friction_velocity_diff)
+	TAG_REFL_PROPERTY(ebrake_moving_friction)
+	TAG_REFL_PROPERTY(ebrake_friction)
+	TAG_REFL_PROPERTY(ebrake_moving_friction_vel_diff)
+	TAG_REFL_STRING_ID(collision_global_material_name)
+	TAG_REFL_PROPERTY(collision_global_material_index)
+	TAG_REFL_PROPERTY(model_state_destroyed)
+	TAG_REFL_STRING_ID(region_name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_vehicle_group_definition::s_shape_phantom_shape_block)
+	TAG_REFL_PROPERTY(size)
+	TAG_REFL_PROPERTY(count)
+	TAG_REFL_PROPERTY(child_shapes_size)
+	TAG_REFL_PROPERTY(child_shapes_capacity)
+	TAG_REFL_PROPERTY(shape_type0)
+	TAG_REFL_PROPERTY(shape0)
+	TAG_REFL_PROPERTY(collision_filter0)
+	TAG_REFL_PROPERTY(shape_type1)
+	TAG_REFL_PROPERTY(shape1)
+	TAG_REFL_PROPERTY(collision_filter1)
+	TAG_REFL_PROPERTY(shape_type2)
+	TAG_REFL_PROPERTY(shape2)
+	TAG_REFL_PROPERTY(collision_filter2)
+	TAG_REFL_PROPERTY(shape_type3)
+	TAG_REFL_PROPERTY(shape3)
+	TAG_REFL_PROPERTY(collision_filter3)
+	TAG_REFL_PROPERTY(multisphere_count)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(x0)
+	TAG_REFL_PROPERTY(x1)
+	TAG_REFL_PROPERTY(y0)
+	TAG_REFL_PROPERTY(y1)
+	TAG_REFL_PROPERTY(z0)
+	TAG_REFL_PROPERTY(z1)
+	TAG_REFL_PROPERTY(size)
+	TAG_REFL_PROPERTY(count)
+	TAG_REFL_PROPERTY(num_spheres0)
+REFL_END
