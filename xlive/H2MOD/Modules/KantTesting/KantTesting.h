@@ -2,5 +2,6 @@
 #define ENABLEKANTTEST 1
 namespace KantTesting
 {
+
 	void Initialize();
 }

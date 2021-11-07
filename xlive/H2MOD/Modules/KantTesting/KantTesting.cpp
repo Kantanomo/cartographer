@@ -6,7 +6,48 @@
 namespace KantTesting
 {
 	template<typename T>
-	void reflect(T item)
+	__declspec(noinline) void reflect_tag_block(T item)
+	{
+		if constexpr (refl::is_reflectable(item)) {
+			constexpr auto type = refl::reflect(item);
+			//
+			// This works???
+			//
+			if (item.size > 0) {
+				int data_size = refl::runtime::invoke<int>(item, "data_size");
+				int type_size = refl::runtime::invoke<int>(item, "type_size");
+				constexpr auto func = refl::util::find_one(type.members, [](auto m) { return m.name == "begin"; }); // -> function_descriptor<Circle, 0>{...}
+				LOG_INFO_GAME("[{}] {:x} - {:x}", __FUNCTION__, data_size, type_size);
+				//refl::util::for_each(type.members, [&](auto member_)
+				//	{
+				//		if constexpr (refl::descriptor::has_attribute<refl::attr::usage::function>(member_) && refl::descriptor::is_function(member_))
+				//		{
+				//			//int data_size = refl::runtime::invoke<int>(a, "data_size");
+				//			//int type_size = refl::runtime::invoke<int>(a, "type_size");
+				//			////auto test = refl::runtime::invoke<void*>(a, "operator[]");
+				//			////auto b = member_()
+				//			//LOG_INFO_GAME("[{}] {:x} - {:x}", __FUNCTION__, data_size, type_size);
+				//			if (member_.name == "begin")
+				//			{
+				//				auto c = member_(item);
+				//				LOG_INFO_GAME("[{}] {:x}", __FUNCTION__, (unsigned long)std::addressof(*c));
+				//			}
+				//			LOG_INFO_GAME("[{}] {}", __FUNCTION__, refl::descriptor::get_display_name(member_));
+				//		}
+				//	});
+			}
+			//
+			//This doesn't?
+			//
+			//int data_size = refl::runtime::invoke<int>(a, "data_size");
+			//int type_size = refl::runtime::invoke<int>(a, "type_size");
+
+
+			//LOG_INFO_GAME("[{}] {:x} - {:x}", __FUNCTION__, data_size, type_size);
+		}
+	}
+	template<typename T>
+	__declspec(noinline) void reflect(T item)
 	{
 		if (refl::is_reflectable(item))
 		{
@@ -22,32 +63,19 @@ namespace KantTesting
 						}
 						if constexpr (refl::descriptor::has_attribute<tag_refl::refl_tag_block>(member))
 						{
-							LOG_ERROR_GAME("[{}] START {}", __FUNCTION__, refl::descriptor::get_display_name(member));
-							auto a = member.get(item);
-							constexpr auto type = refl::reflect(a);
-							//
-							// This works???
-							//
-							refl::util::for_each(type.members, [&](auto member_)
+							auto block = member(item);
+							if constexpr (refl::is_reflectable(block))
+							{
+								if(block.size > 0 && block.data > 0)
 								{
-									if constexpr (refl::descriptor::has_attribute<refl::attr::usage::function>(member_) && refl::descriptor::is_function(member_))
-									{
-										int data_size = refl::runtime::invoke<int>(a, "data_size");
-										int type_size = refl::runtime::invoke<int>(a, "type_size");
-										LOG_INFO_GAME("[{}] {:x} - {:x}", __FUNCTION__, data_size, type_size);
-									}
-								});
-							//
-							//This doesn't?
-							//
-							//int data_size = refl::runtime::invoke<int>(a, "data_size");
-							//int type_size = refl::runtime::invoke<int>(a, "type_size");
-							//LOG_INFO_GAME("[{}] {:x} - {:x}", __FUNCTION__, data_size, type_size);
-
-
-							LOG_ERROR_GAME("[{}] END {}", __FUNCTION__, refl::descriptor::get_display_name(member));
+									LOG_ERROR_GAME("[{}] START {}", __FUNCTION__, refl::descriptor::get_display_name(member));
+									for(auto i = 0; i < block.size; i++)
+										reflect(*block[i]);
+									LOG_ERROR_GAME("[{}] END {}", __FUNCTION__, refl::descriptor::get_display_name(member));
+								}
+							}
 						}
-						else if constexpr (refl::descriptor::has_attribute<refl::attr::usage::member>(member))
+						else if constexpr (refl::descriptor::has_attribute<tag_refl::refl_tag_base>(member))
 						{
 							LOG_INFO_GAME("[{}] START {}", __FUNCTION__, refl::descriptor::get_display_name(member));
 							reflect(member(item));
@@ -69,6 +97,7 @@ namespace KantTesting
 			if (equip)
 			{
 				reflect(*equip);
+				//reflect_tag_block(equip->itemTag.predicted_bitmaps);
 				//refl::util::for_each(refl::reflect<s_equipment_group_definition>(*equip).members, [&](auto member)
 				//	{
 				//		std::ostringstream stream;

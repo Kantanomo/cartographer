@@ -1,6 +1,5 @@
 #pragma once
 #include "refl-cpp.hpp"
-#include "refl-exentended.hpp"
 #include "magicenum/magic_enum.hpp"
 
 
@@ -18,7 +17,6 @@ namespace tag_refl
 	struct property : refl::attr::usage::field{};
 	struct refl_string_id : refl::attr::usage::field {};
 }
-#define TAG_REFL(struct_name) REFL_TYPE(struct_name, refl_impl::metadata::debug(debug_generic_discard<struct_name>), bases<>)
 #define TAG_REFL_BASE_STRUCT(property_name) REFL_FIELD(property_name, tag_refl::refl_tag_base())
 #define TAG_REFL_PROPERTY(property_name) REFL_FIELD(property_name, tag_refl::property())
 #define TAG_REFL_TAG_REFERENCE(property_name) REFL_FIELD(property_name, tag_refl::refl_tag_ref())
@@ -29,6 +27,19 @@ namespace tag_refl
 #define TAG_REFL_DATA_BLOCK(property_name) REFL_FIELD(property_name, tag_refl::refl_data_block())
 #define TAG_REFL_REAL_COLOR_RGB(property_name) REFL_FIELD(property_name, tag_refl::refl_real_color_rgb())
 #define TAG_REFL_BLAM_TAG(property_name) REFL_FIELD(property_name, tag_refl::refl_blam_tag())
+
+#define TAG_REFL(struct_name) REFL_TYPE(struct_name, refl_impl::metadata::debug(debug_generic_discard<struct_name>), bases<>)
+#define TAG_REFL_TAG_BLOCK_DEF(struct_name) \
+	REFL_TYPE(tag_block<struct_name>) \
+		REFL_FIELD(size, tag_refl::property()) \
+		REFL_FIELD(data, tag_refl::property()) \
+		REFL_FUNC(data_size, refl::attr::property{}) \
+		REFL_FUNC(type_size, refl::attr::property{}) \
+		REFL_FUNC(begin, refl::attr::property{}) \
+		REFL_FUNC(end, refl::attr::property{}) \
+		REFL_FUNC(operator[], refl::attr::property{}) \
+	REFL_END \
+	TAG_REFL(struct_name)
 
 
 template<typename T>
@@ -60,11 +71,17 @@ TAG_REFL(blam_tag)
 	REFL_FIELD(tag_type, tag_refl::property())
 REFL_END
 
-REFL_TEMPLATE((typename T), (tag_block<T>))
-	//REFL_FIELD(size, tag_refl::property())
-	//REFL_FIELD(data, tag_refl::property())
-	REFL_FUNC(data_size, refl::attr::property{})
-	REFL_FUNC(type_size, refl::attr::property{})
-	REFL_FUNC(begin, refl::attr::property{})
-	REFL_FUNC(end, refl::attr::property{})
+TAG_REFL(data_block)
+	REFL_FIELD(block_size, tag_refl::property())
+	REFL_FIELD(block_offset, tag_refl::property())
 REFL_END
+
+//REFL_TEMPLATE((typename T), (tag_block<T>))
+//	REFL_FIELD(size, tag_refl::property())
+//	REFL_FIELD(data, tag_refl::property())
+//	//REFL_FUNC(data_size, refl::attr::property{})
+//	//REFL_FUNC(type_size, refl::attr::property{})
+//	REFL_FUNC(begin, refl::attr::property{})
+//	//REFL_FUNC(operator[], refl::attr::property{})
+//	//REFL_FUNC(end, refl::attr::property{})
+//REFL_END

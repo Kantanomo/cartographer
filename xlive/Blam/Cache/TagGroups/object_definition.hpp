@@ -252,61 +252,61 @@ TAG_REFL(s_object_group_definition)
 	TAG_REFL_TAG_BLOCK(predicted_resources)
 REFL_END
 
-//TAG_REFL(s_object_group_definition::s_ai_properties_block)
-//	TAG_REFL_PROPERTY(ai_flags)
-//	TAG_REFL_STRING_ID(ai_type_name)
-//	TAG_REFL_PROPERTY(ai_size)
-//	TAG_REFL_PROPERTY(leap_jump_speed)
-//REFL_END
-//
-//TAG_REFL(s_object_group_definition::s_functions_block)
-//	TAG_REFL_PROPERTY(flags)
-//	TAG_REFL_STRING_ID(import_name)
-//	TAG_REFL_STRING_ID(export_name)
-//	TAG_REFL_STRING_ID(turn_off_with)
-//	TAG_REFL_PROPERTY(min_value)
-//	TAG_REFL_DATA_BLOCK(data)
-//	TAG_REFL_STRING_ID(scale_by)
-//REFL_END
-//
-//TAG_REFL(s_object_group_definition::s_attachments_block)
-//	TAG_REFL_TAG_REFERENCE(type)
-//	TAG_REFL_STRING_ID(marker_old_string_id)
-//	TAG_REFL_PROPERTY(change_color)
-//	TAG_REFL_STRING_ID(primary_scale)
-//	TAG_REFL_STRING_ID(secondary_scale)
-//REFL_END
-//
-//TAG_REFL(s_object_group_definition::s_widgets_block)
-//	TAG_REFL_TAG_REFERENCE(type)
-//REFL_END
-//
-//TAG_REFL(s_object_group_definition::s_old_functions_block)
-//	TAG_REFL_STRING_ID(old_string_id)
-//REFL_END
-//
-//TAG_REFL(s_object_group_definition::s_change_colors_block)
-//	TAG_REFL_TAG_BLOCK(initial_permutations)
-//	TAG_REFL_TAG_BLOCK(functions)
-//REFL_END
-//
-//TAG_REFL(s_object_group_definition::s_change_colors_block::s_change_colors_block_initial_permutations_block)
-//	TAG_REFL_PROPERTY(weight)
-//	TAG_REFL_REAL_COLOR_RGB(color_lower_bound)
-//	TAG_REFL_REAL_COLOR_RGB(color_upper_bound)
-//	TAG_REFL_STRING_ID(variant_name)
-//REFL_END
-//
-//TAG_REFL(s_object_group_definition::s_change_colors_block::s_change_colors_functions_block)
-//	TAG_REFL_PROPERTY(scale_flags)
-//	TAG_REFL_REAL_COLOR_RGB(color_lower_bound)
-//	TAG_REFL_REAL_COLOR_RGB(color_upper_bound)
-//	TAG_REFL_STRING_ID(darken_by)
-//	TAG_REFL_STRING_ID(scale_by)
-//REFL_END
-//
-//TAG_REFL(s_object_group_definition::s_predicted_resources_block)
-//	TAG_REFL_PROPERTY(type)
-//	TAG_REFL_PROPERTY(resource_index)
-//	TAG_REFL_PROPERTY(tag_index)
-//REFL_END
+TAG_REFL_TAG_BLOCK_DEF(s_object_group_definition::s_ai_properties_block)
+	TAG_REFL_PROPERTY(ai_flags)
+	TAG_REFL_STRING_ID(ai_type_name)
+	TAG_REFL_PROPERTY(ai_size)
+	TAG_REFL_PROPERTY(leap_jump_speed)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_object_group_definition::s_functions_block)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_STRING_ID(import_name)
+	TAG_REFL_STRING_ID(export_name)
+	TAG_REFL_STRING_ID(turn_off_with)
+	TAG_REFL_PROPERTY(min_value)
+	TAG_REFL_DATA_BLOCK(data)
+	TAG_REFL_STRING_ID(scale_by)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_object_group_definition::s_attachments_block)
+	TAG_REFL_TAG_REFERENCE(type)
+	TAG_REFL_STRING_ID(marker_old_string_id)
+	TAG_REFL_PROPERTY(change_color)
+	TAG_REFL_STRING_ID(primary_scale)
+	TAG_REFL_STRING_ID(secondary_scale)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_object_group_definition::s_widgets_block)
+	TAG_REFL_TAG_REFERENCE(type)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_object_group_definition::s_old_functions_block)
+	TAG_REFL_STRING_ID(old_string_id)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_object_group_definition::s_change_colors_block)
+	TAG_REFL_TAG_BLOCK(initial_permutations)
+	TAG_REFL_TAG_BLOCK(functions)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_object_group_definition::s_change_colors_block::s_change_colors_block_initial_permutations_block)
+	TAG_REFL_PROPERTY(weight)
+	TAG_REFL_REAL_COLOR_RGB(color_lower_bound)
+	TAG_REFL_REAL_COLOR_RGB(color_upper_bound)
+	TAG_REFL_STRING_ID(variant_name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_object_group_definition::s_change_colors_block::s_change_colors_functions_block)
+	TAG_REFL_PROPERTY(scale_flags)
+	TAG_REFL_REAL_COLOR_RGB(color_lower_bound)
+	TAG_REFL_REAL_COLOR_RGB(color_upper_bound)
+	TAG_REFL_STRING_ID(darken_by)
+	TAG_REFL_STRING_ID(scale_by)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_object_group_definition::s_predicted_resources_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(resource_index)
+	TAG_REFL_PROPERTY(tag_index)
+REFL_END

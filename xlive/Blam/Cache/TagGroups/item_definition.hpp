@@ -67,12 +67,13 @@ TAG_REFL(s_item_group_definition)
 	TAG_REFL_TAG_REFERENCE(unused)
 	TAG_REFL_TAG_REFERENCE(collision_sound)
 	TAG_REFL_TAG_BLOCK(predicted_bitmaps)
-	TAG_REFL_TAG_BLOCK(detonation_damage_effect)
+	TAG_REFL_TAG_REFERENCE(detonation_damage_effect)
 	TAG_REFL_REAL_BOUNDS(detonation_delay)
 	TAG_REFL_TAG_REFERENCE(detonating_effect)
 	TAG_REFL_TAG_REFERENCE(detonation_effect)
 REFL_END
 
-TAG_REFL(s_item_group_definition::s_predicted_bitmaps_block)
+
+TAG_REFL_TAG_BLOCK_DEF(s_item_group_definition::s_predicted_bitmaps_block)
 	TAG_REFL_TAG_REFERENCE(bitmap)
 REFL_END

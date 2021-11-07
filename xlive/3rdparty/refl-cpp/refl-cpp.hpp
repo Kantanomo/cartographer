@@ -4347,8 +4347,8 @@ REFL_TEMPLATE(
     (typename Elem, typename Traits, typename Alloc),
     (std::basic_string<Elem, Traits, Alloc>),
     debug{ refl::detail::write_basic_string() })
-    REFL_FUNC(size, property{ })
-    REFL_FUNC(data, property{ })
+    REFL_FUNC(refl_size, property{ })
+    REFL_FUNC(refl_data, property{ })
     REFL_END
 
 #ifdef __cpp_lib_string_view
@@ -4357,8 +4357,8 @@ REFL_TEMPLATE(
         (typename Elem, typename Traits),
         (std::basic_string_view<Elem, Traits>),
         debug{ refl::detail::write_basic_string_view() })
-    REFL_FUNC(size, property{ })
-    REFL_FUNC(data, property{ })
+    REFL_FUNC(refl_size, property{ })
+    REFL_FUNC(refl_data, property{ })
     REFL_END
 
 #endif
