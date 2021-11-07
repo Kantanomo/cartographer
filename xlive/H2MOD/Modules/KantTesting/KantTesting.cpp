@@ -75,7 +75,7 @@ namespace KantTesting
 								}
 							}
 						}
-						else if constexpr (refl::descriptor::has_attribute<tag_refl::refl_tag_base>(member))
+						else if constexpr (refl::descriptor::has_attribute<refl::attr::usage::member>(member))
 						{
 							LOG_INFO_GAME("[{}] START {}", __FUNCTION__, refl::descriptor::get_display_name(member));
 							reflect(member(item));

@@ -158,6 +158,9 @@ namespace std
 	template<typename T, std::enable_if_t<std::is_enum_v<T>>* = nullptr>
 	std::string to_string(T c)
 	{
+		if constexpr (std::is_same<T, blam_tag::tag_group_type>::value)
+			return blam_tag(c).as_string();
+
 		return std::string(magic_enum::enum_name(c).begin(), magic_enum::enum_name(c).end());
 	}
 
