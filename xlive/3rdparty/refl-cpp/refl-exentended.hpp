@@ -1,6 +1,5 @@
 #pragma once
 #include "refl-cpp.hpp"
-#include "refl-exentended.hpp"
 #include "magicenum/magic_enum.hpp"
 
 
@@ -93,13 +92,3 @@ REFL_END
 TAG_REFL(angle)
 	REFL_FIELD(rad, tag_refl::property())
 REFL_END
-
-//REFL_TEMPLATE((typename T), (tag_block<T>))
-//	REFL_FIELD(size, tag_refl::property())
-//	REFL_FIELD(data, tag_refl::property())
-//	//REFL_FUNC(data_size, refl::attr::property{})
-//	//REFL_FUNC(type_size, refl::attr::property{})
-//	REFL_FUNC(begin, refl::attr::property{})
-//	//REFL_FUNC(operator[], refl::attr::property{})
-//	//REFL_FUNC(end, refl::attr::property{})
-//REFL_END
