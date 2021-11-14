@@ -4,6 +4,8 @@
 #include "Blam\Cache\DataTypes\TagBlock.h"
 
 #include "Blam\Math\BlamMath.h"
+#include "refl-cpp/refl-cpp.hpp"
+#include "refl-cpp/refl-exentended.hpp"
 
 /*********************************************************************
 * name: camera_track
@@ -31,3 +33,12 @@ TAG_GROUP_SIZE_ASSERT(s_camera_track_group_definition, 0xC);
 #pragma pack(pop)
 
 
+TAG_REFL_TAG_BLOCK_DEF(s_camera_track_group_definition::s_control_points_block)
+	TAG_REFL_REAL_VECTOR3D(position)
+	TAG_REFL_REAL_VECTOR3D(orientation)
+	TAG_REFL_PROPERTY(orientation_w)
+REFL_END
+
+TAG_REFL(s_camera_track_group_definition)
+	TAG_REFL_TAG_BLOCK(control_points)
+REFL_END

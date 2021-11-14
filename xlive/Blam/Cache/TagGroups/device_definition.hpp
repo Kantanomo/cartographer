@@ -44,3 +44,21 @@ struct s_device_group_definition :TagGroup<'devi'>
 TAG_GROUP_SIZE_ASSERT(s_device_group_definition, 0x11C);
 #pragma pack(pop)
 
+TAG_REFL(s_device_group_definition)
+	TAG_REFL_BASE_STRUCT(objectTag)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(power_transition_time)
+	TAG_REFL_PROPERTY(power_acceleration_time)
+	TAG_REFL_PROPERTY(position_transition_time)
+	TAG_REFL_PROPERTY(depowered_position_transition_time)
+	TAG_REFL_PROPERTY(depowered_position_acceleration_time)
+	TAG_REFL_PROPERTY(lightmap_flags)
+	TAG_REFL_TAG_REFERENCE(open_up)
+	TAG_REFL_TAG_REFERENCE(close_down)
+	TAG_REFL_TAG_REFERENCE(opened)
+	TAG_REFL_TAG_REFERENCE(depowered)
+	TAG_REFL_TAG_REFERENCE(repowered)
+	TAG_REFL_PROPERTY(delay_time)
+	TAG_REFL_TAG_REFERENCE(delay_effect)
+	TAG_REFL_PROPERTY(automatic_activation_radius)
+REFL_END

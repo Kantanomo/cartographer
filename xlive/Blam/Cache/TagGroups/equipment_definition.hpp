@@ -33,11 +33,6 @@ struct s_equipment_group_definition :TagGroup<'eqip'>
 TAG_GROUP_SIZE_ASSERT(s_equipment_group_definition, 0x13C);
 #pragma pack(pop)
 
-void debug_equipment(std::ostream& os, const s_equipment_group_definition& pt)
-{
-	
-}
-
 TAG_REFL(s_equipment_group_definition)
 	TAG_REFL_BASE_STRUCT(itemTag)
 	TAG_REFL_PROPERTY(powerup_type)

@@ -152,44 +152,123 @@ struct s_creature_group_definition :TagGroup<'crea'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_sphere_shapes_block, 0x80);
 	tag_block<s_sphere_shapes_block> sphere_shapes;//0x104
-	struct {
-		angle maximum_slope_angle;//0x10C
-		angle downhill_falloff_angle;//0x110
-		angle downhill_cutoff_angle;//0x114
-		angle uphill_falloff_angle;//0x118
-		angle uphill_cutoff_angle;//0x11C
-		float downhill_velocity_scale;//0x120
-		float uphill_velocity_scale;//0x124
-	}ground;
-
+	
+	angle maximum_slope_angle;//0x10C
+	angle downhill_falloff_angle;//0x110
+	angle downhill_cutoff_angle;//0x114
+	angle uphill_falloff_angle;//0x118
+	angle uphill_cutoff_angle;//0x11C
+	float downhill_velocity_scale;//0x120
+	float uphill_velocity_scale;//0x124
 	PAD(0x14);//0x128
 
-	struct
-	{
-		angle bank_angle;//0x13C
-		float bank_apply_time;//0x140
-		float bank_decay_time;//0x144
-		float pitch_ratio;//0x148
-		float max_velocity;//0x14C
-		float max_sidestep_velocity;//0x150
-		float acceleration;//0x154
-		float deceleration;//0x158
-		angle angular_velocity_maximum;//0x15C
-		angle angular_acceleration_maximum;//0x160
-		float crouch_velocity_modifier;//0x164
+	angle bank_angle;//0x13C
+	float bank_apply_time;//0x140
+	float bank_decay_time;//0x144
+	float pitch_ratio;//0x148
+	float max_velocity;//0x14C
+	float max_sidestep_velocity;//0x150
+	float acceleration;//0x154
+	float deceleration;//0x158
+	angle angular_velocity_maximum;//0x15C
+	angle angular_acceleration_maximum;//0x160
+	float crouch_velocity_modifier;//0x164
 
-	}flying;
+	tag_reference impact_damage;//0x168
+	tag_reference impact_shield_damage;//0x170
 
-	struct {
-		tag_reference impact_damage;//0x168
-		tag_reference impact_shield_damage;//0x170
-	}sentinel;
-
-	struct {
-		real_bounds destroy_after_death_time;//0x178	
-	}death_and_destruction;
+	real_bounds destroy_after_death_time;//0x178	
 
 };
 TAG_GROUP_SIZE_ASSERT(s_creature_group_definition, 0x180);
 #pragma pack(pop)
 
+TAG_REFL_TAG_BLOCK_DEF(s_creature_group_definition::s_dead_sphere_shapes_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(material)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(relative_mass_scale)
+	TAG_REFL_PROPERTY(friction)
+	TAG_REFL_PROPERTY(restitution)
+	TAG_REFL_PROPERTY(volume)
+	TAG_REFL_PROPERTY(mass)
+	TAG_REFL_PROPERTY(phantom)
+	TAG_REFL_PROPERTY(size0)
+	TAG_REFL_PROPERTY(count0)
+	TAG_REFL_PROPERTY(radius)
+	TAG_REFL_PROPERTY(size1)
+	TAG_REFL_PROPERTY(count1)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_creature_group_definition::s_pill_shapes_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(material)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(relative_mass_scale)
+	TAG_REFL_PROPERTY(friction)
+	TAG_REFL_PROPERTY(restitution)
+	TAG_REFL_PROPERTY(volume)
+	TAG_REFL_PROPERTY(mass)
+	TAG_REFL_PROPERTY(phantom)
+	TAG_REFL_PROPERTY(size)
+	TAG_REFL_PROPERTY(count)
+	TAG_REFL_PROPERTY(radius)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_creature_group_definition::s_sphere_shapes_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(material)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(relative_mass_scale)
+	TAG_REFL_PROPERTY(friction)
+	TAG_REFL_PROPERTY(restitution)
+	TAG_REFL_PROPERTY(volume)
+	TAG_REFL_PROPERTY(mass)
+	TAG_REFL_PROPERTY(phantom)
+	TAG_REFL_PROPERTY(size0)
+	TAG_REFL_PROPERTY(count0)
+	TAG_REFL_PROPERTY(radius)
+	TAG_REFL_PROPERTY(size1)
+	TAG_REFL_PROPERTY(count1)
+REFL_END
+
+TAG_REFL(s_creature_group_definition)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(default_team)
+	TAG_REFL_PROPERTY(motion_sensor_blip_size)
+	TAG_REFL_ANGLE(turning_velocity_maximum)
+	TAG_REFL_ANGLE(turning_acceleration_maximum)
+	TAG_REFL_PROPERTY(casual_turning_modifier)
+	TAG_REFL_PROPERTY(autoaim_width)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(height_standing)
+	TAG_REFL_PROPERTY(height_crouching)
+	TAG_REFL_PROPERTY(radius)
+	TAG_REFL_PROPERTY(mass)
+	TAG_REFL_STRING_ID(living_material_name)
+	TAG_REFL_STRING_ID(dead_material_name)
+	TAG_REFL_TAG_BLOCK(dead_sphere_shapes)
+	TAG_REFL_TAG_BLOCK(pill_shapes)
+	TAG_REFL_TAG_BLOCK(sphere_shapes)
+	TAG_REFL_ANGLE(maximum_slope_angle)
+	TAG_REFL_ANGLE(downhill_falloff_angle)
+	TAG_REFL_ANGLE(downhill_cutoff_angle)
+	TAG_REFL_ANGLE(uphill_falloff_angle)
+	TAG_REFL_ANGLE(uphill_cutoff_angle)
+	TAG_REFL_PROPERTY(downhill_velocity_scale)
+	TAG_REFL_PROPERTY(uphill_velocity_scale)
+	TAG_REFL_ANGLE(bank_angle)
+	TAG_REFL_PROPERTY(bank_apply_time)
+	TAG_REFL_PROPERTY(bank_decay_time)
+	TAG_REFL_PROPERTY(pitch_ratio)
+	TAG_REFL_PROPERTY(max_velocity)
+	TAG_REFL_PROPERTY(max_sidestep_velocity)
+	TAG_REFL_PROPERTY(acceleration)
+	TAG_REFL_PROPERTY(deceleration)
+	TAG_REFL_ANGLE(angular_velocity_maximum)
+	TAG_REFL_ANGLE(angular_acceleration_maximum)
+	TAG_REFL_PROPERTY(crouch_velocity_modifier)
+	TAG_REFL_TAG_REFERENCE(impact_damage)
+	TAG_REFL_TAG_REFERENCE(impact_shield_damage)
+	TAG_REFL_REAL_BOUNDS(destroy_after_death_time)
+REFL_END

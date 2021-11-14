@@ -35,3 +35,14 @@ TAG_GROUP_SIZE_ASSERT(s_device_control_group_definition, 0x140);
 #pragma pack(pop)
 
 
+TAG_REFL(s_device_control_group_definition)
+	TAG_REFL_BASE_STRUCT(deviceTag)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(triggers_when)
+	TAG_REFL_PROPERTY(call_value)
+	TAG_REFL_STRING_ID(action_string)
+	TAG_REFL_TAG_REFERENCE(on)
+	TAG_REFL_TAG_REFERENCE(off)
+	TAG_REFL_TAG_REFERENCE(deny)
+REFL_END
+

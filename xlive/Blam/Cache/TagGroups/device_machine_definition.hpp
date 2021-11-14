@@ -48,3 +48,13 @@ struct s_device_machine_group_definition :TagGroup<'mach'>
 TAG_GROUP_SIZE_ASSERT(s_device_machine_group_definition, 0x134);
 #pragma pack(pop)
 
+TAG_REFL(s_device_machine_group_definition)
+	TAG_REFL_BASE_STRUCT(deviceTag)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(door_open_time)
+	TAG_REFL_REAL_BOUNDS(door_occlusion_bound)
+	TAG_REFL_PROPERTY(collision_response)
+	TAG_REFL_PROPERTY(elevator_node)
+	TAG_REFL_PROPERTY(pathfinding_policy)
+REFL_END

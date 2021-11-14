@@ -1,6 +1,9 @@
 #pragma once
 #include "..\Blam\Cache\TagGroups.hpp"
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam/Math/real_math.h"
+#include "refl-cpp/refl-cpp.hpp"
+#include "refl-cpp/refl-exentended.hpp"
 
 /*********************************************************************
 * name: antenna
@@ -39,4 +42,22 @@ TAG_GROUP_SIZE_ASSERT(s_antenna_group_definition, 0xA0);
 
 #pragma pack(pop)
 
+TAG_REFL_TAG_BLOCK_DEF(s_antenna_group_definition::s_vertices_block)
+	TAG_REFL_PROPERTY(spring_strength_coefficient)
+	TAG_REFL_ANGLE(angles_yaw)
+	TAG_REFL_ANGLE(angles_pitch)
+	TAG_REFL_PROPERTY(length)
+	TAG_REFL_PROPERTY(sequence_index)
+	TAG_REFL_REAL_COLOR_ARGB(color)
+	TAG_REFL_REAL_COLOR_ARGB(lod_color)
+REFL_END
 
+TAG_REFL(s_antenna_group_definition)
+	TAG_REFL_STRING_ID(attachment_marker_name)
+	TAG_REFL_TAG_REFERENCE(bitmaps)
+	TAG_REFL_TAG_REFERENCE(physics)
+	TAG_REFL_PROPERTY(spring_strength_coefficient)
+	TAG_REFL_PROPERTY(falloff_pixels)
+	TAG_REFL_PROPERTY(cutoff_pixels)
+	TAG_REFL_TAG_BLOCK(vertices)
+REFL_END

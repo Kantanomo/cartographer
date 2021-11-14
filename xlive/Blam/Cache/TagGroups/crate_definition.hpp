@@ -20,3 +20,9 @@ struct s_crate_group_definition :TagGroup<'bloc'>
 };
 TAG_GROUP_SIZE_ASSERT(s_crate_group_definition, 0xC0);
 #pragma pack(pop)
+
+
+TAG_REFL(s_crate_group_definition)
+	TAG_REFL_BASE_STRUCT(objectTag)
+	TAG_REFL_PROPERTY(flags)
+REFL_END

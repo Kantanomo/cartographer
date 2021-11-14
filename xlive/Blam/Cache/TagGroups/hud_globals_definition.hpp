@@ -2,6 +2,7 @@
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Math\BlamMath.h"
+#include "refl-cpp/refl-exentended.hpp"
 
 /*********************************************************************
 * name: hud_globals
@@ -12,7 +13,7 @@
 #pragma pack(push,1)
 struct s_hud_globals_group_definition :TagGroup<'hudg'>
 {
-	struct
+	struct s_messaging_parameters
 	{
 		enum class e_anchor : __int16
 		{
@@ -46,7 +47,8 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		tag_reference item_message_text;//0x84
 		tag_reference icon_bitmap;//0x8C
 		tag_reference alternate_icon_text;//0x94
-	}messaging_parameters;
+	};
+	s_messaging_parameters messaging_parameters;
 
 	struct s_button_icons_block
 	{
@@ -68,7 +70,7 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 	TAG_BLOCK_SIZE_ASSERT(s_button_icons_block, 0x10);
 	tag_block<s_button_icons_block> button_icons;//0x9C
 
-	struct
+	struct s_hud_help_text_color
 	{
 		byte_color_argb default_color;//0xA4
 		byte_color_argb flashing_color;//0xA8
@@ -82,12 +84,14 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		e_flash_flags flash_flags;//0xB6
 		float flash_length;//0xB8
 		byte_color_argb disabled_color;//0xBC
-	}hud_help_text_color;
+	};
+
+	s_hud_help_text_color hud_help_text_color;
 
 	PAD(0x4);//0xC0
 	tag_reference hud_messages;//0xC4
 
-	struct
+	struct s_objective_colors
 	{
 		byte_color_argb default_color;//0xCC
 		byte_color_argb flashing_color;//0xD0
@@ -103,9 +107,13 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		byte_color_argb disabled_color;//0xE4
 		__int16 uptime_ticks;//0xE8
 		__int16 fade_ticks;//0xEA
-	}objective_colors;
+	};
 
-	struct
+	s_objective_colors objective_colors;
+
+
+
+	struct s_waypoint_parameters
 	{
 		float top_offset;//0xEC
 		float bottom_offset;//0xF0
@@ -116,7 +124,7 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		struct s_waypoint_arrows_block
 		{
 			tag_string32 name;//0x0
-			PAD(0xC);//0x20
+			real_color_rgb color;
 			float opacity;//0x2C
 			float translucency;//0x30
 			__int16 on_screen_sequence_index;//0x34
@@ -132,39 +140,39 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_waypoint_arrows_block, 0x68);
 		tag_block<s_waypoint_arrows_block> waypoint_arrows;//0x124
-	}way_point_parameters;
+	};
+	s_waypoint_parameters way_point_parameters;
 
 
 	PAD(0x50);//0x12C
 	float hud_scale_in_multiplayer;//0x17C
 	PAD(0x110);//0x180
-	struct
+	struct s_motion_sensor
 	{
 		float motion_sensor_range;//0x290
 		float motion_sensor_velocity_sensitivity;//0x294
 		float motion_sensor_scale;//0x298
 		rect2d default_chapter_title_boundstop;//0x29C
-	}hud_globals;
+	};
+
+	s_motion_sensor motion_snsor_hud_globals;
 
 	PAD(0x2C);//0x2A4
 
-	struct
+	struct s_hud_damage_inidicators
 	{
-		__int16 top_offset;//0x2D0
-		__int16 bottom_offset;//0x2D2
-		__int16 left_offset;//0x2D4
-		__int16 right_offset;//0x2D6
+		rect2d offset;
 		PAD(0x20);//0x2D8
 		tag_reference indicator_bitmap;//0x2F8
 		__int16 sequence_index;//0x300
 		__int16 multiplayer_sequence_index;//0x302
 		byte_color_argb color;//0x304
-
-	}hud_damage_inidicators;
+	};
+	s_hud_damage_inidicators hud_damage_inidicators;
 
 	PAD(0x10);//0x308
 	//hud timer definitions
-	struct
+	struct s_not_much_time_left
 	{
 		byte_color_argb default_color;//0x318
 		byte_color_argb flashing_color;//0x31C
@@ -178,10 +186,11 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		e_flash_flags flash_flags;//0x32A
 		float flash_length;//0x32C
 		byte_color_argb disabled_color;//0x330
-	}not_much_time_left;
+	};
+	s_not_much_time_left not_much_time_left;
 
 	PAD(0x4);//0x334
-	struct
+	struct s_time_out_flash_color
 	{
 		byte_color_argb default_color;//0x338
 		byte_color_argb flashing_color;//0x33C
@@ -197,7 +206,8 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		byte_color_argb disabled_color;//0x350
 		PAD(0x2C);//0x354
 		tag_reference carnage_report_bitmap;//0x380
-	}time_out_flash_color;
+	};
+	s_time_out_flash_color time_out_flash_color;
 
 	//hud crap that wont fit anywhere else
 	__int16 loading_begin_text;//0x388
@@ -311,3 +321,194 @@ s_hud_globals_group_definition *get_hud_globals_ptr()
 {
 	return Memory::GetAddress<s_hud_globals_group_definition*>(0x9765C8, 0x99FBB0);
 }
+
+TAG_REFL(s_hud_globals_group_definition::s_messaging_parameters)
+	TAG_REFL_PROPERTY(anchor)
+	TAG_REFL_PROPERTY(anchor_offset_x)
+	TAG_REFL_PROPERTY(anchor_offset_y)
+	TAG_REFL_PROPERTY(width_scale)
+	TAG_REFL_PROPERTY(height_scale)
+	TAG_REFL_PROPERTY(scaling_flags)
+	TAG_REFL_TAG_REFERENCE(obsolete1)
+	TAG_REFL_TAG_REFERENCE(obsolete2)
+	TAG_REFL_PROPERTY(up_time)
+	TAG_REFL_PROPERTY(fade_time)
+	TAG_REFL_REAL_COLOR_ARGB(icon_color)
+	TAG_REFL_REAL_COLOR_ARGB(text_color)
+	TAG_REFL_PROPERTY(text_spacing)
+	TAG_REFL_TAG_REFERENCE(item_message_text)
+	TAG_REFL_TAG_REFERENCE(icon_bitmap)
+	TAG_REFL_TAG_REFERENCE(alternate_icon_text)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_hud_globals_group_definition::s_button_icons_block)
+	TAG_REFL_PROPERTY(sequence_index)
+	TAG_REFL_PROPERTY(width_offset)
+	TAG_REFL_PROPERTY(offset_from_reference_corner_x)
+	TAG_REFL_PROPERTY(offset_from_reference_corner_y)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(override_icon_color)
+	TAG_REFL_PROPERTY(frame_rate)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(text_index)
+REFL_END
+
+TAG_REFL(s_hud_globals_group_definition::s_hud_help_text_color)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(default_color)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(flashing_color)
+	TAG_REFL_PROPERTY(flash_period)
+	TAG_REFL_PROPERTY(flash_delay)
+	TAG_REFL_PROPERTY(number_of_flashes)
+	TAG_REFL_PROPERTY(flash_flags)
+	TAG_REFL_PROPERTY(flash_length)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(disabled_color)
+REFL_END
+
+TAG_REFL(s_hud_globals_group_definition::s_objective_colors)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(default_color)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(flashing_color)
+	TAG_REFL_PROPERTY(flash_period)
+	TAG_REFL_PROPERTY(flash_delay)
+	TAG_REFL_PROPERTY(number_of_flashes)
+	TAG_REFL_PROPERTY(flash_flags)
+	TAG_REFL_PROPERTY(flash_length)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(disabled_color)
+	TAG_REFL_PROPERTY(uptime_ticks)
+	TAG_REFL_PROPERTY(fade_ticks)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_hud_globals_group_definition::s_waypoint_parameters::s_waypoint_arrows_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_REAL_COLOR_RGB(color)
+	TAG_REFL_PROPERTY(opacity)
+	TAG_REFL_PROPERTY(translucency)
+	TAG_REFL_PROPERTY(on_screen_sequence_index)
+	TAG_REFL_PROPERTY(off_screen_sequence_index)
+	TAG_REFL_PROPERTY(flags)
+REFL_END
+
+TAG_REFL(s_hud_globals_group_definition::s_waypoint_parameters)
+	TAG_REFL_PROPERTY(top_offset)
+	TAG_REFL_PROPERTY(bottom_offset)
+	TAG_REFL_PROPERTY(left_offset)
+	TAG_REFL_PROPERTY(right_offset)
+	TAG_REFL_TAG_REFERENCE(arrow_bitmap)
+	TAG_REFL_TAG_BLOCK(waypoint_arrows)
+REFL_END
+
+TAG_REFL(s_hud_globals_group_definition::s_motion_sensor)
+	TAG_REFL_PROPERTY(motion_sensor_range)
+	TAG_REFL_PROPERTY(motion_sensor_velocity_sensitivity)
+	TAG_REFL_PROPERTY(motion_sensor_scale)
+	TAG_REFL_RECT2D(default_chapter_title_boundstop)
+REFL_END
+
+TAG_REFL(s_hud_globals_group_definition::s_hud_damage_inidicators)
+	TAG_REFL_RECT2D(offset)
+	TAG_REFL_TAG_REFERENCE(indicator_bitmap)
+	TAG_REFL_PROPERTY(sequence_index)
+	TAG_REFL_PROPERTY(multiplayer_sequence_index)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(color)
+REFL_END
+
+TAG_REFL(s_hud_globals_group_definition::s_not_much_time_left)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(default_color)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(flashing_color)
+	TAG_REFL_PROPERTY(flash_period)
+	TAG_REFL_PROPERTY(flash_delay)
+	TAG_REFL_PROPERTY(number_of_flashes)
+	TAG_REFL_PROPERTY(flash_flags)
+	TAG_REFL_PROPERTY(flash_length)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(disabled_color)
+REFL_END
+
+TAG_REFL(s_hud_globals_group_definition::s_time_out_flash_color)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(default_color)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(flashing_color)
+	TAG_REFL_PROPERTY(flash_period)
+	TAG_REFL_PROPERTY(flash_delay)
+	TAG_REFL_PROPERTY(number_of_flashes)
+	TAG_REFL_PROPERTY(flash_flags)
+	TAG_REFL_PROPERTY(flash_length)
+	TAG_REFL_REAL_BYTE_COLOR_ARGB(disabled_color)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_hud_globals_group_definition::s_dashlights_block)
+	TAG_REFL_TAG_REFERENCE(bitmap)
+	TAG_REFL_TAG_REFERENCE(shader)
+	TAG_REFL_PROPERTY(sequence_index)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_TAG_REFERENCE(sound)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_hud_globals_group_definition::s_waypoint_arrows_block)
+	TAG_REFL_TAG_REFERENCE(bitmap)
+	TAG_REFL_TAG_REFERENCE(shader)
+	TAG_REFL_PROPERTY(sequence_index)
+	TAG_REFL_PROPERTY(smallest_size)
+	TAG_REFL_PROPERTY(smallest_distance)
+	TAG_REFL_TAG_REFERENCE(border_bitmap)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_hud_globals_group_definition::s_waypoints_block)
+	TAG_REFL_TAG_REFERENCE(bitmap)
+	TAG_REFL_TAG_REFERENCE(shader)
+	TAG_REFL_PROPERTY(onscreen_sequence_index)
+	TAG_REFL_PROPERTY(occluded_sequence_index)
+	TAG_REFL_PROPERTY(offscreen_sequence_index)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_hud_globals_group_definition::s_hud_sounds_block)
+	TAG_REFL_TAG_REFERENCE(chief_sound)
+	TAG_REFL_PROPERTY(latched_to)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_TAG_REFERENCE(dervish_sound)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_hud_globals_group_definition::s_player_training_data_block)
+	TAG_REFL_STRING_ID(display_string)
+	TAG_REFL_STRING_ID(display_string2)
+	TAG_REFL_STRING_ID(display_string3)
+	TAG_REFL_PROPERTY(max_display_time)
+	TAG_REFL_PROPERTY(display_count)
+	TAG_REFL_PROPERTY(dissapear_delay)
+	TAG_REFL_PROPERTY(redisplay_delay)
+	TAG_REFL_PROPERTY(display_delay_s)
+REFL_END
+
+TAG_REFL(s_hud_globals_group_definition)
+	TAG_REFL_BASE_STRUCT(messaging_parameters)
+	TAG_REFL_TAG_BLOCK(button_icons)
+	TAG_REFL_BASE_STRUCT(hud_help_text_color)
+	TAG_REFL_TAG_REFERENCE(hud_messages)
+	TAG_REFL_BASE_STRUCT(objective_colors)
+	TAG_REFL_BASE_STRUCT(way_point_parameters)
+	TAG_REFL_PROPERTY(hud_scale_in_multiplayer)
+	TAG_REFL_BASE_STRUCT(motion_snsor_hud_globals)
+	TAG_REFL_BASE_STRUCT(hud_damage_inidicators)
+	TAG_REFL_BASE_STRUCT(not_much_time_left)
+	TAG_REFL_BASE_STRUCT(time_out_flash_color)
+	TAG_REFL_PROPERTY(loading_begin_text)
+	TAG_REFL_PROPERTY(loading_end_text)
+	TAG_REFL_PROPERTY(checkpoint_begin_text)
+	TAG_REFL_PROPERTY(checkpoint_end_text)
+	TAG_REFL_TAG_REFERENCE(checkpoint_sound)
+	TAG_REFL_TAG_REFERENCE(hud_text)
+	TAG_REFL_TAG_BLOCK(dashlights)
+	TAG_REFL_TAG_BLOCK(waypoint_arrows)
+	TAG_REFL_TAG_BLOCK(waypoints)
+	TAG_REFL_TAG_BLOCK(hud_sounds)
+	TAG_REFL_TAG_BLOCK(player_training_data)
+	TAG_REFL_TAG_REFERENCE(primary_message_sound)
+	TAG_REFL_TAG_REFERENCE(secondary_message_sound)
+	TAG_REFL_STRING_ID(boot_griefer_string)
+	TAG_REFL_STRING_ID(cannot_boot_griefer_string)
+	TAG_REFL_TAG_REFERENCE(training_shader)
+	TAG_REFL_TAG_REFERENCE(human_training_top_right)
+	TAG_REFL_TAG_REFERENCE(human_training_top_center)
+	TAG_REFL_TAG_REFERENCE(human_training_top_left)
+	TAG_REFL_TAG_REFERENCE(human_training_middle)
+	TAG_REFL_TAG_REFERENCE(elite_training_top_right)
+	TAG_REFL_TAG_REFERENCE(elite_training_top_center)
+	TAG_REFL_TAG_REFERENCE(elite_training_top_left)
+	TAG_REFL_TAG_REFERENCE(elite_training_middle)
+REFL_END

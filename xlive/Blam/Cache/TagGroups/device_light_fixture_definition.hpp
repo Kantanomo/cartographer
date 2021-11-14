@@ -15,3 +15,6 @@ struct s_device_light_fixture_group_definition :TagGroup<'lifi'>
 TAG_GROUP_SIZE_ASSERT(s_device_light_fixture_group_definition, 0x11C);
 #pragma pack(pop)
 
+TAG_REFL(s_device_light_fixture_group_definition)
+	TAG_REFL_BASE_STRUCT(deviceTag)
+REFL_END
