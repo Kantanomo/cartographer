@@ -2,6 +2,7 @@
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Math\BlamMath.h"
+#include "refl-cpp/refl-exentended.hpp"
 
 /*********************************************************************
 * name: model
@@ -80,7 +81,7 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 				};
 				e_flags flags;//0x5
 				PAD(0x2);//0x6
-				float probability_0;//0x8
+				float probability;//0x8
 				struct s_states_block
 				{
 					string_id permutation_name;//0x0
@@ -321,8 +322,8 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 		float maximum_shield_vitality;//0x8C
 		string_id global_shield_material_name;//0x90
 		float minimum_stun_damage_1;//0x94
-		float stun_time_seconds_1;//0x98
-		float recharge_time_seconds_1;//0x9C
+		float stun_time;//0x98
+		float recharge_time;//0x9C
 		float shield_damaged_threshold;//0xA0
 		tag_reference shield_damaged_effect;//0xA4
 		tag_reference shield_depleted_effect;//0xAC
@@ -343,7 +344,7 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 				ignores_shields = FLAG(8),
 			};
 			e_flags flags;//0x4
-			float vitality_percentage_01;//0x8
+			float vitality_percentage;//0x8
 			struct s_instant_responses_block
 			{
 				enum class e_response_type : __int16
@@ -480,7 +481,7 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_targets_block, 0x1C);
 	tag_block<s_targets_block> targets;//0x68
-	struct s_NUM__block
+	struct s_model_variations_block
 	{
 		string_id name;//0x0
 		__int8 collision_region_index;//0x4
@@ -500,28 +501,23 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 		TAG_BLOCK_SIZE_ASSERT(s_permutations_block, 0x8);
 		tag_block<s_permutations_block> permutations;//0x8
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_NUM__block, 0x10);
-	tag_block<s_NUM__block> NUM_;//0x70
-	struct s_NUM__block_1
+	TAG_BLOCK_SIZE_ASSERT(s_model_variations_block, 0x10);
+	tag_block<s_model_variations_block> model_variations;//0x70
+	struct s_nodes_block
 	{
 		string_id name;//0x0
 		__int16 parent_node;//0x4
 		__int16 first_child_node;//0x6
 		__int16 next_sibling_node;//0x8
 		PAD(0x2);//0xA
-		float default_translation_x;//0xC
-		float default_translation_y;//0x10
-		float default_translation_z;//0x14
-		PAD(0xC);//0x18
-		float default_rotation_w;//0x24
+		real_vector3d default_translation;
+		real_quaternion default_rotation;
 		float default_inverse_scale;//0x28
 		PAD(0x24);//0x2C
-		float default_inverse_position_x;//0x50
-		float default_inverse_position_y;//0x54
-		float default_inverse_position_z;//0x58
+		real_vector3d default_inverse_position;
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_NUM__block_1, 0x5C);
-	tag_block<s_NUM__block_1> NUM_1;//0x78
+	TAG_BLOCK_SIZE_ASSERT(s_nodes_block, 0x5C);
+	tag_block<s_nodes_block> nodes;//0x78
 	PAD(0x4);//0x80
 	struct s_model_object_data_block
 	{
@@ -533,15 +529,13 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 		};
 		e_type type;//0x0
 		PAD(0x2);//0x2
-		float offset_x;//0x4
-		float offset_y;//0x8
-		float offset_z;//0xC
+		real_vector3d offset;
 		float radius;//0x10
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_model_object_data_block, 0x14);
 	tag_block<s_model_object_data_block> model_object_data;//0x84
 	tag_reference default_dialogue;//0x8C
-	tag_reference unused;//0x94
+	tag_reference active_camo_shader;//0x94
 	enum class e_flags : __int32
 	{
 		active_camo_always_on = FLAG(0),
@@ -631,3 +625,232 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 	string_id hologram_control_function;//0xF8
 };
 TAG_GROUP_SIZE_ASSERT(s_model_group_definition, 0xFC);
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_variants_block::s_regions_block::s_permutations_block::s_states_block)
+	TAG_REFL_STRING_ID(permutation_name)
+	TAG_REFL_PROPERTY(property_flags)
+	TAG_REFL_PROPERTY(state)
+	TAG_REFL_TAG_REFERENCE(looping_effect)
+	TAG_REFL_STRING_ID(looping_effect_marker_name)
+	TAG_REFL_PROPERTY(initial_probability)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_variants_block::s_regions_block::s_permutations_block)
+	TAG_REFL_STRING_ID(permutation_name)
+	TAG_REFL_PROPERTY(model_permutation_index)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(probability)
+	TAG_REFL_TAG_BLOCK(states)
+	TAG_REFL_PROPERTY(runtime_permutation_index_0)
+	TAG_REFL_PROPERTY(runtime_permutation_index_1)
+	TAG_REFL_PROPERTY(runtime_permutation_index_2)
+	TAG_REFL_PROPERTY(runtime_permutation_index_3)
+	TAG_REFL_PROPERTY(runtime_permutation_index_4)
+	TAG_REFL_PROPERTY(unk_1)
+	TAG_REFL_PROPERTY(unk2)
+	TAG_REFL_PROPERTY(unk3)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_variants_block::s_regions_block)
+	TAG_REFL_STRING_ID(region_name)
+	TAG_REFL_PROPERTY(runtime_model_region_index)
+	TAG_REFL_PROPERTY(region_runtime_flags)
+	TAG_REFL_PROPERTY(parent_variant)
+	TAG_REFL_TAG_BLOCK(permutations)
+	TAG_REFL_PROPERTY(sort_order)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_variants_block::s_objects_block)
+	TAG_REFL_STRING_ID(parent_marker)
+	TAG_REFL_STRING_ID(child_marker)
+	TAG_REFL_TAG_REFERENCE(child_object)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_variants_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(runtime_model_region_0)
+	TAG_REFL_PROPERTY(runtime_model_region_1)
+	TAG_REFL_PROPERTY(runtime_model_region_2)
+	TAG_REFL_PROPERTY(runtime_model_region_3)
+	TAG_REFL_PROPERTY(runtime_model_region_4)
+	TAG_REFL_PROPERTY(runtime_model_region_5)
+	TAG_REFL_PROPERTY(runtime_model_region_6)
+	TAG_REFL_PROPERTY(runtime_model_region_7)
+	TAG_REFL_PROPERTY(runtime_model_region_8)
+	TAG_REFL_PROPERTY(runtime_model_region_9)
+	TAG_REFL_PROPERTY(runtime_model_region_10)
+	TAG_REFL_PROPERTY(runtime_model_region_11)
+	TAG_REFL_PROPERTY(runtime_model_region_12)
+	TAG_REFL_PROPERTY(runtime_model_region_13)
+	TAG_REFL_PROPERTY(runtime_model_region_14)
+	TAG_REFL_PROPERTY(runtime_model_region_15)
+	TAG_REFL_TAG_BLOCK(regions)
+	TAG_REFL_TAG_BLOCK(objects)
+	TAG_REFL_STRING_ID(dialogue_sound_effect)
+	TAG_REFL_TAG_REFERENCE(dialogue)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_materials_block)
+	TAG_REFL_STRING_ID(material_name)
+	TAG_REFL_PROPERTY(material_type)
+	TAG_REFL_PROPERTY(damage_section)
+	TAG_REFL_STRING_ID(material_name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_new_damage_info_block::s_damage_sections_block::s_instant_responses_block)
+	TAG_REFL_PROPERTY(response_type)
+	TAG_REFL_PROPERTY(constraint_damage_type)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(damage_threshold)
+	TAG_REFL_TAG_REFERENCE(transition_effect)
+	TAG_REFL_TAG_REFERENCE(transition_damage_effect)
+	TAG_REFL_STRING_ID(region)
+	TAG_REFL_PROPERTY(new_state)
+	TAG_REFL_PROPERTY(runtime_region_index)
+	TAG_REFL_STRING_ID(effect_marker_name)
+	TAG_REFL_STRING_ID(damage_effect_marker_name)
+	TAG_REFL_PROPERTY(response_delay)
+	TAG_REFL_TAG_REFERENCE(delay_effect)
+	TAG_REFL_STRING_ID(delay_effect_marker_name)
+	TAG_REFL_STRING_ID(constraintgroup_name)
+	TAG_REFL_STRING_ID(ejecting_seat_label)
+	TAG_REFL_PROPERTY(skip_fraction)
+	TAG_REFL_STRING_ID(destroyed_child_object_marker_name)
+	TAG_REFL_PROPERTY(total_damage_threshold)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_new_damage_info_block::s_damage_sections_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(vitality_percentage)
+	TAG_REFL_TAG_BLOCK(instant_responses)
+	TAG_REFL_PROPERTY(stun_time_seconds)
+	TAG_REFL_PROPERTY(recharge_time_seconds)
+	TAG_REFL_STRING_ID(resurrection_restored_region_name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_new_damage_info_block::s_nodes_block)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_new_damage_info_block::s_damage_seats_block)
+	TAG_REFL_STRING_ID(seat_label)
+	TAG_REFL_PROPERTY(direct_damage_scale)
+	TAG_REFL_PROPERTY(damage_transfer_falloff_radius)
+	TAG_REFL_PROPERTY(maximum_transfer_damage_scale)
+	TAG_REFL_PROPERTY(minimum_transfer_damage_scale)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_new_damage_info_block::s_damage_constraints_block)
+	TAG_REFL_STRING_ID(physics_model_constraint_name)
+	TAG_REFL_STRING_ID(damage_constraint_name)
+	TAG_REFL_STRING_ID(damage_constraint_group_name)
+	TAG_REFL_PROPERTY(group_probability_scale)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_new_damage_info_block)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_STRING_ID(global_indirect_material_name)
+	TAG_REFL_PROPERTY(indirect_damage_section)
+	TAG_REFL_PROPERTY(collision_damage_reporting_type)
+	TAG_REFL_PROPERTY(response_damage_reporting_type)
+	TAG_REFL_PROPERTY(maximum_vitality)
+	TAG_REFL_PROPERTY(minimum_stun_damage)
+	TAG_REFL_PROPERTY(stun_time_seconds)
+	TAG_REFL_PROPERTY(recharge_time_seconds)
+	TAG_REFL_PROPERTY(recharge_fraction)
+	TAG_REFL_TAG_REFERENCE(shield_damaged_first_person_shader)
+	TAG_REFL_TAG_REFERENCE(shield_damaged_shader)
+	TAG_REFL_PROPERTY(maximum_shield_vitality)
+	TAG_REFL_STRING_ID(global_shield_material_name)
+	TAG_REFL_PROPERTY(minimum_stun_damage_1)
+	TAG_REFL_PROPERTY(stun_time)
+	TAG_REFL_PROPERTY(recharge_time)
+	TAG_REFL_PROPERTY(shield_damaged_threshold)
+	TAG_REFL_TAG_REFERENCE(shield_damaged_effect)
+	TAG_REFL_TAG_REFERENCE(shield_depleted_effect)
+	TAG_REFL_TAG_REFERENCE(shield_recharging_effect)
+	TAG_REFL_TAG_BLOCK(damage_sections)
+	TAG_REFL_TAG_BLOCK(nodes)
+	TAG_REFL_TAG_BLOCK(damage_seats)
+	TAG_REFL_TAG_BLOCK(damage_constraints)
+	TAG_REFL_TAG_REFERENCE(overshield_first_person_shader)
+	TAG_REFL_TAG_REFERENCE(overshield_shader)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_targets_block)
+	TAG_REFL_STRING_ID(marker_name)
+	TAG_REFL_PROPERTY(size)
+	TAG_REFL_ANGLE(cone_angle)
+	TAG_REFL_PROPERTY(damage_section)
+	TAG_REFL_PROPERTY(variant)
+	TAG_REFL_PROPERTY(targeting_relevance)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(lock_on_distance)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_model_variations_block::s_permutations_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(collision_permutation_index)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_model_variations_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(collision_region_index)
+	TAG_REFL_PROPERTY(physics_region_index)
+	TAG_REFL_TAG_BLOCK(permutations)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_nodes_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(parent_node)
+	TAG_REFL_PROPERTY(first_child_node)
+	TAG_REFL_PROPERTY(next_sibling_node)
+	TAG_REFL_REAL_VECTOR3D(default_translation)
+	TAG_REFL_REAL_QUATERNION(default_rotation)
+	TAG_REFL_PROPERTY(default_inverse_scale)
+	TAG_REFL_REAL_VECTOR3D(default_inverse_position)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_model_object_data_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_REAL_VECTOR3D(offset)
+	TAG_REFL_PROPERTY(radius)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_model_group_definition::s_scenario_load_parameters_block)
+	TAG_REFL_TAG_REFERENCE(scenario)
+	TAG_REFL_DATA_BLOCK(parameters)
+REFL_END
+
+TAG_REFL(s_model_group_definition)
+	TAG_REFL_TAG_REFERENCE(render_model)
+	TAG_REFL_TAG_REFERENCE(collision_model)
+	TAG_REFL_TAG_REFERENCE(animation)
+	TAG_REFL_TAG_REFERENCE(physics)
+	TAG_REFL_TAG_REFERENCE(physics_model)
+	TAG_REFL_PROPERTY(disappear_distance_world_units)
+	TAG_REFL_PROPERTY(begin_fade_distance_world_units)
+	TAG_REFL_PROPERTY(reduce_to_l1_world_units_super_low)
+	TAG_REFL_PROPERTY(reduce_to_l2_world_units_low)
+	TAG_REFL_PROPERTY(reduce_to_l3_world_units_medium)
+	TAG_REFL_PROPERTY(reduce_to_l4_world_units_high)
+	TAG_REFL_PROPERTY(reduce_to_l5_world_units_super_high)
+	TAG_REFL_PROPERTY(shadow_fade_distance)
+	TAG_REFL_TAG_BLOCK(variants)
+	TAG_REFL_TAG_BLOCK(materials)
+	TAG_REFL_TAG_BLOCK(new_damage_info)
+	TAG_REFL_TAG_BLOCK(targets)
+	TAG_REFL_TAG_BLOCK(model_variations)
+	TAG_REFL_TAG_BLOCK(nodes)
+	TAG_REFL_TAG_BLOCK(model_object_data)
+	TAG_REFL_TAG_REFERENCE(default_dialogue)
+	TAG_REFL_TAG_REFERENCE(active_camo_shader)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_STRING_ID(default_dialogue_effect)
+	TAG_REFL_PROPERTY(runtime_flags)
+	TAG_REFL_TAG_BLOCK(scenario_load_parameters)
+	TAG_REFL_TAG_REFERENCE(hologram_shader)
+	TAG_REFL_STRING_ID(hologram_control_function)
+REFL_END
+

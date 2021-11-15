@@ -1,7 +1,7 @@
 #pragma once
 #include "refl-cpp.hpp"
-#include "refl-exentended.hpp"
-#include "refl-exentended.hpp"
+#include "Blam/Math/real_math.h"
+#include "Blam/Math/integer_math.h"
 #include "magicenum/magic_enum.hpp"
 
 
@@ -25,26 +25,27 @@ namespace tag_refl
 	struct refl_ustring_128 : refl::attr::usage::member{};
 	struct refl_real_byte_color_argb : refl::attr::usage::member{};
 	struct refl_rect2d : refl::attr::usage::member{};
+	struct refl_real_quaternion : refl::attr::usage::member{};
 
 	struct property : refl::attr::usage::field{};
 	struct refl_string_id : refl::attr::usage::field {};
 }
 #define TAG_REFL_BASE_STRUCT(property_name) REFL_FIELD(property_name, tag_refl::refl_tag_base())
 #define TAG_REFL_PROPERTY(property_name) REFL_FIELD(property_name, tag_refl::property())
-
-
+#define TAG_REFL_BLAM_TAG(property_name) REFL_FIELD(property_name, tag_refl::refl_blam_tag())
+#define TAG_REFL_DATA_BLOCK(property_name) REFL_FIELD(property_name, tag_refl::refl_data_block())
+#define TAG_REFL_TAG_REFERENCE(property_name) REFL_FIELD(property_name, tag_refl::refl_tag_ref())
+#define TAG_REFL_TAG_BLOCK(property_name) REFL_FIELD(property_name, tag_refl::refl_tag_block())
 #define TAG_REFL_REAL_COLOR_RGB(property_name) REFL_FIELD(property_name, tag_refl::refl_real_color_rgb())
 #define TAG_REFL_REAL_COLOR_ARGB(property_name) REFL_FIELD(property_name, tag_refl::refl_real_color_argb())
 #define TAG_REFL_REAL_BYTE_COLOR_ARGB(property_name) REFL_FIELD(property_name, tag_refl::refl_real_byte_color_argb())
-
 #define TAG_REFL_REAL_POINT2D(property_name) REFL_FIELD(property_name, tag_refl::refl_real_point2d())
 #define TAG_REFL_REAL_BOUNDS(property_name) REFL_FIELD(property_name, tag_refl::refl_real_bounds())
 #define TAG_REFL_REAL_POINT3D(property_name) REFL_FIELD(property_name, tag_refl::refl_real_point3d())
 #define TAG_REFL_REAL_VECTOR3D(property_name) REFL_FIELD(property_name, tag_refl::refl_real_vector3d())
 #define TAG_REFL_ANGLE(property_name) REFL_FIELD(property_name, tag_refl::refl_angle())
 #define TAG_REFL_RECT2D(property_name) REFL_FIELD(property_name, tag_refl::refl_rect2d())
-
-
+#define TAG_REFL_REAL_QUATERNION(property_name) REFL_FIELD(property_name, tag_refl::refl_real_quaternion())
 #define TAG_REFL_STRING_ID(property_name) REFL_FIELD(property_name, tag_refl::refl_string_id())
 #define TAG_REFL_STRING_32(property_name) REFL_FIELD(property_name, tag_refl::refl_string_32())
 #define TAG_REFL_STRING_256(property_name) REFL_FIELD(property_name, tag_refl::refl_string_256())
@@ -52,10 +53,7 @@ namespace tag_refl
 #define TAG_REFL_USTRING_128(property_name) REFL_FIELD(property_name, tag_refl::refl_ustring_128())
 
 
-#define TAG_REFL_BLAM_TAG(property_name) REFL_FIELD(property_name, tag_refl::refl_blam_tag())
-#define TAG_REFL_DATA_BLOCK(property_name) REFL_FIELD(property_name, tag_refl::refl_data_block())
-#define TAG_REFL_TAG_REFERENCE(property_name) REFL_FIELD(property_name, tag_refl::refl_tag_ref())
-#define TAG_REFL_TAG_BLOCK(property_name) REFL_FIELD(property_name, tag_refl::refl_tag_block())
+
 
 #define TAG_REFL(struct_name) REFL_TYPE(struct_name, refl_impl::metadata::debug(debug_generic_discard<struct_name>), bases<>)
 #define TAG_REFL_TAG_BLOCK_DEF(struct_name) \
@@ -74,12 +72,12 @@ namespace tag_refl
 template<typename T>
 void debug_generic_discard(std::ostream& os, const T& pt) {}
 
-REFL_TYPE(tag_reference, refl_impl::metadata::debug(debug_generic_discard<tag_reference>), bases<>)
+TAG_REFL(tag_reference)
 	TAG_REFL_BLAM_TAG(TagGroup)
 	REFL_FIELD(TagIndex, tag_refl::property())
 REFL_END
 
-REFL_TYPE(real_bounds, refl_impl::metadata::debug(debug_generic_discard<real_bounds>), bases<>)
+TAG_REFL(real_bounds)
 	REFL_FIELD(lower, tag_refl::property())
 	REFL_FIELD(upper, tag_refl::property())
 REFL_END
@@ -149,4 +147,11 @@ TAG_REFL(rect2d)
 	REFL_FIELD(left, tag_refl::property())
 	REFL_FIELD(bottom, tag_refl::property())
 	REFL_FIELD(right, tag_refl::property())
+REFL_END
+
+TAG_REFL(real_quaternion)
+	REFL_FIELD(i, tag_refl::property())
+	REFL_FIELD(j, tag_refl::property())
+	REFL_FIELD(k, tag_refl::property())
+	REFL_FIELD(w, tag_refl::property())
 REFL_END

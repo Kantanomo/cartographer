@@ -6,6 +6,7 @@
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Common\Common.h"
 #include "Blam\Math\real_math.h"
+#include "refl-cpp/refl-exentended.hpp"
 
 /*********************************************************************
 * name: light
@@ -52,8 +53,7 @@ struct s_light_group_definition :TagGroup<'ligh'>
 	};
 	e_type type;//0x4
 	PAD(0x2);//0x6
-	float size_modifer;//0x8
-	float size_modifer_2;//0xC
+	real_bounds size_modifier;
 	float shadow_quality_bias;//0x10
 	enum class e_shadow_tap_bias : __int16
 	{
@@ -76,14 +76,12 @@ struct s_light_group_definition :TagGroup<'ligh'>
 		more_colors = FLAG(1),
 	};
 	e_interpolation_flags interpolation_flags;//0x34
-	float bloom_bounds02_lower;//0x38
-	float bloom_bound02_upper;//0x3C
+	real_bounds bloom_bounds;
 	real_color_rgb specular_lower_bound;//0x40
 	real_color_rgb specular_upper_bound;//0x4C
 	real_color_rgb diffuse_lower_bound;//0x58
 	real_color_rgb diffuse_upper_bound;//0x64
-	float brightness_bounds02_lower;//0x70
-	float brightness_bounds_02_upper;//0x74
+	real_bounds brightness_bounds;
 	tag_reference gel_map;//0x78
 	enum class e_specular_mask : __int16
 	{
@@ -214,11 +212,80 @@ struct s_light_group_definition :TagGroup<'ligh'>
 			__int8 value;//0x0
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_data_block, 0x1);
-		tag_block<s_data_block> data;//0x0
-		tag_block<s_data_block> data_2;//0x8
+		tag_block<s_data_block> dx_function;//0x0
+		tag_block<s_data_block> dy_function;//0x8
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_gel_animation_block, 0x10);
 	tag_block<s_gel_animation_block> gel_animation;//0xD4
 	tag_reference shader;//0xDC
 };
 TAG_GROUP_SIZE_ASSERT(s_light_group_definition, 0xE4);
+
+TAG_REFL_TAG_BLOCK_DEF(s_light_group_definition::s_brightness_animation_block::s_data_block)
+	TAG_REFL_PROPERTY(value)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_light_group_definition::s_brightness_animation_block)
+	TAG_REFL_DATA_BLOCK(data)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_light_group_definition::s_color_animation_block::s_data_block)
+	TAG_REFL_PROPERTY(value)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_light_group_definition::s_color_animation_block)
+	TAG_REFL_DATA_BLOCK(data)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_light_group_definition::s_gel_animation_block::s_data_block)
+	TAG_REFL_PROPERTY(value)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_light_group_definition::s_gel_animation_block)
+	TAG_REFL_DATA_BLOCK(dx_function)
+	TAG_REFL_DATA_BLOCK(dy_function)
+REFL_END
+
+TAG_REFL(s_light_group_definition)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(size_modifier)
+	TAG_REFL_PROPERTY(shadow_quality_bias)
+	TAG_REFL_PROPERTY(shadow_tap_bias)
+	TAG_REFL_PROPERTY(radius)
+	TAG_REFL_PROPERTY(specular_radius)
+	TAG_REFL_PROPERTY(near_width)
+	TAG_REFL_PROPERTY(height_stretch)
+	TAG_REFL_ANGLE(field_of_view)
+	TAG_REFL_PROPERTY(falloff_distance)
+	TAG_REFL_PROPERTY(cutoff_distance)
+	TAG_REFL_PROPERTY(interpolation_flags)
+	TAG_REFL_PROPERTY(bloom_bounds)
+	TAG_REFL_REAL_COLOR_RGB(specular_lower_bound)
+	TAG_REFL_REAL_COLOR_RGB(specular_upper_bound)
+	TAG_REFL_REAL_COLOR_RGB(diffuse_lower_bound)
+	TAG_REFL_REAL_COLOR_RGB(diffuse_upper_bound)
+	TAG_REFL_PROPERTY(brightness_bounds)
+	TAG_REFL_TAG_REFERENCE(gel_map)
+	TAG_REFL_PROPERTY(specular_mask)
+	TAG_REFL_PROPERTY(falloff_function)
+	TAG_REFL_PROPERTY(diffuse_contrast)
+	TAG_REFL_PROPERTY(specular_contrast)
+	TAG_REFL_PROPERTY(falloff_geometry)
+	TAG_REFL_TAG_REFERENCE(lens_flare)
+	TAG_REFL_PROPERTY(bounding_radius)
+	TAG_REFL_TAG_REFERENCE(light_volume)
+	TAG_REFL_PROPERTY(default_lightmap_setting)
+	TAG_REFL_PROPERTY(lightmap_half_life)
+	TAG_REFL_PROPERTY(lightmap_light_scale)
+	TAG_REFL_PROPERTY(duration)
+	TAG_REFL_PROPERTY(falloff_function)
+	TAG_REFL_PROPERTY(illumination_fade)
+	TAG_REFL_PROPERTY(shadow_fade)
+	TAG_REFL_PROPERTY(specular_fade)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_TAG_BLOCK(brightness_animation)
+	TAG_REFL_TAG_BLOCK(color_animation)
+	TAG_REFL_TAG_BLOCK(gel_animation)
+	TAG_REFL_TAG_REFERENCE(shader)
+REFL_END
