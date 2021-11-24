@@ -26,6 +26,9 @@ namespace tag_refl
 	struct refl_real_byte_color_argb : refl::attr::usage::member{};
 	struct refl_rect2d : refl::attr::usage::member{};
 	struct refl_real_quaternion : refl::attr::usage::member{};
+	struct refl_real_angle_bounds : refl::attr::usage::member{};
+	struct refl_real_euler_angles3d : refl::attr::usage::member{};
+	struct refl_real_euler_angles2d : refl::attr::usage::member {};
 
 	struct property : refl::attr::usage::field{};
 	struct refl_string_id : refl::attr::usage::field {};
@@ -51,6 +54,9 @@ namespace tag_refl
 #define TAG_REFL_STRING_256(property_name) REFL_FIELD(property_name, tag_refl::refl_string_256())
 #define TAG_REFL_USTRING_32(property_name) REFL_FIELD(property_name, tag_refl::refl_ustring_32())
 #define TAG_REFL_USTRING_128(property_name) REFL_FIELD(property_name, tag_refl::refl_ustring_128())
+#define TAG_REFL_REAL_ANGLE_BOUNDS(property_name) REFL_FIELD(property_name, tag_refl::refl_real_angle_bounds())
+#define TAG_REFL_REAL_EULER_ANGLES3D(property_name) REFL_FIELD(property_name, tag_refl::refl_real_euler_angles3d())
+#define TAG_REFL_REAL_EULER_ANGLES2D(property_name) REFL_FIELD(property_name, tag_refl::refl_real_euler_angles2d())
 
 
 
@@ -67,6 +73,16 @@ namespace tag_refl
 		REFL_FUNC(operator[], refl::attr::property{}) \
 	REFL_END \
 	TAG_REFL(struct_name)
+
+#define TAG_REFL_TAG_BLOCK_FLAT(struct_name) \
+	REFL_TYPE(tag_block<struct_name>) \
+		REFL_FUNC(data_size, refl::attr::property{}) \
+		REFL_FUNC(type_size, refl::attr::property{}) \
+		REFL_FUNC(begin, refl::attr::property{}) \
+		REFL_FUNC(end, refl::attr::property{}) \
+		REFL_FUNC(operator[], refl::attr::property{}) \
+	REFL_END
+	
 
 
 template<typename T>
@@ -120,19 +136,19 @@ TAG_REFL(real_point2d)
 REFL_END
 
 TAG_REFL(tag_string32)
-	REFL_FIELD(Text, tag_refl::property())
+	//REFL_FIELD(Text, tag_refl::property())
 REFL_END
 
 TAG_REFL(tag_string256)
-	REFL_FIELD(Text, tag_refl::property())
+	//REFL_FIELD(Text, tag_refl::property())
 REFL_END
 
 TAG_REFL(tag_unicode32)
-	REFL_FIELD(Text, tag_refl::property())
+//	REFL_FIELD(Text, tag_refl::property())
 REFL_END
 
 TAG_REFL(tag_unicode128)
-	REFL_FIELD(Text, tag_refl::property())
+	//REFL_FIELD(Text, tag_refl::property())
 REFL_END
 
 TAG_REFL(byte_color_argb)
@@ -154,4 +170,20 @@ TAG_REFL(real_quaternion)
 	REFL_FIELD(j, tag_refl::property())
 	REFL_FIELD(k, tag_refl::property())
 	REFL_FIELD(w, tag_refl::property())
+REFL_END
+
+TAG_REFL(angle_bounds)
+	REFL_FIELD(lower, tag_refl::refl_angle())
+	REFL_FIELD(upper, tag_refl::refl_angle())
+REFL_END
+
+TAG_REFL(real_euler_angles3d)
+	REFL_FIELD(yaw, tag_refl::refl_angle())
+	REFL_FIELD(pitch, tag_refl::refl_angle())
+	REFL_FIELD(roll, tag_refl::refl_angle())
+REFL_END
+
+TAG_REFL(real_euler_angles2d)
+	REFL_FIELD(yaw, tag_refl::refl_angle())
+	REFL_FIELD(pitch, tag_refl::refl_angle())
 REFL_END

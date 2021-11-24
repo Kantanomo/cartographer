@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
+#include "refl-cpp/refl-exentended.hpp"
 
 /*********************************************************************
 * name: new_hud_definition
@@ -272,48 +273,28 @@ struct s_new_hud_definition_group_definition :TagGroup<'nhdt'>
 			string_id input_name_1;//0x4
 			string_id range_name_1;//0x8
 			float time_period_in_seconds_1;//0xC
-			struct s_data_block_1
+			struct s_function_block
 			{
 				__int8 value;//0x0
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_1, 0x1);
-			tag_block<s_data_block_1> data_1;//0x10
+			TAG_BLOCK_SIZE_ASSERT(s_function_block, 0x1);
+			tag_block<s_function_block> data_1;//0x10
 			string_id input_name_2;//0x18
 			string_id range_name_2;//0x1C
 			float time_period_in_seconds_2;//0x20
-			struct s_data_block_2
-			{
-				__int8 value;//0x0
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_2, 0x1);
-			tag_block<s_data_block_2> data_2;//0x24
+			tag_block<s_function_block> data_2;//0x24
 			string_id input_name_3;//0x2C
 			string_id range_name_3;//0x30
 			float time_period_in_seconds_3;//0x34
-			struct s_data_block_3
-			{
-				__int8 value;//0x0
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_3, 0x1);
-			tag_block<s_data_block_3> data_3;//0x38
+			tag_block<s_function_block> data_3;//0x38
 			string_id input_name_4;//0x40
 			string_id range_name_4;//0x44
 			float time_period_in_seconds_4;//0x48
-			struct s_data_block_4
-			{
-				__int8 value;//0x0
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_4, 0x1);
-			tag_block<s_data_block_4> data_4;//0x4C
+			tag_block<s_function_block> data_4;//0x4C
 			string_id input_name_5;//0x54
 			string_id range_name_5;//0x58
 			float time_period_in_seconds_5;//0x5C
-			struct s_data_block_5
-			{
-				__int8 value;//0x0
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_5, 0x1);
-			tag_block<s_data_block_5> data;//0x60
+			tag_block<s_function_block> data;//0x60
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_effect_block, 0x68);
 		tag_block<s_effect_block> effect;//0x58
@@ -529,48 +510,28 @@ struct s_new_hud_definition_group_definition :TagGroup<'nhdt'>
 			string_id input_name_1;//0x4
 			string_id range_name_1;//0x8
 			float time_period_in_seconds_1;//0xC
-			struct s_data_block_1
+			struct s_function_block
 			{
 				__int8 value;//0x0
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_1, 0x1);
-			tag_block<s_data_block_1> data_1;//0x10
+			TAG_BLOCK_SIZE_ASSERT(s_function_block, 0x1);
+			tag_block<s_function_block> data_1;//0x10
 			string_id input_name_2;//0x18
 			string_id range_name_2;//0x1C
 			float time_period_in_seconds_2;//0x20
-			struct s_data_block_2
-			{
-				__int8 value;//0x0
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_2, 0x1);
-			tag_block<s_data_block_2> data_2;//0x24
+			tag_block<s_function_block> data_2;//0x24
 			string_id input_name_3;//0x2C
 			string_id range_name_3;//0x30
 			float time_period_in_seconds_3;//0x34
-			struct s_data_block_3
-			{
-				__int8 value;//0x0
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_3, 0x1);
-			tag_block<s_data_block_3> data_3;//0x38
+			tag_block<s_function_block> data_3;//0x38
 			string_id input_name_4;//0x40
 			string_id range_name_4;//0x44
 			float time_period_in_seconds_4;//0x48
-			struct s_data_block_4
-			{
-				__int8 value;//0x0
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_4, 0x1);
-			tag_block<s_data_block_4> data_4;//0x4C
+			tag_block<s_function_block> data_4;//0x4C
 			string_id input_name_5;//0x54
 			string_id range_name_5;//0x58
 			float time_period_in_seconds_5;//0x5C
-			struct s_data_block_5
-			{
-				__int8 value;//0x0
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_data_block_5, 0x1);
-			tag_block<s_data_block_5> data;//0x60
+			tag_block<s_function_block> data;//0x60
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_effect_block, 0x68);
 		tag_block<s_effect_block> effect;//0x4C
@@ -741,3 +702,39 @@ struct s_new_hud_definition_group_definition :TagGroup<'nhdt'>
 	tag_block<s_screen_effect_widgets_block> screen_effect_widgets;//0x20
 };
 TAG_GROUP_SIZE_ASSERT(s_new_hud_definition_group_definition, 0x28);
+
+TAG_REFL_TAG_BLOCK_FLAT(s_new_hud_definition_group_definition::s_bitmap_widgets_block::s_effect_block::s_function_block)
+
+TAG_REFL_TAG_BLOCK_DEF(s_new_hud_definition_group_definition::s_bitmap_widgets_block::s_effect_block)
+	TAG_REFL_DATA_BLOCK(data_1)
+	TAG_REFL_DATA_BLOCK(data_2)
+	TAG_REFL_DATA_BLOCK(data_3)
+	TAG_REFL_DATA_BLOCK(data_4)
+	TAG_REFL_DATA_BLOCK(data)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_new_hud_definition_group_definition::s_bitmap_widgets_block)
+	TAG_REFL_TAG_BLOCK(effect)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_FLAT(s_new_hud_definition_group_definition::s_text_widgets_block::s_effect_block::s_function_block)
+
+TAG_REFL_TAG_BLOCK_DEF(s_new_hud_definition_group_definition::s_text_widgets_block::s_effect_block)
+	TAG_REFL_TAG_BLOCK(data_1)
+	TAG_REFL_TAG_BLOCK(data_2)
+	TAG_REFL_TAG_BLOCK(data_3)
+	TAG_REFL_TAG_BLOCK(data_4)
+	TAG_REFL_TAG_BLOCK(data)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_new_hud_definition_group_definition::s_text_widgets_block)
+	TAG_REFL_TAG_BLOCK(effect)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_FLAT(s_new_hud_definition_group_definition::s_screen_effect_widgets_block)
+
+TAG_REFL(s_new_hud_definition_group_definition)
+	TAG_REFL_TAG_BLOCK(bitmap_widgets)
+	TAG_REFL_TAG_BLOCK(text_widgets)
+	TAG_REFL_TAG_BLOCK(screen_effect_widgets)
+REFL_END

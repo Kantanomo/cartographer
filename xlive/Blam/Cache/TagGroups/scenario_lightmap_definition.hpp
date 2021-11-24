@@ -2,7 +2,6 @@
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Math\real_math.h"
-
 /*********************************************************************
 * name: scenario_structure_lightmap
 * group_tag : ltmp

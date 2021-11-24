@@ -131,7 +131,7 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 	real_bounds water_damage_range;//0x174	
 	float initial_velocity;//0x17C
 	float final_velocity;//0x180
-	angle_bounds guided_angular_velocity_lower;//0x184
+	angle_bounds guided_angular_velocity;//0x184
 	real_bounds acceleration_range;//0x18C
 
 	PAD(0x4);//0x194
@@ -156,7 +156,8 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 		e_material_response response;//0x2
 		tag_reference do_not_use_old_effect;//0x4
 		string_id material_name;//0xC
-		PAD(0x4);//0x10
+		__int16 global_material_index;
+		PAD(0x2);
 	
 		e_material_response potential_result_response;//0x14
 		enum class e_potential_result_flags : __int16
@@ -166,7 +167,7 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 		};
 		e_potential_result_flags potential_result_flags;//0x16
 		float chance_fraction;//0x18
-		angle_bounds between;//0x1C		
+		real_bounds between;//0x1C		
 		real_bounds and;//0x24
 
 		tag_reference do_not_use_old_effect2;//0x2C
@@ -190,3 +191,68 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 };
 TAG_GROUP_SIZE_ASSERT(s_projectile_group_definition, 0x1A4);
 #pragma pack(pop)
+
+TAG_REFL_TAG_BLOCK_DEF(s_projectile_group_definition::s_material_responses_block)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(response)
+	TAG_REFL_TAG_REFERENCE(do_not_use_old_effect)
+	TAG_REFL_STRING_ID(material_name)
+	TAG_REFL_PROPERTY(global_material_index)
+	TAG_REFL_PROPERTY(potential_result_response)
+	TAG_REFL_PROPERTY(potential_result_flags)
+	TAG_REFL_PROPERTY(chance_fraction)
+	TAG_REFL_REAL_BOUNDS(between)
+	TAG_REFL_REAL_BOUNDS(and)
+	TAG_REFL_TAG_REFERENCE(do_not_use_old_effect2)
+	TAG_REFL_PROPERTY(scale_effects_by)
+	TAG_REFL_ANGLE(angular_noise)
+	TAG_REFL_PROPERTY(velocity_noise)
+	TAG_REFL_TAG_REFERENCE(do_not_use_old_detonation_effect)
+	TAG_REFL_PROPERTY(initial_friction)
+	TAG_REFL_PROPERTY(maximum_distance)
+	TAG_REFL_PROPERTY(parallel_friction)
+	TAG_REFL_PROPERTY(perpendicular_friction)
+REFL_END
+
+TAG_REFL(s_projectile_group_definition)
+	TAG_REFL_BASE_STRUCT(objectTag)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(detonation_timer_starts)
+	TAG_REFL_PROPERTY(impact_noise)
+	TAG_REFL_PROPERTY(ai_perception_radius)
+	TAG_REFL_PROPERTY(collision_radius)
+	TAG_REFL_PROPERTY(arming_time)
+	TAG_REFL_PROPERTY(danger_radius)
+	TAG_REFL_REAL_BOUNDS(timer)
+	TAG_REFL_PROPERTY(minimum_velocity)
+	TAG_REFL_PROPERTY(maximum_range)
+	TAG_REFL_PROPERTY(detonation_noise)
+	TAG_REFL_PROPERTY(super_det_projectile_count)
+	TAG_REFL_TAG_REFERENCE(detonation_started)
+	TAG_REFL_TAG_REFERENCE(detonation_effect_airborne)
+	TAG_REFL_TAG_REFERENCE(detonation_effect_ground)
+	TAG_REFL_TAG_REFERENCE(detonation_damage)
+	TAG_REFL_TAG_REFERENCE(attached_detonation_damage)
+	TAG_REFL_TAG_REFERENCE(super_detonation)
+	TAG_REFL_TAG_REFERENCE(super_detonation_damage)
+	TAG_REFL_TAG_REFERENCE(detonation_sound)
+	TAG_REFL_PROPERTY(damage_reporting_type)
+	TAG_REFL_TAG_REFERENCE(super_attached_detonation_damage)
+	TAG_REFL_PROPERTY(material_effect_radius)
+	TAG_REFL_TAG_REFERENCE(flyby_sound)
+	TAG_REFL_TAG_REFERENCE(impact_effect)
+	TAG_REFL_TAG_REFERENCE(impact_damage)
+	TAG_REFL_PROPERTY(boarding_detonation_time)
+	TAG_REFL_TAG_REFERENCE(boarding_detonation_damage)
+	TAG_REFL_TAG_REFERENCE(boarding_attached_detonation_damage)
+	TAG_REFL_PROPERTY(air_gravity_scale)
+	TAG_REFL_REAL_BOUNDS(air_damage_range)
+	TAG_REFL_PROPERTY(water_gravity_scale)
+	TAG_REFL_REAL_BOUNDS(water_damage_range)
+	TAG_REFL_PROPERTY(initial_velocity)
+	TAG_REFL_PROPERTY(final_velocity)
+	TAG_REFL_REAL_ANGLE_BOUNDS(guided_angular_velocity)
+	TAG_REFL_REAL_BOUNDS(acceleration_range)
+	TAG_REFL_PROPERTY(targeted_leading_fraction)
+	TAG_REFL_TAG_BLOCK(material_responses)
+REFL_END

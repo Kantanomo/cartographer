@@ -338,8 +338,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			create_at_rest = FLAG(8),
 		};
 		e_placement_flags placement_flags;//0x4
-		real_point3d position_x;//0x8		
-		real_euler_angles3d rotation_yaw;//0x14		
+		real_point3d position;//0x8		
+		real_euler_angles3d rotation;//0x14		
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -428,12 +428,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			create_at_rest = FLAG(8),
 		};
 		e_placement_flags placement_flags;//0x4
-		float position_x;//0x8
-		float position_y;//0xC
-		float position_z;//0x10
-		angle rotation_yaw;//0x14
-		angle rotation_pitch;//0x18
-		angle rotation_roll;//0x1C
+		real_point3d position;
+		real_euler_angles3d rotation;
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -522,12 +518,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			create_at_rest = FLAG(8),
 		};
 		e_placement_flags placement_flags;//0x4
-		float position_x;//0x8
-		float position_y;//0xC
-		float position_z;//0x10
-		angle rotation_yaw;//0x14
-		angle rotation_pitch;//0x18
-		angle rotation_roll;//0x1C
+		real_point3d position;
+		real_euler_angles3d rotation;
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -605,12 +597,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			create_at_rest = FLAG(8),
 		};
 		e_placement_flags placement_flags;//0x4
-		float position_x;//0x8
-		float position_y;//0xC
-		float position_z;//0x10
-		angle rotation_yaw;//0x14
-		angle rotation_pitch;//0x18
-		angle rotation_roll;//0x1C
+		real_point3d position;
+		real_euler_angles3d rotation;
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -712,12 +700,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			create_at_rest = FLAG(8),
 		};
 		e_placement_flags placement_flags;//0x4
-		float position_x;//0x8
-		float position_y;//0xC
-		float position_z;//0x10
-		angle rotation_yaw;//0x14
-		angle rotation_pitch;//0x18
-		angle rotation_roll;//0x1C
+		real_point3d position;
+		real_euler_angles3d rotation;
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -816,12 +800,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			create_at_rest = FLAG(8),
 		};
 		e_placement_flags placement_flags;//0x4
-		float position_x;//0x8
-		float position_y;//0xC
-		float position_z;//0x10
-		angle rotation_yaw;//0x14
-		angle rotation_pitch;//0x18
-		angle rotation_roll;//0x1C
+		real_point3d position;
+		real_euler_angles3d rotation;
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -910,12 +890,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			create_at_rest = FLAG(8),
 		};
 		e_placement_flags placement_flags;//0x4
-		float position_x;//0x8
-		float position_y;//0xC
-		float position_z;//0x10
-		angle rotation_yaw;//0x14
-		angle rotation_pitch;//0x18
-		angle rotation_roll;//0x1C
+		real_point3d position;
+		real_euler_angles3d rotation;
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -1001,12 +977,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			create_at_rest = FLAG(8),
 		};
 		e_placement_flags placement_flags;//0x4
-		float position_x;//0x8
-		float position_y;//0xC
-		float position_z;//0x10
-		angle rotation_yaw;//0x14
-		angle rotation_pitch;//0x18
-		angle rotation_roll;//0x1C
+		real_point3d position;
+		real_euler_angles3d rotation;
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -1090,7 +1062,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		};
 		e_placement_flags placement_flags;//0x4
 		real_point3d position;//0x8		
-		real_euler_angles3d rotation_;//0x14
+		real_euler_angles3d rotation;//0x14
 
 		float scale;//0x20
 		enum class e_transform_flags : __int16
@@ -1262,10 +1234,10 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			initial_spawn_only = 1,
 			respawn_only = 2,
 		};
-		e_spawn_type spawn_type_0;//0x1C		
-		e_spawn_type spawn_type_1;//0x1E		
-		e_spawn_type spawn_type_2;//0x20		
-		e_spawn_type spawn_type_3;//0x22
+		e_spawn_type spawn_type_1;//0x1C		
+		e_spawn_type spawn_type_2;//0x1E		
+		e_spawn_type spawn_type_3;//0x20		
+		e_spawn_type spawn_type_4;//0x22
 
 		PAD(0x8);
 		enum class e_campaign_player_type : __int16
@@ -1394,7 +1366,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		e_game_type game_type_2;//0x6
 		e_game_type game_type_3;//0x8		
 		e_game_type game_type_4;//0xA
-		PAD(0x2);//0xC
+		__int16 team_index;
 		__int16 spawn_time_in_seconds_;//0xE
 		__int16 respawn_on_empty_time;//0x10
 		enum class e_respawn_timer_starts : __int16
@@ -1419,7 +1391,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		e_classification classification;//0x14
 		PAD(0x2B);//0x15
 		real_point3d position;//0x40		
-		real_euler_angles3d orientation_yaw;//0x4C		
+		real_euler_angles3d orientation;//0x4C		
 		tag_reference itemvehicle_collection;//0x58
 		PAD(0x30);//0x60
 	};
@@ -2354,12 +2326,12 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_globals_block, 0x28);
 	tag_block<s_globals_block> globals;//0x1C0
-	struct s_references_block
+	struct s_script_references_block
 	{
 		tag_reference reference;//0x0
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_references_block, 0x8);
-	tag_block<s_references_block> references;//0x1C8
+	TAG_BLOCK_SIZE_ASSERT(s_script_references_block, 0x8);
+	tag_block<s_script_references_block> script_references;//0x1C8
 	struct s_source_files_block
 	{
 		tag_string32 name;//0x0
@@ -2381,8 +2353,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 				__int16 reference_frame;//0x2C
 				PAD(0x2);//0x2E
 				__int32 surface_index;//0x30
-				angle facing_direction_yaw;//0x34
-				angle facing_direction_pitch;//0x38
+				real_euler_angles2d facing_direction;//0x34
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_points_block, 0x3C);
 			tag_block<s_points_block> points;//0x20
@@ -2408,8 +2379,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		float position_x;//0x24
 		float position_y;//0x28
 		float position_z;//0x2C
-		angle facing_yaw;//0x30
-		angle facing_pitch;//0x34
+		real_euler_angles2d facing;//0x30
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_cutscene_flags_block, 0x38);
 	tag_block<s_cutscene_flags_block> cutscene_flags;//0x1E0
@@ -2432,9 +2402,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		float position_x;//0x24
 		float position_y;//0x28
 		float position_z;//0x2C
-		angle orientation_yaw;//0x30
-		angle orientation_pitch;//0x34
-		angle orientation_roll;//0x38
+		real_euler_angles3d orientation;//0x30
 		angle unused;//0x3C
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_cutscene_camera_points_block, 0x40);
@@ -2442,10 +2410,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	struct s_cutscene_titles_block
 	{
 		string_id name;//0x0
-		__int16 text_bounds_on_screentop;//0x4
-		__int16 text_bounds_on_screenleft;//0x6
-		__int16 text_bounds_on_screenbottom;//0x8
-		__int16 text_bounds_on_screenright;//0xA
+		rect2d text_bounds;
 		enum class e_justification : __int16
 		{
 			left = 0,
@@ -2525,10 +2490,10 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_scenario_resources_block, 0x18);
 	tag_block<s_scenario_resources_block> scenario_resources;//0x218
-	struct s_scenario_resources_block1
+	struct s_structure_physics_block
 	{
 		data_block mopp_code;//0x0
-		struct s_evironment_object_identifiers_block
+		struct s_environment_object_identifiers_block
 		{
 			__int32 unique_id;//0x0
 			__int16 origin_bsp_index;//0x4
@@ -2558,8 +2523,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			};
 			e_source source;//0x7
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_evironment_object_identifiers_block, 0x8);
-		tag_block<s_evironment_object_identifiers_block> evironment_object_identifiers;//0x8
+		TAG_BLOCK_SIZE_ASSERT(s_environment_object_identifiers_block, 0x8);
+		tag_block<s_environment_object_identifiers_block> environment_object_identifiers;//0x8
 		PAD(0x4);//0x10
 		float mopp_bounds_min_x;//0x14
 		float mopp_bounds_min_y;//0x18
@@ -2568,8 +2533,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		float mopp_bounds_max_y;//0x24
 		float mopp_bounds_max_z;//0x28
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_scenario_resources_block1, 0x2C);
-	tag_block<s_scenario_resources_block1> scenario_resources1;//0x220
+	TAG_BLOCK_SIZE_ASSERT(s_structure_physics_block, 0x2C);
+	tag_block<s_structure_physics_block> structure_physics;//0x220
 	struct s_hs_unit_seats_block
 	{
 		datum unit;//0x0		
@@ -2744,7 +2709,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		e_force_combat_status force_combat_status;//0x28
 		PAD(0x2);//0x2A
 		tag_string32 entry_script;//0x2C
-		PAD(0x2);//0x4C
+		__int16 script_index;
 		__int16 follow_squad;//0x4E
 		float follow_radius;//0x50
 		struct s_primary_area_set_block
@@ -2877,7 +2842,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_orders_block, 0x7C);
 	tag_block<s_orders_block> orders;//0x240
-	struct s_triggers_block
+	struct s_ai_triggers_block
 	{
 		tag_string32 name;//0x0
 		enum class e_trigger_flags : __int32
@@ -2926,7 +2891,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			__int16 trigger_volume;//0xC
 			PAD(0x2);//0xE
 			tag_string32 exit_condition_script;//0x10
-			__int16 NUM_;//0x30
+			__int16 exit_condition_script_index;//0x30
 			PAD(0x2);//0x32
 			enum class e_flags : __int32
 			{
@@ -2937,8 +2902,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		TAG_BLOCK_SIZE_ASSERT(s_conditions_block, 0x38);
 		tag_block<s_conditions_block> conditions;//0x28
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_triggers_block, 0x30);
-	tag_block<s_triggers_block> triggers;//0x248
+	TAG_BLOCK_SIZE_ASSERT(s_ai_triggers_block, 0x30);
+	tag_block<s_ai_triggers_block> ai_triggers;//0x248
 	struct s_background_sound_palette_block
 	{
 		tag_string32 name;//0x0
@@ -2978,7 +2943,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		tag_reference weather_system;//0x20
 		PAD(0x24);//0x28
 		tag_reference wind;//0x4C
-		PAD(0xC);//0x54
+		real_vector3d wind_direction;
 		float wind_magnitude;//0x60
 		PAD(0x4);//0x64
 		tag_string32 wind_scale_function;//0x68
@@ -3179,9 +3144,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		float position_x;//0x8
 		float position_y;//0xC
 		float position_z;//0x10
-		angle rotation_yaw;//0x14
-		angle rotation_pitch;//0x18
-		angle rotation_roll;//0x1C
+		real_euler_angles3d rotation;//0x14
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -3249,25 +3212,23 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	struct s_atmospheric_fog_palette_block
 	{
 		string_id name;//0x0
-		struct {
-
+		struct s_atmospheric_fog_definition
+		{
 			real_color_rgb color;//0x4
 			float spread_distance;//0x10
-			PAD(0x4);//0x14
-			float maximum_density;//0x18
+			real_bounds density;
 			float start_distance;//0x1C
 			float opaque_distance;//0x20
-
-		}atmospheric_fog;
-
-		struct {
-
-			real_color_rgb color;//0x24
-			PAD(0x4);//0x30
-			float maximum_density;//0x34
-			float start_distance;//0x38
-			float opaque_distance;//0x3C
-		}secondary_fog;
+		};
+		s_atmospheric_fog_definition atmospheric_fog;
+		struct s_secondary_fog_definition
+		{
+			real_color_rgb color;//0x4
+			real_bounds density;
+			float start_distance;//0x1C
+			float opaque_distance;//0x20
+		};
+		s_secondary_fog_definition secondary_fog;
 
 		//plane fog override
 		PAD(0x4);//0x40
@@ -3333,8 +3294,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		float ecology_margin;//0x8
 		struct s_sources_block
 		{
-			PAD(0xC);//0x0
-			real_euler_angles2d starting_yaw_pitch;//0xC			
+			real_point3d position;
+			real_euler_angles2d facing;//0xC			
 			float radius;//0x14
 			float weight;//0x18
 		};
@@ -3342,7 +3303,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		tag_block<s_sources_block> sources;//0xC
 		struct s_sinks_block
 		{
-			PAD(0xC);//0x0
+			real_point3d position;
 			float radius;//0xC
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_sinks_block, 0x10);
@@ -3636,7 +3597,24 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			__int32 campaign_id;//0x0
 			__int32 map_id;//0x4
 			tag_reference bitmap;//0x8
-			PAD(0xB40);//0x10
+			tag_unicode32 english_name;//0xC
+			tag_unicode32 japanese_name;//0x4C
+			tag_unicode32 german_name;//0x8C
+			tag_unicode32 french_name;//0xCC
+			tag_unicode32 spanish_name;//0x10C
+			tag_unicode32 italian_name;//0x14C
+			tag_unicode32 korean_name;//0x18C
+			tag_unicode32 chinese_name;//0x1CC
+			tag_unicode32 portuguese_name;//0x20C
+			tag_unicode128 english_description;//0x24C
+			tag_unicode128 japanese_description;//0x34C
+			tag_unicode128 german_description;//0x44C
+			tag_unicode128 french_description;//0x54C
+			tag_unicode128 spanish_description;//0x64C
+			tag_unicode128 italian_description;//0x74C
+			tag_unicode128 korean_description;//0x84C
+			tag_unicode128 chinese_description;//0x94C
+			tag_unicode128 portuguese_description;//0xA4C
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_campaign_level_data_block, 0xB50);
 		tag_block<s_campaign_level_data_block> campaign_level_data;//0x8
@@ -3742,3 +3720,1192 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 TAG_GROUP_SIZE_ASSERT(s_scenario_group_definition, 0x3E0);
 #pragma pack(pop)
 
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_skies_block)
+	TAG_REFL_TAG_REFERENCE(sky)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_predicted_resources_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(resource_index)
+	TAG_REFL_TAG_REFERENCE(tag_index)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_comments_block)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_STRING_256(comment)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_object_names_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(placement_index)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenery_block::s_pathfinding_references_block)
+	TAG_REFL_PROPERTY(bsp_index)
+	TAG_REFL_PROPERTY(pathfinding_object_index)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenery_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_ANGLE(rotation_yaw)
+	TAG_REFL_ANGLE(rotation_pitch)
+	TAG_REFL_ANGLE(rotation_roll)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_STRING_ID(variant_name)
+	TAG_REFL_PROPERTY(active_change_colors)
+	TAG_REFL_PROPERTY(pathfinding_policy)
+	TAG_REFL_PROPERTY(lightmapping_policy)
+	TAG_REFL_TAG_BLOCK(pathfinding_references)
+	TAG_REFL_PROPERTY(valid_multiplayer_games)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenery_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_bipeds_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_STRING_ID(variant_name)
+	TAG_REFL_PROPERTY(active_change_colors)
+	TAG_REFL_PROPERTY(body_vitality)
+	TAG_REFL_PROPERTY(flags)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_biped_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_vehicles_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_STRING_ID(variant_name)
+	TAG_REFL_PROPERTY(active_change_colors)
+	TAG_REFL_PROPERTY(body_vitality)
+	TAG_REFL_PROPERTY(flags)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_vehicle_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_equipment_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_PROPERTY(equipment_flags)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_equipment_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_weapons_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_STRING_ID(variant_name)
+	TAG_REFL_PROPERTY(active_change_colors)
+	TAG_REFL_PROPERTY(rounds_left)
+	TAG_REFL_PROPERTY(rounds_loaded)
+	TAG_REFL_PROPERTY(flags)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_weapon_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_device_groups_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(initial_value)
+	TAG_REFL_PROPERTY(flags)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_machines_block::s_pathfinding_references_block)
+	TAG_REFL_PROPERTY(bsp_index)
+	TAG_REFL_PROPERTY(pathfinding_object_index)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_machines_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_PROPERTY(power_group)
+	TAG_REFL_PROPERTY(position_group)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_TAG_BLOCK(pathfinding_references)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_machine_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_controls_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_PROPERTY(power_group)
+	TAG_REFL_PROPERTY(position_group)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(dont_touch_this)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_control_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_light_fixtures_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_PROPERTY(power_group)
+	TAG_REFL_PROPERTY(position_group)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_REAL_COLOR_RGB(color)
+	TAG_REFL_PROPERTY(intensity)
+	TAG_REFL_ANGLE(falloff_angle)
+	TAG_REFL_ANGLE(cutoff_angle)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_light_fixtures_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_sound_scenery_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_PROPERTY(volume_type)
+	TAG_REFL_PROPERTY(height)
+	TAG_REFL_PROPERTY(override_distance_bounds_lower)
+	TAG_REFL_PROPERTY(override_distance_bounds_upper)
+	TAG_REFL_ANGLE(override_cone_angle_bounds_lower)
+	TAG_REFL_ANGLE(override_cone_angle_bounds_upper)
+	TAG_REFL_PROPERTY(override_outer_cone_gain)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_sound_scenery_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_light_volumes_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_PROPERTY(power_group)
+	TAG_REFL_PROPERTY(position_group)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(lightmap_type)
+	TAG_REFL_PROPERTY(lightmap_flags)
+	TAG_REFL_PROPERTY(lightmap_half_life)
+	TAG_REFL_PROPERTY(lightmap_light_scale)
+	TAG_REFL_PROPERTY(target_point_x)
+	TAG_REFL_PROPERTY(target_point_y)
+	TAG_REFL_PROPERTY(target_point_z)
+	TAG_REFL_PROPERTY(width)
+	TAG_REFL_PROPERTY(height_scale)
+	TAG_REFL_ANGLE(field_of_view)
+	TAG_REFL_PROPERTY(falloff_distance)
+	TAG_REFL_PROPERTY(cutoff_distance)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_light_volumes_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_player_starting_profile_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(starting_health_damage)
+	TAG_REFL_PROPERTY(starting_shield_damage)
+	TAG_REFL_TAG_REFERENCE(primary_weapon)
+	TAG_REFL_PROPERTY(primary_rounds_loaded)
+	TAG_REFL_PROPERTY(primary_rounds_total)
+	TAG_REFL_TAG_REFERENCE(secondary_weapon)
+	TAG_REFL_PROPERTY(secondary_rounds_loaded)
+	TAG_REFL_PROPERTY(secondary_rounds_total)
+	TAG_REFL_PROPERTY(starting_fragmentation_grenade_count)
+	TAG_REFL_PROPERTY(starting_plasma_grenade_count)
+	TAG_REFL_PROPERTY(starting_unknown_grenade_count)
+	TAG_REFL_PROPERTY(starting_unknown_grenade_count1)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_player_starting_locations_block)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_ANGLE(facing)
+	TAG_REFL_PROPERTY(team_designator)
+	TAG_REFL_PROPERTY(bsp_index)
+	TAG_REFL_PROPERTY(game_type_1)
+	TAG_REFL_PROPERTY(game_type_2)
+	TAG_REFL_PROPERTY(game_type_3)
+	TAG_REFL_PROPERTY(game_type_4)
+	TAG_REFL_PROPERTY(spawn_type_1)
+	TAG_REFL_PROPERTY(spawn_type_2)
+	TAG_REFL_PROPERTY(spawn_type_3)
+	TAG_REFL_PROPERTY(spawn_type_4)
+	TAG_REFL_PROPERTY(campaign_player_type)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_kill_trigger_volumes_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(object_name)
+	TAG_REFL_STRING_ID(node_name)
+	TAG_REFL_REAL_POINT3D(forward)
+	TAG_REFL_REAL_POINT3D(up)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_POINT3D(extents)
+	TAG_REFL_PROPERTY(kill_trigger_volume)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_netgame_flags_block)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_ANGLE(facing)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(team_designator)
+	TAG_REFL_PROPERTY(identifier)
+	TAG_REFL_PROPERTY(flags)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_netgame_equipment_block)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(game_type_1)
+	TAG_REFL_PROPERTY(game_type_2)
+	TAG_REFL_PROPERTY(game_type_3)
+	TAG_REFL_PROPERTY(game_type_4)
+	TAG_REFL_PROPERTY(team_index)
+	TAG_REFL_PROPERTY(spawn_time_in_seconds_)
+	TAG_REFL_PROPERTY(respawn_on_empty_time)
+	TAG_REFL_PROPERTY(respawn_timer_starts)
+	TAG_REFL_PROPERTY(classification)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES3D(orientation)
+	TAG_REFL_TAG_REFERENCE(itemvehicle_collection)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_starting_equipment_block)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(game_type_1)
+	TAG_REFL_PROPERTY(game_type_2)
+	TAG_REFL_PROPERTY(game_type_3)
+	TAG_REFL_PROPERTY(game_type_4)
+	TAG_REFL_TAG_REFERENCE(item_collection_1)
+	TAG_REFL_TAG_REFERENCE(item_collection_2)
+	TAG_REFL_TAG_REFERENCE(item_collection_3)
+	TAG_REFL_TAG_REFERENCE(item_collection_4)
+	TAG_REFL_TAG_REFERENCE(item_collection_5)
+	TAG_REFL_TAG_REFERENCE(item_collection_6)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_bsp_switch_trigger_volumes_block)
+	TAG_REFL_PROPERTY(trigger_volume)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(destination)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_decals_block)
+	TAG_REFL_PROPERTY(decal_type)
+	TAG_REFL_PROPERTY(yaw)
+	TAG_REFL_PROPERTY(pitch)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_decals_palette_block)
+	TAG_REFL_TAG_REFERENCE(reference)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_detail_object_collection_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_style_palette_block)
+	TAG_REFL_TAG_REFERENCE(reference)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_squad_groups_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(parent)
+	TAG_REFL_PROPERTY(initial_orders)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_squads_block::s_starting_locations_block)
+	TAG_REFL_STRING_ID(name_old_string_id)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_PROPERTY(reference_frame)
+	TAG_REFL_REAL_EULER_ANGLES2D(facing)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(character_type)
+	TAG_REFL_PROPERTY(initial_weapon)
+	TAG_REFL_PROPERTY(initial_secondary_weapon)
+	TAG_REFL_PROPERTY(vehicle_type)
+	TAG_REFL_PROPERTY(seat_type)
+	TAG_REFL_PROPERTY(grenade_type)
+	TAG_REFL_PROPERTY(swarm_count)
+	TAG_REFL_STRING_ID(actor_variant_name)
+	TAG_REFL_STRING_ID(vehicle_variant_name)
+	TAG_REFL_PROPERTY(initial_movement_distance)
+	TAG_REFL_PROPERTY(emitter_vehicle)
+	TAG_REFL_PROPERTY(initial_movement_mode)
+	TAG_REFL_STRING_32(placement_script)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_squads_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(team)
+	TAG_REFL_PROPERTY(parent)
+	TAG_REFL_PROPERTY(squad_delay_time)
+	TAG_REFL_PROPERTY(normal_diff_count)
+	TAG_REFL_PROPERTY(insane_diff_count)
+	TAG_REFL_PROPERTY(major_upgrade)
+	TAG_REFL_PROPERTY(vehicle_type)
+	TAG_REFL_PROPERTY(character_type)
+	TAG_REFL_PROPERTY(initial_zone)
+	TAG_REFL_PROPERTY(initial_weapon)
+	TAG_REFL_PROPERTY(initial_secondary_weapon)
+	TAG_REFL_PROPERTY(grenade_type)
+	TAG_REFL_PROPERTY(initial_order)
+	TAG_REFL_STRING_ID(vehicle_variant)
+	TAG_REFL_TAG_BLOCK(starting_locations)
+	TAG_REFL_STRING_32(placement_script)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_zones_block::s_firing_positions_block)
+	TAG_REFL_REAL_VECTOR3D(position_local)
+	TAG_REFL_PROPERTY(reference_frame)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(area)
+	TAG_REFL_PROPERTY(cluster_index)
+	TAG_REFL_ANGLE(normal_yaw)
+	TAG_REFL_ANGLE(normal_pitch)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_zones_block::s_areas_block::s_flight_hints_block)
+	TAG_REFL_PROPERTY(flight_hint_index)
+	TAG_REFL_PROPERTY(poit_index)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_zones_block::s_areas_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(area_flags)
+	TAG_REFL_PROPERTY(manual_reference_frame)
+	TAG_REFL_TAG_BLOCK(flight_hints)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_zones_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(manual_bsp)
+	TAG_REFL_TAG_BLOCK(firing_positions)
+	TAG_REFL_TAG_BLOCK(areas)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_mission_scenes_block::s_trigger_conditions_block::s_triggers_block)
+	TAG_REFL_PROPERTY(trigger_flags)
+	TAG_REFL_PROPERTY(trigger)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_mission_scenes_block::s_trigger_conditions_block)
+	TAG_REFL_PROPERTY(combination_rule)
+	TAG_REFL_TAG_BLOCK(triggers)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_mission_scenes_block::s_roles_block::s_role_variants_block)
+	TAG_REFL_STRING_ID(variant_designation)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_mission_scenes_block::s_roles_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(group)
+	TAG_REFL_TAG_BLOCK(role_variants)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_mission_scenes_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_TAG_BLOCK(trigger_conditions)
+	TAG_REFL_TAG_BLOCK(roles)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_character_palette_block)
+	TAG_REFL_TAG_REFERENCE(reference)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scripts_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(script_type)
+	TAG_REFL_PROPERTY(return_type)
+	TAG_REFL_PROPERTY(root_expression_index)
+	TAG_REFL_PROPERTY(root_expression_salt)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_globals_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(initialization_expression_index)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_script_references_block)
+	TAG_REFL_TAG_REFERENCE(reference)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scripting_data_block::s_point_sets_block::s_points_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_PROPERTY(reference_frame)
+	TAG_REFL_PROPERTY(surface_index)
+	TAG_REFL_REAL_EULER_ANGLES2D(facing_direction)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scripting_data_block::s_point_sets_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_TAG_BLOCK(points)
+	TAG_REFL_PROPERTY(bsp_index)
+	TAG_REFL_PROPERTY(manual_reference_frame)
+	TAG_REFL_PROPERTY(flags)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scripting_data_block)
+	TAG_REFL_TAG_BLOCK(point_sets)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_cutscene_flags_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_REAL_EULER_ANGLES2D(facing)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_cutscene_camera_points_block)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_REAL_EULER_ANGLES3D(orientation)
+	TAG_REFL_ANGLE(unused)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_cutscene_titles_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_RECT2D(text_bounds)
+	TAG_REFL_PROPERTY(justification)
+	TAG_REFL_PROPERTY(font)
+	TAG_REFL_PROPERTY(fade_in_time)
+	TAG_REFL_PROPERTY(up_time)
+	TAG_REFL_PROPERTY(fade_out_time)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_structure_bsps_block)
+
+	TAG_REFL_TAG_REFERENCE(structure_bsp)
+	TAG_REFL_TAG_REFERENCE(structure_lightmap)
+	TAG_REFL_PROPERTY(unused_radiance_est_search_distance)
+	TAG_REFL_PROPERTY(unused_luminels_per_world_unit)
+	TAG_REFL_PROPERTY(unused_output_white_reference)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(default_sky)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_resources_block::s_references_block)
+	TAG_REFL_TAG_REFERENCE(reference)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_resources_block::s_script_source_block)
+	TAG_REFL_TAG_REFERENCE(reference)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_resources_block::s_ai_resources_block)
+	TAG_REFL_TAG_REFERENCE(reference)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_resources_block)
+	TAG_REFL_TAG_BLOCK(references)
+	TAG_REFL_TAG_BLOCK(script_source)
+	TAG_REFL_TAG_BLOCK(ai_resources)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_structure_physics_block::s_environment_object_identifiers_block)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_structure_physics_block)
+	TAG_REFL_DATA_BLOCK(mopp_code)
+	TAG_REFL_TAG_BLOCK(environment_object_identifiers)
+	TAG_REFL_PROPERTY(mopp_bounds_min_x)
+	TAG_REFL_PROPERTY(mopp_bounds_min_y)
+	TAG_REFL_PROPERTY(mopp_bounds_min_z)
+	TAG_REFL_PROPERTY(mopp_bounds_max_x)
+	TAG_REFL_PROPERTY(mopp_bounds_max_y)
+	TAG_REFL_PROPERTY(mopp_bounds_max_z)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_hs_unit_seats_block)
+	TAG_REFL_TAG_REFERENCE(unit)
+	TAG_REFL_PROPERTY(seats)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_kill_triggers_block)
+	TAG_REFL_PROPERTY(trigger_volume)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_script_expressions_block)
+	TAG_REFL_PROPERTY(salt)
+	TAG_REFL_PROPERTY(opcode)
+	TAG_REFL_PROPERTY(value_type)
+	TAG_REFL_PROPERTY(expression_type)
+	TAG_REFL_PROPERTY(next_expression)
+	TAG_REFL_PROPERTY(data)
+	TAG_REFL_PROPERTY(source_offset)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_orders_block::s_primary_area_set_block)
+	TAG_REFL_PROPERTY(area_type)
+	TAG_REFL_PROPERTY(zone)
+	TAG_REFL_PROPERTY(area)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_orders_block::s_secondary_area_set_block)
+	TAG_REFL_PROPERTY(area_type)
+	TAG_REFL_PROPERTY(zone)
+	TAG_REFL_PROPERTY(area)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_orders_block::s_secondary_set_trigger_block::s_triggers_block)
+	TAG_REFL_PROPERTY(trigger_flags)
+	TAG_REFL_PROPERTY(trigger)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_orders_block::s_secondary_set_trigger_block)
+	TAG_REFL_PROPERTY(combination_rule)
+	TAG_REFL_PROPERTY(dialogue_type)
+	TAG_REFL_TAG_BLOCK(triggers)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_orders_block::s_special_movement_block)
+	TAG_REFL_PROPERTY(special_movement_1)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_orders_block::s_order_endings_block::s_triggers_block)
+	TAG_REFL_PROPERTY(trigger_flags)
+	TAG_REFL_PROPERTY(trigger)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_orders_block::s_order_endings_block)
+	TAG_REFL_PROPERTY(next_order)
+	TAG_REFL_PROPERTY(combination_rule)
+	TAG_REFL_PROPERTY(delay_time)
+	TAG_REFL_PROPERTY(dialogue_type)
+	TAG_REFL_TAG_BLOCK(triggers)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_orders_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(style)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(force_combat_status)
+	TAG_REFL_STRING_32(entry_script)
+	TAG_REFL_PROPERTY(script_index)
+	TAG_REFL_PROPERTY(follow_squad)
+	TAG_REFL_PROPERTY(follow_radius)
+	TAG_REFL_TAG_BLOCK(primary_area_set)
+	TAG_REFL_TAG_BLOCK(secondary_area_set)
+	TAG_REFL_TAG_BLOCK(secondary_set_trigger)
+	TAG_REFL_TAG_BLOCK(special_movement)
+	TAG_REFL_TAG_BLOCK(order_endings)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_ai_triggers_block::s_conditions_block)
+	TAG_REFL_PROPERTY(rule_type)
+	TAG_REFL_PROPERTY(squad)
+	TAG_REFL_PROPERTY(squad_group)
+	TAG_REFL_PROPERTY(a)
+	TAG_REFL_PROPERTY(x)
+	TAG_REFL_PROPERTY(trigger_volume)
+	TAG_REFL_STRING_32(exit_condition_script)
+	TAG_REFL_PROPERTY(exit_condition_script_index)
+	TAG_REFL_PROPERTY(flags)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_ai_triggers_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_PROPERTY(trigger_flags)
+	TAG_REFL_PROPERTY(combination_rule)
+	TAG_REFL_TAG_BLOCK(conditions)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_background_sound_palette_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_TAG_REFERENCE(background_sound)
+	TAG_REFL_TAG_REFERENCE(inside_cluster_sound)
+	TAG_REFL_PROPERTY(cutoff_distance)
+	TAG_REFL_PROPERTY(scale_flags)
+	TAG_REFL_PROPERTY(interior_scale)
+	TAG_REFL_PROPERTY(portal_scale)
+	TAG_REFL_PROPERTY(exterior_scale)
+	TAG_REFL_PROPERTY(interpolation_speed)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_sound_environment_palette_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_TAG_REFERENCE(sound_environment)
+	TAG_REFL_PROPERTY(cutoff_distance)
+	TAG_REFL_PROPERTY(interpolation_speed)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_weather_palette_block)
+	TAG_REFL_STRING_32(name)
+	TAG_REFL_TAG_REFERENCE(weather_system)
+	TAG_REFL_TAG_REFERENCE(wind)
+	TAG_REFL_REAL_VECTOR3D(wind_direction)
+	TAG_REFL_PROPERTY(wind_magnitude)
+	TAG_REFL_STRING_32(wind_scale_function)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_cluster_data_block::s_background_sounds_block)
+	TAG_REFL_PROPERTY(type)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_cluster_data_block::s_sound_environments_block)
+	TAG_REFL_PROPERTY(type)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_cluster_data_block::s_cluster_centroids_block)
+	TAG_REFL_PROPERTY(centroid_x)
+	TAG_REFL_PROPERTY(centroid_y)
+	TAG_REFL_PROPERTY(centroid_z)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_cluster_data_block::s_weather_properties_block)
+	TAG_REFL_PROPERTY(type)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_cluster_data_block::s_atmospheric_fog_properties_block)
+	TAG_REFL_PROPERTY(type)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_scenario_cluster_data_block)
+	TAG_REFL_TAG_REFERENCE(bsp)
+	TAG_REFL_TAG_BLOCK(background_sounds)
+	TAG_REFL_TAG_BLOCK(sound_environments)
+	TAG_REFL_PROPERTY(bsp_checksum)
+	TAG_REFL_TAG_BLOCK(cluster_centroids)
+	TAG_REFL_TAG_BLOCK(weather_properties)
+	TAG_REFL_TAG_BLOCK(atmospheric_fog_properties)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_spawn_data_block::s_dynamic_spawn_overloads_block)
+	TAG_REFL_PROPERTY(overload_type)
+	TAG_REFL_PROPERTY(inner_radius)
+	TAG_REFL_PROPERTY(outer_radius)
+	TAG_REFL_PROPERTY(weight)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_spawn_data_block::s_static_respawn_zones_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(relevant_team)
+	TAG_REFL_PROPERTY(relevant_games)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_PROPERTY(lower_height)
+	TAG_REFL_PROPERTY(upper_height)
+	TAG_REFL_PROPERTY(inner_radius)
+	TAG_REFL_PROPERTY(outer_radius)
+	TAG_REFL_PROPERTY(weight)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_spawn_data_block::s_static_initial_spawn_zones_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_PROPERTY(relevant_team)
+	TAG_REFL_PROPERTY(relevant_games)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_PROPERTY(lower_height)
+	TAG_REFL_PROPERTY(upper_height)
+	TAG_REFL_PROPERTY(inner_radius)
+	TAG_REFL_PROPERTY(outer_radius)
+	TAG_REFL_PROPERTY(weight)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_spawn_data_block)
+	TAG_REFL_PROPERTY(dynamic_spawn_lower_height)
+	TAG_REFL_PROPERTY(dynamic_spawn_upper_height)
+	TAG_REFL_PROPERTY(game_object_reset_height)
+	TAG_REFL_TAG_BLOCK(dynamic_spawn_overloads)
+	TAG_REFL_TAG_BLOCK(static_respawn_zones)
+	TAG_REFL_TAG_BLOCK(static_initial_spawn_zones)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_crates_block)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(name)
+	TAG_REFL_PROPERTY(placement_flags)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+	TAG_REFL_REAL_EULER_ANGLES3D(rotation)
+	TAG_REFL_PROPERTY(scale)
+	TAG_REFL_PROPERTY(transform_flags)
+	TAG_REFL_PROPERTY(manual_bsp_flags)
+	TAG_REFL_PROPERTY(unique_id)
+	TAG_REFL_PROPERTY(origin_bsp_index)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(source)
+	TAG_REFL_PROPERTY(bsp_policy)
+	TAG_REFL_PROPERTY(editor_folder)
+	TAG_REFL_STRING_ID(variant_name)
+	TAG_REFL_PROPERTY(active_change_colors)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_crates_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_atmospheric_fog_palette_block::s_mixers_block)
+	TAG_REFL_STRING_ID(atmospheric_fog_source)
+	TAG_REFL_STRING_ID(interpolator)
+REFL_END
+
+TAG_REFL(s_scenario_group_definition::s_atmospheric_fog_palette_block::s_atmospheric_fog_definition)
+	TAG_REFL_REAL_COLOR_RGB(color)
+	TAG_REFL_PROPERTY(spread_distance)
+	TAG_REFL_REAL_BOUNDS(density)
+	TAG_REFL_PROPERTY(start_distance)
+	TAG_REFL_PROPERTY(opaque_distance)
+REFL_END
+
+TAG_REFL(s_scenario_group_definition::s_atmospheric_fog_palette_block::s_secondary_fog_definition)
+	TAG_REFL_REAL_COLOR_RGB(color)
+	TAG_REFL_REAL_BOUNDS(density)
+	TAG_REFL_PROPERTY(start_distance)
+	TAG_REFL_PROPERTY(opaque_distance)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_atmospheric_fog_palette_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_BASE_STRUCT(atmospheric_fog)
+	TAG_REFL_BASE_STRUCT(secondary_fog)
+	TAG_REFL_REAL_COLOR_RGB(planar_color)
+	TAG_REFL_PROPERTY(planar_max_density)
+	TAG_REFL_PROPERTY(planar_override_amount)
+	TAG_REFL_PROPERTY(planar_min_distance_bias)
+	TAG_REFL_REAL_COLOR_RGB(patchy_color)
+	TAG_REFL_REAL_BOUNDS(patchy_density)
+	TAG_REFL_REAL_BOUNDS(patchy_distance)
+	TAG_REFL_TAG_REFERENCE(patchy_fog)
+	TAG_REFL_TAG_BLOCK(mixers)
+	TAG_REFL_PROPERTY(amount)
+	TAG_REFL_PROPERTY(threshold)
+	TAG_REFL_PROPERTY(brightness)
+	TAG_REFL_PROPERTY(gamma_power)
+	TAG_REFL_PROPERTY(camera_immersion_flags)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_planar_fog_palette_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_TAG_REFERENCE(planar_fog)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_flocks_block::s_sources_block)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_REAL_EULER_ANGLES2D(facing)
+	TAG_REFL_PROPERTY(radius)
+	TAG_REFL_PROPERTY(weight)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_flocks_block::s_sinks_block)
+	TAG_REFL_REAL_POINT3D(position)
+	TAG_REFL_PROPERTY(radius)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_flocks_block)
+	TAG_REFL_PROPERTY(bsp)
+	TAG_REFL_PROPERTY(bounding_volume)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(ecology_margin)
+	TAG_REFL_TAG_BLOCK(sources)
+	TAG_REFL_TAG_BLOCK(sinks)
+	TAG_REFL_PROPERTY(production_frequency)
+	TAG_REFL_PROPERTY(scale_lower)
+	TAG_REFL_PROPERTY(scale_upper)
+	TAG_REFL_TAG_REFERENCE(creature)
+	TAG_REFL_PROPERTY(boid_count_lower)
+	TAG_REFL_PROPERTY(boid_count_upper)
+	TAG_REFL_PROPERTY(neighborhood_radius)
+	TAG_REFL_PROPERTY(avoidance_radius)
+	TAG_REFL_PROPERTY(forward_scale)
+	TAG_REFL_PROPERTY(alignment_scale)
+	TAG_REFL_PROPERTY(avoidance_scale)
+	TAG_REFL_PROPERTY(leveling_force_scale)
+	TAG_REFL_PROPERTY(sink_scale)
+	TAG_REFL_ANGLE(perception_angle)
+	TAG_REFL_PROPERTY(average_throttle)
+	TAG_REFL_PROPERTY(maximum_throttle)
+	TAG_REFL_PROPERTY(position_scale)
+	TAG_REFL_PROPERTY(position_min_radius)
+	TAG_REFL_PROPERTY(position_max_radius)
+	TAG_REFL_PROPERTY(movement_weight_threshold)
+	TAG_REFL_PROPERTY(danger_radius)
+	TAG_REFL_PROPERTY(danger_scale)
+	TAG_REFL_PROPERTY(random_offset_scale)
+	TAG_REFL_REAL_BOUNDS(random_offset_period)
+	TAG_REFL_STRING_ID(flock_name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_creatures_palette_block)
+	TAG_REFL_TAG_REFERENCE(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_decorators_palette_block)
+	TAG_REFL_TAG_REFERENCE(decorator_set)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_bsp_transition_volumes_block)
+	TAG_REFL_PROPERTY(bsp_index_key)
+	TAG_REFL_PROPERTY(trigger_volume)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_structure_bsp_lighting_block::s_lighting_points_block)
+	TAG_REFL_PROPERTY(position_x)
+	TAG_REFL_PROPERTY(position_y)
+	TAG_REFL_PROPERTY(position_z)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_structure_bsp_lighting_block)
+	TAG_REFL_TAG_REFERENCE(bsp)
+	TAG_REFL_TAG_BLOCK(lighting_points)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_editor_folders_block)
+	TAG_REFL_PROPERTY(parent_folder)
+	TAG_REFL_STRING_256(name)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_level_data_block::s_campaign_level_data_block)
+	TAG_REFL_PROPERTY(campaign_id)
+	TAG_REFL_PROPERTY(map_id)
+	TAG_REFL_TAG_REFERENCE(bitmap)
+	TAG_REFL_USTRING_32(english_name)
+	TAG_REFL_USTRING_32(japanese_name)
+	TAG_REFL_USTRING_32(german_name)
+	TAG_REFL_USTRING_32(french_name)
+	TAG_REFL_USTRING_32(spanish_name)
+	TAG_REFL_USTRING_32(italian_name)
+	TAG_REFL_USTRING_32(korean_name)
+	TAG_REFL_USTRING_32(chinese_name)
+	TAG_REFL_USTRING_32(portuguese_name)
+	TAG_REFL_USTRING_128(english_description)
+	TAG_REFL_USTRING_128(japanese_description)
+	TAG_REFL_USTRING_128(german_description)
+	TAG_REFL_USTRING_128(french_description)
+	TAG_REFL_USTRING_128(spanish_description)
+	TAG_REFL_USTRING_128(italian_description)
+	TAG_REFL_USTRING_128(korean_description)
+	TAG_REFL_USTRING_128(chinese_description)
+	TAG_REFL_USTRING_128(portuguese_description)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_level_data_block::s_multiplayer_block)
+	TAG_REFL_PROPERTY(map_id)
+	TAG_REFL_TAG_REFERENCE(bitmap)
+	TAG_REFL_USTRING_32(english_name)
+	TAG_REFL_USTRING_32(japanese_name)
+	TAG_REFL_USTRING_32(german_name)
+	TAG_REFL_USTRING_32(french_name)
+	TAG_REFL_USTRING_32(spanish_name)
+	TAG_REFL_USTRING_32(italian_name)
+	TAG_REFL_USTRING_32(korean_name)
+	TAG_REFL_USTRING_32(chinese_name)
+	TAG_REFL_USTRING_32(portuguese_name)
+	TAG_REFL_USTRING_128(english_description)
+	TAG_REFL_USTRING_128(japanese_description)
+	TAG_REFL_USTRING_128(german_description)
+	TAG_REFL_USTRING_128(french_description)
+	TAG_REFL_USTRING_128(spanish_description)
+	TAG_REFL_USTRING_128(italian_description)
+	TAG_REFL_USTRING_128(korean_description)
+	TAG_REFL_USTRING_128(chinese_description)
+	TAG_REFL_USTRING_128(portuguese_description)
+	TAG_REFL_STRING_256(path)
+	TAG_REFL_PROPERTY(sort_order)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_PROPERTY(max_teams_none)
+	TAG_REFL_PROPERTY(max_teams_ctf)
+	TAG_REFL_PROPERTY(max_teams_slayer)
+	TAG_REFL_PROPERTY(max_teams_oddball)
+	TAG_REFL_PROPERTY(max_teams_koth)
+	TAG_REFL_PROPERTY(max_teams_race)
+	TAG_REFL_PROPERTY(max_teams_headhunter)
+	TAG_REFL_PROPERTY(max_teams_juggernaut)
+	TAG_REFL_PROPERTY(max_teams_territories)
+	TAG_REFL_PROPERTY(max_teams_assault)
+	TAG_REFL_PROPERTY(max_teams_stub_10)
+	TAG_REFL_PROPERTY(max_teams_stub_11)
+	TAG_REFL_PROPERTY(max_teams_stub_12)
+	TAG_REFL_PROPERTY(max_teams_stub_13)
+	TAG_REFL_PROPERTY(max_teams_stub_14)
+	TAG_REFL_PROPERTY(max_teams_stub_15)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_level_data_block)
+	TAG_REFL_TAG_REFERENCE(level_description)
+	TAG_REFL_TAG_BLOCK(campaign_level_data)
+	TAG_REFL_TAG_BLOCK(multiplayer)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_mission_dialogue_block)
+	TAG_REFL_TAG_REFERENCE(mission_dialogue)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_interpolators_block::s_data_block)
+	TAG_REFL_PROPERTY(value)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_interpolators_block)
+	TAG_REFL_STRING_ID(name)
+	TAG_REFL_STRING_ID(accelerator_name)
+	TAG_REFL_STRING_ID(multiplier_name)
+	TAG_REFL_DATA_BLOCK(data)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_screen_effect_references_block)
+	TAG_REFL_TAG_REFERENCE(screen_effect)
+	TAG_REFL_STRING_ID(primary_input)
+	TAG_REFL_STRING_ID(secondary_input)
+REFL_END
+
+TAG_REFL_TAG_BLOCK_DEF(s_scenario_group_definition::s_simulation_definition_table_block)
+	TAG_REFL_TAG_REFERENCE(tag)
+REFL_END
+
+TAG_REFL(s_scenario_group_definition)
+	TAG_REFL_TAG_REFERENCE(do_not_use)
+	TAG_REFL_TAG_BLOCK(skies)
+	TAG_REFL_PROPERTY(type)
+	TAG_REFL_PROPERTY(flags)
+	TAG_REFL_ANGLE(local_north)
+	TAG_REFL_TAG_BLOCK(predicted_resources)
+	TAG_REFL_DATA_BLOCK(editor_scenario_data)
+	TAG_REFL_TAG_BLOCK(comments)
+	TAG_REFL_TAG_BLOCK(object_names)
+	TAG_REFL_TAG_BLOCK(scenery)
+	TAG_REFL_TAG_BLOCK(scenery_palette)
+	TAG_REFL_TAG_BLOCK(bipeds)
+	TAG_REFL_TAG_BLOCK(biped_palette)
+	TAG_REFL_TAG_BLOCK(vehicles)
+	TAG_REFL_TAG_BLOCK(vehicle_palette)
+	TAG_REFL_TAG_BLOCK(equipment)
+	TAG_REFL_TAG_BLOCK(equipment_palette)
+	TAG_REFL_TAG_BLOCK(weapons)
+	TAG_REFL_TAG_BLOCK(weapon_palette)
+	TAG_REFL_TAG_BLOCK(device_groups)
+	TAG_REFL_TAG_BLOCK(machines)
+	TAG_REFL_TAG_BLOCK(machine_palette)
+	TAG_REFL_TAG_BLOCK(controls)
+	TAG_REFL_TAG_BLOCK(control_palette)
+	TAG_REFL_TAG_BLOCK(light_fixtures)
+	TAG_REFL_TAG_BLOCK(light_fixtures_palette)
+	TAG_REFL_TAG_BLOCK(sound_scenery)
+	TAG_REFL_TAG_BLOCK(sound_scenery_palette)
+	TAG_REFL_TAG_BLOCK(light_volumes)
+	TAG_REFL_TAG_BLOCK(light_volumes_palette)
+	TAG_REFL_TAG_BLOCK(player_starting_profile)
+	TAG_REFL_TAG_BLOCK(player_starting_locations)
+	TAG_REFL_TAG_BLOCK(kill_trigger_volumes)
+	TAG_REFL_TAG_BLOCK(netgame_flags)
+	TAG_REFL_TAG_BLOCK(netgame_equipment)
+	TAG_REFL_TAG_BLOCK(starting_equipment)
+	TAG_REFL_TAG_BLOCK(bsp_switch_trigger_volumes)
+	TAG_REFL_TAG_BLOCK(decals)
+	TAG_REFL_TAG_BLOCK(decals_palette)
+	TAG_REFL_TAG_BLOCK(detail_object_collection_palette)
+	TAG_REFL_TAG_BLOCK(style_palette)
+	TAG_REFL_TAG_BLOCK(squad_groups)
+	TAG_REFL_TAG_BLOCK(squads)
+	TAG_REFL_TAG_BLOCK(zones)
+	TAG_REFL_TAG_BLOCK(mission_scenes)
+	TAG_REFL_TAG_BLOCK(character_palette)
+	TAG_REFL_DATA_BLOCK(script_syntax_data)
+	TAG_REFL_DATA_BLOCK(script_string_data)
+	TAG_REFL_TAG_BLOCK(scripts)
+	TAG_REFL_TAG_BLOCK(globals)
+	TAG_REFL_TAG_BLOCK(script_references)
+	TAG_REFL_TAG_BLOCK(scripting_data)
+	TAG_REFL_TAG_BLOCK(cutscene_flags)
+	TAG_REFL_TAG_BLOCK(cutscene_camera_points)
+	TAG_REFL_TAG_BLOCK(cutscene_titles)
+	TAG_REFL_TAG_REFERENCE(custom_object_names)
+	TAG_REFL_TAG_REFERENCE(chapter_title_text)
+	TAG_REFL_TAG_REFERENCE(hud_messages)
+	TAG_REFL_TAG_BLOCK(structure_bsps)
+	TAG_REFL_TAG_BLOCK(scenario_resources)
+	TAG_REFL_TAG_BLOCK(structure_physics)
+	TAG_REFL_TAG_BLOCK(hs_unit_seats)
+	TAG_REFL_TAG_BLOCK(scenario_kill_triggers)
+	TAG_REFL_TAG_BLOCK(script_expressions)
+	TAG_REFL_TAG_BLOCK(orders)
+	TAG_REFL_TAG_BLOCK(ai_triggers)
+	TAG_REFL_TAG_BLOCK(background_sound_palette)
+	TAG_REFL_TAG_BLOCK(sound_environment_palette)
+	TAG_REFL_TAG_BLOCK(weather_palette)
+	TAG_REFL_TAG_BLOCK(scenario_cluster_data)
+	TAG_REFL_TAG_BLOCK(spawn_data)
+	TAG_REFL_TAG_BLOCK(crates)
+	TAG_REFL_TAG_BLOCK(crates_palette)
+	TAG_REFL_TAG_REFERENCE(global_lighting)
+	TAG_REFL_TAG_BLOCK(atmospheric_fog_palette)
+	TAG_REFL_TAG_BLOCK(planar_fog_palette)
+	TAG_REFL_TAG_BLOCK(flocks)
+	TAG_REFL_TAG_REFERENCE(subtitles)
+	TAG_REFL_TAG_BLOCK(creatures_palette)
+	TAG_REFL_TAG_BLOCK(decorators_palette)
+	TAG_REFL_TAG_BLOCK(bsp_transition_volumes)
+	TAG_REFL_TAG_BLOCK(structure_bsp_lighting)
+	TAG_REFL_TAG_BLOCK(editor_folders)
+	TAG_REFL_TAG_BLOCK(level_data)
+	TAG_REFL_TAG_REFERENCE(territory_location_names)
+	TAG_REFL_TAG_BLOCK(mission_dialogue)
+	TAG_REFL_TAG_REFERENCE(objectives)
+	TAG_REFL_TAG_BLOCK(interpolators)
+	TAG_REFL_TAG_BLOCK(screen_effect_references)
+	TAG_REFL_TAG_BLOCK(simulation_definition_table)
+REFL_END

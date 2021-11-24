@@ -1,5 +1,5 @@
 #pragma once
-
+#include "refl-cpp/refl-exentended.hpp"
 //Base definition for a TagGroup
 template <const LONG GroupTag>
 struct TagGroup
