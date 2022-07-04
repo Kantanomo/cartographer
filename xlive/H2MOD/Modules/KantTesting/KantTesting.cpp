@@ -140,6 +140,9 @@ namespace KantTesting
 	typedef void(__cdecl t_object_attach_to_marker)(datum target, string_id target_marker, datum object, string_id object_marker);
 	t_object_attach_to_marker* c_object_attach_to_marker;
 
+	typedef void(__cdecl t_objects_detach)(datum object_index);
+	t_objects_detach* c_objects_detach;
+
 	void __cdecl examine_objects_nearby(int player_index)
 	{
 		auto player = s_player::GetPlayer(player_index);
@@ -190,7 +193,8 @@ namespace KantTesting
 										if(c_objects_can_see_objects_internal(player->unit_index, output[i], 30))
 										{
 											LOG_INFO_GAME("{} Looking at object {:x} {}", __FUNCTION__, output[i], tags::get_tag_name(object->tag_definition_index));
-											c_object_attach_to_marker(player->unit_index, HaloString::HS_HEAD, output[i], 0);
+											c_object_attach_to_marker(player->unit_index, 0, output[i], 0);
+											//c_object_attach_to_marker(output[i], 0, player->unit_index, 0);
 										}
 										break;
 									default:;
@@ -204,6 +208,7 @@ namespace KantTesting
 		}
 	}
 	int a = VK_NUMPAD0;
+	int b = VK_NUMPAD1;
 	void Initialize()
 	{
 		if (ENABLEKANTTEST) {
@@ -211,7 +216,20 @@ namespace KantTesting
 			c_objects_in_sphere = Memory::GetAddress<t_objects_in_sphere*>(0x1331BA);
 			c_objects_can_see_objects_internal = Memory::GetAddress<t_objects_can_see_objects_internal*>(0xFDBD5);
 			c_object_attach_to_marker = Memory::GetAddress<t_object_attach_to_marker*>(0x1381E1);
+			c_objects_detach = Memory::GetAddress<t_objects_detach*>(0x137A84);
 			KeyboardInput::RegisterHotkey(&a, [] { examine_objects_nearby(0); });
+			KeyboardInput::RegisterHotkey(&b, []
+				{
+					auto player = s_player::GetPlayer(0);
+					if (!DATUM_IS_NONE(player->unit_index))
+					{
+						auto unit = object_get_fast_unsafe<s_biped_data_definition>(player->unit_index);
+						if (!DATUM_IS_NONE(unit->parent_datum))
+						{
+							c_objects_detach(DATUM_INDEX_TO_ABSOLUTE_INDEX(player->unit_index));
+						}
+					}
+				});
 		//	if (!Memory::isDedicatedServer())
 			//{
 			//tags::on_map_load(MapLoad);
