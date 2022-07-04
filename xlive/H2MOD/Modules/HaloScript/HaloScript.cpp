@@ -60,6 +60,14 @@ namespace HaloScript
 		p_object_destroy(object_datum_index);
 	}
 
+	typedef bool(__cdecl t_objects_can_see_object)(datum observing_datum, datum target_datum, float angle);
+	t_objects_can_see_object* p_objects_can_see_object;
+	bool ObjectsCanSeeObject(datum observing_object, datum target_object, float angle)
+	{
+		return p_objects_can_see_object(observing_object, target_object, angle);
+	}
+
+
 	void Initialize()
 	{
 		p_unit_kill	= Memory::GetAddress<unit_kill_t*>(0x13B514, 0x12A363);
@@ -70,5 +78,6 @@ namespace HaloScript
 		p_physics_set_velocity_frame = Memory::GetAddress<physics_set_velocity_frame_t*>(0xB3D5B, 0xA3F6E);
 		p_render_lights_enable_cinematic_shadow = Memory::GetAddress<render_lights_enable_cinematic_shadow_t*>(0x19245A);
 		p_object_destroy = Memory::GetAddress<object_destroy_t*>(0xFDCFD, 0x124ED5);
+		p_objects_can_see_object = Memory::GetAddress<t_objects_can_see_object*>(0xFDC5C);
 	}
 }

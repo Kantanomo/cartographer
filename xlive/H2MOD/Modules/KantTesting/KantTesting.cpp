@@ -18,6 +18,9 @@
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Blam\Engine\Memory\bitstream.h"
 #include "Blam\Engine\Memory\bitstream.h"
+#include "Blam/Enums/HaloStrings.h"
+#include "H2MOD/Modules/HaloScript/HaloScript.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
@@ -126,10 +129,89 @@ namespace KantTesting
 			//rep->third_person_variant = new_variant->name;
 		}
 	}
-	
+
+
+	typedef int(__cdecl t_objects_in_sphere)(int a1, int object_type, DWORD* a3, real_point3d* a4, real_point2d* a5, int* a6, __int16 a7);
+	t_objects_in_sphere* c_objects_in_sphere;
+
+	typedef bool(__cdecl t_objects_can_see_objects_internal)(datum observer, datum target, float angle);
+	t_objects_can_see_objects_internal* c_objects_can_see_objects_internal;
+
+	typedef void(__cdecl t_object_attach_to_marker)(datum target, string_id target_marker, datum object, string_id object_marker);
+	t_object_attach_to_marker* c_object_attach_to_marker;
+
+	void __cdecl examine_objects_nearby(int player_index)
+	{
+		auto player = s_player::GetPlayer(player_index);
+		if(!DATUM_IS_NONE(player->unit_index))
+		{
+			auto unit = object_get_fast_unsafe<s_biped_data_definition>(player->unit_index);
+			if (DATUM_IS_NONE(unit->parent_datum))
+			{
+				auto searchRadius = unit->radius + 0.8f;
+
+				real_point2d unk_point = { searchRadius, searchRadius + 3 };
+				int unk_loc[2] = { 4, -5 };
+				DWORD* location = unit->location;
+				real_point3d* center = &unit->center;
+
+				auto iter = 0;
+				int output[64];
+				/*do
+				{*/
+					auto found = c_objects_in_sphere(0, 0, location, center, &unk_point, output, 64);
+					if(found > 0)
+					{
+						LOG_INFO_GAME("{} found {} objects", __FUNCTION__, found);
+						for(auto i = 0; i < found; i++)
+						{
+							auto object = object_get_fast_unsafe<s_object_data_definition>(output[i]);
+							auto object_type = 1 << object->object_type;
+							if((object_type & (FLAG(e_object_type::creature | e_object_type::sound_scenery | e_object_type::projectile | e_object_type::garbage))) == 0)
+							{
+
+								auto distance = *center - object->center;
+								auto a = (object->radius + searchRadius) * (object->radius + searchRadius);
+								auto b = distance.x * distance.x;
+								auto c = distance.y * distance.y;
+								auto d = distance.z * distance.z;
+
+								if (a >= b + c + d) 
+								{
+									switch (object->object_type)
+									{
+									case vehicle:
+									case weapon:
+									case equipment:
+									case scenery:
+									case crate:
+									case creature:
+										LOG_INFO_GAME("{} found valid object {:x} {}", __FUNCTION__, output[i], tags::get_tag_name(object->tag_definition_index));
+										if(c_objects_can_see_objects_internal(player->unit_index, output[i], 30))
+										{
+											LOG_INFO_GAME("{} Looking at object {:x} {}", __FUNCTION__, output[i], tags::get_tag_name(object->tag_definition_index));
+											c_object_attach_to_marker(player->unit_index, HaloString::HS_HEAD, output[i], 0);
+										}
+										break;
+									default:;
+									}
+								}
+							}
+						}
+					}
+				//}
+			}
+		}
+	}
+	int a = VK_NUMPAD0;
 	void Initialize()
 	{
 		if (ENABLEKANTTEST) {
+
+			c_objects_in_sphere = Memory::GetAddress<t_objects_in_sphere*>(0x1331BA);
+			c_objects_can_see_objects_internal = Memory::GetAddress<t_objects_can_see_objects_internal*>(0xFDBD5);
+			c_object_attach_to_marker = Memory::GetAddress<t_object_attach_to_marker*>(0x1381E1);
+			KeyboardInput::RegisterHotkey(&a, [] { examine_objects_nearby(0); });
 		//	if (!Memory::isDedicatedServer())
 			//{
 			//tags::on_map_load(MapLoad);
