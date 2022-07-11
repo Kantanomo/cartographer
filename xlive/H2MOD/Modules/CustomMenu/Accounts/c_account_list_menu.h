@@ -17,7 +17,7 @@ public:
 	bool account_removal_mode;
 	// button handler callback
 
-	c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _default_selected_button, bool _account_removal_mode);
+	c_account_edit_list(int _flags, int _account_count, int _default_selected_button, bool _account_removal_mode);
 
 	virtual char* get_item_list() override
 	{
@@ -57,12 +57,12 @@ public:
 	
 	static bool accountingGoBackToList;
 	static int accountingActiveHandleCount;
-	static bool isAccountingActiveHandle();
+	static bool IsAccountingActiveHandle();
 	static void UpdateAccountingActiveHandle(bool active);
 
 	static void* __cdecl open(s_new_ui_screen_parameters* a1);
 
-	c_account_list_menu::c_account_list_menu(int _ui_channel, int a4, __int16 _flags, bool account_removal_mode);
+	c_account_list_menu(int _ui_channel, int a4, __int16 _flags, bool account_removal_mode);
 
 	// interface
 	virtual int custom_deconstructor(BYTE flags) override
