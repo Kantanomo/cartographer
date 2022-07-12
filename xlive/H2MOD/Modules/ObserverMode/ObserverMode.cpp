@@ -129,8 +129,35 @@ namespace ObserverMode
 
 		if(ObserverMode == observer_followcam)
 		{
-			float distance = control->actions.throttle.y * 0.01;
-			CameraPosition->j -= distance;
+			//float distance = control->actions.throttle.y * 0.01;
+			//CameraPosition->j -= distance;
+			float movementAngle = GetAngle(0, 0, control->actions.throttle.x * MAXSHORT, control->actions.throttle.y * MAXSHORT) + 90.0f;
+			float movementDistance = GetDistance(0, 0, control->actions.throttle.x, control->actions.throttle.y);
+			if (isnan(movementAngle)) movementAngle = 0;
+			if (isnan(movementDistance)) movementDistance = 0;
+			if (movementDistance > 1) movementDistance = 1;
+			if (abs(movementAngle - 0) < 10) movementAngle = 0;
+			if (abs(movementAngle - 360) < 10) movementAngle = 0;
+			if (abs(movementAngle - 90) < 10) movementAngle = 90;
+			if (abs(movementAngle - 180) < 10) movementAngle = 180;
+			if (abs(movementAngle - 270) < 10) movementAngle = 270;
+
+			//LOG_INFO_GAME("[ObserverMode] : Movement Angle {}", IntToString<float>(movementAngle));
+
+			float PitchUnk = (((CameraAngles->j + ((float)1.492256522)) * 180.0f) / 2.984513f) - 90.0f;
+			float YawUnk = (CameraAngles->i * 360.0f) / 6.283185f;
+
+			float Num1 = (float)(sin((movementAngle * M_PI) / 180.0f) * (movementDistance * 0.05f));
+			float Num2 = (float)-(cos((movementAngle * M_PI) / 180.0f) * (movementDistance * 0.05f));
+			float num14 = (float)((sin((PitchUnk * M_PI) / 180.0) * Num1));
+			float num15 = (float)(((cos((PitchUnk * M_PI) / 180.0) * Num1)) * sin((YawUnk * M_PI) / 180.0));
+			float num16 = (float)(((cos((PitchUnk * M_PI) / 180.0) * Num1)) * cos((YawUnk * M_PI) / 180.0));
+			float num17 = (float)((Num2)*sin(((YawUnk - 90.0f) * M_PI) / 180.0));
+			float num18 = (float)((Num2)*cos(((YawUnk - 90.0f) * M_PI) / 180.0));
+
+			CameraPosition->i += (num18 + num16);
+			CameraPosition->j += (num15 + num17);
+			CameraPosition->k += num14 + (control->actions.trigger * 0.03f) + -(control->actions.secondary_trigger * 0.03f);
 		}
 
 
@@ -174,7 +201,7 @@ namespace ObserverMode
 			}
 			else if (mode == observer_firstperson)
 			{
-				DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
+				DirectorHooks::SetDirectorMode(DirectorHooks::e_scripted);
 			}
 			else if (mode == observer_none)
 			{
@@ -215,6 +242,8 @@ namespace ObserverMode
 	typedef void(__cdecl p_sub_7BD2EC)(int a1, DWORD* a2);
 	p_sub_7BD2EC* sub_7BD2EC;
 
+	typedef void(__cdecl t_object_get_center_of_mass)(datum index, real_point3d* out);
+	t_object_get_center_of_mass* p_object_get_center_of_mass;
 	//This is called with the local player index and unk
 	//local_player_index was used in the original function to grab the local player unit_datum for following
 	//unk is believed to be the editor_camera setting
@@ -222,8 +251,9 @@ namespace ObserverMode
 	{
 		s_data_array* Objects = *Memory::GetAddress<s_data_array**>(0x4E461C);
 		if (observer_current_index == -1) {
-			NextPlayer();
+			//NextPlayer();
 		}
+		//observer_current_index = 0xE2800011;
 		if(unk != 65535){
 			*(DWORD*)(unk + 8) = 0;
 			*(DWORD*)(unk) = DATUM_INDEX_TO_ABSOLUTE_INDEX(observer_current_index);
@@ -231,10 +261,15 @@ namespace ObserverMode
 
 			auto object = *(DWORD*)&Objects->data[12 * DATUM_INDEX_TO_ABSOLUTE_INDEX(observer_current_index) + 4];
 			//LOG_INFO_GAME("[ObserverMode] Object {}, Address {}", observer_current_index, IntToString<int>(object, std::hex));
-			sub_7BD2EC(DATUM_INDEX_TO_ABSOLUTE_INDEX(observer_current_index), (DWORD*)(unk + 12));
+			//sub_7BD2EC(DATUM_INDEX_TO_ABSOLUTE_INDEX(observer_current_index), (DWORD*)(unk + 12));
+			p_object_get_center_of_mass(observer_current_index, (real_point3d*)(unk + 12));
+			((real_point3d*)(unk + 12))->z += 0.5f;
 		}
 	}
-
+	void SetTarget(datum target)
+	{
+		observer_current_index = target;
+	}
 	void ApplyHooks()
 	{
 		p_editor_camera_update = (h_editor_camera_update)DetourFunc(Memory::GetAddress<BYTE*>(0xCC41E), (BYTE*)editor_camera_update, 7);
@@ -253,7 +288,7 @@ namespace ObserverMode
 		//network_player_actions = Memory::GetAddress<Blam::EngineDefinitions::Players::s_network_player_actions**>(0x514EE8);
 
 		sub_7BD2EC = Memory::GetAddress<p_sub_7BD2EC*>(0x13D2EC);
-
+		p_object_get_center_of_mass = Memory::GetAddress<t_object_get_center_of_mass*>(0x132A23);
 		ImGuiHandler::ImDebugOverlay::AddWatchItem("oyaw", "Observer Yaw");
 		ImGuiHandler::ImDebugOverlay::AddWatchItem("opitch", "Observer Pitch");
 		ImGuiHandler::ImDebugOverlay::AddWatchItem("oyawu", "Yaw Calc");

@@ -16,6 +16,9 @@
 
 #include "imgui.h"
 #include "imgui_handler.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Utils/Utils.h"
 
 namespace ImGuiHandler {
 	namespace ImAdvancedSettings {
@@ -960,7 +963,7 @@ namespace ImGuiHandler {
 				GameSettings();
 
 				
-#if DISPLAY_DEV_TESTING_MENU
+#if 1
 				if (ImGui::CollapsingHeader("Dev Testing"))
 				{
 					if(ImGui::CollapsingHeader("Misc"))
@@ -973,8 +976,8 @@ namespace ImGuiHandler {
 							while(playerIt.get_next_active_player())
 							{
 								auto player = playerIt.get_current_player_data();
-								int object = *(int*)&Objects->datum[12 * player->unit_index.Index + 8];
-								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
+								//int object = *(int*)&Objects->data[12 * player->unit_index.Index + 8];
+								//LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
 							}
 						}
 					}
@@ -982,7 +985,7 @@ namespace ImGuiHandler {
 					{
 						if(ImGui::Button("Game"))
 						{
-							DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
+							DirectorHooks::SetDirectorMode(DirectorHooks::e_scripted);
 							ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
 						}
 						if(ImGui::Button("Editor"))
@@ -1003,7 +1006,7 @@ namespace ImGuiHandler {
 						}
 						if(ImGui::Button("Player"))
 						{
-							DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
+							DirectorHooks::SetDirectorMode(DirectorHooks::e_scripted);
 							ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
 						}
 						if(ImGui::Button("N"))

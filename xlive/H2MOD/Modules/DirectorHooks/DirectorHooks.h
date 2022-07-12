@@ -4,7 +4,7 @@ namespace DirectorHooks
 {
 	enum e_director_mode
 	{
-		e_game = 1,
+		e_scripted = 1,
 		e_editor = 2,
 		e_firstperson = 4
 	};

@@ -19,8 +19,10 @@
 #include "Blam\Engine\Memory\bitstream.h"
 #include "Blam\Engine\Memory\bitstream.h"
 #include "Blam/Enums/HaloStrings.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
@@ -143,6 +145,14 @@ namespace KantTesting
 	typedef void(__cdecl t_objects_detach)(datum object_index);
 	t_objects_detach* c_objects_detach;
 
+	typedef void(__cdecl t_object_set_velocities)(datum index, real_vector3d* translation, real_point3d* angular);
+	t_object_set_velocities* c_object_set_velocities;
+	auto tran = new real_vector3d{ 0, 50, 0 };
+	auto angu = new real_point3d{ 0,20,0 };
+
+	typedef void(__cdecl t_item_maintains_z_up)(datum index);
+	t_item_maintains_z_up* c_item_maintains_z_up;
+	datum current_object;
 	void __cdecl examine_objects_nearby(int player_index)
 	{
 		auto player = s_player::GetPlayer(player_index);
@@ -193,7 +203,11 @@ namespace KantTesting
 										if(c_objects_can_see_objects_internal(player->unit_index, output[i], 30))
 										{
 											LOG_INFO_GAME("{} Looking at object {:x} {}", __FUNCTION__, output[i], tags::get_tag_name(object->tag_definition_index));
-											c_object_attach_to_marker(player->unit_index, 0, output[i], 0);
+											//c_object_attach_to_marker(player->unit_index, 0, output[i], 0);
+											ObserverMode::SwitchObserverMode(ObserverMode::observer_followcam);
+											ObserverMode::SetTarget(output[i]);
+											current_object = output[i];
+											HaloScript::ObjectSetVelocity(output[i], 10, 0, 0);
 											//c_object_attach_to_marker(output[i], 0, player->unit_index, 0);
 										}
 										break;
@@ -209,6 +223,32 @@ namespace KantTesting
 	}
 	int a = VK_NUMPAD0;
 	int b = VK_NUMPAD1;
+	int forward = VK_NUMPAD8;
+	int back = VK_NUMPAD2;
+	int left = VK_NUMPAD4;
+	int right = VK_NUMPAD6;
+	void moveobject(int dir)
+	{
+		switch(dir)
+		{
+		case 0:
+			HaloScript::ObjectSetVelocity(current_object, 10, 0, 0);
+			c_item_maintains_z_up(current_object);
+			break;
+		case 1:
+			HaloScript::ObjectSetVelocity(current_object, 0, 10, 0);
+			c_item_maintains_z_up(current_object);
+			break;
+		case 2:
+			HaloScript::ObjectSetVelocity(current_object, 0, -10, 0);
+			c_item_maintains_z_up(current_object);
+			break;
+		case 3:
+			HaloScript::ObjectSetVelocity(current_object, -10, 0, 0);
+			c_item_maintains_z_up(current_object);
+			break;
+		}
+	}
 	void Initialize()
 	{
 		if (ENABLEKANTTEST) {
@@ -217,10 +257,13 @@ namespace KantTesting
 			c_objects_can_see_objects_internal = Memory::GetAddress<t_objects_can_see_objects_internal*>(0xFDBD5);
 			c_object_attach_to_marker = Memory::GetAddress<t_object_attach_to_marker*>(0x1381E1);
 			c_objects_detach = Memory::GetAddress<t_objects_detach*>(0x137A84);
+			c_object_set_velocities = Memory::GetAddress<t_object_set_velocities*>(0x135123);
+			c_item_maintains_z_up = Memory::GetAddress<t_item_maintains_z_up*>(0x181349);
 			KeyboardInput::RegisterHotkey(&a, [] { examine_objects_nearby(0); });
 			KeyboardInput::RegisterHotkey(&b, []
 				{
-					auto player = s_player::GetPlayer(0);
+					DirectorHooks::SetDirectorMode(DirectorHooks::e_firstperson);
+					/*auto player = s_player::GetPlayer(0);
 					if (!DATUM_IS_NONE(player->unit_index))
 					{
 						auto unit = object_get_fast_unsafe<s_biped_data_definition>(player->unit_index);
@@ -228,8 +271,12 @@ namespace KantTesting
 						{
 							c_objects_detach(DATUM_INDEX_TO_ABSOLUTE_INDEX(player->unit_index));
 						}
-					}
+					}*/
 				});
+			KeyboardInput::RegisterHotkey(&forward,[]{ moveobject(0); });
+			KeyboardInput::RegisterHotkey(&back, [] { moveobject(3); });
+			KeyboardInput::RegisterHotkey(&left, [] { moveobject(1); });
+			KeyboardInput::RegisterHotkey(&right, [] { moveobject(2); });
 		//	if (!Memory::isDedicatedServer())
 			//{
 			//tags::on_map_load(MapLoad);

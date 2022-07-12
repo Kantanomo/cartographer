@@ -1,4 +1,5 @@
 #pragma once
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 
 namespace ObserverMode
 {
@@ -11,7 +12,7 @@ namespace ObserverMode
 	};
 	void NextPlayer();
 	void SwitchObserverMode(e_observer_mode mode);
-	
+	void SetTarget(datum target);
 	void FollowObject(int local_player_index, int unk);
 	void ApplyHooks();
 	void Initialize();

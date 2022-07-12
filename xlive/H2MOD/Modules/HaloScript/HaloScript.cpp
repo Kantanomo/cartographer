@@ -67,6 +67,12 @@ namespace HaloScript
 		return p_objects_can_see_object(observing_object, target_object, angle);
 	}
 
+	typedef void(__cdecl t_object_set_velocity)(datum index, float i, float j, float k);
+	t_object_set_velocity* p_object_set_velocity;
+	void ObjectSetVelocity(datum index, float i, float j, float k)
+	{
+		p_object_set_velocity(index, i, j, k);
+	}
 
 	void Initialize()
 	{
@@ -79,5 +85,6 @@ namespace HaloScript
 		p_render_lights_enable_cinematic_shadow = Memory::GetAddress<render_lights_enable_cinematic_shadow_t*>(0x19245A);
 		p_object_destroy = Memory::GetAddress<object_destroy_t*>(0xFDCFD, 0x124ED5);
 		p_objects_can_see_object = Memory::GetAddress<t_objects_can_see_object*>(0xFDC5C);
+		p_object_set_velocity = Memory::GetAddress<t_object_set_velocity*>(0x14B83F);
 	}
 }

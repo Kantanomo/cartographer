@@ -47,6 +47,8 @@
 
 #include <float.h>
 
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)
 #endif
@@ -1211,7 +1213,7 @@ void H2MOD::Initialize()
 		DirectorHooks::Initialize();
 		SpecialEvents::Initialize();
 		ImGuiHandler::WeaponOffsets::Initialize();
-		//ObserverMode::Initialize();
+		ObserverMode::Initialize();
 		TEST_N_DEF(PC3);
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
