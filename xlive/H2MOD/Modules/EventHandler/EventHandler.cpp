@@ -13,5 +13,6 @@ std::map<EventType, std::vector<EventCallback>> event_map =
 	{ EventType::player_control,	{} },
 	{ EventType::blue_screen,		{} },
 	{ EventType::player_spawn,		{} },
-	{ EventType::object_damage,		{} }
+	{ EventType::object_damage,		{} },
+	{ EventType::object_update,		{}}
 };

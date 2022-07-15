@@ -304,7 +304,7 @@ void main_game_loop_hook() {
 	// update local user network stats
 	gXnIp.GetLocalUserXn()->pckStats.PckDataSampleUpdate();
 	main_game_loop();
-	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
+ 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }
 
 static char HookedServerShutdownCheck() {

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "KantTesting.h"
+
+#include "Blam/Engine/Objects/ObjectGlobals.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
@@ -152,7 +154,42 @@ namespace KantTesting
 
 	typedef void(__cdecl t_item_maintains_z_up)(datum index);
 	t_item_maintains_z_up* c_item_maintains_z_up;
+
+	typedef void(__cdecl t_object_set_position_direct)(datum object_index, real_vector3d* forward, real_point3d* position, real_vector3d* up, DWORD* unk);
+	t_object_set_position_direct* c_object_set_position_direct;
+
+	typedef void(__cdecl t_object_set_in_limbo)(datum object_index, bool enable);
+	t_object_set_in_limbo* c_object_set_in_limbo;
+
+	typedef void(__cdecl t_object_activate)(datum object_index);
+	t_object_activate* c_object_activate;
+
 	datum current_object;
+	real_point3d current_location;
+	void main_z(datum index, EventHandler::e_object_update_event type)
+	{
+		if(index == current_object)
+		{
+			auto object = object_get_fast_unsafe<s_object_data_definition>(index);
+			object->up = *Memory::GetAddress<real_point3d*>(0x41272C);
+
+			auto c1 = (object->orientation.k * object->up.j) - (object->orientation.j * object->up.k);
+			auto c2 = (object->orientation.i * object->up.k) - (object->up.i * object->orientation.k);
+			auto c3 = (object->up.i * object->orientation.j) - (object->orientation.i * object->up.j);
+
+			auto p1 = (object->up.j * c1) - (object->up.i * c2);
+			auto p2 = (object->up.i * c3) - (object->up.k * c1);
+			auto p3 = (object->up.k * c2) - (object->up.j * c3);
+			object->orientation.i = p3;
+			object->orientation.j = p2;
+			object->orientation.k = p1;
+
+			if (normalize3d(&object->orientation) == 0.0f)
+				object->orientation = *Memory::GetAddress<real_vector3d*>(0x412724);
+			object->position.z = 2;
+			c_object_set_position_direct(index, &current_location, &object->orientation, &object->up, 0);
+		}
+	}
 	void __cdecl examine_objects_nearby(int player_index)
 	{
 		auto player = s_player::GetPlayer(player_index);
@@ -207,8 +244,14 @@ namespace KantTesting
 											ObserverMode::SwitchObserverMode(ObserverMode::observer_followcam);
 											ObserverMode::SetTarget(output[i]);
 											current_object = output[i];
-											HaloScript::ObjectSetVelocity(output[i], 10, 0, 0);
+											current_location = object_get_fast_unsafe<s_object_data_definition>(current_object)->position;
+											EventHandler::register_callback(main_z, EventType::object_update, EventExecutionType::execute_after);
+											//HaloScript::ObjectSetVelocity(output[i], 10, 0, 0);
+											//auto object = object_get_fast_unsafe<s_object_data_definition>(output[i]);
+											//c_object_set_position_direct(current_object, &object->orientation, &object->position, &object->up, 0);
 											//c_object_attach_to_marker(output[i], 0, player->unit_index, 0);
+											//c_object_activate(player->unit_index);
+
 										}
 										break;
 									default:;
@@ -221,6 +264,7 @@ namespace KantTesting
 			}
 		}
 	}
+
 	int a = VK_NUMPAD0;
 	int b = VK_NUMPAD1;
 	int forward = VK_NUMPAD8;
@@ -249,6 +293,156 @@ namespace KantTesting
 			break;
 		}
 	}
+	typedef void(__cdecl t_get_early_moving_objects)(int* data, int* count);
+	t_get_early_moving_objects* c_get_early_moving_objects;
+
+	typedef void(__cdecl t_object_update)(datum object_index);
+	t_object_update* c_object_update;
+
+	typedef void(__cdecl t_early_moving_update_unk)(datum object_index);
+	t_early_moving_update_unk* c_early_moving_update_unk;
+
+	typedef void(__cdecl t_object_move)(datum object_index);
+	t_object_move* c_object_move;
+
+	typedef void(__cdecl t_weapon_fire_barrels_eval)();
+	t_weapon_fire_barrels_eval* c_weapon_fire_barrels_eval;
+
+	typedef void(__cdecl t_object_pre_delete_recursive)(datum object_index);
+	t_object_pre_delete_recursive* c_object_pre_delete_recursive;
+
+	typedef void(__cdecl t_object_delete_recursive)(datum object_index, bool deactivate_first);
+	t_object_delete_recursive* c_object_delete_recursive;
+
+	typedef void(__cdecl t_objects_garbage_collection)();
+	t_objects_garbage_collection* c_objects_garbage_collection;
+
+	void __cdecl objects_update()
+	{
+		int early_moving_data;
+		int early_moving_count;
+		c_get_early_moving_objects(&early_moving_data, &early_moving_count);
+
+		s_object_globals::get()->objects_updating = true;
+
+		for (auto i = 0; i < early_moving_count; i++)
+		{
+			auto datum_index = *(datum*)(early_moving_data + 4 * i);
+			auto header = get_objects_header(datum_index);
+			auto flags = header->flags;
+			if ((flags & FLAG(e_object_header_flag::_object_header_active_bit)) != 0 &&
+				(flags & FLAG(e_object_header_flag::_object_header_requires_motion_bit)) != 0 &&
+				(flags & FLAG(e_object_header_flag::_object_header_being_deleted_bit)) == 0)
+			{
+				ObjectUpdateEventExecute(EventExecutionType::execute_before, datum_index, EventHandler::_e_object_update_event_early_mover);
+				c_object_update(datum_index);
+				ObjectUpdateEventExecute(EventExecutionType::execute_after, datum_index, EventHandler::_e_object_update_event_early_mover);
+
+				flags = header->flags;
+				if ((flags & FLAG(e_object_header_flag::object_header_flags_4)) != 0 && 
+					(flags & FLAG(e_object_header_flag::_object_header_being_deleted_bit)) == 0)
+				{
+					c_early_moving_update_unk(datum_index);
+				}
+			}
+		}
+
+		s_data_iterator<s_object_header> iterator(get_objects_header());
+		auto current = iterator.get_next_datum();
+		if(current)
+		{
+			do
+			{
+				auto flags = current->flags;
+				auto object = object_get_fast_unsafe<s_object_data_definition>(iterator.get_current_datum_index());
+				if(current->type == projectile)
+				{
+					LOG_INFO_GAME("[{}] {}", __FUNCTION__, current->flags);
+				}
+				if ((flags & FLAG(e_object_header_flag::_object_header_active_bit)) != 0 &&
+					(flags & FLAG(e_object_header_flag::_object_header_requires_motion_bit)) != 0 &&
+					(flags & FLAG(e_object_header_flag::_object_header_being_deleted_bit)) == 0 &&
+					(object->field_C0 & FLAG(8)) == 0)
+				{
+					ObjectUpdateEventExecute(EventExecutionType::execute_before, iterator.get_current_datum_index(), EventHandler::_e_object_update_event_default);
+					c_object_update(iterator.get_current_datum_index());
+					ObjectUpdateEventExecute(EventExecutionType::execute_after, iterator.get_current_datum_index(), EventHandler::_e_object_update_event_default);
+				}
+				current = iterator.get_next_datum();
+			} while (current);
+			s_object_globals::get()->objects_updating = false;
+		}
+		else
+		{
+			s_object_globals::get()->objects_updating = false;
+		}
+	}
+
+	void __cdecl objects_post_update()
+	{
+		s_object_globals::get()->objects_updating = true;
+		s_data_iterator<s_object_header> iterator(get_objects_header());
+		auto current = iterator.get_next_datum();
+		if(current)
+		{
+			do
+			{
+				auto index = iterator.get_current_datum_index();
+				current->flags = static_cast<e_object_header_flag>(current->flags & (
+					FLAG(_object_header_child_bit) |
+					FLAG(object_header_flags_10) |
+					FLAG(_object_header_being_deleted_bit) |
+					FLAG(object_header_flags_4) |
+					FLAG(_object_header_requires_motion_bit) |
+					FLAG(_object_header_active_bit) |
+					FLAG(_object_header_unk_bit)));
+
+				auto flags = current->flags;
+				if((flags & FLAG(_object_header_being_deleted_bit)) != 0 &&
+					(flags & FLAG(_object_header_active_bit)) != 0 &&
+					(flags & FLAG(_object_header_requires_motion_bit)) != 0 &&
+					(flags & FLAG(object_header_flags_10)) == 0)
+				{
+					current->flags = static_cast<e_object_header_flag>(current->flags & (
+						FLAG(_object_header_child_bit) |
+						FLAG(_object_header_connected_to_map_bit) |
+						FLAG(object_header_flags_10) |
+						FLAG(object_header_flags_4) |
+						FLAG(_object_header_requires_motion_bit) |
+						FLAG(_object_header_active_bit) |
+						FLAG(_object_header_unk_bit)));
+					ObjectUpdateEventExecute(EventExecutionType::execute_before, index, EventHandler::_e_object_update_event_post);
+					c_object_update(index);
+					ObjectUpdateEventExecute(EventExecutionType::execute_before, index, EventHandler::_e_object_update_event_post);
+					if ((current->flags & FLAG(object_header_flags_4)) != 0)
+						c_object_move(index);
+				}
+
+				current = iterator.get_next_datum();
+			} while (current);
+		}
+
+		c_weapon_fire_barrels_eval();
+		iterator.reset();
+		current = iterator.get_next_datum();
+		if (current)
+		{
+			do
+			{
+				auto index = iterator.get_current_datum_index();
+				if((current->flags & FLAG(object_header_flags_10)) != 0)
+				{
+					c_object_pre_delete_recursive(index);
+					c_object_delete_recursive(index, 1);
+				}
+				current = iterator.get_next_datum();
+			}
+			while (current);
+		}
+		s_object_globals::get()->objects_updating = false;
+		c_objects_garbage_collection();
+	}
+
 	void Initialize()
 	{
 		if (ENABLEKANTTEST) {
@@ -259,6 +453,10 @@ namespace KantTesting
 			c_objects_detach = Memory::GetAddress<t_objects_detach*>(0x137A84);
 			c_object_set_velocities = Memory::GetAddress<t_object_set_velocities*>(0x135123);
 			c_item_maintains_z_up = Memory::GetAddress<t_item_maintains_z_up*>(0x181349);
+			c_object_set_position_direct = Memory::GetAddress<t_object_set_position_direct*>(0x136B7F);
+			c_object_set_in_limbo = Memory::GetAddress<t_object_set_in_limbo*>(0x136355);
+			c_object_activate = Memory::GetAddress<t_object_activate*>(0x13204A);
+
 			KeyboardInput::RegisterHotkey(&a, [] { examine_objects_nearby(0); });
 			KeyboardInput::RegisterHotkey(&b, []
 				{
@@ -277,6 +475,19 @@ namespace KantTesting
 			KeyboardInput::RegisterHotkey(&back, [] { moveobject(3); });
 			KeyboardInput::RegisterHotkey(&left, [] { moveobject(1); });
 			KeyboardInput::RegisterHotkey(&right, [] { moveobject(2); });
+
+			c_get_early_moving_objects = Memory::GetAddress<t_get_early_moving_objects*>(0x14BA08);
+			c_object_update = Memory::GetAddress<t_object_update*>(0x1352A9);
+			c_early_moving_update_unk = Memory::GetAddress<t_early_moving_update_unk*>(0x14BC7D);
+			c_object_move = Memory::GetAddress<t_object_move*>(0x137E6D);
+			c_weapon_fire_barrels_eval = Memory::GetAddress<t_weapon_fire_barrels_eval*>(0x160AB7);
+			c_object_pre_delete_recursive = Memory::GetAddress<t_object_pre_delete_recursive*>(0x1386E1);
+			c_object_delete_recursive = Memory::GetAddress<t_object_delete_recursive*>(0x13683D);
+			c_objects_garbage_collection = Memory::GetAddress<t_objects_garbage_collection*>(0x1316A4);
+
+			PatchCall(Memory::GetAddress(0x4A52D), objects_update);
+			PatchCall(Memory::GetAddress(0x4A53C), objects_post_update);
+
 		//	if (!Memory::isDedicatedServer())
 			//{
 			//tags::on_map_load(MapLoad);

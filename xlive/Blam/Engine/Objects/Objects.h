@@ -119,7 +119,8 @@ struct s_object_data_definition
 	char gap_6[3];
 	datum havok_datum;
 	char gap_B8[8];
-	WORD field_C0;
+	BYTE field_C0;
+	BYTE field_C1;
 	WORD field_C2;
 	DWORD field_C4;
 	DWORD field_C8;
@@ -214,14 +215,16 @@ CHECK_STRUCT_SIZE(s_weapon_data_definition, 0x25C);
 
 enum e_object_header_flag :BYTE
 {
-	_object_header_active_bit = 0x1,
-	_object_header_requires_motion_bit = 0x2,
-	object_header_flags_4 = 0x4,
-	_object_header_being_deleted_bit = 0x8,
-	object_header_flags_10 = 0x10,
-	_object_header_connected_to_map_bit = 0x20,
-	_object_header_child_bit = 0x40,
+	_object_header_active_bit = 0,
+	_object_header_requires_motion_bit = 0x1,
+	object_header_flags_4 = 0x2,
+	_object_header_being_deleted_bit = 0x3,
+	object_header_flags_10 = 0x4,
+	_object_header_connected_to_map_bit = 0x5,
+	_object_header_child_bit = 0x6,
+	_object_header_unk_bit = 0x7
 };
+
 
 
 struct s_object_header {

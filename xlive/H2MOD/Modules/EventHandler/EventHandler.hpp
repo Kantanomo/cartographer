@@ -44,7 +44,8 @@ enum class EventType
 	player_control,
 	blue_screen,
 	player_spawn,
-	object_damage
+	object_damage,
+	object_update
 };
 
 enum class EventExecutionType
@@ -80,7 +81,12 @@ namespace EventHandler
 		add,
 		remove
 	};
-
+	enum e_object_update_event
+	{
+		_e_object_update_event_default,
+		_e_object_update_event_early_mover,
+		_e_object_update_event_post
+	};
 	using CountdownStartEventCallback = void(*)();
 	using GameLifeCycleEventCallback = void(*)(e_game_life_cycle state);
 	using NetworkPlayerEventCallback = void(*)(int peerIndex, NetworkPlayerEventType type);
@@ -91,6 +97,7 @@ namespace EventHandler
 	using BlueScreenEventCallback = void(*)();
 	using PlayerSpawnEventCallback = void(*)(datum PlayerDatum);
 	using ObjectDamageEventCallback = void(*)(datum PlayerDatum, datum KillerDatum);
+	using ObjectUpdateEventCallback = void(*)(datum object_index, e_object_update_event type);
 
 	static const char* get_event_name(EventType event_type)
 	{
@@ -116,6 +123,8 @@ namespace EventHandler
 			return STRINGIFY(EventType::player_spawn);
 		case EventType::object_damage:
 			return STRINGIFY(EventType::object_damage);
+		case EventType::object_update:
+			return STRINGIFY(EventType::object_update);
 		case EventType::none:
 			return STRINGIFY(EventType::none);
 		default:
@@ -248,4 +257,5 @@ namespace EventHandler
 	REGISTER_EVENT_EXECUTE_METHOD(BlueScreenEventExecute, EventType::blue_screen, BlueScreenEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(PlayerSpawnEventExecute, EventType::player_spawn, PlayerSpawnEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(ObjectDamageEventExecute, EventType::object_damage, ObjectDamageEventCallback);
+	REGISTER_EVENT_EXECUTE_METHOD(ObjectUpdateEventExecute, EventType::object_update, ObjectUpdateEventCallback);
 }

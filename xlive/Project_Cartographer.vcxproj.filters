@@ -148,6 +148,7 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
+    <ClCompile Include="Blam\Engine\Objects\ObjectGlobals.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />

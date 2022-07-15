@@ -115,6 +115,12 @@ public:
 		return m_last_datum_index;
 	}
 
+	void reset()
+	{
+		m_current_absolute_index = NONE;
+		m_last_datum_index = DATUM_INDEX_NONE;
+	}
+
 private:
 	
 	s_data_array* m_data_array;

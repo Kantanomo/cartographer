@@ -26,5 +26,7 @@ struct s_object_globals
 	bool object_custom_animations_prevent_lipsync_head_movement;
 	bool enable_warthog_turret_light;
 	bool field_83;
+
+	static s_object_globals* get();
 };
 CHECK_STRUCT_SIZE(s_object_globals, 0x84);
