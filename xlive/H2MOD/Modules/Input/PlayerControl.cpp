@@ -21,6 +21,7 @@ p_network_player_actions_to_player_actions* network_player_actions_to_player_act
 
 void PlayerControl::ApplyHooks()
 {
+	network_player_actions_to_player_actions = Memory::GetAddress<p_network_player_actions_to_player_actions*>(0x1DB569);
 	return; // TODO FIXME usercall convention functions, bad hooks
 	p_UpdatePlayerControl = Memory::GetAddress<c_UpdatePlayerControl*>(0x90D62);
 	network_player_actions_to_player_actions = Memory::GetAddress<p_network_player_actions_to_player_actions*>(0x1DB569);
@@ -28,12 +29,10 @@ void PlayerControl::ApplyHooks()
 	PatchCall(Memory::GetAddress(0x9390D), UpdatePlayerControl);
 }
 
-s_player_actions PlayerControl::GetPlayerActions(int player_index)
+void PlayerControl::GetPlayerActions(int player_index, s_player_actions* outActions)
 {
-	s_player_actions newActions;
-	s_player_motion nActions = *Memory::GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));
-	network_player_actions_to_player_actions(&nActions, &newActions);
-	return newActions;
+	s_player_motion* nActions = Memory::GetAddress<s_player_motion*>(0x514EE8 + player_index * 0x54);
+	network_player_actions_to_player_actions(nActions, outActions);
 }
 
 s_player_control* PlayerControl::GetControls(int local_player_index)

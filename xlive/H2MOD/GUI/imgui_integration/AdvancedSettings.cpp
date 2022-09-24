@@ -16,6 +16,9 @@
 
 #include "imgui.h"
 #include "imgui_handler.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Utils/Utils.h"
 
 namespace ImGuiHandler {
 	namespace ImAdvancedSettings {
@@ -960,23 +963,23 @@ namespace ImGuiHandler {
 				GameSettings();
 
 				
-#if DISPLAY_DEV_TESTING_MENU
+#if  1
 				if (ImGui::CollapsingHeader("Dev Testing"))
 				{
 					if(ImGui::CollapsingHeader("Misc"))
 					{
-						if(ImGui::Button("Log Player Unit Objects"))
-						{
-							PlayerIterator playerIt;
-							s_data_array* Objects = *Memory::GetAddress<s_data_array**>(0x4E461C);
-							
-							while(playerIt.get_next_active_player())
-							{
-								auto player = playerIt.get_current_player_data();
-								int object = *(int*)&Objects->datum[12 * player->unit_index.Index + 8];
-								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
-							}
-						}
+						//if(ImGui::Button("Log Player Unit Objects"))
+						//{
+						//	PlayerIterator playerIt;
+						//	s_data_array* Objects = *Memory::GetAddress<s_data_array**>(0x4E461C);
+						//	
+						//	while(playerIt.get_next_active_player())
+						//	{
+						//		auto player = playerIt.get_current_player_data();
+						//		int object = *(int*)&Objects->datum[12 * player->unit_index.Index + 8];
+						//		LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
+						//	}
+						//}
 					}
 					if(ImGui::CollapsingHeader("Director Mode"))
 					{

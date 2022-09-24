@@ -22,7 +22,7 @@ typedef struct XLIVE_INPUT_INFO {
 	LRESULT lRet;
 } XLIVE_INPUT_INFO;
 
-#define DISPLAY_DEV_TESTING_MENU 0
+#define DISPLAY_DEV_TESTING_MENU 1
 
 static void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont);
 static void drawRect(FLOAT X, FLOAT Y, FLOAT Width, FLOAT Height, D3DCOLOR dColor);
