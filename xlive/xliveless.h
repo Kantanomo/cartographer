@@ -32,6 +32,7 @@ extern h2log *network_log;
 extern h2log *console_log;
 extern h2log *onscreendebug_log;
 extern h2log *voice_log;
+extern h2log* squirrel_log;
 
 #define CHECK_PTR(check, expression) \
 do \
@@ -180,6 +181,25 @@ do \
 
 // "Wait, that's illegal" except it is definitely not a joke related to xLiveLess
 #define LOG_CRITICAL_XLIVE(msg, ...)     LOG_CRITICAL  (xlive_log, msg, __VA_ARGS__)
+
+// squirrel
+// For the most unimportant stuff related to squirrel
+#define LOG_TRACE_SQ(msg, ...)        LOG_TRACE     (squirrel_log, msg, __VA_ARGS__)
+
+// Somewhat more useful information related to squirrel
+#define LOG_DEBUG_SQ(msg, ...)        LOG_DEBUG     (squirrel_log, msg, __VA_ARGS__)
+
+// Things that even users may want to see related to squirrel
+#define LOG_INFO_SQ(msg, ...)         LOG_INFO      (squirrel_log, msg, __VA_ARGS__)
+
+// A surprise to be sure, but not a serious one related to squirrel
+#define LOG_WARNING_SQ(msg, ...)      LOG_WARNING   (squirrel_log, msg, __VA_ARGS__)
+
+// Absolutely not good, probably game breaking events related to squirrel
+#define LOG_ERROR_SQ(msg, ...)        LOG_ERROR     (squirrel_log, msg, __VA_ARGS__)
+
+// "Wait, that's illegal" except it is definitely not a joke related to squirrel
+#define LOG_CRITICAL_SQ(msg, ...)     LOG_CRITICAL  (squirrel_log, msg, __VA_ARGS__)
 
 inline void verify_output_log(const char *expression, const char *func_name, const char* file, const int line)
 {

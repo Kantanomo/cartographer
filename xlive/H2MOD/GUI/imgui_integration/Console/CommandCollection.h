@@ -35,7 +35,7 @@ namespace CommandCollection
 	int KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	
+	int load_script_cmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 
 	// misc

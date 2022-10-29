@@ -39,6 +39,8 @@ h2log *onscreendebug_log = nullptr;
 // Console logger, receives output from all loggers
 h2log *console_log = nullptr;
 
+//Squirrel Engine log
+h2log* squirrel_log = nullptr;
 // Voice chat logger
 h2log* voice_log = nullptr;
 

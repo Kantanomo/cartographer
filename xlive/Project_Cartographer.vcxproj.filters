@@ -148,6 +148,7 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
+    <ClCompile Include="H2MOD\SquirrelEngine\SquirrelEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -481,6 +482,33 @@
     <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
+    <ClInclude Include="H2MOD\SquirrelEngine\SquirrelEngine.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratAllocator.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratArray.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratClass.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratClassType.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratConst.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratFunction.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratGlobalMethods.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratMemberMethods.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratObject.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratOverloadMethods.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratScript.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratTable.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratTypes.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratUtil.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat\sqratVM.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqmodule.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqrat.h" />
+    <ClInclude Include="3rdparty\sqrat\include\sqratimport.h" />
+    <ClInclude Include="3rdparty\squirrel\include\sqconfig.h" />
+    <ClInclude Include="3rdparty\squirrel\include\sqstdaux.h" />
+    <ClInclude Include="3rdparty\squirrel\include\sqstdblob.h" />
+    <ClInclude Include="3rdparty\squirrel\include\sqstdio.h" />
+    <ClInclude Include="3rdparty\squirrel\include\sqstdmath.h" />
+    <ClInclude Include="3rdparty\squirrel\include\sqstdstring.h" />
+    <ClInclude Include="3rdparty\squirrel\include\sqstdsystem.h" />
+    <ClInclude Include="3rdparty\squirrel\include\squirrel.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -44,7 +44,9 @@ enum class EventType
 	player_control,
 	blue_screen,
 	player_spawn,
-	object_damage
+	object_damage,
+	team_change,
+	player_death
 };
 
 enum class EventExecutionType
@@ -91,6 +93,8 @@ namespace EventHandler
 	using BlueScreenEventCallback = void(*)();
 	using PlayerSpawnEventCallback = void(*)(datum PlayerDatum);
 	using ObjectDamageEventCallback = void(*)(datum PlayerDatum, datum KillerDatum);
+	using TeamChangeEventCallback = void(*)(int localPlayerIndex, int team_id);
+	using PlayerDeathEventCallback = void(*)(datum unit_datum);
 
 	static const char* get_event_name(EventType event_type)
 	{
@@ -116,6 +120,10 @@ namespace EventHandler
 			return STRINGIFY(EventType::player_spawn);
 		case EventType::object_damage:
 			return STRINGIFY(EventType::object_damage);
+		case EventType::team_change:
+			return STRINGIFY(EventType::team_change);
+		case EventType::player_death:
+			return STRINGIFY(EventType::player_death);
 		case EventType::none:
 			return STRINGIFY(EventType::none);
 		default:
@@ -248,4 +256,6 @@ namespace EventHandler
 	REGISTER_EVENT_EXECUTE_METHOD(BlueScreenEventExecute, EventType::blue_screen, BlueScreenEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(PlayerSpawnEventExecute, EventType::player_spawn, PlayerSpawnEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(ObjectDamageEventExecute, EventType::object_damage, ObjectDamageEventCallback);
+	REGISTER_EVENT_EXECUTE_METHOD(TeamChangeEventExecute, EventType::team_change, TeamChangeEventCallback);
+	REGISTER_EVENT_EXECUTE_METHOD(PlayerDeathEventExecute, EventType::player_death, PlayerDeathEventCallback);
 }

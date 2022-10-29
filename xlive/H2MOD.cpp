@@ -48,6 +48,7 @@
 #include <float.h>
 
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/SquirrelEngine/SquirrelEngine.h"
 
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)
@@ -393,8 +394,10 @@ player_died_t p_player_died;
 void __cdecl OnPlayerDeath(datum playerIdx)
 {
 	CustomVariantHandler::OnPlayerDeath(ExecTime::_preEventExec, playerIdx);
+	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_before, playerIdx);
 	p_player_died(playerIdx);
 	CustomVariantHandler::OnPlayerDeath(ExecTime::_postEventExec, playerIdx);
+	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_after, playerIdx);
 }
 
 /* This is technically closer to object death than player-death as it impacts anything with health at all. */
@@ -431,6 +434,9 @@ void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, unsigned short a2, int a
 	//20 / 10 / 2018 18:48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000002, a4 : 00000001, a5 : 00000007, a6 : 00000001)
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
+
+	if (!SquirrelEngine::on_update_score(a2, a5))
+		return;
 
 	CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, a2, a3, a4, a5, a6);
 	p_update_player_score(thisptr, a2, a3, a4, a5, a6);
@@ -481,6 +487,9 @@ void H2MOD::set_local_rank(BYTE rank)
 
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
+	if (!SquirrelEngine::on_auto_pickup_handler(player_datum, object_datum))
+		return 0;
+
 	auto p_auto_handle = Memory::GetAddress<int(_cdecl*)(datum, datum)>(0x57AA5, 0x5FF9D);
 
 	int result = 0;
@@ -649,6 +658,9 @@ change_team_t p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
 {
+	if (!SquirrelEngine::on_player_team_change(localPlayerIndex, teamIndex))
+		return;
+
 	s_network_session* session = NetworkSession::GetCurrentNetworkSession();
 
 	if ((session->parameters[0].session_mode == 4 && Engine::get_game_life_cycle() == _life_cycle_pre_game)
@@ -656,7 +668,10 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 		//rvb mode enabled, don't change teams
 		return;
 	}
+
+	EventHandler::TeamChangeEventExecute(EventExecutionType::execute_before, localPlayerIndex, teamIndex);
 	p_change_local_team(localPlayerIndex, teamIndex);
+	EventHandler::TeamChangeEventExecute(EventExecutionType::execute_after, localPlayerIndex, teamIndex);
 }
 
 void H2MOD::set_local_team_index(int local_player_index, int team_index)
@@ -1238,7 +1253,8 @@ void H2MOD::Initialize()
 
 	Engine::Objects::apply_biped_object_definition_patches();
 	StatsHandler::Initialize();
-
+	SquirrelEngineGlobals::Initialize();
+	SquirrelEngine::Initialize();
 	LOG_INFO_GAME("H2MOD - Initialized");
 }
 

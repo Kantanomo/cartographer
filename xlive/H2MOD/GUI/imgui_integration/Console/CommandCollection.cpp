@@ -14,6 +14,7 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 
 #include "..\ImGui_Handler.h"
+#include "H2MOD/SquirrelEngine/SquirrelEngine.h"
 
 std::mutex commandInsertMtx;
 
@@ -54,7 +55,8 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	new ConsoleCommand("spawn", "spawn an object from the list, 4 - 10 parameter(s): "
 		"<string>: object name <int>: count <bool>: same team, near player <float3>: (only if near player false) position xyz, rotation (optional) ijk", 4, 10, CommandCollection::SpawnCmd),
 	new ConsoleCommand("spawnreloadcommandlist", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd),
-	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden)
+	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden),
+	new ConsoleCommand("loadscript", "loads a script into the squirrell engine", 1, 1, CommandCollection::load_script_cmd, CommandFlags_::CommandFlag_Hidden)
 };
 
 void CommandCollection::InitializeCommandsMap()
@@ -674,6 +676,14 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	output->OutputFmt(StringFlag_None, "# loaded tag datum: %#X", tag_loader::ResolveNewDatum(tagDatum));
 
 	LOG_INFO_GAME("{} - {} {} {}", tagName, tagType.as_string(), mapName);
+	return 0;
+}
+
+int CommandCollection::load_script_cmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	IOutput* output = cbData.strOutput;
+	std::string scriptPath = tokens[1];
+	SquirrelEngine::script_start(scriptPath);
 	return 0;
 }
 
