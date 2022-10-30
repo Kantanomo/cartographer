@@ -4,7 +4,11 @@
 #include <sqrat/include/sqrat.h>
 #include <sqrat/include/sqratimport.h>
 
+#include "Blam/Engine/Game/PhysicsConstants.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 
@@ -70,7 +74,7 @@ namespace SquirrelEngineGlobals
 
 	void log_debug_hook(HSQUIRRELVM vm, SQInteger type, const SQChar* sourcename, SQInteger line, const SQChar* funcname)
 	{
-		LOG_TRACE_SQ("[Squirrel] Debug type {}, source {}, line {}, function {}", type, sourcename, line, funcname);
+		//LOG_TRACE_SQ("[Squirrel] Debug type {}, source {}, line {}, function {}", type, sourcename, line, funcname);
 	}
 
 	void Initialize()
@@ -155,8 +159,8 @@ namespace SquirrelEngine
 		Sqrat::Function sqMapLoadFunc = Sqrat::RootTable().GetFunction(_SC("OnMapLoad"));
 		if (!sqMapLoadFunc.IsNull())
 			sqMapLoadFunc.Execute();
-		else
-			LOG_WARNING_SQ("[Squirrel] - No OnMapLoad function was found!");
+		/*else
+			LOG_WARNING_SQ("[Squirrel] - No OnMapLoad function was found!");*/
 	}
 
 	void on_pre_player_spawn(datum unit_datum)
@@ -173,9 +177,9 @@ namespace SquirrelEngine
 				SquirrelEngineGlobals::sqAddDebugText(e.Message());
 			}
 		}
-		else {
+		/*else {
 			LOG_WARNING_FUNC("[Squirrel] - No OnPrePlayerSpawn function was found!");
-		}
+		}*/
 	}
 
 	void on_player_spawn(datum unit_datum)
@@ -193,9 +197,9 @@ namespace SquirrelEngine
 				SquirrelEngineGlobals::sqAddDebugText(e.Message());
 			}
 		}
-		else {
+		/*else {
 			LOG_WARNING_FUNC("[Squirrel] - No OnPrePlayerSpawn function was found!");
-		}
+		}*/
 	}
 
 	bool on_player_team_change(int player_index, int team_index)
@@ -205,7 +209,7 @@ namespace SquirrelEngine
 			return *sqFunc.Evaluate<bool>(player_index, team_index).Get();
 		else
 		{
-			LOG_WARNING_FUNC("[Squirrel] - No OnChangeTeam function was found!");
+			//LOG_WARNING_FUNC("[Squirrel] - No OnChangeTeam function was found!");
 			return true;
 		}
 	}
@@ -226,8 +230,8 @@ namespace SquirrelEngine
 		Sqrat::Function sqFunc = Sqrat::RootTable().GetFunction("OnPlayerDeath");
 		if (!sqFunc.IsNull())
 			sqFunc.Execute(unit_datum, damaging_datum);
-		else
-			LOG_WARNING_FUNC("[Squirrel] - No OnPlayerDeath function was found!");
+		/*else
+			LOG_WARNING_FUNC("[Squirrel] - No OnPlayerDeath function was found!");*/
 	}
 
 	bool on_update_score(datum playerDatum, int killType)
@@ -237,18 +241,34 @@ namespace SquirrelEngine
 			return *sqFunc.Evaluate<bool>(playerDatum, killType);
 		else
 		{
-			LOG_WARNING_FUNC("[Squirrel] - No OnPlayerScoreUpdate function was found!");
+			//LOG_WARNING_FUNC("[Squirrel] - No OnPlayerScoreUpdate function was found!");
 			return true;
 		}
 	}
-
+	void on_before_game_tick()
+	{
+		Sqrat::Function func = Sqrat::RootTable().GetFunction("OnBeforeGameTick");
+		if (!func.IsNull())
+			func.Execute();
+		/*else
+			LOG_WARNING_FUNC("[Squirrel] - No OnBeforeGameTick function was found!");*/
+	}
+	void on_after_game_tick()
+	{
+		Sqrat::Function func = Sqrat::RootTable().GetFunction("OnAfterGameTick");
+		if (!func.IsNull())
+			func.Execute();
+		/*else
+			LOG_WARNING_FUNC("[Squirrel] - No OnAfterGameTick function was found!");*/
+	}
 	void Initialize()
 	{
 		EventHandler::register_callback(on_map_load, EventType::map_load, EventExecutionType::execute_before);
 		EventHandler::register_callback(on_pre_player_spawn, EventType::player_spawn, EventExecutionType::execute_before);
 		EventHandler::register_callback(on_player_spawn, EventType::player_spawn, EventExecutionType::execute_after);
 		EventHandler::register_callback(on_player_death, EventType::player_death, EventExecutionType::execute_after);
-
+		EventHandler::register_callback(on_before_game_tick, EventType::game_loop, EventExecutionType::execute_before);
+		EventHandler::register_callback(on_after_game_tick, EventType::game_loop, EventExecutionType::execute_after);
 		start_squirrel_vm();
 	}
 
@@ -277,10 +297,50 @@ namespace SquirrelEngine
 		}
 	}
 
+	void script_set_gravity(float value)
+	{
+		physics_constants::get()->gravity = value * physics_constants::get_default_gravity();
+	}
+
+	e_game_life_cycle script_get_game_life_cycle()
+	{
+		return Engine::get_game_life_cycle();
+	}
+
+	void script_leave_session()
+	{
+		NetworkSession::LeaveSession();
+	}
+
+	float script_player_distance_from_player(int player_1, int player_2)
+	{
+		if (player_1 == -1 || player_2 == -1)
+			return 0;
+
+		return h2mod->get_distance(player_1, player_2);
+	}
+
+	void script_set_player_grenades(int playerIndex, e_grenades type, byte count, bool resetEquipment)
+	{
+		if (playerIndex == -1)
+			return;
+		h2mod->set_player_unit_grenades_count(playerIndex, type, count, resetEquipment);
+	}
+
 	void bind_functions(HSQUIRRELVM vm)
 	{
 		using namespace Sqrat;
 		DefaultVM::Set(vm);
 		RootTable().Func("print", &print_from_script);
+		RootTable().Func("set_gravity", &script_set_gravity);
+		RootTable().Func("get_game_life_cycle", &script_get_game_life_cycle);
+		RootTable().Func("game_leave_session", &script_leave_session);
+		RootTable().Func("get_player_distance_from_player", &script_player_distance_from_player);
+		RootTable().Func("set_player_grenades_count", &script_set_player_grenades);
+		RootTable().Func("hs_object_destroy", &HaloScript::ObjectDestroy);
+		RootTable().Func("hs_unit_kill", &HaloScript::UnitKill);
+		RootTable().Func("hs_unit_in_vehicle", &HaloScript::UnitInVehicle);
+		RootTable().Func("hs_unit_get_health", &HaloScript::UnitGetHealth);
+		RootTable().Func("hs_unit_get_shield", &HaloScript::UnitGetShield);
 	}
 }
