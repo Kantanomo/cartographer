@@ -40,6 +40,20 @@ namespace ControllerInput
 		byte* unk_input_struct;
 	}
 
+	bool check_gamepad_input_state(XINPUT_BUTTONS input)
+	{
+		auto InputDevices = Memory::GetAddress<controller_info**>(0x479F00);
+		for (auto i = 0; i < 20; i++)
+		{
+			auto InputDevice = InputDevices[i];
+			if (InputDevice->error_level == 0)
+			{
+				(*reinterpret_cast<void(__thiscall*)(controller_info*)>(InputDevice->xinput_device_vtbl[2]))(InputDevice);
+				return (InputDevice->xinput_state.Gamepad.wButtons & input);
+			}
+		}
+		return false;
+	}
 
 	//Main function that iterates through all available input devices and calls update_xinput_state from the items vtable
 	void __cdecl update_xinput_devices()

@@ -3,6 +3,7 @@
 #include "EngineHooks.h"
 #include "H2MOD.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD/SquirrelEngine/SquirrelEngine.h"
 #include "Util\Hooks\Hook.h"
 
 #if !defined(_CARTOGRAPHER_DLL_CONF)
@@ -68,6 +69,35 @@ namespace EngineHooks
 		*executable_version = EXECUTABLE_VERSION;
 		*compatible_version = COMPATIBLE_VERSION;
 	}
+
+	update_player_score_t p_update_player_score;
+	void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, unsigned short a2, int a3, int a4, int a5, char a6)
+	{
+		//LOG_TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
+		//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
+		// / 10 / 2018 18:46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
+		//	20 / 10 / 2018 18 : 46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
+
+		//20 / 10 / 2018 18:48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000002, a4 : 00000001, a5 : 00000007, a6 : 00000001)
+		//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
+		//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
+
+		if (!SquirrelEngine::on_update_score(a2, a5))
+			return;
+
+		CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, a2, a3, a4, a5, a6);
+		p_update_player_score(thisptr, a2, a3, a4, a5, a6);
+		CustomVariantHandler::OnPlayerScore(ExecTime::_postEventExec, thisptr, a2, a3, a4, a5, a6);
+	}
+
+	void call_update_player_score(datum playerDatumIndex)
+	{
+		if (playerDatumIndex == -1)
+			return;
+
+		p_update_player_score((void*)(Memory::IsDedicatedServer() ? 0x30005508 : 0x3000595C), playerDatumIndex, 0, 1, -1, 0);
+	}
+
 #pragma endregion
 
 	void ApplyHooks()
@@ -86,5 +116,8 @@ namespace EngineHooks
 			p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)verify_game_version_on_join_hook, 5);
 			p_verify_executable_version = (verify_executable_type)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)verify_executable_type_hook, 8);
 		}
+
+		/* Statborg hooks */
+		DETOUR_ATTACH(p_update_player_score, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), OnPlayerScore);
 	}
 }

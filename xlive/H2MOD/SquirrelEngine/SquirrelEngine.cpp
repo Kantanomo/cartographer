@@ -7,10 +7,13 @@
 #include "Blam/Engine/Game/PhysicsConstants.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 #define SCRAT_USE_EXCEPTIONS
 namespace SquirrelEngineGlobals
@@ -104,7 +107,7 @@ namespace SquirrelEngine
 		sq_setnativedebughook(Sqrat::DefaultVM::Get(), SquirrelEngineGlobals::log_debug_hook);
 		sqstd_seterrorhandlers(Sqrat::DefaultVM::Get());
 		sqstd_printcallstack(Sqrat::DefaultVM::Get());
-		
+
 		GlobalScript.CompileFile(_SC("Scripts/Globals.nut"));
 
 		GlobalScript.Run();
@@ -141,7 +144,7 @@ namespace SquirrelEngine
 
 		Sqrat::string errMsg;
 		//varScript.CompileFile(_SC(path.c_str()));
-		if(varScript.CompileFile(_SC(path.c_str()), errMsg))
+		if (varScript.CompileFile(_SC(path.c_str()), errMsg))
 		{
 			varScript.Run();
 			SquirrelEngineGlobals::script_loaded = true;
@@ -168,7 +171,7 @@ namespace SquirrelEngine
 		Sqrat::Function sqFunc = Sqrat::RootTable().GetFunction("OnPrePlayerSpawn");
 		if (!sqFunc.IsNull())
 		{
-			try 
+			try
 			{
 				sqFunc.Execute(unit_datum);
 			}
@@ -274,26 +277,26 @@ namespace SquirrelEngine
 
 	void print_from_script(std::string message, log_level level)
 	{
-		switch(level)
+		switch (level)
 		{
-			case trace: 
-				LOG_TRACE_SQ("[Message from Script]: {}", message);
-				break;
-			case debug: 
-				LOG_DEBUG_SQ("[Message from Script]: {}", message);
-				break;
-			case info: 
-				LOG_INFO_SQ("[Message from Script]: {}", message);
-				break;
-			case warning:
-				LOG_WARNING_SQ("[Message from Script]: {}", message);
-				break;
-			case error: 
-				LOG_ERROR_SQ("[Message from Script]: {}", message);
-				break;
-			case critical: 
-				LOG_CRITICAL_SQ("[Message from Script]: {}", message);
-				break;
+		case trace:
+			LOG_TRACE_SQ("[Message from Script]: {}", message);
+			break;
+		case debug:
+			LOG_DEBUG_SQ("[Message from Script]: {}", message);
+			break;
+		case info:
+			LOG_INFO_SQ("[Message from Script]: {}", message);
+			break;
+		case warning:
+			LOG_WARNING_SQ("[Message from Script]: {}", message);
+			break;
+		case error:
+			LOG_ERROR_SQ("[Message from Script]: {}", message);
+			break;
+		case critical:
+			LOG_CRITICAL_SQ("[Message from Script]: {}", message);
+			break;
 		}
 	}
 
@@ -327,9 +330,64 @@ namespace SquirrelEngine
 		h2mod->set_player_unit_grenades_count(playerIndex, type, count, resetEquipment);
 	}
 
+	bool script_get_gamepad_input_pressed(ControllerInput::XINPUT_BUTTONS button)
+	{
+		if (_Shell::IsGameMinimized())
+			return false;
+
+		return ControllerInput::check_gamepad_input_state(button);
+	}
+
+	bool script_check_key_state(int keycode)
+	{
+		if (_Shell::IsGameMinimized())
+			return false;
+
+		return (GetKeyState(keycode) & 0x8000);
+	}
+
+	bool script_validate_object_type(datum object_datum, e_object_type type)
+	{
+		if (object_datum == -1)
+			return false;
+
+		if (get_objects_header(object_datum)->type == type)
+			return true;
+
+		return false;
+	}
+
+	void script_spawn_object(datum object_datum, float x, float y, float z, float i, float j, float k)
+	{
+		s_object_placement_data nObject;
+		Engine::Objects::create_new_placement_data(&nObject, object_datum, -1, 0);
+		nObject.position.x = x;
+		nObject.position.y = y;
+		nObject.position.z = z;
+		nObject.translational_velocity.i = i;
+		nObject.translational_velocity.j = j;
+		nObject.translational_velocity.k = k;
+		datum new_datum = Engine::Objects::object_new(&nObject);
+		if (!DATUM_IS_NONE(new_datum))
+			Engine::Objects::simulation_action_object_create(new_datum);
+	}
+
+	void script_spawn_object_at_player(datum object_datum, datum player_datum, float x, float y, float z, float i, float j, float k)
+	{
+		auto biped_object = object_get_fast_unsafe<s_biped_data_definition>(player_datum);
+		s_object_placement_data nObject;
+		Engine::Objects::create_new_placement_data(&nObject, object_datum, -1, 0);
+		nObject.position = biped_object->position;
+		nObject.translational_velocity = biped_object->translational_velocity;
+		datum new_datum = Engine::Objects::object_new(&nObject);
+		if (!DATUM_IS_NONE(new_datum))
+			Engine::Objects::simulation_action_object_create(new_datum);
+	}
+
 	void bind_functions(HSQUIRRELVM vm)
 	{
 		using namespace Sqrat;
+		
 		DefaultVM::Set(vm);
 		RootTable().Func("print", &print_from_script);
 		RootTable().Func("set_gravity", &script_set_gravity);
@@ -337,10 +395,24 @@ namespace SquirrelEngine
 		RootTable().Func("game_leave_session", &script_leave_session);
 		RootTable().Func("get_player_distance_from_player", &script_player_distance_from_player);
 		RootTable().Func("set_player_grenades_count", &script_set_player_grenades);
+		RootTable().Func("update_player_score", &EngineHooks::call_update_player_score);
+		RootTable().Func("object_validate_type", &script_validate_object_type);
+		RootTable().Func("object_create", &script_spawn_object);
+		RootTable().Func("object_create_at_player", &script_spawn_object_at_player);
+
+
+		//======================
+		//==Halo Script Calls===
+		//======================
+
 		RootTable().Func("hs_object_destroy", &HaloScript::ObjectDestroy);
 		RootTable().Func("hs_unit_kill", &HaloScript::UnitKill);
 		RootTable().Func("hs_unit_in_vehicle", &HaloScript::UnitInVehicle);
 		RootTable().Func("hs_unit_get_health", &HaloScript::UnitGetHealth);
 		RootTable().Func("hs_unit_get_shield", &HaloScript::UnitGetShield);
+		
+
+		RootTable().Func("get_gamepad_input_pressed", &script_get_gamepad_input_pressed);
+		RootTable().Func("check_key_state", &script_check_key_state);
 	}
 }
