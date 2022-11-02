@@ -421,27 +421,6 @@ char __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 	return ret;
 }
 
-typedef void(__thiscall* update_player_score_t)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
-update_player_score_t p_update_player_score;
-
-void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, unsigned short a2, int a3, int a4, int a5, char a6)
-{
-	//LOG_TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
-	//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
-	// / 10 / 2018 18:46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
-	//	20 / 10 / 2018 18 : 46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
-
-	//20 / 10 / 2018 18:48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000002, a4 : 00000001, a5 : 00000007, a6 : 00000001)
-	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
-	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
-
-	if (!SquirrelEngine::on_update_score(a2, a5))
-		return;
-
-	CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, a2, a3, a4, a5, a6);
-	p_update_player_score(thisptr, a2, a3, a4, a5, a6);
-	CustomVariantHandler::OnPlayerScore(ExecTime::_postEventExec, thisptr, a2, a3, a4, a5, a6);
-}
 
 // Client Sided Patch
 void H2MOD::disable_weapon_pickup(bool bEnable)
@@ -1133,7 +1112,7 @@ void H2MOD::ApplyHooks() {
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
 	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
-	DETOUR_ATTACH(p_update_player_score, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), OnPlayerScore);
+	
 	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
 
 	// bellow hooks applied to specific executables

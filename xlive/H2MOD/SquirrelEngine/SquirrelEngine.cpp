@@ -14,6 +14,7 @@
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
 #define SCRAT_USE_EXCEPTIONS
 namespace SquirrelEngineGlobals
@@ -384,6 +385,35 @@ namespace SquirrelEngine
 			Engine::Objects::simulation_action_object_create(new_datum);
 	}
 
+	bool script_validate_object_datum(datum object_datum, datum tag_datum)
+	{
+		//????
+		auto object = object_get_fast_unsafe<s_object_data_definition>(object_datum);
+		if (object->tag_definition_index == tag_datum)
+			return true;
+		return false;
+	}
+
+	void script_play_custom_sound(wchar_t* name, int sleep)
+	{
+		h2mod->custom_sound_play(name, sleep);
+	}
+
+	void script_disable_sound(datum tag_datum)
+	{
+		h2mod->disable_sounds(tag_datum);
+	}
+
+	void script_set_local_team(int local_player_id, int team_index)
+	{
+		h2mod->set_local_team_index(local_player_id, team_index);
+	}
+
+	byte script_get_local_team()
+	{
+		return h2mod->get_local_team_index();
+	}
+
 	void bind_functions(HSQUIRRELVM vm)
 	{
 		using namespace Sqrat;
@@ -399,6 +429,32 @@ namespace SquirrelEngine
 		RootTable().Func("object_validate_type", &script_validate_object_type);
 		RootTable().Func("object_create", &script_spawn_object);
 		RootTable().Func("object_create_at_player", &script_spawn_object_at_player);
+		RootTable().Func("object_validate_datum", &script_validate_object_datum);
+		RootTable().Func("get_engine_type", &Engine::get_current_engine_type);
+		RootTable().Func("give_player_weapon", &call_give_player_weapon);
+		RootTable().Func("play_sound", &script_play_custom_sound);
+		RootTable().Func("disable_sound", &script_disable_sound);
+		RootTable().Func("send_team_change", &NetworkMessage::SendTeamChange);
+		RootTable().Func("set_local_team", &script_set_local_team);
+		RootTable().Func("get_local_team", &script_get_local_team);
+
+		//==========================
+		//==Network session calls===
+		//==========================
+		RootTable().Func("get_player_count", &NetworkSession::GetPlayerCount);
+		RootTable().Func("get_player_name_by_index", &NetworkSession::GetPlayerName);
+		RootTable().Func("local_peer_is_host", &NetworkSession::LocalPeerIsSessionHost);
+		RootTable().Func("get_local_peer_index", &NetworkSession::GetLocalPeerIndex);
+		RootTable().Func("get_peer_index_by_id", &NetworkSession::GetPeerIndex);
+		RootTable().Func("get_peer_count", &NetworkSession::GetPeerCount);
+		RootTable().Func("get_player_id_by_name", &NetworkSession::GetPlayerIdByName);
+		RootTable().Func("get_player_xuid_by_id", &NetworkSession::GetPlayerId);
+		RootTable().Func("get_peer_id_by_xuid", &NetworkSession::GetPeerIndexFromId);
+		RootTable().Func("kick_peer", &NetworkSession::KickPeer);
+		RootTable().Func("end_game", &NetworkSession::EndGame);
+		RootTable().Func("get_variant_name", &NetworkSession::GetGameVariantName);
+
+
 
 
 		//======================
