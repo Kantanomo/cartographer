@@ -10,6 +10,7 @@
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineHooks/EngineHooks.h"
 
 int soundBuffer = 0;
 std::unordered_map<int, std::unordered_map<e_headhunter_sounds, const wchar_t*>> headhunterSoundTable;
@@ -61,8 +62,6 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 	}
 }
 
-typedef void(__thiscall *update_player_score_t)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
-extern update_player_score_t p_update_player_score;
 
 void HeadHunter::PickupSkull(datum playerIdx, datum skullDatum)
 {
@@ -77,7 +76,7 @@ void HeadHunter::PickupSkull(datum playerIdx, datum skullDatum)
 		char* player_score_data = p_get_score_data_ptr();
 		if (player_score_data)
 		{
-			p_update_player_score(player_score_data, DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx), 0, 1, -1, 0);
+			EngineHooks::call_update_player_score(player_score_data, DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx), 0, 1, -1, 0, 0);
 			HaloScript::ObjectDestroy(skullDatum);
 			if (TimeElapsedMS(soundBuffer) > 2500)
 			{

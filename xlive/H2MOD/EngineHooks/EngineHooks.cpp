@@ -97,6 +97,10 @@ namespace EngineHooks
 
 		p_update_player_score((void*)(Memory::IsDedicatedServer() ? 0x30005508 : 0x3000595C), playerDatumIndex, 0, 1, -1, 0);
 	}
+	void call_update_player_score(void* thisptr, BYTE _edx, unsigned short a2, int a3, int a4, int a5, char a6)
+	{
+		p_update_player_score(thisptr, _edx, a2, a3, a4, a5);
+	}
 
 #pragma endregion
 

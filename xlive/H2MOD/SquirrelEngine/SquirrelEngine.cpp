@@ -15,6 +15,7 @@
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 #define SCRAT_USE_EXCEPTIONS
 namespace SquirrelEngineGlobals
@@ -414,6 +415,11 @@ namespace SquirrelEngine
 		return h2mod->get_local_team_index();
 	}
 
+	void script_call_update_player_score(datum playerIndex)
+	{
+		EngineHooks::call_update_player_score(playerIndex);
+	}
+
 	void bind_functions(HSQUIRRELVM vm)
 	{
 		using namespace Sqrat;
@@ -425,7 +431,7 @@ namespace SquirrelEngine
 		RootTable().Func("game_leave_session", &script_leave_session);
 		RootTable().Func("get_player_distance_from_player", &script_player_distance_from_player);
 		RootTable().Func("set_player_grenades_count", &script_set_player_grenades);
-		RootTable().Func("update_player_score", &EngineHooks::call_update_player_score);
+		RootTable().Func("update_player_score", &script_call_update_player_score);
 		RootTable().Func("object_validate_type", &script_validate_object_type);
 		RootTable().Func("object_create", &script_spawn_object);
 		RootTable().Func("object_create_at_player", &script_spawn_object_at_player);
@@ -438,9 +444,13 @@ namespace SquirrelEngine
 		RootTable().Func("set_local_team", &script_set_local_team);
 		RootTable().Func("get_local_team", &script_get_local_team);
 
+
+
+
 		//==========================
 		//==Network session calls===
 		//==========================
+
 		RootTable().Func("get_player_count", &NetworkSession::GetPlayerCount);
 		RootTable().Func("get_player_name_by_index", &NetworkSession::GetPlayerName);
 		RootTable().Func("local_peer_is_host", &NetworkSession::LocalPeerIsSessionHost);
@@ -470,5 +480,188 @@ namespace SquirrelEngine
 
 		RootTable().Func("get_gamepad_input_pressed", &script_get_gamepad_input_pressed);
 		RootTable().Func("check_key_state", &script_check_key_state);
+
+
+		//https://scrat.sourceforge.net/binding.html#basicUsage
+		RootTable().Bind("tag_instance",
+			Class<tags::tag_instance>(vm, "tag_instance")
+			.Var("type", &tags::tag_instance::type)
+			.Var("datum_index", &tags::tag_instance::datum_index)
+			.Var("data_offset", &tags::tag_instance::data_offset)
+			.Var("size", &tags::tag_instance::size)
+		);
+
+		ConstTable().Enum("log_lvel", Enumeration(vm)
+			.Const("trace", (int)log_level::trace)
+			.Const("debug", (int)log_level::debug)
+			.Const("info", (int)log_level::info)
+			.Const("warning", (int)log_level::warning)
+			.Const("error", (int)log_level::error)
+			.Const("critical", (int)log_level::critical)
+		);
+		
+		ConstTable().Enum("grenade_type", Enumeration(vm)
+			.Const("fragmentation", e_grenades::Fragmentation)
+			.Const("Plasma", e_grenades::Plasma)
+		);
+
+		ConstTable().Enum("game_life_cycle", Enumeration(vm)
+			.Const("none", e_game_life_cycle::_life_cycle_none)
+			.Const("pre_game`", e_game_life_cycle::_life_cycle_pre_game)
+			.Const("start_game", e_game_life_cycle::_life_cycle_start_game)
+			.Const("in_game", e_game_life_cycle::_life_cycle_in_game)
+			.Const("post_game", e_game_life_cycle::_life_cycle_post_game)
+			.Const("joining", e_game_life_cycle::_life_cycle_joining)
+			.Const("match_making", e_game_life_cycle::_life_cycle_matchmaking)
+		);
+
+		ConstTable().Enum("engine_type", Enumeration(vm)
+			.Const("single_player", e_engine_type::_single_player)
+			.Const("multiplayer", e_engine_type::_multiplayer)
+			.Const("main_menu", e_engine_type::_main_menu)
+			.Const("multiplayer_shared", e_engine_type::_mutiplayer_shared)
+			.Const("single_player_shared", e_engine_type::_single_player_shared)
+		);
+
+		ConstTable().Enum("object_type", Enumeration(vm)
+			.Const("biped", e_object_type::biped)
+			.Const("vehicle", e_object_type::vehicle)
+			.Const("weapon", e_object_type::weapon)
+			.Const("equipment", e_object_type::equipment)
+			.Const("garbage", e_object_type::garbage)
+			.Const("projectile", e_object_type::projectile)
+			.Const("scenery", e_object_type::scenery)
+			.Const("machine", e_object_type::machine)
+			.Const("control", e_object_type::control)
+			.Const("light_fixture", e_object_type::light_fixture)
+			.Const("sound_scenery", e_object_type::sound_scenery)
+			.Const("crate", e_object_type::crate)
+			.Const("creature", e_object_type::creature)
+		);
+
+		ConstTable().Enum("blam_tag", Enumeration(vm)
+			.Const("none", (int)blam_tag::tag_group_type::none)
+			.Const("model", (int)blam_tag::tag_group_type::model)
+			.Const("rendermodel", (int)blam_tag::tag_group_type::rendermodel)
+			.Const("collisionmodel", (int)blam_tag::tag_group_type::collisionmodel)
+			.Const("physicsmodel", (int)blam_tag::tag_group_type::physicsmodel)
+			.Const("bitmap", (int)blam_tag::tag_group_type::bitmap)
+			.Const("colortable", (int)blam_tag::tag_group_type::colortable)
+			.Const("multilingualunicodestringlist", (int)blam_tag::tag_group_type::multilingualunicodestringlist)
+			.Const("unit", (int)blam_tag::tag_group_type::unit)
+			.Const("biped", (int)blam_tag::tag_group_type::biped)
+			.Const("vehicle", (int)blam_tag::tag_group_type::vehicle)
+			.Const("scenery", (int)blam_tag::tag_group_type::scenery)
+			.Const("crate", (int)blam_tag::tag_group_type::crate)
+			.Const("creature", (int)blam_tag::tag_group_type::creature)
+			.Const("physics", (int)blam_tag::tag_group_type::physics)
+			.Const("object", (int)blam_tag::tag_group_type::object)
+			.Const("contrail", (int)blam_tag::tag_group_type::contrail)
+			.Const("weapon", (int)blam_tag::tag_group_type::weapon)
+			.Const("light", (int)blam_tag::tag_group_type::light)
+			.Const("effect", (int)blam_tag::tag_group_type::effect)
+			.Const("particle", (int)blam_tag::tag_group_type::particle)
+			.Const("particlemodel", (int)blam_tag::tag_group_type::particlemodel)
+			.Const("particlephysics", (int)blam_tag::tag_group_type::particlephysics)
+			.Const("globals", (int)blam_tag::tag_group_type::globals)
+			.Const("sound", (int)blam_tag::tag_group_type::sound)
+			.Const("soundlooping", (int)blam_tag::tag_group_type::soundlooping)
+			.Const("item", (int)blam_tag::tag_group_type::item)
+			.Const("equipment", (int)blam_tag::tag_group_type::equipment)
+			.Const("antenna", (int)blam_tag::tag_group_type::antenna)
+			.Const("lightvolume", (int)blam_tag::tag_group_type::lightvolume)
+			.Const("liquid", (int)blam_tag::tag_group_type::liquid)
+			.Const("cellularautomata", (int)blam_tag::tag_group_type::cellularautomata)
+			.Const("cellularautomata2d", (int)blam_tag::tag_group_type::cellularautomata2d)
+			.Const("stereosystem", (int)blam_tag::tag_group_type::stereosystem)
+			.Const("cameratrack", (int)blam_tag::tag_group_type::cameratrack)
+			.Const("projectile", (int)blam_tag::tag_group_type::projectile)
+			.Const("device", (int)blam_tag::tag_group_type::device)
+			.Const("devicemachine", (int)blam_tag::tag_group_type::devicemachine)
+			.Const("devicecontrol", (int)blam_tag::tag_group_type::devicecontrol)
+			.Const("devicelightfixture", (int)blam_tag::tag_group_type::devicelightfixture)
+			.Const("pointphysics", (int)blam_tag::tag_group_type::pointphysics)
+			.Const("scenariostructurelightmap", (int)blam_tag::tag_group_type::scenariostructurelightmap)
+			.Const("scenariostructurebsp", (int)blam_tag::tag_group_type::scenariostructurebsp)
+			.Const("scenario", (int)blam_tag::tag_group_type::scenario)
+			.Const("shader", (int)blam_tag::tag_group_type::shader)
+			.Const("shadertemplate", (int)blam_tag::tag_group_type::shadertemplate)
+			.Const("shaderlightresponse", (int)blam_tag::tag_group_type::shaderlightresponse)
+			.Const("shaderpass", (int)blam_tag::tag_group_type::shaderpass)
+			.Const("vertexshader", (int)blam_tag::tag_group_type::vertexshader)
+			.Const("pixelshader", (int)blam_tag::tag_group_type::pixelshader)
+			.Const("decoratorset", (int)blam_tag::tag_group_type::decoratorset)
+			.Const("decorators", (int)blam_tag::tag_group_type::decorators)
+			.Const("sky", (int)blam_tag::tag_group_type::sky)
+			.Const("wind", (int)blam_tag::tag_group_type::wind)
+			.Const("soundenvironment", (int)blam_tag::tag_group_type::soundenvironment)
+			.Const("lensflare", (int)blam_tag::tag_group_type::lensflare)
+			.Const("planarfog", (int)blam_tag::tag_group_type::planarfog)
+			.Const("patchyfog", (int)blam_tag::tag_group_type::patchyfog)
+			.Const("meter", (int)blam_tag::tag_group_type::meter)
+			.Const("decal", (int)blam_tag::tag_group_type::decal)
+			.Const("colony", (int)blam_tag::tag_group_type::colony)
+			.Const("damageeffect", (int)blam_tag::tag_group_type::damageeffect)
+			.Const("dialogue", (int)blam_tag::tag_group_type::dialogue)
+			.Const("itemcollection", (int)blam_tag::tag_group_type::itemcollection)
+			.Const("vehiclecollection", (int)blam_tag::tag_group_type::vehiclecollection)
+			.Const("weaponhudinterface", (int)blam_tag::tag_group_type::weaponhudinterface)
+			.Const("grenadehudinterface", (int)blam_tag::tag_group_type::grenadehudinterface)
+			.Const("unithudinterface", (int)blam_tag::tag_group_type::unithudinterface)
+			.Const("newhuddefinition", (int)blam_tag::tag_group_type::newhuddefinition)
+			.Const("hudnumber", (int)blam_tag::tag_group_type::hudnumber)
+			.Const("hudglobals", (int)blam_tag::tag_group_type::hudglobals)
+			.Const("multiplayerscenariodescription", (int)blam_tag::tag_group_type::multiplayerscenariodescription)
+			.Const("detailobjectcollection", (int)blam_tag::tag_group_type::detailobjectcollection)
+			.Const("soundscenery", (int)blam_tag::tag_group_type::soundscenery)
+			.Const("hudmessagetext", (int)blam_tag::tag_group_type::hudmessagetext)
+			.Const("userinterfacescreenwidgetdefinition", (int)blam_tag::tag_group_type::userinterfacescreenwidgetdefinition)
+			.Const("userinterfacelistskindefinition", (int)blam_tag::tag_group_type::userinterfacelistskindefinition)
+			.Const("userinterfaceglobalsdefinition", (int)blam_tag::tag_group_type::userinterfaceglobalsdefinition)
+			.Const("userinterfacesharedglobalsdefinition", (int)blam_tag::tag_group_type::userinterfacesharedglobalsdefinition)
+			.Const("textvaluepairdefinition", (int)blam_tag::tag_group_type::textvaluepairdefinition)
+			.Const("multiplayervariantsettingsinterfacedefinition", (int)blam_tag::tag_group_type::multiplayervariantsettingsinterfacedefinition)
+			.Const("materialeffects", (int)blam_tag::tag_group_type::materialeffects)
+			.Const("garbage", (int)blam_tag::tag_group_type::garbage)
+			.Const("style", (int)blam_tag::tag_group_type::style)
+			.Const("character", (int)blam_tag::tag_group_type::character)
+			.Const("aidialogueglobals", (int)blam_tag::tag_group_type::aidialogueglobals)
+			.Const("aimissiondialogue", (int)blam_tag::tag_group_type::aimissiondialogue)
+			.Const("scenariosceneryresource", (int)blam_tag::tag_group_type::scenariosceneryresource)
+			.Const("scenariobipedsresource", (int)blam_tag::tag_group_type::scenariobipedsresource)
+			.Const("scenariovehiclesresource", (int)blam_tag::tag_group_type::scenariovehiclesresource)
+			.Const("scenarioequipmentresource", (int)blam_tag::tag_group_type::scenarioequipmentresource)
+			.Const("scenarioweaponsresource", (int)blam_tag::tag_group_type::scenarioweaponsresource)
+			.Const("scenariosoundsceneryresource", (int)blam_tag::tag_group_type::scenariosoundsceneryresource)
+			.Const("scenariolightsresource", (int)blam_tag::tag_group_type::scenariolightsresource)
+			.Const("scenariodevicesresource", (int)blam_tag::tag_group_type::scenariodevicesresource)
+			.Const("scenariodecalsresource", (int)blam_tag::tag_group_type::scenariodecalsresource)
+			.Const("scenariocinematicsresource", (int)blam_tag::tag_group_type::scenariocinematicsresource)
+			.Const("scenariotriggervolumesresource", (int)blam_tag::tag_group_type::scenariotriggervolumesresource)
+			.Const("scenarioclusterdataresource", (int)blam_tag::tag_group_type::scenarioclusterdataresource)
+			.Const("scenariocreatureresource", (int)blam_tag::tag_group_type::scenariocreatureresource)
+			.Const("scenariodecoratorsresource", (int)blam_tag::tag_group_type::scenariodecoratorsresource)
+			.Const("scenariostructurelightingresource", (int)blam_tag::tag_group_type::scenariostructurelightingresource)
+			.Const("scenariohssourcefile", (int)blam_tag::tag_group_type::scenariohssourcefile)
+			.Const("scenarioairesource", (int)blam_tag::tag_group_type::scenarioairesource)
+			.Const("scenariocommentsresource", (int)blam_tag::tag_group_type::scenariocommentsresource)
+			.Const("breakablesurface", (int)blam_tag::tag_group_type::breakablesurface)
+			.Const("materialphysics", (int)blam_tag::tag_group_type::materialphysics)
+			.Const("soundclasses", (int)blam_tag::tag_group_type::soundclasses)
+			.Const("multiplayerglobals", (int)blam_tag::tag_group_type::multiplayerglobals)
+			.Const("soundeffecttemplate", (int)blam_tag::tag_group_type::soundeffecttemplate)
+			.Const("soundeffectcollection", (int)blam_tag::tag_group_type::soundeffectcollection)
+			.Const("chocolatemountain", (int)blam_tag::tag_group_type::chocolatemountain)
+			.Const("modelanimationgraph", (int)blam_tag::tag_group_type::modelanimationgraph)
+			.Const("cloth", (int)blam_tag::tag_group_type::cloth)
+			.Const("screeneffect", (int)blam_tag::tag_group_type::screeneffect)
+			.Const("weathersystem", (int)blam_tag::tag_group_type::weathersystem)
+			.Const("soundmix", (int)blam_tag::tag_group_type::soundmix)
+			.Const("sounddialogueconstants", (int)blam_tag::tag_group_type::sounddialogueconstants)
+			.Const("soundcachefilegestalt", (int)blam_tag::tag_group_type::soundcachefilegestalt)
+			.Const("cachefilesound", (int)blam_tag::tag_group_type::cachefilesound)
+			.Const("mousecursordefinition", (int)blam_tag::tag_group_type::mousecursordefinition)
+			.Const("uldg", (int)blam_tag::tag_group_type::udlg)
+		);
 	}
 }

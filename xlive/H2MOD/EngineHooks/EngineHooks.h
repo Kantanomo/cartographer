@@ -13,5 +13,6 @@ namespace EngineHooks
 	typedef void(__thiscall* update_player_score_t)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 
 	void call_update_player_score(datum playerDatumIndex);
+	void call_update_player_score(void* thisptr, BYTE _edx, unsigned short a2, int a3, int a4, int a5, char a6);
 	void ApplyHooks();
 }
