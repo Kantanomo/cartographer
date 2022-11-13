@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 
 enum class hs_type : WORD {
 	unparsed,

@@ -60,6 +60,20 @@ namespace HaloScript
 		p_object_destroy(object_datum_index);
 	}
 
+	typedef void(__cdecl kill_volume_enable_t)(int kill_volume_index);
+	kill_volume_enable_t* p_kill_volume_enable;
+	void KillVolumeEnable(int kill_volume_index)
+	{
+		p_kill_volume_enable(kill_volume_index);
+	}
+
+	typedef void(__cdecl kill_volume_disable_t)(int kill_volume_index);
+	kill_volume_disable_t* p_kill_volume_disable;
+	void KillVolumeDisable(int kill_volume_index)
+	{
+		p_kill_volume_disable(kill_volume_index);
+	}
+
 	void Initialize()
 	{
 		p_unit_kill	= Memory::GetAddress<unit_kill_t*>(0x13B514, 0x12A363);
@@ -70,5 +84,7 @@ namespace HaloScript
 		p_physics_set_velocity_frame = Memory::GetAddress<physics_set_velocity_frame_t*>(0xB3D5B, 0xA3F6E);
 		p_render_lights_enable_cinematic_shadow = Memory::GetAddress<render_lights_enable_cinematic_shadow_t*>(0x19245A);
 		p_object_destroy = Memory::GetAddress<object_destroy_t*>(0xFDCFD, 0x124ED5);
+		p_kill_volume_enable = Memory::GetAddress<kill_volume_enable_t*>(0xB3A64, 0xA3C77);
+		p_kill_volume_disable = Memory::GetAddress<kill_volume_disable_t*>(0xB3AB8, 0xA3CCB);
 	}
 }

@@ -16,6 +16,7 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 #define SCRAT_USE_EXCEPTIONS
 namespace SquirrelEngineGlobals
@@ -53,7 +54,7 @@ namespace SquirrelEngineGlobals
 		std::string dbMsg;
 		va_list arglist;
 		va_start(arglist, desc);
-		//fmt::vsprintf(nDbgMsg, desc, arglist);
+		vsprintf(nDbgMsg, desc, arglist);
 		va_end(arglist);
 
 		LOG_INFO_SQ("{}", nDbgMsg);
@@ -65,7 +66,7 @@ namespace SquirrelEngineGlobals
 		std::string dbMsg;
 		va_list arglist;
 		va_start(arglist, desc);
-		//fmt::vsprintf(nDbgMsg, desc, arglist);
+		vsprintf(nDbgMsg, desc, arglist);
 		va_end(arglist);
 
 		LOG_CRITICAL_SQ("{}", nDbgMsg);
@@ -301,6 +302,38 @@ namespace SquirrelEngine
 			break;
 		}
 	}
+	void wprint_from_script(std::wstring message, log_level level)
+	{
+		switch (level)
+		{
+		case trace:
+			LOG_TRACE_SQ(L"[Message from Script]: {}", message);
+			break;
+		case debug:
+			LOG_DEBUG_SQ(L"[Message from Script]: {}", message);
+			break;
+		case info:
+			LOG_INFO_SQ(L"[Message from Script]: {}", message);
+			break;
+		case warning:
+			LOG_WARNING_SQ(L"[Message from Script]: {}", message);
+			break;
+		case error:
+			LOG_ERROR_SQ(L"[Message from Script]: {}", message);
+			break;
+		case critical:
+			LOG_CRITICAL_SQ(L"[Message from Script]: {}", message);
+			break;
+		}
+	}
+
+	std::string ws2s(std::wstring string)
+	{
+		using convert_typeX = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+		return converterX.to_bytes(string);
+	}
 
 	void script_set_gravity(float value)
 	{
@@ -420,12 +453,73 @@ namespace SquirrelEngine
 		EngineHooks::call_update_player_score(playerIndex);
 	}
 
+	std::string script_get_player_xuid_by_id(int player_id)
+	{
+		player_id = player_id & 0xFFFF;
+		if (player_id == -1)
+			return std::string("");
+
+		return std::to_string(NetworkSession::GetPlayerId(player_id));
+	}
+
+	int script_get_peer_id_by_xuid(std::string xuid_string)
+	{
+		if (xuid_string.empty())
+			return 0;
+
+		XUID xuid = std::stoll(xuid_string);
+		return NetworkSession::GetPeerIndexFromId(xuid);
+	}
+
+	std::string script_get_name_by_xuid(std::string xuid_string)
+	{
+		if (xuid_string.empty())
+			return std::string("");
+
+		XUID xuid = std::stoll(xuid_string);
+		auto player_id = NetworkSession::GetPlayerIndexFromId(xuid);
+		return ws2s(NetworkSession::GetPlayerName(player_id));
+	}
+
+	int script_get_player_id_by_xuid(std::string xuid_string)
+	{
+		if (xuid_string.empty())
+			return 0;
+
+		XUID xuid = std::stoll(xuid_string);
+		return NetworkSession::GetPlayerIndexFromId(xuid);
+	}
+
+	int script_get_player_index_from_unit_datum_index(datum unit_index)
+	{
+		return h2mod->get_player_index_from_unit_datum_index(unit_index);
+	}
+
+	std::string script_get_player_name_by_id(int player_id)
+	{
+		return ws2s(NetworkSession::GetPlayerName(player_id));
+	}
+
+	datum script_inject_tag(std::string map_name, std::string tag_path, int type)
+	{
+		auto tag_datum = tag_loader::Get_tag_datum(tag_path, static_cast<blam_tag::tag_group_type>(type), map_name);
+		if (!DATUM_IS_NONE(tag_datum))
+		{
+			tag_loader::Load_tag(tag_datum, true, map_name);
+			tag_loader::Push_Back();
+			auto new_datum = tag_loader::ResolveNewDatum(tag_datum);
+			return new_datum;
+		}
+		return -1;
+	}
+
 	void bind_functions(HSQUIRRELVM vm)
 	{
 		using namespace Sqrat;
 		
 		DefaultVM::Set(vm);
 		RootTable().Func("print", &print_from_script);
+		RootTable().Func("wprint", &wprint_from_script);
 		RootTable().Func("set_gravity", &script_set_gravity);
 		RootTable().Func("get_game_life_cycle", &script_get_game_life_cycle);
 		RootTable().Func("game_leave_session", &script_leave_session);
@@ -443,8 +537,8 @@ namespace SquirrelEngine
 		RootTable().Func("send_team_change", &NetworkMessage::SendTeamChange);
 		RootTable().Func("set_local_team", &script_set_local_team);
 		RootTable().Func("get_local_team", &script_get_local_team);
-
-
+		RootTable().Func("get_player_index_by_unit_index", &script_get_player_index_from_unit_datum_index);
+		RootTable().Func("inject_tag", &script_inject_tag);
 
 
 		//==========================
@@ -452,14 +546,15 @@ namespace SquirrelEngine
 		//==========================
 
 		RootTable().Func("get_player_count", &NetworkSession::GetPlayerCount);
-		RootTable().Func("get_player_name_by_index", &NetworkSession::GetPlayerName);
+		RootTable().Func("get_player_name_by_index", &script_get_player_name_by_id);
 		RootTable().Func("local_peer_is_host", &NetworkSession::LocalPeerIsSessionHost);
 		RootTable().Func("get_local_peer_index", &NetworkSession::GetLocalPeerIndex);
 		RootTable().Func("get_peer_index_by_id", &NetworkSession::GetPeerIndex);
 		RootTable().Func("get_peer_count", &NetworkSession::GetPeerCount);
 		RootTable().Func("get_player_id_by_name", &NetworkSession::GetPlayerIdByName);
-		RootTable().Func("get_player_xuid_by_id", &NetworkSession::GetPlayerId);
-		RootTable().Func("get_peer_id_by_xuid", &NetworkSession::GetPeerIndexFromId);
+		RootTable().Func("get_player_xuid_by_id", &script_get_player_xuid_by_id);
+		RootTable().Func("get_peer_id_by_xuid", &script_get_peer_id_by_xuid);
+		RootTable().Func("get_player_name_by_xuid", &script_get_name_by_xuid);
 		RootTable().Func("kick_peer", &NetworkSession::KickPeer);
 		RootTable().Func("end_game", &NetworkSession::EndGame);
 		RootTable().Func("get_variant_name", &NetworkSession::GetGameVariantName);
@@ -482,7 +577,7 @@ namespace SquirrelEngine
 		RootTable().Func("check_key_state", &script_check_key_state);
 
 
-		//https://scrat.sourceforge.net/binding.html#basicUsage
+		//z
 		RootTable().Bind("tag_instance",
 			Class<tags::tag_instance>(vm, "tag_instance")
 			.Var("type", &tags::tag_instance::type)
@@ -490,6 +585,34 @@ namespace SquirrelEngine
 			.Var("data_offset", &tags::tag_instance::data_offset)
 			.Var("size", &tags::tag_instance::size)
 		);
+
+		RootTable().Bind("angle",
+			Class<angle>(vm, "angle")
+			.Ctor<float>()
+			.Var("rad", &angle::rad)
+			.Func("equals", &angle::operator==)
+			.Func("as_degree", &angle::as_degree)
+			.Func("as_rad", &angle::as_rad)
+		);
+
+		RootTable().Bind("real_euler_angles3d",
+			Class<real_euler_angles3d>(vm, "real_euler_angles3d")
+			.Ctor<angle, angle, angle>()
+			.Var("yaw", &real_euler_angles3d::yaw)
+			.Var("pitch", &real_euler_angles3d::pitch)
+			.Var("roll", &real_euler_angles3d::roll)
+		);
+
+		RootTable().Bind("real_vector3d", 
+			Class<real_vector3d>(vm, "real_vector3d")
+			.Ctor<float, float, float>()
+			.Var("x", &real_vector3d::x)
+			.Var("y", &real_vector3d::y)
+			.Var("z", &real_vector3d::z)
+			.Func("equals", &real_vector3d::operator==)
+			.Func("get_angle", &real_vector3d::get_angle)
+		);
+
 
 		ConstTable().Enum("log_lvel", Enumeration(vm)
 			.Const("trace", (int)log_level::trace)

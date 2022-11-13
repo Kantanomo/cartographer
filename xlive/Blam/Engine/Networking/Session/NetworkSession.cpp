@@ -169,7 +169,18 @@ int NetworkSession::GetPeerIndexFromId(unsigned long long xuid)
 	}
 	return NONE;
 }
-
+int NetworkSession::GetPlayerIndexFromId(unsigned long long xuid)
+{
+	if (GetPlayerCount() > 0)
+	{
+		for (int playerIdx = 0; playerIdx < ENGINE_PLAYER_MAX; playerIdx++)
+		{
+			if (PlayerIsActive(playerIdx) && GetPlayerId(playerIdx) == xuid)
+				return playerIdx;
+		}
+	}
+	return NONE;
+}
 void NetworkSession::KickPeer(int peerIdx)
 {
 	typedef void(__thiscall* game_session_boot_t)(s_network_session*, int, bool);

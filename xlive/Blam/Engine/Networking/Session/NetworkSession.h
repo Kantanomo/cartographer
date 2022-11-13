@@ -53,6 +53,7 @@ namespace NetworkSession
 
 	int GetPlayerTeam(int playerIdx);
 	int GetPeerIndexFromId(unsigned long long xuid);
+	int GetPlayerIndexFromId(unsigned long long xuid);
 	s_player_information* GetPlayerInformation(int playerIdx);
 
 	wchar_t* GetGameVariantName();
