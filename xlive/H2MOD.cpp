@@ -49,6 +49,7 @@
 
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD/SquirrelEngine/SquirrelEngine.h"
+#include "H2MOD/SquirrelEngine/SquirrelGloals.h"
 
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)

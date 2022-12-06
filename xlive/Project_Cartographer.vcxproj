@@ -321,7 +321,9 @@
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
+    <ClCompile Include="H2MOD\SquirrelEngine\SquirellNetwork.cpp" />
     <ClCompile Include="H2MOD\SquirrelEngine\SquirrelEngine.cpp" />
+    <ClCompile Include="H2MOD\SquirrelEngine\SquirrelGlobals.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.cpp" />
@@ -647,6 +649,8 @@
     <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
     <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\SquirrelEngine\SquirrelEngine.h" />
+    <ClInclude Include="H2MOD\SquirrelEngine\SquirrelGloals.h" />
+    <ClInclude Include="H2MOD\SquirrelEngine\SquirrelNetwork.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />

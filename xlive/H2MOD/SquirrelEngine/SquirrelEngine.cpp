@@ -17,78 +17,9 @@
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "SquirrelGloals.h"
 
 #define SCRAT_USE_EXCEPTIONS
-namespace SquirrelEngineGlobals
-{
-	bool script_loaded = false;
-	bool script_id = 0;
-	std::wstring script_path = L"a";
-	bool script_downloaded = false;
-	bool first_run = true;
-	void sqAddDebugText(std::string Msg)
-	{
-		LOG_DEBUG_SQ("{}", Msg);
-	}
-
-	static SQInteger _sqstd_aux_printerror(HSQUIRRELVM v)
-	{
-		SQPRINTFUNCTION pf = sq_geterrorfunc(v);
-		if (pf) {
-			const SQChar* sErr = 0;
-			if (sq_gettop(v) >= 1) {
-				if (SQ_SUCCEEDED(sq_getstring(v, 2, &sErr))) {
-					pf(v, _SC("\nAN ERROR HAS OCCURRED [%s]\n"), sErr);
-				}
-				else {
-					pf(v, _SC("\nAN ERROR HAS OCCURRED [unknown]\n"));
-				}
-				sqstd_printcallstack(v);
-			}
-		}
-		return 0;
-	}
-	void log_info(HSQUIRRELVM v, const SQChar* desc, ...)
-	{
-		char nDbgMsg[2555];
-		std::string dbMsg;
-		va_list arglist;
-		va_start(arglist, desc);
-		vsprintf(nDbgMsg, desc, arglist);
-		va_end(arglist);
-
-		LOG_INFO_SQ("{}", nDbgMsg);
-	}
-
-	void log_error(HSQUIRRELVM v, const SQChar* desc, ...)
-	{
-		char nDbgMsg[2555];
-		std::string dbMsg;
-		va_list arglist;
-		va_start(arglist, desc);
-		vsprintf(nDbgMsg, desc, arglist);
-		va_end(arglist);
-
-		LOG_CRITICAL_SQ("{}", nDbgMsg);
-
-	}
-
-	void log_compile_error(HSQUIRRELVM v, const SQChar* desc, const SQChar* source, SQInteger line, SQInteger column)
-	{
-		LOG_CRITICAL_SQ("[Squirrel] Compiler error - line {}, column {}, desc {}, souce {}", line, column, desc, source);
-	}
-
-	void log_debug_hook(HSQUIRRELVM vm, SQInteger type, const SQChar* sourcename, SQInteger line, const SQChar* funcname)
-	{
-		//LOG_TRACE_SQ("[Squirrel] Debug type {}, source {}, line {}, function {}", type, sourcename, line, funcname);
-	}
-
-	void Initialize()
-	{
-		squirrel_log = h2log::create("squirrel", prepareLogFileName(L"squirrel"), true, 0);
-	}
-
-}
 
 namespace SquirrelEngine
 {
@@ -129,6 +60,24 @@ namespace SquirrelEngine
 		SquirrelEngineGlobals::script_downloaded = true;
 	}
 
+	static SQInteger _sqstd_aux_printerror(HSQUIRRELVM v)
+	{
+		SQPRINTFUNCTION pf = sq_geterrorfunc(v);
+		if (pf) {
+			const SQChar* sErr = 0;
+			if (sq_gettop(v) >= 1) {
+				if (SQ_SUCCEEDED(sq_getstring(v, 2, &sErr))) {
+					pf(v, _SC("\nAN ERROR HAS OCCURRED [%s]\n"), sErr);
+				}
+				else {
+					pf(v, _SC("\nAN ERROR HAS OCCURRED [unknown]\n"));
+				}
+				sqstd_printcallstack(v);
+			}
+		}
+		return 0;
+	}
+
 	void script_start(std::string path)
 	{
 		/*LOG_TRACE_SQ("Loading defaults");*/
@@ -141,7 +90,7 @@ namespace SquirrelEngine
 		sq_notifyallexceptions(Sqrat::DefaultVM::Get(), true);
 		sq_setcompilererrorhandler(Sqrat::DefaultVM::Get(), SquirrelEngineGlobals::log_compile_error);
 		sq_setnativedebughook(Sqrat::DefaultVM::Get(), SquirrelEngineGlobals::log_debug_hook);
-		sq_newclosure(Sqrat::DefaultVM::Get(), SquirrelEngineGlobals::_sqstd_aux_printerror, 0);
+		sq_newclosure(Sqrat::DefaultVM::Get(), _sqstd_aux_printerror, 0);
 		sq_seterrorhandler(Sqrat::DefaultVM::Get());
 		sqstd_seterrorhandlers(Sqrat::DefaultVM::Get());
 
@@ -576,8 +525,9 @@ namespace SquirrelEngine
 		RootTable().Func("get_gamepad_input_pressed", &script_get_gamepad_input_pressed);
 		RootTable().Func("check_key_state", &script_check_key_state);
 
+		
 
-		//z
+		////z
 		RootTable().Bind("tag_instance",
 			Class<tags::tag_instance>(vm, "tag_instance")
 			.Var("type", &tags::tag_instance::type)
@@ -597,7 +547,7 @@ namespace SquirrelEngine
 
 		RootTable().Bind("real_euler_angles3d",
 			Class<real_euler_angles3d>(vm, "real_euler_angles3d")
-			.Ctor<angle, angle, angle>()
+			//.Ctor<angle, angle, angle>()
 			.Var("yaw", &real_euler_angles3d::yaw)
 			.Var("pitch", &real_euler_angles3d::pitch)
 			.Var("roll", &real_euler_angles3d::roll)
