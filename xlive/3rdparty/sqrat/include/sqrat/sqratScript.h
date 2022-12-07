@@ -29,7 +29,7 @@
 #define _SCRAT_SCRIPT_H_
 
 #include "3rdparty/squirrel/include/squirrel.h"
-#include <sqstdio.h>
+#include "3rdparty/squirrel/include/sqstdio.h"
 #include <string.h>
 
 #include "sqratObject.h"
