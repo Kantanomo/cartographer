@@ -30,7 +30,7 @@
 
 #include <cassert>
 #include <map>
-#include <squirrel.h>
+#include "3rdparty/squirrel/include/squirrel.h"
 #include <string.h>
 
 #if defined(SCRAT_USE_CXX11_OPTIMIZATIONS)

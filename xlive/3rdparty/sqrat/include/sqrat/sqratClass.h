@@ -29,7 +29,7 @@
 #define _SCRAT_CLASS_H_
 
 #include <typeinfo>
-#include <squirrel.h>
+#include "3rdparty/squirrel/include/squirrel.h"
 #include <string.h>
 
 #include "sqratObject.h"

@@ -29,7 +29,7 @@
 #if !defined(_SCRAT_SQFUNC_H_)
 #define _SCRAT_SQFUNC_H_
 
-#include <squirrel.h>
+#include "3rdparty/squirrel/include/squirrel.h"
 #include "sqratObject.h"
 
 namespace Sqrat {

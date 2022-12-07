@@ -33,7 +33,7 @@
 #include <cstring>
 #endif
 
-#include <squirrel.h>
+#include "3rdparty/squirrel/include/squirrel.h"
 #include <string>
 
 #include "sqratClassType.h"

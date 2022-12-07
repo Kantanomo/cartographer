@@ -28,7 +28,7 @@
 #if !defined(_SCRAT_CONST_H_)
 #define _SCRAT_CONST_H_
 
-#include <squirrel.h>
+#include "3rdparty/squirrel/include/squirrel.h"
 #include <string.h>
 
 #include "sqratObject.h"

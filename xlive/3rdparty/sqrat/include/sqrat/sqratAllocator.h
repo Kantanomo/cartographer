@@ -28,7 +28,7 @@
 #if !defined(_SCRAT_ALLOCATOR_H_)
 #define _SCRAT_ALLOCATOR_H_
 
-#include <squirrel.h>
+#include "3rdparty/squirrel/include/squirrel.h"
 #include <string.h>
 
 #include "sqratObject.h"

@@ -28,7 +28,7 @@
 #if !defined(_SCRAT_CLASSTYPE_H_)
 #define _SCRAT_CLASSTYPE_H_
 
-#include <squirrel.h>
+#include "3rdparty/squirrel/include/squirrel.h"
 #include <typeinfo>
 
 #include "sqratUtil.h"
