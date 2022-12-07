@@ -1,5 +1,5 @@
 #pragma once
-#include <sqrat/include/sqrat.h>
+#include "sqrat/include/sqrat.h"
 
 #include "squirrel/include/squirrel.h"
 

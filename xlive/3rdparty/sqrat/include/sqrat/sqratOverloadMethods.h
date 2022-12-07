@@ -29,7 +29,7 @@
 #define _SQRAT_OVERLOAD_METHODS_H_
 
 #include "3rdparty/squirrel/include/squirrel.h"
-#include <sqstdaux.h>
+#include "3rdparty/squirrel/include/sqstdaux.h"
 #include <sstream>
 #include "sqratTypes.h"
 #include "sqratUtil.h"
