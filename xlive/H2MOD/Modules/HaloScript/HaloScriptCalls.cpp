@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-#include "HaloScript.h"
+#include "HaloScriptCalls.h"
 
-namespace HaloScript
+namespace HaloScriptCalls
 {
 	typedef int(__cdecl unit_kill_t)(datum unitDatum);
 	unit_kill_t* p_unit_kill;

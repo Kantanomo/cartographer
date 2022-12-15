@@ -23,7 +23,7 @@
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
 #include "H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h"
-#include "H2MOD\Modules\HaloScript\HaloScript.h"
+#include "H2MOD\Modules\HaloScript\HaloScriptCalls.h"
 #include "H2MOD\Modules\HudElements\HudElements.h"
 #include "H2MOD\Modules\Input\ControllerInput.h"
 #include "H2MOD\Modules\Input\KeyboardInput.h"
@@ -47,6 +47,8 @@
 #include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
 
 #include <float.h>
+
+#include "H2MOD/Modules/HaloScript/HaloScriptNetworking.h"
 
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
 #pragma fenv_access (on)
@@ -519,7 +521,11 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 	{
 		WriteValue(Memory::GetAddress(0x41F6B1), 0);
 	}
-
+	if (game_options->m_engine_type == _multiplayer && tags::get_cache_header()->type == s_cache_header::e_scnr_type::SinglePlayerScenario)
+	{
+		game_options->m_engine_type = _single_player;
+		game_options->coop = 1;
+	}
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, game_options->m_engine_type);
 	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, game_options);
 
@@ -1113,7 +1119,8 @@ void H2MOD::Initialize()
 	MeleeFix::Initialize();
 	TagFixes::Initalize();
 	MapSlots::Initialize();
-	HaloScript::Initialize();
+	HaloScriptCalls::Initialize();
+	HaloScriptNetworking::Initialize();
 	KantTesting::Initialize();
 	H2X::ApplyPatches();
 	H2MOD::ApplyHooks();

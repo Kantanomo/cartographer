@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/StringID.h"
 
-namespace HaloScript
+namespace HaloScriptCalls
 {
 	void UnitKill(datum unitDatum);
 	bool UnitInVehicle(datum unitDatum);
