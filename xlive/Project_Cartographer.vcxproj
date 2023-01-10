@@ -262,7 +262,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScriptNetworking.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.cpp" />
@@ -272,7 +271,7 @@
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
-    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScriptCalls.cpp" />
+    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
@@ -593,7 +592,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
-    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScriptNetworking.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.h" />
@@ -603,7 +601,7 @@
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
-    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScriptCalls.h" />
+    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
     <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />

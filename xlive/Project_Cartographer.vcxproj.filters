@@ -92,7 +92,7 @@
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
-    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScriptCalls.cpp" />
+    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\DebugOverlay.cpp" />
@@ -152,7 +152,6 @@
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
-    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScriptNetworking.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -379,7 +378,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
-    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScriptCalls.h" />
+    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
@@ -496,7 +495,6 @@
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
-    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScriptNetworking.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

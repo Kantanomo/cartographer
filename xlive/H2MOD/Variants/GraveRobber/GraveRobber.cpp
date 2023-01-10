@@ -5,7 +5,7 @@
 #include "Blam/Engine/Game/GameGlobals.h"
 #include "Blam/Engine/Players/LocalPlayers.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
-#include "H2MOD/Modules/HaloScript/HaloScriptCalls.h"
+#include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
 
@@ -81,7 +81,7 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 		p_update_player_score(player_score_data, absPlayerIdx, 0, 1, -1, 0);
 	}
 	
-	HaloScriptCalls::ObjectDestroy(skullDatum);
+	HaloScript::ObjectDestroy(skullDatum);
 
 	for (byte i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
 	{
