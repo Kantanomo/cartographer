@@ -3,6 +3,11 @@ namespace ControllerInput
 {
 	struct CustomControllerLayout
 	{
+		CustomControllerLayout() {};
+		CustomControllerLayout(const char* layout)
+		{
+			FromString(layout);
+		};
 		WORD DPAD_UP		= XINPUT_GAMEPAD_DPAD_UP;
 		WORD DPAD_DOWN		= XINPUT_GAMEPAD_DPAD_DOWN;
 		WORD DPAD_LEFT		= XINPUT_GAMEPAD_DPAD_LEFT;

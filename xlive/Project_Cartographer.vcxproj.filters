@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
@@ -214,6 +213,9 @@
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
+    <ClCompile Include="H2MOD\Utils\EasyJson.cpp" />
+    <ClCompile Include="H2MOD\Utils\EasyJsonStruct.cpp" />
+    <ClCompile Include="Blam\Cartographer\Settings\Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -324,7 +326,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
-    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
@@ -653,6 +654,8 @@
     <ClInclude Include="Blam\Engine\cseries\cseries_windows.h" />
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
     <ClInclude Include="resources\version_resource.h" />
+    <ClInclude Include="Blam\Engine\main\main.h" />
+    <ClInclude Include="Blam\Cartographer\Settings\Setting.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
@@ -661,6 +664,8 @@
   <ItemGroup>
     <None Include="xlive.def" />
     <None Include="3rdparty\directx\include\d3dx9math.inl" />
-    <None Include="resources\Resource.aps" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\bitmaps\crash_window_header.bmp" />
   </ItemGroup>
 </Project>
