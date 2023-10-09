@@ -1,7 +1,8 @@
 #pragma once
-#include "H2MOD/Utils/EasyJsonStruct.cpp"
 #include <H2MOD/Modules/SpecialEvents/SpecialEvents.h>
 #include <H2MOD/Modules/Input/ControllerInput.h>
+#include "H2MOD/Utils/EasyJsonStruct.cpp"
+
 struct s_cartographer_settings : s_base_easy_json_struct<s_cartographer_settings> {
 	bool h2portable = false;
 	unsigned short base_port = 2000;

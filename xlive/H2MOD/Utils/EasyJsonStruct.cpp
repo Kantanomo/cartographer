@@ -1,3 +1,4 @@
+#pragma once
 #include "stdafx.h"
 #include "H2MOD/Utils/Utils.h"
 
@@ -9,11 +10,6 @@
 #include "rapidjson/pointer.h"
 using namespace rapidjson;
 
-enum e_easy_json_error : byte {
-	success,
-	file_open_error,
-	json_parse_error
-};
 
 
 template<typename struct_type>
@@ -24,6 +20,12 @@ private:
 	std::vector<std::string> key_path;
 	struct_type* object;
 public:
+    enum e_easy_json_error : byte {
+        success,
+        file_open_error,
+        json_parse_error
+    };
+
 	easy_json_struct(const wchar_t* file_name_in, struct_type* object_pointer)
 	{
 		wcsncpy(file_name, file_name_in, 255);

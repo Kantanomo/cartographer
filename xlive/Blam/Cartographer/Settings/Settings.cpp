@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Setting.h"
 #include <H2MOD/Modules/Shell/Startup/Startup.h>
 

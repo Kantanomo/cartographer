@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "KantTesting.h"
 #include <H2MOD/Modules/Shell/Startup/Startup.h>
-#include <Blam/Cartographer/Settings/Setting.h>
-
+#include "Blam/Cartographer/Settings/Setting.h"
+#include "H2MOD/Utils/EasyJsonStruct.cpp"
 
 
 namespace KantTesting
