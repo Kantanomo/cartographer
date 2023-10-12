@@ -26,6 +26,7 @@
 
 #include "imgui.h"
 #include "imgui_handler.h"
+#include "Blam/Cartographer/Settings/Setting.h"
 
 namespace ImGuiHandler {
 	namespace ImAdvancedSettings {
@@ -66,7 +67,7 @@ namespace ImGuiHandler {
 
 				draw_list->AddRectFilled(ImVec2(Center.x - 100, Center.y - 100), ImVec2(Center.x + 100, Center.y + 100), ImColor(20, 20, 20));
 				draw_list->AddCircleFilled(Center, 100, ImColor(255, 255, 255), 120);
-				if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+				if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
 					int X_Axis = (int)(100 * (H2Config_Deadzone_A_X / 100));
 					int Y_Axis = (int)(100 * (H2Config_Deadzone_A_Y / 100));
 					ImVec2 Y_TopLeft(
@@ -80,7 +81,7 @@ namespace ImGuiHandler {
 					ImVec2 X_BottomRight(Center.x + X_Axis, Center.y + 100);
 					draw_list->AddRectFilled(X_TopLeft, X_BottomRight, ImColor(20, 20, 20, 125));
 				}
-				if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
+				if (cartographer_settings.game.input.deadzone_type == radial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
 					draw_list->AddCircleFilled(Center, H2Config_Deadzone_Radial, ImColor(20, 20, 20, 125), 120);
 				}
 
@@ -103,10 +104,10 @@ namespace ImGuiHandler {
 					radial_invalid = true;
 				}
 				bool valid = true;
-				if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both)
+				if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone)
 					if (axial_invalid == 2)
 						valid = false;
-				if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both)
+				if (cartographer_settings.game.input.deadzone_type == radial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone)
 					if (radial_invalid)
 						valid = false;
 
@@ -304,7 +305,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(100));
 					if (ImGui::Combo("##Shadows", &g_shadows, s_items, 4))
 					{
-						H2Config_Override_Shadows = (e_override_texture_resolution)g_shadows;
+						cartographer_settings.game.video.override_shadows = (e_override_texture_resolution)g_shadows;
 						RenderHooks::ResetDevice();
 					}
 					ImGui::NextColumn();
@@ -312,7 +313,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(100));
 					if (ImGui::Combo("##Water", &g_water, s_items, 4))
 					{
-						H2Config_Override_Water = (e_override_texture_resolution)g_water;
+						cartographer_settings.game.video.override_water = (e_override_texture_resolution)g_water;
 						RenderHooks::ResetDevice();
 					}
 					ImGui::NextColumn();
@@ -321,7 +322,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(100));
 					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 2))
 					{
-						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
+						cartographer_settings.game.video.experimental_rendering = (e_frame_limiter_type)g_experimental;
 					}
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
@@ -339,7 +340,7 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(light_suppressor_tooltip));
 
-					//ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
+					//ImGui::Checkbox(GetString(e_rendering_mode), &cartographer_settings.game.video.experimental_rendering);
 					//if (ImGui::IsItemHovered())
 					//	ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
 
@@ -502,7 +503,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
 					{
-						H2Config_Controller_Deadzone = (H2Config_Deadzone_Type)(byte)g_deadzone;
+						cartographer_settings.game.input.deadzone_type = (e_controller_deadzone_type)(byte)g_deadzone;
 						ControllerInput::SetDeadzones();
 					}
 					if (ImGui::IsItemHovered())
@@ -512,7 +513,7 @@ namespace ImGuiHandler {
 					ImGui::PopItemWidth();
 					ImGui::Columns(1);
 
-					if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+					if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
 						ImGui::Text(GetString(axial_deadzone_X));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						ImGui::SliderFloat("##C_Deadzone_A_X_1", &H2Config_Deadzone_A_X, 0, 100, "");
@@ -566,7 +567,7 @@ namespace ImGuiHandler {
 						}
 						ImGui::PopItemWidth();
 					}
-					if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
+					if (cartographer_settings.game.input.deadzone_type == radial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
 						ImGui::Text(GetString(radial_deadzone_radius));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						ImGui::SliderFloat("##C_Deadzone_R_1", &H2Config_Deadzone_Radial, 0, 100, "");
@@ -873,10 +874,10 @@ namespace ImGuiHandler {
 					if (ImGui::Combo("##Language_Selection", &g_language_code, l_items, 9))
 					{
 						if (g_language_code == 8)
-							H2Config_language.code_main = -1;
+							cartographer_settings.language_code.code_main = -1;
 						else
-							H2Config_language.code_main = g_language_code;
-						setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
+							cartographer_settings.language_code.code_main = g_language_code;
+						setCustomLanguage(cartographer_settings.language_code.code_main, cartographer_settings.language_code.code_variant);
 					}
 					ImGui::PopItemWidth();
 
@@ -888,16 +889,16 @@ namespace ImGuiHandler {
 		}
 		const char* GetString(e_advanced_string string, const std::string& id)
 		{
-			if (string_table.count(H2Config_language.code_main))
+			if (string_table.count(cartographer_settings.language_code.code_main))
 			{
-				if (string_table.at(H2Config_language.code_main).count(string)) {
+				if (string_table.at(cartographer_settings.language_code.code_main).count(string)) {
 					if (id.empty()) {
-						return const_cast<char*>(string_table.at(H2Config_language.code_main).at(string));
+						return const_cast<char*>(string_table.at(cartographer_settings.language_code.code_main).at(string));
 					}
 
 					if (!string_cache.count(id))
 					{
-						std::string temp_str(const_cast<char*>(string_table.at(H2Config_language.code_main).at(string)));
+						std::string temp_str(const_cast<char*>(string_table.at(cartographer_settings.language_code.code_main).at(string)));
 						temp_str.append("##");
 						temp_str.append(id);
 						string_cache[id] = temp_str;
@@ -921,12 +922,12 @@ namespace ImGuiHandler {
 		{
 			if (!g_init)
 			{
-				g_deadzone = (int)H2Config_Controller_Deadzone;
+				g_deadzone = (int)cartographer_settings.game.input.deadzone_type;
 				g_aiming = (int)H2Config_controller_modern;
-				g_language_code = H2Config_language.code_main;
-				g_shadows = (int)H2Config_Override_Shadows;
-				g_water = (int)H2Config_Override_Water;
-				g_experimental = (int)H2Config_experimental_fps;
+				g_language_code = cartographer_settings.language_code.code_main;
+				g_shadows = (int)cartographer_settings.game.video.override_shadows;
+				g_water = (int)cartographer_settings.game.video.override_water;
+				g_experimental = (int)cartographer_settings.game.video.experimental_rendering;
 				if (g_language_code == -1)
 					g_language_code = 8;
 				g_init = true;

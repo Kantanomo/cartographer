@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "CustomLanguage.h"
+
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/text/unicode.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -181,8 +183,8 @@ bool read_custom_labels() {
 
 	addDebugText("Reading Custom Languages File...");
 
-	bool prev_capture = H2Config_custom_labels_capture_missing;
-	H2Config_custom_labels_capture_missing = false;
+	bool prev_capture = cartographer_settings.language_label_capture;
+	cartographer_settings.language_label_capture = false;
 
 	wchar_t labels_file_path[1024];
 	swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", H2ProcessFilePath);
@@ -338,7 +340,7 @@ bool read_custom_labels() {
 		fclose(labelsFile);
 		custom_labels_updated = false;
 	}
-	H2Config_custom_labels_capture_missing = prev_capture;
+	cartographer_settings.language_label_capture = prev_capture;
 	addDebugText("Finished Reading Custom Languages File.");
 	return read_file_success;
 }
@@ -378,8 +380,8 @@ bool reloadCustomLanguages() {
 
 void write_custom_labels() {
 	if (custom_labels_updated) {
-		bool prev_capture = H2Config_custom_labels_capture_missing;
-		H2Config_custom_labels_capture_missing = false;
+		bool prev_capture = cartographer_settings.language_label_capture;
+		cartographer_settings.language_label_capture = false;
 
 		wchar_t labels_file_path[1024];
 		swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", H2ProcessFilePath);
@@ -418,7 +420,7 @@ void write_custom_labels() {
 
 			fclose(labelsFile);
 		}
-		H2Config_custom_labels_capture_missing = prev_capture;
+		cartographer_settings.language_label_capture = prev_capture;
 	}
 }
 
@@ -445,7 +447,7 @@ char* __stdcall H2GetLabel(int a1, int label_id, int a3, int a4) { //sub_3defd
 	//if (strcmp(label, "PROFILE NAME") == 0) {
 	//	return label;//in order to breakpoint and get label_id's.
 	//}
-	if (!H2Config_custom_labels_capture_missing) {
+	if (!cartographer_settings.language_label_capture) {
 		return label;
 	}
 	return get_custom_label(current_language, label_menu_id, label_id, label);
@@ -567,7 +569,7 @@ __declspec(naked) char* nak_c00031b97()
 
 
 void setCustomLanguage(int main, int variant) {
-	H2Config_custom_labels_capture_missing = false;
+	cartographer_settings.language_label_capture = false;
 
 	if (main >= 0 && main <= 7)
 		current_language_main = main;
@@ -693,9 +695,9 @@ void InitCustomLanguage() {
 		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x00031b97);
 		PatchCall(H2BaseAddr + 0x00031e89, nak_c00031b97);
 
-		bool redoCapture = H2Config_custom_labels_capture_missing;
-		setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
-		H2Config_custom_labels_capture_missing = redoCapture;
+		bool redoCapture = cartographer_settings.language_label_capture;
+		setCustomLanguage(cartographer_settings.language_code.code_main, cartographer_settings.language_code.code_variant);
+		cartographer_settings.language_label_capture = redoCapture;
 	}
 }
 

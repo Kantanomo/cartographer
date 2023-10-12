@@ -338,8 +338,9 @@ public:
 };
 
 template<typename type>
-struct s_base_easy_json_struct
+class s_base_easy_json_struct
 {
-    virtual void load(easy_json_struct<type>& json) = 0;
+public:
+	virtual void load(easy_json_struct<type>& json) = 0;
     virtual void save(easy_json_struct<type>& json) = 0;
 };

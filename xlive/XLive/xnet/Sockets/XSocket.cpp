@@ -11,6 +11,8 @@
 
 #include <MSWSock.h>
 
+#include "Blam/Cartographer/Settings/Setting.h"
+
 std::vector<XSocket*> XSocket::Sockets;
 
 // #5310: XOnlineStartup
@@ -371,7 +373,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 		memcpy((char*)packet + sizeof(XBroadcastPacket), lpBuffers->buf, lpBuffers->len);
 
-		int portOffset = H2Config_base_port % 1000;
+		int portOffset = cartographer_settings.base_port % 1000;
 
 		// TODO: properly implement this broadcast BS
 		for (int i = 2000; i <= 5000; i += 1000)
@@ -603,16 +605,16 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	switch (ntohs(virtual_port))
 	{
 	case 1000:
-		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port);
+		((struct sockaddr_in*)name)->sin_port = htons(cartographer_settings.base_port);
 		break;
 	case 1001:
-		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 1);
+		((struct sockaddr_in*)name)->sin_port = htons(cartographer_settings.base_port + 1);
 		break;
 	case 1005:
-		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 5);
+		((struct sockaddr_in*)name)->sin_port = htons(cartographer_settings.base_port + 5);
 		break;
 	case 1006:
-		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 6);
+		((struct sockaddr_in*)name)->sin_port = htons(cartographer_settings.base_port + 6);
 		break;
 	default:
 		break;

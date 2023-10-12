@@ -21,18 +21,14 @@ unsigned short H2Config_master_port_login = 27020;
 unsigned short H2Config_master_port_relay = 1001;
 
 //config variables
-bool H2Portable = false;//TODO
 
 std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
-unsigned short H2Config_base_port = 2000;
 char H2Config_str_wan[16] = { "" };
 char H2Config_str_lan[16] = { "" };
 unsigned long H2Config_ip_wan = 0;
 unsigned long H2Config_ip_lan = 0;
-_H2Config_language H2Config_language = { -1, 0 };
-bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
 bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
@@ -47,7 +43,6 @@ float H2Config_mouse_sens = 0;
 bool H2Config_mouse_uniform = false;
 float H2Config_controller_sens = 0;
 bool H2Config_controller_modern = false;
-H2Config_Deadzone_Type H2Config_Controller_Deadzone = H2Config_Deadzone_Type::Axial;
 float H2Config_Deadzone_A_X = 26.0f;
 float H2Config_Deadzone_A_Y = 26.0f;
 float H2Config_Deadzone_Radial = 1.0f;
@@ -75,14 +70,10 @@ char H2Config_stats_authkey[32 + 1] = { "" };
 bool H2Config_vip_lock = false;
 bool H2Config_even_shuffle_teams = false;
 bool H2Config_koth_random = true;
-H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = _rendering_mode_none;
 bool H2Config_anti_cheat_enabled = true;
 
 float H2Config_crosshair_scale = 1.0f;
 float H2Config_raw_mouse_scale = 25.0f;
-
-e_override_texture_resolution H2Config_Override_Shadows;
-e_override_texture_resolution H2Config_Override_Water;
 
 ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
@@ -112,8 +103,8 @@ void SaveH2Config() {
 	if (!H2IsDediServer) {
 		extern int current_language_main;
 		extern int current_language_sub;
-		H2Config_language.code_main = current_language_main;
-		H2Config_language.code_variant = current_language_sub;
+		cartographer_settings.language_code.code_main = current_language_main;
+		cartographer_settings.language_code.code_variant = current_language_sub;
 	}
 
 	wchar_t fileConfigPath[1024];
@@ -128,7 +119,7 @@ void SaveH2Config() {
 			wcscpy_s(fileConfigPath, jsonPath);
 		}
 	}
-	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
+	else if (cartographer_settings.h2portable || !H2Config_isConfigFileAppDataLocal) {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigJsonFilenames[H2IsDediServer], H2ProcessFilePath, _Shell::GetInstanceId());
 	}
 	else {
@@ -139,15 +130,15 @@ void SaveH2Config() {
 
 	easy_json_struct json(fileConfigPath, &cartographer_settings);
 
-	auto rc = json.load();
-
-	if (rc < 0) {
+	//TODO add error checking to the save function
+	json.save();
+	/*if (rc < 0) {
 		addDebugText("json.load() failed with error: %d while trying to read configuration file!", (int)rc);
 	}
 	else
 	{
 		json.save();
-	}
+	}*/
 
 	addDebugText("End saving H2Configuration file.");
 }
@@ -215,8 +206,8 @@ void ReadH2Config() {
 		if (!H2IsDediServer) {
 			extern int current_language_main;
 			extern int current_language_sub;
-			H2Config_language.code_main = current_language_main;
-			H2Config_language.code_variant = current_language_sub;
+			cartographer_settings.language_code.code_main = current_language_main;
+			cartographer_settings.language_code.code_variant = current_language_sub;
 		}
 		fclose(fileConfig);
 
@@ -309,8 +300,8 @@ void UpgradeConfig()
 		if (!H2IsDediServer) {
 			extern int current_language_main;
 			extern int current_language_sub;
-			H2Config_language.code_main = current_language_main;
-			H2Config_language.code_variant = current_language_sub;
+			cartographer_settings.language_code.code_main = current_language_main;
+			cartographer_settings.language_code.code_variant = current_language_sub;
 		}
 
 		CSimpleIniA ini;

@@ -2,6 +2,7 @@
 
 #include "AccountLogin.h"
 
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -83,7 +84,7 @@ int ConfigureUserDetails(const char* username, const char* login_token, unsigned
 
 	int result = strlen(login_token) == 32 ? 1 : 2;
 
-	XUserSetup(0, xuid, username, xnaddr, lanaddr, H2Config_base_port, machineUID, abOnline, online_signin);
+	XUserSetup(0, xuid, username, xnaddr, lanaddr, cartographer_settings.base_port, machineUID, abOnline, online_signin);
 	UpdateMasterLoginStatus(developer);
 
 	if (online_signin) {

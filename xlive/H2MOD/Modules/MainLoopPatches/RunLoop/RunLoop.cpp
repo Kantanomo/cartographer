@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RunLoop.h"
 
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 
@@ -243,7 +244,7 @@ extern bool xboxTickrateEnabled;
 // as well as the game speeding up while minimized
 bool __cdecl cinematic_in_progress_hook()
 {
-	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	e_frame_limiter_type experimental_rendering_mode = cartographer_settings.game.video.experimental_rendering;
 
 	switch (experimental_rendering_mode)
 	{
@@ -272,7 +273,7 @@ bool __cdecl cinematics_in_progress_disable_framerate_cap_hook()
 
 bool __cdecl should_limit_framerate_hook()
 {
-	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	e_frame_limiter_type experimental_rendering_mode = cartographer_settings.game.video.experimental_rendering;
 
 	switch (experimental_rendering_mode)
 	{
@@ -624,7 +625,7 @@ void InitRunLoop() {
 	else {
 		addDebugText("Hooking loop Function");
 
-		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+		e_frame_limiter_type experimental_rendering_mode = cartographer_settings.game.video.experimental_rendering;
 
 		// always init these pointers
 		initialize_main_loop_function_pointers();

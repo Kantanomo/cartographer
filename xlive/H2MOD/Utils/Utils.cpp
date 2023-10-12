@@ -5,6 +5,8 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include <sys/timeb.h>
 
+#include "Blam/Cartographer/Settings/Setting.h"
+
 int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);
 	for (int i = lineStrLen; i < 255; i++) {
@@ -595,7 +597,7 @@ void pushHostLobby() {
 	if (p_should_send_broadcast_reply(NULL))
 	{
 		char msg[100] = { 0x00, 0x43, 0x05 };
-		sprintf(&msg[3], "push clientlobby %d", H2Config_base_port + 1);
+		sprintf(&msg[3], "push clientlobby %d", cartographer_settings.base_port + 1);
 
 		addDebugText("Pushing open lobby.");
 

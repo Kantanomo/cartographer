@@ -20,25 +20,6 @@ struct _H2Config_language {
 	int code_variant;
 };
 
-enum H2Config_Deadzone_Type : byte {
-	Axial,
-	Radial,
-	Both
-};
-
-enum e_override_texture_resolution : int
-{
-	tex_low,
-	tex_default,
-	tex_high,
-	tex_ultra
-};
-
-enum H2Config_Experimental_Rendering_Mode : byte
-{
-	_rendering_mode_none,
-	_rendering_mode_original_game_frame_limit
-};
 
 extern std::string cartographerURL;
 extern std::string cartographerMapRepoURL;
@@ -47,16 +28,12 @@ extern unsigned long H2Config_master_ip;
 extern unsigned short H2Config_master_port_login;
 extern unsigned short H2Config_master_port_relay;
 
-extern bool H2Portable;
 extern bool H2Config_isConfigFileAppDataLocal;
-extern unsigned short H2Config_base_port;
 extern char H2Config_str_wan[16];
 extern char H2Config_str_lan[16];
 extern unsigned long H2Config_ip_wan;
 extern unsigned long H2Config_ip_lan;
 
-extern _H2Config_language H2Config_language;
-extern bool H2Config_custom_labels_capture_missing;
 extern bool H2Config_skip_intro;
 extern bool H2Config_raw_input;
 extern bool H2Config_discord_enable;
@@ -70,7 +47,6 @@ extern float H2Config_mouse_sens;
 extern bool H2Config_mouse_uniform;
 extern float H2Config_controller_sens;
 extern bool H2Config_controller_modern;
-extern H2Config_Deadzone_Type H2Config_Controller_Deadzone;
 extern float H2Config_Deadzone_A_X;
 extern float H2Config_Deadzone_A_Y;
 extern float H2Config_Deadzone_Radial;
@@ -97,7 +73,6 @@ extern char H2Config_stats_authkey[32 + 1];
 extern bool H2Config_vip_lock;
 extern bool H2Config_even_shuffle_teams;
 extern bool H2Config_koth_random;
-extern H2Config_Experimental_Rendering_Mode H2Config_experimental_fps;
 extern bool H2Config_anti_cheat_enabled;
 
 extern int H2Config_hotkeyIdHelp;
@@ -111,9 +86,6 @@ extern int H2Config_minimum_player_start;
 extern float H2Config_raw_mouse_scale;
 extern float H2Config_crosshair_scale;
 extern ControllerInput::CustomControllerLayout H2Config_CustomLayout;
-
-extern e_override_texture_resolution H2Config_Override_Shadows;
-extern e_override_texture_resolution H2Config_Override_Water;
 
 extern bool H2Config_upnp_enable;
 extern bool H2Config_melee_fix;

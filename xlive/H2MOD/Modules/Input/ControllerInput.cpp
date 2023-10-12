@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ControllerInput.h"
 
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -247,7 +248,7 @@ namespace ControllerInput
 	void ControllerInput::SetDeadzones()
 	{
 		if (Memory::IsDedicatedServer()) return;
-		if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+		if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
 			*axialDeadzoneX = (short)((float)MAXSHORT * (H2Config_Deadzone_A_X / 100));
 			*axialDeadzoneY = (short)((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100));
 			//*axialDeadzoneX = baseDeadzone * H2Config_Deadzone_A_X;
@@ -258,7 +259,7 @@ namespace ControllerInput
 			*axialDeadzoneX = 0;
 			*axialDeadzoneY = 0;
 		}
-		if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
+		if (cartographer_settings.game.input.deadzone_type == radial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
 			radialDeadzone = (short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100));
 		} 
 		else
@@ -280,7 +281,7 @@ namespace ControllerInput
 		int thumbStickR = 0;
 		bool radialL = false;
 		bool radialR = false;
-		if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+		if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
 			if (abs(scInput[26]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
 				thumbStickL++;
 			if (abs(scInput[27]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100)))

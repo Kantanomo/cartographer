@@ -4,6 +4,7 @@
 #include "WinMainH2.h"
 #include "../Config.h"
 #include "../Shell.h"
+#include "Blam/Cartographer/Settings/Setting.h"
 
 #include "Blam/Engine/cseries/cseries_windows_debug_pc.h"
 
@@ -52,14 +53,14 @@ wchar_t* FlagFilePathConfig = 0;
 void PostH2Config() {
 
 	wchar_t mutexName2[256];
-	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", H2Config_base_port);
+	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", cartographer_settings.base_port);
 	HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
 	DWORD lastErr2 = GetLastError();
 	if (lastErr2 == ERROR_ALREADY_EXISTS) {
-		addDebugText("Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
-		_Shell::OpenMessageBox(NULL, MB_ICONWARNING, "BASE PORT BIND WARNING!", "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
+		addDebugText("Base port %d is already bound to!\nExpect MP to not work!", cartographer_settings.base_port);
+		_Shell::OpenMessageBox(NULL, MB_ICONWARNING, "BASE PORT BIND WARNING!", "Base port %d is already bound to!\nExpect MP to not work!", cartographer_settings.base_port);
 	}
-	addDebugText("Base port: %d.", H2Config_base_port);
+	addDebugText("Base port: %d.", cartographer_settings.base_port);
 }
 
 wchar_t xinput_path[_MAX_PATH];

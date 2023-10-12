@@ -11,6 +11,7 @@
 #include "rapidjson/prettywriter.h"
 
 #include "../xnet/IpManagement/XnIp.h"
+#include "Blam/Cartographer/Settings/Setting.h"
 
 #include "H2MOD/Utils/Utils.h"
 
@@ -815,7 +816,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		document.AddMember("dwFilledPublicSlots", Value().SetInt(dwFilledPublicSlots), docAllocator);
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), docAllocator);
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), docAllocator);
-		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), docAllocator);
+		document.AddMember("dwPort", Value().SetInt(cartographer_settings.base_port), docAllocator);
 		document.AddMember("lanaddr", Value().SetUint(localUser->m_xnaddr.ina.s_addr), docAllocator);
 
 		document.AddMember("xnkid", xnkid_val, docAllocator);

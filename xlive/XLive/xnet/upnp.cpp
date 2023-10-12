@@ -3,6 +3,7 @@
 #include "upnp.h"
 #include <miniupnpc/upnpcommands.h>
 
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
 /* Ripped from ED thanks guys - PermaNull*/
@@ -50,13 +51,13 @@ void ForwardPorts()
 	ModuleUPnP upnp;
 	Utils::UPnPResult upnpResult(Utils::UPnPErrorType::None, 0);
 
-	upnpResult = upnp.UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
+	upnpResult = upnp.UPnPForwardPort(false, cartographer_settings.base_port, cartographer_settings.base_port, "Halo2");
 	LOG_INFO_NETWORK("ForwardPorts() - Halo2 port forwarding result: {}", upnpResult.ErrorCode);
 
-	upnpResult = upnp.UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
+	upnpResult = upnp.UPnPForwardPort(false, (cartographer_settings.base_port + 1), (cartographer_settings.base_port + 1), "Halo2_1");
 	LOG_INFO_NETWORK("ForwardPorts() - Halo2_1 port forwarding result: {}", upnpResult.ErrorCode);
 
-	upnpResult = upnp.UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
+	upnpResult = upnp.UPnPForwardPort(true, (cartographer_settings.base_port + 10), (cartographer_settings.base_port + 10), "Halo2_QoS");
 	LOG_INFO_NETWORK("ForwardPorts() - Halo2_QoSport forwarding result: {}", upnpResult.ErrorCode);
 
 	LOG_INFO_NETWORK("ForwardPorts() - Finished forwarding ports.");

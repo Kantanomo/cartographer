@@ -48,10 +48,10 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 			//Incase any of the old rendering modes were used for a higher fps, set it back to 60.
 			settings->game.video.fps_limit = 60;
 		case 0:
-			settings->game.video.experimental_rendering = s_game_settings::s_video_settings::e_rendering_mode::_rendering_mode_none;
+			settings->game.video.experimental_rendering = e_frame_limiter_type::_rendering_mode_none;
 			break;
 		case 1:
-			settings->game.video.experimental_rendering = s_game_settings::s_video_settings::e_rendering_mode::_rendering_mode_original_game_frame_limit;
+			settings->game.video.experimental_rendering = e_frame_limiter_type::_rendering_mode_original_game_frame_limit;
 			break;
 		}
 
@@ -63,33 +63,33 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 		switch (json["game"]["video"].get<int>("override_shadows", 1))
 		{
 		case 0:
-			settings->game.video.override_shadows = s_game_settings::s_video_settings::e_override_texture_resolution::tex_low;
+			settings->game.video.override_shadows = e_override_texture_resolution::tex_low;
 			break;
 		default:
 		case 1:
-			settings->game.video.override_shadows = s_game_settings::s_video_settings::e_override_texture_resolution::tex_default;
+			settings->game.video.override_shadows = e_override_texture_resolution::tex_default;
 			break;
 		case 2:
-			settings->game.video.override_shadows = s_game_settings::s_video_settings::e_override_texture_resolution::tex_high;
+			settings->game.video.override_shadows = e_override_texture_resolution::tex_high;
 			break;
 		case 3:
-			settings->game.video.override_shadows = s_game_settings::s_video_settings::e_override_texture_resolution::tex_ultra;
+			settings->game.video.override_shadows = e_override_texture_resolution::tex_ultra;
 			break;
 		}
 		switch (json["game"]["video"].get<int>("override_water", 1))
 		{
 		case 0:
-			settings->game.video.override_water = s_game_settings::s_video_settings::e_override_texture_resolution::tex_low;
+			settings->game.video.override_water = e_override_texture_resolution::tex_low;
 			break;
 		default:
 		case 1:
-			settings->game.video.override_water = s_game_settings::s_video_settings::e_override_texture_resolution::tex_default;
+			settings->game.video.override_water = e_override_texture_resolution::tex_default;
 			break;
 		case 2:
-			settings->game.video.override_water = s_game_settings::s_video_settings::e_override_texture_resolution::tex_high;
+			settings->game.video.override_water = e_override_texture_resolution::tex_high;
 			break;
 		case 3:
-			settings->game.video.override_water = s_game_settings::s_video_settings::e_override_texture_resolution::tex_ultra;
+			settings->game.video.override_water = e_override_texture_resolution::tex_ultra;
 			break;
 		}
 
@@ -114,13 +114,13 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 		{
 		default:
 		case 0:
-			settings->game.input.deadzone_type = s_game_settings::s_input_settings::e_deadzone_type::Axial;
+			settings->game.input.deadzone_type = e_controller_deadzone_type::axial_deadzone;
 			break;
 		case 1:
-			settings->game.input.deadzone_type = s_game_settings::s_input_settings::e_deadzone_type::Radial;
+			settings->game.input.deadzone_type = e_controller_deadzone_type::radial_deadzone;
 			break;
 		case 2:
-			settings->game.input.deadzone_type = s_game_settings::s_input_settings::e_deadzone_type::Both;
+			settings->game.input.deadzone_type = e_controller_deadzone_type::both_deadzone;
 			break;
 		}
 
@@ -266,4 +266,4 @@ void s_cartographer_settings::save(easy_json_struct<s_cartographer_settings>& js
 
 }
 
-extern s_cartographer_settings cartographer_settings = {};
+s_cartographer_settings cartographer_settings;

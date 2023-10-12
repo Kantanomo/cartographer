@@ -27,6 +27,7 @@
 
 #include "Accounts/c_account_list_menu.h"
 #include "Accounts/c_account_create_menu.h"
+#include "Blam/Cartographer/Settings/Setting.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -181,7 +182,7 @@ bool GSCustomMenuCall_Language_Sub() {
 #pragma region CM_Language_Main
 
 void languageCaptureSetLabel() {
-	if (H2Config_custom_labels_capture_missing) {
+	if (cartographer_settings.language_label_capture) {
 		add_cartographer_label(CMLabelMenuId_Language, 13, H2CustomLanguageGetLabel(CMLabelMenuId_Language, 0xFFFFF002), true);
 	}
 	else {
@@ -191,7 +192,7 @@ void languageCaptureSetLabel() {
 }
 
 void toggleLanguageCapture() {
-	H2Config_custom_labels_capture_missing = !H2Config_custom_labels_capture_missing;
+	cartographer_settings.language_label_capture = !cartographer_settings.language_label_capture;
 	languageCaptureSetLabel();
 }
 
