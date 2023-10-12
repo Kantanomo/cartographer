@@ -4,11 +4,14 @@
 
 
 #include <rapidjson/prettywriter.h>
+
+#include "Blam/Math/real_math.h"
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/ostreamwrapper.h"
 #include "rapidjson/pointer.h"
 using namespace rapidjson;
+
 
 
 
@@ -30,6 +33,7 @@ public:
 	{
 		wcsncpy(file_name, file_name_in, 255);
 		object = object_pointer;
+        doc_.SetObject();
 	}
 
 	e_easy_json_error load() {
@@ -339,19 +343,3 @@ struct s_base_easy_json_struct
     virtual void load(easy_json_struct<type>& json) = 0;
     virtual void save(easy_json_struct<type>& json) = 0;
 };
-
-//struct test : s_base_easy_json_struct {
-//	virtual void load() {
-//		auto a = 89999;
-//		auto b = a;
-//	}
-//	virtual void save() {};
-//};
-//
-//struct test2 : s_base_easy_json_struct {
-//	virtual void load() {
-//		auto a = 89999;
-//		auto b = a;
-//	}
-//	virtual void save() {};
-//};

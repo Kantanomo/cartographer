@@ -2,7 +2,6 @@
 #include "KantTesting.h"
 #include <H2MOD/Modules/Shell/Startup/Startup.h>
 #include "Blam/Cartographer/Settings/Setting.h"
-#include "H2MOD/Utils/EasyJsonStruct.cpp"
 
 
 namespace KantTesting
@@ -22,11 +21,11 @@ namespace KantTesting
 	
 	void Initialize()
 	{
-		s_cartographer_settings a;
-		easy_json_struct<s_cartographer_settings> b(L"banana.json", &a);
-		b.load();
 		
-		b.save();
+		//easy_json_struct test(L"banana.json", &cartographer_settings);
+		//test.load();
+		
+		//test.save();
 		//tttt(a);
 		if (ENABLEKANTTEST) {
 		//	if (!Memory::isDedicatedServer())

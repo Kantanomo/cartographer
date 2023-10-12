@@ -2,9 +2,11 @@
 #include "Setting.h"
 #include <H2MOD/Modules/Shell/Startup/Startup.h>
 
+
+
 void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& json)
 {
-	auto settings = this;
+	const auto settings = this;
 	json["cartographer"].get_ds("h2portable", &settings->h2portable);
 	json["cartographer"].get_ds("base_port", &settings->base_port);
 	json["cartographer"].get_ds("upnp", &settings->upnp);
@@ -49,7 +51,7 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 			settings->game.video.experimental_rendering = s_game_settings::s_video_settings::e_rendering_mode::_rendering_mode_none;
 			break;
 		case 1:
-			settings->game.video.experimental_rendering = s_game_settings::s_video_settings::e_rendering_mode::_rendering_mode_none;
+			settings->game.video.experimental_rendering = s_game_settings::s_video_settings::e_rendering_mode::_rendering_mode_original_game_frame_limit;
 			break;
 		}
 
@@ -129,10 +131,10 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 	}
 	if (H2IsDediServer)
 	{
-		auto server_name = json["server"].get<const char*>("server_name", "Halo 2 Server");
-		auto server_playlist = json["server"].get<const char*>("server_playlist", "");
-		auto login_identifier = json["server"].get<const char*>("login_identifier", "");
-		auto login_password = json["server"].get<const char*>("login_password", "");
+		const auto server_name = json["server"].get<const char*>("server_name", "Halo 2 Server");
+		const auto server_playlist = json["server"].get<const char*>("server_playlist", "");
+		const auto login_identifier = json["server"].get<const char*>("login_identifier", "");
+		const auto login_password = json["server"].get<const char*>("login_password", "");
 		if (server_name)
 			strncpy(settings->server.server_name, server_name, XUSER_MAX_NAME_LENGTH);
 		if (server_playlist)
@@ -156,8 +158,8 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 			settings->server.enabled_team_bit_flags = 0;
 			memset(settings->server.enabled_team_flag_array, 0, sizeof(settings->server.enabled_team_flag_array));
 
-			size_t true_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '1');
-			size_t false_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '0');
+			const size_t true_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '1');
+			const size_t false_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '0');
 
 			const char team_bit_to_find[] = "01";
 			size_t occurance_offset;
@@ -191,7 +193,7 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 
 void s_cartographer_settings::save(easy_json_struct<s_cartographer_settings>& json)
 {
-	auto settings = this;
+	const auto settings = this;
 	json["cartographer"].set("h2portable", settings->h2portable);
 	json["cartographer"].set("base_port", settings->base_port);
 	json["cartographer"].set("upnp", settings->upnp);
@@ -263,3 +265,5 @@ void s_cartographer_settings::save(easy_json_struct<s_cartographer_settings>& js
 #endif 
 
 }
+
+extern s_cartographer_settings cartographer_settings = {};

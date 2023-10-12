@@ -13,6 +13,8 @@ struct s_cartographer_settings : s_base_easy_json_struct<s_cartographer_settings
 	bool debug_log_console = false;
 	bool language_label_capture = false;
 	bool discord_enable = true;
+	unsigned long internal_ip = 0;
+	unsigned long external_ip = 0;
 
 	struct s_language_code {
 		int code_main;
@@ -28,7 +30,7 @@ struct s_cartographer_settings : s_base_easy_json_struct<s_cartographer_settings
 
 		struct s_video_settings {
 			int fps_limit = 60;
-			float static_lod_scale = 0;
+			int static_lod_scale = 0;
 			int field_of_view = 78;
 			int vehicle_field_of_view = 78;
 			bool static_fp_fov = false;
@@ -114,6 +116,8 @@ struct s_cartographer_settings : s_base_easy_json_struct<s_cartographer_settings
 
 	s_development_settings development;
 
-	virtual void load(easy_json_struct<s_cartographer_settings>& json);
-	virtual void save(easy_json_struct<s_cartographer_settings>& json);
+	void load(easy_json_struct<s_cartographer_settings>& json) override;
+	void save(easy_json_struct<s_cartographer_settings>& json) override;
 };
+
+extern s_cartographer_settings cartographer_settings;
