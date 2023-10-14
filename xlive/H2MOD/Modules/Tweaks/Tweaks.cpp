@@ -361,7 +361,7 @@ void H2Tweaks::SetScreenRefreshRate() {
 	{
 		static bool refresh_redirected = false;
 		if (!refresh_redirected) {
-			WritePointer(Memory::GetAddress(0x25E869) + 3, &H2Config_refresh_rate);
+			WritePointer(Memory::GetAddress(0x25E869) + 3, &cartographer_settings.game.video.refresh_rate);
 			refresh_redirected = true;
 		}
 	}

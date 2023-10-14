@@ -26,8 +26,6 @@ extern std::string cartographerMapRepoURL;
 
 extern bool H2Config_isConfigFileAppDataLocal;
 
-extern int H2Config_field_of_view;
-extern int H2Config_vehicle_field_of_view;
 extern bool H2Config_static_first_person;
 extern float H2Config_mouse_sens;
 extern bool H2Config_mouse_uniform;
@@ -36,7 +34,6 @@ extern bool H2Config_controller_modern;
 extern float H2Config_Deadzone_A_X;
 extern float H2Config_Deadzone_A_Y;
 extern float H2Config_Deadzone_Radial;
-extern __int16 H2Config_refresh_rate;
 extern bool H2Config_shader_lod_max;
 extern bool H2Config_light_suppressor;
 extern bool H2Config_d3d9ex;

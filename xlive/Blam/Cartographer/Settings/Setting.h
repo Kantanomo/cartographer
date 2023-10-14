@@ -39,7 +39,7 @@ struct s_cartographer_video_settings {
 	int field_of_view = 78;
 	int vehicle_field_of_view = 78;
 	bool static_fp_fov = false;
-	int refresh_rate = 60;
+	__int16 refresh_rate = 60;
 	bool shader_lod_max = false;
 	bool light_suppressor = false;
 	bool d3dex = false;
