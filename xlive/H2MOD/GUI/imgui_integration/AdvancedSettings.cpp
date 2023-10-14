@@ -842,14 +842,14 @@ namespace ImGuiHandler {
 
 					TextVerticalPad(GetString(no_events_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##no_events", &H2Config_no_events);
+					ImGui::Checkbox("##no_events", &cartographer_settings.game.no_events);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(no_events_tooltip));
 
 					if (get_current_special_event() == e_special_event_type::_halloween) {
 						TextVerticalPad(GetString(skeleton_biped));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##spooky_scary", &H2Config_spooky_boy);
+						ImGui::Checkbox("##spooky_scary", &cartographer_settings.game.skeleton_biped);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skeleton_biped_tooltip));
 					}

@@ -2,6 +2,7 @@
 
 #include "SpecialEvents.h"
 #include "SpecialEventHelpers.h"
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Events/Birthday.h"
 #include "Events/Christmas.h"
 #include "Events/Halloween.h"
@@ -72,7 +73,7 @@ bool check_special_event_date(std::wstring date)
 // Enables event if the current date and time line up with an event time
 e_special_event_type get_current_special_event()
 {
-	if (H2Config_no_events)
+	if (cartographer_settings.game.no_events)
 		return _no_event;
 
 #ifndef NDEBUG

@@ -3,6 +3,7 @@
 
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_engine_util.h"
@@ -111,7 +112,7 @@ namespace PlayerRepresentation
 		}
 		else
 		{
-			if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
+			if (cartographer_settings.game.skeleton_biped && !Memory::IsDedicatedServer())
 			{
 				for (byte user_index = 0; user_index < k_number_of_users; user_index++)
 				{
@@ -213,7 +214,7 @@ namespace PlayerRepresentation
 
 		if (options->game_mode == _game_mode_multiplayer)
 		{
-			if (H2Config_spooky_boy && get_current_special_event() == e_special_event_type::_halloween && !Memory::IsDedicatedServer())
+			if (cartographer_settings.game.skeleton_biped && get_current_special_event() == e_special_event_type::_halloween && !Memory::IsDedicatedServer())
 			{
 				for (byte user_index = 0; user_index < k_number_of_users; user_index++)
 				{
@@ -226,7 +227,7 @@ namespace PlayerRepresentation
 			datum skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			datum skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
 
-			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && get_current_special_event() == e_special_event_type::_halloween && !H2Config_no_events)
+			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && get_current_special_event() == e_special_event_type::_halloween && !cartographer_settings.game.no_events)
 			{
 				tag_loader::Load_tag(skele_fp_datum, true, "carto_shared");
 				tag_loader::Load_tag(skele_body_datum, true, "carto_shared");

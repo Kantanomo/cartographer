@@ -9,6 +9,7 @@
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
@@ -31,7 +32,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 {
 	if (state == _life_cycle_in_game)
 	{
-		if (H2Config_spooky_boy) 
+		if (cartographer_settings.game.skeleton_biped)
 		{
 			for (byte user_index = 0; user_index < k_number_of_users; user_index++)
 			{

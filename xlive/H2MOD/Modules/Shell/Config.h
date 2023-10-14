@@ -42,9 +42,6 @@ extern bool H2Config_anti_cheat_enabled;
 extern int H2Config_minimum_player_start;
 
 
-extern bool H2Config_melee_fix;
-extern bool H2Config_no_events;
-extern bool H2Config_spooky_boy;
 
 #ifndef NDEBUG
 extern int H2Config_forced_event;

@@ -38,9 +38,6 @@ bool H2Config_anti_cheat_enabled = true;
 
 
 
-bool H2Config_melee_fix = true;
-bool H2Config_no_events = false;
-bool H2Config_spooky_boy = true;
 #ifndef NDEBUG
 int H2Config_forced_event = 0;
 #endif
