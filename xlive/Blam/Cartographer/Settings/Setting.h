@@ -9,7 +9,7 @@ struct s_language_code {
 	int code_variant;
 };
 
-enum e_frame_limiter_type : byte
+enum e_frame_limiter_type : uint8
 {
 	_rendering_mode_none,
 	_rendering_mode_original_game_frame_limit
@@ -47,7 +47,7 @@ struct s_hud_settings {
 };
 
 
-enum e_controller_deadzone_type : byte {
+enum e_controller_deadzone_type : uint8 {
 	axial_deadzone,
 	radial_deadzone,
 	both_deadzone
@@ -117,8 +117,10 @@ public:
 	bool debug_log_console = false;
 	bool language_label_capture = false;
 	bool discord_enable = true;
-	unsigned long internal_ip = 0;
-	unsigned long external_ip = 0;
+	char lan_ip_str[16] = { "" };
+	unsigned long lan_ip = 0;
+	char wan_ip_str[16] = { "" };
+	unsigned long wan_ip = 0;
 	s_language_code language_code = { -1,0 };
 	s_game_settings game;
 	s_server_settings server;

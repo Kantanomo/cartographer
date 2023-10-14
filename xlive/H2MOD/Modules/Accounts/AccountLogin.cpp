@@ -195,8 +195,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			addDebugText("Client External IP Address is: %s", tempstr1);
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE) {
-				if (strlen(H2Config_str_wan) <= 0 && strlen(H2Config_str_lan) > 0) {
-					H2Config_ip_wan = resolvedAddr;
+				if (strlen(cartographer_settings.wan_ip_str) <= 0 && strlen(cartographer_settings.lan_ip_str) > 0) {
+					cartographer_settings.wan_ip = resolvedAddr;
 				}
 				xnaddr = resolvedAddr;
 			}

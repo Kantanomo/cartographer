@@ -25,10 +25,6 @@ unsigned short H2Config_master_port_relay = 1001;
 std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
-char H2Config_str_wan[16] = { "" };
-char H2Config_str_lan[16] = { "" };
-unsigned long H2Config_ip_wan = 0;
-unsigned long H2Config_ip_lan = 0;
 bool H2Config_skip_intro = false;
 bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
