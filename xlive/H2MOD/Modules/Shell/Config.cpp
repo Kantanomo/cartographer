@@ -18,9 +18,6 @@ std::string H2ConfigVersionSection("H2ConfigurationVersion:" + H2ConfigVersionNu
 
 //config variables
 
-std::string cartographerURL = "https://cartographer.online";
-std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
-
 bool ownsConfigFile = false;
 bool H2Config_isConfigFileAppDataLocal = false;
 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "Blam/Engine/cartographer/endpoints/endpoints.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "rapidjson/document.h"
@@ -41,9 +42,7 @@ void AchievementUnlock(unsigned long long xuid, int achievement_id, XOVERLAPPED*
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		std::string url(cartographerURL + "/achievement-api/unlock.php");
-
-		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, k_cartographer_achievement_unlock_url);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -63,7 +62,7 @@ void GetAchievements(unsigned long long xuid)
 	curl = curl_interface_init_no_verify();
 	if (curl) {
 
-		std::string server_url(cartographerURL + "/achievement-api/achievement_list.php?xuid=" + std::to_string(xuid));
+		std::string server_url(k_cartographer_achievement_get_url + std::to_string(xuid));
 
 		curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);

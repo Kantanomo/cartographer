@@ -2,6 +2,7 @@
 
 #include "AccountCreate.h"
 
+#include "Blam/Engine/cartographer/endpoints/endpoints.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
@@ -88,7 +89,7 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 	free(escaped_user_password);
 
 #ifndef LC4
-	int rtn_code = MasterHttpResponse(std::string(cartographerURL + "/create1"), http_request_body_build, &rtn_result);
+	int rtn_code = MasterHttpResponse(k_cartographer_create_url, http_request_body_build, &rtn_result);
 #else
 	TEST_N_DEF(LC4);
 #endif

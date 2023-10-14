@@ -366,6 +366,7 @@
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zutil.h" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
+    <ClInclude Include="Blam\Engine\cartographer\endpoints\endpoints.h" />
     <ClInclude Include="Blam\Engine\cartographer\settings\settings.h" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />

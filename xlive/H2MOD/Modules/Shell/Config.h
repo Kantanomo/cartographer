@@ -19,7 +19,3 @@ struct _H2Config_language {
 	int code_main;
 	int code_variant;
 };
-
-
-extern std::string cartographerURL;
-extern std::string cartographerMapRepoURL;

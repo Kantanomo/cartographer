@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "Updater.h"
+
+#include "Blam/Engine/cartographer/endpoints/endpoints.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
@@ -278,7 +280,7 @@ static void FetchUpdateDetails() {
 
 	addDebugText("Fetching Update Details.");
 	char* rtn_result = 0;
-	int rtn_code = MasterHttpResponse(std::string(cartographerURL + "/update1.ini"), "", &rtn_result);
+	int rtn_code = MasterHttpResponse(k_cartographer_update_url, "", &rtn_result);
 	if (rtn_code == 0) {
 		addDebugText("Got Update Details.");
 

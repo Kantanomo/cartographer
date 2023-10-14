@@ -2,6 +2,7 @@
 
 #include "AccountLogin.h"
 
+#include "Blam/Engine/cartographer/endpoints/endpoints.h"
 #include "Blam/Engine/cartographer/settings/settings.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
@@ -406,7 +407,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	free(escaped_user_password);
 
 #if !defined(LC2)
-	int error_code = MasterHttpResponse(std::string(cartographerURL + "/login2"), http_request_body_build, &rtn_result);
+	int error_code = MasterHttpResponse(k_cartographer_login_url, http_request_body_build, &rtn_result);
 #else
 	TEST_N_DEF(LC2);
 #endif

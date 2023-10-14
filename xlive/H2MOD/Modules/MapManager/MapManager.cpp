@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "MapManager.h"
+
+#include "Blam/Engine/cartographer/endpoints/endpoints.h"
 #include "CustomMapDataCache/CustomMapDataCache.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -429,7 +431,7 @@ static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ul
 }
 
 bool MapDownloadQuery::DownloadFromRepo() {
-	std::string url(cartographerMapRepoURL + "/");
+	
 
 	FILE *fp = nullptr;
 	CURL *curl = nullptr;
@@ -448,6 +450,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 			return false;
 		}
 
+		std::string url(k_cartographer_maps_repo_url);
 		char *url_encoded_map_filename = curl_easy_escape(curl, m_clientMapFilename.c_str(), m_clientMapFilename.length());
 		url += url_encoded_map_filename;
 		curl_free(url_encoded_map_filename);

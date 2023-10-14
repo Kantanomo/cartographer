@@ -11,6 +11,7 @@
 #include "rapidjson/prettywriter.h"
 
 #include "../xnet/IpManagement/XnIp.h"
+#include "Blam/Engine/cartographer/endpoints/endpoints.h"
 #include "Blam/Engine/cartographer/settings/settings.h"
 
 #include "H2MOD/Utils/Utils.h"
@@ -424,8 +425,6 @@ void CServerList::EnumerateFromHttp()
 	DWORD outStringBufferSize = 0;
 	int itemsLeftToDownload, validItemsFound = 0;
 
-	std::string serverlist_url(cartographerURL + "/live/server_list.php");
-
 	m_pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 	m_pOverlapped->InternalHigh = 0;
 	m_pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
@@ -442,7 +441,7 @@ void CServerList::EnumerateFromHttp()
 		return;
 	}
 
-	curl_easy_setopt(curl, CURLOPT_URL, serverlist_url.c_str());
+	curl_easy_setopt(curl, CURLOPT_URL, k_cartographer_server_list_url);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &m_serverListToDownload);
 	curl_res = curl_easy_perform(curl);
@@ -533,7 +532,7 @@ void CServerList::EnumerateFromHttp()
 
 			auto& itemQuery = itemsToDownloadQuery[serverQueryIdx++];
 
-			std::string server_url = std::string(cartographerURL + "/live/servers/" + xuidStrItr->GetString());
+			std::string server_url = std::string(k_cartographer_server_get_url) + xuidStrItr->GetString();
 
 			// server_url is copied to another buffer when setting CURLOPT_URL
 			curl_easy_setopt(itemQuery.first, CURLOPT_URL, server_url.c_str());
@@ -647,9 +646,8 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 	curl = curl_interface_init_no_verify();
 	if (curl) {
 		rapidjson::Document document;
-		std::string url(cartographerURL + "/live/dedicount.php");
 
-		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, k_cartographer_dedicated_count);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -755,7 +753,6 @@ void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 		rapidjson::Document document;
 		document.SetObject();
 		auto& docAllocator = document.GetAllocator();
-		std::string url(cartographerURL + "/live/del_server.php");
 
 		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[0].xuid), docAllocator);
 		document.AddMember("token", Value().SetString(H2CurrentAccountLoginToken, docAllocator), docAllocator);
@@ -764,7 +761,7 @@ void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, k_cartographer_server_delete_url);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer.GetString());
@@ -797,7 +794,6 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		rapidjson::Document document;
 		document.SetObject();
 		auto& docAllocator = document.GetAllocator();
-		std::string url(cartographerURL + "/live/add_server.php");
 
 		Value token(kStringType);
 		if (H2CurrentAccountLoginToken)
@@ -879,7 +875,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, k_cartographer_server_add_url);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
