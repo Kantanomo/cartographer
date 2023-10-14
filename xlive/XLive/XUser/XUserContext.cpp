@@ -1,11 +1,12 @@
 #include "stdafx.h"
 
 #include "XUserContext.h"
+
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/game/game_engine.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Shell/Shell.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "XLive/xbox/xbox.h"
 
@@ -116,7 +117,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 	LOG_TRACE_XLIVE("XUserSetContext  (userIndex = {0}, contextId = {1}, contextValue = {2})",
 		dwUserIndex, dwContextId, dwContextValue);
 
-	if (Memory::IsDedicatedServer() || !H2Config_discord_enable || _Shell::GetInstanceId() > 1)
+	if (Memory::IsDedicatedServer() || !cartographer_settings.discord_enable || _Shell::GetInstanceId() > 1)
 		return ERROR_SUCCESS;
 
 	if (dwContextId == 0x00000003)

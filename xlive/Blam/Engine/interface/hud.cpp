@@ -1,12 +1,7 @@
 #include "stdafx.h"
 #include "hud.h"
-#include "new_hud_definitions.h"
-
-
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game_globals.h"
-
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 
@@ -61,7 +56,7 @@ void hud_patches_on_map_load()
 {
 	if (Memory::IsDedicatedServer()) { return; }
 
-	set_crosshair_offset(H2Config_crosshair_offset);
+	set_crosshair_offset(cartographer_settings.game.hud.crosshair_offset);
 	set_primary_hud_scale(1.0f);
 	set_secondary_hud_scale(1.0f);
 }

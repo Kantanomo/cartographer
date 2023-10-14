@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Tweaks.h"
 
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/rasterizer/rasterizer_settings.h"
@@ -9,7 +10,6 @@
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Variants/VariantMPGameEngine.h"
 
@@ -23,9 +23,9 @@ hookServ1_t p_hookServ1;
 int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 	char result = p_hookServ1(hKey, lpSubKey);
 	addDebugText("Post Server Registry Read.");
-	if (strlen(H2Config_dedi_server_playlist) > 0) {
+	if (strlen(cartographer_settings.server.playlist) > 0) {
 		wchar_t* ServerPlaylist = Memory::GetAddress<wchar_t*>(0, 0x3B3704);
-		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
+		swprintf(ServerPlaylist, 256, L"%hs", cartographer_settings.server.playlist);
 	}
 	return result;
 }
@@ -35,7 +35,7 @@ void __cdecl update_keyboard_buttons_state_hook(BYTE *a1, WORD *a2, BYTE *a3, bo
 	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
 
 	BYTE keyboardState[256] = {};
-	if (!H2Config_disable_ingame_keyboard 
+	if (!cartographer_settings.game.input.disable_ingame_keyboard
 		&& GetKeyboardState(keyboardState))
 	{
 		for (int i = 0; i < 256; i++)
@@ -90,8 +90,8 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 		//boot them offline.
 		XUserSignOut(0);
 		UpdateMasterLoginStatus();
-		H2Config_master_ip = inet_addr("127.0.0.1");
-		H2Config_master_port_relay = 2001;
+		cartographer_settings.master_server_ip = inet_addr("127.0.0.1");
+		cartographer_settings.master_server_relay_port = 2001;
 	}
 	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
 	return result;
@@ -252,7 +252,7 @@ void H2Tweaks::ApplyPatches() {
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
 
 		// set the additional pcr time
-		WriteValue<BYTE>(Memory::GetAddress(0, 0xE590) + 2, H2Config_additional_pcr_time);
+		WriteValue<BYTE>(Memory::GetAddress(0, 0xE590) + 2, cartographer_settings.server.additional_pcr_time);
 
 		// fix human turret variant setting not working on dedicated servers
 		WriteValue<int>(Memory::GetAddress(0x0, 0x3557FC), 1);
@@ -265,7 +265,7 @@ void H2Tweaks::ApplyPatches() {
 
 		bool IntroHQ = true;//clients should set on halo2.exe -highquality
 
-		if (!H2Config_skip_intro && IntroHQ) {
+		if (!cartographer_settings.game.skip_intro && IntroHQ) {
 			BYTE assmIntroHQ[] = { 0xEB };
 			WriteBytes(Memory::GetAddress(0x221C29), assmIntroHQ, 1);
 		}
@@ -360,7 +360,7 @@ void H2Tweaks::SetScreenRefreshRate() {
 	{
 		static bool refresh_redirected = false;
 		if (!refresh_redirected) {
-			WritePointer(Memory::GetAddress(0x25E869) + 3, &H2Config_refresh_rate);
+			WritePointer(Memory::GetAddress(0x25E869) + 3, &cartographer_settings.game.video.refresh_rate);
 			refresh_redirected = true;
 		}
 	}
@@ -386,7 +386,7 @@ void H2Tweaks::WarpFix(bool enable)
 
 void H2Tweaks::RefreshTogglexDelay() {
 	BYTE xDelayJMP[] = { 0x74 };
-	if (!H2Config_xDelay)
+	if (!cartographer_settings.enable_xdelay)
 		xDelayJMP[0] = 0xEB;
 	WriteBytes(Memory::GetAddress(0x1c9d8e, 0x1a1316), xDelayJMP, 1);
 }

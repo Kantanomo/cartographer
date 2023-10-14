@@ -1,9 +1,10 @@
 #include "stdafx.h"
 
 #include "Utils.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include <sys/timeb.h>
+
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);
@@ -595,7 +596,7 @@ void pushHostLobby() {
 	if (p_should_send_broadcast_reply(NULL))
 	{
 		char msg[100] = { 0x00, 0x43, 0x05 };
-		sprintf(&msg[3], "push clientlobby %d", H2Config_base_port + 1);
+		sprintf(&msg[3], "push clientlobby %d", cartographer_settings.base_port + 1);
 
 		addDebugText("Pushing open lobby.");
 
@@ -605,8 +606,8 @@ void pushHostLobby() {
 			addDebugText("ERROR: Could not create socket.");
 		}
 		serverAddress.sin_family = AF_INET;
-		serverAddress.sin_addr.s_addr = H2Config_master_ip;
-		serverAddress.sin_port = htons(H2Config_master_port_relay);
+		serverAddress.sin_addr.s_addr = cartographer_settings.master_server_ip;
+		serverAddress.sin_port = htons(cartographer_settings.master_server_relay_port);
 
 		if (sendto(socketDescriptor, msg, strlen(&msg[3]) + 3, 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) <= 0) {
 			//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)

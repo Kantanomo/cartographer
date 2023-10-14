@@ -2,10 +2,10 @@
 
 #include "WinMainH2.h"
 
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Shell.h""
+#include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Utils/Utils.h"
 
 #include "Util/Hooks/Hook.h"
@@ -121,8 +121,7 @@ bool engine_basic_init()
 	DWORD* flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 	ZeroMemory(flags_array, e_startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
-	H2Config_voice_chat = false;
-	flags_array[e_startup_flags::nointro] = H2Config_skip_intro;
+	flags_array[e_startup_flags::nointro] = cartographer_settings.game.skip_intro;
 
 	void(__cdecl * fn_c000285fd)() = (void(__cdecl*)())Memory::GetAddress<void*>(0x000285fd);
 
@@ -130,7 +129,7 @@ bool engine_basic_init()
 	init_data_checksum_info();
 	runtime_state_initialize();
 
-	flags_array[e_startup_flags::d3d9ex_enabled] = H2Config_d3d9ex;
+	flags_array[e_startup_flags::d3d9ex_enabled] = cartographer_settings.game.video.d3dex;
 	flags_array[e_startup_flags::disable_voice_chat] = 1;
 
 	int arg_count;

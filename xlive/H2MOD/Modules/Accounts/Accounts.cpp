@@ -2,8 +2,8 @@
 
 #include "Accounts.h"
 
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "H2MOD/Modules/Shell/Shell.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
@@ -93,7 +93,7 @@ void SaveH2Accounts() {
 		addDebugText("Mutex is ours!");
 
 		wchar_t fileConfigPath[1024];
-		if (H2Portable) {
+		if (cartographer_settings.h2portable) {
 			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2ProcessFilePath);
 		}
 		else {
@@ -288,7 +288,7 @@ bool ReadH2Accounts() {
 
 	wchar_t fileConfigPath[1024];
 
-	if (H2Portable) {
+	if (cartographer_settings.h2portable) {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2ProcessFilePath);
 	}
 	else {

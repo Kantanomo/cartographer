@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "render_cameras.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Util/Hooks/Hook.h"
 
 typedef void(__cdecl render_camera_build_projection_t)(s_camera*, float*, real_matrix4x3*);
@@ -13,7 +13,7 @@ void __cdecl render_camera_build_projection_hook(s_camera* camera, float* frustu
 
 	float old_camera_field_of_view = camera->vertical_field_of_view;
 	
-	if (H2Config_static_first_person) 
+	if (cartographer_settings.game.video.static_fp_fov) 
 	{
 		camera->vertical_field_of_view = ((64.f * M_PI) / 180.0f) * 0.78500003f;
 	}

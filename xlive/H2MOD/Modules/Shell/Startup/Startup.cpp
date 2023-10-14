@@ -4,6 +4,7 @@
 #include "WinMainH2.h"
 #include "../Config.h"
 #include "../Shell.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 #include "Blam/Engine/cseries/cseries_windows_debug_pc.h"
 
@@ -52,14 +53,14 @@ wchar_t* FlagFilePathConfig = 0;
 void PostH2Config() {
 
 	wchar_t mutexName2[256];
-	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", H2Config_base_port);
+	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", cartographer_settings.base_port);
 	HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
 	DWORD lastErr2 = GetLastError();
 	if (lastErr2 == ERROR_ALREADY_EXISTS) {
-		addDebugText("Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
-		_Shell::OpenMessageBox(NULL, MB_ICONWARNING, "BASE PORT BIND WARNING!", "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
+		addDebugText("Base port %d is already bound to!\nExpect MP to not work!", cartographer_settings.base_port);
+		_Shell::OpenMessageBox(NULL, MB_ICONWARNING, "BASE PORT BIND WARNING!", "Base port %d is already bound to!\nExpect MP to not work!", cartographer_settings.base_port);
 	}
-	addDebugText("Base port: %d.", H2Config_base_port);
+	addDebugText("Base port: %d.", cartographer_settings.base_port);
 }
 
 wchar_t xinput_path[_MAX_PATH];
@@ -339,17 +340,17 @@ void InitH2Startup() {
 	EnterCriticalSection(&log_section);
 
 	// prepare default log files if enabled, after we read the H2Config
-	bool should_enable_console_log = H2Config_debug_log && H2Config_debug_log_console;
-	console_log = h2log::create_console("CONSOLE MAIN", should_enable_console_log, H2Config_debug_log_level);
+	bool should_enable_console_log = cartographer_settings.debug_log && cartographer_settings.debug_log_console;
+	console_log = h2log::create_console("CONSOLE MAIN", should_enable_console_log, cartographer_settings.debug_log_level);
 
-	xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"), H2Config_debug_log, H2Config_debug_log_level);
+	xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"), cartographer_settings.debug_log, cartographer_settings.debug_log_level);
 	LOG_DEBUG_XLIVE(DLL_VERSION_STR);
-	h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"), H2Config_debug_log, H2Config_debug_log_level);
+	h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"), cartographer_settings.debug_log, cartographer_settings.debug_log_level);
 	LOG_DEBUG_GAME(DLL_VERSION_STR);
-	network_log = h2log::create("Network", prepareLogFileName(L"h2network"), H2Config_debug_log, H2Config_debug_log_level);
+	network_log = h2log::create("Network", prepareLogFileName(L"h2network"), cartographer_settings.debug_log, cartographer_settings.debug_log_level);
 	LOG_DEBUG_NETWORK(DLL_VERSION_STR);
 #if COMPILE_WITH_VOICE
-	voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"), H2Config_debug_log, H2Config_debug_log_level);
+	voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"), cartographer_settings.debug_log, cartographer_settings.debug_log_level);
 	LOG_DEBUG(voice_log, DLL_VERSION_STR);
 #endif
 
@@ -389,7 +390,7 @@ void H2DedicatedServerStartup() {
 		BYTE abOnline[20];
 		XNetRandom(abEnet, sizeof(abEnet));
 		XNetRandom(abOnline, sizeof(abOnline));
-		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, sizeof(abEnet)).c_str(), ByteToHexStr(abOnline, sizeof(abOnline)).c_str(), false);
+		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, cartographer_settings.lan_ip, ByteToHexStr(abEnet, sizeof(abEnet)).c_str(), ByteToHexStr(abOnline, sizeof(abOnline)).c_str(), false);
 	}
 }
 

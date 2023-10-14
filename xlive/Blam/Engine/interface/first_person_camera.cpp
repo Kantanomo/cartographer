@@ -7,12 +7,13 @@
 #include "Blam/Engine/units/units.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 bool player_control_fov_overridden = false;
 float overridden_fov_radians;
@@ -79,8 +80,8 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 void first_person_camera_apply_patches()
 {
 	// Set the custom FOV's from our config beforehand
-	player_control_set_field_of_view(H2Config_field_of_view);
-	observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+	player_control_set_field_of_view(cartographer_settings.game.video.field_of_view);
+	observer_set_suggested_field_of_view(cartographer_settings.game.video.vehicle_field_of_view);
 
 	// Patch this call for our custom fov implementation
 	PatchCall(Memory::GetAddress(0xCD880, 0xB8BF9), player_control_get_field_of_view);

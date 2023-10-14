@@ -1,8 +1,10 @@
 #include "stdafx.h"
 
 #include "Mouseinput.h"
+
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game_time.h"
-#include "H2MOD/Modules/Shell/Config.h"
+#include "Blam/Math/BlamMath.h"
 #include "Util/Hooks/Hook.h"
 
 bool rawInputInit = false;
@@ -22,7 +24,7 @@ mouse_input_t* p_mouse_input;
 char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7)
 {
 	time_globals* time = time_globals::get();
-	if (H2Config_raw_input)
+	if (cartographer_settings.game.input.raw_mouse_input)
 	{
 		if (!rawInputInit) {
 			MouseInput::SetSensitivity(1.0f);
@@ -31,14 +33,14 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 			WriteBytes(base + 0x627E7, assmNop, 8);
 			rawInputInit = true;
 		}
-		*dx = time->seconds_per_tick * (float)ms->lX * -(H2Config_raw_mouse_scale / 100);
-		*dy = time->seconds_per_tick * (float)ms->lY * -(H2Config_raw_mouse_scale / 100);
+		*dx = time->seconds_per_tick * (float)ms->lX * -(cartographer_settings.game.input.mouse_raw_scale / 100);
+		*dy = time->seconds_per_tick * (float)ms->lY * -(cartographer_settings.game.input.mouse_raw_scale / 100);
 	}
 	else
 	{
 		if (rawInputInit)
 		{
-			MouseInput::SetSensitivity(H2Config_mouse_sens);
+			MouseInput::SetSensitivity(cartographer_settings.game.input.mouse_sensitivity);
 			WriteBytes(base + 0x627CC, o_SetDX, 8);
 			WriteBytes(base + 0x62802, o_SetDY, 8);
 			WriteBytes(base + 0x627E7, o_SetDX2, 8);
@@ -57,7 +59,7 @@ void MouseInput::SetSensitivity(float value)
 {
 	if (value == 0.0f)
 		return;
-	if (H2Config_raw_input)
+	if (cartographer_settings.game.input.raw_mouse_input)
 		value = 1.0f;
 
 	value = blam_max(value - 1.0f, 0.0f);
@@ -65,7 +67,7 @@ void MouseInput::SetSensitivity(float value)
 	*Memory::GetAddress<float*>(0x4A89B0) = (80.0f + 20.0f * value) - 30.0f; //x-axis
 
 	//y-axis
-	if (H2Config_mouse_uniform)
+	if (cartographer_settings.game.input.mouse_uniform_sens)
 		*Memory::GetAddress<float*>(0x4A89B4) = (80.0f + 20.0f * value) - 30.0f;
 	else
 		*Memory::GetAddress<float*>(0x4A89B4) = (40.0f + 10.0f * value) - 15.0f;
@@ -91,5 +93,5 @@ void MouseInput::Initialize()
 	//VirtualProtect((LPVOID)setDx2, 8, PAGE_EXECUTE_READWRITE, &dwBack);
 	p_mouse_input = Memory::GetAddress<mouse_input_t*>(0x61ea2);
 	PatchCall(Memory::GetAddress(0x62f65), mouse_input);
-	SetSensitivity(H2Config_mouse_sens);
+	SetSensitivity(cartographer_settings.game.input.mouse_sensitivity);
 }

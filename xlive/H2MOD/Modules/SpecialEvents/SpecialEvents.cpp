@@ -2,6 +2,7 @@
 
 #include "SpecialEvents.h"
 #include "SpecialEventHelpers.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Events/Birthday.h"
 #include "Events/Christmas.h"
 #include "Events/Halloween.h"
@@ -10,7 +11,6 @@
 
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 // This function gets the current date and time
@@ -72,12 +72,12 @@ bool check_special_event_date(std::wstring date)
 // Enables event if the current date and time line up with an event time
 e_special_event_type get_current_special_event()
 {
-	if (H2Config_no_events)
+	if (cartographer_settings.game.no_events)
 		return _no_event;
 
 #ifndef NDEBUG
-	if (H2Config_forced_event != _no_event)
-		return (e_special_event_type)H2Config_forced_event;
+	if (cartographer_settings.development.forced_event != _no_event)
+		return cartographer_settings.development.forced_event;
 #endif
 	if (check_special_event_week(L"3-17"))
 		return _st_paddys;

@@ -2,6 +2,7 @@
 
 #include "AccountLogin.h"
 
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -83,7 +84,7 @@ int ConfigureUserDetails(const char* username, const char* login_token, unsigned
 
 	int result = strlen(login_token) == 32 ? 1 : 2;
 
-	XUserSetup(0, xuid, username, xnaddr, lanaddr, H2Config_base_port, machineUID, abOnline, online_signin);
+	XUserSetup(0, xuid, username, xnaddr, lanaddr, cartographer_settings.base_port, machineUID, abOnline, online_signin);
 	UpdateMasterLoginStatus(developer);
 
 	if (online_signin) {
@@ -194,8 +195,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			addDebugText("Client External IP Address is: %s", tempstr1);
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE) {
-				if (strlen(H2Config_str_wan) <= 0 && strlen(H2Config_str_lan) > 0) {
-					H2Config_ip_wan = resolvedAddr;
+				if (strlen(cartographer_settings.wan_ip_str) <= 0 && strlen(cartographer_settings.lan_ip_str) > 0) {
+					cartographer_settings.wan_ip = resolvedAddr;
 				}
 				xnaddr = resolvedAddr;
 			}
@@ -217,13 +218,13 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE || strcmp(tempstr1, "255.255.255.255") == 0) {
 				//addDebugText("H2 master relay IP is: %s", tempstr1);
-				H2Config_master_ip = resolvedAddr;
+				cartographer_settings.master_server_ip = resolvedAddr;
 			}
 		}
 		else if (sscanf(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
 			if (tempint1 >= 0) {
 				//addDebugText("H2 master relay port is: %d", tempint1);
-				H2Config_master_port_relay = tempint1;
+				cartographer_settings.master_server_relay_port = tempint1;
 			}
 		}
 		else if (strstr(fileLine, "login_token=")) {
@@ -317,7 +318,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		return result;
 	}
 
-	int user_configure_result = ConfigureUserDetails(username, login_token, xuid, xnaddr, H2Config_ip_lan, machineUID, abOnline, true, result == 4);
+	int user_configure_result = ConfigureUserDetails(username, login_token, xuid, xnaddr, cartographer_settings.lan_ip, machineUID, abOnline, true, result == 4);
 	if (user_configure_result != 0) {
 		//allow no login_token from backend in DB emergencies / random logins.
 		if (user_configure_result == 1) {
@@ -494,7 +495,7 @@ HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD d
 		//currently credentials are taken from the config file.
 		//also don't enable this since nothing's initialised for the server.
 		addDebugText("Signing in dedicated server online.");
-		if (HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password, nullptr))
+		if (HandleGuiLogin(0, cartographer_settings.server.login_identifier, cartographer_settings.server.login_password, nullptr))
 		{
 			XUserSignInSetStatusChanged(0);
 		}

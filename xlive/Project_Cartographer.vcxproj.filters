@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
@@ -214,7 +213,10 @@
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
-    <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_types.cpp" 
+    <ClCompile Include="H2MOD\Utils\EasyJson.cpp" />
+    <ClCompile Include="H2MOD\Utils\EasyJsonStruct.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\settings\settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -324,7 +326,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
-    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
@@ -659,6 +660,8 @@
     <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
+    <ClInclude Include="Blam\Engine\main\main.h" />
+    <ClInclude Include="Blam\Engine\cartographer\settings\settings.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

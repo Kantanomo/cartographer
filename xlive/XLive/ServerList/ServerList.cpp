@@ -11,6 +11,7 @@
 #include "rapidjson/prettywriter.h"
 
 #include "../xnet/IpManagement/XnIp.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 #include "H2MOD/Utils/Utils.h"
 
@@ -815,7 +816,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		document.AddMember("dwFilledPublicSlots", Value().SetInt(dwFilledPublicSlots), docAllocator);
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), docAllocator);
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), docAllocator);
-		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), docAllocator);
+		document.AddMember("dwPort", Value().SetInt(cartographer_settings.base_port), docAllocator);
 		document.AddMember("lanaddr", Value().SetUint(localUser->m_xnaddr.ina.s_addr), docAllocator);
 
 		document.AddMember("xnkid", xnkid_val, docAllocator);
@@ -858,7 +859,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 			document["pProperties"].PushBack(property, docAllocator);
 		}
 
-		const char* name = strnlen_s(H2Config_dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? H2Config_dedi_server_name : usersSignInInfo[dwUserIndex].szUserName;
+		const char* name = strnlen_s(cartographer_settings.server.server_name, XUSER_MAX_NAME_LENGTH) > 0 ? cartographer_settings.server.server_name : usersSignInInfo[dwUserIndex].szUserName;
 
 		/* For whatever reason the game is currently refusing to send the servername or player profile name so we're going to send it ourselves.*/
 		Value serv_name_property(kObjectType);

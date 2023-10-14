@@ -2,6 +2,7 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/game/game.h"
@@ -42,8 +43,6 @@
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
@@ -472,7 +471,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	static bool resetAfterMatch = false;
 
 	// set the light suppressor flag to false
-	if (H2Config_light_suppressor)
+	if (cartographer_settings.game.video.light_suppressor)
 	{
 		WriteValue(Memory::GetAddress(0x41F6B1), 0);
 	}
@@ -528,8 +527,8 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)options->game_mode, variant_name);
 
 		ControllerInput::SetDeadzones();
-		ControllerInput::SetSensitiviy(H2Config_controller_sens);
-		MouseInput::SetSensitivity(H2Config_mouse_sens);
+		ControllerInput::SetSensitiviy(cartographer_settings.game.input.controller_sens);
+		MouseInput::SetSensitivity(cartographer_settings.game.input.mouse_sensitivity);
 		hud_patches_on_map_load();
 
 		if (options->game_mode == _game_mode_multiplayer)
@@ -643,10 +642,10 @@ __declspec(naked) void calculate_model_lod_detour()
 		// todo check if this is needed when using a static LOD, might save on some processor time
 		call calculate_model_lod
 
-		cmp H2Config_static_lod_state, 0
+		cmp cartographer_settings.game.video.static_lod_scale, 0
 		jz END_DETOUR
 
-		mov eax, H2Config_static_lod_state
+		mov eax, cartographer_settings.game.video.static_lod_scale
 		sub eax, 1 // convert setting to in-game model LOD value (0 - 5, L1 - L6)
 
 		END_DETOUR:
@@ -754,7 +753,7 @@ get_enabled_teams_flags_t p_get_enabled_teams_flags;
 short __cdecl get_enabled_team_flags(s_network_session* session)
 {
 	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
-	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
+	short new_teams_enabled_flags = (default_teams_enabled_flags & cartographer_settings.server.enabled_team_bit_flags);
 	const short red_versus_blue_teams = FLAG(_game_team_red) | FLAG(_game_team_blue);
 	const short infection_teams = FLAG(_game_team_red) | FLAG(_game_team_green);
 
@@ -834,9 +833,9 @@ bool __cdecl should_start_pregame_countdown_hook()
 		return false; 
 
 	bool minimumPlayersConditionMet = true;
-	if (H2Config_minimum_player_start > 0)
+	if (cartographer_settings.server.minimum_player_start > 0)
 	{
-		if (NetworkSession::GetPlayerCount() >= H2Config_minimum_player_start)
+		if (NetworkSession::GetPlayerCount() >= cartographer_settings.server.minimum_player_start)
 		{
 			LOG_INFO_GAME(L"{} - minimum Player count met", __FUNCTIONW__);
 			minimumPlayersConditionMet = true;
@@ -851,7 +850,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 	if (!minimumPlayersConditionMet)
 		return false;
 
-	if (H2Config_even_shuffle_teams
+	if (cartographer_settings.server.shuffle_even_teams
 		&& NetworkSession::IsVariantTeamPlay())
 	{
 		std::mt19937 mt_rand(rd());
@@ -928,7 +927,7 @@ void H2MOD::RegisterEvents()
 	{
 		// Server only callbacks
 		// Setup Events for H2Config_vip_lock
-		if (H2Config_vip_lock)
+		if (cartographer_settings.server.vip_lock)
 			EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 	}
 	else 
@@ -959,7 +958,7 @@ void H2MOD::ApplyHooks() {
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
 
 	//Disable lightsupressor function
-	if (H2Config_light_suppressor)
+	if (cartographer_settings.game.video.light_suppressor)
 	{
 		NopFill(Memory::GetAddress(0x1922d9), 7);
 	}

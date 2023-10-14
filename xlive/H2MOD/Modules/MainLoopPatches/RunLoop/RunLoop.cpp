@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RunLoop.h"
 
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 
@@ -13,7 +14,6 @@
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
@@ -156,7 +156,7 @@ void CartographerMainLoop() {
 	}
 	if(H2IsDediServer)
 	{
-		StatsHandler::playerRanksUpdateTick();
+		//StatsHandler::playerRanksUpdateTick();
 	}
 	//EventHandler::executeGameLoopCallbacks();
 	/*
@@ -165,8 +165,8 @@ void CartographerMainLoop() {
 		halo2ServerOnce1 = true;
 		pushHostLobby();
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
-		if (strlen(H2Config_dedi_server_name) > 0) {
-			swprintf(LanServerName, 32, L"%hs", H2Config_dedi_server_name);
+		if (strlen(cartographer_settings.server.server_name) > 0) {
+			swprintf(LanServerName, 32, L"%hs", cartographer_settings.server.server_name);
 		}
 	}
 
@@ -219,7 +219,7 @@ void __cdecl rasterizer_present_hook(int a1) {
 	auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
 
 	p_rasterizer_present(a1);
-	XLiveThrottleFramerate(H2Config_fps_limit);
+	XLiveThrottleFramerate(cartographer_settings.game.video.fps_limit);
 }
 
 typedef void(_cdecl* main_loop_body_t)();
@@ -243,7 +243,7 @@ extern bool xboxTickrateEnabled;
 // as well as the game speeding up while minimized
 bool __cdecl cinematic_in_progress_hook()
 {
-	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	e_frame_limiter_type experimental_rendering_mode = cartographer_settings.game.video.experimental_rendering;
 
 	switch (experimental_rendering_mode)
 	{
@@ -272,7 +272,7 @@ bool __cdecl cinematics_in_progress_disable_framerate_cap_hook()
 
 bool __cdecl should_limit_framerate_hook()
 {
-	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	e_frame_limiter_type experimental_rendering_mode = cartographer_settings.game.video.experimental_rendering;
 
 	switch (experimental_rendering_mode)
 	{
@@ -395,7 +395,7 @@ void __cdecl game_main_loop()
 		p_input_update();
 		if (!_Shell::IsGameMinimized()) 
 		{
-			if (H2Config_controller_modern)
+			if (cartographer_settings.game.input.controller_modern)
 			{
 				ControllerInput::procces_input();
 			}
@@ -512,7 +512,7 @@ int update_bsp = 0x4A16D;
 
 float __cdecl fps_get_seconds_per_frame()
 {
-	return (1.0f / H2Config_fps_limit);
+	return (1.0f / cartographer_settings.game.video.fps_limit);
 }
 void __cdecl alt_main_game_loop_hook()
 {
@@ -535,10 +535,10 @@ void __cdecl alt_main_game_loop_hook()
 		//game_main_loop();
 		//main_game_loop();
 	}
-	if (H2Config_fps_limit != 0) {
+	if (cartographer_settings.game.video.fps_limit != 0) {
 		QueryPerformanceCounter(&end_render);
 		render_time = static_cast<double>(end_render.QuadPart - start_render.QuadPart) / freq.QuadPart;
-		if (render_time >= (1.0f / H2Config_fps_limit)) {
+		if (render_time >= (1.0f / cartographer_settings.game.video.fps_limit)) {
 			QueryPerformanceCounter(&start_render);
 			EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
 			game_main_loop();
@@ -624,7 +624,7 @@ void InitRunLoop() {
 	else {
 		addDebugText("Hooking loop Function");
 
-		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+		e_frame_limiter_type experimental_rendering_mode = cartographer_settings.game.video.experimental_rendering;
 
 		// always init these pointers
 		initialize_main_loop_function_pointers();

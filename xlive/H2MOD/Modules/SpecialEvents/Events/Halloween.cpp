@@ -9,6 +9,7 @@
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
@@ -16,7 +17,6 @@
 #include "Blam/Engine/scenario/scenario_definitions.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
@@ -31,7 +31,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 {
 	if (state == _life_cycle_in_game)
 	{
-		if (H2Config_spooky_boy) 
+		if (cartographer_settings.game.skeleton_biped)
 		{
 			for (byte user_index = 0; user_index < k_number_of_users; user_index++)
 			{

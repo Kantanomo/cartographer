@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
 #include "RenderHooks.h"
-#include "H2MOD/Modules/Shell/Config.h"
+
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Util/Hooks/Hook.h"
 
 bool ras_layer_overrides[RenderHooks::end];
@@ -64,7 +65,7 @@ namespace RenderHooks
 		{
 		
 		case RenderHooks::dynamic_shadows:
-			switch (H2Config_Override_Shadows)
+			switch (cartographer_settings.game.video.override_shadows)
 			{
 			case tex_low:
 				return 512;
@@ -77,7 +78,7 @@ namespace RenderHooks
 
 		case RenderHooks::lightmap_shadows_1:
 		case RenderHooks::lightmap_shadows_2:
-			switch (H2Config_Override_Shadows)
+			switch (cartographer_settings.game.video.override_shadows)
 			{
 			case tex_low:
 				return 512;
@@ -89,7 +90,7 @@ namespace RenderHooks
 			break;
 
 		case RenderHooks::water:
-				switch (H2Config_Override_Water)
+				switch (cartographer_settings.game.video.override_water)
 				{
 				case tex_low:
 					return 512;
@@ -109,7 +110,7 @@ namespace RenderHooks
 	int getHeight(e_layer_type e, unsigned int height)
 	{
 		if (e == e_layer_type::lightmap_shadows_1 || e == e_layer_type::lightmap_shadows_2)
-			switch (H2Config_Override_Shadows)
+			switch (cartographer_settings.game.video.override_shadows)
 			{
 				case tex_low:
 					return 512;
@@ -119,7 +120,7 @@ namespace RenderHooks
 					return 4096;
 			}
 		if (e == e_layer_type::dynamic_shadows) {
-			switch (H2Config_Override_Shadows)
+			switch (cartographer_settings.game.video.override_shadows)
 			{
 				case tex_low:
 					return 512;
@@ -131,7 +132,7 @@ namespace RenderHooks
 		}
 		if (e == e_layer_type::water)
 		{
-			switch (H2Config_Override_Water)
+			switch (cartographer_settings.game.video.override_water)
 			{
 				case tex_low:
 					return 256;

@@ -26,6 +26,7 @@
 
 #include "imgui.h"
 #include "imgui_handler.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 namespace ImGuiHandler {
 	namespace ImAdvancedSettings {
@@ -45,6 +46,7 @@ namespace ImGuiHandler {
 			int g_experimental = 0;
 			bool g_init = false;
 			int g_language_code = -1;
+			int g_lod_state = 0;
 
 			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
 			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
@@ -66,9 +68,10 @@ namespace ImGuiHandler {
 
 				draw_list->AddRectFilled(ImVec2(Center.x - 100, Center.y - 100), ImVec2(Center.x + 100, Center.y + 100), ImColor(20, 20, 20));
 				draw_list->AddCircleFilled(Center, 100, ImColor(255, 255, 255), 120);
-				if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
-					int X_Axis = (int)(100 * (H2Config_Deadzone_A_X / 100));
-					int Y_Axis = (int)(100 * (H2Config_Deadzone_A_Y / 100));
+				if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
+					
+					int X_Axis = (int)(100 * (cartographer_settings.game.input.deadzone_axial_x / 100));
+					int Y_Axis = (int)(100 * (cartographer_settings.game.input.deadzone_axial_y / 100));
 					ImVec2 Y_TopLeft(
 						Center.x - 100,
 						Center.y - Y_Axis);
@@ -80,8 +83,8 @@ namespace ImGuiHandler {
 					ImVec2 X_BottomRight(Center.x + X_Axis, Center.y + 100);
 					draw_list->AddRectFilled(X_TopLeft, X_BottomRight, ImColor(20, 20, 20, 125));
 				}
-				if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
-					draw_list->AddCircleFilled(Center, H2Config_Deadzone_Radial, ImColor(20, 20, 20, 125), 120);
+				if (cartographer_settings.game.input.deadzone_type == radial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
+					draw_list->AddCircleFilled(Center, cartographer_settings.game.input.deadzone_radial, ImColor(20, 20, 20, 125), 120);
 				}
 
 				short* C_Input = (short*)ControllerInput::get_controller_input(0);
@@ -89,12 +92,12 @@ namespace ImGuiHandler {
 					Center.x + (100 * (C_Input[28] / (float)MAXSHORT)),
 					Center.y - (100 * (C_Input[29] / (float)MAXSHORT)));
 				int axial_invalid = 0;
-				if (abs(C_Input[28]) <= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
+				if (abs(C_Input[28]) <= ((float)MAXSHORT * (cartographer_settings.game.input.deadzone_axial_x / 100)))
 					axial_invalid++;
-				if (abs(C_Input[29]) <= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100)))
+				if (abs(C_Input[29]) <= ((float)MAXSHORT * (cartographer_settings.game.input.deadzone_axial_y / 100)))
 					axial_invalid++;
 				bool radial_invalid = false;
-				unsigned int ar = pow((short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100)), 2);
+				unsigned int ar = pow((short)((float)MAXSHORT * (cartographer_settings.game.input.deadzone_radial / 100)), 2);
 				unsigned int arx = pow(C_Input[28], 2);
 				unsigned int ary = pow(C_Input[29], 2);
 				unsigned int rh = arx + ary;
@@ -103,10 +106,10 @@ namespace ImGuiHandler {
 					radial_invalid = true;
 				}
 				bool valid = true;
-				if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both)
+				if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone)
 					if (axial_invalid == 2)
 						valid = false;
-				if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both)
+				if (cartographer_settings.game.input.deadzone_type == radial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone)
 					if (radial_invalid)
 						valid = false;
 
@@ -128,25 +131,25 @@ namespace ImGuiHandler {
 					//Player FOV
 					ImGui::Text(GetString(player_field_of_view));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderInt("##PlayerFOV1", &H2Config_field_of_view, 45, 110, ""); ImGui::SameLine();
+					ImGui::SliderInt("##PlayerFOV1", &cartographer_settings.game.video.field_of_view, 45, 110, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						player_control_set_field_of_view(H2Config_field_of_view);
+						player_control_set_field_of_view(cartographer_settings.game.video.field_of_view);
 
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputInt("##PlayerFOV2", &H2Config_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+					ImGui::InputInt("##PlayerFOV2", &cartographer_settings.game.video.field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_field_of_view > 110)
-							H2Config_field_of_view = 110;
-						if (H2Config_field_of_view < 45)
-							H2Config_field_of_view = 45;
+						if (cartographer_settings.game.video.field_of_view > 110)
+							cartographer_settings.game.video.field_of_view = 110;
+						if (cartographer_settings.game.video.field_of_view < 45)
+							cartographer_settings.game.video.field_of_view = 45;
 
-						player_control_set_field_of_view(H2Config_field_of_view);
+						player_control_set_field_of_view(cartographer_settings.game.video.field_of_view);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "PlayerFov3"), b2_size))
 					{
-						H2Config_field_of_view = 78.0f;
-						player_control_set_field_of_view(H2Config_field_of_view);
+						cartographer_settings.game.video.field_of_view = 78.0f;
+						player_control_set_field_of_view(cartographer_settings.game.video.field_of_view);
 					}
 					ImGui::PopItemWidth();
 
@@ -154,72 +157,72 @@ namespace ImGuiHandler {
 					//Vehicle FOV
 					ImGui::Text(GetString(vehicle_field_of_view));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, ""); ImGui::SameLine();
+					ImGui::SliderInt("##VehicleFOV1", &cartographer_settings.game.video.vehicle_field_of_view, 45, 110, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						observer_set_suggested_field_of_view(cartographer_settings.game.video.vehicle_field_of_view);
 
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputInt("##VehicleFOV2", &H2Config_vehicle_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+					ImGui::InputInt("##VehicleFOV2", &cartographer_settings.game.video.vehicle_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_vehicle_field_of_view > 110)
-							H2Config_vehicle_field_of_view = 110;
-						if (H2Config_vehicle_field_of_view < 45)
-							H2Config_vehicle_field_of_view = 45;
+						if (cartographer_settings.game.video.vehicle_field_of_view > 110)
+							cartographer_settings.game.video.vehicle_field_of_view = 110;
+						if (cartographer_settings.game.video.vehicle_field_of_view < 45)
+							cartographer_settings.game.video.vehicle_field_of_view = 45;
 
-						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						observer_set_suggested_field_of_view(cartographer_settings.game.video.vehicle_field_of_view);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "VehicleFOV3"), b2_size))
 					{
-						H2Config_vehicle_field_of_view = 78.0f;
-						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						cartographer_settings.game.video.vehicle_field_of_view = 78.0f;
+						observer_set_suggested_field_of_view(cartographer_settings.game.video.vehicle_field_of_view);
 					}
 					ImGui::PopItemWidth();
 
 					//Crosshair Offset
 					ImGui::Text(GetString(crosshair_offset));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderFloat("##Crosshair1", &H2Config_crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
+					ImGui::SliderFloat("##Crosshair1", &cartographer_settings.game.hud.crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						set_crosshair_offset(H2Config_crosshair_offset);
+						set_crosshair_offset(cartographer_settings.game.hud.crosshair_offset);
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputFloat("##Crosshair2", &H2Config_crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
+					ImGui::InputFloat("##Crosshair2", &cartographer_settings.game.hud.crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_crosshair_offset > 0.5)
-							H2Config_crosshair_offset = 0.5;
-						if (H2Config_crosshair_offset < 0)
-							H2Config_crosshair_offset = 0;
+						if (cartographer_settings.game.hud.crosshair_offset > 0.5)
+							cartographer_settings.game.hud.crosshair_offset = 0.5;
+						if (cartographer_settings.game.hud.crosshair_offset < 0)
+							cartographer_settings.game.hud.crosshair_offset = 0;
 
-						set_crosshair_offset(H2Config_crosshair_offset);
+						set_crosshair_offset(cartographer_settings.game.hud.crosshair_offset);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "Crosshair3"), b2_size))
 					{
-						H2Config_crosshair_offset = 0.138f;
-						set_crosshair_offset(H2Config_crosshair_offset);
+						cartographer_settings.game.hud.crosshair_offset = 0.138f;
+						set_crosshair_offset(cartographer_settings.game.hud.crosshair_offset);
 					}
 					ImGui::PopItemWidth();
 
 					//Crosshair Size
 					ImGui::Text(GetString(crosshair_size));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderFloat("##CrosshairSize1", &H2Config_crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
+					ImGui::SliderFloat("##CrosshairSize1", &cartographer_settings.game.hud.crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						set_crosshair_scale(H2Config_crosshair_scale);
+						set_crosshair_scale(cartographer_settings.game.hud.crosshair_scale);
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputFloat("##CrosshairSize2", &H2Config_crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
+					ImGui::InputFloat("##CrosshairSize2", &cartographer_settings.game.hud.crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_crosshair_scale > 2)
-							H2Config_crosshair_scale = 2;
-						if (H2Config_crosshair_scale < 0)
-							H2Config_crosshair_scale = 0;
-						set_crosshair_scale(H2Config_crosshair_scale);
+						if (cartographer_settings.game.hud.crosshair_scale > 2)
+							cartographer_settings.game.hud.crosshair_scale = 2;
+						if (cartographer_settings.game.hud.crosshair_scale < 0)
+							cartographer_settings.game.hud.crosshair_scale = 0;
+						set_crosshair_scale(cartographer_settings.game.hud.crosshair_scale);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "CrosshairSize3"), b2_size))
 					{
-						H2Config_crosshair_scale = 1;
-						set_crosshair_scale(H2Config_crosshair_scale);
+						cartographer_settings.game.hud.crosshair_scale = 1;
+						set_crosshair_scale(cartographer_settings.game.hud.crosshair_scale);
 					}
 					ImGui::PopItemWidth();
 
@@ -233,9 +236,9 @@ namespace ImGuiHandler {
 
 					ImGui::Columns(2, NULL, false);
 
-					ImGui::Checkbox(GetString(hide_ingame_chat), &H2Config_hide_ingame_chat);
+					ImGui::Checkbox(GetString(hide_ingame_chat), &cartographer_settings.game.hud.hide_ingame_chat);
 					ImGui::NextColumn();
-					ImGui::Checkbox(GetString(static_fp), &H2Config_static_first_person);
+					ImGui::Checkbox(GetString(static_fp), &cartographer_settings.game.video.static_fp_fov);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(static_fp_tooltip));
 					ImGui::NextColumn();
@@ -263,29 +266,29 @@ namespace ImGuiHandler {
 					ImGui::Columns(2, NULL, false);
 					ImGui::Text(GetString(fps_limit));
 					ImGui::PushItemWidth(WidthPercentage(50));
-					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110);
+					ImGui::InputInt("##FPS1", &cartographer_settings.game.video.fps_limit, 0, 110);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(fps_limit_tooltip));
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_fps_limit < 10)
-							H2Config_fps_limit = 10;
-						if (H2Config_fps_limit > 144)
-							H2Config_fps_limit = 144;
+						if (cartographer_settings.game.video.fps_limit < 10)
+							cartographer_settings.game.video.fps_limit = 10;
+						if (cartographer_settings.game.video.fps_limit > 144)
+							cartographer_settings.game.video.fps_limit = 144;
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(50), item_size.y)))
 					{
-						H2Config_fps_limit = 60;
+						cartographer_settings.game.video.fps_limit = 60;
 					}
 					ImGui::NextColumn();
 					ImGui::PopItemWidth();
 					ImGui::Text(GetString(refresh_rate));
 					ImGui::PushItemWidth(WidthPercentage(100));
-					int gRefresh = H2Config_refresh_rate;
+					int gRefresh = cartographer_settings.game.video.refresh_rate;
 					ImGui::InputInt("##Refresh1", &gRefresh, 0, 110, ImGuiInputTextFlags_AlwaysOverwrite);
 					if (ImGui::IsItemEdited())
-						H2Config_refresh_rate = gRefresh;
+						cartographer_settings.game.video.refresh_rate = gRefresh;
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
 
@@ -294,7 +297,10 @@ namespace ImGuiHandler {
 					ImGui::Text(GetString(lod));
 					const char* items[] = { GetString(e_default), GetString(lod_1), GetString(lod_2), GetString(lod_3), GetString(lod_4), GetString(lod_5), GetString(lod_6) };
 					ImGui::PushItemWidth(WidthPercentage(100));
-					ImGui::Combo("##LOD", &H2Config_static_lod_state, items, 7);
+					if(ImGui::Combo("##LOD", &g_lod_state, items, 7))
+					{
+						cartographer_settings.game.video.static_lod_scale = (e_static_lod)g_lod_state;
+					}
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(lod_tooltip));
 
@@ -304,7 +310,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(100));
 					if (ImGui::Combo("##Shadows", &g_shadows, s_items, 4))
 					{
-						H2Config_Override_Shadows = (e_override_texture_resolution)g_shadows;
+						cartographer_settings.game.video.override_shadows = (e_override_texture_resolution)g_shadows;
 						RenderHooks::ResetDevice();
 					}
 					ImGui::NextColumn();
@@ -312,7 +318,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(100));
 					if (ImGui::Combo("##Water", &g_water, s_items, 4))
 					{
-						H2Config_Override_Water = (e_override_texture_resolution)g_water;
+						cartographer_settings.game.video.override_water = (e_override_texture_resolution)g_water;
 						RenderHooks::ResetDevice();
 					}
 					ImGui::NextColumn();
@@ -321,7 +327,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(100));
 					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 2))
 					{
-						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
+						cartographer_settings.game.video.experimental_rendering = (e_frame_limiter_type)g_experimental;
 					}
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
@@ -329,17 +335,17 @@ namespace ImGuiHandler {
 
 					//Force max shader LOD
 
-					ImGui::Checkbox(GetString(shader_lod_max), &H2Config_shader_lod_max);
+					ImGui::Checkbox(GetString(shader_lod_max), &cartographer_settings.game.video.shader_lod_max);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(shader_lod_max_tooltip));
 
 					//Disable Light Suppressor
 
-					ImGui::Checkbox(GetString(light_suppressor), &H2Config_light_suppressor);
+					ImGui::Checkbox(GetString(light_suppressor), &cartographer_settings.game.video.light_suppressor);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(light_suppressor_tooltip));
 
-					//ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
+					//ImGui::Checkbox(GetString(e_rendering_mode), &cartographer_settings.game.video.experimental_rendering);
 					//if (ImGui::IsItemHovered())
 					//	ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
 
@@ -355,7 +361,7 @@ namespace ImGuiHandler {
 					//Raw Input
 					TextVerticalPad(GetString(raw_mouse));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##RawMouse", &H2Config_raw_input);
+					ImGui::Checkbox("##RawMouse", &cartographer_settings.game.input.raw_mouse_input);
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::SetTooltip(GetString(raw_mouse_tooltip));
@@ -364,68 +370,68 @@ namespace ImGuiHandler {
 					ImGui::NextColumn();
 					TextVerticalPad(GetString(uniform_sensitivity));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##MK_Sep", &H2Config_mouse_uniform);
+					ImGui::Checkbox("##MK_Sep", &cartographer_settings.game.input.mouse_uniform_sens);
 					if (ImGui::IsItemEdited())
 					{
-						MouseInput::SetSensitivity(H2Config_mouse_sens);
+						MouseInput::SetSensitivity(cartographer_settings.game.input.mouse_sensitivity);
 					}
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::SetTooltip(GetString(uniform_sensitivity_tooltip));
 					}
 					ImGui::Columns(1);
-					if (H2Config_raw_input) {
+					if (cartographer_settings.game.input.raw_mouse_input) {
 						ImGui::Text(GetString(raw_mouse_sensitivity));
 						ImGui::PushItemWidth(WidthPercentage(75));
-						int g_raw_scale = (int)H2Config_raw_mouse_scale;
+						int g_raw_scale = (int)cartographer_settings.game.input.mouse_raw_scale;
 						ImGui::SliderInt("##RawMouseScale1", &g_raw_scale, 1, 100, ""); ImGui::SameLine();
 						if (ImGui::IsItemEdited())
 						{
-							H2Config_raw_mouse_scale = (float)g_raw_scale;
+							cartographer_settings.game.input.mouse_raw_scale = (float)g_raw_scale;
 						}
 						ImGui::PushItemWidth(WidthPercentage(15));
-						ImGui::InputFloat("##RawMouseScale2", &H2Config_raw_mouse_scale, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+						ImGui::InputFloat("##RawMouseScale2", &cartographer_settings.game.input.mouse_raw_scale, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 						if (ImGui::IsItemEdited()) {
 							if (g_raw_scale > 100)
 								g_raw_scale = 100;
 							if (g_raw_scale < 1)
 								g_raw_scale = 1;
-							g_raw_scale = (int)H2Config_raw_mouse_scale;
+							g_raw_scale = (int)cartographer_settings.game.input.mouse_raw_scale;
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
 						if (ImGui::Button(GetString(reset, "RawMouseScale2"), ImVec2(WidthPercentage(10), item_size.y)))
 						{
 							g_raw_scale = 25;
-							H2Config_raw_mouse_scale = 25.0f;
+							cartographer_settings.game.input.mouse_raw_scale = 25.0f;
 						}
 					}
 					else
 					{
 						ImGui::Text(GetString(mouse_sensitivity));
 						ImGui::PushItemWidth(WidthPercentage(75));
-						int g_mouse_sens = (int)H2Config_mouse_sens;
+						int g_mouse_sens = (int)cartographer_settings.game.input.mouse_sensitivity;
 						ImGui::SliderInt("##Mousesens1", &g_mouse_sens, 1, 100, ""); ImGui::SameLine();
 						if (ImGui::IsItemEdited())
 						{
-							H2Config_mouse_sens = (float)g_mouse_sens;
-							MouseInput::SetSensitivity(H2Config_mouse_sens);
+							cartographer_settings.game.input.mouse_sensitivity = (float)g_mouse_sens;
+							MouseInput::SetSensitivity(cartographer_settings.game.input.mouse_sensitivity);
 						}
 						ImGui::PushItemWidth(WidthPercentage(15));
-						ImGui::InputFloat("##Mousesens2", &H2Config_mouse_sens, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+						ImGui::InputFloat("##Mousesens2", &cartographer_settings.game.input.mouse_sensitivity, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 						if (ImGui::IsItemEdited()) {
 							if (g_mouse_sens > 100)
 								g_mouse_sens = 100;
 							if (g_mouse_sens < 1)
 								g_mouse_sens = 1;
-							g_mouse_sens = (int)H2Config_mouse_sens;
-							MouseInput::SetSensitivity(H2Config_mouse_sens);
+							g_mouse_sens = (int)cartographer_settings.game.input.mouse_sensitivity;
+							MouseInput::SetSensitivity(cartographer_settings.game.input.mouse_sensitivity);
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
 						if (ImGui::Button(GetString(reset, "Mousesens3"), ImVec2(WidthPercentage(10), item_size.y)))
 						{
 							g_mouse_sens = 3;
-							H2Config_mouse_sens = 3.0f;
-							MouseInput::SetSensitivity(H2Config_mouse_sens);
+							cartographer_settings.game.input.mouse_sensitivity = 3.0f;
+							MouseInput::SetSensitivity(cartographer_settings.game.input.mouse_sensitivity);
 						}
 					}
 				}
@@ -440,10 +446,10 @@ namespace ImGuiHandler {
 					//Uniform Sensitivity
 					TextVerticalPad(GetString(uniform_sensitivity));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##C_Sep", &H2Config_mouse_uniform);
+					ImGui::Checkbox("##C_Sep", &cartographer_settings.game.input.mouse_uniform_sens);
 					if (ImGui::IsItemEdited())
 					{
-						MouseInput::SetSensitivity(H2Config_mouse_sens);
+						MouseInput::SetSensitivity(cartographer_settings.game.input.mouse_sensitivity);
 					}
 					if (ImGui::IsItemHovered())
 					{
@@ -454,29 +460,29 @@ namespace ImGuiHandler {
 
 					ImGui::Text(GetString(controller_sensitivity));
 					ImGui::PushItemWidth(WidthPercentage(75));
-					int g_controller_sens = (int)H2Config_controller_sens;
+					int g_controller_sens = (int)cartographer_settings.game.input.controller_sens;
 					ImGui::SliderInt("##Controllersens1", &g_controller_sens, 1, 100, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 					{
-						H2Config_controller_sens = (float)g_controller_sens;
-						ControllerInput::SetSensitiviy(H2Config_controller_sens);
+						cartographer_settings.game.input.controller_sens = (float)g_controller_sens;
+						ControllerInput::SetSensitiviy(cartographer_settings.game.input.controller_sens);
 					}
 					ImGui::PushItemWidth(WidthPercentage(15));
-					ImGui::InputFloat("##Controllersens2", &H2Config_controller_sens, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+					ImGui::InputFloat("##Controllersens2", &cartographer_settings.game.input.controller_sens, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						if (g_controller_sens > 100)
 							g_controller_sens = 100;
 						if (g_controller_sens < 1)
 							g_controller_sens = 1;
-						g_controller_sens = (int)H2Config_controller_sens;
-						ControllerInput::SetSensitiviy(H2Config_controller_sens);
+						g_controller_sens = (int)cartographer_settings.game.input.controller_sens;
+						ControllerInput::SetSensitiviy(cartographer_settings.game.input.controller_sens);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "Controllersens3"), ImVec2(WidthPercentage(10), item_size.y)))
 					{
 						g_controller_sens = 3;
-						H2Config_controller_sens = 3.0f;
-						ControllerInput::SetSensitiviy(H2Config_controller_sens);
+						cartographer_settings.game.input.controller_sens = 3.0f;
+						ControllerInput::SetSensitiviy(cartographer_settings.game.input.controller_sens);
 					}
 					ImGui::PopItemWidth();
 
@@ -486,7 +492,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##C_Aiming_Style", &g_aiming, a_items, 2))
 					{
-						H2Config_controller_modern = g_aiming != 0;
+						cartographer_settings.game.input.controller_modern = g_aiming != 0;
 						ControllerInput::ToggleModern();
 					}
 					if (ImGui::IsItemHovered())
@@ -502,7 +508,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
 					{
-						H2Config_Controller_Deadzone = (H2Config_Deadzone_Type)(byte)g_deadzone;
+						cartographer_settings.game.input.deadzone_type = (e_controller_deadzone_type)(byte)g_deadzone;
 						ControllerInput::SetDeadzones();
 					}
 					if (ImGui::IsItemHovered())
@@ -512,84 +518,84 @@ namespace ImGuiHandler {
 					ImGui::PopItemWidth();
 					ImGui::Columns(1);
 
-					if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+					if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
 						ImGui::Text(GetString(axial_deadzone_X));
 						ImGui::PushItemWidth(WidthPercentage(75));
-						ImGui::SliderFloat("##C_Deadzone_A_X_1", &H2Config_Deadzone_A_X, 0, 100, "");
+						ImGui::SliderFloat("##C_Deadzone_A_X_1", &cartographer_settings.game.input.deadzone_axial_x, 0, 100, "");
 						if (ImGui::IsItemEdited())
 						{
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(13));
-						ImGui::InputFloat("##C_Deadzone_A_X_2", &H2Config_Deadzone_A_X, 0, 3);
+						ImGui::InputFloat("##C_Deadzone_A_X_2", &cartographer_settings.game.input.deadzone_axial_x, 0, 3);
 						if (ImGui::IsItemEdited())
 						{
-							if (H2Config_Deadzone_A_X < 0)
-								H2Config_Deadzone_A_X = 0;
-							if (H2Config_Deadzone_A_X > 100)
-								H2Config_Deadzone_A_X = 100;
+							if (cartographer_settings.game.input.deadzone_axial_x < 0)
+								cartographer_settings.game.input.deadzone_axial_x = 0;
+							if (cartographer_settings.game.input.deadzone_axial_x > 100)
+								cartographer_settings.game.input.deadzone_axial_x = 100;
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(15));
 						if (ImGui::Button(GetString(e_default, "C_Deadzone_A_X_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
-							H2Config_Deadzone_A_X = (8689.0f / (float)MAXSHORT) * 100;
+							cartographer_settings.game.input.deadzone_axial_x = (8689.0f / (float)MAXSHORT) * 100;
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::PopItemWidth();
 						ImGui::Text(GetString(axial_deadzone_Y));
 						ImGui::PushItemWidth(WidthPercentage(75));
-						ImGui::SliderFloat("##C_Deadzone_A_Y_1", &H2Config_Deadzone_A_Y, 0, 100, "");
+						ImGui::SliderFloat("##C_Deadzone_A_Y_1", &cartographer_settings.game.input.deadzone_axial_y, 0, 100, "");
 						if (ImGui::IsItemEdited())
 						{
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(13));
-						ImGui::InputFloat("##C_Deadzone_A_Y_2", &H2Config_Deadzone_A_Y, 0, 3);
+						ImGui::InputFloat("##C_Deadzone_A_Y_2", &cartographer_settings.game.input.deadzone_axial_y, 0, 3);
 						if (ImGui::IsItemEdited())
 						{
-							if (H2Config_Deadzone_A_Y < 0)
-								H2Config_Deadzone_A_Y = 0;
-							if (H2Config_Deadzone_A_Y > 100)
-								H2Config_Deadzone_A_Y = 100;
+							if (cartographer_settings.game.input.deadzone_axial_y < 0)
+								cartographer_settings.game.input.deadzone_axial_y = 0;
+							if (cartographer_settings.game.input.deadzone_axial_y > 100)
+								cartographer_settings.game.input.deadzone_axial_y = 100;
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(12));
 						if (ImGui::Button(GetString(e_default, "C_Deadzone_A_Y_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
-							H2Config_Deadzone_A_Y = (8689.0f / (float)MAXSHORT) * 100;
+							cartographer_settings.game.input.deadzone_axial_y = (8689.0f / (float)MAXSHORT) * 100;
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::PopItemWidth();
 					}
-					if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
+					if (cartographer_settings.game.input.deadzone_type == radial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
 						ImGui::Text(GetString(radial_deadzone_radius));
 						ImGui::PushItemWidth(WidthPercentage(75));
-						ImGui::SliderFloat("##C_Deadzone_R_1", &H2Config_Deadzone_Radial, 0, 100, "");
+						ImGui::SliderFloat("##C_Deadzone_R_1", &cartographer_settings.game.input.deadzone_radial, 0, 100, "");
 						if (ImGui::IsItemEdited())
 						{
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(13));
-						ImGui::InputFloat("##C_Deadzone_R_2", &H2Config_Deadzone_Radial, 0, 3);
+						ImGui::InputFloat("##C_Deadzone_R_2", &cartographer_settings.game.input.deadzone_radial, 0, 3);
 						if (ImGui::IsItemEdited())
 						{
-							if (H2Config_Deadzone_Radial < 0)
-								H2Config_Deadzone_Radial = 0;
-							if (H2Config_Deadzone_Radial > 100)
-								H2Config_Deadzone_Radial = 100;
+							if (cartographer_settings.game.input.deadzone_radial < 0)
+								cartographer_settings.game.input.deadzone_radial = 0;
+							if (cartographer_settings.game.input.deadzone_radial > 100)
+								cartographer_settings.game.input.deadzone_radial = 100;
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(12));
 						if (ImGui::Button(GetString(e_default, "C_Deadzone_R_R_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
-							H2Config_Deadzone_Radial = (8689.0f / (float)MAXSHORT) * 100;
+							cartographer_settings.game.input.deadzone_radial = (8689.0f / (float)MAXSHORT) * 100;
 							ControllerInput::SetDeadzones();
 						}
 						ImGui::PopItemWidth();
@@ -600,6 +606,7 @@ namespace ImGuiHandler {
 					ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
 					ImGui::NewLine();
 					ImGui::Columns(3, NULL, false);
+					auto layout = &cartographer_settings.game.input.controller_layout;
 					for (auto i = 0; i < 14; i++)
 					{
 						ImGui::Text(button_items[i]);
@@ -610,46 +617,46 @@ namespace ImGuiHandler {
 							switch (button_values[i])
 							{
 							case XINPUT_GAMEPAD_DPAD_UP:
-								H2Config_CustomLayout.DPAD_UP = button_values[button_placeholders[i]];
+								layout->DPAD_UP = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_DPAD_DOWN:
-								H2Config_CustomLayout.DPAD_DOWN = button_values[button_placeholders[i]];
+								layout->DPAD_DOWN = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_DPAD_LEFT:
-								H2Config_CustomLayout.DPAD_LEFT = button_values[button_placeholders[i]];
+								layout->DPAD_LEFT = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_DPAD_RIGHT:
-								H2Config_CustomLayout.DPAD_RIGHT = button_values[button_placeholders[i]];
+								layout->DPAD_RIGHT = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_START:
-								H2Config_CustomLayout.START = button_values[button_placeholders[i]];
+								layout->START = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_BACK:
-								H2Config_CustomLayout.BACK = button_values[button_placeholders[i]];
+								layout->BACK = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_LEFT_THUMB:
-								H2Config_CustomLayout.LEFT_THUMB = button_values[button_placeholders[i]];
+								layout->LEFT_THUMB = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_RIGHT_THUMB:
-								H2Config_CustomLayout.RIGHT_THUMB = button_values[button_placeholders[i]];
+								layout->RIGHT_THUMB = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_LEFT_SHOULDER:
-								H2Config_CustomLayout.LEFT_SHOULDER = button_values[button_placeholders[i]];
+								layout->LEFT_SHOULDER = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_RIGHT_SHOULDER:
-								H2Config_CustomLayout.RIGHT_SHOULDER = button_values[button_placeholders[i]];
+								layout->RIGHT_SHOULDER = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_A:
-								H2Config_CustomLayout.A = button_values[button_placeholders[i]];
+								layout->A = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_B:
-								H2Config_CustomLayout.B = button_values[button_placeholders[i]];
+								layout->B = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_X:
-								H2Config_CustomLayout.X = button_values[button_placeholders[i]];
+								layout->X = button_values[button_placeholders[i]];
 								break;
 							case XINPUT_GAMEPAD_Y:
-								H2Config_CustomLayout.Y = button_values[button_placeholders[i]];
+								layout->Y = button_values[button_placeholders[i]];
 								break;
 							}
 						}
@@ -667,7 +674,7 @@ namespace ImGuiHandler {
 						ImGui::Columns(2, NULL, false);
 						TextVerticalPad(GetString(anti_cheat));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						if (ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
+						if (ImGui::Checkbox("##Anti-Cheat", &cartographer_settings.server.enable_anti_cheat))
 						{
 							for (int i = 0; i < NetworkSession::GetPeerCount(); i++)
 							{
@@ -684,7 +691,7 @@ namespace ImGuiHandler {
 						//XDelay
 						TextVerticalPad(GetString(disable_x_delay));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						if (ImGui::Checkbox("##XDelay", &H2Config_xDelay))
+						if (ImGui::Checkbox("##XDelay", &cartographer_settings.enable_xdelay))
 						{
 							H2Tweaks::RefreshTogglexDelay();
 						}
@@ -823,11 +830,11 @@ namespace ImGuiHandler {
 
 					TextVerticalPad(GetString(discord_presence));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##DRP", &H2Config_discord_enable);
+					ImGui::Checkbox("##DRP", &cartographer_settings.discord_enable);
 
 					TextVerticalPad(GetString(upnp_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##upnp", &H2Config_upnp_enable);
+					ImGui::Checkbox("##upnp", &cartographer_settings.upnp);
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::SetTooltip(GetString(upnp_tooltip));
@@ -835,14 +842,14 @@ namespace ImGuiHandler {
 
 					TextVerticalPad(GetString(no_events_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##no_events", &H2Config_no_events);
+					ImGui::Checkbox("##no_events", &cartographer_settings.game.no_events);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(no_events_tooltip));
 
 					if (get_current_special_event() == e_special_event_type::_halloween) {
 						TextVerticalPad(GetString(skeleton_biped));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##spooky_scary", &H2Config_spooky_boy);
+						ImGui::Checkbox("##spooky_scary", &cartographer_settings.game.skeleton_biped);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skeleton_biped_tooltip));
 					}
@@ -852,7 +859,7 @@ namespace ImGuiHandler {
 					ImGui::NextColumn();
 					TextVerticalPad(GetString(disable_intro_videos));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
+					ImGui::Checkbox("##Intro", &cartographer_settings.game.skip_intro);
 
 #if 0
 					ImGui::NextColumn();
@@ -873,10 +880,10 @@ namespace ImGuiHandler {
 					if (ImGui::Combo("##Language_Selection", &g_language_code, l_items, 9))
 					{
 						if (g_language_code == 8)
-							H2Config_language.code_main = -1;
+							cartographer_settings.language_code.code_main = -1;
 						else
-							H2Config_language.code_main = g_language_code;
-						setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
+							cartographer_settings.language_code.code_main = g_language_code;
+						setCustomLanguage(cartographer_settings.language_code.code_main, cartographer_settings.language_code.code_variant);
 					}
 					ImGui::PopItemWidth();
 
@@ -888,16 +895,16 @@ namespace ImGuiHandler {
 		}
 		const char* GetString(e_advanced_string string, const std::string& id)
 		{
-			if (string_table.count(H2Config_language.code_main))
+			if (string_table.count(cartographer_settings.language_code.code_main))
 			{
-				if (string_table.at(H2Config_language.code_main).count(string)) {
+				if (string_table.at(cartographer_settings.language_code.code_main).count(string)) {
 					if (id.empty()) {
-						return const_cast<char*>(string_table.at(H2Config_language.code_main).at(string));
+						return const_cast<char*>(string_table.at(cartographer_settings.language_code.code_main).at(string));
 					}
 
 					if (!string_cache.count(id))
 					{
-						std::string temp_str(const_cast<char*>(string_table.at(H2Config_language.code_main).at(string)));
+						std::string temp_str(const_cast<char*>(string_table.at(cartographer_settings.language_code.code_main).at(string)));
 						temp_str.append("##");
 						temp_str.append(id);
 						string_cache[id] = temp_str;
@@ -921,14 +928,15 @@ namespace ImGuiHandler {
 		{
 			if (!g_init)
 			{
-				g_deadzone = (int)H2Config_Controller_Deadzone;
-				g_aiming = (int)H2Config_controller_modern;
-				g_language_code = H2Config_language.code_main;
-				g_shadows = (int)H2Config_Override_Shadows;
-				g_water = (int)H2Config_Override_Water;
-				g_experimental = (int)H2Config_experimental_fps;
+				g_deadzone = (int)cartographer_settings.game.input.deadzone_type;
+				g_aiming = (int)cartographer_settings.game.input.controller_modern;
+				g_language_code = cartographer_settings.language_code.code_main;
+				g_shadows = (int)cartographer_settings.game.video.override_shadows;
+				g_water = (int)cartographer_settings.game.video.override_water;
+				g_experimental = (int)cartographer_settings.game.video.experimental_rendering;
 				if (g_language_code == -1)
 					g_language_code = 8;
+				g_lod_state = (int)cartographer_settings.game.video.static_lod_scale;
 				g_init = true;
 			}
 
@@ -1036,33 +1044,33 @@ namespace ImGuiHandler {
 						}
 						ImGui::Columns(1);
 					}
-					static int event_type = H2Config_forced_event;
+					static int event_type = cartographer_settings.development.forced_event;
 					if (ImGui::CollapsingHeader("Events"))
 					{
 						if (ImGui::RadioButton("None", &event_type, e_special_event_type::_no_event))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_no_event;
+							cartographer_settings.development.forced_event = e_special_event_type::_no_event;
 						} ImGui::SameLine();
 						if (ImGui::RadioButton("Christmas", &event_type, e_special_event_type::_christmas))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_christmas;
+							cartographer_settings.development.forced_event = e_special_event_type::_christmas;
 						} ImGui::SameLine();
 						if (ImGui::RadioButton("St Paddys", &event_type, e_special_event_type::_st_paddys))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_st_paddys;
+							cartographer_settings.development.forced_event = e_special_event_type::_st_paddys;
 						} ImGui::SameLine();
 						if (ImGui::RadioButton("Mook Madness", &event_type, e_special_event_type::_mook_maddness))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_mook_maddness;
+							cartographer_settings.development.forced_event = e_special_event_type::_mook_maddness;
 						}
 
 						if (ImGui::RadioButton("Halloween", &event_type, e_special_event_type::_halloween))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_halloween;
+							cartographer_settings.development.forced_event = e_special_event_type::_halloween;
 						}ImGui::SameLine();
 						if (ImGui::RadioButton("Birthday", &event_type, e_special_event_type::_birthday))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_birthday;
+							cartographer_settings.development.forced_event = e_special_event_type::_birthday;
 						}
 
 					}
@@ -1088,7 +1096,7 @@ namespace ImGuiHandler {
 		void Open()
 		{
 			WORD Buttons[14];
-			H2Config_CustomLayout.ToArray(Buttons);
+			cartographer_settings.game.input.controller_layout.ToArray(Buttons);
 			for (auto i = 0; i < 14; i++)
 			{
 				for (auto j = 0; j < 14; j++)

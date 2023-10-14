@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "new_hud.h"
 
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/bitmaps/bitmap_group.h"
 #include "Blam/Engine/camera/camera.h"
 #include "Blam/Engine/game/game.h"
@@ -11,8 +12,8 @@
 #include "Blam/Math/integer_math.h"
 
 #include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
 
 bool g_should_draw_hud_override = true;
@@ -37,7 +38,7 @@ s_hud_scripted_globals* get_hud_scripted_globals(void)
 
 bool __cdecl render_ingame_chat_check() 
 {
-	if (H2Config_hide_ingame_chat)
+	if (cartographer_settings.game.hud.hide_ingame_chat)
 	{
 		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
 		if (s_player::GetPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(local_player_datum_index))->is_chatting == 2) 
@@ -176,7 +177,7 @@ void initialize_crosshair_scale(bool game_mode_ui_shell)
 
 	get_crosshair_bitmap_datums();
 	initialize_crosshair_bitmap_data();
-	set_crosshair_scale(H2Config_crosshair_scale);
+	set_crosshair_scale(cartographer_settings.game.hud.crosshair_scale);
 }
 
 // Checks if we shouldn't draw the hud
@@ -200,9 +201,9 @@ void new_hud_apply_patches()
 {
 	if (Memory::IsDedicatedServer()) { return; }
 
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleHideIngameChat,
+	KeyboardInput::RegisterHotkey(&cartographer_settings.game.input.hotkey_hide_ingame_chat,
 		[]() {
-			H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
+			cartographer_settings.game.hud.hide_ingame_chat = !cartographer_settings.game.hud.hide_ingame_chat;
 		}
 	);
 

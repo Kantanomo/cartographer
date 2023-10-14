@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "ControllerInput.h"
 
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Hook.h"
 
 namespace ControllerInput
@@ -42,6 +42,23 @@ namespace ControllerInput
 	}
 
 
+	const WORD xinput_button_flags_array[] = {
+		XINPUT_GAMEPAD_DPAD_UP,
+		XINPUT_GAMEPAD_DPAD_DOWN,
+		XINPUT_GAMEPAD_DPAD_LEFT,
+		XINPUT_GAMEPAD_DPAD_RIGHT,
+		XINPUT_GAMEPAD_START,
+		XINPUT_GAMEPAD_BACK,
+		XINPUT_GAMEPAD_LEFT_THUMB,
+		XINPUT_GAMEPAD_RIGHT_THUMB,
+		XINPUT_GAMEPAD_LEFT_SHOULDER,
+		XINPUT_GAMEPAD_RIGHT_SHOULDER,
+		XINPUT_GAMEPAD_A,
+		XINPUT_GAMEPAD_B,
+		XINPUT_GAMEPAD_X,
+		XINPUT_GAMEPAD_Y
+	};
+
 	//Main function that iterates through all available input devices and calls update_xinput_state from the items vtable
 	void __cdecl update_xinput_devices()
 	{
@@ -56,35 +73,12 @@ namespace ControllerInput
 				(*reinterpret_cast<void(__thiscall *)(controller_info*)>(InputDevice->xinput_device_vtbl[2]))(InputDevice);
 				if (get_game_life_cycle() == _life_cycle_in_game || game_mode_get() == _game_mode_campaign)
 				{
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
-						controller_button |= H2Config_CustomLayout.DPAD_UP;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
-						controller_button |= H2Config_CustomLayout.DPAD_DOWN;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
-						controller_button |= H2Config_CustomLayout.DPAD_LEFT;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
-						controller_button |= H2Config_CustomLayout.DPAD_RIGHT;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_START)
-						controller_button |= H2Config_CustomLayout.START;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
-						controller_button |= H2Config_CustomLayout.BACK;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB)
-						controller_button |= H2Config_CustomLayout.LEFT_THUMB;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
-						controller_button |= H2Config_CustomLayout.RIGHT_THUMB;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-						controller_button |= H2Config_CustomLayout.LEFT_SHOULDER;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-						controller_button |= H2Config_CustomLayout.RIGHT_SHOULDER;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
-						controller_button |= H2Config_CustomLayout.A;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
-						controller_button |= H2Config_CustomLayout.B;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
-						controller_button |= H2Config_CustomLayout.X;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
-						controller_button |= H2Config_CustomLayout.Y;
-
+					for (const auto& flag : xinput_button_flags_array) {
+						if (InputDevice->xinput_state.Gamepad.wButtons & flag) {
+							controller_button |= cartographer_settings.game.input.controller_layout[flag];
+						}
+					}
+					
 					InputDevice->xinput_state.Gamepad.wButtons = controller_button;
 				}
 			}
@@ -223,7 +217,7 @@ namespace ControllerInput
 	void ControllerInput::ToggleModern()
 	{
 		if (Memory::IsDedicatedServer()) return;
-		if(H2Config_controller_modern)
+		if(cartographer_settings.game.input.controller_modern)
 		{
 			PatchCall(Memory::GetAddress(0x39B82), procces_input);
 		}
@@ -247,19 +241,19 @@ namespace ControllerInput
 	void ControllerInput::SetDeadzones()
 	{
 		if (Memory::IsDedicatedServer()) return;
-		if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
-			*axialDeadzoneX = (short)((float)MAXSHORT * (H2Config_Deadzone_A_X / 100));
-			*axialDeadzoneY = (short)((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100));
-			//*axialDeadzoneX = baseDeadzone * H2Config_Deadzone_A_X;
-			//*axialDeadzoneY = baseDeadzone * H2Config_Deadzone_A_Y;
+		if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
+			*axialDeadzoneX = (short)((float)MAXSHORT * (cartographer_settings.game.input.deadzone_axial_x / 100));
+			*axialDeadzoneY = (short)((float)MAXSHORT * (cartographer_settings.game.input.deadzone_axial_y / 100));
+			//*axialDeadzoneX = baseDeadzone * cartographer_settings.game.input.deadzone_axial_x;
+			//*axialDeadzoneY = baseDeadzone * cartographer_settings.game.input.deadzone_axial_y;
 		}
 		else
 		{
 			*axialDeadzoneX = 0;
 			*axialDeadzoneY = 0;
 		}
-		if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both) {
-			radialDeadzone = (short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100));
+		if (cartographer_settings.game.input.deadzone_type == radial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
+			radialDeadzone = (short)((float)MAXSHORT * (cartographer_settings.game.input.deadzone_radial / 100));
 		} 
 		else
 		{
@@ -280,17 +274,17 @@ namespace ControllerInput
 		int thumbStickR = 0;
 		bool radialL = false;
 		bool radialR = false;
-		if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
-			if (abs(scInput[26]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
+		if (cartographer_settings.game.input.deadzone_type == axial_deadzone || cartographer_settings.game.input.deadzone_type == both_deadzone) {
+			if (abs(scInput[26]) >= ((float)MAXSHORT * (cartographer_settings.game.input.deadzone_axial_x / 100)))
 				thumbStickL++;
-			if (abs(scInput[27]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100)))
+			if (abs(scInput[27]) >= ((float)MAXSHORT * (cartographer_settings.game.input.deadzone_axial_y / 100)))
 				thumbStickL++;
-			if (abs(scInput[28]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_X / 100)))
+			if (abs(scInput[28]) >= ((float)MAXSHORT * (cartographer_settings.game.input.deadzone_axial_x / 100)))
 				thumbStickR++;
-			if (abs(scInput[29]) >= ((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100)))
+			if (abs(scInput[29]) >= ((float)MAXSHORT * (cartographer_settings.game.input.deadzone_axial_y / 100)))
 				thumbStickR++;
 		}
-		unsigned int ar = pow((short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100)), 2);
+		unsigned int ar = pow((short)((float)MAXSHORT * (cartographer_settings.game.input.deadzone_radial / 100)), 2);
 		unsigned int alx = pow(scInput[26], 2);
 		unsigned int aly = pow(scInput[27], 2);
 		unsigned int arx = pow(scInput[28], 2);
@@ -342,7 +336,7 @@ namespace ControllerInput
 		PatchCall(Memory::GetAddress(0x2eb1b), h_game_is_minimized);
 		PatchCall(Memory::GetAddress(0x2FA58), update_xinput_devices);
 		//Codecave(Memory::GetAddress(0x2e975), apply_dead_zones, 166);
-		SetSensitiviy(H2Config_controller_sens);
+		SetSensitiviy(cartographer_settings.game.input.controller_sens);
 		ToggleModern();
 		SetDeadzones();
 	}

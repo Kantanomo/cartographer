@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "MeleeFix.h"
 
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 #include "H2MOD/Modules/GamePhysics/MeleeLunge.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "Util/Hooks/Hook.h"
 
@@ -20,7 +20,7 @@ namespace MeleeFix
 				.text:007C302F 130 84 C0                test    al, al          ; Logical Compare
 				.text:007C3031 130 0F 84 4B 01 00 00    jz      loc_7C3182      <=== Remove this jump
 			 */
-			if (H2Config_melee_fix)
+			if (cartographer_settings.game.melee_fix)
 			{
 				// NopFill(Memory::GetAddress(0x143031, 0), 6);
 			}

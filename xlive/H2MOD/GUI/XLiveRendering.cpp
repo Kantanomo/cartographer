@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_dx9.h"
 #include "backends/imgui_impl_win32.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 #include "Blam/Engine/units/bipeds.h"
 #include "Blam/Engine/game/game.h"
@@ -11,12 +12,11 @@
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Networking/Networking.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Shell.h"
-
+#include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
 
 extern void InitInstance();
@@ -634,7 +634,7 @@ HRESULT WINAPI XLiveRender()
 		}
 		drawText(0, 15, masterStateColor, GetMasterStateStr(), smallFont);
 
-		if (H2Config_anti_cheat_enabled)
+		if (cartographer_settings.server.enable_anti_cheat)
 			drawText(0, 30, COLOR_GREEN, "Anti-Cheat: Enabled", smallFont);
 		else
 			drawText(0, 30, COLOR_RED, "Anti-Cheat: Disabled", smallFont);
@@ -739,7 +739,7 @@ HRESULT WINAPI XLiveRender()
 
 	// limit framerate if needed
 	// UPDATE: frame limiting in XLiveRender adds input lag
-	// XLiveThrottleFramerate(H2Config_fps_limit);
+	// XLiveThrottleFramerate(cartographer_settings.game.video.fps_limit);
 
 	return S_OK;
 }

@@ -3,6 +3,7 @@
 
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/scenario/scenario.h"
@@ -11,12 +12,12 @@
 #include "Blam/Engine/units/units.h"
 
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD.h"
 
 std::vector<unsigned long long> Infection::zombieIdentifiers;
 
@@ -186,7 +187,7 @@ void Infection::preSpawnServerSetup() {
 			}
 		}
 		else {
-			if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
+			if (get_current_special_event() == e_special_event_type::_halloween && cartographer_settings.game.skeleton_biped)
 				s_player::SetUnitBipedType(currentPlayerIndex, character_type_skeleton);
 			else
 				s_player::SetUnitBipedType(currentPlayerIndex, character_type_spartan);
@@ -195,7 +196,7 @@ void Infection::preSpawnServerSetup() {
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
-	if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
+	if (get_current_special_event() == e_special_event_type::_halloween && cartographer_settings.game.skeleton_biped)
 		s_player::SetUnitBipedType(playerIndex, character_type_skeleton);
 	else
 		s_player::SetUnitBipedType(playerIndex, character_type_spartan);

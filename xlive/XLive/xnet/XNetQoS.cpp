@@ -4,8 +4,9 @@
 #include <WS2tcpip.h>
 #include "xnet.h"
 #include "XLive/xnet/XNetQoS.h"
+
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "IpManagement/XnIp.h"
-#include "H2MOD/Modules/Shell/Config.h"
 
 using namespace std::chrono_literals;
 
@@ -326,7 +327,7 @@ void CXNetQoS::Listener()
 
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_addr.s_addr = INADDR_ANY; // anyone can connect
-		serverAddr.sin_port = htons(H2Config_base_port + 10);
+		serverAddr.sin_port = htons(cartographer_settings.base_port + 10);
 
 		DWORD dwBytes = 0;
 		GUID GuidAcceptEx = WSAID_ACCEPTEX;

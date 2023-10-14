@@ -2,9 +2,9 @@
 
 #include "StatsHandler.h"
 
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Utils/Utils.h"
 
@@ -240,8 +240,8 @@ void StatsHandler::verifyRegistrationStatus()
 		// check result returned a new AuthKey, attempt to register the server with it
 		if (serverRegistration(authKey)) {
 			// success save AuthKey to config
-			strncpy(H2Config_stats_authkey, authKey, 32);
-			SaveH2Config();
+			//strncpy(H2Config_stats_authkey, authKey, 32);
+			//SaveH2Config();
 			Status.Registered = true;
 			Status.StatsEnabled = true;
 			LOG_TRACE_GAME("{} was successful.", __FUNCTION__);
@@ -342,7 +342,7 @@ bool StatsHandler::serverRegistration(const char* authKey)
 	curl_mime_data(field, "ServerRegistration", CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "Server_Name");
-	curl_mime_data(field, H2Config_dedi_server_name, CURL_ZERO_TERMINATED);
+	curl_mime_data(field, cartographer_settings.server.server_name, CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "Server_XUID");
 	curl_mime_data(field, std::to_string(dedicated_server_id).c_str(), CURL_ZERO_TERMINATED);
@@ -405,7 +405,7 @@ const char* StatsHandler::getAPIToken()
 	curl_mime_data(field, "ServerLogin", CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "AuthKey");
-	curl_mime_data(field, H2Config_stats_authkey, CURL_ZERO_TERMINATED);
+	//curl_mime_data(field, H2Config_stats_authkey, CURL_ZERO_TERMINATED);
 	headerlist = curl_slist_append(headerlist, "Expect:");
 
 	struct curl_response_text s;
