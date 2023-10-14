@@ -213,7 +213,7 @@
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
-    <ClCompile Include="Blam\Engine\objects\object_types.cpp" 
+    <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
     <ClCompile Include="H2MOD\Utils\EasyJson.cpp" />
     <ClCompile Include="H2MOD\Utils\EasyJsonStruct.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\settings\settings.cpp" />
