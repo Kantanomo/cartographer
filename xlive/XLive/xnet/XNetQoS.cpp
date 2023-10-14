@@ -5,9 +5,8 @@
 #include "xnet.h"
 #include "XLive/xnet/XNetQoS.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "IpManagement/XnIp.h"
-#include "H2MOD/Modules/Shell/Config.h"
 
 using namespace std::chrono_literals;
 

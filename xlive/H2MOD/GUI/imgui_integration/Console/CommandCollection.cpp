@@ -15,7 +15,7 @@
 #include "H2MOD/Utils/Utils.h"
 
 // for XNet connection logging
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 

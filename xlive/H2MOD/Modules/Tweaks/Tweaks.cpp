@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Tweaks.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/rasterizer/rasterizer_settings.h"
@@ -10,7 +10,6 @@
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Variants/VariantMPGameEngine.h"
 

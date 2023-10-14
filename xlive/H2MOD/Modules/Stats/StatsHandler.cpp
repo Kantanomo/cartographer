@@ -2,10 +2,9 @@
 
 #include "StatsHandler.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Utils/Utils.h"
 
@@ -242,7 +241,7 @@ void StatsHandler::verifyRegistrationStatus()
 		if (serverRegistration(authKey)) {
 			// success save AuthKey to config
 			//strncpy(H2Config_stats_authkey, authKey, 32);
-			SaveH2Config();
+			//SaveH2Config();
 			Status.Registered = true;
 			Status.StatsEnabled = true;
 			LOG_TRACE_GAME("{} was successful.", __FUNCTION__);

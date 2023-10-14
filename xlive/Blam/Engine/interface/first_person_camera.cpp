@@ -7,14 +7,13 @@
 #include "Blam/Engine/units/units.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 
 bool player_control_fov_overridden = false;
 float overridden_fov_radians;

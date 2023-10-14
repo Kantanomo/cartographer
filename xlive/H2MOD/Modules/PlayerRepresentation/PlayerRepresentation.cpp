@@ -3,7 +3,7 @@
 
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_engine_util.h"
@@ -12,7 +12,6 @@
 #include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"

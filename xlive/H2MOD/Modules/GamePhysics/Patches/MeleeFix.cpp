@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "MeleeFix.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 #include "H2MOD/Modules/GamePhysics/MeleeLunge.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "Util/Hooks/Hook.h"
 

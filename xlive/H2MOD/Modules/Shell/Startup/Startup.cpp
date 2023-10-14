@@ -4,7 +4,7 @@
 #include "WinMainH2.h"
 #include "../Config.h"
 #include "../Shell.h"
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 
 #include "Blam/Engine/cseries/cseries_windows_debug_pc.h"
 

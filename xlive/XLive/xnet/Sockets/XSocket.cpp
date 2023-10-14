@@ -3,7 +3,6 @@
 #include "XLive/xnet/upnp.h"
 #include "XLive/xnet/Sockets/XSocket.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
-#include "H2MOD/Modules/Shell/Config.h"
 
 #include "XLive/xnet/net_utils.h"
 
@@ -11,7 +10,7 @@
 
 #include <MSWSock.h>
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 
 std::vector<XSocket*> XSocket::Sockets;
 

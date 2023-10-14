@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "new_hud.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Blam/Engine/bitmaps/bitmap_group.h"
 #include "Blam/Engine/camera/camera.h"
 #include "Blam/Engine/game/game.h"
@@ -12,8 +12,8 @@
 #include "Blam/Math/integer_math.h"
 
 #include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
 
 bool g_should_draw_hud_override = true;

@@ -2,7 +2,7 @@
 
 #include "SpecialEvents.h"
 #include "SpecialEventHelpers.h"
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Events/Birthday.h"
 #include "Events/Christmas.h"
 #include "Events/Halloween.h"
@@ -11,7 +11,6 @@
 
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 // This function gets the current date and time

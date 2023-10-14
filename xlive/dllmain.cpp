@@ -1,11 +1,10 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/Shell/Shell.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Detour.h"
 
 HMODULE hThis = NULL;

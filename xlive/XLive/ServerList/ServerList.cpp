@@ -11,7 +11,7 @@
 #include "rapidjson/prettywriter.h"
 
 #include "../xnet/IpManagement/XnIp.h"
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 
 #include "H2MOD/Utils/Utils.h"
 

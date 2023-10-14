@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "render_cameras.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Util/Hooks/Hook.h"
 
 typedef void(__cdecl render_camera_build_projection_t)(s_camera*, float*, real_matrix4x3*);

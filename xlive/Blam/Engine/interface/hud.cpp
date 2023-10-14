@@ -1,13 +1,7 @@
 #include "stdafx.h"
 #include "hud.h"
-#include "new_hud_definitions.h"
-#include "Blam/Cartographer/Settings/Setting.h"
-
-
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/game_globals.h"
-
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 

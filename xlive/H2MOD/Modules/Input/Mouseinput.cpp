@@ -2,9 +2,9 @@
 
 #include "Mouseinput.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/game_time.h"
-#include "H2MOD/Modules/Shell/Config.h"
+#include "Blam/Math/BlamMath.h"
 #include "Util/Hooks/Hook.h"
 
 bool rawInputInit = false;

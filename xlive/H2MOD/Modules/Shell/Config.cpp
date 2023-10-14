@@ -2,7 +2,7 @@
 
 #include "Config.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -216,9 +216,7 @@ void UpgradeConfig()
 		H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
 	}
 	if (err) {
-		addDebugText("ERROR: No H2Configuration files could be found!");
-		CMForce_Update = true;
-		H2Config_isConfigFileAppDataLocal = true;
+		addDebugText("INFO: No old H2Configuration file could be located to upgrade.");
 	}
 	else
 	{

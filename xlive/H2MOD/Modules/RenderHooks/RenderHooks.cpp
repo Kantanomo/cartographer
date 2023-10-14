@@ -2,8 +2,7 @@
 
 #include "RenderHooks.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
-#include "H2MOD/Modules/Shell/Config.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Util/Hooks/Hook.h"
 
 bool ras_layer_overrides[RenderHooks::end];

@@ -9,7 +9,7 @@
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
@@ -17,7 +17,6 @@
 #include "Blam/Engine/scenario/scenario_definitions.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 

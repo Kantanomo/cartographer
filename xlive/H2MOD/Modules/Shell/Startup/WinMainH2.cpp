@@ -2,11 +2,10 @@
 
 #include "WinMainH2.h"
 
-#include "Blam/Cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/Settings/Setting.h"
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Shell.h""
+#include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Utils/Utils.h"
 
 #include "Util/Hooks/Hook.h"
