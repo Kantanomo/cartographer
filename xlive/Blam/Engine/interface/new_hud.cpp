@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "new_hud.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/bitmaps/bitmap_group.h"
 #include "Blam/Engine/camera/camera.h"
 #include "Blam/Engine/game/game.h"

@@ -3,7 +3,7 @@
 
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/scenario/scenario.h"

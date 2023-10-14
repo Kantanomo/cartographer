@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ControllerInput.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "Util/Hooks/Hook.h"

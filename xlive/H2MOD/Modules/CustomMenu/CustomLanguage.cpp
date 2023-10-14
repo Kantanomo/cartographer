@@ -2,7 +2,7 @@
 
 #include "CustomLanguage.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/text/unicode.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"

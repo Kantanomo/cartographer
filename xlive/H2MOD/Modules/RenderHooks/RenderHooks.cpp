@@ -2,7 +2,7 @@
 
 #include "RenderHooks.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Util/Hooks/Hook.h"
 
 bool ras_layer_overrides[RenderHooks::end];

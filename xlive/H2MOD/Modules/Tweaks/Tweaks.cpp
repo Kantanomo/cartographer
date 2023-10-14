@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Tweaks.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/rasterizer/rasterizer_settings.h"

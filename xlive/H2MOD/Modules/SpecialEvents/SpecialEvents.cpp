@@ -2,7 +2,7 @@
 
 #include "SpecialEvents.h"
 #include "SpecialEventHelpers.h"
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Events/Birthday.h"
 #include "Events/Christmas.h"
 #include "Events/Halloween.h"

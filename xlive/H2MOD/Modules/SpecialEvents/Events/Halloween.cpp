@@ -9,7 +9,7 @@
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"

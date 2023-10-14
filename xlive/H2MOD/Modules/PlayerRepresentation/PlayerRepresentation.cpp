@@ -3,7 +3,7 @@
 
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_engine_util.h"

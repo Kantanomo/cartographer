@@ -2,7 +2,7 @@
 
 #include "Mouseinput.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Math/BlamMath.h"
 #include "Util/Hooks/Hook.h"

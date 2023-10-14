@@ -215,7 +215,7 @@
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
     <ClCompile Include="H2MOD\Utils\EasyJson.cpp" />
     <ClCompile Include="H2MOD\Utils\EasyJsonStruct.cpp" />
-    <ClCompile Include="Blam\Engine\cartographer\Settings\Settings.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\settings\settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -655,7 +655,7 @@
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
     <ClInclude Include="resources\version_resource.h" />
     <ClInclude Include="Blam\Engine\main\main.h" />
-    <ClInclude Include="Blam\Engine\cartographer\Settings\Setting.h" />
+    <ClInclude Include="Blam\Engine\cartographer\settings\settings.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

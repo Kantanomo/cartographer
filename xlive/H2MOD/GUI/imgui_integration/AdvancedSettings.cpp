@@ -26,7 +26,7 @@
 
 #include "imgui.h"
 #include "imgui_handler.h"
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 namespace ImGuiHandler {
 	namespace ImAdvancedSettings {

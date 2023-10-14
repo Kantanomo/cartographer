@@ -2,7 +2,7 @@
 
 #include "NetworkMessageTypeCollection.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/memory/bitstream.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"

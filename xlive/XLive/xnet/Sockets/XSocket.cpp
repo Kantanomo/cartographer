@@ -10,7 +10,7 @@
 
 #include <MSWSock.h>
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 std::vector<XSocket*> XSocket::Sockets;
 

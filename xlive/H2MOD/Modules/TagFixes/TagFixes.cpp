@@ -7,7 +7,7 @@
 #include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
 
 #include "H2MOD.h"
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 

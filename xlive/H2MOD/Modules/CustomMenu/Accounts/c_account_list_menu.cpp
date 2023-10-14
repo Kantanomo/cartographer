@@ -9,7 +9,7 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include "../CustomLanguage.h"
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 
 #include "H2MOD/Utils/Utils.h"

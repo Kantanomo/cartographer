@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MeleeFix.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 #include "H2MOD/Modules/GamePhysics/MeleeLunge.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"

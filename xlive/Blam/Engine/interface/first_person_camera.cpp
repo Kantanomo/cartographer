@@ -13,7 +13,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 bool player_control_fov_overridden = false;
 float overridden_fov_radians;

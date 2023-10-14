@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "RunLoop.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 

@@ -2,7 +2,7 @@
 
 #include "KeyboardInput.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"

@@ -2,7 +2,7 @@
 
 #include "Config.h"
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"

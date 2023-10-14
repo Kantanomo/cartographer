@@ -3,7 +3,7 @@
 #include "upnp.h"
 #include <miniupnpc/upnpcommands.h>
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 /* Ripped from ED thanks guys - PermaNull*/
 ModuleUPnP::ModuleUPnP()

@@ -4,7 +4,7 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include <sys/timeb.h>
 
-#include "Blam/Engine/cartographer/Settings/Setting.h"
+#include "Blam/Engine/cartographer/settings/settings.h"
 
 int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);
