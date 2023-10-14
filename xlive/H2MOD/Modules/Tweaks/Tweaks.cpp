@@ -387,7 +387,7 @@ void H2Tweaks::WarpFix(bool enable)
 
 void H2Tweaks::RefreshTogglexDelay() {
 	BYTE xDelayJMP[] = { 0x74 };
-	if (!H2Config_xDelay)
+	if (!cartographer_settings.enable_xdelay)
 		xDelayJMP[0] = 0xEB;
 	WriteBytes(Memory::GetAddress(0x1c9d8e, 0x1a1316), xDelayJMP, 1);
 }

@@ -26,14 +26,9 @@ extern std::string cartographerMapRepoURL;
 
 extern bool H2Config_isConfigFileAppDataLocal;
 
-extern bool H2Config_xDelay;
-extern bool H2Config_voice_chat;
 extern char H2Config_dedi_server_name[XUSER_NAME_SIZE];
 extern char H2Config_dedi_server_playlist[256];
 extern int H2Config_additional_pcr_time;
-extern bool H2Config_debug_log;
-extern int H2Config_debug_log_level;
-extern bool H2Config_debug_log_console;
 extern char H2Config_login_identifier[255];
 extern char H2Config_login_password[255];
 extern short H2Config_team_bit_flags;
@@ -47,7 +42,6 @@ extern bool H2Config_anti_cheat_enabled;
 extern int H2Config_minimum_player_start;
 
 
-extern bool H2Config_upnp_enable;
 extern bool H2Config_melee_fix;
 extern bool H2Config_no_events;
 extern bool H2Config_spooky_boy;

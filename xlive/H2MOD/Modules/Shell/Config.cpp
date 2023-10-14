@@ -21,14 +21,9 @@ std::string H2ConfigVersionSection("H2ConfigurationVersion:" + H2ConfigVersionNu
 std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
-bool H2Config_xDelay = true;
-bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
 int H2Config_additional_pcr_time = 25;
-bool H2Config_debug_log = false;
-int H2Config_debug_log_level = 2;
-bool H2Config_debug_log_console = false;
 char H2Config_login_identifier[255] = { "" };
 char H2Config_login_password[255] = { "" };
 int H2Config_minimum_player_start = 0;
@@ -43,7 +38,6 @@ bool H2Config_anti_cheat_enabled = true;
 
 
 
-bool H2Config_upnp_enable = true;
 bool H2Config_melee_fix = true;
 bool H2Config_no_events = false;
 bool H2Config_spooky_boy = true;

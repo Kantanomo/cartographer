@@ -691,7 +691,7 @@ namespace ImGuiHandler {
 						//XDelay
 						TextVerticalPad(GetString(disable_x_delay));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						if (ImGui::Checkbox("##XDelay", &H2Config_xDelay))
+						if (ImGui::Checkbox("##XDelay", &cartographer_settings.enable_xdelay))
 						{
 							H2Tweaks::RefreshTogglexDelay();
 						}
@@ -834,7 +834,7 @@ namespace ImGuiHandler {
 
 					TextVerticalPad(GetString(upnp_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##upnp", &H2Config_upnp_enable);
+					ImGui::Checkbox("##upnp", &cartographer_settings.upnp);
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::SetTooltip(GetString(upnp_tooltip));

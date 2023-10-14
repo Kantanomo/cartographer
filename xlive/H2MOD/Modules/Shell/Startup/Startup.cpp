@@ -340,17 +340,17 @@ void InitH2Startup() {
 	EnterCriticalSection(&log_section);
 
 	// prepare default log files if enabled, after we read the H2Config
-	bool should_enable_console_log = H2Config_debug_log && H2Config_debug_log_console;
-	console_log = h2log::create_console("CONSOLE MAIN", should_enable_console_log, H2Config_debug_log_level);
+	bool should_enable_console_log = cartographer_settings.debug_log && cartographer_settings.debug_log_console;
+	console_log = h2log::create_console("CONSOLE MAIN", should_enable_console_log, cartographer_settings.debug_log_level);
 
-	xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"), H2Config_debug_log, H2Config_debug_log_level);
+	xlive_log = h2log::create("XLive", prepareLogFileName(L"h2xlive"), cartographer_settings.debug_log, cartographer_settings.debug_log_level);
 	LOG_DEBUG_XLIVE(DLL_VERSION_STR);
-	h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"), H2Config_debug_log, H2Config_debug_log_level);
+	h2mod_log = h2log::create("H2MOD", prepareLogFileName(L"h2mod"), cartographer_settings.debug_log, cartographer_settings.debug_log_level);
 	LOG_DEBUG_GAME(DLL_VERSION_STR);
-	network_log = h2log::create("Network", prepareLogFileName(L"h2network"), H2Config_debug_log, H2Config_debug_log_level);
+	network_log = h2log::create("Network", prepareLogFileName(L"h2network"), cartographer_settings.debug_log, cartographer_settings.debug_log_level);
 	LOG_DEBUG_NETWORK(DLL_VERSION_STR);
 #if COMPILE_WITH_VOICE
-	voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"), H2Config_debug_log, H2Config_debug_log_level);
+	voice_log = h2log::create("Voice", prepareLogFileName(L"voicechat"), cartographer_settings.debug_log, cartographer_settings.debug_log_level);
 	LOG_DEBUG(voice_log, DLL_VERSION_STR);
 #endif
 

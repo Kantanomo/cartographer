@@ -122,7 +122,6 @@ bool engine_basic_init()
 	DWORD* flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 	ZeroMemory(flags_array, e_startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
-	H2Config_voice_chat = false;
 	flags_array[e_startup_flags::nointro] = cartographer_settings.game.skip_intro;
 
 	void(__cdecl * fn_c000285fd)() = (void(__cdecl*)())Memory::GetAddress<void*>(0x000285fd);

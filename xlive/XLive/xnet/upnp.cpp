@@ -42,7 +42,7 @@ Utils::UPnPResult ModuleUPnP::UPnPForwardPort(bool tcp, int externalport, int in
 
 void ForwardPorts()
 {
-	if (!H2Config_upnp_enable)
+	if (!cartographer_settings.upnp)
 	{
 		LOG_INFO_NETWORK("ForwardPorts() - UPNP disabled by config, skipping forwarding.");
 		return;
