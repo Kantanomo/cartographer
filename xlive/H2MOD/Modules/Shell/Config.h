@@ -26,7 +26,6 @@ extern std::string cartographerMapRepoURL;
 
 extern bool H2Config_isConfigFileAppDataLocal;
 
-extern bool H2Config_static_first_person;
 extern float H2Config_mouse_sens;
 extern bool H2Config_mouse_uniform;
 extern float H2Config_controller_sens;
@@ -34,9 +33,6 @@ extern bool H2Config_controller_modern;
 extern float H2Config_Deadzone_A_X;
 extern float H2Config_Deadzone_A_Y;
 extern float H2Config_Deadzone_Radial;
-extern bool H2Config_shader_lod_max;
-extern bool H2Config_light_suppressor;
-extern bool H2Config_d3d9ex;
 extern float H2Config_crosshair_offset;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;

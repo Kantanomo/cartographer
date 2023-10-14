@@ -131,7 +131,7 @@ bool engine_basic_init()
 	init_data_checksum_info();
 	runtime_state_initialize();
 
-	flags_array[e_startup_flags::d3d9ex_enabled] = H2Config_d3d9ex;
+	flags_array[e_startup_flags::d3d9ex_enabled] = cartographer_settings.game.video.d3dex;
 	flags_array[e_startup_flags::disable_voice_chat] = 1;
 
 	int arg_count;

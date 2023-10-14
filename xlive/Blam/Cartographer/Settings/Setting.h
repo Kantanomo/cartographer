@@ -43,8 +43,6 @@ struct s_cartographer_video_settings {
 	bool shader_lod_max = false;
 	bool light_suppressor = false;
 	bool d3dex = false;
-
-
 	e_frame_limiter_type experimental_rendering = _rendering_mode_none;
 	e_override_texture_resolution override_shadows = tex_default;
 	e_override_texture_resolution override_water = tex_default;

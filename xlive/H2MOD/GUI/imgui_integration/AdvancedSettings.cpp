@@ -130,25 +130,25 @@ namespace ImGuiHandler {
 					//Player FOV
 					ImGui::Text(GetString(player_field_of_view));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderInt("##PlayerFOV1", &H2Config_field_of_view, 45, 110, ""); ImGui::SameLine();
+					ImGui::SliderInt("##PlayerFOV1", &cartographer_settings.game.video.field_of_view, 45, 110, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						player_control_set_field_of_view(H2Config_field_of_view);
+						player_control_set_field_of_view(cartographer_settings.game.video.field_of_view);
 
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputInt("##PlayerFOV2", &H2Config_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+					ImGui::InputInt("##PlayerFOV2", &cartographer_settings.game.video.field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_field_of_view > 110)
-							H2Config_field_of_view = 110;
-						if (H2Config_field_of_view < 45)
-							H2Config_field_of_view = 45;
+						if (cartographer_settings.game.video.field_of_view > 110)
+							cartographer_settings.game.video.field_of_view = 110;
+						if (cartographer_settings.game.video.field_of_view < 45)
+							cartographer_settings.game.video.field_of_view = 45;
 
-						player_control_set_field_of_view(H2Config_field_of_view);
+						player_control_set_field_of_view(cartographer_settings.game.video.field_of_view);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "PlayerFov3"), b2_size))
 					{
-						H2Config_field_of_view = 78.0f;
-						player_control_set_field_of_view(H2Config_field_of_view);
+						cartographer_settings.game.video.field_of_view = 78.0f;
+						player_control_set_field_of_view(cartographer_settings.game.video.field_of_view);
 					}
 					ImGui::PopItemWidth();
 
@@ -156,25 +156,25 @@ namespace ImGuiHandler {
 					//Vehicle FOV
 					ImGui::Text(GetString(vehicle_field_of_view));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, ""); ImGui::SameLine();
+					ImGui::SliderInt("##VehicleFOV1", &cartographer_settings.game.video.vehicle_field_of_view, 45, 110, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						observer_set_suggested_field_of_view(cartographer_settings.game.video.vehicle_field_of_view);
 
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputInt("##VehicleFOV2", &H2Config_vehicle_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+					ImGui::InputInt("##VehicleFOV2", &cartographer_settings.game.video.vehicle_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_vehicle_field_of_view > 110)
-							H2Config_vehicle_field_of_view = 110;
-						if (H2Config_vehicle_field_of_view < 45)
-							H2Config_vehicle_field_of_view = 45;
+						if (cartographer_settings.game.video.vehicle_field_of_view > 110)
+							cartographer_settings.game.video.vehicle_field_of_view = 110;
+						if (cartographer_settings.game.video.vehicle_field_of_view < 45)
+							cartographer_settings.game.video.vehicle_field_of_view = 45;
 
-						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						observer_set_suggested_field_of_view(cartographer_settings.game.video.vehicle_field_of_view);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "VehicleFOV3"), b2_size))
 					{
-						H2Config_vehicle_field_of_view = 78.0f;
-						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						cartographer_settings.game.video.vehicle_field_of_view = 78.0f;
+						observer_set_suggested_field_of_view(cartographer_settings.game.video.vehicle_field_of_view);
 					}
 					ImGui::PopItemWidth();
 
@@ -237,7 +237,7 @@ namespace ImGuiHandler {
 
 					ImGui::Checkbox(GetString(hide_ingame_chat), &H2Config_hide_ingame_chat);
 					ImGui::NextColumn();
-					ImGui::Checkbox(GetString(static_fp), &H2Config_static_first_person);
+					ImGui::Checkbox(GetString(static_fp), &cartographer_settings.game.video.static_fp_fov);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(static_fp_tooltip));
 					ImGui::NextColumn();
@@ -284,10 +284,10 @@ namespace ImGuiHandler {
 					ImGui::PopItemWidth();
 					ImGui::Text(GetString(refresh_rate));
 					ImGui::PushItemWidth(WidthPercentage(100));
-					int gRefresh = H2Config_refresh_rate;
+					int gRefresh = cartographer_settings.game.video.refresh_rate;
 					ImGui::InputInt("##Refresh1", &gRefresh, 0, 110, ImGuiInputTextFlags_AlwaysOverwrite);
 					if (ImGui::IsItemEdited())
-						H2Config_refresh_rate = gRefresh;
+						cartographer_settings.game.video.refresh_rate = gRefresh;
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
 
@@ -334,13 +334,13 @@ namespace ImGuiHandler {
 
 					//Force max shader LOD
 
-					ImGui::Checkbox(GetString(shader_lod_max), &H2Config_shader_lod_max);
+					ImGui::Checkbox(GetString(shader_lod_max), &cartographer_settings.game.video.shader_lod_max);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(shader_lod_max_tooltip));
 
 					//Disable Light Suppressor
 
-					ImGui::Checkbox(GetString(light_suppressor), &H2Config_light_suppressor);
+					ImGui::Checkbox(GetString(light_suppressor), &cartographer_settings.game.video.light_suppressor);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(light_suppressor_tooltip));
 

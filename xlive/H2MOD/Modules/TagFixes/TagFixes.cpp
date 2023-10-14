@@ -7,6 +7,7 @@
 #include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
 
 #include "H2MOD.h"
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
@@ -232,11 +233,11 @@ namespace TagFixes
 			fix_dynamic_lights();
 			font_table_fix();
 			sound_classes_fix();
-			if (H2Config_shader_lod_max)
+			if (cartographer_settings.game.video.shader_lod_max)
 			{
 				shader_lod_max();
 			}
-			if (H2Config_light_suppressor)
+			if (cartographer_settings.game.video.light_suppressor)
 			{
 				light_framerate_killer();
 			}

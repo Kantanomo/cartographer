@@ -473,7 +473,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	static bool resetAfterMatch = false;
 
 	// set the light suppressor flag to false
-	if (H2Config_light_suppressor)
+	if (cartographer_settings.game.video.light_suppressor)
 	{
 		WriteValue(Memory::GetAddress(0x41F6B1), 0);
 	}
@@ -960,7 +960,7 @@ void H2MOD::ApplyHooks() {
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
 
 	//Disable lightsupressor function
-	if (H2Config_light_suppressor)
+	if (cartographer_settings.game.video.light_suppressor)
 	{
 		NopFill(Memory::GetAddress(0x1922d9), 7);
 	}
