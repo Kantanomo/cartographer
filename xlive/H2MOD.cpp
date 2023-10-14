@@ -755,7 +755,7 @@ get_enabled_teams_flags_t p_get_enabled_teams_flags;
 short __cdecl get_enabled_team_flags(s_network_session* session)
 {
 	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
-	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
+	short new_teams_enabled_flags = (default_teams_enabled_flags & cartographer_settings.server.enabled_team_bit_flags);
 	const short red_versus_blue_teams = FLAG(_game_team_red) | FLAG(_game_team_blue);
 	const short infection_teams = FLAG(_game_team_red) | FLAG(_game_team_green);
 
@@ -835,9 +835,9 @@ bool __cdecl should_start_pregame_countdown_hook()
 		return false; 
 
 	bool minimumPlayersConditionMet = true;
-	if (H2Config_minimum_player_start > 0)
+	if (cartographer_settings.server.minimum_player_start > 0)
 	{
-		if (NetworkSession::GetPlayerCount() >= H2Config_minimum_player_start)
+		if (NetworkSession::GetPlayerCount() >= cartographer_settings.server.minimum_player_start)
 		{
 			LOG_INFO_GAME(L"{} - minimum Player count met", __FUNCTIONW__);
 			minimumPlayersConditionMet = true;
@@ -852,7 +852,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 	if (!minimumPlayersConditionMet)
 		return false;
 
-	if (H2Config_even_shuffle_teams
+	if (cartographer_settings.server.shuffle_even_teams
 		&& NetworkSession::IsVariantTeamPlay())
 	{
 		std::mt19937 mt_rand(rd());
@@ -929,7 +929,7 @@ void H2MOD::RegisterEvents()
 	{
 		// Server only callbacks
 		// Setup Events for H2Config_vip_lock
-		if (H2Config_vip_lock)
+		if (cartographer_settings.server.vip_lock)
 			EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 	}
 	else 

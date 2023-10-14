@@ -21,32 +21,8 @@ std::string H2ConfigVersionSection("H2ConfigurationVersion:" + H2ConfigVersionNu
 std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
-char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
-char H2Config_dedi_server_playlist[256] = { "" };
-int H2Config_additional_pcr_time = 25;
-char H2Config_login_identifier[255] = { "" };
-char H2Config_login_password[255] = { "" };
-int H2Config_minimum_player_start = 0;
-char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
-bool H2Config_team_flag_array[8];
-short H2Config_team_bit_flags = 0xFF;
-char H2Config_stats_authkey[32 + 1] = { "" };
-bool H2Config_vip_lock = false;
-bool H2Config_even_shuffle_teams = false;
-bool H2Config_koth_random = true;
-bool H2Config_anti_cheat_enabled = true;
-
-
-
-#ifndef NDEBUG
-int H2Config_forced_event = 0;
-#endif
-
-
 bool ownsConfigFile = false;
 bool H2Config_isConfigFileAppDataLocal = false;
-
-
 
 void SaveH2Config() {
 	addDebugText("Saving H2Configuration File...");
@@ -351,7 +327,6 @@ void UpgradeConfig()
 				json["server"].set("minimum_player_start", ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", cartographer_settings.server.minimum_player_start));
 				json["server"].set("vip_lock", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", cartographer_settings.server.vip_lock));
 				json["server"].set("shuffle_even_teams", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shuffle_even_teams", cartographer_settings.server.shuffle_even_teams));
-				json["server"].set("koth_random", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", cartographer_settings.server.koth_random));
 				json["server"].set("login_identifier", login_identifier);
 				json["server"].set("login_password", login_password);
 				json["server"].set("teams_enabled_bit_flags", team_bit_mask);

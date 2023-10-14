@@ -188,7 +188,6 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 		json["server"].get_ds("minimum_player_start", &settings->server.minimum_player_start);
 		json["server"].get_ds("vip_lock", &settings->server.vip_lock);
 		json["server"].get_ds("shuffle_even_teams", &settings->server.shuffle_even_teams);
-		json["server"].get_ds("koth_random", &settings->server.koth_random);
 		json["server"].get_ds("enable_anti_cheat", &settings->server.enable_anti_cheat);
 
 		auto team_bit_mask = json["server"].get<std::string>("teams_enabled_bit_flags", settings->server.enabled_teams_bit_str);
@@ -300,7 +299,6 @@ void s_cartographer_settings::save(easy_json_struct<s_cartographer_settings>& js
 		json["server"].set("minimum_player_start", settings->server.minimum_player_start);
 		json["server"].set("vip_lock", settings->server.vip_lock);
 		json["server"].set("shuffle_even_teams", settings->server.shuffle_even_teams);
-		json["server"].set("koth_random", settings->server.koth_random);
 		json["server"].set("enable_anti_cheat", settings->server.enable_anti_cheat);
 		json["server"].set("teams_enabled_bit_flags", settings->server.enabled_teams_bit_str);
 	}

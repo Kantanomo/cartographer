@@ -104,7 +104,6 @@ struct s_cartographer_server_settings {
 	int minimum_player_start = 0;
 	bool vip_lock = false;
 	bool shuffle_even_teams = false;
-	bool koth_random = true;
 	char enabled_teams_bit_str[16] = "1-1-1-1-1-1-1-1";
 	short enabled_team_bit_flags = 0xFF;
 	bool enabled_team_flag_array[8];

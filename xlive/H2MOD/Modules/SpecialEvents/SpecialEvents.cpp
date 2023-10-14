@@ -77,8 +77,8 @@ e_special_event_type get_current_special_event()
 		return _no_event;
 
 #ifndef NDEBUG
-	if (H2Config_forced_event != _no_event)
-		return (e_special_event_type)H2Config_forced_event;
+	if (cartographer_settings.development.forced_event != _no_event)
+		return cartographer_settings.development.forced_event;
 #endif
 	if (check_special_event_week(L"3-17"))
 		return _st_paddys;

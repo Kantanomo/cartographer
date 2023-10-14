@@ -157,7 +157,7 @@ void CartographerMainLoop() {
 	}
 	if(H2IsDediServer)
 	{
-		StatsHandler::playerRanksUpdateTick();
+		//StatsHandler::playerRanksUpdateTick();
 	}
 	//EventHandler::executeGameLoopCallbacks();
 	/*
@@ -166,8 +166,8 @@ void CartographerMainLoop() {
 		halo2ServerOnce1 = true;
 		pushHostLobby();
 		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
-		if (strlen(H2Config_dedi_server_name) > 0) {
-			swprintf(LanServerName, 32, L"%hs", H2Config_dedi_server_name);
+		if (strlen(cartographer_settings.server.server_name) > 0) {
+			swprintf(LanServerName, 32, L"%hs", cartographer_settings.server.server_name);
 		}
 	}
 

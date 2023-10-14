@@ -859,7 +859,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 			document["pProperties"].PushBack(property, docAllocator);
 		}
 
-		const char* name = strnlen_s(H2Config_dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? H2Config_dedi_server_name : usersSignInInfo[dwUserIndex].szUserName;
+		const char* name = strnlen_s(cartographer_settings.server.server_name, XUSER_MAX_NAME_LENGTH) > 0 ? cartographer_settings.server.server_name : usersSignInInfo[dwUserIndex].szUserName;
 
 		/* For whatever reason the game is currently refusing to send the servername or player profile name so we're going to send it ourselves.*/
 		Value serv_name_property(kObjectType);

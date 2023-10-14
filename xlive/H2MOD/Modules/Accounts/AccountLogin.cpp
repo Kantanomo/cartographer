@@ -495,7 +495,7 @@ HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD d
 		//currently credentials are taken from the config file.
 		//also don't enable this since nothing's initialised for the server.
 		addDebugText("Signing in dedicated server online.");
-		if (HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password, nullptr))
+		if (HandleGuiLogin(0, cartographer_settings.server.login_identifier, cartographer_settings.server.login_password, nullptr))
 		{
 			XUserSignInSetStatusChanged(0);
 		}

@@ -24,9 +24,9 @@ hookServ1_t p_hookServ1;
 int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 	char result = p_hookServ1(hKey, lpSubKey);
 	addDebugText("Post Server Registry Read.");
-	if (strlen(H2Config_dedi_server_playlist) > 0) {
+	if (strlen(cartographer_settings.server.playlist) > 0) {
 		wchar_t* ServerPlaylist = Memory::GetAddress<wchar_t*>(0, 0x3B3704);
-		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
+		swprintf(ServerPlaylist, 256, L"%hs", cartographer_settings.server.playlist);
 	}
 	return result;
 }
@@ -253,7 +253,7 @@ void H2Tweaks::ApplyPatches() {
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
 
 		// set the additional pcr time
-		WriteValue<BYTE>(Memory::GetAddress(0, 0xE590) + 2, H2Config_additional_pcr_time);
+		WriteValue<BYTE>(Memory::GetAddress(0, 0xE590) + 2, cartographer_settings.server.additional_pcr_time);
 
 		// fix human turret variant setting not working on dedicated servers
 		WriteValue<int>(Memory::GetAddress(0x0, 0x3557FC), 1);

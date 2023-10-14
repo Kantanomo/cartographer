@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_dx9.h"
 #include "backends/imgui_impl_win32.h"
+#include "Blam/Cartographer/Settings/Setting.h"
 
 #include "Blam/Engine/game/game.h"
 
@@ -634,7 +635,7 @@ HRESULT WINAPI XLiveRender()
 		}
 		drawText(0, 15, masterStateColor, GetMasterStateStr(), smallFont);
 
-		if (H2Config_anti_cheat_enabled)
+		if (cartographer_settings.server.enable_anti_cheat)
 			drawText(0, 30, COLOR_GREEN, "Anti-Cheat: Enabled", smallFont);
 		else
 			drawText(0, 30, COLOR_RED, "Anti-Cheat: Disabled", smallFont);

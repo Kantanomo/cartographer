@@ -674,7 +674,7 @@ namespace ImGuiHandler {
 						ImGui::Columns(2, NULL, false);
 						TextVerticalPad(GetString(anti_cheat));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						if (ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
+						if (ImGui::Checkbox("##Anti-Cheat", &cartographer_settings.server.enable_anti_cheat))
 						{
 							for (int i = 0; i < NetworkSession::GetPeerCount(); i++)
 							{
@@ -1044,33 +1044,33 @@ namespace ImGuiHandler {
 						}
 						ImGui::Columns(1);
 					}
-					static int event_type = H2Config_forced_event;
+					static int event_type = cartographer_settings.development.forced_event;
 					if (ImGui::CollapsingHeader("Events"))
 					{
 						if (ImGui::RadioButton("None", &event_type, e_special_event_type::_no_event))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_no_event;
+							cartographer_settings.development.forced_event = e_special_event_type::_no_event;
 						} ImGui::SameLine();
 						if (ImGui::RadioButton("Christmas", &event_type, e_special_event_type::_christmas))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_christmas;
+							cartographer_settings.development.forced_event = e_special_event_type::_christmas;
 						} ImGui::SameLine();
 						if (ImGui::RadioButton("St Paddys", &event_type, e_special_event_type::_st_paddys))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_st_paddys;
+							cartographer_settings.development.forced_event = e_special_event_type::_st_paddys;
 						} ImGui::SameLine();
 						if (ImGui::RadioButton("Mook Madness", &event_type, e_special_event_type::_mook_maddness))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_mook_maddness;
+							cartographer_settings.development.forced_event = e_special_event_type::_mook_maddness;
 						}
 
 						if (ImGui::RadioButton("Halloween", &event_type, e_special_event_type::_halloween))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_halloween;
+							cartographer_settings.development.forced_event = e_special_event_type::_halloween;
 						}ImGui::SameLine();
 						if (ImGui::RadioButton("Birthday", &event_type, e_special_event_type::_birthday))
 						{
-							H2Config_forced_event = (int)e_special_event_type::_birthday;
+							cartographer_settings.development.forced_event = e_special_event_type::_birthday;
 						}
 
 					}

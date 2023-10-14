@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "NetworkMessageTypeCollection.h"
+
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/memory/bitstream.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -238,7 +240,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
 		{
 			s_anti_cheat* recieved_data = (s_anti_cheat*)packet;
-			H2Config_anti_cheat_enabled = recieved_data->enabled;
+			cartographer_settings.server.enable_anti_cheat = recieved_data->enabled;
 		}
 		break;
 	}
@@ -369,7 +371,7 @@ void NetworkMessage::SendAntiCheat(int peerIdx)
 		s_session_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peerIdx);
 
 		s_anti_cheat data;
-		data.enabled = H2Config_anti_cheat_enabled;
+		data.enabled = cartographer_settings.server.enable_anti_cheat;
 		if (peerIdx != -1 && !NetworkSession::IsPeerIndexLocal(peerIdx)) {
 			if (observer_channel->field_1) {
 				observer->sendNetworkMessage(session->session_index, observer_channel->observer_index, s_network_observer::e_network_message_send_protocol::in_band, _anti_cheat, sizeof(s_anti_cheat), &data);
