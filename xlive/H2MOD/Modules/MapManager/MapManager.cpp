@@ -450,7 +450,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 			return false;
 		}
 
-		std::string url(k_cartographer_maps_repo_url);
+		std::string url(K_CARTOGRAPHER_MAPS_REPO_URL);
 		char *url_encoded_map_filename = curl_easy_escape(curl, m_clientMapFilename.c_str(), m_clientMapFilename.length());
 		url += url_encoded_map_filename;
 		curl_free(url_encoded_map_filename);

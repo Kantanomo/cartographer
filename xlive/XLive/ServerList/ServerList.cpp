@@ -441,7 +441,7 @@ void CServerList::EnumerateFromHttp()
 		return;
 	}
 
-	curl_easy_setopt(curl, CURLOPT_URL, k_cartographer_server_list_url);
+	curl_easy_setopt(curl, CURLOPT_URL, K_CARTOGRAPHER_SERVER_LIST_URL);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &m_serverListToDownload);
 	curl_res = curl_easy_perform(curl);
@@ -532,7 +532,7 @@ void CServerList::EnumerateFromHttp()
 
 			auto& itemQuery = itemsToDownloadQuery[serverQueryIdx++];
 
-			std::string server_url = std::string(k_cartographer_server_get_url) + xuidStrItr->GetString();
+			std::string server_url = std::string(K_CARTOGRAPHER_SERVER_GET_URL) + xuidStrItr->GetString();
 
 			// server_url is copied to another buffer when setting CURLOPT_URL
 			curl_easy_setopt(itemQuery.first, CURLOPT_URL, server_url.c_str());
@@ -647,7 +647,7 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 	if (curl) {
 		rapidjson::Document document;
 
-		curl_easy_setopt(curl, CURLOPT_URL, k_cartographer_dedicated_count);
+		curl_easy_setopt(curl, CURLOPT_URL, K_CARTOGRAPHER_DEDICATED_COUNT);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);
@@ -761,7 +761,7 @@ void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, k_cartographer_server_delete_url);
+		curl_easy_setopt(curl, CURLOPT_URL, K_CARTOGRAPHER_SERVER_DELETE_URL);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer.GetString());
@@ -875,7 +875,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
 
-		curl_easy_setopt(curl, CURLOPT_URL, k_cartographer_server_add_url);
+		curl_easy_setopt(curl, CURLOPT_URL, K_CARTOGRAPHER_SERVER_ADD_URL);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, BasicStrDownloadCb);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
