@@ -51,7 +51,32 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 		json["game"].get_ds("skeleton_biped", &settings->game.skeleton_biped);
 
 		json["game"]["video"].get_ds("fps_limit", &settings->game.video.fps_limit);
-		json["game"]["video"].get_ds("static_lod_scale", &settings->game.video.static_lod_scale);
+		//json["game"]["video"].get_ds("static_lod_scale", &settings->game.video.static_lod_scale);
+		switch (json["game"]["video"].get<int>("static_lod_scale", 0))
+		{
+		default:
+		case 0:
+			settings->game.video.static_lod_scale = lod_disable;
+			break;
+		case 1:
+			settings->game.video.static_lod_scale = lod_super_low;
+			break;
+		case 2:
+			settings->game.video.static_lod_scale = lod_low;
+			break;
+		case 3:
+			settings->game.video.static_lod_scale = lod_medium;
+			break;
+		case 4:
+			settings->game.video.static_lod_scale = lod_high;
+			break;
+		case 5:
+			settings->game.video.static_lod_scale = lod_super_high;
+			break;
+		case 6:
+			settings->game.video.static_lod_scale = lod_cinematic;
+			break;
+		}
 		json["game"]["video"].get_ds("field_of_view", &settings->game.video.field_of_view);
 		json["game"]["video"].get_ds("vehicle_field_of_view", &settings->game.video.vehicle_field_of_view);
 		json["game"]["video"].get_ds("static_fp_fov", &settings->game.video.static_fp_fov);
@@ -229,7 +254,7 @@ void s_cartographer_settings::save(easy_json_struct<s_cartographer_settings>& js
 		json["game"].set("skeleton_biped", settings->game.skeleton_biped);
 
 		json["game"]["video"].set("fps_limit", settings->game.video.fps_limit);
-		json["game"]["video"].set("static_lod_scale", settings->game.video.static_lod_scale);
+		json["game"]["video"].set("static_lod_scale", (int)settings->game.video.static_lod_scale);
 		json["game"]["video"].set("field_of_view", settings->game.video.field_of_view);
 		json["game"]["video"].set("vehicle_field_of_view", settings->game.video.vehicle_field_of_view);
 		json["game"]["video"].set("static_fp_fov", settings->game.video.static_fp_fov);

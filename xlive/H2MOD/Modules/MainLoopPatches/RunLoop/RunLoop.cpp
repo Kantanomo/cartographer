@@ -220,7 +220,7 @@ void __cdecl rasterizer_present_hook(int a1) {
 	auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
 
 	p_rasterizer_present(a1);
-	XLiveThrottleFramerate(H2Config_fps_limit);
+	XLiveThrottleFramerate(cartographer_settings.game.video.fps_limit);
 }
 
 typedef void(_cdecl* main_loop_body_t)();
@@ -513,7 +513,7 @@ int update_bsp = 0x4A16D;
 
 float __cdecl fps_get_seconds_per_frame()
 {
-	return (1.0f / H2Config_fps_limit);
+	return (1.0f / cartographer_settings.game.video.fps_limit);
 }
 void __cdecl alt_main_game_loop_hook()
 {
@@ -536,10 +536,10 @@ void __cdecl alt_main_game_loop_hook()
 		//game_main_loop();
 		//main_game_loop();
 	}
-	if (H2Config_fps_limit != 0) {
+	if (cartographer_settings.game.video.fps_limit != 0) {
 		QueryPerformanceCounter(&end_render);
 		render_time = static_cast<double>(end_render.QuadPart - start_render.QuadPart) / freq.QuadPart;
-		if (render_time >= (1.0f / H2Config_fps_limit)) {
+		if (render_time >= (1.0f / cartographer_settings.game.video.fps_limit)) {
 			QueryPerformanceCounter(&start_render);
 			EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
 			game_main_loop();

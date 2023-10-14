@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "Mouseinput.h"
+
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/game_time.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Hook.h"
@@ -22,7 +24,7 @@ mouse_input_t* p_mouse_input;
 char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7)
 {
 	time_globals* time = time_globals::get();
-	if (H2Config_raw_input)
+	if (cartographer_settings.game.input.raw_mouse_input)
 	{
 		if (!rawInputInit) {
 			MouseInput::SetSensitivity(1.0f);
@@ -57,7 +59,7 @@ void MouseInput::SetSensitivity(float value)
 {
 	if (value == 0.0f)
 		return;
-	if (H2Config_raw_input)
+	if (cartographer_settings.game.input.raw_mouse_input)
 		value = 1.0f;
 
 	value = blam_max(value - 1.0f, 0.0f);

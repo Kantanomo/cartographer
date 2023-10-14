@@ -46,6 +46,7 @@ namespace ImGuiHandler {
 			int g_experimental = 0;
 			bool g_init = false;
 			int g_language_code = -1;
+			int g_lod_state = 0;
 
 			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
 			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
@@ -264,20 +265,20 @@ namespace ImGuiHandler {
 					ImGui::Columns(2, NULL, false);
 					ImGui::Text(GetString(fps_limit));
 					ImGui::PushItemWidth(WidthPercentage(50));
-					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110);
+					ImGui::InputInt("##FPS1", &cartographer_settings.game.video.fps_limit, 0, 110);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(fps_limit_tooltip));
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_fps_limit < 10)
-							H2Config_fps_limit = 10;
-						if (H2Config_fps_limit > 144)
-							H2Config_fps_limit = 144;
+						if (cartographer_settings.game.video.fps_limit < 10)
+							cartographer_settings.game.video.fps_limit = 10;
+						if (cartographer_settings.game.video.fps_limit > 144)
+							cartographer_settings.game.video.fps_limit = 144;
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(50), item_size.y)))
 					{
-						H2Config_fps_limit = 60;
+						cartographer_settings.game.video.fps_limit = 60;
 					}
 					ImGui::NextColumn();
 					ImGui::PopItemWidth();
@@ -295,7 +296,10 @@ namespace ImGuiHandler {
 					ImGui::Text(GetString(lod));
 					const char* items[] = { GetString(e_default), GetString(lod_1), GetString(lod_2), GetString(lod_3), GetString(lod_4), GetString(lod_5), GetString(lod_6) };
 					ImGui::PushItemWidth(WidthPercentage(100));
-					ImGui::Combo("##LOD", &H2Config_static_lod_state, items, 7);
+					if(ImGui::Combo("##LOD", &g_lod_state, items, 7))
+					{
+						cartographer_settings.game.video.static_lod_scale = (e_static_lod)g_lod_state;
+					}
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(lod_tooltip));
 
@@ -356,7 +360,7 @@ namespace ImGuiHandler {
 					//Raw Input
 					TextVerticalPad(GetString(raw_mouse));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##RawMouse", &H2Config_raw_input);
+					ImGui::Checkbox("##RawMouse", &cartographer_settings.game.input.raw_mouse_input);
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::SetTooltip(GetString(raw_mouse_tooltip));
@@ -375,7 +379,7 @@ namespace ImGuiHandler {
 						ImGui::SetTooltip(GetString(uniform_sensitivity_tooltip));
 					}
 					ImGui::Columns(1);
-					if (H2Config_raw_input) {
+					if (cartographer_settings.game.input.raw_mouse_input) {
 						ImGui::Text(GetString(raw_mouse_sensitivity));
 						ImGui::PushItemWidth(WidthPercentage(75));
 						int g_raw_scale = (int)H2Config_raw_mouse_scale;
@@ -824,7 +828,7 @@ namespace ImGuiHandler {
 
 					TextVerticalPad(GetString(discord_presence));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##DRP", &H2Config_discord_enable);
+					ImGui::Checkbox("##DRP", &cartographer_settings.discord_enable);
 
 					TextVerticalPad(GetString(upnp_title));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
@@ -930,6 +934,7 @@ namespace ImGuiHandler {
 				g_experimental = (int)cartographer_settings.game.video.experimental_rendering;
 				if (g_language_code == -1)
 					g_language_code = 8;
+				g_lod_state = (int)cartographer_settings.game.video.static_lod_scale;
 				g_init = true;
 			}
 

@@ -2,6 +2,7 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/game/game.h"
@@ -643,10 +644,10 @@ __declspec(naked) void calculate_model_lod_detour()
 		// todo check if this is needed when using a static LOD, might save on some processor time
 		call calculate_model_lod
 
-		cmp H2Config_static_lod_state, 0
+		cmp cartographer_settings.game.video.static_lod_scale, 0
 		jz END_DETOUR
 
-		mov eax, H2Config_static_lod_state
+		mov eax, cartographer_settings.game.video.static_lod_scale
 		sub eax, 1 // convert setting to in-game model LOD value (0 - 5, L1 - L6)
 
 		END_DETOUR:

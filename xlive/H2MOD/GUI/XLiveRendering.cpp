@@ -739,7 +739,7 @@ HRESULT WINAPI XLiveRender()
 
 	// limit framerate if needed
 	// UPDATE: frame limiting in XLiveRender adds input lag
-	// XLiveThrottleFramerate(H2Config_fps_limit);
+	// XLiveThrottleFramerate(cartographer_settings.game.video.fps_limit);
 
 	return S_OK;
 }

@@ -22,10 +22,20 @@ enum e_override_texture_resolution : int
 	tex_high,
 	tex_ultra
 };
+enum e_static_lod : DWORD
+{
+	lod_disable = 0,
+	lod_super_low,
+	lod_low,
+	lod_medium,
+	lod_high,
+	lod_super_high,
+	lod_cinematic
+};
 
 struct s_cartographer_video_settings {
 	int fps_limit = 60;
-	int static_lod_scale = 0;
+	e_static_lod static_lod_scale = lod_disable;
 	int field_of_view = 78;
 	int vehicle_field_of_view = 78;
 	bool static_fp_fov = false;

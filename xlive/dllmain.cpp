@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/Shell/Shell.h"
@@ -56,7 +57,7 @@ void HeapDebugInitialize()
 void DiscordInitialize()
 {
 	if (Memory::IsDedicatedServer()
-		|| !H2Config_discord_enable
+		|| !cartographer_settings.discord_enable
 		|| _Shell::GetInstanceId() > 1)
 		return;
 
