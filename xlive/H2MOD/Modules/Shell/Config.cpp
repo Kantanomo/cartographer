@@ -16,16 +16,12 @@ const wchar_t* H2ConfigJsonFilenames[] = { L"%wshalo2config%d.json", L"%wsh2serv
 std::string H2ConfigVersionNumber("1");
 std::string H2ConfigVersionSection("H2ConfigurationVersion:" + H2ConfigVersionNumber);
 
-unsigned long H2Config_master_ip = inet_addr("149.56.81.89");
-unsigned short H2Config_master_port_login = 27020;
-unsigned short H2Config_master_port_relay = 1001;
 
 //config variables
 
 std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
-bool H2Config_skip_intro = false;
 bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
 //bool H2Config_controller_aim_assist = true;

@@ -607,8 +607,8 @@ void pushHostLobby() {
 			addDebugText("ERROR: Could not create socket.");
 		}
 		serverAddress.sin_family = AF_INET;
-		serverAddress.sin_addr.s_addr = H2Config_master_ip;
-		serverAddress.sin_port = htons(H2Config_master_port_relay);
+		serverAddress.sin_addr.s_addr = cartographer_settings.master_server_ip;
+		serverAddress.sin_port = htons(cartographer_settings.master_server_relay_port);
 
 		if (sendto(socketDescriptor, msg, strlen(&msg[3]) + 3, 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) <= 0) {
 			//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)

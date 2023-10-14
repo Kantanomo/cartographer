@@ -23,7 +23,7 @@ enum e_override_texture_resolution : int
 	tex_ultra
 };
 
-struct s_video_settings {
+struct s_cartographer_video_settings {
 	int fps_limit = 60;
 	int static_lod_scale = 0;
 	int field_of_view = 78;
@@ -40,7 +40,7 @@ struct s_video_settings {
 	e_override_texture_resolution override_water = tex_default;
 };
 
-struct s_hud_settings {
+struct s_cartographer_hud_settings {
 	float crosshair_scale = 1.0;
 	bool hide_ingame_chat = false;
 	float crosshair_offset = 0.138;
@@ -53,7 +53,7 @@ enum e_controller_deadzone_type : uint8 {
 	both_deadzone
 };
 
-struct s_input_settings {
+struct s_cartographer_input_settings {
 	bool raw_mouse_input = false;
 	float mouse_raw_scale = 25.0;
 	bool mouse_uniform_sens = false;
@@ -75,18 +75,18 @@ struct s_input_settings {
 	ControllerInput::CustomControllerLayout controller_layout = "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768";
 };
 
-struct s_game_settings {
+struct s_cartographer_game_settings {
 	bool skip_intro = false;
 	bool melee_fix = true;
 	bool no_events = false;
 	bool skeleton_biped = true;
 
-	s_video_settings video;
-	s_hud_settings hud;
-	s_input_settings input;
+	s_cartographer_video_settings video;
+	s_cartographer_hud_settings hud;
+	s_cartographer_input_settings input;
 };
 
-struct s_server_settings {
+struct s_cartographer_server_settings {
 	char server_name[XUSER_NAME_SIZE] = "A Halo 2 Server";
 	char playlist[256] = { "" };
 	char login_identifier[255] = { "" };
@@ -102,7 +102,7 @@ struct s_server_settings {
 	bool enable_anti_cheat = true;
 };
 
-struct s_development_settings {
+struct s_cartographer_development_settings {
 	e_special_event_type forced_event = _no_event;
 };
 
@@ -117,14 +117,19 @@ public:
 	bool debug_log_console = false;
 	bool language_label_capture = false;
 	bool discord_enable = true;
-	char lan_ip_str[16] = { "" };
+	char lan_ip_str[16] = "";
 	unsigned long lan_ip = 0;
-	char wan_ip_str[16] = { "" };
+	char wan_ip_str[16] = "";
 	unsigned long wan_ip = 0;
+
+	unsigned long master_server_ip = inet_addr("149.56.81.89");
+	unsigned short master_server_login_port = 27020;
+	unsigned short master_server_relay_port = 1001;
+
 	s_language_code language_code = { -1,0 };
-	s_game_settings game;
-	s_server_settings server;
-	s_development_settings development;
+	s_cartographer_game_settings game;
+	s_cartographer_server_settings server;
+	s_cartographer_development_settings development;
 
 	void load(easy_json_struct<s_cartographer_settings>& json) override;
 	void save(easy_json_struct<s_cartographer_settings>& json) override;

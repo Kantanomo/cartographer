@@ -218,13 +218,13 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE || strcmp(tempstr1, "255.255.255.255") == 0) {
 				//addDebugText("H2 master relay IP is: %s", tempstr1);
-				H2Config_master_ip = resolvedAddr;
+				cartographer_settings.master_server_ip = resolvedAddr;
 			}
 		}
 		else if (sscanf(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
 			if (tempint1 >= 0) {
 				//addDebugText("H2 master relay port is: %d", tempint1);
-				H2Config_master_port_relay = tempint1;
+				cartographer_settings.master_server_relay_port = tempint1;
 			}
 		}
 		else if (strstr(fileLine, "login_token=")) {
@@ -318,7 +318,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		return result;
 	}
 
-	int user_configure_result = ConfigureUserDetails(username, login_token, xuid, xnaddr, H2Config_ip_lan, machineUID, abOnline, true, result == 4);
+	int user_configure_result = ConfigureUserDetails(username, login_token, xuid, xnaddr, cartographer_settings.lan_ip, machineUID, abOnline, true, result == 4);
 	if (user_configure_result != 0) {
 		//allow no login_token from backend in DB emergencies / random logins.
 		if (user_configure_result == 1) {

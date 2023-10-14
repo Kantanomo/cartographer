@@ -9,6 +9,7 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include "../CustomLanguage.h"
+#include "Blam/Cartographer/Settings/Setting.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 
@@ -171,12 +172,12 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 		XNetRandom(abEnet, sizeof(abEnet));
 		XNetRandom(abOnline, sizeof(abOnline));
 		accountRemoveMode = false;
-		if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false)) {
+		if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, cartographer_settings.lan_ip, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false)) {
 			//show select profile gui
 			extern int notify_xlive_ui;
 			notify_xlive_ui = 0;
-			H2Config_master_ip = inet_addr("127.0.0.1");
-			H2Config_master_port_relay = 2001;
+			cartographer_settings.master_server_ip = inet_addr("127.0.0.1");
+			cartographer_settings.master_server_relay_port = 2001;
 			close_parent_screen = true;
 			XUserSignInSetStatusChanged(0);
 		}

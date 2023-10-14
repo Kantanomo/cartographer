@@ -853,7 +853,7 @@ namespace ImGuiHandler {
 					ImGui::NextColumn();
 					TextVerticalPad(GetString(disable_intro_videos));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##Intro", &H2Config_skip_intro);
+					ImGui::Checkbox("##Intro", &cartographer_settings.game.skip_intro);
 
 #if 0
 					ImGui::NextColumn();

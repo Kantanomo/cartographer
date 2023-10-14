@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Tweaks.h"
 
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/rasterizer/rasterizer_settings.h"
@@ -90,8 +91,8 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 		//boot them offline.
 		XUserSignOut(0);
 		UpdateMasterLoginStatus();
-		H2Config_master_ip = inet_addr("127.0.0.1");
-		H2Config_master_port_relay = 2001;
+		cartographer_settings.master_server_ip = inet_addr("127.0.0.1");
+		cartographer_settings.master_server_relay_port = 2001;
 	}
 	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
 	return result;
@@ -265,7 +266,7 @@ void H2Tweaks::ApplyPatches() {
 
 		bool IntroHQ = true;//clients should set on halo2.exe -highquality
 
-		if (!H2Config_skip_intro && IntroHQ) {
+		if (!cartographer_settings.game.skip_intro && IntroHQ) {
 			BYTE assmIntroHQ[] = { 0xEB };
 			WriteBytes(Memory::GetAddress(0x221C29), assmIntroHQ, 1);
 		}

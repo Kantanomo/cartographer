@@ -24,17 +24,8 @@ struct _H2Config_language {
 extern std::string cartographerURL;
 extern std::string cartographerMapRepoURL;
 
-extern unsigned long H2Config_master_ip;
-extern unsigned short H2Config_master_port_login;
-extern unsigned short H2Config_master_port_relay;
-
 extern bool H2Config_isConfigFileAppDataLocal;
-extern char H2Config_str_wan[16];
-extern char H2Config_str_lan[16];
-extern unsigned long H2Config_ip_wan;
-extern unsigned long H2Config_ip_lan;
 
-extern bool H2Config_skip_intro;
 extern bool H2Config_raw_input;
 extern bool H2Config_discord_enable;
 extern bool H2Config_controller_aim_assist;

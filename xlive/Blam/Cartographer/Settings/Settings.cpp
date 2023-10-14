@@ -16,6 +16,20 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 	json["cartographer"].get_ds("debug_log_console", &settings->debug_log_console);
 	json["cartographer"].get_ds("language_label_capture", &settings->language_label_capture);
 	json["cartographer"].get_ds("discord_enable", &settings->discord_enable);
+	const auto wan_ip = json["cartographer"].get<const char*>("wan_ip", "");
+	const auto lan_ip = json["cartographer"].get<const char*>("lan_ip", "");
+
+	if (strnlen_s(wan_ip, 15) >= 7 && inet_addr(wan_ip) != INADDR_NONE)
+	{
+		strncpy(settings->wan_ip_str, wan_ip, 15);
+		settings->wan_ip = inet_addr(settings->wan_ip_str);
+	}
+
+	if (strnlen_s(lan_ip, 15) >= 7 && inet_addr(lan_ip) != INADDR_NONE)
+	{
+		strncpy(settings->lan_ip_str, lan_ip, 15);
+		settings->lan_ip = inet_addr(settings->lan_ip_str);
+	}
 
 	auto language_code = json["cartographer"].get<std::string>("language_code", "-1x0");
 	if (!language_code.empty())
@@ -203,8 +217,11 @@ void s_cartographer_settings::save(easy_json_struct<s_cartographer_settings>& js
 	json["cartographer"].set("debug_log_console", settings->debug_log_console);
 	json["cartographer"].set("language_label_capture", settings->language_label_capture);
 	json["cartographer"].set("discord_enable", settings->discord_enable);
+	json["cartographer"].set("wan_ip", settings->wan_ip_str);
+	json["cartographer"].set("lan_ip", settings->wan_ip_str);
 	std::string lang_str(std::to_string(settings->language_code.code_main) + "x" + std::to_string(settings->language_code.code_variant));
 	json["cartographer"].set("language_code", lang_str);
+
 	if (!H2IsDediServer) {
 		json["game"].set("skip_intro", settings->game.skip_intro);
 		json["game"].set("melee_fix", settings->game.melee_fix);

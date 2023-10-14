@@ -2,6 +2,7 @@
 
 #include "WinMainH2.h"
 
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -122,7 +123,7 @@ bool engine_basic_init()
 	ZeroMemory(flags_array, e_startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
 
 	H2Config_voice_chat = false;
-	flags_array[e_startup_flags::nointro] = H2Config_skip_intro;
+	flags_array[e_startup_flags::nointro] = cartographer_settings.game.skip_intro;
 
 	void(__cdecl * fn_c000285fd)() = (void(__cdecl*)())Memory::GetAddress<void*>(0x000285fd);
 
