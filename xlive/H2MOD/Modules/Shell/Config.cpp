@@ -21,8 +21,6 @@ std::string H2ConfigVersionSection("H2ConfigurationVersion:" + H2ConfigVersionNu
 std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
-float H2Config_crosshair_offset = NAN;
-bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
 bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
@@ -43,7 +41,6 @@ bool H2Config_even_shuffle_teams = false;
 bool H2Config_koth_random = true;
 bool H2Config_anti_cheat_enabled = true;
 
-float H2Config_crosshair_scale = 1.0f;
 
 
 bool H2Config_upnp_enable = true;

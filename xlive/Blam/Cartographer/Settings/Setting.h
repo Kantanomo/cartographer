@@ -51,7 +51,7 @@ struct s_cartographer_video_settings {
 struct s_cartographer_hud_settings {
 	float crosshair_scale = 1.0;
 	bool hide_ingame_chat = false;
-	float crosshair_offset = 0.138;
+	float crosshair_offset = NAN;
 };
 
 

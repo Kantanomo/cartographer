@@ -26,8 +26,6 @@ extern std::string cartographerMapRepoURL;
 
 extern bool H2Config_isConfigFileAppDataLocal;
 
-extern float H2Config_crosshair_offset;
-extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
 extern bool H2Config_voice_chat;
 extern char H2Config_dedi_server_name[XUSER_NAME_SIZE];
@@ -48,7 +46,6 @@ extern bool H2Config_anti_cheat_enabled;
 
 extern int H2Config_minimum_player_start;
 
-extern float H2Config_crosshair_scale;
 
 extern bool H2Config_upnp_enable;
 extern bool H2Config_melee_fix;

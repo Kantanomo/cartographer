@@ -182,47 +182,47 @@ namespace ImGuiHandler {
 					//Crosshair Offset
 					ImGui::Text(GetString(crosshair_offset));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderFloat("##Crosshair1", &H2Config_crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
+					ImGui::SliderFloat("##Crosshair1", &cartographer_settings.game.hud.crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						set_crosshair_offset(H2Config_crosshair_offset);
+						set_crosshair_offset(cartographer_settings.game.hud.crosshair_offset);
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputFloat("##Crosshair2", &H2Config_crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
+					ImGui::InputFloat("##Crosshair2", &cartographer_settings.game.hud.crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_crosshair_offset > 0.5)
-							H2Config_crosshair_offset = 0.5;
-						if (H2Config_crosshair_offset < 0)
-							H2Config_crosshair_offset = 0;
+						if (cartographer_settings.game.hud.crosshair_offset > 0.5)
+							cartographer_settings.game.hud.crosshair_offset = 0.5;
+						if (cartographer_settings.game.hud.crosshair_offset < 0)
+							cartographer_settings.game.hud.crosshair_offset = 0;
 
-						set_crosshair_offset(H2Config_crosshair_offset);
+						set_crosshair_offset(cartographer_settings.game.hud.crosshair_offset);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "Crosshair3"), b2_size))
 					{
-						H2Config_crosshair_offset = 0.138f;
-						set_crosshair_offset(H2Config_crosshair_offset);
+						cartographer_settings.game.hud.crosshair_offset = 0.138f;
+						set_crosshair_offset(cartographer_settings.game.hud.crosshair_offset);
 					}
 					ImGui::PopItemWidth();
 
 					//Crosshair Size
 					ImGui::Text(GetString(crosshair_size));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderFloat("##CrosshairSize1", &H2Config_crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
+					ImGui::SliderFloat("##CrosshairSize1", &cartographer_settings.game.hud.crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						set_crosshair_scale(H2Config_crosshair_scale);
+						set_crosshair_scale(cartographer_settings.game.hud.crosshair_scale);
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputFloat("##CrosshairSize2", &H2Config_crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
+					ImGui::InputFloat("##CrosshairSize2", &cartographer_settings.game.hud.crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_crosshair_scale > 2)
-							H2Config_crosshair_scale = 2;
-						if (H2Config_crosshair_scale < 0)
-							H2Config_crosshair_scale = 0;
-						set_crosshair_scale(H2Config_crosshair_scale);
+						if (cartographer_settings.game.hud.crosshair_scale > 2)
+							cartographer_settings.game.hud.crosshair_scale = 2;
+						if (cartographer_settings.game.hud.crosshair_scale < 0)
+							cartographer_settings.game.hud.crosshair_scale = 0;
+						set_crosshair_scale(cartographer_settings.game.hud.crosshair_scale);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "CrosshairSize3"), b2_size))
 					{
-						H2Config_crosshair_scale = 1;
-						set_crosshair_scale(H2Config_crosshair_scale);
+						cartographer_settings.game.hud.crosshair_scale = 1;
+						set_crosshair_scale(cartographer_settings.game.hud.crosshair_scale);
 					}
 					ImGui::PopItemWidth();
 
@@ -236,7 +236,7 @@ namespace ImGuiHandler {
 
 					ImGui::Columns(2, NULL, false);
 
-					ImGui::Checkbox(GetString(hide_ingame_chat), &H2Config_hide_ingame_chat);
+					ImGui::Checkbox(GetString(hide_ingame_chat), &cartographer_settings.game.hud.hide_ingame_chat);
 					ImGui::NextColumn();
 					ImGui::Checkbox(GetString(static_fp), &cartographer_settings.game.video.static_fp_fov);
 					if (ImGui::IsItemHovered())

@@ -214,8 +214,8 @@ void hotkeyFuncWindowMode() {
 }
 
 void hotkeyFuncToggleHideIngameChat() {
-	H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
-	if (H2Config_hide_ingame_chat) {
+	cartographer_settings.game.hud.hide_ingame_chat = !cartographer_settings.game.hud.hide_ingame_chat;
+	if (cartographer_settings.game.hud.hide_ingame_chat) {
 		addDebugText("Hiding in-game chat menu.");
 	}
 	else {
