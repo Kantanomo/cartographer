@@ -4,7 +4,6 @@
 #define K_CARTOGRAPHER_UPDATE_URL "https://cartographer.online/update1.ini"
 #define K_CARTOGRAPHER_CREATE_URL "https://cartographer.online/create1"
 #define K_CARTOGRAPHER_LOGIN_URL "https://cartographer.online/login2"
-#define K_CARTOGRAPHER_MAP_REPO_URL "https://cartographer.online"
 #define K_CARTOGRAPHER_ACHIEVEMENT_UNLOCK_URL "https://cartographer.online/achievement-api/unlock.php"
 #define K_CARTOGRAPHER_ACHIEVEMENT_GET_URL "https://cartographer.online/achievement-api/achievement_list.php?xuid="
 
