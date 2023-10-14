@@ -529,8 +529,8 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)options->game_mode, variant_name);
 
 		ControllerInput::SetDeadzones();
-		ControllerInput::SetSensitiviy(H2Config_controller_sens);
-		MouseInput::SetSensitivity(H2Config_mouse_sens);
+		ControllerInput::SetSensitiviy(cartographer_settings.game.input.controller_sens);
+		MouseInput::SetSensitivity(cartographer_settings.game.input.mouse_sensitivity);
 		hud_patches_on_map_load();
 
 		if (options->game_mode == _game_mode_multiplayer)

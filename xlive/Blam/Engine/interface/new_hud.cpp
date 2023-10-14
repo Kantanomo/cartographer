@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "new_hud.h"
 
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "Blam/Engine/bitmaps/bitmap_group.h"
 #include "Blam/Engine/camera/camera.h"
 #include "Blam/Engine/game/game.h"
@@ -197,7 +198,7 @@ void new_hud_apply_patches()
 {
 	if (Memory::IsDedicatedServer()) { return; }
 
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleHideIngameChat,
+	KeyboardInput::RegisterHotkey(&cartographer_settings.game.input.hotkey_hide_ingame_chat,
 		[]() {
 			H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
 		}

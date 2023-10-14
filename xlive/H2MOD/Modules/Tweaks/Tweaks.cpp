@@ -36,7 +36,7 @@ void __cdecl update_keyboard_buttons_state_hook(BYTE *a1, WORD *a2, BYTE *a3, bo
 	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
 
 	BYTE keyboardState[256] = {};
-	if (!H2Config_disable_ingame_keyboard 
+	if (!cartographer_settings.game.input.disable_ingame_keyboard
 		&& GetKeyboardState(keyboardState))
 	{
 		for (int i = 0; i < 256; i++)

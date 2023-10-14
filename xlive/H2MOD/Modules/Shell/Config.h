@@ -26,15 +26,7 @@ extern std::string cartographerMapRepoURL;
 
 extern bool H2Config_isConfigFileAppDataLocal;
 
-extern float H2Config_mouse_sens;
-extern bool H2Config_mouse_uniform;
-extern float H2Config_controller_sens;
-extern bool H2Config_controller_modern;
-extern float H2Config_Deadzone_A_X;
-extern float H2Config_Deadzone_A_Y;
-extern float H2Config_Deadzone_Radial;
 extern float H2Config_crosshair_offset;
-extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
 extern bool H2Config_voice_chat;
@@ -54,17 +46,9 @@ extern bool H2Config_even_shuffle_teams;
 extern bool H2Config_koth_random;
 extern bool H2Config_anti_cheat_enabled;
 
-extern int H2Config_hotkeyIdHelp;
-extern int H2Config_hotkeyIdAlignWindow;
-extern int H2Config_hotkeyIdWindowMode;
-extern int H2Config_hotkeyIdToggleHideIngameChat;
-extern int H2Config_hotkeyIdGuide;
-extern int H2Config_hotkeyIdConsole;
 extern int H2Config_minimum_player_start;
 
-extern float H2Config_raw_mouse_scale;
 extern float H2Config_crosshair_scale;
-extern ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
 extern bool H2Config_upnp_enable;
 extern bool H2Config_melee_fix;

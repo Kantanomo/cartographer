@@ -64,14 +64,15 @@ enum e_controller_deadzone_type : uint8 {
 struct s_cartographer_input_settings {
 	bool raw_mouse_input = false;
 	float mouse_raw_scale = 25.0;
+	float mouse_sensitivity = 0;
 	bool mouse_uniform_sens = false;
 	bool disable_ingame_keyboard = false;
-	int hotkey_help = 113;
-	int hotkey_align_window = 118;
-	int hotkey_window_mode = 119;
-	int hotkey_hide_ingame_chat = 120;
-	int hotkey_guide = 36;
-	int hotkey_console = 121;
+	int hotkey_help = VK_F2;
+	int hotkey_align_window = VK_F7;
+	int hotkey_window_mode = VK_F8;
+	int hotkey_hide_ingame_chat = VK_F9;
+	int hotkey_guide = VK_HOME;
+	int hotkey_console = VK_F10;
 	float controller_sens = 0.0;
 	bool controller_modern = false;
 

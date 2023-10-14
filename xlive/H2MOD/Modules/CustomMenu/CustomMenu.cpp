@@ -651,7 +651,7 @@ void RefreshToggleIngameKeyboardControls() {
 	}
 
 	//multi-process splitscreen input hacks
-	if (H2Config_disable_ingame_keyboard) {
+	if (cartographer_settings.game.input.disable_ingame_keyboard) {
 		//Allows to repeat last movement when lose focus in mp, unlocks METHOD E from point after intro vid
 		BYTE getFocusB[] = { 0x00 };
 		WriteBytes(H2BaseAddr + 0x2E3C5, getFocusB, 1);
@@ -1264,7 +1264,7 @@ void CMSetupVFTables_Guide() {
 void* __cdecl CustomMenu_Guide(s_new_ui_screen_parameters* a1) {
 	char* guide_desc_base = H2CustomLanguageGetLabel(CMLabelMenuId_Guide, 0xFFFFFFF2);
 	char* guide_description = (char*)malloc(strlen(guide_desc_base) + 50);
-	sprintf(guide_description, guide_desc_base, GetVKeyCodeString(H2Config_hotkeyIdGuide).c_str());
+	sprintf(guide_description, guide_desc_base, GetVKeyCodeString(cartographer_settings.game.input.hotkey_guide).c_str());
 	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF1, guide_description, true);
 	free(guide_description);
 	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 4, 272);

@@ -27,6 +27,42 @@ namespace ControllerInput
 			WORD temp[] = { DPAD_UP , DPAD_DOWN , DPAD_LEFT, DPAD_RIGHT, START, BACK, LEFT_THUMB, RIGHT_THUMB, LEFT_SHOULDER, RIGHT_SHOULDER, A, B ,X, Y };
 			memcpy(out, temp, sizeof(temp));
 		}
+		WORD operator[](WORD flag) const
+		{
+			switch(flag)
+			{
+				case XINPUT_GAMEPAD_DPAD_UP:
+					return DPAD_UP;
+				case XINPUT_GAMEPAD_DPAD_DOWN:
+					return DPAD_DOWN;
+				case XINPUT_GAMEPAD_DPAD_LEFT:
+					return DPAD_LEFT;
+				case XINPUT_GAMEPAD_DPAD_RIGHT:
+					return DPAD_RIGHT;
+				case XINPUT_GAMEPAD_START:
+					return START;
+				case XINPUT_GAMEPAD_BACK:
+					return BACK;
+				case XINPUT_GAMEPAD_LEFT_THUMB:
+					return LEFT_THUMB;
+				case XINPUT_GAMEPAD_RIGHT_THUMB:
+					return RIGHT_THUMB;
+				case XINPUT_GAMEPAD_LEFT_SHOULDER:
+					return LEFT_SHOULDER;
+				case XINPUT_GAMEPAD_RIGHT_SHOULDER:
+					return RIGHT_SHOULDER;
+				case XINPUT_GAMEPAD_A:
+					return A;
+				case XINPUT_GAMEPAD_B:
+					return B;
+				case XINPUT_GAMEPAD_X:
+					return X;
+				case XINPUT_GAMEPAD_Y:
+					return Y;
+				default: 
+					return 0;
+			}
+		}
 		std::string ToString()
 		{
 			std::string temp;

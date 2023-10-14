@@ -396,7 +396,7 @@ void __cdecl game_main_loop()
 		p_input_update();
 		if (!_Shell::IsGameMinimized()) 
 		{
-			if (H2Config_controller_modern)
+			if (cartographer_settings.game.input.controller_modern)
 			{
 				ControllerInput::procces_input();
 			}

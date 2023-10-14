@@ -21,15 +21,7 @@ std::string H2ConfigVersionSection("H2ConfigurationVersion:" + H2ConfigVersionNu
 std::string cartographerURL = "https://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
-float H2Config_mouse_sens = 0;
-bool H2Config_mouse_uniform = false;
-float H2Config_controller_sens = 0;
-bool H2Config_controller_modern = false;
-float H2Config_Deadzone_A_X = 26.0f;
-float H2Config_Deadzone_A_Y = 26.0f;
-float H2Config_Deadzone_Radial = 1.0f;
 float H2Config_crosshair_offset = NAN;
-bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
 bool H2Config_voice_chat = false;
@@ -52,9 +44,7 @@ bool H2Config_koth_random = true;
 bool H2Config_anti_cheat_enabled = true;
 
 float H2Config_crosshair_scale = 1.0f;
-float H2Config_raw_mouse_scale = 25.0f;
 
-ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
 bool H2Config_upnp_enable = true;
 bool H2Config_melee_fix = true;
@@ -64,12 +54,6 @@ bool H2Config_spooky_boy = true;
 int H2Config_forced_event = 0;
 #endif
 
-int H2Config_hotkeyIdHelp = VK_F2;
-int H2Config_hotkeyIdAlignWindow = VK_F7;
-int H2Config_hotkeyIdWindowMode = VK_F8;
-int H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
-int H2Config_hotkeyIdGuide = VK_HOME;
-int H2Config_hotkeyIdConsole = VK_F10;
 
 bool ownsConfigFile = false;
 bool H2Config_isConfigFileAppDataLocal = false;
@@ -346,7 +330,7 @@ void UpgradeConfig()
 				json["game"]["input"].set("raw_mouse_input", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", cartographer_settings.game.input.raw_mouse_input));
 				json["game"]["input"].set("mouse_raw_scale", std::stof(raw_mouse_scale_str));
 				json["game"]["input"].set("mouse_uniform_sens", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", cartographer_settings.game.input.mouse_uniform_sens));
-				json["game"]["input"].set("mouse_sens", std::stof(mouse_sens_str));
+				json["game"]["input"].set("mouse_sensitivity", std::stof(mouse_sens_str));
 				json["game"]["input"].set("disable_ingame_keyboard", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", cartographer_settings.game.input.disable_ingame_keyboard));
 				json["game"]["input"].set("hotkey_help", ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_help", cartographer_settings.game.input.hotkey_help));
 				json["game"]["input"].set("hotkey_align_window", ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_align_window", cartographer_settings.game.input.hotkey_align_window));
@@ -409,7 +393,7 @@ void UpgradeConfig()
 
 #pragma region Config Init/Deinit
 void InitH2Config() {
-	H2Config_disable_ingame_keyboard = _Shell::GetInstanceId() > 1 ? true : false;
+	cartographer_settings.game.input.disable_ingame_keyboard = _Shell::GetInstanceId() > 1 ? true : false;
 	UpgradeConfig();
 	ReadH2Config();
 }

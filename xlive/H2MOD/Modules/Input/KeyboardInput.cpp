@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "KeyboardInput.h"
+
+#include "Blam/Cartographer/Settings/Setting.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
@@ -47,7 +49,7 @@ unsigned char KeyboardInput::GetGameKbState(__int16 keycode)
 
 void KeyboardInput::ToggleKeyboardInput()
 {
-	if (H2Config_disable_ingame_keyboard) {
+	if (cartographer_settings.game.input.disable_ingame_keyboard) {
 		//Allows to repeat last movement when lose focus in mp, unlocks METHOD E from point after intro vid
 		BYTE getFocusB[] = { 0x00 };
 		WriteBytes(H2BaseAddr + 0x2E3C5, getFocusB, 1);
@@ -103,11 +105,11 @@ void KeyboardInput::ExecuteHotkey(WPARAM message)
 void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
 	addDebugText("Options:");
-	addDebugText("%s - Print and show this help text.", GetVKeyCodeString(H2Config_hotkeyIdHelp).c_str());
-	addDebugText("%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(H2Config_hotkeyIdAlignWindow).c_str());
-	addDebugText("%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(H2Config_hotkeyIdWindowMode).c_str());
-	addDebugText("%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat).c_str());
-	addDebugText("%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
+	addDebugText("%s - Print and show this help text.", GetVKeyCodeString(cartographer_settings.game.input.hotkey_help).c_str());
+	addDebugText("%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(cartographer_settings.game.input.hotkey_align_window).c_str());
+	addDebugText("%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(cartographer_settings.game.input.hotkey_window_mode).c_str());
+	addDebugText("%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(cartographer_settings.game.input.hotkey_hide_ingame_chat).c_str());
+	addDebugText("%s - Toggles hiding the Console Menu.", GetVKeyCodeString(cartographer_settings.game.input.hotkey_console).c_str());
 	addDebugText("------------------------------");
 
 	if (!ImGuiHandler::IsWindowActive(Console::windowName))
@@ -243,11 +245,11 @@ void KeyboardInput::Initialize()
 	}
 	ToggleKeyboardInput();
 	addDebugText("Registering Hotkeys");
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdHelp, hotkeyFuncHelp);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdConsole, hotkeyFuncConsole);
+	KeyboardInput::RegisterHotkey(&cartographer_settings.game.input.hotkey_help, hotkeyFuncHelp);
+	KeyboardInput::RegisterHotkey(&cartographer_settings.game.input.hotkey_align_window, hotkeyFuncAlignWindow);
+	KeyboardInput::RegisterHotkey(&cartographer_settings.game.input.hotkey_window_mode, hotkeyFuncWindowMode);
+	KeyboardInput::RegisterHotkey(&cartographer_settings.game.input.hotkey_guide, hotkeyFuncGuide);
+	KeyboardInput::RegisterHotkey(&cartographer_settings.game.input.hotkey_console, hotkeyFuncConsole);
 	// KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
 }
 

@@ -139,6 +139,7 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 		json["game"]["input"].get_ds("raw_mouse_input", &settings->game.input.raw_mouse_input);
 		json["game"]["input"].get_ds("mouse_raw_scale", &settings->game.input.mouse_raw_scale);
 		json["game"]["input"].get_ds("mouse_uniform_sens", &settings->game.input.mouse_uniform_sens);
+		json["game"]["input"].get_ds("mouse_sensitivity", &settings->game.input.mouse_sensitivity);
 		json["game"]["input"].get_ds("disable_ingame_keyboard", &settings->game.input.disable_ingame_keyboard);
 		json["game"]["input"].get_ds("hotkey_help", &settings->game.input.hotkey_help);
 		json["game"]["input"].get_ds("hotkey_align_window", &settings->game.input.hotkey_align_window);
@@ -273,6 +274,7 @@ void s_cartographer_settings::save(easy_json_struct<s_cartographer_settings>& js
 		json["game"]["input"].set("raw_mouse_input", settings->game.input.raw_mouse_input);
 		json["game"]["input"].set("mouse_raw_scale", settings->game.input.mouse_raw_scale);
 		json["game"]["input"].set("mouse_uniform_sens", settings->game.input.mouse_uniform_sens);
+		json["game"]["input"].set("mouse_sensitivity", settings->game.input.mouse_sensitivity);
 		json["game"]["input"].set("disable_ingame_keyboard", settings->game.input.disable_ingame_keyboard);
 		json["game"]["input"].set("hotkey_help", settings->game.input.hotkey_help);
 		json["game"]["input"].set("hotkey_align_window", settings->game.input.hotkey_align_window);
