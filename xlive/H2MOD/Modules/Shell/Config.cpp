@@ -24,13 +24,6 @@ bool H2Config_isConfigFileAppDataLocal = false;
 void SaveH2Config() {
 	addDebugText("Saving H2Configuration File...");
 
-	if (!H2IsDediServer) {
-		extern int current_language_main;
-		extern int current_language_sub;
-		cartographer_settings.language_code.code_main = current_language_main;
-		cartographer_settings.language_code.code_variant = current_language_sub;
-	}
-
 	wchar_t fileConfigPath[1024];
 	if (FlagFilePathConfig) {
 		wcscpy_s(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
@@ -54,15 +47,14 @@ void SaveH2Config() {
 
 	easy_json_struct json(fileConfigPath, &cartographer_settings);
 
-	//TODO add error checking to the save function
-	json.save();
-	/*if (rc < 0) {
-		addDebugText("json.load() failed with error: %d while trying to read configuration file!", (int)rc);
+	auto rc = json.save();
+	if (rc < 0) {
+		addDebugText("json.save() failed with error: %d while trying to read configuration file!", rc);
 	}
 	else
 	{
-		json.save();
-	}*/
+		addDebugText("Successfully saved H2Configuration.");
+	}
 
 	addDebugText("End saving H2Configuration file.");
 }
@@ -127,12 +119,6 @@ void ReadH2Config() {
 	else {
 		ownsConfigFile = (readInstanceIdFile == _Shell::GetInstanceId());
 
-		if (!H2IsDediServer) {
-			extern int current_language_main;
-			extern int current_language_sub;
-			cartographer_settings.language_code.code_main = current_language_main;
-			cartographer_settings.language_code.code_variant = current_language_sub;
-		}
 		fclose(fileConfig);
 
 		easy_json_struct json(fileConfigPath, &cartographer_settings);

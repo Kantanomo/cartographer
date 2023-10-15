@@ -15,7 +15,7 @@
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Modules/Updater/Updater.h"
-
+#include "H2MOD.h"
 #include "Util/filesys.h"
 #include "Util/hash.h"
 #include "Util/Hooks/Hook.h"

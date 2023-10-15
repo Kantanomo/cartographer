@@ -13,7 +13,7 @@
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
-
+#include "H2MOD.h"
 // for XNet connection logging
 #include "Blam/Engine/cartographer/settings/settings.h"
 #include "XLive/xnet/IpManagement/XnIp.h"

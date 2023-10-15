@@ -58,14 +58,27 @@ public:
 		return e_easy_json_error::success;
 	}
 
-	void save() {
-		std::ofstream ofs(file_name);
-		OStreamWrapper osw(ofs);
-		PrettyWriter<OStreamWrapper> writer(osw);
-		writer.SetIndent('\t', 1);  // Set indentation to use tabs.
-		object->save(*this);
-		doc_.Accept(writer);
-	}
+    e_easy_json_error save() {
+        std::ofstream ofs(file_name);
+        if (!ofs.is_open()) {
+            return e_easy_json_error::file_open_error;
+        }
+
+        OStreamWrapper osw(ofs);
+        PrettyWriter<OStreamWrapper> writer(osw);
+        writer.SetIndent('\t', 1);  // Set indentation to use tabs.
+
+        object->save(*this);
+
+        // Serialize the document and handle any errors during serialization.
+        if (!doc_.Accept(writer)) {
+            return e_easy_json_error::json_parse_error;
+        }
+
+        // If everything is successful, return success.
+        return e_easy_json_error::success;
+    }
+
 	/// <summary>
    /// Gets a pointer to the JSON Value associated with the current key path in the document.
    /// If the key path is empty, returns a pointer to the root document object.
