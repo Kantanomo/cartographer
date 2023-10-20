@@ -14,7 +14,7 @@ namespace KantTesting
 	void tttt(T s)
 	{
 		Document doc_;
-		static_assert(std::is_base_of<s_base_easy_json_struct, T>::value,
+		static_assert(std::is_base_of<c_base_easy_json_struct, T>::value,
 			"T must be a derived class of Base in Context<T>.");
 		s.load(doc_);
 	}

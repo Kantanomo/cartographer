@@ -5,7 +5,14 @@
     <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-nointro -windowed</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-nointro -novsync</LocalDebuggerCommandArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Server|Win32'">
+    <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
+    <LocalDebuggerCommand>$(OutDir)h2server.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>-live</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDedicatedServer|Win32'">
     <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
@@ -20,7 +27,7 @@
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>
-    <LocalDebuggerCommandArguments>-nointro  -novsync</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-nointro -novsync</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup>
     <ShowAllFiles>true</ShowAllFiles>

@@ -4,7 +4,7 @@
 
 
 
-void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& json)
+void c_cartographer_settings::load(easy_json_struct<c_cartographer_settings>& json)
 {
 	const auto settings = this;
 	json["cartographer"].get_ds("h2portable", &settings->h2portable);
@@ -16,23 +16,22 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 	json["cartographer"].get_ds("debug_log_console", &settings->debug_log_console);
 	json["cartographer"].get_ds("language_label_capture", &settings->language_label_capture);
 	json["cartographer"].get_ds("discord_enable", &settings->discord_enable);
-	const auto wan_ip = json["cartographer"].get<const char*>("wan_ip", "");
-	const auto lan_ip = json["cartographer"].get<const char*>("lan_ip", "");
 
+	const auto wan_ip = json["cartographer"].get<const char*>("wan_ip", "");
 	if (strnlen_s(wan_ip, 15) >= 7 && inet_addr(wan_ip) != INADDR_NONE)
 	{
 		strncpy(settings->wan_ip_str, wan_ip, 15);
 		settings->wan_ip = inet_addr(settings->wan_ip_str);
 	}
 
+	const auto lan_ip = json["cartographer"].get<const char*>("lan_ip", "");
 	if (strnlen_s(lan_ip, 15) >= 7 && inet_addr(lan_ip) != INADDR_NONE)
 	{
 		strncpy(settings->lan_ip_str, lan_ip, 15);
 		settings->lan_ip = inet_addr(settings->lan_ip_str);
 	}
 
-	auto language_code = json["cartographer"].get<std::string>("language_code", "-1x0");
-	if (!language_code.empty())
+	if (auto language_code = json["cartographer"].get<std::string>("language_code", "-1x0"); !language_code.empty())
 	{
 		auto delim_offset = language_code.find("x");
 		if (delim_offset != std::string::npos)
@@ -43,6 +42,7 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 			settings->language_code.code_variant = stol(code_variant_substr);
 		}
 	}
+	
 	if (!H2IsDediServer)
 	{
 		json["game"].get_ds("skip_intro", &settings->game.skip_intro);
@@ -172,15 +172,15 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 	if (H2IsDediServer)
 	{
 		const auto server_name = json["server"].get<const char*>("server_name", "Halo 2 Server");
-		const auto server_playlist = json["server"].get<const char*>("server_playlist", "");
-		const auto login_identifier = json["server"].get<const char*>("login_identifier", "");
-		const auto login_password = json["server"].get<const char*>("login_password", "");
 		if (server_name)
 			strncpy(settings->server.server_name, server_name, XUSER_MAX_NAME_LENGTH);
+		const auto server_playlist = json["server"].get<const char*>("server_playlist", "");
 		if (server_playlist)
 			strncpy(settings->server.playlist, server_playlist, sizeof(settings->server.playlist));
+		const auto login_identifier = json["server"].get<const char*>("login_identifier", "");
 		if (login_identifier)
 			strncpy(settings->server.login_identifier, login_identifier, sizeof(settings->server.login_identifier));
+		const auto login_password = json["server"].get<const char*>("login_password", "");
 		if (login_password)
 			strncpy(settings->server.login_password, login_password, sizeof(settings->server.login_password));
 
@@ -230,7 +230,7 @@ void s_cartographer_settings::load(easy_json_struct<s_cartographer_settings>& js
 #endif
 }
 
-void s_cartographer_settings::save(easy_json_struct<s_cartographer_settings>& json)
+void c_cartographer_settings::save(easy_json_struct<c_cartographer_settings>& json)
 {
 	const auto settings = this;
 	json["cartographer"].set("h2portable", settings->h2portable);
@@ -308,4 +308,4 @@ void s_cartographer_settings::save(easy_json_struct<s_cartographer_settings>& js
 
 }
 
-s_cartographer_settings cartographer_settings;
+c_cartographer_settings cartographer_settings;

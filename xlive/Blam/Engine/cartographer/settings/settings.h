@@ -1,7 +1,8 @@
 #pragma once
 #include <H2MOD/Modules/SpecialEvents/SpecialEvents.h>
 #include <H2MOD/Modules/Input/ControllerInput.h>
-#include "H2MOD/Utils/EasyJsonStruct.cpp"
+#include "Blam/Engine/cartographer/easy_json/easy_json_struct.cpp"
+
 
 
 struct s_language_code {
@@ -114,7 +115,7 @@ struct s_cartographer_development_settings {
 	e_special_event_type forced_event = _no_event;
 };
 
-class s_cartographer_settings : s_base_easy_json_struct<s_cartographer_settings> {
+class c_cartographer_settings : c_base_easy_json_struct<c_cartographer_settings> {
 public:
 	bool h2portable = false;
 	unsigned short base_port = 2000;
@@ -139,8 +140,8 @@ public:
 	s_cartographer_server_settings server;
 	s_cartographer_development_settings development;
 
-	void load(easy_json_struct<s_cartographer_settings>& json) override;
-	void save(easy_json_struct<s_cartographer_settings>& json) override;
+	void load(easy_json_struct<c_cartographer_settings>& json) override;
+	void save(easy_json_struct<c_cartographer_settings>& json) override;
 };
 
-extern s_cartographer_settings cartographer_settings;
+extern c_cartographer_settings cartographer_settings;

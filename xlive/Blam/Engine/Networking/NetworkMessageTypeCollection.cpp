@@ -293,6 +293,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 			NetworkMessage::SendAntiCheat(peer_index);
 		}
 	}
+
 }
 
 void NetworkMessage::SendRequestMapFilename(int mapDownloadId)

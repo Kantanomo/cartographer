@@ -12,9 +12,6 @@
 #include "rapidjson/pointer.h"
 using namespace rapidjson;
 
-
-
-
 template<typename struct_type>
 class easy_json_struct {
 private:
@@ -58,7 +55,7 @@ public:
 		return e_easy_json_error::success;
 	}
 
-    e_easy_json_error save() {
+    e_easy_json_error save(bool save_object = true) {
         std::ofstream ofs(file_name);
         if (!ofs.is_open()) {
             return e_easy_json_error::file_open_error;
@@ -68,7 +65,8 @@ public:
         PrettyWriter<OStreamWrapper> writer(osw);
         writer.SetIndent('\t', 1);  // Set indentation to use tabs.
 
-        object->save(*this);
+        if(save_object)
+			object->save(*this);
 
         // Serialize the document and handle any errors during serialization.
         if (!doc_.Accept(writer)) {
@@ -351,7 +349,7 @@ public:
 };
 
 template<typename type>
-class s_base_easy_json_struct
+class c_base_easy_json_struct
 {
 public:
 	virtual void load(easy_json_struct<type>& json) = 0;

@@ -214,8 +214,8 @@
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
-    <ClCompile Include="H2MOD\Utils\EasyJson.cpp" />
-    <ClCompile Include="H2MOD\Utils\EasyJsonStruct.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\easy_json\easy_json.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\easy_json\easy_json_struct.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\settings\settings.cpp" />
   </ItemGroup>
   <ItemGroup>
