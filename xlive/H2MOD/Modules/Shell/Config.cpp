@@ -44,6 +44,11 @@ void SaveH2Config() {
 
 	easy_json json(fileConfigPath, &cartographer_settings);
 
+#ifndef NDEBUG
+	json.log_function = addDebugText;
+	json.log_w_function = addDebugText;
+#endif
+
 	auto rc = json.save();
 	if (rc < 0) {
 		addDebugText("json.save() failed with error: %d while trying to read configuration file!", rc);
@@ -231,6 +236,11 @@ void UpgradeConfig()
 			{
 				addDebugText("ini file has not been upgraded.. upgrading now");
 				easy_json json(jsonPath, &cartographer_settings);
+
+#ifndef NDEBUG
+				json.log_function = addDebugText;
+				json.log_w_function = addDebugText;
+#endif
 
 				json["cartographer"].set("h2portable", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "h2portable", false));
 				json["cartographer"].set("base_port", ini.GetLongValue(H2ConfigVersionSection.c_str(), "base_port", 2000));

@@ -1,5 +1,7 @@
 #pragma once
 #include "stdafx.h"
+
+#include "easy_json_writer.h"
 #include "H2MOD/Utils/Utils.h"
 #include "rapidjson/prettywriter.h"
 #include "Blam/Math/real_math.h"
@@ -8,6 +10,7 @@
 #include "rapidjson/ostreamwrapper.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/error/en.h"
+
 using namespace rapidjson;
 #define EASY_JSON_LOG(fmt, ...) \
     if (log_function != nullptr) \
@@ -16,6 +19,9 @@ using namespace rapidjson;
 #define EASY_JSON_LOGW(fmt, ...) \
     if (log_w_function != nullptr) \
         log_w_function(fmt, ##__VA_ARGS__)
+
+
+
 
 template<typename struct_type>
 class easy_json {
@@ -92,20 +98,24 @@ public:
     }
 
     e_easy_json_error save(bool save_object = true) {
+        EASY_JSON_LOGW(L"[easy_json] attempting to save file \"%ws\"", file_name);
         std::ofstream ofs(file_name);
         if (!ofs.is_open()) {
+            EASY_JSON_LOG("[easy_json] json file could not be opened, perhaps it is open in another program or you do not have permissions to write to the location.");
             return e_easy_json_error::file_open_error;
         }
 
         OStreamWrapper osw(ofs);
-        PrettyWriter<OStreamWrapper> writer(osw);
+        easy_json_writer writer(osw);
         writer.SetIndent('\t', 1);  // Set indentation to use tabs.
 
         if (save_object)
             object->save(*this);
 
         // Serialize the document and handle any errors during serialization.
-        if (!doc_.Accept(writer)) {
+        if (!doc_.Accept(writer)) 
+        {
+            EASY_JSON_LOG("[easy_json] json writing failed on key: %s with value %s", writer.getLastKey(), writer.getLastValue());
             return e_easy_json_error::json_parse_error;
         }
 
@@ -154,7 +164,7 @@ public:
     }
     easy_json& operator[](const char* key)
     {
-        key_path.push_back(key);
+        key_path.emplace_back(key);
         return *this;
     }
 
@@ -265,7 +275,7 @@ public:
         }
         else {
             // Unsupported type
-            static_assert(sizeof(T) == 0, "Unsupported type in json_config::get()");
+            static_assert(sizeof(T) == 0, "Unsupported type in easy_json::get()");
         }
     }
     /// <summary>
@@ -313,11 +323,25 @@ public:
     void set(const char* key, T value, bool auto_save = false) {
 
         Value* current_object = get_current_pointer();
+
+        if (current_object == nullptr)
+        {
+            std::string key_path_str = "\\";
+            for (const auto& str : key_path)
+                key_path_str += str + "\\";
+            key_path.clear();
+            std::stringstream ss;
+            ss << value;
+            EASY_JSON_LOG("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
+            EASY_JSON_LOG("[easy_json] failed to set: %s value: %s", key, ss.str().c_str());
+            return;
+        }
+
         key_path.clear();
 
         bool is_new = !current_object->HasMember(key);
         Value k(key, doc_.GetAllocator());
-
+        
         constexpr bool is_rapidjson_type_v =
             std::is_same_v<T, bool> ||
             std::is_same_v<T, int> ||
@@ -396,7 +420,7 @@ public:
         }
         else {
             // Unsupported type
-            static_assert(sizeof(T) == 0, "Unsupported type in eay_json_config::set()");
+            static_assert(sizeof(T) == 0, "Unsupported type in easy_json::set()");
         }
 
         if (auto_save)
