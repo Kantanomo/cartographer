@@ -4,7 +4,7 @@
 
 
 
-void c_cartographer_settings::load(easy_json_struct<c_cartographer_settings>& json)
+void c_cartographer_settings::load(easy_json<c_cartographer_settings>& json)
 {
 	const auto settings = this;
 	json["cartographer"].get_ds("h2portable", &settings->h2portable);
@@ -230,7 +230,7 @@ void c_cartographer_settings::load(easy_json_struct<c_cartographer_settings>& js
 #endif
 }
 
-void c_cartographer_settings::save(easy_json_struct<c_cartographer_settings>& json)
+void c_cartographer_settings::save(easy_json<c_cartographer_settings>& json)
 {
 	const auto settings = this;
 	json["cartographer"].set("h2portable", settings->h2portable);

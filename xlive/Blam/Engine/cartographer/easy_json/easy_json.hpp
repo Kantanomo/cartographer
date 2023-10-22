@@ -17,9 +17,8 @@ using namespace rapidjson;
     if (log_w_function != nullptr) \
         log_w_function(fmt, ##__VA_ARGS__)
 
-
 template<typename struct_type>
-class easy_json_struct {
+class easy_json {
 private:
     wchar_t file_name[255];
     Document doc_;
@@ -37,7 +36,7 @@ public:
     t_log_function* log_function;
     t_log_w_function* log_w_function;
 
-    easy_json_struct(const wchar_t* file_name_in, struct_type* object_pointer)
+    easy_json(const wchar_t* file_name_in, struct_type* object_pointer)
     {
         wcsncpy(file_name, file_name_in, 255);
         object = object_pointer;
@@ -60,7 +59,6 @@ public:
             ifs.open(file_name);
         }
         IStreamWrapper isw(ifs);
-        Document d;
         doc_.SetObject();
         ParseResult parse_result = doc_.ParseStream(isw);
         if (doc_.HasParseError())
@@ -154,27 +152,39 @@ public:
         // Return a pointer to the final value object in the path
         return value;
     }
-    easy_json_struct& operator[](const char* key)
+    easy_json& operator[](const char* key)
     {
         key_path.push_back(key);
         return *this;
     }
-
-    std::unordered_map<std::string, Value> defaultValues_;
 
     template<typename T>
     T get(const char* key, T defaultValue = T{}) {
         // Check if the key exists in the document
 
         Value* current_object = get_current_pointer();
+
+        if(current_object == nullptr)
+        {
+            std::string key_path_str = "\\";
+            for (const auto& str : key_path)
+                key_path_str += str + "\\";
+            key_path.clear();
+            std::stringstream ss;
+            ss << defaultValue;
+        	EASY_JSON_LOG("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
+            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
+            return defaultValue;
+        }
+        
         key_path.clear();
         Value v;
 
-        auto it = defaultValues_.find(key);
         if (!current_object->HasMember(key)) {
-            if (it == defaultValues_.end())
-                return defaultValue;
-            v = defaultValues_[key];
+            std::stringstream ss;
+            ss << defaultValue;
+            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
+            return defaultValue;
         }
 
         v = (*current_object)[key];
@@ -197,68 +207,45 @@ public:
             if (v.Is<T>())
             {
                 ss << v.Get<T>();
-                EASY_JSON_LOG("[easy_json]get: %s value: %s", key, ss.str().c_str());
+                EASY_JSON_LOG("[easy_json] get: %s value: %s", key, ss.str().c_str());
                 return v.Get<T>();
             }
-
-            if (defaultValue == T{} && it != defaultValues_.end())
-            {
-                ss << v.Get<T>();
-                EASY_JSON_LOG("[easy_json]get: %s value: %s", key, ss.str().c_str());
-                return defaultValues_[key].Get<T>();
-            }
-
+            
             ss << defaultValue;
-            EASY_JSON_LOG("[easy_json]get: %s value: %s", key, ss.str().c_str());
+            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
             return defaultValue;
         }
         //specializations for non supported data types below
         else if constexpr (std::is_same_v<T, short>) {
             if (v.Is<int>())
             {
-                EASY_JSON_LOG("[easy_json]get: %s value: %d", key, v.GetInt());
+                EASY_JSON_LOG("[easy_json] get: %s value: %d", key, v.GetInt());
                 return static_cast<short>(v.GetInt());
             }
 
-            if (defaultValue == T{} && it != defaultValues_.end())
-            {
-                EASY_JSON_LOG("[easy_json]get: %s value: %d", key, v.GetInt());
-                return static_cast<short>(defaultValues_[key].GetInt());
-            }
-
-            EASY_JSON_LOG("[easy_json]get: %s value: %d", key, defaultValue);
+            EASY_JSON_LOG("[easy_json] get: %s value(default): %d", key, defaultValue);
             return defaultValue;
         }
         else if constexpr (std::is_same_v<T, unsigned short>) {
             if (v.Is<unsigned int>())
             {
-                EASY_JSON_LOG("[easy_json]get: %s value: %d", key, v.GetUint());
+                EASY_JSON_LOG("[easy_json] get: %s value: %d", key, v.GetUint());
                 return static_cast<unsigned short>(v.GetUint());
             }
 
-            if (defaultValue == T{} && it != defaultValues_.end())
-            {
-                EASY_JSON_LOG("[easy_json]get: %s value: %d", key, v.GetUint());
-                return static_cast<unsigned short>(defaultValues_[key].GetUint());
-            }
-
-            EASY_JSON_LOG("[easy_json]get: %s value: %d", key, defaultValue);
+            EASY_JSON_LOG("[easy_json] get: %s value(default): %d", key, defaultValue);
             return defaultValue;
         }
         else if constexpr (std::is_same_v<T, std::string>) {
-            if (v.Is<const char*>())
+        	if (v.Is<const char*>())
             {
-                EASY_JSON_LOG("[easy_json]get: %s value: %s", key, v.GetString());
+                EASY_JSON_LOG("[easy_json] get: %s value: %s", key, v.GetString());
                 return v.GetString();
             }
-
-            if (defaultValue == T{} && it != defaultValues_.end())
-            {
-                EASY_JSON_LOG("[easy_json]get: %s value: %s", key, v.GetString());
-                return defaultValues_[key].GetString();
-            }
-
-            EASY_JSON_LOG("[easy_json]get: %s value: %s", key, defaultValue);
+            //push the default value onto a stringstream due to ambiguous variadic templating.
+            std::stringstream ss;
+            ss << defaultValue;
+            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
             return defaultValue;
         }
         else if constexpr (std::is_same_v<T, real_point3d>) {
@@ -268,22 +255,12 @@ public:
                 auto y = v[1].GetFloat();
                 auto z = v[2].GetFloat();
                 ss << x << ", " << y << ", " << z;
-                EASY_JSON_LOG("[easy_json]get: %s value: %s", key, ss.str().c_str());
-                return real_point3d(x, y, z);
-            }
-
-            if (defaultValue == T{} && it != defaultValues_.end())
-            {
-                auto x = defaultValues_[key][0].GetFloat();
-                auto y = defaultValues_[key][1].GetFloat();
-                auto z = defaultValues_[key][2].GetFloat();
-                ss << x << ", " << y << ", " << z;
-                EASY_JSON_LOG("[easy_json]get: %s value: %s", key, ss.str().c_str());
+                EASY_JSON_LOG("[easy_json] get: %s value: %s", key, ss.str().c_str());
                 return real_point3d(x, y, z);
             }
 
             ss << defaultValue.x << ", " << defaultValue.y << ", " << defaultValue.z;
-            EASY_JSON_LOG("[easy_json]get: %s value: %s", key, ss.str().c_str());
+            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
             return defaultValue;
         }
         else {
@@ -431,8 +408,8 @@ template<typename type>
 class c_base_easy_json_struct
 {
 public:
-    virtual void load(easy_json_struct<type>& json) = 0;
-    virtual void save(easy_json_struct<type>& json) = 0;
+    virtual void load(easy_json<type>& json) = 0;
+    virtual void save(easy_json<type>& json) = 0;
 };
 
 #undef EASY_JSON_LOG

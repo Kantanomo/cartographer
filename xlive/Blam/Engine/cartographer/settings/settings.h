@@ -1,7 +1,7 @@
 #pragma once
 #include <H2MOD/Modules/SpecialEvents/SpecialEvents.h>
 #include <H2MOD/Modules/Input/ControllerInput.h>
-#include "Blam/Engine/cartographer/easy_json/easy_json_struct.hpp"
+#include "Blam/Engine/cartographer/easy_json/easy_json.hpp"
 
 struct s_language_code {
 	int code_main;
@@ -138,8 +138,8 @@ public:
 	s_cartographer_server_settings server;
 	s_cartographer_development_settings development;
 
-	void load(easy_json_struct<c_cartographer_settings>& json) override;
-	void save(easy_json_struct<c_cartographer_settings>& json) override;
+	void load(easy_json<c_cartographer_settings>& json) override;
+	void save(easy_json<c_cartographer_settings>& json) override;
 };
 
 extern c_cartographer_settings cartographer_settings;
