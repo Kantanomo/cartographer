@@ -120,6 +120,11 @@ void ReadH2Config() {
 
 		easy_json_struct json(fileConfigPath, &cartographer_settings);
 
+#ifndef NDEBUG
+		json.log_function = addDebugText;
+		json.log_w_function = addDebugText;
+#endif
+
 		auto rc = json.load();
 		if (rc < 0)
 		{
@@ -322,15 +327,26 @@ void UpgradeConfig()
 #endif
 
 				auto rc = json.save(false);
-
-
-				//ini.SetBoolValue(H2ConfigVersionSection.c_str(), "json_upgraded", true);
-				//ini.SaveFile(fileConfig);
 				fclose(fileConfig);
-				_wfopen_s(&fileConfig, fileConfigPath, L"a+b");
-				fputs("\njson_upgraded = true\n", fileConfig);
-				fclose(fileConfig);
-				addDebugText("ini file has been upgraded!");
+
+				switch(rc)
+				{
+				case easy_json_struct<c_cartographer_settings>::success:
+					_wfopen_s(&fileConfig, fileConfigPath, L"a+b");
+					fputs("\njson_upgraded = true\n", fileConfig);
+					fclose(fileConfig);
+					addDebugText("ini file has been upgraded!");
+					break;
+				case easy_json_struct<c_cartographer_settings>::file_open_error:
+					addDebugText(L"ini file upgrade failed, unable to access file %s", jsonPath);
+					break;
+				case easy_json_struct<c_cartographer_settings>::json_parse_error:
+					addDebugText("ini file upgrade failed do to an error that shouldn't be possible.");
+					break;
+				default:
+					addDebugText("ini file upgrade failed do to an unknown reason error code %d \n\t ini Filepath: %s \n\t json Filepath: %s", rc, fileConfigPath, jsonPath);
+					break;
+				}
 			}
 			else
 			{

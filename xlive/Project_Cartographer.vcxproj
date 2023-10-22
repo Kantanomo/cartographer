@@ -476,6 +476,7 @@
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zutil.h" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
+    <ClInclude Include="Blam\Engine\cartographer\easy_json\easy_json_struct.hpp" />
     <ClInclude Include="Blam\Engine\cartographer\endpoints\endpoints.h" />
     <ClInclude Include="Blam\Engine\cartographer\settings\settings.h" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
@@ -626,7 +627,6 @@
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\easy_json\easy_json.cpp" />
-    <ClCompile Include="Blam\Engine\cartographer\easy_json\easy_json_struct.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
