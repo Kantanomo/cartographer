@@ -87,7 +87,7 @@ void ReadH2Config() {
 			addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
 		}
 		else {
-			addDebugText(L"invalid ini path \"%ws\" continuing..", fileConfigPath);
+			addDebugText(L"invalid json path \"%ws\" continuing..", fileConfigPath);
 		}
 		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 	}
@@ -366,6 +366,7 @@ void UpgradeConfig()
 	}
 
 }
+
 
 #pragma region Config Init/Deinit
 void InitH2Config() {

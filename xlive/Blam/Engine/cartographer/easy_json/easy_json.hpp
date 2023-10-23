@@ -20,9 +20,6 @@ using namespace rapidjson;
     if (log_w_function != nullptr) \
         log_w_function(fmt, ##__VA_ARGS__)
 
-
-
-
 template<typename struct_type>
 class easy_json {
 private:
