@@ -280,7 +280,7 @@ static void FetchUpdateDetails() {
 
 	addDebugText("Fetching Update Details.");
 	char* rtn_result = 0;
-	int rtn_code = MasterHttpResponse(K_CARTOGRAPHER_UPDATE_URL, "", &rtn_result);
+	int rtn_code = MasterHttpResponse(k_cartographer_update_url, "", &rtn_result);
 	if (rtn_code == 0) {
 		addDebugText("Got Update Details.");
 

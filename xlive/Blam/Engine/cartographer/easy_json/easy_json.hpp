@@ -12,11 +12,11 @@
 #include "rapidjson/error/en.h"
 
 using namespace rapidjson;
-#define EASY_JSON_LOG(fmt, ...) \
+#define easy_json_log(fmt, ...) \
     if (log_function != nullptr) \
         log_function(fmt, ##__VA_ARGS__)
 
-#define EASY_JSON_LOGW(fmt, ...) \
+#define easy_json_logw(fmt, ...) \
     if (log_w_function != nullptr) \
         log_w_function(fmt, ##__VA_ARGS__)
 
@@ -47,14 +47,14 @@ public:
     }
 
     e_easy_json_error load() {
-        EASY_JSON_LOGW(L"[easy_json] attempting to load file \"%ws\"", file_name);
+        easy_json_logw(L"[easy_json] attempting to load file \"%ws\"", file_name);
         std::ifstream ifs(file_name);
         if (!ifs) {
-            EASY_JSON_LOG("[easy_json] file does not exist, creating new file");
+            easy_json_log("[easy_json] file does not exist, creating new file");
             // The file does not exist, so create it.
             std::ofstream ofs(file_name);
             if (!ofs) {
-                EASY_JSON_LOG("[easy_json] failed to create file");
+                easy_json_log("[easy_json] failed to create file");
                 throw std::runtime_error("Failed to create file");
             }
             ofs << "{}";  // Initialize with an empty JSON object.
@@ -68,7 +68,7 @@ public:
         {
             ParseErrorCode errorCode = parse_result.Code();
             size_t errorOffset = parse_result.Offset();
-            EASY_JSON_LOG("[easy_json] json parsing error code: %d at offset %d", errorCode, errorOffset);
+            easy_json_log("[easy_json] json parsing error code: %d at offset %d", errorCode, errorOffset);
             
             size_t currentPosition = ifs.tellg();
             size_t lineStart = 0;
@@ -79,8 +79,8 @@ public:
             {
                 if (lineStart <= errorOffset && errorOffset <= lineStart + line.length())
                 {
-                    EASY_JSON_LOG("[easy_json] offending line in the json file: %s", line.c_str());
-                    EASY_JSON_LOG("[easy_json] error message: %s", GetParseError_En(errorCode));
+                    easy_json_log("[easy_json] offending line in the json file: %s", line.c_str());
+                    easy_json_log("[easy_json] error message: %s", GetParseError_En(errorCode));
                     break;
                 }
                 lineStart += line.length() + 1;  // +1 for the newline character
@@ -95,10 +95,10 @@ public:
     }
 
     e_easy_json_error save(bool save_object = true) {
-        EASY_JSON_LOGW(L"[easy_json] attempting to save file \"%ws\"", file_name);
+        easy_json_logw(L"[easy_json] attempting to save file \"%ws\"", file_name);
         std::ofstream ofs(file_name);
         if (!ofs.is_open()) {
-            EASY_JSON_LOG("[easy_json] json file could not be opened, perhaps it is open in another program or you do not have permissions to write to the location.");
+            easy_json_log("[easy_json] json file could not be opened, perhaps it is open in another program or you do not have permissions to write to the location.");
             return e_easy_json_error::file_open_error;
         }
 
@@ -112,7 +112,7 @@ public:
         // Serialize the document and handle any errors during serialization.
         if (!doc_.Accept(writer)) 
         {
-            EASY_JSON_LOG("[easy_json] json writing failed on key: %s with value %s", writer.getLastKey(), writer.getLastValue());
+            easy_json_log("[easy_json] json writing failed on key: %s with value %s", writer.getLastKey(), writer.getLastValue());
             return e_easy_json_error::json_parse_error;
         }
 
@@ -179,8 +179,8 @@ public:
             key_path.clear();
             std::stringstream ss;
             ss << defaultValue;
-        	EASY_JSON_LOG("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
-            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
+        	easy_json_log("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
+            easy_json_log("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
             return defaultValue;
         }
         
@@ -190,7 +190,7 @@ public:
         if (!current_object->HasMember(key)) {
             std::stringstream ss;
             ss << defaultValue;
-            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
+            easy_json_log("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
             return defaultValue;
         }
 
@@ -214,45 +214,45 @@ public:
             if (v.Is<T>())
             {
                 ss << v.Get<T>();
-                EASY_JSON_LOG("[easy_json] get: %s value: %s", key, ss.str().c_str());
+                easy_json_log("[easy_json] get: %s value: %s", key, ss.str().c_str());
                 return v.Get<T>();
             }
             
             ss << defaultValue;
-            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
+            easy_json_log("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
             return defaultValue;
         }
         //specializations for non supported data types below
         else if constexpr (std::is_same_v<T, short>) {
             if (v.Is<int>())
             {
-                EASY_JSON_LOG("[easy_json] get: %s value: %d", key, v.GetInt());
+                easy_json_log("[easy_json] get: %s value: %d", key, v.GetInt());
                 return static_cast<short>(v.GetInt());
             }
 
-            EASY_JSON_LOG("[easy_json] get: %s value(default): %d", key, defaultValue);
+            easy_json_log("[easy_json] get: %s value(default): %d", key, defaultValue);
             return defaultValue;
         }
         else if constexpr (std::is_same_v<T, unsigned short>) {
             if (v.Is<unsigned int>())
             {
-                EASY_JSON_LOG("[easy_json] get: %s value: %d", key, v.GetUint());
+                easy_json_log("[easy_json] get: %s value: %d", key, v.GetUint());
                 return static_cast<unsigned short>(v.GetUint());
             }
 
-            EASY_JSON_LOG("[easy_json] get: %s value(default): %d", key, defaultValue);
+            easy_json_log("[easy_json] get: %s value(default): %d", key, defaultValue);
             return defaultValue;
         }
         else if constexpr (std::is_same_v<T, std::string>) {
         	if (v.Is<const char*>())
             {
-                EASY_JSON_LOG("[easy_json] get: %s value: %s", key, v.GetString());
+                easy_json_log("[easy_json] get: %s value: %s", key, v.GetString());
                 return v.GetString();
             }
             //push the default value onto a stringstream due to ambiguous variadic templating.
             std::stringstream ss;
             ss << defaultValue;
-            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
+            easy_json_log("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
             return defaultValue;
         }
         else if constexpr (std::is_same_v<T, real_point3d>) {
@@ -262,12 +262,12 @@ public:
                 auto y = v[1].GetFloat();
                 auto z = v[2].GetFloat();
                 ss << x << ", " << y << ", " << z;
-                EASY_JSON_LOG("[easy_json] get: %s value: %s", key, ss.str().c_str());
+                easy_json_log("[easy_json] get: %s value: %s", key, ss.str().c_str());
                 return real_point3d(x, y, z);
             }
 
             ss << defaultValue.x << ", " << defaultValue.y << ", " << defaultValue.z;
-            EASY_JSON_LOG("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
+            easy_json_log("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
             return defaultValue;
         }
         else {
@@ -329,8 +329,8 @@ public:
             key_path.clear();
             std::stringstream ss;
             ss << value;
-            EASY_JSON_LOG("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
-            EASY_JSON_LOG("[easy_json] failed to set: %s value: %s", key, ss.str().c_str());
+            easy_json_log("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
+            easy_json_log("[easy_json] failed to set: %s value: %s", key, ss.str().c_str());
             return;
         }
 
@@ -433,5 +433,5 @@ public:
     virtual void save(easy_json<type>& json) = 0;
 };
 
-#undef EASY_JSON_LOG
-#undef EASY_JSON_LOGW
+#undef easy_json_log
+#undef easy_json_logw
