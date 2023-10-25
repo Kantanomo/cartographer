@@ -10,90 +10,105 @@ using namespace rapidjson;
 class easy_json_writer : public PrettyWriter<OStreamWrapper> {
 public:
     explicit easy_json_writer(OStreamWrapper& os) : PrettyWriter(os), buffer{}, lastKey{}, lastValue{} {}
-
+    std::string path;
+    char lastKey[256];
+    char lastValue[256];
     bool Key(const Ch* str) {
-        copyToString(lastKey, str, std::strlen(str));
+        copy_rj_ch_to_buffer(lastKey, str, std::strlen(str));
         return PrettyWriter::Key(str);
     }
 
     bool Key(const char* str, SizeType length, bool copy = false)
     {
-        copyToString(lastKey, str, length);
+        copy_rj_ch_to_buffer(lastKey, str, length);
         return PrettyWriter::Key(str, length, copy);
     }
 
     bool Bool(bool b)
     {
-        copyToString(lastValue, (b ? "1" : "0"), 1);
+        copy_rj_ch_to_buffer(lastValue, (b ? "1" : "0"), 1);
         return PrettyWriter::Bool(b);
     }
 
     bool String(const Ch* str, SizeType length, bool copy = false)
     {
-        copyToString(lastValue, str, length);
+        copy_rj_ch_to_buffer(lastValue, str, length);
         return PrettyWriter::String(str, length, copy);
     }
 
     bool String(const Ch* str)
     {
-        copyToString(lastValue, str, std::strlen(str));
+        copy_rj_ch_to_buffer(lastValue, str, std::strlen(str));
         return PrettyWriter::String(str);
     }
 
     bool Int(int i)
     {
         int length = snprintf(buffer, sizeof(buffer), "%d", i);
-        copyToString(lastValue, buffer, length);
+        copy_rj_ch_to_buffer(lastValue, buffer, length);
         return PrettyWriter::Int(i);
     }
 
     bool Uint(unsigned u)
     {
         int length = snprintf(buffer, sizeof(buffer), "%d", u);
-        copyToString(lastValue, buffer, length);
+        copy_rj_ch_to_buffer(lastValue, buffer, length);
         return PrettyWriter::Uint(u);
     }
 
     bool Double(double d)
     {
         int length = snprintf(buffer, sizeof(buffer), "%.17g", d);
-        copyToString(lastValue, buffer, length);
-        return PrettyWriter::Double(d);
+        copy_rj_ch_to_buffer(lastValue, buffer, length);
+        bool res =  PrettyWriter::Double(d);
+        return res;
     }
 
     bool RawNumber(const Ch* str, SizeType length, bool copy = false)
     {
-        copyToString(lastValue, str, length);
+        copy_rj_ch_to_buffer(lastValue, str, length);
         return PrettyWriter::RawNumber(str, length, copy);
     }
 
     bool StartObject()
     {
+        if (strcmp(lastKey, ""))
+        {
+            path += ".";
+            path += lastKey;
+        }
         return PrettyWriter::StartObject();
     }
 
     bool EndObject(SizeType memberCount = 0)
     {
+        size_t lastDot = path.rfind(".");
+        if (lastDot != std::string::npos) {
+            path = path.erase(lastDot);
+        }
         return PrettyWriter::EndObject(memberCount);
     }
 
-    const char* getLastKey() const
+    std::vector<std::string> get_path_vector() const
     {
-        return lastKey;
-    }
+        std::vector<std::string> tokens;
+        std::istringstream stream(path);
+        std::string token;
 
-    const char* getLastValue() const
-    {
-        return lastValue;
-    }
+        while (std::getline(stream, token, '.')) {
+            if(!token.empty())
+				tokens.push_back(token);
+        }
 
+        return tokens;
+    }
 private:
-    static void copyToString(char* dest, const Ch* src, SizeType length)
+    static void copy_rj_ch_to_buffer(char* dest, const Ch* src, SizeType length)
     {
         memcpy(dest, src, length);
         dest[length] = '\0';
     }
+    
     char buffer[32];
-    char lastKey[256];
-    char lastValue[256];
+
 };

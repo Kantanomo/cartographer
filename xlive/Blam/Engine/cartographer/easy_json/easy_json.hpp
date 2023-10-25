@@ -112,10 +112,35 @@ public:
         // Serialize the document and handle any errors during serialization.
         if (!doc_.Accept(writer)) 
         {
-            easy_json_log("[easy_json] json writing failed on key: %s with value %s", writer.getLastKey(), writer.getLastValue());
+            easy_json_log("[easy_json] json writing failed on key: %s with value %s", writer.lastKey, writer.lastValue);
+            easy_json_log("[easy_json] attempting to resave the config without the failed key...");
+            easy_json_log("[easy_json] key path: %s", writer.path.c_str());
+            for(const auto& token : writer.get_path_vector())
+                operator[](token.c_str());
+
+            Value* member = get_current_pointer();
+            key_path.clear();
+            if(member != nullptr)
+            {
+                if (member->HasMember(writer.lastKey))
+                {
+                    easy_json_log("[easy_json] removing found key: %s at path: %s", writer.lastKey, writer.path.c_str());
+                    member->RemoveMember(writer.lastKey);
+                    ofs.close();
+                    return save(false);
+                }
+            }
+
+            easy_json_log("[easy_json] failed to resolve the save conflict settings will not be saved.");
+            //reset the ofstream and init the file with an empty json object
+        	ofs.close();
+            ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
+            ofs << "{}";
+            ofs.close();
+
             return e_easy_json_error::json_parse_error;
         }
-
+        easy_json_log("[easy_json] json file successfully saved.");
         // If everything is successful, return success.
         return e_easy_json_error::success;
     }
