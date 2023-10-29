@@ -175,9 +175,9 @@ namespace ImGuiHandler
 		void Close()
 		{
 			extra_height = 0;
-			SetDefaultOption("Ok", nullptr);
-			SetSecondaryOption("", nullptr);
-			SetTertiaryOption("", nullptr);
+			SetDefaultOption("Ok");
+			SetSecondaryOption("");
+			SetTertiaryOption("");
 			SetTitle("Message");
 		}
 	}

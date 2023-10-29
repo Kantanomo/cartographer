@@ -198,7 +198,7 @@ void ReadH2Config() {
 			{
 				saving_disabled = true;
 				constexpr char message_base[] = "Cartographer Configuration was not loaded, any changes made will not be saved until errors are corrected. Alternatively you can choose to reset your configuration";
-				char message_buffer[2048];
+				char message_buffer[sizeof(message_base) + sizeof(json.error_message)];
 				sprintf(message_buffer, "%s\n\n%s", message_base, json.error_message);
 				ImGuiHandler::ImMessageBox::SetTitle("Configuration Error");
 				ImGuiHandler::ImMessageBox::SetMessage(message_buffer);
