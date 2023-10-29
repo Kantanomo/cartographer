@@ -4,6 +4,7 @@ void InitH2Config();
 void DeinitH2Config();
 void SaveH2Config();
 void ReadH2Config();
+void GetH2ConfigFolder(wchar_t* path_out);
 void UpgradeConfig();
 
 #ifndef _CARTOGRAPHER_DLL_CONF

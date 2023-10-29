@@ -27,7 +27,22 @@ private:
     Document doc_;
     std::vector<std::string> key_path;
     struct_type* object;
+    struct_type backup_object;
 
+    static char* trim_tabs_from_str(const char* input) {
+        size_t length = strlen(input);
+        char* output = new char[length + 1]; // +1 for null terminator
+        size_t j = 0;
+
+        for (size_t i = 0; i < length; ++i) {
+            if (input[i] != '\t') {
+                output[j++] = input[i];
+            }
+        }
+
+        output[j] = '\0'; // Null-terminate the output string
+        return output;
+    }
 public:
     enum e_easy_json_error : byte {
         success,
@@ -38,6 +53,8 @@ public:
     typedef void t_log_w_function(const wchar_t* format, ...);
     t_log_function* log_function;
     t_log_w_function* log_w_function;
+    e_easy_json_error error_code;
+    char error_message[1024];
 
     easy_json(const wchar_t* file_name_in, struct_type* object_pointer)
     {
@@ -64,6 +81,7 @@ public:
         IStreamWrapper isw(ifs);
         doc_.SetObject();
         ParseResult parse_result = doc_.ParseStream(isw);
+        
         if (doc_.HasParseError())
         {
             ParseErrorCode errorCode = parse_result.Code();
@@ -75,26 +93,38 @@ public:
             size_t lineCount = 1;
             ifs.seekg(0);
             std::string line;
+            char* trimmed_line;
             while (std::getline(ifs, line))
             {
                 if (lineStart <= errorOffset && errorOffset <= lineStart + line.length())
                 {
-                    easy_json_log("[easy_json] offending line in the json file: %s", line.c_str());
+                    trimmed_line = trim_tabs_from_str(line.c_str());
+                    easy_json_log("[easy_json] offending line in the json file: %s", trimmed_line);
                     easy_json_log("[easy_json] error message: %s", GetParseError_En(errorCode));
                     break;
                 }
                 lineStart += line.length() + 1;  // +1 for the newline character
                 lineCount++;
             }
+            size_t oFileBufSize = (wcslen(file_name) + 1) * sizeof(char);
+            char* oFile = (char*)malloc(oFileBufSize);
+            wcstombs2(file_name, oFile, oFileBufSize);
 
+            error_code = json_parse_error;
+            sprintf(error_message, "Failed to load file:\n\t%s\n\nError reason:\n\t%s\n\nFailed to parse line:\n\t%s", oFile, GetParseError_En(errorCode), trimmed_line);
+            free(trimmed_line);
+            free(oFile);
             return e_easy_json_error::json_parse_error;
         }
 
         object->load(*this);
+        //Store a copy of the loaded object for data-integrity when saving if an error occurs.
+        backup_object = struct_type(*object);
         return e_easy_json_error::success;
     }
 
     e_easy_json_error save(bool save_object = true) {
+
         easy_json_logw(L"[easy_json] attempting to save file \"%ws\"", file_name);
         std::ofstream ofs(file_name);
         if (!ofs.is_open()) {
@@ -112,7 +142,7 @@ public:
         // Serialize the document and handle any errors during serialization.
         if (!doc_.Accept(writer)) 
         {
-            easy_json_log("[easy_json] json writing failed on key: %s with value %s", writer.lastKey, writer.lastValue);
+            easy_json_log("[easy_json] json writing failed on key: \"%s\" with value \"%s\"", writer.lastKey, writer.lastValue);
             easy_json_log("[easy_json] attempting to resave the config without the failed key...");
             easy_json_log("[easy_json] key path: %s", writer.path.c_str());
             for(const auto& token : writer.get_path_vector())
@@ -127,17 +157,18 @@ public:
                     easy_json_log("[easy_json] removing found key: %s at path: %s", writer.lastKey, writer.path.c_str());
                     member->RemoveMember(writer.lastKey);
                     ofs.close();
+                    //save while passing false to restart the saving process without re-processing the actual object.
                     return save(false);
                 }
             }
 
-            easy_json_log("[easy_json] failed to resolve the save conflict settings will not be saved.");
-            //reset the ofstream and init the file with an empty json object
+        	//reset the ofstream and re-save the first loaded settings.
         	ofs.close();
             ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
-            ofs << "{}";
+            backup_object.save(*this);
             ofs.close();
 
+            easy_json_log("[easy_json] failed to resolve the save conflict settings will not be saved.");
             return e_easy_json_error::json_parse_error;
         }
         easy_json_log("[easy_json] json file successfully saved.");

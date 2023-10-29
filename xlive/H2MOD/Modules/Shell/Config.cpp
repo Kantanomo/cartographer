@@ -3,6 +3,7 @@
 #include "Config.h"
 
 #include "Blam/Engine/cartographer/settings/settings.h"
+#include "H2MOD/GUI/ImGui_Integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -20,8 +21,67 @@ std::string H2ConfigVersionSection("H2ConfigurationVersion:" + H2ConfigVersionNu
 
 bool ownsConfigFile = false;
 bool H2Config_isConfigFileAppDataLocal = false;
+bool saving_disabled = false;
+
+
+void GetH2ConfigFolder(wchar_t* path_out)
+{
+	int readInstanceIdFile = _Shell::GetInstanceId();
+	wchar_t local[1024];
+	wcscpy_s(local, ARRAYSIZE(local), H2AppDataLocal);
+	H2Config_isConfigFileAppDataLocal = false;
+
+	errno_t err = 0;
+	FILE* fileConfig = nullptr;
+	wchar_t fileConfigPath[1024];
+
+	if (FlagFilePathConfig) {
+		wcscpy_s(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
+		size_t len = wcslen(fileConfigPath);
+		if (len >= 4 && wcsncmp(fileConfigPath + len - 4, L".ini", 4) == 0) {
+			wchar_t jsonPath[1024];
+			wcsncpy(jsonPath, FlagFilePathConfig, len - 4);
+			jsonPath[len - 4] = L'\0';
+			wcscat(jsonPath, L".json\0");
+			wcscpy_s(fileConfigPath, jsonPath);
+		}
+	}
+	else {
+		do {
+			wchar_t* checkFilePath = H2ProcessFilePath;
+			if (H2Config_isConfigFileAppDataLocal) {
+				checkFilePath = local;
+			}
+
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigJsonFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
+			addDebugText(L"Reading config: \"%ws\"", fileConfigPath);
+			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
+
+			if (err) {
+				addDebugText("H2Configuration file does not exist, error code: 0x%x", err);
+			}
+			H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
+			if (err && !H2Config_isConfigFileAppDataLocal) {
+				--readInstanceIdFile;
+			}
+		} while (err && readInstanceIdFile > 0);
+		H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
+	}
+
+	const wchar_t* lastSeparator = wcsrchr(fileConfigPath, L'\\');
+	size_t length = lastSeparator - fileConfigPath;
+	wcsncpy_s(path_out, MAX_PATH, fileConfigPath, length);
+	path_out[length] = L'\0'; // Null-terminate the string
+}
 
 void SaveH2Config() {
+
+	if(saving_disabled)
+	{
+		addDebugText("Saving has been disabled");
+		return;
+	}
+
 	addDebugText("Saving H2Configuration File...");
 
 	wchar_t fileConfigPath[1024];
@@ -131,9 +191,32 @@ void ReadH2Config() {
 #endif
 
 		auto rc = json.load();
-		if (rc < 0)
+		if (rc != easy_json<c_cartographer_settings>::success)
 		{
 			addDebugText("json.load() failed with error: %d while trying to read configuration file!", (int)rc);
+			if(json.error_code == json.json_parse_error)
+			{
+				saving_disabled = true;
+				constexpr char message_base[] = "Cartographer Configuration was not loaded, any changes made will not be saved until errors are corrected. Alternatively you can choose to reset your configuration";
+				char message_buffer[2048];
+				sprintf(message_buffer, "%s\n\n%s", message_base, json.error_message);
+				ImGuiHandler::ImMessageBox::SetTitle("Configuration Error");
+				ImGuiHandler::ImMessageBox::SetMessage(message_buffer);
+				ImGuiHandler::ImMessageBox::SetSecondaryOption("Reset Config", true, []()
+					{
+						addDebugText("User has manually chosen to reset their configuration after failing to load.");
+						saving_disabled = false;
+						SaveH2Config();
+					});
+				ImGuiHandler::ImMessageBox::SetTertiaryOption("Open Config Folder", false, []()
+					{
+						wchar_t folder_path[MAX_PATH];
+						GetH2ConfigFolder(folder_path);
+						ShellExecute(NULL, L"explore", folder_path, NULL, NULL, SW_SHOWNORMAL);
+					});
+				ImGuiHandler::ToggleWindow(ImGuiHandler::ImMessageBox::windowName);
+
+			}
 		}
 		else
 		{

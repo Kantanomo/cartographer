@@ -216,6 +216,10 @@ namespace ImGuiHandler
 	{
 		void Render(bool* p_open);
 		void SetMessage(std::string message);
+		void SetDefaultOption(const char* label, bool close_window = true, const std::function<void()>& callback_function = nullptr);
+		void SetSecondaryOption(const char* label, bool close_window = true, const std::function<void()>& callback_function = nullptr);
+		void SetTertiaryOption(const char* label, bool close_window = true, const std::function<void()>& callback_function = nullptr);
+		void SetTitle(const char* label);
 		void Open();
 		void Close();
 

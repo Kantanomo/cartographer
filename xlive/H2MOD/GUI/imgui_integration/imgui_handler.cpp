@@ -15,6 +15,14 @@
 
 namespace ImGuiHandler
 {
+	/*
+	 * imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
+		imgui_windows.emplace_back(ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close);
+		imgui_windows.emplace_back(ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);
+		imgui_windows.emplace_back(ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close);
+		imgui_windows.emplace_back(ImAdvancedSettings::windowName, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close);
+		imgui_windows.emplace_back(Console::windowName, false, Console::Render, Console::Open, Console::Close);
+	 */
 	std::vector<s_imgui_window> imgui_windows;
 	PDIRECT3DTEXTURE9			g_patch_notes_texture = NULL;
 
@@ -95,6 +103,17 @@ namespace ImGuiHandler
 	void ToggleWindow(const std::string& name)
 	{
 		bool keep_game_input_blocked = false;
+		if(imgui_windows.empty())
+		{
+			imgui_windows = {
+				s_imgui_window("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close),
+				s_imgui_window(ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close),
+				s_imgui_window(ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close),
+				s_imgui_window(ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close),
+				s_imgui_window(ImAdvancedSettings::windowName, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close),
+				s_imgui_window(Console::windowName, false, Console::Render, Console::Open, Console::Close)
+			};
+		}
 
 		for (auto& window : imgui_windows)
 		{
@@ -157,12 +176,6 @@ namespace ImGuiHandler
 
 		ImAdvancedSettings::BuildStringsTable();
 		WeaponOffsets::BuildStringsTable();
-		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
-		imgui_windows.emplace_back(ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close);
-		imgui_windows.emplace_back(ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);
-		imgui_windows.emplace_back(ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close);
-		imgui_windows.emplace_back(ImAdvancedSettings::windowName, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close);
-		imgui_windows.emplace_back(Console::windowName, false, Console::Render, Console::Open, Console::Close);
 
 		atexit([]() {
 			ImGui_ImplDX9_Shutdown();

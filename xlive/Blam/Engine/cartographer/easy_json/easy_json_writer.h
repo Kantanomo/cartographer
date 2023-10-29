@@ -3,7 +3,6 @@
 
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/document.h"
-#include "rapidjson/istreamwrapper.h"
 #include "rapidjson/ostreamwrapper.h"
 using namespace rapidjson;
 
