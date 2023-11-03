@@ -476,7 +476,7 @@
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zutil.h" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
-    <ClInclude Include="Blam\Engine\cartographer\easy_json\easy_json.hpp" />
+    <ClInclude Include="Blam\Engine\cartographer\easy_json\easy_json.h" />
     <ClInclude Include="Blam\Engine\cartographer\easy_json\easy_json_writer.h" />
     <ClInclude Include="Blam\Engine\cartographer\endpoints\endpoints.h" />
     <ClInclude Include="Blam\Engine\cartographer\settings\settings.h" />

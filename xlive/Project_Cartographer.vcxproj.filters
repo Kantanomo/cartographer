@@ -661,7 +661,7 @@
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_engine_player.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_events.h" />
     <ClInclude Include="Blam\Engine\cartographer\endpoints\endpoints.h" />
-    <ClInclude Include="Blam\Engine\cartographer\easy_json\easy_json.hpp" />
+    <ClInclude Include="Blam\Engine\cartographer\easy_json\easy_json.h" />
     <ClInclude Include="Blam\Engine\cartographer\easy_json\easy_json_writer.h" />
   </ItemGroup>
   <ItemGroup>

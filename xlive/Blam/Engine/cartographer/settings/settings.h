@@ -1,7 +1,7 @@
 #pragma once
 #include <H2MOD/Modules/SpecialEvents/SpecialEvents.h>
 #include <H2MOD/Modules/Input/ControllerInput.h>
-#include "Blam/Engine/cartographer/easy_json/easy_json.hpp"
+#include "Blam/Engine/cartographer/easy_json/easy_json.h"
 
 struct s_language_code {
 	int code_main;
