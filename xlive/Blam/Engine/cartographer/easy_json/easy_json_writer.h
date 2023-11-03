@@ -81,7 +81,7 @@ public:
 
     bool EndObject(SizeType memberCount = 0)
     {
-        size_t lastDot = path.rfind(".");
+        size_t lastDot = path.rfind('.');
         if (lastDot != std::string::npos) {
             path = path.erase(lastDot);
         }

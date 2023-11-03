@@ -1,10 +1,12 @@
 #pragma once
 #include "stdafx.h"
-
 #include "easy_json_writer.h"
-#include "H2MOD/Utils/Utils.h"
-#include "rapidjson/prettywriter.h"
+
+#include "Blam/Engine/cseries/cseries_strings.h"
 #include "Blam/Math/real_math.h"
+#include "H2MOD/Utils/Utils.h"
+
+#include "rapidjson/prettywriter.h"
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/ostreamwrapper.h"
@@ -23,7 +25,7 @@ using namespace rapidjson;
 template<typename struct_type>
 class easy_json {
 private:
-    wchar_t file_name[255];
+    c_static_wchar_string260 m_file_name;
     Document doc_;
     std::vector<std::string> key_path;
     struct_type* object;
@@ -58,32 +60,32 @@ public:
 
     easy_json(const wchar_t* file_name_in, struct_type* object_pointer)
     {
-        wcsncpy(file_name, file_name_in, 255);
+        m_file_name.set(file_name_in);
         object = object_pointer;
         doc_.SetObject();
     }
 
     e_easy_json_error load() {
-        easy_json_logw(L"[easy_json] attempting to load file \"%ws\"", file_name);
-        std::ifstream ifs(file_name);
+        easy_json_logw(L"[easy_json] attempting to load file \"%ws\"", m_file_name.get_string());
+        std::ifstream ifs(m_file_name.get_string());
         if (!ifs) {
             easy_json_log("[easy_json] file does not exist, creating new file");
             // The file does not exist, so create it.
-            std::ofstream ofs(file_name);
+            std::ofstream ofs(m_file_name.get_string());
             if (!ofs) {
                 easy_json_log("[easy_json] failed to create file");
                 throw std::runtime_error("Failed to create file");
             }
             ofs << "{}";  // Initialize with an empty JSON object.
             ofs.close();
-            ifs.open(file_name);
+            ifs.open(m_file_name.get_string());
         }
         IStreamWrapper isw(ifs);
         doc_.SetObject();
-        ParseResult parse_result = doc_.ParseStream(isw);
         
         if (doc_.HasParseError())
         {
+            ParseResult parse_result = doc_.ParseStream(isw);
             ParseErrorCode errorCode = parse_result.Code();
             size_t errorOffset = parse_result.Offset();
             easy_json_log("[easy_json] json parsing error code: %d at offset %d", errorCode, errorOffset);
@@ -106,9 +108,9 @@ public:
                 lineStart += line.length() + 1;  // +1 for the newline character
                 lineCount++;
             }
-            size_t oFileBufSize = (wcslen(file_name) + 1) * sizeof(char);
+            size_t oFileBufSize = m_file_name.length() + 1 * sizeof(char);
             char* oFile = (char*)malloc(oFileBufSize);
-            wcstombs2(file_name, oFile, oFileBufSize);
+            wcstombs2(m_file_name.get_buffer(), oFile, oFileBufSize);
 
             error_code = json_parse_error;
             sprintf(error_message, "Failed to load file:\n\t%s\n\nError reason:\n\t%s\n\nFailed to parse line:\n\t%s", oFile, GetParseError_En(errorCode), trimmed_line);
@@ -125,8 +127,8 @@ public:
 
     e_easy_json_error save(bool save_object = true) {
 
-        easy_json_logw(L"[easy_json] attempting to save file \"%ws\"", file_name);
-        std::ofstream ofs(file_name);
+        easy_json_logw(L"[easy_json] attempting to save file \"%ws\"", m_file_name.get_string());
+        std::ofstream ofs(m_file_name.get_string());
         if (!ofs.is_open()) {
             easy_json_log("[easy_json] json file could not be opened, perhaps it is open in another program or you do not have permissions to write to the location.");
             return e_easy_json_error::file_open_error;
@@ -164,7 +166,7 @@ public:
 
         	//reset the ofstream and re-save the first loaded settings.
         	ofs.close();
-            ofs.open(file_name, std::ofstream::out | std::ofstream::trunc);
+            ofs.open(m_file_name.get_string(), std::ofstream::out | std::ofstream::trunc);
             backup_object.save(*this);
             ofs.close();
 
