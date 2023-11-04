@@ -4,7 +4,7 @@
 
 
 
-void c_cartographer_settings::load(easy_json<c_cartographer_settings>& json)
+void c_cartographer_settings::load(c_easy_json<c_cartographer_settings>& json)
 {
 	const auto settings = this;
 	json["cartographer"].get_ds("h2portable", &settings->h2portable);
@@ -17,17 +17,17 @@ void c_cartographer_settings::load(easy_json<c_cartographer_settings>& json)
 	json["cartographer"].get_ds("language_label_capture", &settings->language_label_capture);
 	json["cartographer"].get_ds("discord_enable", &settings->discord_enable);
 
-	const auto wan_ip = json["cartographer"].get<const char*>("wan_ip", "");
-	if (strnlen_s(wan_ip, 15) >= 7 && inet_addr(wan_ip) != INADDR_NONE)
+	const char* wan_ip_string = json["cartographer"].get<const char*>("wan_ip", "");
+	if (strnlen_s(wan_ip_string, 15) >= 7 && inet_addr(wan_ip_string) != INADDR_NONE)
 	{
-		strncpy(settings->wan_ip_str, wan_ip, 15);
+		strncpy(settings->wan_ip_str, wan_ip_string, 15);
 		settings->wan_ip = inet_addr(settings->wan_ip_str);
 	}
 
-	const auto lan_ip = json["cartographer"].get<const char*>("lan_ip", "");
-	if (strnlen_s(lan_ip, 15) >= 7 && inet_addr(lan_ip) != INADDR_NONE)
+	const char* lan_ip_string = json["cartographer"].get<const char*>("lan_ip", "");
+	if (strnlen_s(lan_ip_string, 15) >= 7 && inet_addr(lan_ip_string) != INADDR_NONE)
 	{
-		strncpy(settings->lan_ip_str, lan_ip, 15);
+		strncpy(settings->lan_ip_str, lan_ip_string, 15);
 		settings->lan_ip = inet_addr(settings->lan_ip_str);
 	}
 
@@ -230,7 +230,7 @@ void c_cartographer_settings::load(easy_json<c_cartographer_settings>& json)
 #endif
 }
 
-void c_cartographer_settings::save(easy_json<c_cartographer_settings>& json)
+void c_cartographer_settings::save(c_easy_json<c_cartographer_settings>& json)
 {
 	const auto settings = this;
 	json["cartographer"].set("h2portable", settings->h2portable);

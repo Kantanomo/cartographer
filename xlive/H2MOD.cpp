@@ -1082,7 +1082,9 @@ void H2MOD::Initialize()
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
+#if ENABLEKANTTEST
 	KantTesting::Initialize();
+#endif
 	ProjectileFix::ApplyPatches();
 	H2X::ApplyPatches();
 	H2MOD::ApplyHooks();

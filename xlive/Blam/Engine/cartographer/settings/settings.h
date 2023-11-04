@@ -138,8 +138,8 @@ public:
 	s_cartographer_server_settings server;
 	s_cartographer_development_settings development;
 
-	void load(easy_json<c_cartographer_settings>& json) override;
-	void save(easy_json<c_cartographer_settings>& json) override;
+	void load(c_easy_json<c_cartographer_settings>& json) override;
+	void save(c_easy_json<c_cartographer_settings>& json) override;
 };
 
 extern c_cartographer_settings cartographer_settings;

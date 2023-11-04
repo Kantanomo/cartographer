@@ -71,7 +71,7 @@ public:
 
     bool StartObject()
     {
-        if (strcmp(lastKey, ""))
+        if (lastKey[0] == '\0')
         {
             path += ".";
             path += lastKey;

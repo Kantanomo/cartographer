@@ -22,18 +22,25 @@ using namespace rapidjson;
     if (log_w_function != nullptr) \
         log_w_function(fmt, ##__VA_ARGS__)
 
+enum e_easy_json_error
+{
+    _easy_json_error_success,
+    _easy_json_error_file_open,
+    _easy_json_error_parse_failed
+};
+
 template<typename struct_type>
-class easy_json {
+class c_easy_json {
 private:
     c_static_wchar_string260 m_file_name;
-    Document doc_;
-    std::vector<std::string> key_path;
-    struct_type* object;
-    struct_type backup_object;
+    Document m_doc;
+    std::vector<std::string> m_key_path;
+    struct_type* m_object;
+    struct_type m_backup_object;
 
     static char* trim_tabs_from_str(const char* input) {
         size_t length = strlen(input);
-        char* output = new char[length + 1]; // +1 for null terminator
+        char* output = (char*)calloc(length + 1, sizeof(char)); // +1 for null terminator
         size_t j = 0;
 
         for (size_t i = 0; i < length; ++i) {
@@ -46,11 +53,6 @@ private:
         return output;
     }
 public:
-    enum e_easy_json_error : byte {
-        success,
-        file_open_error,
-        json_parse_error
-    };
     typedef void t_log_function(const char* format, ...);
     typedef void t_log_w_function(const wchar_t* format, ...);
     t_log_function* log_function;
@@ -58,15 +60,16 @@ public:
     e_easy_json_error error_code;
     char error_message[1024];
 
-    easy_json(const wchar_t* file_name_in, struct_type* object_pointer)
+    c_easy_json(const wchar_t* file_name_in, struct_type* object_pointer)
     {
         m_file_name.set(file_name_in);
-        object = object_pointer;
-        doc_.SetObject();
+        m_object = object_pointer;
+        m_doc.SetObject();
     }
 
     e_easy_json_error load() {
-        easy_json_logw(L"[easy_json] attempting to load file \"%ws\"", m_file_name.get_string());
+        const wchar_t* string = m_file_name.get_string();
+        //easy_json_logw(L"[easy_json] attempting to load file \"%ws\"", string);
         std::ifstream ifs(m_file_name.get_string());
         if (!ifs) {
             easy_json_log("[easy_json] file does not exist, creating new file");
@@ -81,11 +84,11 @@ public:
             ifs.open(m_file_name.get_string());
         }
         IStreamWrapper isw(ifs);
-        doc_.SetObject();
+        m_doc.SetObject();
         
-        if (doc_.HasParseError())
+        if (m_doc.HasParseError())
         {
-            ParseResult parse_result = doc_.ParseStream(isw);
+            ParseResult parse_result = m_doc.ParseStream(isw);
             ParseErrorCode errorCode = parse_result.Code();
             size_t errorOffset = parse_result.Offset();
             easy_json_log("[easy_json] json parsing error code: %d at offset %d", errorCode, errorOffset);
@@ -112,17 +115,17 @@ public:
             char* oFile = (char*)malloc(oFileBufSize);
             wcstombs2(m_file_name.get_buffer(), oFile, oFileBufSize);
 
-            error_code = json_parse_error;
+            error_code = _easy_json_error_parse_failed;
             sprintf(error_message, "Failed to load file:\n\t%s\n\nError reason:\n\t%s\n\nFailed to parse line:\n\t%s", oFile, GetParseError_En(errorCode), trimmed_line);
             free(trimmed_line);
             free(oFile);
-            return e_easy_json_error::json_parse_error;
+            return _easy_json_error_parse_failed;
         }
 
-        object->load(*this);
+        m_object->load(*this);
         //Store a copy of the loaded object for data-integrity when saving if an error occurs.
-        backup_object = struct_type(*object);
-        return e_easy_json_error::success;
+        m_backup_object = struct_type(*m_object);
+        return _easy_json_error_success;
     }
 
     e_easy_json_error save(bool save_object = true) {
@@ -131,7 +134,7 @@ public:
         std::ofstream ofs(m_file_name.get_string());
         if (!ofs.is_open()) {
             easy_json_log("[easy_json] json file could not be opened, perhaps it is open in another program or you do not have permissions to write to the location.");
-            return e_easy_json_error::file_open_error;
+            return _easy_json_error_file_open;
         }
 
         OStreamWrapper osw(ofs);
@@ -139,10 +142,10 @@ public:
         writer.SetIndent('\t', 1);  // Set indentation to use tabs.
 
         if (save_object)
-            object->save(*this);
+            m_object->save(*this);
 
         // Serialize the document and handle any errors during serialization.
-        if (!doc_.Accept(writer)) 
+        if (!m_doc.Accept(writer)) 
         {
             easy_json_log("[easy_json] json writing failed on key: \"%s\" with value \"%s\"", writer.lastKey, writer.lastValue);
             easy_json_log("[easy_json] attempting to resave the config without the failed key...");
@@ -151,7 +154,7 @@ public:
                 operator[](token.c_str());
 
             Value* member = get_current_pointer();
-            key_path.clear();
+            m_key_path.clear();
             if(member != nullptr)
             {
                 if (member->HasMember(writer.lastKey))
@@ -167,15 +170,15 @@ public:
         	//reset the ofstream and re-save the first loaded settings.
         	ofs.close();
             ofs.open(m_file_name.get_string(), std::ofstream::out | std::ofstream::trunc);
-            backup_object.save(*this);
+            m_backup_object.save(*this);
             ofs.close();
 
             easy_json_log("[easy_json] failed to resolve the save conflict settings will not be saved.");
-            return e_easy_json_error::json_parse_error;
+            return _easy_json_error_parse_failed;
         }
         easy_json_log("[easy_json] json file successfully saved.");
         // If everything is successful, return success.
-        return e_easy_json_error::success;
+        return _easy_json_error_success;
     }
 
     /// <summary>
@@ -187,23 +190,23 @@ public:
     Value* get_current_pointer()
     {
         // Check if path is empty, if so, return a pointer to the root document object
-        if (key_path.empty()) {
-            return Pointer("").Get(doc_);
+        if (m_key_path.empty()) {
+            return Pointer("").Get(m_doc);
         }
 
         // Obtain a pointer to the root document object
-        Value* value = Pointer("").Get(doc_);
+        Value* value = Pointer("").Get(m_doc);
 
         // Iterate through each element in the path vector
-        for (const auto& element : key_path)
+        for (const auto& element : m_key_path)
         {
             // Check if the current value is an object
             if (value->IsObject()) {
                 // If the current element is not a member of the object, add a new member with the given name
                 if (!value->HasMember(element.c_str())) {
                     Value key;
-                    key.SetString(element.c_str(), doc_.GetAllocator());
-                    value->AddMember(key, rapidjson::Value(rapidjson::kObjectType), doc_.GetAllocator());
+                    key.SetString(element.c_str(), m_doc.GetAllocator());
+                    value->AddMember(key, rapidjson::Value(rapidjson::kObjectType), m_doc.GetAllocator());
                 }
                 // Update the value pointer to point to the member with the given name
                 value = &((*value)[element.c_str()]);
@@ -217,9 +220,9 @@ public:
         // Return a pointer to the final value object in the path
         return value;
     }
-    easy_json& operator[](const char* key)
+    c_easy_json& operator[](const char* key)
     {
-        key_path.emplace_back(key);
+        m_key_path.emplace_back(key);
         return *this;
     }
 
@@ -232,9 +235,9 @@ public:
         if(current_object == nullptr)
         {
             std::string key_path_str = "\\";
-            for (const auto& str : key_path)
+            for (const auto& str : m_key_path)
                 key_path_str += str + "\\";
-            key_path.clear();
+            m_key_path.clear();
             std::stringstream ss;
             ss << defaultValue;
         	easy_json_log("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
@@ -242,7 +245,7 @@ public:
             return defaultValue;
         }
         
-        key_path.clear();
+        m_key_path.clear();
         Value v;
 
         if (!current_object->HasMember(key)) {
@@ -382,9 +385,9 @@ public:
         if (current_object == nullptr)
         {
             std::string key_path_str = "\\";
-            for (const auto& str : key_path)
+            for (const auto& str : m_key_path)
                 key_path_str += str + "\\";
-            key_path.clear();
+            m_key_path.clear();
             std::stringstream ss;
             ss << value;
             easy_json_log("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
@@ -392,10 +395,10 @@ public:
             return;
         }
 
-        key_path.clear();
+        m_key_path.clear();
 
         bool is_new = !current_object->HasMember(key);
-        Value k(key, doc_.GetAllocator());
+        Value k(key, m_doc.GetAllocator());
         
         constexpr bool is_rapidjson_type_v =
             std::is_same_v<T, bool> ||
@@ -415,7 +418,7 @@ public:
     //Test for all default supported rapidjson types
         if constexpr (is_rapidjson_type_v) {
             if (is_new)
-                current_object->AddMember(k, value, doc_.GetAllocator());
+                current_object->AddMember(k, value, m_doc.GetAllocator());
             else
                 (*current_object)[key].Set<T>(value);
         }
@@ -424,35 +427,35 @@ public:
             if (!FloatIsNaN(value))
             {
                 if (is_new)
-                    current_object->AddMember(k, value, doc_.GetAllocator());
+                    current_object->AddMember(k, value, m_doc.GetAllocator());
                 else
                     (*current_object)[key].SetFloat(value);
             }
         }
         else if constexpr (std::is_same_v<T, short>) {
             if (is_new)
-                current_object->AddMember(k, value, doc_.GetAllocator());
+                current_object->AddMember(k, value, m_doc.GetAllocator());
             else
                 (*current_object)[key].SetInt(value);
         }
         else if constexpr (std::is_same_v<T, unsigned short>) {
             if (is_new)
-                current_object->AddMember(k, value, doc_.GetAllocator());
+                current_object->AddMember(k, value, m_doc.GetAllocator());
             else
                 (*current_object)[key].SetUint(value);
         }
         else if constexpr (std::is_same_v<T, std::string>) {
             if (is_new)
             {
-                Value v(value.c_str(), value.size(), doc_.GetAllocator());
-                current_object->AddMember(k, v, doc_.GetAllocator());
+                Value v(value.c_str(), value.size(), m_doc.GetAllocator());
+                current_object->AddMember(k, v, m_doc.GetAllocator());
             }
             else
-                (*current_object)[key].SetString(value.c_str(), doc_.GetAllocator());
+                (*current_object)[key].SetString(value.c_str(), m_doc.GetAllocator());
         }
         else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
             if (is_new)
-                current_object->AddMember(k, StringRef(value), doc_.GetAllocator());
+                current_object->AddMember(k, StringRef(value), m_doc.GetAllocator());
             else
                 (*current_object)[key].SetString(StringRef(value));
         }
@@ -460,17 +463,17 @@ public:
             if (is_new)
             {
                 Value vals(rapidjson::kArrayType);
-                vals.PushBack(value.x, doc_.GetAllocator());
-                vals.PushBack(value.y, doc_.GetAllocator());
-                vals.PushBack(value.z, doc_.GetAllocator());
-                current_object->AddMember(k, vals, doc_.GetAllocator());
+                vals.PushBack(value.x, m_doc.GetAllocator());
+                vals.PushBack(value.y, m_doc.GetAllocator());
+                vals.PushBack(value.z, m_doc.GetAllocator());
+                current_object->AddMember(k, vals, m_doc.GetAllocator());
             }
             else
             {
                 (*current_object)[key].Clear();
-                (*current_object)[key].PushBack(value.x, doc_.GetAllocator());
-                (*current_object)[key].PushBack(value.y, doc_.GetAllocator());
-                (*current_object)[key].PushBack(value.z, doc_.GetAllocator());
+                (*current_object)[key].PushBack(value.x, m_doc.GetAllocator());
+                (*current_object)[key].PushBack(value.y, m_doc.GetAllocator());
+                (*current_object)[key].PushBack(value.z, m_doc.GetAllocator());
             }
         }
         else {
@@ -487,8 +490,8 @@ template<typename type>
 class c_base_easy_json_struct
 {
 public:
-    virtual void load(easy_json<type>& json) = 0;
-    virtual void save(easy_json<type>& json) = 0;
+    virtual void load(c_easy_json<type>& json) = 0;
+    virtual void save(c_easy_json<type>& json) = 0;
 };
 
 #undef easy_json_log
