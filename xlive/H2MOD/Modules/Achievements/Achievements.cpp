@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Blam/Engine/cartographer/endpoints/endpoints.h"
+#include "Blam/Engine/cseries/cseries_strings.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "rapidjson/document.h"
@@ -62,9 +63,14 @@ void GetAchievements(unsigned long long xuid)
 	curl = curl_interface_init_no_verify();
 	if (curl) {
 
-		std::string server_url(k_cartographer_achievement_get_url + std::to_string(xuid));
+		c_static_string260 server_url;
+		server_url.set(k_cartographer_achievement_get_url);
+		char str[21];
+		sprintf(str, "%llu", xuid);
+		server_url.append(str);
+		//std::string server_url(k_cartographer_achievement_get_url + std::to_string(xuid));
 
-		curl_easy_setopt(curl, CURLOPT_URL, server_url.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, server_url.get_string());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 		res = curl_easy_perform(curl);

@@ -65,11 +65,12 @@ public:
         m_file_name.set(file_name_in);
         m_object = object_pointer;
         m_doc.SetObject();
+        log_function = nullptr;
+        log_w_function = nullptr;
     }
 
     e_easy_json_error load() {
-        const wchar_t* string = m_file_name.get_string();
-        //easy_json_logw(L"[easy_json] attempting to load file \"%ws\"", string);
+        easy_json_logw(L"[easy_json] attempting to load file \"%ws\"", m_file_name.get_string());
         std::ifstream ifs(m_file_name.get_string());
         if (!ifs) {
             easy_json_log("[easy_json] file does not exist, creating new file");
@@ -85,10 +86,9 @@ public:
         }
         IStreamWrapper isw(ifs);
         m_doc.SetObject();
-        
+        ParseResult parse_result = m_doc.ParseStream(isw);
         if (m_doc.HasParseError())
         {
-            ParseResult parse_result = m_doc.ParseStream(isw);
             ParseErrorCode errorCode = parse_result.Code();
             size_t errorOffset = parse_result.Offset();
             easy_json_log("[easy_json] json parsing error code: %d at offset %d", errorCode, errorOffset);
@@ -182,12 +182,12 @@ public:
     }
 
     /// <summary>
-   /// Gets a pointer to the JSON Value associated with the current key path in the document.
-   /// If the key path is empty, returns a pointer to the root document object.
-   /// If any key in the path does not exist, it creates the necessary nested structure in the document.
-   /// </summary>
-   /// <returns>A pointer to the JSON Value associated with the current key path, or nullptr if the path is invalid.</returns>
-    Value* get_current_pointer()
+    /// Gets a pointer to the JSON Value associated with the current key path in the document.
+    /// If the key path is empty, returns a pointer to the root document object.
+    /// If any key in the path does not exist, it creates the necessary nested structure in the document.
+    /// </summary>
+    /// <returns>A pointer to the JSON Value associated with the current key path, or nullptr if the path is invalid.</returns>
+    __declspec(noinline) Value* get_current_pointer()
     {
         // Check if path is empty, if so, return a pointer to the root document object
         if (m_key_path.empty()) {
@@ -196,7 +196,6 @@ public:
 
         // Obtain a pointer to the root document object
         Value* value = Pointer("").Get(m_doc);
-
         // Iterate through each element in the path vector
         for (const auto& element : m_key_path)
         {
@@ -209,29 +208,29 @@ public:
                     value->AddMember(key, rapidjson::Value(rapidjson::kObjectType), m_doc.GetAllocator());
                 }
                 // Update the value pointer to point to the member with the given name
-                value = &((*value)[element.c_str()]);
+            	value = &((*value)[element.c_str()]);
             }
             else {
                 // If the current value is not an object, return a null pointer
                 return nullptr;
             }
         }
-
         // Return a pointer to the final value object in the path
         return value;
     }
+
     c_easy_json& operator[](const char* key)
     {
         m_key_path.emplace_back(key);
         return *this;
     }
 
-    template<typename T>
+	template<typename T>
     T get(const char* key, T defaultValue = T{}) {
         // Check if the key exists in the document
 
         Value* current_object = get_current_pointer();
-
+        
         if(current_object == nullptr)
         {
             std::string key_path_str = "\\";

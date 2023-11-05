@@ -27,6 +27,7 @@
 
 #include "Accounts/c_account_list_menu.h"
 #include "Accounts/c_account_create_menu.h"
+#include "Blam/Engine/cartographer/endpoints/endpoints.h"
 #include "Blam/Engine/cartographer/settings/settings.h"
 
 extern DWORD H2BaseAddr;
@@ -1223,7 +1224,7 @@ static bool CMButtonHandler_Guide(int button_id) {
 		ImGuiHandler::ToggleWindow(ImGuiHandler::ImAdvancedSettings::windowName);
 	}
 	else if (button_id == 1) {
-		ShellExecuteA(NULL, "open", "https://cartographer.online/", NULL, NULL, SW_SHOWDEFAULT);
+		ShellExecuteA(NULL, "open", k_cartographer_url, NULL, NULL, SW_SHOWDEFAULT);
 	}
 	else if (button_id == 2) {
 		GSCustomMenuCall_Credits();

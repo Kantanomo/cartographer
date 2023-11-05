@@ -3,6 +3,7 @@
 #include "Updater.h"
 
 #include "Blam/Engine/cartographer/endpoints/endpoints.h"
+#include "Blam/Engine/cseries/cseries_strings.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
@@ -99,6 +100,14 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
+
+		// Ignore SSL certificate issues
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+		// Enable automatic following of redirects
+		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
 		res = curl_easy_perform(curl);
 		/* always cleanup */
 		curl_easy_cleanup(curl);
@@ -408,6 +417,7 @@ bool DownloadUpdatedFiles() {
 	swprintf(dir_update, ARRAYSIZE(dir_update), L"%ws\\Halo2\\Update\\", dir_temp);
 
 	int entry_count = UpdateFileEntries.size();
+	
 	for (int i = 0; i < entry_count; i++) {
 		if (UpdateFileEntries[i]->need_to_update == 2) {
 			files_downloaded = true;
@@ -419,9 +429,11 @@ bool DownloadUpdatedFiles() {
 				swprintf(existingfilepath, ARRAYSIZE(existingfilepath), L"%s%hs", dir_update, UpdateFileEntries[i]->local_name);
 			}
 			_wremove(existingfilepath);
-			std::string im_lazy_2_dl = "https://cartographer.online/";
-			im_lazy_2_dl += UpdateFileEntries[i]->server_uri;
-			DownloadFile(im_lazy_2_dl.c_str(), existingfilepath);
+			c_static_string260 uri;
+			uri.set(k_cartographer_url);
+			uri.append(UpdateFileEntries[i]->server_uri);
+
+			DownloadFile(uri.get_string(), existingfilepath);
 		}
 	}
 
