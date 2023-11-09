@@ -13,6 +13,10 @@
 #include "rapidjson/pointer.h"
 #include "rapidjson/error/en.h"
 
+#define k_max_json_depth 5
+#define k_max_path_item_length 15
+#define easy_json_key_length_assert(expr) typedef char static_assertion[(expr) ? 1 : -1]
+
 using namespace rapidjson;
 #define easy_json_log(fmt, ...) \
     if (log_function != nullptr) \
@@ -21,6 +25,9 @@ using namespace rapidjson;
 #define easy_json_logw(fmt, ...) \
     if (log_w_function != nullptr) \
         log_w_function(fmt, ##__VA_ARGS__)
+
+
+
 
 enum e_easy_json_error
 {
@@ -34,7 +41,8 @@ class c_easy_json {
 private:
     c_static_wchar_string260 m_file_name;
     Document m_doc;
-    std::vector<std::string> m_key_path;
+    int m_current_depth = 0;
+    char m_key_path[k_max_json_depth][k_max_path_item_length];
     struct_type* m_object;
     struct_type m_backup_object;
 
@@ -154,7 +162,7 @@ public:
                 operator[](token.c_str());
 
             Value* member = get_current_pointer();
-            m_key_path.clear();
+            clear_key_path();
             if(member != nullptr)
             {
                 if (member->HasMember(writer.lastKey))
@@ -190,25 +198,26 @@ public:
     __declspec(noinline) Value* get_current_pointer()
     {
         // Check if path is empty, if so, return a pointer to the root document object
-        if (m_key_path.empty()) {
+        if (m_current_depth == 0) {
             return Pointer("").Get(m_doc);
         }
 
         // Obtain a pointer to the root document object
         Value* value = Pointer("").Get(m_doc);
         // Iterate through each element in the path vector
-        for (const auto& element : m_key_path)
+        for (int i = 0; i < m_current_depth; ++i) 
         {
+            char* current_key = m_key_path[i];
             // Check if the current value is an object
             if (value->IsObject()) {
                 // If the current element is not a member of the object, add a new member with the given name
-                if (!value->HasMember(element.c_str())) {
+                if (!value->HasMember(current_key)) {
                     Value key;
-                    key.SetString(element.c_str(), m_doc.GetAllocator());
+                    key.SetString(current_key, m_doc.GetAllocator());
                     value->AddMember(key, rapidjson::Value(rapidjson::kObjectType), m_doc.GetAllocator());
                 }
                 // Update the value pointer to point to the member with the given name
-            	value = &((*value)[element.c_str()]);
+            	value = &((*value)[current_key]);
             }
             else {
                 // If the current value is not an object, return a null pointer
@@ -221,8 +230,15 @@ public:
 
     c_easy_json& operator[](const char* key)
     {
-        m_key_path.emplace_back(key);
+        strncpy(m_key_path[m_current_depth], key, k_max_path_item_length - 1);
+        m_key_path[m_current_depth][k_max_path_item_length - 1] = '\0'; // Ensure null-termination
+        m_current_depth++;
         return *this;
+    }
+
+    void clear_key_path() {
+        memset(m_key_path, 0, sizeof(m_key_path));
+        m_current_depth = 0;
     }
 
 	template<typename T>
@@ -233,18 +249,28 @@ public:
         
         if(current_object == nullptr)
         {
-            std::string key_path_str = "\\";
-            for (const auto& str : m_key_path)
-                key_path_str += str + "\\";
-            m_key_path.clear();
+            size_t total_length = m_current_depth;
+            for (int i = 0; i < m_current_depth; ++i) {
+                total_length += strlen(m_key_path[i]);
+            }
+            char* combined_path = (char*)malloc(total_length + 1);
+            strcpy(combined_path, m_key_path[0]);
+        	for (int i = 1; i < m_current_depth; ++i) {
+                strcat(combined_path, "\\");
+                strcat(combined_path, m_key_path[i]);
+            }
+            
+            clear_key_path();
             std::stringstream ss;
             ss << defaultValue;
-        	easy_json_log("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
+        	easy_json_log("[easy_json] the provided keypath was unable to be accessed.. path: %s", combined_path);
             easy_json_log("[easy_json] get: %s value(default): %s", key, ss.str().c_str());
+
+        	free(combined_path);
             return defaultValue;
         }
         
-        m_key_path.clear();
+        clear_key_path();
         Value v;
 
         if (!current_object->HasMember(key)) {
@@ -383,18 +409,26 @@ public:
 
         if (current_object == nullptr)
         {
-            std::string key_path_str = "\\";
-            for (const auto& str : m_key_path)
-                key_path_str += str + "\\";
-            m_key_path.clear();
+            size_t total_length = m_current_depth;
+            for (int i = 0; i < m_current_depth; ++i) {
+                total_length += strlen(m_key_path[i]);
+            }
+            char* combined_path = (char*)malloc(total_length + 1);
+            strcpy(combined_path, m_key_path[0]);
+            for (int i = 1; i < m_current_depth; ++i) {
+                strcat(combined_path, "\\");
+                strcat(combined_path, m_key_path[i]);
+            }
+
+            clear_key_path();
             std::stringstream ss;
             ss << value;
-            easy_json_log("[easy_json] the provided keypath was unable to be accessed.. path: %s", key_path_str.c_str());
+            easy_json_log("[easy_json] the provided keypath was unable to be accessed.. path: %s", combined_path);
             easy_json_log("[easy_json] failed to set: %s value: %s", key, ss.str().c_str());
             return;
         }
 
-        m_key_path.clear();
+        clear_key_path();
 
         bool is_new = !current_object->HasMember(key);
         Value k(key, m_doc.GetAllocator());
@@ -495,3 +529,4 @@ public:
 
 #undef easy_json_log
 #undef easy_json_logw
+#undef easy_json_key_length_assert
