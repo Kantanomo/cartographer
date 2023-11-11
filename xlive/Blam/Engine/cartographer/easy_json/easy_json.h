@@ -158,7 +158,7 @@ public:
 			easy_json_log("[easy_json] attempting to resave the config without the failed key...");
 			easy_json_log("[easy_json] key path: %s", writer.path);
 			for (const auto& token : writer.get_path_vector())
-				operator[](token);
+				operator[](token.c_str());
 
 			Value* member = get_current_pointer();
 			clear_key_path();
