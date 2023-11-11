@@ -156,7 +156,7 @@ public:
 		{
 			easy_json_log("[easy_json] json writing failed on key: \"%s\" with value \"%s\"", writer.lastKey, writer.lastValue);
 			easy_json_log("[easy_json] attempting to resave the config without the failed key...");
-			easy_json_log("[easy_json] key path: %s", writer.path);
+			easy_json_log("[easy_json] key path: %s", writer.path.c_str());
 			for (const auto& token : writer.get_path_vector())
 				operator[](token.c_str());
 
@@ -166,7 +166,7 @@ public:
 			{
 				if (member->HasMember(writer.lastKey))
 				{
-					easy_json_log("[easy_json] removing found key: %s at path: %s", writer.lastKey, writer.path);
+					easy_json_log("[easy_json] removing found key: %s at path: %s", writer.lastKey, writer.path.c_str());
 					member->RemoveMember(writer.lastKey);
 					ofs.close();
 					//save while passing false to restart the saving process without re-processing the actual object.
