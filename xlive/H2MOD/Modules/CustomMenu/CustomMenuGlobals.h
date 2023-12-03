@@ -8,16 +8,6 @@ struct s_new_ui_screen_parameters;
 typedef void(__thiscall* button_handler_cb_t)(void* context, int a1, int* a2);
 typedef void* (__cdecl* proc_ui_screen_load_cb_t)(s_new_ui_screen_parameters*);
 
-enum e_ui_channel
-{
-	_ui_channel_hardware_error = 0,
-	_ui_channel_game_error = 1,
-	_ui_channel_virtual_keyboard = 2,
-	_ui_channel_gameshell_dialog = 3,
-	_ui_channel_gameshell_screen = 5,
-	_ui_channel_gameshell_background = 6,
-};
-
 struct alignas(4) s_new_ui_screen_parameters
 {
 	void data_new(__int16 _flags1, __int16 _flags2, int ui_channel, int a4, proc_ui_screen_load_cb_t ui_screen_load_cb)

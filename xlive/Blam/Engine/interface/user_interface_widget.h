@@ -1,4 +1,5 @@
 #pragma once
+#include "Blam/Engine/math/integer_math.h"
 
 enum e_user_interface_widget_type
 {
@@ -31,6 +32,8 @@ struct c_user_interface_animation
 };
 
 
+
+
 struct c_user_interface_widget
 {
 	void* v_table;
@@ -55,3 +58,29 @@ struct c_user_interface_widget
 	int8 byte6E;
 	bool can_handle_events;
 };
+
+struct c_user_interface_widget_vtable
+{
+	void* c_user_interface_widget__sub_799B8F;
+	int(__thiscall* c_user_interface_widget__sub_79B108)(c_user_interface_widget*);
+	void(__thiscall* c_user_interface_widget__recurse_next_child_pointlessly)(c_user_interface_widget*);
+	int(__thiscall* c_user_interface_widget__update)(c_user_interface_widget*);
+	void* nullsub_117;
+	void(__thiscall* c_user_interface_widget__get_mouse_region_out)(c_user_interface_widget*, rectangle2d*);
+	void(__thiscall* c_user_interface_widget__set_animation_with_children)(c_user_interface_widget*, c_user_interface_animation*);
+	void* c_user_interface_widget__return_0;
+	void* c_user_interface_widget__sub_79AF34;
+	void* (__thiscall* c_user_interface_widget__sub_79B701)(c_user_interface_widget*, c_user_interface_widget*);
+	void* c_user_interface_widget__sub_79B77F;
+	void* c_user_interface_widget__sub_79B818;
+	void* c_user_interface_widget__sub_79AFE4;
+	int(__thiscall* c_user_interface_widget__get_parent_screen_channel_type)(c_user_interface_widget*);
+	int(__thiscall* c_user_interface_widget__get_parent_screen_render_window)(c_user_interface_widget*);
+	int(__thiscall* nullsub_314)(c_user_interface_widget*, int);
+	int(__thiscall* nullsub_313)(c_user_interface_widget*, int);
+	void* c_user_interface_widget__sub_79A75D;
+	bool(__thiscall* c_user_interface_widget__return_0_2)(c_user_interface_widget*);
+	void* _purecall;
+	void* c_user_interface_widget__sub_79B6E0;
+};
+

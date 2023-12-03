@@ -761,6 +761,59 @@ struct s_window_pane_reference
 };
 TAG_BLOCK_SIZE_ASSERT(s_window_pane_reference, 0x4C);
 
+enum e_user_interface_shape_group : int16
+{
+	_interface_shape_group_none,
+    _interface_shape_group_0,
+    _interface_shape_group_1,
+    _interface_shape_group_2,
+    _interface_shape_group_3,
+    _interface_shape_group_4,
+    _interface_shape_group_5,
+    _interface_shape_group_6,
+    _interface_shape_group_7,
+    _interface_shape_group_8,
+    _interface_shape_group_9,
+    _interface_shape_group_10,
+    _interface_shape_group_11,
+    _interface_shape_group_12,
+    _interface_shape_group_13,
+    _interface_shape_group_14,
+    _interface_shape_group_15,
+    _interface_shape_group_16,
+    _interface_shape_group_17,
+    _interface_shape_group_18,
+    _interface_shape_group_19,
+    _interface_shape_group_20,
+    _interface_shape_group_21,
+    _interface_shape_group_22,
+    _interface_shape_group_23,
+    _interface_shape_group_24,
+    _interface_shape_group_25,
+    _interface_shape_group_26,
+    _interface_shape_group_27,
+    _interface_shape_group_28,
+    _interface_shape_group_29,
+    _interface_shape_group_30,
+    _interface_shape_group_31
+};
+
+struct s_local_string_section_references_block
+{
+    string_id string_id;
+};
+
+struct s_interface_local_strings_block
+{
+    string_id section_name;
+    tag_block<s_local_string_section_references_block> local_string_section_references;
+};
+
+struct s_interface_local_bitmaps_block
+{
+    tag_reference bitmap;
+};
+
 struct s_user_interface_screen_widget_definition : TagGroup<'wgit'>
 {
     /* Explaination("Notes on screen widgets:", 
@@ -791,4 +844,14 @@ struct s_user_interface_screen_widget_definition : TagGroup<'wgit'>
     tag_reference string_list_tag;
     // Explaination("Panes", "Define the screen's panes here (normal screens have 1 pane, tab-view screens have 2+ panes)")
     tag_block<s_window_pane_reference> panes;
+    e_user_interface_shape_group shape_type;
+    int16 unk_2A;
+    string_id header_string_id;
+    tag_block<s_interface_local_strings_block> local_strings;
+    tag_block<s_interface_local_bitmaps_block> local_bitmaps;
+    real_rgb_color source_color;
+    real_rgb_color destination_color;
+    point2d accumulate_zoom_scale;
+    point2d refraction_scale;
+    tag_reference mouse_cursor_definition;
 };

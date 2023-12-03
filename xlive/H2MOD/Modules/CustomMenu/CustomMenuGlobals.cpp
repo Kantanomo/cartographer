@@ -3,6 +3,7 @@
 #include "CustomLanguage.h"
 
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/interface/user_interface.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 BYTE* ui_memory_pool_allocate(int size, int a2)
