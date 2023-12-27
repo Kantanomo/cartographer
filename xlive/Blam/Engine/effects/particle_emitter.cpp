@@ -114,6 +114,7 @@ void c_particle_emitter::update_matrix_and_child_particles(c_particle_emitter* t
 		{
 			thisx->emission_time -= 1.0f;
 
+			//thisx->update_children(particle_state, particle_system, emitter_definition, alpha, emitter_time_b, delta, scale);
 			thisx->update_children(particle_state, particle_system, emitter_definition, alpha , 0, delta, scale);
 
 			emitter_time_b += emitter_time_a;
@@ -134,6 +135,6 @@ __declspec(naked) void c_particle_emitter_update_matrix_and_child_particles_to_s
 
 void particle_emitter_apply_patches()
 {
-	//PatchCall(Memory::GetAddress(0x106423), c_particle_emitter_update_matrix_and_child_particles_to_stdcall);
+	PatchCall(Memory::GetAddress(0x106423), c_particle_emitter_update_matrix_and_child_particles_to_stdcall);
 	//p_c_particle_emitter_update_matrix_and_child_particles = (c_particle_emitter_update_matrix_and_child_particles_t)DetourClassFunc((uint8*)Memory::GetAddress(0x105A90), (uint8*)c_particle_emitter::update_matrix_and_child_particles, 10);
 }

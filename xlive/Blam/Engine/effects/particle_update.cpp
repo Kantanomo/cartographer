@@ -196,5 +196,5 @@ void apply_particle_update_patches()
 	//PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
 	//PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
 	PatchCall(Memory::GetAddress(0x48D5C), game_frame_particle_update);
-	PatchCall(Memory::GetAddress(0x105380), particle_update_points_interpolate_hook);
+	//PatchCall(Memory::GetAddress(0x105380), particle_update_points_interpolate_hook);
 }
