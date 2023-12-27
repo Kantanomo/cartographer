@@ -19,7 +19,7 @@ bool __cdecl biped_is_running_invisible_crouched_uber_melee(datum object_index)
 }
 
 
-real_vector2d* biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector3d* up, real_vector2d* forward_out, real_vector2d* up_out)
+void biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector3d* up, real_vector2d* forward_out, real_vector2d* up_out)
 {
     forward_out->i = forward->i;
     forward_out->j = forward->j;
@@ -37,7 +37,7 @@ real_vector2d* biped_build_2d_camera_frame(const real_vector3d* forward, const r
             *forward_out = global_forward2d;
         }
     }
-    return perpendicular2d(forward_out, up_out);
+    perpendicular2d(forward_out, up_out);
 }
 
 void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forward, datum object_index, real_point3d* camera_position, const real_vector3d* camera_up)
@@ -73,11 +73,11 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
             {
                 function_value = 1.0f;
             }
-            function_result = transition_function_evaluate(5, function_value);
+            function_result = transition_function_evaluate(_transition_function_cosine, function_value);
         }
         else
         {
-            function_result = transition_function_evaluate(5, 0.0f);
+            function_result = transition_function_evaluate(_transition_function_cosine, 0.0f);
         }
 
 
