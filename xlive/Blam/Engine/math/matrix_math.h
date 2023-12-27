@@ -47,3 +47,5 @@ void __cdecl matrix3x3_from_forward_and_up(real_matrix3x3* out_matrix, real_vect
 void __cdecl matrix3x3_multiply(real_matrix3x3* input_matrix_1, real_matrix3x3* input_matrix_2, real_matrix3x3* out_matrix);
 
 void __cdecl matrix3x3_transform_vector(real_matrix3x3* input_matrix, real_vector3d* input_vector, real_vector3d* out_vector);
+
+void __cdecl matrix3x3_create_from_rotations(real_matrix3x3* out_matrix, real32 yaw, real32 pitch, real32 roll);

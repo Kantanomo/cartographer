@@ -156,3 +156,8 @@ void matrix3x3_transform_vector(real_matrix3x3* input_matrix, real_vector3d* inp
 {
 	INVOKE(0x78800, 0x763F6, matrix3x3_transform_vector, input_matrix, input_vector, out_vector);
 }
+
+void matrix3x3_create_from_rotations(real_matrix3x3* out_matrix, real32 yaw, real32 pitch, real32 roll)
+{
+	INVOKE(0x796A9, 0, matrix3x3_create_from_rotations, out_matrix, yaw, pitch, roll);
+}

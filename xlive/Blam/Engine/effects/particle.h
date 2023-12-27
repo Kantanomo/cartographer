@@ -36,6 +36,7 @@ struct c_particle
 	real_vector3d m_velocity;
 	int8 gap_34[12];
 };
+CHECK_STRUCT_SIZE(c_particle, 0x40);
 
 struct s_particle_interpolation_data
 {

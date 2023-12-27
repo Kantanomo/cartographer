@@ -33,12 +33,12 @@ float projectile_get_update_tick_length(datum projectile_datum_index, bool proje
 	if ((*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5)) != 0 // check if travels instantaneously flag is set in the projectile flags
 		&& (projectile_instant_update || *(int*)(object_data + 428) == time_globals::get_game_time())) // also check if the projectile is updated twice in the same tick
 	{
-		LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
+		//LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
 		return time_globals::get_seconds_per_tick() * ((float)time_globals::get()->ticks_per_second / 30.f);
 	}
 	else
 	{
-		LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get_tickrate());
+		//LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get_tickrate());
 		return time_globals::get_seconds_per_tick();
 	}
 }
@@ -62,14 +62,14 @@ bool __cdecl projectile_new_hook(datum projectile_object_index, int a2)
 void __cdecl projectile_update_instantaneous(datum projectile_object_index, real_point3d *a2)
 {
 	float tick_length = projectile_get_update_tick_length(projectile_object_index, true);
-	LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
+	//LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2, tick_length);
 }
 
 void __cdecl projectile_update_regular(datum projectile_object_index, real_point3d *a2)
 {
 	float tick_length = projectile_get_update_tick_length(projectile_object_index, false);
-	LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
+	//LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2, tick_length);
 }
 
@@ -143,11 +143,11 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 
 	BYTE* projectile = (BYTE*)object_get_fast_unsafe(trigger_projectile_datum_index);
 
-	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - original values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
+	//LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - original values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
 
 	v1 = (real_vector3d*)(projectile + 432);
 
-	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - new values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
+	//LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - new values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
 
 	p_matrix4x3_transform_point(matrix, v1, out);
 }

@@ -65,6 +65,7 @@ real_point3d* halo_particle_interpolator_get_interpolated_position(datum particl
 				g_particle_interpolator_delta_remainder,
 				&particle_position
 			);
+
 			*out_point = particle_position;
 			return out_point;
 		}
@@ -72,7 +73,6 @@ real_point3d* halo_particle_interpolator_get_interpolated_position(datum particl
 		*out_point = g_previous_particle_interpolation_frame_data->particle_data[particle_abs_index].position;
 		return out_point;
 	}
-
 	*out_point = particle_position;
 	return out_point;
 }
@@ -124,46 +124,12 @@ void particle_update(real32 delta)
 		}
 	}
 	halo_particle_interpolator_update();
+	g_particle_interpolator_delta_remainder = delta;
 
-
-	/*g_particle_interpolator_delta += delta;
-
-	real32 game_tick_length = time_globals::get()->seconds_per_tick ;
-	real32 accumulated_delta = g_particle_interpolator_delta;
-	real32 nearest_whole_tick_delta = 0.f;
-	if(g_particle_interpolator_delta >= game_tick_length)
-	{
-		do
-		{
-			accumulated_delta -= game_tick_length;
-			nearest_whole_tick_delta += game_tick_length;
-		} while (accumulated_delta >= game_tick_length);
-
-		g_particle_interpolator_delta = accumulated_delta;
-
-		if(nearest_whole_tick_delta > 0.f)
-		{
-			s_data_iterator<c_particle_system> particle_system_it(get_particle_system_table());
-
-			while (particle_system_it.get_next_datum())
-			{
-				c_particle_system* particle_system = particle_system_it.get_current_datum();
-				if (particle_system->field_4C == NONE && !c_particle_system::update(particle_system, nearest_whole_tick_delta))
-				{
-					if (particle_system->parent_effect_index != NONE)
-					{
-						particle_syste_remove_from_effects_cache(particle_system->parent_effect_index, particle_system_it.get_current_datum_index());
-					}
-					c_particle_system::destroy(particle_system_it.get_current_datum_index());
-				}
-			}
-			halo_particle_interpolator_update();
-		}
-		g_particle_interpolator_delta_remainder = accumulated_delta / game_tick_length;
-	}*/
 }
+
 
 void apply_particle_patches()
 {
-	PatchCall(Memory::GetAddress(0xAA636, 0xB1C5D), particle_update);
+	//PatchCall(Memory::GetAddress(0xAA636, 0xB1C5D), particle_update);
 }

@@ -6,6 +6,7 @@
 #include "Blam/Engine/camera/observer.h"
 #include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/effects/contrails.h"
+#include "Blam/Engine/effects/effects.h"
 #include "Blam/Engine/effects/particle.h"
 #include "Blam/Engine/effects/particle_update.h"
 #include "Blam/Engine/game/aim_assist.h"
@@ -930,6 +931,7 @@ void H2MOD::ApplyHooks() {
 		game_state_procs_apply_patches();
 		apply_particle_patches();
 		apply_particle_system_patches();
+		effects_apply_patches();
 		apply_particle_update_patches();
 		apply_dead_camera_patches();
 		loading_apply_patches();
@@ -940,6 +942,7 @@ void H2MOD::ApplyHooks() {
 		cloth_apply_patches();
 		camera_apply_patches();
 		player_control_apply_patches();
+		particle_emitter_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

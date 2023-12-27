@@ -90,4 +90,8 @@ void toggle_first_person(bool state);
 
 void first_person_weapon_apply_camera_effect(int32 user_index, real_matrix4x3* effect_matrix);
 
+void __cdecl first_person_weapon_get_worldspace_node_matrix(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix);
+
+real_matrix4x3* __cdecl first_person_weapon_get_relative_node_matrix(int32 user_index, datum weapon_index, int16 node_index);
+
 void first_person_weapons_apply_patches(void);

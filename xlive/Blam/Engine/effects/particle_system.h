@@ -47,8 +47,12 @@ public:
 	void destroy_children();
 	bool update_new(real32 delta_time);
 	void update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2);
+	void update_colors_and_get_location(real32 flt_1, real32 flt_2, pixel32 color, pixel32 color_2, s_particle_system_update_timings* timings);
 	void adjust_particle_system_indexes(datum* datum_1, datum* datum_2);
+	void update_locations(s_particle_system_update_timings* timings, real_matrix4x3* matrix, bool has_bit_15);
 	int get_active_particle_locations_count();
+	bool flags_bit_10_is_set() const;
+
 	bool static __stdcall update(c_particle_system* thisx, real32 delta_time);
 	static void __stdcall update_location_time(c_particle_system* thisx, s_particle_system_update_timings* timings, real_matrix4x3* matrix, int unused);
 	static void __cdecl destroy(datum particle_system_index);

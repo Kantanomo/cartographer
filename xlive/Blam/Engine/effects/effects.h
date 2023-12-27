@@ -1,41 +1,62 @@
 #pragma once
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/math/color_math.h"
+#include "Blam/Engine/math/matrix_math.h"
 #include "Blam/Engine/memory/data.h"
+
+#define k_maximum_effect_locations 512
+
+enum e_effect_datum_flags : int16
+{
+	_effect_datum_flags_bit_15 = 15
+};
 
 enum e_effect_location_flags : int16
 {
-    _effect_location_flags_bit_15 = FLAG(15),
+    _effect_location_datum_flags_bit_15 = 15,
 };
 
 
-struct effect_datum
+class effect_datum
 {
+public:
     int8 gap_0[2];
-    int16 flags;
+    e_effect_datum_flags flags;
     int32 tag_datum;
-    int8 gap_8[64];
+    int8 gap_8[24];
+    int16 sky_owner_cluster;
+    int8 gap_22[14];
+    real_vector3d vector;
+    int8 gap_3C[12];
     datum multi_purpose_origin_index;
     s_damage_owner damage_owner;
     int32 origin_local_user_index;
     int16 event_index;
-    int8 gap_60[28];
+    int8 gap_5E[6];
+    float delay;
+    int8 gap_68[4];
+    float type_specific_scale;
+    float scale;
+    int8 gap_74[6];
     datum effect_locations[32];
-    int8 gap_80[145];
+    datum particle_system;
+    void* particle_system_ptr;
+    pixel32 pixel_1;
+    pixel32 pixel_2;
+    int8 gap_10C[132];
 };
 
 CHECK_STRUCT_SIZE(effect_datum, 400);
 
-struct effect_location_datum
+class effect_location_datum
 {
+public:
     int8 gap_0[2];
     e_effect_location_flags flags;
     int32 parent_effect_location_index;
-    int8 gap_8[4];
-    real_point3d unk_real_point_8;
-    int8 gap_18[12];
-    real_point3d unk_real_point_24;
-    real_point3d location;
+    real_matrix4x3 matrix;
+
+    real_matrix4x3* calculate_origin_matrix(effect_datum* effect, bool sky_relative, real_matrix4x3* out_matrix);
 };
 
 CHECK_STRUCT_SIZE(effect_location_datum, 60);

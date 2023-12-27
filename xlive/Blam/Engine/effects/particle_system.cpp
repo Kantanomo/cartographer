@@ -50,8 +50,7 @@ c_particle_system_definition* c_particle_system::get_particle_system_definition(
 	if (tag_type.tag_type == blam_tag::tag_group_type::breakablesurface)
 	{
 		s_breakable_surface_definition* breakable_surface = (s_breakable_surface_definition*)tags::get_tag_fast(this->tag_index);
-		effect_definition* effect = (effect_definition*)tags::get_tag_fast(breakable_surface->effect.TagIndex);
-		return effect->events[this->effect_event_index]->particle_systems[this->event_particle_system_index];
+		return breakable_surface->particle_effects[this->event_particle_system_index];
 	}
 	return nullptr;
 }
@@ -120,11 +119,27 @@ void c_particle_system::update_colors(bool v_mirrored_or_one_shot, bool one_shot
 	function(this, v_mirrored_or_one_shot, one_shot, color, color_2);
 }
 
+void c_particle_system::update_colors_and_get_location(real32 flt_1, real32 flt_2, pixel32 color, pixel32 color_2,
+	s_particle_system_update_timings* timings)
+{
+	typedef void(__thiscall* update_colors_and_get_location_t)(c_particle_system*, real32, real32, pixel32, pixel32, s_particle_system_update_timings*);
+	auto function = Memory::GetAddress<update_colors_and_get_location_t>(0xC3DD5);
+	function(this, flt_1, flt_2, color, color_2, timings);
+}
+
 void c_particle_system::adjust_particle_system_indexes(datum* datum_1, datum* datum_2)
 {
 	typedef void(__thiscall* adjust_particle_system_indexes_t)(c_particle_system*, datum*, datum*);
 	auto function = Memory::GetAddress<adjust_particle_system_indexes_t>(0xC35F7, 0);
 	function(this, datum_1, datum_2);
+}
+
+void c_particle_system::update_locations(s_particle_system_update_timings* timings, real_matrix4x3* matrix,
+	bool has_bit_15)
+{
+	typedef void(__thiscall* update_locations_t)(c_particle_system*, s_particle_system_update_timings*, real_matrix4x3*, bool);
+	auto function = Memory::GetAddress<update_locations_t>(0xC376A, 0);
+	function(this, timings, matrix, has_bit_15);
 }
 
 int c_particle_system::get_active_particle_locations_count()
@@ -155,6 +170,11 @@ int c_particle_system::get_active_particle_locations_count()
 	} while (current_location_index != NONE);
 
 	return location_count;
+}
+
+bool c_particle_system::flags_bit_10_is_set() const
+{
+	return (this->flags >> 10) & 1;
 }
 
 
@@ -195,7 +215,7 @@ void apply_particle_system_patches()
 {
 	pc_particle_system_update_effect_time = (c_particle_system_update_effect_time_t)DetourClassFunc((uint8*)Memory::GetAddress(0xC373B), (uint8*)c_particle_system::update_effect_time, 10);
 	p_c_particle_system_update = (c_particle_system_update_t)DetourClassFunc((uint8*)Memory::GetAddressRelative(0x4C43F9), (uint8*)c_particle_system::update, 10);
-	p_c_particle_system__update_location_time = (t_c_particle_system__update_location_time)DetourClassFunc((uint8*)Memory::GetAddress(0xC3E32), (uint8*)c_particle_system::update_location_time, 11);
+	//p_c_particle_system__update_location_time = (t_c_particle_system__update_location_time)DetourClassFunc((uint8*)Memory::GetAddress(0xC3E32), (uint8*)c_particle_system::update_location_time, 11);
 	//WriteValue(Memory::GetAddress(0x10496D), 256 * 4);  // Emitters
 	//WriteValue(Memory::GetAddress(0x1045E3), 1024 * 4); // Particles
 	//WriteValue(Memory::GetAddress(0x105DEE), 256 * 4);  // Particles Locations
