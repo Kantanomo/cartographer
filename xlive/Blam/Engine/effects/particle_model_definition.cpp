@@ -26,3 +26,8 @@ bool c_particle_model_definition_interface::particle_is_one_shot()
 {
 	return (this->particle_model_definition->flags >> 8) & 1;
 }
+
+real32 c_particle_model_definition_interface::particle_scale_evaluate()
+{
+	return 1.0f;
+}

@@ -41,23 +41,48 @@ void c_particle_emitter::adjust_matrix_and_vector_to_effect_camera(bool use_effe
 	}
 }
 
-void c_particle_emitter::update_children(s_particle_state* particle_state,
-	c_particle_system* particle_system, c_particle_emitter_definition* emitter_definition, real32 a5, real32 a6,
-	real32 delta, real32 a7)
+void c_particle_emitter::update_children(
+	s_particle_state* particle_state,
+	c_particle_system* particle_system,
+	c_particle_emitter_definition* emitter_definition, 
+	real32 a5,
+	real32 a6,
+	real32 delta, 
+	real32 a7)
 {
 	typedef void(__thiscall* update_children_t)(c_particle_emitter*, s_particle_state*, c_particle_system*, c_particle_emitter_definition*, real32, real32, real32, real32);
 	auto function = Memory::GetAddress<update_children_t>(0x104FFE);
 	function(this, particle_state, particle_system, emitter_definition, a5, a6, delta, a7);
 }
 
-typedef void(__stdcall* c_particle_emitter_update_matrix_and_child_particles_t)(c_particle_emitter* thisx, real32 delta,
-	c_particle_system* particle_system, c_particle_emitter_definition* emitter_definition,
-	s_particle_state* particle_state, real_matrix4x3* in_martix, real32 alpha);
-c_particle_emitter_update_matrix_and_child_particles_t p_c_particle_emitter_update_matrix_and_child_particles;
+void c_particle_emitter::update_particles(
+	c_particle_system* particle_system,
+	c_particle_location* particle_location,
+	c_particle_system_definition* particle_system_definition,
+	c_particle_emitter_definition* particle_emitter_definition,
+	real32 delta_time,
+	real_vector3d* particle_location_position)
+{
+	typedef void(__thiscall* update_particles_t)(c_particle_emitter*, c_particle_system*, c_particle_location*, c_particle_system_definition*, c_particle_emitter_definition*, real32, real_vector3d*);
+	auto function = Memory::GetAddress<update_particles_t>(0x104C91);
+	function(this, particle_system, particle_location, particle_system_definition, particle_emitter_definition, delta_time, particle_location_position);
+}
 
-void c_particle_emitter::update_matrix_and_child_particles(c_particle_emitter* thisx, real32 delta,
-                                                           c_particle_system* particle_system, c_particle_emitter_definition* emitter_definition,
-                                                           s_particle_state* particle_state, real_matrix4x3* in_martix, real32 alpha)
+void c_particle_emitter::destroy_particles()
+{
+	typedef void(__thiscall* destroy_particles_t)(c_particle_emitter*);
+	auto function = Memory::GetAddress<destroy_particles_t>(0x104AF5);
+	function(this);
+}
+
+void c_particle_emitter::update_matrix_and_child_particles(
+	c_particle_emitter* thisx, 
+	real32 delta,
+	c_particle_system* particle_system, 
+	c_particle_emitter_definition* emitter_definition,
+	s_particle_state* particle_state, 
+	real_matrix4x3* in_martix,
+	real32 alpha)
 {
 	c_particle_system_definition* particle_system_definition = particle_system->get_particle_system_definition();
 	real32 scale = 1.0f;
@@ -93,7 +118,7 @@ void c_particle_emitter::update_matrix_and_child_particles(c_particle_emitter* t
 	}
 	if(thisx->emission_time + k_real_math_epsilon >= 1.0f)
 	{
-		bool particle_system_flag_check = (particle_system->flags & 2560) != 0;
+		bool particle_system_flag_check = (particle_system->flags.test(_particle_system_flags_bit_11) && particle_system->flags.test(_particle_system_flags_bit_9));
 		bool particle_system_definition_flag_check = (particle_system_definition->flags >> 7) & 1;
 
 		real32 emitter_time_a = 0.f;
@@ -135,6 +160,5 @@ __declspec(naked) void c_particle_emitter_update_matrix_and_child_particles_to_s
 
 void particle_emitter_apply_patches()
 {
-	PatchCall(Memory::GetAddress(0x106423), c_particle_emitter_update_matrix_and_child_particles_to_stdcall);
-	//p_c_particle_emitter_update_matrix_and_child_particles = (c_particle_emitter_update_matrix_and_child_particles_t)DetourClassFunc((uint8*)Memory::GetAddress(0x105A90), (uint8*)c_particle_emitter::update_matrix_and_child_particles, 10);
+	//PatchCall(Memory::GetAddress(0x106423), c_particle_emitter_update_matrix_and_child_particles_to_stdcall);
 }

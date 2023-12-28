@@ -102,4 +102,5 @@ public:
     size_t get_particle_definition_locations_size();
     bool particle_is_v_mirrored_or_one_shot();
     bool particle_is_one_shot();
+    real32 particle_scale_evaluate();
 };

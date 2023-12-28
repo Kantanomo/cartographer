@@ -57,7 +57,7 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 				real_point3d particle_camera_position{};
 				real_argb_color particle_color;
 
-				if (TEST_BIT(particle_system->flags, _particle_system_scale_with_sky_render_model_bit))
+				if (particle_system->flags.test(_particle_system_scale_with_sky_render_model_bit))
 					sky_render_model_scale = get_current_sky_render_model_scale();
 
 				
@@ -187,14 +187,15 @@ void game_frame_particle_update(real32 delta)
 real_vector3d* __cdecl particle_update_points_interpolate_hook(const real_vector3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out)
 {
 	// Cheesy
-	return points_interpolate(previous_point, target_point, 0.0f, out);
+	points_interpolate(previous_point, target_point, 0.0f, out);
+	return out;
 }
 
 void apply_particle_update_patches()
 {
 	p_particle_system_update_particle_position_and_velocity = Memory::GetAddress<particle_system_update_particle_position_and_velocity_t>(0xC4125);
-	//PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
-	//PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
+	PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
+	PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
 	PatchCall(Memory::GetAddress(0x48D5C), game_frame_particle_update);
-	//PatchCall(Memory::GetAddress(0x105380), particle_update_points_interpolate_hook);
+	PatchCall(Memory::GetAddress(0x105380), particle_update_points_interpolate_hook);
 }

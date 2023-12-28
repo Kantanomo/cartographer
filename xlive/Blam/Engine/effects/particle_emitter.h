@@ -13,7 +13,11 @@ struct c_particle_emitter
 	real_matrix3x3 matrix;
 	real_point3d position;
 	real_point3d previous_position;
-	void adjust_matrix_and_vector_to_effect_camera(bool use_effect_camera, real_matrix3x3* out_matrix, real_point3d* out_point) const;
+	void adjust_matrix_and_vector_to_effect_camera(
+		bool use_effect_camera, 
+		real_matrix3x3* out_matrix, 
+		real_point3d* out_point) const;
+
 	void update_children(s_particle_state* particle_state,
 		c_particle_system* particle_system,
 		c_particle_emitter_definition* emitter_definition,
@@ -21,6 +25,17 @@ struct c_particle_emitter
 		real32 a6,
 		real32 delta,
 		real32 a7);
+
+	void update_particles(
+		c_particle_system* particle_system,
+		c_particle_location* particle_location,
+		c_particle_system_definition* particle_system_definition,
+		c_particle_emitter_definition* particle_emitter_definition,
+		real32 delta_time,
+		real_vector3d* particle_location_position);
+
+	void destroy_particles();
+
 
 	static void __stdcall update_matrix_and_child_particles(
 		c_particle_emitter* thisx,

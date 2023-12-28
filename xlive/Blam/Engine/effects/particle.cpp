@@ -111,10 +111,12 @@ void particle_update(real32 delta)
 {
 	s_data_iterator<c_particle_system> particle_system_it(get_particle_system_table());
 	g_particle_delta_temp = delta;
+	g_particle_interpolator_delta_remainder = delta;
 	while (particle_system_it.get_next_datum())
 	{
 		c_particle_system* particle_system = particle_system_it.get_current_datum();
-		if (particle_system->first_particle_index == NONE && !c_particle_system::update(particle_system, delta))
+		//if (particle_system->first_particle_index == NONE && !c_particle_system::update(particle_system, delta))
+		if (particle_system->first_particle_index == NONE && !particle_system->update_rewritten(delta))
 		{
 			if (particle_system->parent_effect_index != NONE)
 			{
@@ -124,8 +126,6 @@ void particle_update(real32 delta)
 		}
 	}
 	halo_particle_interpolator_update();
-	g_particle_interpolator_delta_remainder = delta;
-
 }
 
 

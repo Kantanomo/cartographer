@@ -30,7 +30,7 @@ struct c_particle
 	e_particle_flags flags;
 	int32 next_particle;
 	real32 time_accumulator;
-	real32 effect_delay_time;
+	real32 effect_duration;
 	int8 gap_10[12];
 	real_point3d m_position;
 	real_vector3d m_velocity;

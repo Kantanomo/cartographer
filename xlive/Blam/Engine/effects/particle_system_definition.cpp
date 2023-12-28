@@ -25,6 +25,14 @@ real32 c_particle_emitter_definition::get_particle_emissions_per_tick(s_particle
 	typedef real32(__thiscall* get_particle_emissions_per_tick_t)(c_particle_emitter_definition*, s_particle_state*);
 	auto function = Memory::GetAddress<get_particle_emissions_per_tick_t>(0x104941);
 	return function(this, particle_state);
+	//return this->particle_emmision_rate.get_result(particle_state) * 120.f;
+}
+
+real32 c_particle_emitter_definition::particle_size_evaluate()
+{
+	typedef real32(__thiscall* get_particle_size_t)(c_particle_emitter_definition*);
+	auto function = Memory::GetAddress<get_particle_size_t>(0xFF4CF);
+	return function(this);
 }
 
 c_particle_definition_interface* c_particle_system_definition::get_particle_system_interface() const
@@ -60,4 +68,11 @@ bool c_particle_sprite_definition_interface::particle_is_v_mirrored_or_one_shot(
 bool c_particle_sprite_definition_interface::particle_is_one_shot()
 {
 	return (this->particle_definition->flags >> 8) & 1;
+}
+
+real32 c_particle_sprite_definition_interface::particle_scale_evaluate()
+{
+	typedef real32(__thiscall* particle_scale_evaluate_t)(c_particle_sprite_definition_interface*);
+	auto function = Memory::GetAddress<particle_scale_evaluate_t>(0x103B14, 0);
+	return function(this);
 }

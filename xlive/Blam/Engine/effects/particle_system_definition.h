@@ -102,6 +102,7 @@ public:
     void get_emitter_particle_color(s_particle_state* particle_state, real_argb_color* out_color);
     void get_emitter_particle_inverse_color(s_particle_state* particle_state, real_argb_color* out_color);
     real32 get_particle_emissions_per_tick(s_particle_state* particle_state);
+    real32 particle_size_evaluate();
 };
 CHECK_STRUCT_SIZE(c_particle_emitter_definition, 0xB8);
 
@@ -210,4 +211,5 @@ public:
     size_t get_particle_definition_locations_size();
     bool particle_is_v_mirrored_or_one_shot();
     bool particle_is_one_shot();
+    real32 particle_scale_evaluate();
 };

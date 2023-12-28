@@ -8,7 +8,22 @@
 
 enum e_particle_system_flags : int16
 {
+	_particle_system_flags_updating_bit = 1,
+	_particle_system_flags_bit_2 = 2,
+	_particle_system_flags_bit_3 = 3,
+	_particle_system_flags_bit_4 = 4,
+	_particle_system_flags_bit_5 = 5,
+	_particle_system_flags_bit_6 = 6,
+	_particle_system_flags_bit_7 = 7,
+	_particle_system_flags_bit_8 = 8,
+	_particle_system_flags_bit_9 = 9,
 	_particle_system_scale_with_sky_render_model_bit = 10,
+	_particle_system_flags_bit_11 = 11,
+	_particle_system_flags_bit_12 = 12,
+	_particle_system_flags_bit_13 = 13,
+	_particle_system_flags_bit_14 = 14,
+	_particle_system_flags_bit_15 = 15,
+	k_particle_system_flags_count
 };
 
 struct s_particle_system_update_timings
@@ -25,7 +40,7 @@ public:
 	int32 datum_salt;
 	real32 accumulated_time;
 	real32 duration;
-	e_particle_system_flags flags;
+	c_flags<e_particle_system_flags, int16, k_particle_system_flags_count> flags;
 	int16 event_particle_system_index;
 	datum tag_index;
 	int16 effect_event_index;
@@ -45,13 +60,14 @@ public:
 	pixel32 color;
 	c_particle_system_definition* get_particle_system_definition() const;
 	void destroy_children();
-	bool update_new(real32 delta_time);
+	bool update_rewritten(real32 delta_time);
 	void update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2);
 	void update_colors_and_get_location(real32 flt_1, real32 flt_2, pixel32 color, pixel32 color_2, s_particle_system_update_timings* timings);
 	void adjust_particle_system_indexes(datum* datum_1, datum* datum_2);
 	void update_locations(s_particle_system_update_timings* timings, real_matrix4x3* matrix, bool has_bit_15);
 	int get_active_particle_locations_count();
 	bool flags_bit_10_is_set() const;
+	//void update_location_time(s_particle_system_update_timings* timings, real_matrix4x3* matrix, int unused);
 
 	bool static __stdcall update(c_particle_system* thisx, real32 delta_time);
 	static void __stdcall update_location_time(c_particle_system* thisx, s_particle_system_update_timings* timings, real_matrix4x3* matrix, int unused);
