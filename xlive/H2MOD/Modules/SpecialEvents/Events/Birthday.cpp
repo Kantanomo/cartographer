@@ -10,8 +10,16 @@
 
 void birthday_event_map_load()
 {
-	tag_injection_set_active_map(k_events_map);
-	if (tag_injection_active_map_verified())
+	// Carto Shared Tags
+	datum bday_hat_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\birthday_hat\\birthday_hat", _tag_group_scenery, "carto_shared");
+	datum bday_cake_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\birthday_cake\\birthday_cake", _tag_group_render_model, "carto_shared");
+	datum fp_bday_cake_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\birthday_cake\\fp\\fp", _tag_group_render_model, "carto_shared");
+
+	// Halo 2 Tags
+	datum ball_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+	datum bomb_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+
+	if (!DATUM_IS_NONE(bday_hat_datum))
 	{
 		datum hat_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\birthday_hat\\birthday_hat", true);
 		datum ball_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball");

@@ -13,7 +13,9 @@
 
 void paddy_event_map_load()
 {
-	tag_injection_set_active_map(k_events_map);
+	datum paddy_hat_datum = tag_loader::get_tag_datum_by_name("objects\\multi\\stpat_hat\\stpat_hat", _tag_group_scenery, "carto_shared");
+	datum paddy_beard_datum = tag_loader::get_tag_datum_by_name("objects\\multi\\stpat_hat\\beard\\beard", _tag_group_scenery, "carto_shared");
+	datum paddy_pot_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", _tag_group_scenery, "carto_shared");
 
 	datum paddy_hat_datum = tag_injection_load(_tag_group_scenery, "objects\\multi\\stpat_hat\\stpat_hat", true);
 	datum paddy_beard_datum = tag_injection_load(_tag_group_scenery, "objects\\multi\\stpat_hat\\beard\\beard", true);
