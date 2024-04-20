@@ -723,8 +723,8 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	tag_type.string[0] = p_string[3];
 
 	auto tagDatum = tag_loader::get_tag_datum_by_name(tagName, tag_type.group, mapName);
-	tag_loader::Load_tag(tagDatum, true, mapName);
-	tag_loader::Push_Back();
+	tag_loader::preload_tag_data_from_cache(tagDatum, true, mapName);
+	tag_loader::push_loaded_tag_data();
 	output->Output(StringFlag_None, "# loaded tag datum: %#X", tag_loader::resolve_cache_index_to_injected(tagDatum));
 
 	LOG_INFO_GAME("{} - {} {} {}", tagName, tag_type.string, mapName);
