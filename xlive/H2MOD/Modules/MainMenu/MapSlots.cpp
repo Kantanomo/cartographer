@@ -201,11 +201,9 @@ namespace MapSlots
 			LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
 			for (const auto& item : BitmapsToLoad)
 			{
-				tag_injection_set_active_map(item.second.c_str());
-				tag_injection_load(_tag_group_bitmap, item.first, false);
-				tag_injection_inject();
+				tag_loader::preload_tag_data_from_cache(item.first, false, item.second);
 			}
-
+			tag_loader::push_loaded_tag_data();
 			add_new_multiplayer_map_slots_game();
 		}
 

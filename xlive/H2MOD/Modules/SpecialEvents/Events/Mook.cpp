@@ -21,7 +21,8 @@ void mook_event_map_load()
 
 	if (mook_ball_weapon_datum != NONE && ball_weapon_datum != NONE && bomb_weapon_datum != NONE)
 	{
-		tag_injection_inject();
+		tag_loader::preload_tag_data_from_cache(mook_ball_weapon_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		mook_ball_weapon_datum = tag_loader::resolve_cache_index_to_injected(mook_ball_weapon_datum);
 

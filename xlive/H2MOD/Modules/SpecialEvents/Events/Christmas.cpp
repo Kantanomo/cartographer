@@ -32,8 +32,11 @@ void christmas_event_map_load()
 	datum present_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\present\\present", _tag_group_render_model, "carto_shared");
 	datum fp_present_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\present\\fp_present", _tag_group_render_model, "carto_shared");
 
-	if (!tag_injection_active_map_verified())
-		return;
+	if (!DATUM_IS_NONE(santa_hat_datum) && !DATUM_IS_NONE(beard_datum))
+	{
+		tag_loader::preload_tag_data_from_cache(santa_hat_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(beard_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		santa_hat_datum = tag_loader::resolve_cache_index_to_injected(santa_hat_datum);
 		beard_datum = tag_loader::resolve_cache_index_to_injected(beard_datum);
@@ -78,6 +81,11 @@ void christmas_event_map_load()
 			auto flood_biped = tags::get_tag<_tag_group_biped, _biped_definition>(flood_datum, true);
 			add_hat_and_beard_to_model(flood_biped->unit.object.model.index, santa_hat_datum, beard_datum, false);
 		}
+	}
+	if (!DATUM_IS_NONE(snow_datum))
+	{
+		tag_loader::preload_tag_data_from_cache(snow_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		snow_datum = tag_loader::resolve_cache_index_to_injected(snow_datum);
 
@@ -85,6 +93,11 @@ void christmas_event_map_load()
 		{
 			cluster.weather_index = (short)bsp_definition->weather_palette.count - 1;
 		}
+	}
+	if (!DATUM_IS_NONE(candy_cane_datum) && !DATUM_IS_NONE(sword_weapon_datum))
+	{
+		tag_loader::preload_tag_data_from_cache(candy_cane_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		candy_cane_datum = tag_loader::resolve_cache_index_to_injected(candy_cane_datum);
 
@@ -105,6 +118,11 @@ void christmas_event_map_load()
 			attachment.marker = 0;
 			attachment.primary_scale = 0;
 		}
+	}
+	if (!DATUM_IS_NONE(deer_datum) && !DATUM_IS_NONE(ghost_datum))
+	{
+		tag_loader::preload_tag_data_from_cache(deer_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		deer_datum = tag_loader::resolve_cache_index_to_injected(deer_datum);
 
@@ -115,6 +133,11 @@ void christmas_event_map_load()
 		datum ghost_model_datum = ghost_vehicle->object.model.index;
 		auto ghost_model = tags::get_tag<_tag_group_model, s_model_definition>(ghost_model_datum);
 		ghost_model->render_model.index = deer_datum;
+	}
+	if (!DATUM_IS_NONE(ornament_datum) && !DATUM_IS_NONE(frag_model_datum) && !DATUM_IS_NONE(plasma_model_datum))
+	{
+		tag_loader::preload_tag_data_from_cache(ornament_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		ornament_datum = tag_loader::resolve_cache_index_to_injected(ornament_datum);
 
@@ -123,6 +146,12 @@ void christmas_event_map_load()
 
 		auto plasma_model = tags::get_tag<_tag_group_model, s_model_definition>(plasma_model_datum);
 		plasma_model->render_model.index = ornament_datum;
+	}
+	if (!DATUM_IS_NONE(present_datum) && !DATUM_IS_NONE(fp_present_datum) && !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
+	{
+		tag_loader::preload_tag_data_from_cache(present_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(fp_present_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		present_datum = tag_loader::resolve_cache_index_to_injected(present_datum);
 		fp_present_datum = tag_loader::resolve_cache_index_to_injected(fp_present_datum);
