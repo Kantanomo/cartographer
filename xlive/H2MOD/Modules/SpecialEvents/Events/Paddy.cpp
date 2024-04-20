@@ -25,6 +25,10 @@ void paddy_event_map_load()
 	{
 		tag_injection_inject();
 
+		paddy_hat_datum = tag_loader::resolve_cache_index_to_injected(paddy_hat_datum);
+		paddy_beard_datum = tag_loader::resolve_cache_index_to_injected(paddy_beard_datum);
+		paddy_pot_datum = tag_loader::resolve_cache_index_to_injected(paddy_pot_datum);
+
 		auto paddy_pot = tags::get_tag<_tag_group_scenery, s_scenery_group_definition>(paddy_pot_datum, true);
 		auto paddy_pot_model = tags::get_tag<_tag_group_model, s_model_definition>(paddy_pot->objectTag.model.index, true);
 

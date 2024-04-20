@@ -23,6 +23,8 @@ void mook_event_map_load()
 	{
 		tag_injection_inject();
 
+		mook_ball_weapon_datum = tag_loader::resolve_cache_index_to_injected(mook_ball_weapon_datum);
+
 		auto mook_ball_weapon = tags::get_tag<_tag_group_weapon, _weapon_definition>(mook_ball_weapon_datum, true);
 
 		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, mook_ball_weapon->item.object.model.index, mook_ball_weapon->item.object.model.index);

@@ -35,14 +35,8 @@ void christmas_event_map_load()
 	if (!tag_injection_active_map_verified())
 		return;
 
-	datum santa_hat_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", true);
-	datum beard_datum = tag_injection_load(_tag_group_scenery, "objects\\multi\\stpat_hat\\beard\\santa_beard", true);
-	datum snow_datum = tag_injection_load(_tag_group_weather_system, "scenarios\\multi\\lockout\\lockout_big", true);
-	datum candy_cane_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\candy_cane\\candy_cane", true);
-	datum deer_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\reindeer_ghost\\reindeer_ghost", true);
-	datum ornament_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\ornament\\ornament", true);
-	datum present_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\present\\present", true);
-	datum fp_present_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\present\\fp_present", true);
+		santa_hat_datum = tag_loader::resolve_cache_index_to_injected(santa_hat_datum);
+		beard_datum = tag_loader::resolve_cache_index_to_injected(beard_datum);
 
 	if(santa_hat_datum != NONE && 
 		beard_datum != NONE && 
@@ -85,19 +79,15 @@ void christmas_event_map_load()
 			add_hat_and_beard_to_model(flood_biped->unit.object.model.index, santa_hat_datum, beard_datum, false);
 		}
 
-		// Change/Add weather system to bsp
-		auto bsp_definition = tags::get_tag_fast<structure_bsp>(get_global_scenario()->structure_bsps[0]->structure_bsp.index);
-		auto weat_block = MetaExtender::add_tag_block2<structure_weather_palette_entry>((unsigned long)std::addressof(bsp_definition->weather_palette));
-		weat_block->name.set("snow_cs");
-		weat_block->weather_system.group.group = _tag_group_weather_system;
-		weat_block->weather_system.index = snow_datum;
+		snow_datum = tag_loader::resolve_cache_index_to_injected(snow_datum);
 
 		for (auto& cluster : bsp_definition->clusters)
 		{
 			cluster.weather_index = (short)bsp_definition->weather_palette.count - 1;
 		}
 
-		// Change sword model to candy cane
+		candy_cane_datum = tag_loader::resolve_cache_index_to_injected(candy_cane_datum);
+
 		auto sword_weapon = tags::get_tag_fast<_weapon_definition>(sword_weapon_datum);
 
 		datum sword_model_datum = sword_weapon->item.object.model.index;
@@ -116,7 +106,8 @@ void christmas_event_map_load()
 			attachment.primary_scale = 0;
 		}
 
-		// Change ghost to reindeer
+		deer_datum = tag_loader::resolve_cache_index_to_injected(deer_datum);
+
 		auto ghost_vehicle = tags::get_tag<_tag_group_vehicle, _unit_definition>(ghost_datum);
 		ghost_vehicle->object.attachments.data = 0;
 		ghost_vehicle->object.attachments.count = 0;
@@ -125,13 +116,17 @@ void christmas_event_map_load()
 		auto ghost_model = tags::get_tag<_tag_group_model, s_model_definition>(ghost_model_datum);
 		ghost_model->render_model.index = deer_datum;
 
+		ornament_datum = tag_loader::resolve_cache_index_to_injected(ornament_datum);
+
 		auto frag_model = tags::get_tag<_tag_group_model, s_model_definition>(frag_model_datum);
 		frag_model->render_model.index = ornament_datum;
 
 		auto plasma_model = tags::get_tag<_tag_group_model, s_model_definition>(plasma_model_datum);
 		plasma_model->render_model.index = ornament_datum;
 
-		// Change the models for objectives to presents
+		present_datum = tag_loader::resolve_cache_index_to_injected(present_datum);
+		fp_present_datum = tag_loader::resolve_cache_index_to_injected(fp_present_datum);
+
 		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, fp_present_datum, present_datum);
 		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, fp_present_datum, present_datum);
 	}

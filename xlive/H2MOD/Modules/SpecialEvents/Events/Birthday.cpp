@@ -27,7 +27,11 @@ void birthday_event_map_load()
 		datum bday_cake_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\birthday_cake\\birthday_cake", true);
 		datum fp_bday_cake_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\birthday_cake\\fp\\fp", true);
 
-		if (hat_datum != NONE && bday_cake_datum != NONE && fp_bday_cake_datum != NONE && ball_weapon_datum != NONE && bomb_weapon_datum != NONE)
+		bday_hat_datum = tag_loader::resolve_cache_index_to_injected(bday_hat_datum);
+
+		// Give Birthday Hat and Beard to Chief & Friends
+		if (datum hlmt_chief_datum = tags::find_tag(_tag_group_model, "objects\\characters\\masterchief\\masterchief");
+			hlmt_chief_datum != NONE) 
 		{
 			tag_injection_inject();
 
@@ -47,8 +51,10 @@ void birthday_event_map_load()
 				add_hat_to_model(hlmt_elite_datum, hat_datum, true);
 			}
 
-			replace_fp_and_3p_models_from_weapon(ball_weapon_datum, fp_bday_cake_datum, bday_cake_datum);
-			replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, fp_bday_cake_datum, bday_cake_datum);
-		}
+		bday_cake_datum = tag_loader::resolve_cache_index_to_injected(bday_cake_datum);
+		fp_bday_cake_datum = tag_loader::resolve_cache_index_to_injected(fp_bday_cake_datum);
+
+		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, fp_bday_cake_datum, bday_cake_datum);
+		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, fp_bday_cake_datum, bday_cake_datum);
 	}
 }

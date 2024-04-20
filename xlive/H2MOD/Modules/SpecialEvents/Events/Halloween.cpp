@@ -111,11 +111,12 @@ void halloween_event_map_load()
 		datum ltmp_datum = tags::find_tag(_tag_group_scenario_structure_lightmap,
 			"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
 
-		if(tag_injection_is_injected(lbitm_datum) && ltmp_datum != NONE)
-		{
-			s_scenario_structure_lightmap_group_definition* lightmap = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
-			lightmap->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
-		}
+		candle_datum = tag_loader::resolve_cache_index_to_injected(candle_datum);
+		candle_fire_datum = tag_loader::resolve_cache_index_to_injected(candle_fire_datum);
+		pump_datum = tag_loader::resolve_cache_index_to_injected(pump_datum);
+		large_candle_datum = tag_loader::resolve_cache_index_to_injected(large_candle_datum);
+		lbitm_datum = tag_loader::resolve_cache_index_to_injected(lbitm_datum);
+		sky_datum = tag_loader::resolve_cache_index_to_injected(sky_datum);
 
 		scenario* scenario_definition = tags::get_tag_fast<scenario>(cache_files_get_tags_header()->scenario_index);
 		structure_bsp* bsp_definition = tags::get_tag_fast<structure_bsp>(scenario_definition->structure_bsps[0]->structure_bsp.index);
@@ -150,7 +151,15 @@ void halloween_event_map_load()
 
 		tag_injection_inject();
 
-		if (candle_datum != NONE && pump_datum != NONE)
+		candle_datum = tag_loader::resolve_cache_index_to_injected(candle_datum);
+		candle_fire_datum = tag_loader::resolve_cache_index_to_injected(candle_fire_datum);
+		pump_datum = tag_loader::resolve_cache_index_to_injected(pump_datum);
+
+		LOG_INFO_GAME("{:x}", candle_datum);
+		LOG_INFO_GAME("{:x}", candle_fire_datum);
+		LOG_INFO_GAME("{:x}", pump_datum);
+
+		if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum))
 		{
 			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
 			// We execute this after a bluescreen since our new objects arent recreated automatically
