@@ -398,6 +398,7 @@
     <ClCompile Include="Blam\Engine\creatures\creature_definitions.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_model_definitions.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_model_definitions.cpp" />
+    <ClCompile Include="H2MOD\Tags\MetaLoader\xml_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1058,6 +1059,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_main.h" />
     <ClInclude Include="Blam\Engine\creatures\creature_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\physics_model_definitions.h" />
+    <ClInclude Include="H2MOD\Tags\MetaLoader\xml_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
