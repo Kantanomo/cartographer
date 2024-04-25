@@ -1,7 +1,6 @@
 #pragma once
 #include "cseries/cseries_strings.h"
 #include "tinyxml/tinyxml2.h"
-#include "tag_files/tag_loader/tag_injection_define.h"
 
 
 class c_xml_definition_block
@@ -27,19 +26,10 @@ class c_xml_definition_block
 	uint32 m_tag_block_count;
 	c_xml_definition_block* m_tag_blocks;
 
-#if K_TAG_INJECTION_DEBUG
-	c_static_string64* m_tag_reference_names;
-	c_static_string64* m_classless_tag_reference_names;
-	c_static_string64* m_data_reference_names;
-	c_static_string64* m_tag_block_names;
-#endif
-
-
 public:
-	c_xml_definition_block(void) = default;
 	c_xml_definition_block(tinyxml2::XMLElement* base_element, uint32 offset, uint32 size);
-	~c_xml_definition_block(void) = default;
-
+	c_xml_definition_block() = default;
+	~c_xml_definition_block() = default;
 	void reset_counts();
 	void get_element_counts();
 	void allocate_buffers();
@@ -48,7 +38,7 @@ public:
 
 	uint32 get_size() const;
 	uint32 get_offset() const;
-	const char* get_name() const;
+	c_static_string64* get_name();
 
 	uint32 get_tag_references_count() const;
 	uint32 get_tag_reference_offset(uint32 index) const;
@@ -64,12 +54,5 @@ public:
 
 	uint32 get_tag_block_count() const;
 	c_xml_definition_block* get_tag_block(uint32 index) const;
-
-#if K_TAG_INJECTION_DEBUG
-	c_static_string64* get_tag_reference_name(uint32 index) const;
-	c_static_string64* get_classless_tag_reference_name(uint32 index) const;
-	c_static_string64* get_data_reference_name(uint32 index) const;
-	c_static_string64* get_tag_block_name(uint32 index) const;
-#endif
 
 };
