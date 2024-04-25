@@ -5,8 +5,9 @@
 #include "Networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Tags/MetaLoader/xml_loader.h"
 #include "tag_files/files_windows.h"
+#include "tag_files/tag_loader/xml/xml_agent.h"
+#include "tag_files/tag_loader/xml/xml_definition_loader.h"
 
 
 namespace KantTesting
@@ -23,6 +24,8 @@ namespace KantTesting
 		//c_xml_definition_agent lol(type, "C:\\Halo2\\mods\\plugins\\sky.xml");
 		FILE* a = fopen("C:\\Halo2\\mods\\maps\\carto_shared.map", "r");
 		c_xml_definition_loader heh(lol.get_definition(), a, 0xE29A00BF);
+
+		heh.validate_data();
 		//c_xml_definition_loader heh(lol.get_definition(), a, 0xE19B001Du);
 		auto ab = 1233123;
 	}

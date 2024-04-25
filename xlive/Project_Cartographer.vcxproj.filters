@@ -306,7 +306,9 @@
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\xml_loader.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -879,7 +881,9 @@
     <ClInclude Include="Blam\Engine\physics\structure_physics.h" />
     <ClInclude Include="Blam\Engine\game\game_portals.h" />
     <ClInclude Include="Blam\Engine\render\render_lights.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\xml_loader.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
