@@ -40,7 +40,6 @@ class c_xml_definition_loader
 	// tag instance loaded from cache
 	tags::tag_instance m_instance;
 
-
 	uint32 m_tag_reference_offset_count;
 	s_offset_link* m_tag_reference_offsets;
 
