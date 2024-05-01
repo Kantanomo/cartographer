@@ -6,8 +6,7 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "tag_files/files_windows.h"
-#include "tag_files/tag_loader/xml/xml_agent.h"
-#include "tag_files/tag_loader/xml/xml_definition_loader.h"
+#include "tag_files/tag_loader/tag_injection_manager.h"
 
 
 namespace KantTesting
@@ -20,13 +19,13 @@ namespace KantTesting
 	{
 		tag_group type;
 		type.group = _tag_group_biped;
-		c_xml_definition_agent lol(type, "C:\\Halo2\\mods\\plugins\\bipd.xml");
-		//c_xml_definition_agent lol(type, "C:\\Halo2\\mods\\plugins\\sky.xml");
-		FILE* a = fopen("C:\\Halo2\\mods\\maps\\carto_shared.map", "r");
-		c_xml_definition_loader heh(lol.get_definition(), a, 0xE29A00BF);
 
-		heh.validate_data();
-		//c_xml_definition_loader heh(lol.get_definition(), a, 0xE19B001Du);
+		c_tag_injecting_manager manager;
+
+		manager.set_active_map("carto_shared");
+		manager.load_tag(_tag_group_biped, "objects\\characters\\masterchief_skeleton\\masterchief_skeleton", true);
+
+
 		auto ab = 1233123;
 	}
 }
