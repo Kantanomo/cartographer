@@ -13,7 +13,7 @@ struct s_tag_injecting_table_entry
 	datum cache_index;
 	datum injected_index;
 	tag_group type;
-	c_xml_definition_loader* loaded_data;
+	c_xml_definition_loader loaded_data;
 	uint8* injected_data;
 };
 
@@ -29,14 +29,13 @@ public:
 	c_tag_injection_table();
 	~c_tag_injection_table();
 
-	void clear();
-
-	uint16 get_entry_count() const;
 
 	s_tag_injecting_table_entry* init_entry(datum cache_index, e_tag_group type);
 
-	s_tag_injecting_table_entry* get_entry(uint16 index) const;
-	s_tag_injecting_table_entry* get_entry_by_cache_index(datum datum_index) const;
-	s_tag_injecting_table_entry* get_entry_by_injected_index(datum datum_index) const;
+	s_tag_injecting_table_entry* get_entry(uint16 index);
+	s_tag_injecting_table_entry* get_entry_by_cache_index(datum datum_index);
+	s_tag_injecting_table_entry* get_entry_by_injected_index(datum datum_index);
 	bool has_entry_by_cache_index(datum datum_index) const;
+	bool has_entry_by_injected_index(datum datum_index) const;
+	bool has_existing_preloaded_entry_by_cache_index(datum datum_index);
 };
