@@ -195,6 +195,8 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
+      <StackReserveSize>
+      </StackReserveSize>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -634,6 +636,8 @@
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.cpp" />
@@ -1002,6 +1006,8 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_block.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.h" />
