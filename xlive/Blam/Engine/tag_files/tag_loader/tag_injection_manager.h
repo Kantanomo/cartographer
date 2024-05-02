@@ -27,6 +27,10 @@ private:
 	uint32 m_injectable_used_size;
 	tags::tag_instance* m_instances;
 
+	uint32 m_base_tag_data_size;
+	uint32 m_injectable_used_size;
+	tags::tag_instance* m_instances;
+
 	bool m_active_map_verified;
 	c_static_wchar_string<MAX_PATH> m_active_map;
 	s_cache_header m_active_map_cache_header;
