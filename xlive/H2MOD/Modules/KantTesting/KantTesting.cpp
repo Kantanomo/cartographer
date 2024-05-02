@@ -20,10 +20,10 @@ namespace KantTesting
 		tag_group type;
 		type.group = _tag_group_biped;
 
-		c_tag_injecting_manager manager;
+		//c_tag_injecting_manager manager;
 
-		manager.set_active_map("carto_shared");
-		manager.load_tag(_tag_group_biped, "objects\\characters\\masterchief_skeleton\\masterchief_skeleton", true);
+		//manager.set_active_map("carto_shared");
+		//manager.load_tag(_tag_group_biped, "objects\\characters\\masterchief_skeleton\\masterchief_skeleton", true);
 
 
 		auto ab = 1233123;

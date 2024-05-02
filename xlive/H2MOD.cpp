@@ -90,6 +90,7 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
@@ -985,7 +986,7 @@ void H2MOD::Initialize()
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
 		
-		Initialise_tag_loader();
+		tag_injection_initialize();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		ImGuiHandler::WeaponOffsets::Initialize();
