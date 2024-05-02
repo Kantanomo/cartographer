@@ -11,6 +11,7 @@
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 
@@ -69,7 +70,7 @@ e_special_event_type get_current_special_event()
 
 void load_special_event()
 {
-	if (tag_injection_check_map_exists(k_events_map))
+	if (tag_injection_check_map_exists("carto_shared"))
 	{
 		bool create_new_markers = true;
 		switch (get_current_special_event())
