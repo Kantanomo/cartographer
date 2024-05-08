@@ -391,7 +391,6 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 }
 
 
-
 uint32 c_xml_definition_loader::get_total_size() const
 {
 	return this->m_total_data_size;
