@@ -147,10 +147,10 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 		new_def->tag_datum = skele_datum;
 	}
 	else
-	{
+	{*/
 		clone_representation(_character_type_spartan);
-	}
-	return;
+	//}
+	//return;
 }
 
 void game_globals_add_flood_representation(scenario* scenario_definition)
