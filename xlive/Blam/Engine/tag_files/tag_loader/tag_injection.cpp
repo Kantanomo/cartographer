@@ -61,12 +61,8 @@ datum tag_injection_resolve_cache_datum(datum cache_datum)
 		if (inst.data_offset != 0)
 			return inst.datum_index;
 
-		// 0xE7052CA0
-		// 0x00003ba7
 		return NONE;
 	}
-	//if (entry->injected_index == 0x00003ba7u)
-	//	return 0xE7052CA0u;
 
 	return entry->injected_index;
 }
