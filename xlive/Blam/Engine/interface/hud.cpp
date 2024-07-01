@@ -6,7 +6,6 @@
 #include "game/game_globals.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
 
 
