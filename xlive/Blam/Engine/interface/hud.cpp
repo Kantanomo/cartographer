@@ -17,7 +17,6 @@
 #include "render/render.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
 
 /* constants */
