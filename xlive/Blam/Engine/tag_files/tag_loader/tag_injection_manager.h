@@ -49,6 +49,7 @@ public:
 	void init_directories();
 
 	void set_base_map_tag_data_size(uint32 size);
+	uint32 get_base_map_tag_data_size() const;
 	void set_instance_table(tags::tag_instance* table);
 
 	uint16 get_entry_count() const;
