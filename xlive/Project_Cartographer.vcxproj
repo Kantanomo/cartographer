@@ -196,6 +196,8 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
+      <StackReserveSize>
+      </StackReserveSize>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -700,6 +702,12 @@
     <ClCompile Include="Blam\Engine\tag_files\string_id.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.cpp" />
     <ClCompile Include="Blam\Engine\text\draw_string.cpp" />
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
     <ClCompile Include="Blam\Engine\text\font_group.cpp" />
@@ -763,9 +771,6 @@
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\ServerConsole.cpp" />
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -1085,6 +1090,13 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_files.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_define.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_reference.h" />
     <ClInclude Include="Blam\Engine\text\draw_string.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
@@ -1164,9 +1176,6 @@
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="resources\version_resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\curl-interface.h" />

@@ -3,7 +3,6 @@
 #include "game/game.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Modules/WeaponOffsets/WeaponOffsetConfig.h"
 
 
