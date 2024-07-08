@@ -1,24 +1,16 @@
 #include "stdafx.h"
 #include "RunLoop.h"
 
-#include "game/game.h"
-#include "game/game_time.h"
-#include "shell/shell_windows.h"
 #include "main/main_game_time.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
-#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Utils/Utils.h"
-
 
 #include "XLive/xnet/IpManagement/XnIp.h"
 
@@ -108,16 +100,6 @@ void __cdecl game_modules_dispose_hook() {
 	timeEndPeriod(TIMER_RESOLUTION_MS);
 }
 
-// rasterizer_present hook
-// used to limit framerate using our implementation
-void __cdecl rasterizer_present_hook(bitmap_data* bitmap) {
-	//typedef void(__cdecl* rasterizer_present_t)(int);
-	//auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
-
-	rasterizer_present(bitmap);
-	shell_windows_throttle_framerate(H2Config_fps_limit);
-}
-
 typedef void(_cdecl* main_loop_body_t)();
 main_loop_body_t p_main_loop_body;
 void __cdecl main_loop_body() {
@@ -151,9 +133,6 @@ void InitRunLoop() {
 		// override
 		g_experimental_rendering_mode = _rendering_mode_original_game_frame_limit;
 
-		// present hooks for the frame limiter
-		PatchCall(Memory::GetAddress(0x19073C), rasterizer_present_hook);
-		PatchCall(Memory::GetAddress(0x19074C), rasterizer_present_hook);
 
 		switch (g_experimental_rendering_mode)
 		{
