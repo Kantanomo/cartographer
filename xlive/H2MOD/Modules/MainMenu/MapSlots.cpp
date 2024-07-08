@@ -31,7 +31,7 @@ namespace MapSlots
 		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
 		for (const auto& map : AddedMaps)
 		{
-			std::string map_location = def_maps_loc + "\\" + map + ".map";
+			std::wstring map_location = def_maps_loc + L"\\" + map + L".map";
 			if (std::filesystem::exists(map_location))
 			{
 				LOG_TRACE_GAME(L"[Map Slots]: Startup - Caching {}", map);
@@ -214,8 +214,8 @@ namespace MapSlots
 
 	void Initialize(void)
 	{
-		AddedMaps.emplace_back("highplains");
-		AddedMaps.emplace_back("derelict");
+		AddedMaps.emplace_back(L"highplains");
+		AddedMaps.emplace_back(L"derelict");
 		CacheMapData();
 
 		if (Memory::IsDedicatedServer())

@@ -2,7 +2,7 @@
 
 #define k_tag_group_count 120
 
-enum e_tag_group : uint32
+enum e_tag_group : int32
 {
 	_tag_group_cache_file_sound = '$#!+',
 	_tag_group_scenario_scenery_resource = '*cen',

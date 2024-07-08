@@ -729,8 +729,6 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 
 	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_datum);
 
-	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_datum);
-
 	LOG_INFO_GAME("{} - {} {}", tagName, tag_type.string);
 	return 0;
 }

@@ -69,7 +69,7 @@ e_special_event_type get_current_special_event()
 
 void load_special_event()
 {
-	if (tag_injection_check_map_exists("carto_shared"))
+	if (tag_injection_check_map_exists(k_events_map))
 	{
 		bool create_new_markers = true;
 		switch (get_current_special_event())
