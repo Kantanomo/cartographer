@@ -9,6 +9,7 @@
 #include "rasterizer/rasterizer_loading.h"
 
 /* globals */
+
 datum last_bitmap_tag_index = 0;
 
 
