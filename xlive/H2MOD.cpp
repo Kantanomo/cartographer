@@ -41,6 +41,7 @@
 #include "objects/damage.h"
 #include "units/bipeds.h"
 #include "rasterizer/rasterizer_lens_flares.h"
+#include "rasterizer/rasterizer_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_fog.h"
 #include "rasterizer/dx9/rasterizer_dx9_fullscreen_passes.h"
 #include "rasterizer/dx9/rasterizer_dx9_lens_flares.h"
@@ -930,7 +931,9 @@ void H2MOD::ApplyHooks() {
 		screens_apply_patches();
 		aim_assist_apply_patches();
 		main_game_apply_patches();
-		
+
+		rasterizer_main_apply_patches();
+
 		rasterizer_dx9_fullscreen_passes_apply_patches();
 		rasterizer_dx9_lens_flares_apply_patches();
 		rasterizer_dx9_main_apply_patches();
