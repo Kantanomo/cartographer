@@ -513,8 +513,7 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 	if (manager->m_table.has_entry_by_cache_index(cache_datum))
 		return;
 
-	c_static_string260 name;
-	manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
+
 
 #if K_TAG_INJECTION_DEBUG
 	char null_terminated_class[5];
@@ -523,6 +522,9 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 	null_terminated_class[2] = group.string[1];
 	null_terminated_class[3] = group.string[0];
 	null_terminated_class[4] = '\0';
+
+	c_static_string260 name;
+	manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
 
 	LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependency {} {}", name.get_string(), null_terminated_class);
 #endif
@@ -574,12 +576,6 @@ void c_tag_injecting_manager::inject_tags()
 
 		entry->is_injected = true;
 
-		if(entry->type.group == _tag_group_bitmap)
-		{
-			bitmap_group* test =(bitmap_group*)entry->loaded_data.get_data();
-			auto sdfsd = 213123;
-		}
-
 		uint32 injection_offset = this->m_base_tag_data_size + this->m_injectable_used_size;
 
 #if K_TAG_INJECTION_DEBUG
@@ -599,6 +595,7 @@ void c_tag_injecting_manager::inject_tags()
 		injection_instance->size = entry->loaded_data.get_total_size();
 		injection_instance->datum_index = entry->injected_index;
 
+#if K_TAG_INJECTION_DEBUG
 		char null_terminated_class[5];
 		null_terminated_class[0] = entry->type.string[3];
 		null_terminated_class[1] = entry->type.string[2];
@@ -609,7 +606,6 @@ void c_tag_injecting_manager::inject_tags()
 		c_static_string260 tag_name;
 		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
 
-#if K_TAG_INJECTION_DEBUG
 		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {} datum: {:x}", null_terminated_class, injection_offset, injection_instance->size, tag_name.get_string(), entry->injected_index);
 #endif
 
