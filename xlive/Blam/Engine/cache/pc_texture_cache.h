@@ -2,6 +2,8 @@
 #include "bitmaps/bitmap_group.h"
 #include "memory/data.h"
 
+#define k_max_pc_texture_cache_count 10000
+
 // todo: unfinished very large struct
 struct s_pc_texture_cache_globals
 {
