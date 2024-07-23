@@ -127,3 +127,5 @@ void* datum_get(const s_data_array* data, datum datum_index);
 void* datum_try_and_get(const s_data_array* data_array, datum datum_index);
 
 void __cdecl datum_delete(s_data_array* data_array, datum datum_index);
+
+uint32 datum_header_allocate(uint32 total_size, uint32 alignment_bits);

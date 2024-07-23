@@ -16,3 +16,8 @@ void __cdecl datum_delete(s_data_array* data_array, datum datum_index)
 	INVOKE(0x6693E, 0x3262A, datum_delete, data_array, datum_index);
 	return;
 }
+
+uint32 __cdecl datum_header_allocate(uint32 total_size, uint32 alignment_bits)
+{
+	return INVOKE(0x37E69, 0, datum_header_allocate, total_size, alignment_bits);
+}

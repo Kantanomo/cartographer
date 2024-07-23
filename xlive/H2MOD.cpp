@@ -863,6 +863,8 @@ void H2MOD::ApplyHooks() {
 	simulation_apply_patches();
 	simulation_players_apply_patches();
 
+	cache_files_apply_patches();
+
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
 	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
@@ -1001,7 +1003,7 @@ void H2MOD::Initialize()
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MeleeFix::Initialize();
-	TagFixes::Initalize();
+	//TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	KantTesting::Initialize();
