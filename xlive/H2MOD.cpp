@@ -988,7 +988,6 @@ void H2MOD::Initialize()
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
 		
-		tag_injection_initialize();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		ImGuiHandler::WeaponOffsets::Initialize();
@@ -1001,6 +1000,8 @@ void H2MOD::Initialize()
 	{
 		playlist_loader::initialize();
 	}
+
+	tag_injection_initialize();
 	CommandCollection::InitializeCommands();
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
