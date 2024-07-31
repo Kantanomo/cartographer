@@ -1,18 +1,18 @@
 #include "stdafx.h"
-
 #include "Christmas.h"
+
 #include "../SpecialEventHelpers.h"
 
 #include "items/weapon_definitions.h"
 #include "game/game_globals.h"
 #include "models/models.h"
 #include "scenario/scenario.h"
+#include "tag_files/tag_loader/tag_injection.h"
 #include "units/biped_definitions.h"
 
 #include "H2MOD/Tags/MetaExtender.h"
-#include "tag_files/tag_loader/tag_injection.h"
 
-void christmas_event_map_load()
+void christmas_event_map_load(void)
 {
 	// Halo 2 tags
 	datum sword_weapon_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\melee\\energy_blade\\energy_blade");
@@ -37,25 +37,9 @@ void christmas_event_map_load()
 	datum present_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\present\\present", true);
 	datum fp_present_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\present\\fp_present", true);
 
-	if(santa_hat_datum != NONE && 
-		beard_datum != NONE && 
-		snow_datum != NONE &&
-		candy_cane_datum != NONE &&
-		sword_weapon_datum != NONE &&
-		deer_datum != NONE &&
-		ghost_datum != NONE &&
-		ornament_datum != NONE &&
-		frag_model_datum != NONE &&
-		plasma_model_datum != NONE &&
-		present_datum != NONE &&
-		fp_present_datum != NONE &&
-		ball_weapon_datum != NONE &&
-		bomb_weapon_datum != NONE)
-	{
-		tag_injection_inject();
 
-	if(santa_hat_datum != NONE && 
-		beard_datum != NONE && 
+	if (santa_hat_datum != NONE &&
+		beard_datum != NONE &&
 		snow_datum != NONE &&
 		candy_cane_datum != NONE &&
 		sword_weapon_datum != NONE &&
@@ -145,4 +129,6 @@ void christmas_event_map_load()
 		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, fp_present_datum, present_datum);
 		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, fp_present_datum, present_datum);
 	}
+	
+	return;
 }
