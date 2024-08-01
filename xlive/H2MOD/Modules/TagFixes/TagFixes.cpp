@@ -204,4 +204,9 @@ namespace TagFixes
 			fall_damage_fix();
 		}
 	}
+
+	void Initalize()
+	{
+		tags::on_map_load(OnMapLoad);
+	}
 }

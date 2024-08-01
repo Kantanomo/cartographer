@@ -57,6 +57,7 @@
 #include "simulation/game_interface/simulation_game_units.h"
 #include "render/render_cameras.h"
 #include "render/render_submit.h"
+#include "tag_files/tag_loader/tag_injection.h"
 #include "text/font_cache.h"
 #include "units/units.h"
 #include "widgets/cloth.h"
@@ -90,7 +91,6 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
-#include "tag_files/tag_loader/tag_injection.h"
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
@@ -1005,7 +1005,7 @@ void H2MOD::Initialize()
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MeleeFix::Initialize();
-	//TagFixes::Initalize();
+	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	KantTesting::Initialize();
