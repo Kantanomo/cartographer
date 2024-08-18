@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "first_person_camera.h"
 
+#include "user_interface_controller.h"
 #include "cache/cache_files.h"
 #include "game/player_control.h"
 #include "objects/objects.h"
@@ -9,6 +10,7 @@
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/Shell/Config.h"
+#include "saved_games/cartographer_player_profile.h"
 
 
 bool player_control_fov_overridden = false;
@@ -46,9 +48,10 @@ void player_control_set_field_of_view(float fov)
 	overridden_fov_radians = DEGREES_TO_RADIANS(fov);
 }
 
-float __cdecl player_control_get_field_of_view(int controller_index)
+float __cdecl player_control_get_field_of_view(e_controller_index controller_index)
 {
 	const s_player_control* player_control_info = player_control_get(controller_index);
+	const s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get(controller_index);
 
 	float result = observer_suggested_field_of_view();
 	if (player_control_info->unit_datum_index != NONE)
@@ -61,7 +64,7 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 		}
 		else if (player_control_fov_overridden)
 		{
-			fov = overridden_fov_radians;
+			fov = DEGREES_TO_RADIANS(profile_settings->field_of_view);
 		}
 		else
 		{
