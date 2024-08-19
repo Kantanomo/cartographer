@@ -108,7 +108,7 @@ namespace ImGuiHandler {
 					if (abs(state->thumb_right.y) <= ((float)MAXSHORT * (current_cartographer_profile->deadzone_axial_y / 100)))
 						axial_invalid++;
 					bool radial_invalid = false;
-					unsigned int ar = pow((short)((float)MAXSHORT * (current_cartographer_profile->deadzone_radial / 100)), 2);
+					unsigned int ar = pow((short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100)), 2);
 					unsigned int arx = pow(state->thumb_right.x, 2);
 					unsigned int ary = pow(state->thumb_right.y, 2);
 					unsigned int rh = arx + ary;
@@ -514,7 +514,7 @@ namespace ImGuiHandler {
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(13));
-						ImGui::InputFloat("##C_Deadzone_A_X_2", &current_cartographer_profile->deadzone_axial_x, 0, 3);
+						ImGui::InputFloat("##C_Deadzone_A_X_2", &H2Config_Deadzone_A_X, 0, 3);
 						if (ImGui::IsItemEdited())
 						{
 							if (current_cartographer_profile->deadzone_axial_x < 0)
