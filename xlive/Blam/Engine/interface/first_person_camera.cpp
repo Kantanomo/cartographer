@@ -48,21 +48,22 @@ void player_control_set_field_of_view(float fov)
 	overridden_fov_radians = DEGREES_TO_RADIANS(fov);
 }
 
-float __cdecl player_control_get_field_of_view(e_controller_index controller_index)
+float __cdecl player_control_get_field_of_view(uint32 user_index)
 {
-	const s_player_control* player_control_info = player_control_get(controller_index);
-	const s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get(controller_index);
+	const s_player_control* player_control_info = player_control_get(user_index);
 
 	float result = observer_suggested_field_of_view();
+	
 	if (player_control_info->unit_datum_index != NONE)
 	{
 		float fov;
-		
+		const s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_user_index(user_index);
+
 		if (currentVariantSettings.forced_fov != 0)
 		{
 			fov = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
 		}
-		else if (player_control_fov_overridden)
+		else if (profile_settings)
 		{
 			fov = DEGREES_TO_RADIANS(profile_settings->field_of_view);
 		}
