@@ -151,7 +151,7 @@ struct object_datum
 	c_object_identifier object_identifier;
 	int16 name_list_index;
 	uint8 structure_bsp_index;
-	int8 netgame_equipment_index;
+	int8 multiplayer_spawn_monitor_index;
 	e_bsp_policy placement_policy;
 	int8 field_b1;
 	int8 field_b2;

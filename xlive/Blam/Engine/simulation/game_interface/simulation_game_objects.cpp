@@ -22,7 +22,7 @@ void __stdcall c_simulation_object_entity_definition__object_build_creation_data
     object_datum* object = object_get_fast_unsafe<object_datum>(object_index);
     creation_data->object_definition_index = object->tag_definition_index;
     creation_data->object_scenario_datum_index = object->placement_index;
-    creation_data->multiplayer_spawn_monitor_index = object->netgame_equipment_index;
+    creation_data->multiplayer_spawn_monitor_index = object->multiplayer_spawn_monitor_index;
     creation_data->model_variant_index = object->model_variant_id;
     creation_data->emblem_info = object->emblem_info;
     return;

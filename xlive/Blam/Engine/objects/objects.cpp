@@ -538,7 +538,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 	object->next_index = NONE;
 	object->current_weapon_datum = NONE;
 	object->name_list_index = NONE;
-	object->netgame_equipment_index = NONE;
+	object->multiplayer_spawn_monitor_index = NONE;
 	object->byte_108 = NONE;
 	object->byte_109 = NONE;
 	object->placement_policy = data->placement_policy;
