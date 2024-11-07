@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "imgui_handler.h"
+#include "game/players.h"
 
 #include "input/input_windows.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "input/input_abstraction.h"
 
 extern int notify_xlive_ui;
 
@@ -157,8 +159,18 @@ namespace ImGuiHandler
 				ImTextureID texId = ImGuiHandler::GetTexture(patch_notes);
 				ImGui::Image(texId, ImGui::GetIO().DisplaySize);
 
-				if (input_get_gamepad_state(0)->button_frames_down[_xinput_gamepad_a]
-					|| ImGui::IsItemClicked())
+
+				for (int32 user_index = 0; user_index < k_number_of_users; user_index++)
+				{
+					if(input_abstraction_globals->input_has_gamepad[user_index] && 
+						input_get_gamepad_state(user_index)->button_frames_down[_xinput_gamepad_a])
+					{
+						ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+					}
+				}
+				
+
+				if (ImGui::IsItemClicked())
 				{
 					ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
 				}
