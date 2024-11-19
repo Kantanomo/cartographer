@@ -13,6 +13,18 @@
 
 /* enums */
 
+enum e_game_engine_timer_type
+{
+
+	k_game_engine_timer_count = 3
+};
+
+enum e_game_engine_state
+{
+
+	k_game_engine_state_count = 4
+};
+
 enum e_valid_multiplayer_games : short
 {
 	valid_multiplayer_game_capture_the_flag = FLAG(0),
@@ -179,7 +191,8 @@ struct s_game_engine_globals
 	uint32 field_28;
 	int32 player_entity_index[k_maximum_players];
 	int16 field_6C;
-	uint32 field_70;
+	int16 round_index;
+	int16 field_72;
 	uint32 gap_74[28];
 	real32 unk_local_player_hud_field[k_number_of_users];
 	uint8 field_F4;
