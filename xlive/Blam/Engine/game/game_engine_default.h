@@ -8,18 +8,18 @@ enum e_simulation_game_engine_update : uint32
 	k_simulation_game_engine_update_flag_count = 31
 };
 
-enum e_game_engine_variant_flag_test_type : uint8
+enum e_game_engine_variant_flag_test_type : uint32
 {
 	_game_engine_variant_flag_test_extra_damage,
 	_game_engine_variant_flag_test_damage_resistant,
 	_game_engine_variant_flag_test_always_invisible
 };
 
-class c_game_engine
+class c_game_engine_default
 {
 public:
 	virtual e_game_engine_type get_type();
-	virtual bool setup() = 0;
+	virtual bool setup();
 	virtual bool cleanup() = 0;
 	virtual bool function_4();
 	virtual bool verify_netpoints(uint32 netpoint_index) = 0;
@@ -31,40 +31,40 @@ public:
 	virtual void player_team_change(datum player_index) = 0;
 	virtual void game_start() = 0;
 	virtual void function_13() = 0;
-	virtual void function_14(datum player_index);
-	virtual void render_game_engine_elements(uint32 user_index);
-	virtual void function_16(datum player_index);
-	virtual bool function_17(datum player_index, datum weapon_index);
-	virtual void handle_player_objective_touch_interaction(datum player_index, datum object_index);
-	virtual void function_19();
-	virtual real32 get_player_speed_modifier(datum player_index);
-	virtual uint32 function_21(datum object_index);
-	virtual void update_object_color_change(datum object_index);
-	virtual void function_23(datum index);
-	virtual void handle_object_taken_event(datum weapon_index, datum biped_index);
-	virtual void handle_object_dropped_event(datum weapon_index, datum biped_index);
+	virtual void function_14(datum player_index) = 0;
+	virtual void render_game_engine_elements(uint32 user_index) = 0;
+	virtual void function_16(datum player_index) = 0;
+	virtual bool function_17(datum player_index, datum weapon_index) = 0;
+	virtual void handle_player_objective_touch_interaction(datum player_index, datum object_index) = 0;
+	virtual void function_19() = 0;
+	virtual real32 get_player_speed_modifier(datum player_index) = 0;
+	virtual uint32 function_21(datum object_index) = 0;
+	virtual void update_object_color_change(datum object_index) = 0;
+	virtual void function_23(datum index) = 0;
+	virtual void handle_object_taken_event(datum weapon_index, datum biped_index) = 0;
+	virtual void handle_object_dropped_event(datum weapon_index, datum biped_index) = 0;
 	virtual int32 get_sudden_death_timer(int32 time_remaining_in_ticks, bool unk, bool unk_2);
 	virtual e_game_team get_primary_team_index();
 	virtual bool is_team_enemy(e_game_team a, e_game_team b);
 	virtual void get_multiplayer_score_string(wchar_t* out_string);
-	virtual void function_30(int32 a1, int32 a2, int32 a3);
-	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4);
+	virtual void function_30(int32 a1, int32 a2, int32 a3) = 0;
+	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) = 0;
 	virtual int32 function_32(datum player_index, datum player_index_2, bool a3, int32 a4);
-	virtual void function_33(datum player_index, void* unk);
+	virtual void function_33(datum player_index, void* unk) = 0;
 	virtual bool function_34(datum player_index, void* unk);
-	virtual bool function_35(int32 unk_index);
+	virtual bool function_35(int32 unk_index) = 0;
 	virtual bool test_variant_engine_flag(datum player_index, e_game_engine_variant_flag_test_type type);
-	virtual void function_37(int32 unk_always_1);
-	virtual uint32 function_38(datum player_index, bool* always_returned_true);
+	virtual void function_37(int32 unk_always_1) = 0;
+	virtual void get_player_state_index(datum player_index, bool* always_returned_true);
 	virtual bool should_garbage_collect(datum object_index);
 	virtual uint32 get_game_engine_entity_type();
-	virtual void function_41();
+	virtual void function_41() = 0;
 	virtual void function_42(void* unk);
-	virtual void function_43(int8 flags, int8* out_flags, void* unk);
+	virtual void function_43(int8 flags, void* unk, void* unk_2);
 	virtual void function_44(int8 flags, void* unk);
-	virtual void set_simulation_baseline_data(int32 unused, void* unk);
-	virtual void build_simulation_update(void* unk, int32 unused, void* unk_2);
-	virtual bool apply_simulation_update(int16 flags, int32 unused, void* unk);
+	virtual void set_simulation_baseline_data(int32 unused, void* unk) = 0;
+	virtual void build_simulation_update(void* unk, int32 unused, void* unk_2) = 0;
+	virtual bool apply_simulation_update(int16 flags, int32 unused, void* unk) = 0;
 	virtual void set_player_simulation_baseline_data(int32 unused, int32 unused_2, void* unk);
 	virtual void build_player_simulation_update(int16 abs_player_index, void* unk, int32 unused, void* unk_2);
 	virtual bool apply_player_simulation_update(int16 abs_player_index, int8 flags, int32 unused, void* unk);
