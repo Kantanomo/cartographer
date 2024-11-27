@@ -15,8 +15,11 @@ enum e_game_engine_variant_flag_test_type : uint32
 	_game_engine_variant_flag_test_always_invisible
 };
 
-class c_game_engine_default
+class c_game_engine
 {
+public:
+	c_game_engine() = default;
+
 public:
 	virtual e_game_engine_type get_type();
 	virtual bool setup();
@@ -49,7 +52,7 @@ public:
 	virtual void get_multiplayer_score_string(wchar_t* out_string);
 	virtual void function_30(int32 a1, int32 a2, int32 a3) = 0;
 	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) = 0;
-	virtual int32 function_32(datum player_index, datum player_index_2, bool a3, int32 a4);
+	virtual int32 get_player_killed_event_id(datum player_index, datum player_index_2, bool a3) = 0;
 	virtual void function_33(datum player_index, void* unk) = 0;
 	virtual bool function_34(datum player_index, void* unk);
 	virtual bool function_35(int32 unk_index) = 0;
