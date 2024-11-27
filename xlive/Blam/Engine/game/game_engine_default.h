@@ -18,21 +18,18 @@ enum e_game_engine_variant_flag_test_type : uint32
 class c_game_engine
 {
 public:
-	c_game_engine() = default;
-
-public:
 	virtual e_game_engine_type get_type();
 	virtual bool setup();
-	virtual bool cleanup() = 0;
+	virtual bool cleanup();
 	virtual bool function_4();
 	virtual bool verify_netpoints(uint32 netpoint_index) = 0;
-	virtual void player_join(datum player_index) = 0;
+	virtual void player_join(datum player_index);
 	virtual void send_game_start_event(datum player_index) = 0;
-	virtual void player_leave(datum player_index) = 0;
-	virtual void player_rejoin(datum player_index) = 0;
-	virtual void swap_player_indices(uint32 old_index, uint32 new_index) = 0;
-	virtual void player_team_change(datum player_index) = 0;
-	virtual void game_start() = 0;
+	virtual void player_leave(datum player_index);
+	virtual void player_rejoin(datum player_index);
+	virtual void swap_player_indices(uint32 old_index, uint32 new_index);
+	virtual void player_team_change(datum player_index);
+	virtual void game_start();
 	virtual void function_13() = 0;
 	virtual void function_14(datum player_index) = 0;
 	virtual void render_game_engine_elements(uint32 user_index) = 0;
@@ -43,17 +40,17 @@ public:
 	virtual real32 get_player_speed_modifier(datum player_index) = 0;
 	virtual uint32 function_21(datum object_index) = 0;
 	virtual void update_object_color_change(datum object_index) = 0;
-	virtual void function_23(datum index) = 0;
+	virtual void function_23(datum index);
 	virtual void handle_object_taken_event(datum weapon_index, datum biped_index) = 0;
 	virtual void handle_object_dropped_event(datum weapon_index, datum biped_index) = 0;
 	virtual int32 get_sudden_death_timer(int32 time_remaining_in_ticks, bool unk, bool unk_2);
 	virtual e_game_team get_primary_team_index();
 	virtual bool is_team_enemy(e_game_team a, e_game_team b);
 	virtual void get_multiplayer_score_string(wchar_t* out_string);
-	virtual void function_30(int32 a1, int32 a2, int32 a3) = 0;
+	virtual void function_30(int32 a1, int32 a2, int32 a3);
 	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) = 0;
 	virtual int32 get_player_killed_event_id(datum player_index, datum player_index_2, bool a3) = 0;
-	virtual void function_33(datum player_index, void* unk) = 0;
+	virtual void function_33(datum player_index, void* unk);
 	virtual bool function_34(datum player_index, void* unk);
 	virtual bool function_35(int32 unk_index) = 0;
 	virtual bool test_variant_engine_flag(datum player_index, e_game_engine_variant_flag_test_type type);

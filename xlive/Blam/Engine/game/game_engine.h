@@ -2,6 +2,7 @@
 
 #include "game_engine_ctf.h"
 #include "game_engine_default.h"
+#include "game_engine_juggernaut.h"
 #include "game/game_allegiance.h"
 #include "game_statborg.h"
 #include "players.h"
@@ -20,6 +21,7 @@ enum
 };
 
 static c_ctf_engine g_game_engine_ctf;
+static c_juggernaut_engine g_juggernaut_engine;
 
 /* enums */
 
