@@ -614,6 +614,7 @@
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_ctf.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_default.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_juggernaut.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
     <ClCompile Include="Blam\Engine\game\game_results.cpp" />
@@ -891,6 +892,7 @@
     <ClInclude Include="Blam\Engine\game\game_allegiance.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_ctf.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_default.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_juggernaut.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_territories.h" />

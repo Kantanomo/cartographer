@@ -21,7 +21,7 @@ bool c_game_engine::function_4()
 	return true;
 }
 
-bool c_game_engine::verify_netpoints(uint32 netpoint_index)
+bool c_game_engine::verify_netpoint(uint32 netpoint_index)
 {
 	return false;
 }
@@ -56,7 +56,36 @@ void c_game_engine::game_start()
 
 }
 
+bool c_game_engine::function_17(datum player_index, datum weapon_index)
+{
+	return false;
+}
+
+void c_game_engine::handle_player_objective_touch_interaction(datum player_index, datum object_index)
+{
+
+}
+
+uint32 c_game_engine::function_21(datum object_index)
+{
+
+}
+
+void c_game_engine::update_object_color_change(datum object_index)
+{
+
+}
+
 void c_game_engine::function_23(datum index)
+{
+
+}
+
+void c_game_engine::handle_object_taken_event(datum weapon_index, datum biped_index)
+{
+}
+
+void c_game_engine::handle_object_dropped_event(datum weapon_index, datum biped_index)
 {
 
 }
@@ -88,7 +117,7 @@ void c_game_engine::function_30(int32 a1, int32 a2, int32 a3)
 
 int32 c_game_engine::get_player_killed_event_id(datum player_index, datum player_index_2, bool a3)
 {
-	return -1;
+	return NONE;
 }
 
 void c_game_engine::function_33(datum player_index, void* unk)
@@ -104,6 +133,11 @@ bool c_game_engine::function_34(datum player_index, void* unk)
 bool c_game_engine::test_variant_engine_flag(datum player_index, e_game_engine_variant_flag_test_type type)
 {
 	return INVOKE_TYPE(0x1112D1, 0, bool(__thiscall*)(c_game_engine*, datum, e_game_engine_variant_flag_test_type), this, player_index, type);
+}
+
+void c_game_engine::function_37(int32 unk_always_1)
+{
+
 }
 
 void c_game_engine::get_player_state_index(datum player_index, bool* always_returned_true)
