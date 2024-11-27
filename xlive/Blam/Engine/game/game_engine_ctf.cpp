@@ -14,7 +14,7 @@ bool c_ctf_engine::setup()
 	return INVOKE_TYPE(0xD6B11, 0, bool(__thiscall*)(c_game_engine*), this);
 }
 
-bool c_ctf_engine::verify_netpoints(uint32 netpoint_index)
+bool c_ctf_engine::verify_netpoint(uint32 netpoint_index)
 {
 	return INVOKE_TYPE(0xD4A63, 0, bool(__thiscall*)(c_game_engine*, uint32), this, netpoint_index);
 }
