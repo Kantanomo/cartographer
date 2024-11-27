@@ -9,7 +9,7 @@ class c_ctf_engine : public c_game_engine
 public:
 	virtual e_game_engine_type get_type() override;
 	virtual bool setup() override;
-	virtual bool verify_netpoints(uint32 netpoint_index) override;
+	virtual bool verify_netpoint(uint32 netpoint_index) override;
 	virtual void send_game_start_event(datum player_index) override;
 	virtual void function_13() override;
 	virtual void function_14(datum player_index) override;

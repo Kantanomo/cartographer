@@ -56,6 +56,11 @@ void c_game_engine::game_start()
 
 }
 
+void c_game_engine::function_14(datum player_index)
+{
+
+}
+
 bool c_game_engine::function_17(datum player_index, datum weapon_index)
 {
 	return false;
@@ -66,9 +71,19 @@ void c_game_engine::handle_player_objective_touch_interaction(datum player_index
 
 }
 
-uint32 c_game_engine::function_21(datum object_index)
+void c_game_engine::function_19()
 {
 
+}
+
+real32 c_game_engine::get_player_speed_modifier(datum player_index)
+{
+	return 1.f;
+}
+
+uint32 c_game_engine::function_21(datum object_index)
+{
+	return NONE;
 }
 
 void c_game_engine::update_object_color_change(datum object_index)
