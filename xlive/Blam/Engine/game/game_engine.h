@@ -3,7 +3,9 @@
 #include "game_engine_ctf.h"
 #include "game_engine_juggernaut.h"
 #include "game_engine_king.h"
+#include "game_engine_oddball.h"
 #include "game_engine_slayer.h"
+#include "game_engine_territories.h"
 #include "game/game_allegiance.h"
 #include "game_statborg.h"
 #include "math/color_math.h"
@@ -19,6 +21,8 @@ static c_ctf_engine g_game_engine_ctf;
 static c_juggernaut_engine g_juggernaut_engine;
 static c_slayer_engine g_slayer_engine;
 static c_king_engine g_king_engine;
+static c_territories_engine g_territories_engine;
+static c_oddball_engine g_oddball_engine;
 
 /* enums */
 
