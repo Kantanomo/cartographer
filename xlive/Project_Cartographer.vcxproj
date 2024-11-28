@@ -615,6 +615,7 @@
     <ClCompile Include="Blam\Engine\game\game_engine_ctf.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_default.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_juggernaut.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_oddball.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_slayer.cpp" />
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
@@ -894,6 +895,7 @@
     <ClInclude Include="Blam\Engine\game\game_engine_ctf.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_default.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_juggernaut.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_oddball.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_slayer.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
