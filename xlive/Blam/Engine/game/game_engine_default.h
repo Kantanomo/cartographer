@@ -34,7 +34,7 @@ public:
 	virtual void function_14(datum player_index);
 	virtual void render_game_engine_elements(uint32 user_index) = 0;
 	virtual void function_16(datum player_index) = 0;
-	virtual bool function_17(datum player_index, datum weapon_index);
+	virtual bool player_can_interact_with_weapon(datum player_index, datum weapon_index);
 	virtual void handle_player_objective_touch_interaction(datum player_index, datum object_index);
 	virtual void function_19();
 	virtual real32 get_player_speed_modifier(datum player_index);
@@ -61,7 +61,7 @@ public:
 	virtual void function_41() = 0;
 	virtual void function_42(void* unk);
 	virtual void function_43(int8 flags, void* unk, void* unk_2);
-	virtual void function_44(int8 flags, void* unk);
+	virtual bool function_44(int8 flags, void* unk);
 	virtual void set_simulation_baseline_data(int32 unused, void* unk) = 0;
 	virtual void build_simulation_update(void* unk, int32 unused, void* unk_2) = 0;
 	virtual bool apply_simulation_update(int16 flags, int32 unused, void* unk) = 0;

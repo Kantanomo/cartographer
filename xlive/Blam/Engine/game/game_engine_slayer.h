@@ -1,7 +1,7 @@
 #pragma once
 #include "game_engine_default.h"
 
-class c_slayer_engine : c_game_engine
+class c_slayer_engine : public c_game_engine
 {
 public:
 	virtual e_game_engine_type get_type() override;
