@@ -6,6 +6,7 @@
 #include "game_engine_oddball.h"
 #include "game_engine_slayer.h"
 #include "game_engine_territories.h"
+#include "game_engine_test.h"
 #include "game/game_allegiance.h"
 #include "game_statborg.h"
 #include "players.h"
@@ -29,7 +30,7 @@ static c_slayer_engine g_slayer_engine;
 static c_king_engine g_king_engine;
 static c_territories_engine g_territories_engine;
 static c_oddball_engine g_oddball_engine;
-
+static c_game_engine* g_test_engine_ptr = &g_test_engine;
 /* enums */
 
 enum e_game_engine_timer_type
@@ -386,3 +387,9 @@ void __cdecl game_engine_player_activated(datum player_index);
 bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b);
 
 void __cdecl game_engine_render(void);
+
+bool game_engine_in_round();
+
+c_game_engine** get_game_mode_engines();
+
+void test_replace_game_engine_mode(e_game_engine_type type, c_game_engine* engine);

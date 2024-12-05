@@ -61,9 +61,9 @@ void c_game_engine::function_14(datum player_index)
 
 }
 
-bool c_game_engine::function_17(datum player_index, datum weapon_index)
+bool c_game_engine::player_can_interact_with_weapon(datum player_index, datum weapon_index)
 {
-	return false;
+	return true;
 }
 
 void c_game_engine::handle_player_objective_touch_interaction(datum player_index, datum object_index)
@@ -180,9 +180,9 @@ void c_game_engine::function_43(int8 flags, void* unk, void* unk_2)
 	INVOKE_TYPE(0x111750, 0, void(__thiscall*)(c_game_engine*, int8, void*, void*), this, flags, unk, unk_2);
 }
 
-void c_game_engine::function_44(int8 flags, void* unk)
+bool c_game_engine::function_44(int8 flags, void* unk)
 {
-	INVOKE_TYPE(0x11196A, 0, void(__thiscall*)(c_game_engine*, int8, void*), this, flags, unk);
+	return INVOKE_TYPE(0x111965, 0, bool(__thiscall*)(c_game_engine*, int8, void*), this, flags, unk);
 }
 
 void c_game_engine::set_player_simulation_baseline_data(int32 unused, int32 unused_2, void* unk)
@@ -197,7 +197,7 @@ void c_game_engine::build_player_simulation_update(int16 abs_player_index, void*
 
 bool c_game_engine::apply_player_simulation_update(int16 abs_player_index, int8 flags, int32 unused, void* unk)
 {
-	return INVOKE_TYPE(0x111681, 0, bool(__thiscall*)(c_game_engine*, int16, int8, int32, void*), this, abs_player_index, flags, unused, unk);
+	return INVOKE_TYPE(0x111541, 0, bool(__thiscall*)(c_game_engine*, int16, int8, int32, void*), this, abs_player_index, flags, unused, unk);
 }
 
 uint32 c_game_engine::get_territory_name(wchar_t* a1, int32 a2, int32 a3, wchar_t* a4, wchar_t* a5)

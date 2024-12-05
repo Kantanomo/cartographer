@@ -44,7 +44,7 @@ void c_ctf_engine::function_16(datum player_index)
 	INVOKE_TYPE(0xD6C91, 0, void(__thiscall*)(c_game_engine*, datum), this, player_index);
 }
 
-bool c_ctf_engine::function_17(datum player_index, datum weapon_index)
+bool c_ctf_engine::player_can_interact_with_weapon(datum player_index, datum weapon_index)
 {
 	return INVOKE_TYPE(0xD4915, 0, bool(__thiscall*)(c_game_engine*, datum, datum), this, player_index, weapon_index);
 }
