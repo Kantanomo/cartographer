@@ -23,6 +23,11 @@ c_game_engine** get_game_mode_engines()
 	return Memory::GetAddress<c_game_engine**>(0x4D8548, 0x4F3CE4);
 }
 
+void test_replace_game_engine_mode(e_game_engine_type type, c_game_engine* engine)
+{
+	Memory::GetAddress<c_game_engine**>(0x4D8548, 0x4F3CE4)[type] = engine;
+}
+
 c_game_engine* get_slayer_engine()
 {
 	return get_game_mode_engines()[_game_engine_type_slayer];
