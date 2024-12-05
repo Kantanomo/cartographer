@@ -63,15 +63,36 @@ void c_slayer_engine::function_41()
 
 void c_slayer_engine::set_simulation_baseline_data(int32 unused, void* unk)
 {
-	INVOKE_TYPE(0x110D7A, 0x0, void(__thiscall*)(c_game_engine*, int32, void*), this, unused, unk);
+	memset(unk, 0, sizeof(int32) * 8);
+	this->function_42(unk);
+
+	//INVOKE_TYPE(0x110D7A, 0x0, void(__thiscall*)(c_game_engine*, int32, void*), this, unused, unk);
 }
 
 void c_slayer_engine::build_simulation_update(void* unk, int32 unused, void* unk_2)
 {
-	INVOKE_TYPE(0x110DA8, 0x0, void(__thiscall*)(c_game_engine*, void*, int32, void*), this, unk, unused, unk_2);
+	int32 flag_test = *(int32*)unk & 0x1F;
+	int32 unk_result = 0;
+	if(flag_test)
+	{
+		this->function_43(flag_test, &unk_result, unk_2);
+		*(int32*)unk = unk_result;
+	}
+	else
+	{
+		*(int32*)unk = 0;
+	}
+
+	//INVOKE_TYPE(0x110DA8, 0x0, void(__thiscall*)(c_game_engine*, void*, int32, void*), this, unk, unused, unk_2);
 }
 
 bool c_slayer_engine::apply_simulation_update(int16 flags, int32 unused, void* unk)
 {
-	return INVOKE_TYPE(0x110DE4, 0x0, bool(__thiscall*)(c_game_engine*, int16, int32, void*), this, flags, unused, unk);
+	if((flags & 0x1F) != 0)
+	{
+		return this->function_44(flags & 0x1F, unk) != 0;
+	}
+	return true;
+
+	//return INVOKE_TYPE(0x110DE4, 0x0, bool(__thiscall*)(c_game_engine*, int16, int32, void*), this, flags, unused, unk);
 }

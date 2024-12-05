@@ -15,7 +15,7 @@ public:
 	virtual void function_14(datum player_index) override;
 	virtual void render_game_engine_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
-	virtual bool function_17(datum player_index, datum weapon_index) override;
+	virtual bool player_can_interact_with_weapon(datum player_index, datum weapon_index) override;
 	virtual void handle_player_objective_touch_interaction(datum player_index, datum object_index) override;
 	virtual void function_19() override;
 	virtual real32 get_player_speed_modifier(datum player_index) override;
