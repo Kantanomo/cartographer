@@ -21,7 +21,7 @@ void c_oddball_engine::function_13()
 	INVOKE_TYPE(0x10FF30, 0x0, void(__thiscall*)(c_game_engine*), this);
 }
 
-void c_oddball_engine::render_game_engine_elements(uint32 user_index)
+void c_oddball_engine::render_game_engine_hud_elements(uint32 user_index)
 {
 	INVOKE_TYPE(0x110579, 0x0, void(__thiscall*)(c_game_engine*, uint32), this, user_index);
 }

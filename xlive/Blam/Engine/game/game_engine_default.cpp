@@ -23,7 +23,7 @@ bool c_game_engine::function_4()
 
 bool c_game_engine::verify_netpoint(uint32 netpoint_index)
 {
-	return false;
+	return true;
 }
 
 void c_game_engine::player_join(datum player_index)

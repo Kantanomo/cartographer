@@ -10,7 +10,7 @@ public:
 	virtual void send_game_start_event(datum player_index) override;
 	virtual void function_13() override;
 	virtual void function_14(datum player_index) override;
-	virtual void render_game_engine_elements(uint32 user_index) override;
+	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
 	virtual void function_19() override;
 	virtual void get_multiplayer_score_string(wchar_t* out_string) override;

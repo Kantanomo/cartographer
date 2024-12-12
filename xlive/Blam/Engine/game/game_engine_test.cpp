@@ -6,3 +6,9 @@ void c_test_engine::function_14(datum player_index)
 {
 	c_slayer_engine::function_14(player_index);
 }
+
+void c_test_engine::function_23(datum index)
+{
+	c_slayer_engine::function_23(index);
+}
+

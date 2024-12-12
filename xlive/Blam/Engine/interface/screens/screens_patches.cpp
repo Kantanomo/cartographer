@@ -13,6 +13,7 @@
 #include "screen_single_player_profile_select.h"
 #include "screen_virtual_keyboard.h"
 #include "screen_error_dialog.h"
+#include "screen_game_engine_category.h"
 #include "screen_button_settings.h"
 #include "screen_controller_settings_menu.h"
 #include "screen_multiplayer_video_settings_menu.h"
@@ -50,4 +51,6 @@ void screens_apply_patches()
 	c_controller_settings_edit_list::apply_instance_patches();
 	c_screen_multiplayer_video_settings::apply_instance_patches();
 	c_screen_resolution_menu::apply_instance_patches();
+	c_screen_game_engine_category_list::apply_patches();
+	c_screen_game_engine_category::apply_patches();
 }

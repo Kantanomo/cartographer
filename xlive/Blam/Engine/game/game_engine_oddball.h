@@ -8,7 +8,7 @@ public:
 	virtual bool setup() override;
 	virtual void send_game_start_event(datum player_index) override;
 	virtual void function_13() override;
-	virtual void render_game_engine_elements(uint32 user_index) override;
+	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
 	virtual void function_19() override;
 	virtual real32 get_player_speed_modifier(datum player_index) override;

@@ -930,6 +930,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_campaign_options_dialog.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_gamma_setting.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_lod_setting.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_game_engine_category.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_main_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_video_settings_menu.cpp" />
@@ -1355,6 +1356,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_bungie_news.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_campaign_options_dialog.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_game_engine_category.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_gamma_setting.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_lod_setting.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_main_menu.h" />
