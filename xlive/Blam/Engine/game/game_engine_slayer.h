@@ -10,7 +10,7 @@ public:
 	virtual void send_game_start_event(datum player_index) override;
 	virtual void swap_player_indices(uint32 old_index, uint32 new_index) override;
 	virtual void function_13() override;
-	virtual void render_game_engine_elements(uint32 user_index) override;
+	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
 	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
 	virtual bool function_35(int32 unk_index) override;

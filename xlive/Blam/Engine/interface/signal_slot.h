@@ -96,6 +96,7 @@ public:
 		return INVOKE_CLASS_FN(m_class_ptr, m_handler) (event, id);
 	}
 };
+
 //ASSERT_STRUCT_SIZE(class c_slot2<class c_search_option_max_players_edit_list, struct s_event_record *, long>, 0x18);
 
 class _slot_linker

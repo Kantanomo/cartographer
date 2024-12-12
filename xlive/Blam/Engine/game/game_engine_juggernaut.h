@@ -13,7 +13,7 @@ public:
 	virtual void swap_player_indices(uint32 old_index, uint32 new_index) override;
 	virtual void function_13() override;
 	virtual void function_14(datum player_index) override;
-	virtual void render_game_engine_elements(uint32 user_index) override;
+	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
 	virtual void function_19() override;
 	virtual real32 get_player_speed_modifier(datum player_index) override;

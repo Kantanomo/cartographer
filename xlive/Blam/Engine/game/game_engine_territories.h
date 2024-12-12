@@ -15,7 +15,7 @@ public:
 	virtual void player_team_change(datum player_index) override;
 	virtual void function_13() override;
 	virtual void function_14(datum player_index) override;
-	virtual void render_game_engine_elements(uint32 user_index) override;
+	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
 	virtual bool player_can_interact_with_weapon(datum player_index, datum weapon_index) override;
 	virtual void function_19() override;

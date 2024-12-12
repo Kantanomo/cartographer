@@ -31,7 +31,7 @@ void c_slayer_engine::function_13()
 	INVOKE_TYPE(0x110C5F, 0x0, void(__thiscall*)(c_game_engine*), this);
 }
 
-void c_slayer_engine::render_game_engine_elements(uint32 user_index)
+void c_slayer_engine::render_game_engine_hud_elements(uint32 user_index)
 {
 	INVOKE_TYPE(0x111129, 0x0, void(__thiscall*)(c_game_engine*, uint32), this, user_index);
 }
