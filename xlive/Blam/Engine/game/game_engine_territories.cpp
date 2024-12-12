@@ -41,7 +41,7 @@ void c_territories_engine::function_14(datum player_index)
 	INVOKE_TYPE(0x10C9A5, 0x0, void(__thiscall*)(c_game_engine*, datum), this, player_index);
 }
 
-void c_territories_engine::render_game_engine_elements(uint32 user_index)
+void c_territories_engine::render_game_engine_hud_elements(uint32 user_index)
 {
 	INVOKE_TYPE(0x10CDCF, 0x0, void(__thiscall*)(c_game_engine*, uint32), this, user_index);
 }
