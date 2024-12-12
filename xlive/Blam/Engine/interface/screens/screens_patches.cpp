@@ -13,6 +13,7 @@
 #include "screen_single_player_profile_select.h"
 #include "screen_virtual_keyboard.h"
 #include "screen_error_dialog.h"
+#include "screen_game_engine_category.h"
 
 void screens_apply_patches_on_map_load()
 {
@@ -36,4 +37,6 @@ void screens_apply_patches()
 	c_screen_virtual_keyboard::apply_patches();
 	c_screen_error_dialog_ok::apply_patches();
 	c_screen_error_dialog_ok_cancel::apply_patches();
+	c_screen_game_engine_category_list::apply_patches();
+	c_screen_game_engine_category::apply_patches();
 }
