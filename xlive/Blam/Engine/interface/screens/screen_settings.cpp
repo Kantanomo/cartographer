@@ -234,7 +234,7 @@ void c_settings_list::handle_item_variant(s_event_record** pevent)
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_game_engine_category::load;
+	params.m_load_function = c_screen_game_engine_category::load_settings;
 
 	params.m_load_function(&params);
 }

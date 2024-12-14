@@ -138,6 +138,21 @@ void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name
 	return;
 }
 
+bool __cdecl saved_games_generate_file_name(e_saved_game_file_type type, wchar_t* out_string)
+{
+	return INVOKE(0x4333A, 0, saved_games_generate_file_name, type, out_string);
+}
+
+uint32 saved_games_create_new_game_variant(e_controller_index origin_controller, e_saved_game_file_type type,
+	wchar_t* name)
+{
+	return INVOKE(0x5AB63, 0, saved_games_create_new_game_variant, origin_controller, type, name);
+}
+
+bool saved_games_load_game_variant(uint32 enumerated_index, s_game_variant* out_variant)
+{
+	return INVOKE(0x5A96B, 0, saved_games_load_game_variant, enumerated_index, out_variant);
+}
 
 /* private code */
 
