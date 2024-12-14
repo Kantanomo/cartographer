@@ -19,13 +19,21 @@ enum e_screen_game_engine_items : uint16
 	k_screen_game_engine_item_count
 };
 
+enum e_screen_game_engine_category_type : int8
+{
+	_screen_game_engine_category_lobby,
+	_screen_game_engine_category_settings,
+};
+
 class c_screen_game_engine_category_list : public c_list_widget
 {
 public:
 	c_list_item_widget m_list_items[k_screen_game_engine_item_count];
+	e_screen_game_engine_category_type type;
+	int8 data[7];
 	c_slot2<c_screen_game_engine_category_list, s_event_record*, datum> m_slot;
-	int8 data[8];
-	void handle_item_pressed_event(s_event_record* pevent, datum* pitem_index);
+	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
+	void item_pressed_event_error() const;
 
 public:
 	static void apply_patches();
@@ -45,13 +53,16 @@ class c_screen_game_engine_category : public c_screen_with_menu
 {
 protected:
 	c_screen_game_engine_category_list m_game_engine_list;
-	int8 data[5];
+	e_screen_game_engine_category_type m_type;
+	int8 data[4];
 public:
 	static void apply_patches();
-	static void* load(s_screen_parameters* parameters);
-	c_screen_game_engine_category(e_user_interface_channel_type ui_channel, e_user_interface_render_window window_index, uint16 user_flags, int8 unk_1, int8 unk_2, int8 unk_3);
+	static void* load_settings(s_screen_parameters* parameters);
+	static void* load_lobby(s_screen_parameters* parameters);
+	c_screen_game_engine_category(e_user_interface_channel_type ui_channel, e_user_interface_render_window window_index, uint16 user_flags, e_user_interface_screen_id screen_id, e_screen_game_engine_category_type type, int8 unk_2, int8 unk_3);
 	virtual ~c_screen_game_engine_category() = default;
-	virtual void* load_proc() override;
+	virtual void sub_60E884() override;
+	virtual const void* load_proc() const override;
 };
 
 // size of c_screen_game_engine_category if list count 0 + total size of all list item widgets based on item count

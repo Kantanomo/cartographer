@@ -87,6 +87,17 @@ void __cdecl user_interface_enter_game_shell(int32 context)
 	return;
 }
 
+void user_interface_set_variant(uint32 enumerated_file_index, s_game_variant* variant)
+{
+	INVOKE(0x209A6E, 0, user_interface_set_variant, enumerated_file_index, variant);
+}
+
+s_game_variant* user_interface_get_variant()
+{
+	return INVOKE(0x209A92, 0, user_interface_get_variant);
+}
+
+
 void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface_render_window render_window, rectangle2d* out_rect2d)
 {
 	INVOKE(0x20B697, 0x0, render_menu_user_interface, controller_index, render_window, out_rect2d);

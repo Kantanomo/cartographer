@@ -29,6 +29,14 @@ enum e_saved_game_file_type : int32
 	_saved_game_file_type_invalid = NONE,
 };
 
+enum e_saved_game_disk_result : int32
+{
+	_saved_gave_disk_result_success = 0,
+	_saved_game_disk_result_no_free_slots = 1,
+	_saved_game_disk_result_no_free_space = 2,
+	_saved_games_disk_result_memory_unit_error = 4
+};
+
 /* structures */
 
 struct s_saved_game_file_loading_information
@@ -83,7 +91,7 @@ struct s_saved_game_files_globals
 	bool memory_initialized_for_game;
 	bool cache_files_exist;
 	int32 unk_3;
-	int32 unk_4;
+	e_saved_game_disk_result saved_file_creation_result;
 	int32 unk_5;
 	int32 unk_6;
 	c_static_array_tracked<s_saved_game_files_globals_cached_game_save, k_maximum_enumerated_cached_save_game_files> cached_save_files;
@@ -107,5 +115,11 @@ const wchar_t* saved_games_get_file_type_as_string(e_saved_game_file_type file_t
 bool saved_games_append_file_type_to_path(wchar_t* in_path, e_saved_game_file_type file_type, wchar_t* out_path);
 
 void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name);
+
+bool __cdecl saved_games_generate_file_name(e_saved_game_file_type type, wchar_t* out_string);
+
+uint32 saved_games_create_new_game_variant(e_controller_index origin_controller, e_saved_game_file_type type, wchar_t* name);
+
+bool saved_games_load_game_variant(uint32 enumerated_index, s_game_variant* out_variant);
 
 void saved_game_files_apply_hooks();
