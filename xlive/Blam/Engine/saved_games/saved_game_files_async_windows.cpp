@@ -142,7 +142,7 @@ bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, v
 		{
 			csmemcpy(buffer, saved_game_globals->default_save_files[abs_index]->buffer, buffer_size);
 			in_out_completion->unk_2 = true;
-			in_out_completion->unk_4 = 0;
+			in_out_completion->creation_result = 0;
 			in_out_completion->completed = true;
 			in_out_completion->unk_808 = 1.f;
 			result = true;
@@ -255,7 +255,7 @@ bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, u
 
 	bool result = in_out_completion.completed;
 	if (!result)
-		saved_game_globals->unk_4 = in_out_completion.unk_4;
+		saved_game_globals->saved_file_creation_result = (e_saved_game_disk_result)in_out_completion.creation_result;
 	return result;
 }
 

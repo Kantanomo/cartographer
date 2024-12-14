@@ -450,6 +450,15 @@
     <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\_compiled_shader_table.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_default.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_ctf.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_juggernaut.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_king.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_oddball.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_slayer.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_territories.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_test.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_game_engine_category.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_custom_game_profile_select.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1906,6 +1915,13 @@
     <ClInclude Include="Blam\Engine\game\game_engine_ctf.h" />
     <ClInclude Include="Blam\Engine\game\multiplayer_globals_definition.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_default.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_juggernaut.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_king.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_oddball.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_slayer.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_test.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_game_engine_category.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_custom_game_profile_select.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
