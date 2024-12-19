@@ -1,10 +1,11 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "screen_game_engine_category.h"
 
 #include "screen_custom_game_profile_select.h"
 #include "screen_virtual_keyboard.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
+#include "main/game_preferences.h"
 #include "saved_games/saved_game_files.h"
 #include "tag_files/global_string_ids.h"
 
@@ -28,7 +29,7 @@ __declspec(naked) void jmp_c_screen_game_engine_category_list_get_list_count() {
 
 void c_screen_game_engine_category_list::update_list_items(c_list_item_widget* item, int32 skin_index)
 {
-	static s_item_text_mapping items_map[k_screen_game_engine_item_count] =
+	const static s_item_text_mapping items_map[k_screen_game_engine_item_count] =
 	{
 		{_screen_game_engine_item_slayer, _string_id_slayer},
 		{_screen_game_engine_item_king, _string_id_koth},
@@ -36,13 +37,21 @@ void c_screen_game_engine_category_list::update_list_items(c_list_item_widget* i
 		{_screen_game_engine_item_juggernaut, _string_id_juggernaut},
 		{_screen_game_engine_item_ctf, _string_id_ctf},
 		{_screen_game_engine_item_assault, _string_id_assault},
-		{_screen_game_engine_item_territories, _string_id_territories},
-		//{_screen_game_engine_item_zombies, _string_id_zombies}
+		{_screen_game_engine_item_territories, _string_id_territories}
 	};
 
-	//// todo: re-implement update_list into this function to handle non string-id strings
-
-	//this->update_list_items_from_mapping(item, skin_index, 0, items_map, k_screen_game_engine_item_count);
+	const static wchar_t* zombies_strings[k_language_count]
+	{
+		L"Zombies",
+		L"ゾンビ",
+		L"Zombies",
+		L"Zombi",
+		L"Zombi",
+		L"Zombi",
+		L"좀비",
+		L"僵尸",
+		L"Zumbis"
+	};
 
 	if (item == nullptr)
 		return;
@@ -51,10 +60,12 @@ void c_screen_game_engine_category_list::update_list_items(c_list_item_widget* i
 	if(item_text)
 	{
 		s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item->get_last_data_index());
+		const e_language language = get_current_language();
 		switch((e_screen_game_engine_items)item_datum->item_id)
 		{
 			case _screen_game_engine_item_zombies:
-				item_text->set_text(L"Zombies");
+				// TODO: if we ever do a map recompile grab the text from the stringid again
+				item_text->set_text(zombies_strings[language]);
 				break;
 			default:
 				item_text->set_text_from_string_id(items_map[item_datum->item_id].item_text);
@@ -71,6 +82,10 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 
 	if(item)
 	{
+		if(this->data[2])
+		{
+			
+		}
 		if(this->data[0])
 		{
 			e_saved_game_file_type saved_game_file_type = _saved_game_file_type_profile;
@@ -348,8 +363,8 @@ c_screen_game_engine_category::c_screen_game_engine_category(e_user_interface_ch
 void c_screen_game_engine_category::sub_60E884()
 {
 	this->m_game_engine_list.type = this->m_type;
-	this->m_game_engine_list.data[1] = this->data[0];
-	this->m_game_engine_list.data[2] = this->data[1];
+	this->m_game_engine_list.data[0] = this->data[0];
+	this->m_game_engine_list.data[1] = this->data[1];
 }
 
 const void* c_screen_game_engine_category::load_proc() const
