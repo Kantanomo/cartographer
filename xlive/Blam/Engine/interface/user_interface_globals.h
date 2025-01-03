@@ -45,4 +45,5 @@ e_scenario_type __cdecl user_interface_globals_get_map_type();
 void __cdecl user_interface_globals_set_game_difficulty_real(int32 difficulty);
 void __cdecl user_interface_globals_set_loading_from_persistent_storage(bool a1);
 void __cdecl user_interface_globals_commit_edit_profile_changes();
+void __cdecl user_interface_globals_save_edit_profile_to_disk();
 
