@@ -44,6 +44,11 @@ void __cdecl user_interface_globals_commit_edit_profile_changes()
 	INVOKE(0x209A98, 0x0, user_interface_globals_commit_edit_profile_changes);
 }
 
+void __cdecl user_interface_globals_save_edit_profile_to_disk()
+{
+	INVOKE(0x209C3E, 0, user_interface_globals_save_edit_profile_to_disk);
+}
+
 void __cdecl user_interface_globals_save_profile_changes_to_disk()
 {
 	INVOKE(0x209C3E, 0x0, user_interface_globals_save_profile_changes_to_disk);
