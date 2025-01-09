@@ -32,7 +32,6 @@ public:
 	e_screen_game_engine_category_type type;
 	int8 data[7];
 	c_slot2<c_screen_game_engine_category_list, s_event_record*, datum> m_slot;
-	void handle_item_pressed_event_internal(s_event_record** pevent, datum* pitem_index);
 	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
 	void item_pressed_event_error() const;
 

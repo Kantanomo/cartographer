@@ -37,6 +37,12 @@ bool __cdecl pc_file_system_get_drive_letter_for_type(e_pc_file_system_type type
 	return INVOKE(0x8F1FE, 0, pc_file_system_get_drive_letter_for_type, type, buffer);
 }
 
+char* pc_file_system_get_saved_games_location(char* out_path, int16 buffer_size)
+{
+	// invoking by type to remove unused parameter
+	return INVOKE_TYPE(0x3E43E, 0, char*(__cdecl*)(int32, char*, int16), 0, out_path, buffer_size);
+}
+
 void pc_file_system_apply_hooks()
 {
 	//DETOUR_ATTACH(p_pc_file_system_create_directory_hierarchy, Memory::GetAddress<t_pc_file_system_create_directory_hierarchy>(0x8EF9E), pc_file_system_create_directory_hierarchy);
