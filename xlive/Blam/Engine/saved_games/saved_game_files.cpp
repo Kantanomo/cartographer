@@ -2,6 +2,10 @@
 #include "saved_game_files.h"
 
 #include "cache/physical_memory_map.h"
+#include "cseries/async.h"
+#include "filesys/pc_file_system.h"
+#include "filesys/pc_saved_game.h"
+#include "tag_files/files_windows.h"
 #include "text/unicode.h"
 
 /* globals */
@@ -50,6 +54,28 @@ s_saved_game_main_menu_globals* saved_game_main_menu_globals_get()
 s_saved_game_files_globals* saved_game_files_globals_get()
 {
 	return Memory::GetAddress<s_saved_game_files_globals*>(0x482424);
+}
+
+e_global_string_id saved_games_get_type_string_id(e_saved_game_file_type type)
+{
+	const static e_global_string_id saved_game_file_type_string_ids[k_number_of_saved_game_file_types]
+	{
+		_string_id_player_profile_display_name,
+		_string_id_slayer_display_name,
+		_string_id_koth_display_name,
+		_string_id_race_display_name,
+		_string_id_oddball_display_name,
+		_string_id_juggernaut_display_name,
+		_string_id_headhunter_display_name,
+		_string_id_ctf_display_name,
+		_string_id_assault_display_name,
+		_string_id_territories_display_name
+	};
+
+	if (type <= k_number_of_saved_game_file_types)
+		return saved_game_file_type_string_ids[type];
+
+	return saved_game_file_type_string_ids[0];
 }
 
 bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* out_info, uint32 enumerated_index)
@@ -139,13 +165,103 @@ void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name
 	return;
 }
 
-bool __cdecl saved_games_generate_file_name(e_saved_game_file_type type, wchar_t* out_string)
+bool __cdecl saved_game_get_display_name_for_type(wchar_t* display_name, e_saved_game_file_type saved_game_type,
+	e_language language, wchar_t* full_display_name)
 {
-	return INVOKE(0x4333A, 0, saved_games_generate_file_name, type, out_string);
+	//todo: rewrite and fix broken implementation to return the game engine mode string?
+
+	return INVOKE(0x427F6, 0, saved_game_get_display_name_for_type, display_name, saved_game_type, language, full_display_name);
+}
+
+bool __cdecl saved_games_create_save_game_directory(e_saved_game_file_type type, wchar_t* out_string)
+{
+	ASSERT(out_string);
+
+	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
+
+
+	int8 test_result;
+
+	if(input_windows_drive_letter_test(0, &test_result))
+	{
+		wchar_t full_display_name[save_game_max_name] {};
+		char flat_path[MAX_PATH]{};
+		wchar_t wide_path[MAX_PATH]{};
+
+		pc_file_system_get_saved_games_location(flat_path, NUMBEROF(flat_path));
+
+
+		int16 current_folder_index = 0;
+		do
+		{
+			usnzprintf(out_string, save_game_max_name, L"Halo%04d", current_folder_index + 1);
+
+			saved_game_get_display_name_for_type(out_string, type, saved_game_files_globals->language_id, full_display_name);
+
+			if (pc_saved_game_get_next_available_save_location(flat_path, full_display_name, 3, 0, wide_path, MAX_PATH))
+				break;
+
+			++current_folder_index;
+
+		} while (current_folder_index + 1 < k_maximum_enumerated_saved_game_files_any_type_per_memory_unit);
+
+		if(current_folder_index == 4096)
+		{
+			saved_game_files_globals->saved_file_creation_result = _saved_game_disk_result_no_free_slots;
+
+			memset(out_string, 0, sizeof(wchar_t) * save_game_max_name);
+		}
+	}
+
+	return *out_string != 0;
+
+	return INVOKE(0x4333A, 0, saved_games_create_save_game_directory, type, out_string);
+}
+
+uint32 saved_games_create_file(e_saved_game_file_type type, e_controller_index originating_controller_index,
+	wchar_t* new_file_name)
+{
+	//s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
+	//s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
+
+	//async_yield_until_done((s_async_completion*)saved_game_files_globals, true);
+
+	//if(saved_game_main_menu_globals->save_files.get_count() >= k_maximum_enumerated_saved_game_files_any_type_per_memory_unit)
+	//{
+	//	saved_game_files_globals->saved_file_creation_result = _saved_game_disk_result_no_free_slots;
+
+	//	return NONE;
+	//}
+
+	//wchar_t full_display_name[save_game_max_name] {};
+
+	//if(saved_game_get_display_name_for_type(new_file_name, type, saved_game_files_globals->language_id, full_display_name))
+	//{
+	//	char flat_games_location[MAX_PATH] {};
+	//	wchar_t wide_save_location[MAX_PATH] {};
+	//	
+	//	pc_file_system_get_saved_games_location(flat_games_location, MAX_PATH);
+
+	//	if(!pc_saved_game_get_next_available_save_location(flat_games_location, full_display_name, 1, 0, wide_save_location, MAX_PATH))
+	//	{
+	//		CHAR multi_byte_location[256] {};
+	//		WCHAR saved_game_full_path[256] {};
+
+	//		s_file_reference filo;
+
+	//		saved_games_append_file_type_to_path(wide_save_location, type, saved_game_full_path);
+	//		WideCharToMultiByte(CP_UTF8, 0, saved_game_full_path, NONE, multi_byte_location, 256, 0, 0);
+
+	//		if(file_reference_create_from_path(&filo, multi_byte_location, 0) 
+	//			&& file_create(&filo)
+	//			&& )
+	//			// TODO: Finish
+	//	}
+	//}
 }
 
 uint32 saved_games_create_new_game_variant(e_controller_index origin_controller, e_saved_game_file_type type,
-	wchar_t* name)
+                                           wchar_t* name)
 {
 	return INVOKE(0x5AB63, 0, saved_games_create_new_game_variant, origin_controller, type, name);
 }
