@@ -161,7 +161,7 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 
 			saved_game_globals->saved_file_creation_result = _saved_gave_disk_result_success;
 
-			if (!saved_games_generate_file_name(saved_game_file_type, saved_game_file_name))
+			if (!saved_games_create_save_game_directory(saved_game_file_type, saved_game_file_name))
 			{
 				DISPLAY_ASSERT("Failed to create a name for a new variant!");
 				item_pressed_event_error();
@@ -330,7 +330,7 @@ void* c_screen_game_engine_category::load_settings(s_screen_parameters* paramete
 			parameters->user_flags,
 			_screen_game_engine_category_listing,
 			_screen_game_engine_category_settings,
-			0,
+			1,
 			0
 		);
 

@@ -891,6 +891,7 @@
     <ClCompile Include="Blam\Engine\effects\particle_system_definition.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_update.cpp" />
     <ClCompile Include="Blam\Engine\filesys\pc_file_system.cpp" />
+    <ClCompile Include="Blam\Engine\filesys\pc_saved_game.cpp" />
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_ctf.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_default.cpp" />

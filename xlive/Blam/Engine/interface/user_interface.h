@@ -1,4 +1,5 @@
 #pragma once
+#include "saved_games/game_variant.h"
 
 /* enums */
 

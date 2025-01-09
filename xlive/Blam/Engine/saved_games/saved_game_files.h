@@ -1,5 +1,7 @@
 #pragma once
 #include "player_profile.h"
+#include "main/game_preferences.h"
+#include "tag_files/global_string_ids.h"
 
 /* constants */
 
@@ -98,7 +100,7 @@ struct s_saved_game_files_globals
 	bool meta_data_lock_done;
 	int32 unk_7;
 	int32 locked_thread_id;
-	int32 unk_8;
+	e_language language_id;
 };
 ASSERT_STRUCT_SIZE(s_saved_game_files_globals, 2312);
 
@@ -108,6 +110,8 @@ s_saved_game_main_menu_globals* saved_game_main_menu_globals_get();
 
 s_saved_game_files_globals* saved_game_files_globals_get();
 
+e_global_string_id saved_games_get_type_string_id(e_saved_game_file_type type);
+
 bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* out_info, uint32 enumerated_index);
 
 const wchar_t* saved_games_get_file_type_as_string(e_saved_game_file_type file_type);
@@ -116,7 +120,9 @@ bool saved_games_append_file_type_to_path(wchar_t* in_path, e_saved_game_file_ty
 
 void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name);
 
-bool __cdecl saved_games_generate_file_name(e_saved_game_file_type type, wchar_t* out_string);
+bool __cdecl saved_game_get_display_name_for_type(wchar_t* display_name, e_saved_game_file_type saved_game_type, e_language language, wchar_t* full_display_name);
+
+bool __cdecl saved_games_create_save_game_directory(e_saved_game_file_type type, wchar_t* out_string);
 
 uint32 saved_games_create_new_game_variant(e_controller_index origin_controller, e_saved_game_file_type type, wchar_t* name);
 
