@@ -30,4 +30,8 @@ bool __cdecl pc_file_system_get_drive_letter_for_type(e_pc_file_system_type type
 
 char* __cdecl pc_file_system_get_saved_games_location(char* out_path, int16 buffer_size);
 
+int32 __cdecl pc_file_system_delete_save_directory(CHAR* flat_file_path, wchar_t* save_file_name);
+
+bool __cdecl pc_file_system_check_disk_free_space(uint32 size);
+
 void pc_file_system_apply_hooks();

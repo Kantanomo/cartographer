@@ -161,14 +161,14 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 
 			saved_game_globals->saved_file_creation_result = _saved_gave_disk_result_success;
 
-			if (!saved_games_create_save_game_directory(saved_game_file_type, saved_game_file_name))
+			if (!saved_game_create_save_game_directory(saved_game_file_type, saved_game_file_name))
 			{
 				DISPLAY_ASSERT("Failed to create a name for a new variant!");
 				item_pressed_event_error();
 			}
 			else
 			{
-				uint32 new_variant_enumerated_index = saved_games_create_new_game_variant((*pevent)->controller, saved_game_file_type, saved_game_file_name);
+				uint32 new_variant_enumerated_index = saved_game_create_new_game_variant((*pevent)->controller, saved_game_file_type, saved_game_file_name);
 				if (new_variant_enumerated_index == UINT_MAX)
 				{
 					DISPLAY_ASSERT("Failed to write new variant to disk");
@@ -178,7 +178,7 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 				{
 					s_game_variant new_variant{};
 
-					if (!saved_games_load_game_variant(new_variant_enumerated_index, &new_variant))
+					if (!saved_game_load_game_variant(new_variant_enumerated_index, &new_variant))
 					{
 						DISPLAY_ASSERT("Failed to load new variant from disk");
 						item_pressed_event_error();
