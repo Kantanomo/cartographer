@@ -139,9 +139,28 @@ bool saved_game_new_main_menu_globals_save_file(s_saved_game_main_menu_globals_s
 	return true;
 }
 
-bool __cdecl saved_game_add_save_to_cache(s_saved_game_main_menu_globals_save_file_info* new_save, uint32* out_save_count)
+bool __cdecl saved_game_add_save_to_cache(s_saved_game_main_menu_globals_save_file_info* new_save, uint32* out_save_index)
 {
-	return INVOKE(0x427A7, 0, saved_game_add_save_to_cache, new_save, out_save_count);
+	s_saved_game_main_menu_globals* main_menu_globals = saved_game_main_menu_globals_get();
+
+	ASSERT(new_save);
+	ASSERT(main_menu_globals);
+
+	uint32 last_save_index = main_menu_globals->save_files.get_count();
+
+	if(last_save_index != k_maximum_enumerated_saved_game_files_any_type_per_memory_unit)
+	{
+		s_saved_game_main_menu_globals_save_file_info* save = main_menu_globals->save_files.next();
+
+		memcpy(save, new_save, sizeof(s_saved_game_main_menu_globals_save_file_info));
+
+		*out_save_index = last_save_index;
+
+		return true;
+	}
+
+	return false;
+	//return INVOKE(0x427A7, 0, saved_game_add_save_to_cache, new_save, out_save_index);
 }
 
 void __fastcall saved_game_remove_save_from_cache(uint32 enumerated_file_index)
@@ -295,7 +314,7 @@ int32 saved_game_create_file(e_saved_game_file_type type, e_controller_index ori
 				&& file_create(&filo)
 				&& saved_game_add_save_to_cache(&new_main_menu_save, &new_saved_game_index))
 			{
-				const uint32 new_file_enumerated_file_index = type & 0xF | ((new_saved_game_index & 0x1FFF | ((saved_game_main_menu_globals->saved_game_file_index_salt & 0x1FF) << 14)) << 8);
+				const int32 new_file_enumerated_file_index = type & 0xF | ((new_saved_game_index & 0x1FFF | ((saved_game_main_menu_globals->saved_game_file_index_salt & 0x1FF) << 14)) << 8);
 
 				if(new_file_enumerated_file_index != NONE)
 				{
