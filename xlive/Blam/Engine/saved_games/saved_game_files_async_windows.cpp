@@ -23,6 +23,7 @@ t_saved_games_async_helper_read_file p_saved_games_async_helper_read_file;
 
 /* prototypes */
 
+
 bool __cdecl saved_games_async_helper_write_file(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion);
 bool __cdecl saved_games_async_helper_async_read_create_task(void* unk, void* buffer, uint32 buffer_size, bool unk_flag, s_async_completion* in_out_completion);
 bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion);
@@ -31,6 +32,7 @@ void __cdecl saved_games_async_helper_read_file_callback(int32 a1, int8* context
 bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, uint32 buffer_size);
 bool __cdecl saved_games_async_helper_create_task_write_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion);
 bool __cdecl saved_games_async_helper_create_task_read_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion);
+bool __cdecl saved_games_async_helper_create_task_write_save_file(uint32 enumerated_file_index, wchar_t* display_name, void* data, uint32 data_size);
 
 /* public code */
 
@@ -49,7 +51,7 @@ void saved_games_async_helper_get_saved_game_bin_path(uint32 enumerated_file_ind
 	ASSERT(binary_name);
 
 	s_saved_game_main_menu_globals_save_file_info file_info{};
-	saved_games_get_file_info(&file_info, enumerated_file_index);
+	saved_game_get_file_info(&file_info, enumerated_file_index);
 
 	ustrncpy(out_path, file_info.file_path, NUMBEROF(file_info.file_path));
 	ustrncat(out_path, binary_name, NUMBEROF(file_info.file_path));
@@ -112,6 +114,15 @@ bool saved_games_async_helper_read_saved_game_bin(const wchar_t* binary_name, ui
 	return result;
 }
 
+bool saved_games_async_helper_write_variant(uint32 enumerated_file_index, s_game_variant* variant)
+{
+	s_game_variant saving_variant{};
+
+	memcpy(&saving_variant, variant, sizeof(s_game_variant));
+
+	return saved_games_async_helper_create_task_write_save_file(enumerated_file_index, saving_variant.variant_name, (void*)&saving_variant, sizeof(s_game_variant));
+}
+
 /* private code */
 
 bool __cdecl saved_games_async_helper_write_file(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion)
@@ -153,11 +164,11 @@ bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, v
 		s_saved_game_main_menu_globals_save_file_info file_info {};
 		wchar_t file_path[256];
 		char flattened_file_path[256];
-		if(saved_games_get_file_info(&file_info, enumerated_index))
+		if(saved_game_get_file_info(&file_info, enumerated_index))
 		{
-			if(file_info.unk_5 != NONE)
+			if(file_info.language_id != NONE)
 			{
-				if(saved_games_append_file_type_to_path(file_info.file_path, file_info.type, file_path))
+				if(saved_game_new_main_menu_globals_save_file(&file_info, file_info.type, file_path))
 				{
 					WideCharToMultiByte(65001, 0, file_path, -1, flattened_file_path, NUMBEROF(flattened_file_path), 0, 0);
 					result = saved_games_async_helper_async_read_create_task(flattened_file_path, buffer, buffer_size, 0, in_out_completion);
@@ -266,4 +277,9 @@ bool __cdecl saved_games_async_helper_create_task_write_bin_file(wchar_t* full_p
 bool __cdecl saved_games_async_helper_create_task_read_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion)
 {
 	return INVOKE(0x9B67D, 0, saved_games_async_helper_create_task_read_bin_file, full_path, buffer, header_size, data, data_size, unk, completion);
+}
+
+bool saved_games_async_helper_create_task_write_save_file(uint32 enumerated_file_index, wchar_t* display_name, void* data, uint32 data_size)
+{
+	return INVOKE(0x464DF, 0, saved_games_async_helper_create_task_write_save_file, enumerated_file_index, display_name, data, data_size);
 }

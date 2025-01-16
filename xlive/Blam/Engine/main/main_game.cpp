@@ -80,21 +80,21 @@ void main_game_launch_set_coop_player_count(int32 player_count)
 
 void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 {
-	if (!IN_RANGE(player_count, 1, k_number_of_users))
-	{
-		error(2, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
-	}
-	else
-	{
-		g_main_game_launch_options.game_mode = _game_mode_multiplayer;
-		g_main_game_launch_user_count = player_count;
-		if (g_main_game_launch_options.game_variant.variant_game_engine_index == _game_engine_type_none)
-		{
-			game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
-			g_main_game_launch_options.game_variant.round_time_limit = 0;
-		}
-	}
-	return;
+    if (!IN_RANGE(player_count, 1, k_number_of_users))
+    {
+        error(2, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
+    }
+    else
+    {
+        g_main_game_launch_options.game_mode = _game_mode_multiplayer;
+        g_main_game_launch_user_count = player_count;
+        if (g_main_game_launch_options.game_variant.variant_game_engine_index == _game_engine_type_none)
+        {
+            game_variant_create_default_new(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
+            g_main_game_launch_options.game_variant.round_time_limit = 0;
+        }
+    }
+    return;
 }
 
 void main_game_launch_set_multiplayer_variant(const char* variant_name)
@@ -108,15 +108,15 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 		}
 	}
 
-	if (i == k_variant_count)
-	{
-		error(2, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
-		game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
-	}
-	else
-	{
-		game_variant_build_default(&g_main_game_launch_options.game_variant, k_launch_multiplayer_variants[i].index);
-	}
+    if (i == k_variant_count)
+    {
+        error(2, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
+        game_variant_create_default_new(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
+    }
+    else
+    {
+        game_variant_create_default_new(&g_main_game_launch_options.game_variant, variants[i].index);
+    }
 
 	g_main_game_launch_options.game_variant.round_time_limit = 0;
 	g_main_game_launch_options.game_mode = _game_mode_multiplayer;
