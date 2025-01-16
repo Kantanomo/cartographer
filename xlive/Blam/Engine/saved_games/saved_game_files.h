@@ -122,7 +122,7 @@ const wchar_t* saved_game_get_file_type_as_string(e_saved_game_file_type file_ty
 
 bool saved_game_new_main_menu_globals_save_file(s_saved_game_main_menu_globals_save_file_info* new_save, e_saved_game_file_type file_type, wchar_t* out_path);
 
-bool __cdecl saved_game_add_save_to_cache(s_saved_game_main_menu_globals_save_file_info* new_save, uint32* out_save_count);
+bool __cdecl saved_game_add_save_to_cache(s_saved_game_main_menu_globals_save_file_info* new_save, uint32* out_save_index);
 
 void __fastcall saved_game_remove_save_from_cache(uint32 enumerated_file_index);
 
