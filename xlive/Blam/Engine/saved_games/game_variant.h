@@ -337,4 +337,6 @@ ASSERT_STRUCT_SIZE(s_game_variant, 304);
 
 s_game_variant* get_game_variant(void);
 
-void __cdecl game_variant_build_default(s_game_variant* variant, e_game_variant_description_index game_variant_type);
+void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_variant_description_index game_variant_type);
+
+bool __cdecl game_variant_validate(s_game_variant* variant);
