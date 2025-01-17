@@ -21,8 +21,8 @@ struct ConsoleCommandCtxData
 enum CommandFlags_
 {
     CommandFlag_None = 0,
-    CommandFlag_Hidden = 1 << 0, // will not display in help commands or anywhere else where this flag is tested
-    CommandFlag_SetsVariable = 1 << 1  // internal, do not set by yourself, but you can test it
+    CommandFlag_Hidden = FLAG(0),       // will not display in help commands or anywhere else where this flag is tested
+    CommandFlag_SetsVariable = FLAG(1)  // internal, do not set by yourself, but you can test it
 };
 
 class ConsoleCommand final
