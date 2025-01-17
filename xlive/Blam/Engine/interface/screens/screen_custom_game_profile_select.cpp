@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "screen_custom_game_profile_select.h"
 
+#include "screen_game_engine_category.h"
+#include "interface/user_interface_memory.h"
+#include "saved_games/saved_game_files.h"
+
 void* c_screen_custom_game_profile_select::load_slayer_settings(s_screen_parameters* parameters)
 {
 	return INVOKE(0x25213A, 0, load_slayer_settings, parameters);
@@ -104,4 +108,69 @@ void* c_screen_custom_game_profile_select::load_territories_settings_unused(s_sc
 void* c_screen_custom_game_profile_select::load_territories_lobby(s_screen_parameters* parameters)
 {
 	return INVOKE(0x252E78, 0, load_territories_lobby, parameters);
+}
+
+void* c_screen_custom_game_profile_select::load_headhunter_settings(s_screen_parameters* parameters)
+{
+	int8* screen;
+
+	void* pool = ui_pool_allocate_space(21648, 0);
+
+	if(pool)
+	{
+		 screen = INVOKE_TYPE(0x252007, 0, int8 *(__thiscall*)(void*, e_user_interface_screen_id, e_user_interface_channel_type, e_user_interface_render_window, int16),
+			pool,
+			_screen_custom_game_menu,
+			parameters->m_channel_type,
+			parameters->m_window_index,
+			parameters->m_flags);
+
+
+		 //screen->set_allocated(true);
+		 screen[108] = 1;
+		 *((int32*)screen + 5410) = _saved_game_file_type_game_variant_headhunter;
+		 screen[21644] = 1;
+		 screen[21645] = 0;
+
+		 user_interface_register_screen_to_channel((c_screen_with_menu*)screen, parameters);
+	}
+	else
+	{
+		screen = NULL;
+	}
+
+	return nullptr;
+}
+
+void* c_screen_custom_game_profile_select::load_headhunter_lobby(s_screen_parameters* parameters)
+{
+	int8* screen;
+
+	void* pool = ui_pool_allocate_space(21648, 0);
+
+	if (pool)
+	{
+		screen = INVOKE_TYPE(0x252007, 0, int8 * (__thiscall*)(void*, e_user_interface_screen_id, e_user_interface_channel_type, e_user_interface_render_window, int16),
+			pool,
+			_screen_multiplayer_variant_listlobby,
+			parameters->m_channel_type,
+			parameters->m_window_index,
+			parameters->m_flags);
+
+
+		//screen->set_allocated(true);
+		screen[108] = 1;
+		*((int32*)screen + 5410) = _saved_game_file_type_game_variant_headhunter;
+		screen[21644] = 0;
+		screen[21645] = 0;
+		screen[21614] = parameters->m_context != nullptr;
+
+		user_interface_register_screen_to_channel((c_screen_with_menu*)screen, parameters);
+	}
+	else
+	{
+		screen = NULL;
+	}
+
+	return nullptr;
 }

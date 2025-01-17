@@ -366,7 +366,7 @@ int32 saved_game_create_new_game_variant(e_controller_index origin_controller, e
 			game_variant_create_default_new(&new_variant, _game_variant_description_juggernaut);
 			break;
 		case _saved_game_file_type_game_variant_headhunter:
-			//game_variant_create_default_new(&new_variant, _game_variant_description_headhunter);
+			game_variant_create_default_new(&new_variant, _game_variant_description_headhunter);
 			break;
 		case _saved_game_file_type_game_variant_ctf:
 			game_variant_create_default_new(&new_variant, _game_variant_description_ctf);

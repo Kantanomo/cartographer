@@ -108,7 +108,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 		}
 	}
 
-    if (i == k_variant_count)
+    if (i == k_base_game_variant_description_count)
     {
         error(2, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
         game_variant_create_default_new(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
