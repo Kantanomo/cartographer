@@ -33,6 +33,8 @@ e_saved_game_file_type get_saved_game_file_type_from_item_index(uint32 index)
 		case _screen_game_engine_item_zombies:
 			// todo: new default_string_id_type
 			return _saved_game_file_type_game_variant_slayer;
+		case _screen_game_engine_item_headhunter:
+			return _saved_game_file_type_game_variant_headhunter;
 	}
 
 	return _saved_game_file_type_profile;
@@ -66,7 +68,8 @@ void c_screen_game_engine_category_list::update_list_items(c_list_item_widget* i
 		{_screen_game_engine_item_juggernaut, _string_id_juggernaut},
 		{_screen_game_engine_item_ctf, _string_id_ctf},
 		{_screen_game_engine_item_assault, _string_id_assault},
-		{_screen_game_engine_item_territories, _string_id_territories}
+		{_screen_game_engine_item_territories, _string_id_territories},
+		{_screen_game_engine_item_headhunter, _string_id_headhunter}
 	};
 
 	const static wchar_t* zombies_strings[k_language_count]
@@ -81,7 +84,6 @@ void c_screen_game_engine_category_list::update_list_items(c_list_item_widget* i
 		L"僵尸",
 		L"Zumbis"
 	};
-
 	if (item == nullptr)
 		return;
 
@@ -271,6 +273,15 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_lobby;
 				break;
+			case _screen_game_engine_item_headhunter:
+				// todo: new load function for headhunter
+				if (this->type == _screen_game_engine_category_settings)
+					params.m_load_function = c_screen_custom_game_profile_select::load_headhunter_settings;
+				else if (!this->data[1])
+					params.m_load_function = c_screen_custom_game_profile_select::load_headhunter_lobby;
+				else
+					params.m_load_function = c_screen_custom_game_profile_select::load_headhunter_lobby;
+				break;
 			}
 
 			if (this->data[3])
@@ -330,7 +341,7 @@ void* c_screen_game_engine_category::load_settings(s_screen_parameters* paramete
 			parameters->user_flags,
 			_screen_game_engine_category_listing,
 			_screen_game_engine_category_settings,
-			1,
+			0,
 			0
 		);
 
