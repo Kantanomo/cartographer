@@ -31,6 +31,10 @@ public:
 	static void* load_territories_settings(s_screen_parameters* parameters);
 	static void* load_territories_settings_unused(s_screen_parameters* parameters);
 	static void* load_territories_lobby(s_screen_parameters* parameters);
+
+	static void* load_headhunter_settings(s_screen_parameters* parameters);
+	static void* load_headhunter_settings_unused(s_screen_parameters* parameters);
+	static void* load_headhunter_lobby(s_screen_parameters* parameters);
 };
 
 //ASSERT_STRUCT_SIZE(c_screen_custom_game_profile_select, 21648);
