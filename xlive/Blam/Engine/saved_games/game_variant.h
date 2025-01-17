@@ -18,7 +18,7 @@ enum e_game_engine_type : int32
 	k_game_engine_type_count
 };
 
-enum e_game_variant_description_index : char
+enum e_game_variant_description_index : int8
 {
 	_game_variant_description_slayer = 0,
 	_game_variant_description_oddball = 1,
@@ -27,7 +27,12 @@ enum e_game_variant_description_index : char
 	_game_variant_description_ctf = 4,
 	_game_variant_description_invasion = 5,
 	_game_variant_description_territories = 6,
-	k_variant_count
+	k_base_game_variant_description_count = 7,
+
+	// cartographer added variant descriptions
+	_game_variant_description_zombies = 7,
+	_game_variant_description_headhunter = 8,
+	k_game_variant_description_count
 };
 
 enum e_game_engine_flags : int32

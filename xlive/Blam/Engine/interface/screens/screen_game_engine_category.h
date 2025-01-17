@@ -16,6 +16,7 @@ enum e_screen_game_engine_items : uint16
 	_screen_game_engine_item_assault = 5,
 	_screen_game_engine_item_territories = 6,
 	_screen_game_engine_item_zombies = 7,
+	_screen_game_engine_item_headhunter = 8,
 	k_screen_game_engine_item_count
 };
 

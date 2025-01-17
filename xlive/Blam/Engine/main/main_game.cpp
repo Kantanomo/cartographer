@@ -81,7 +81,7 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 
 void main_game_launch_set_multiplayer_variant(const char* variant_name)
 {
-    s_variant_description_map variants[k_variant_count];
+    s_variant_description_map variants[k_base_game_variant_description_count];
     variants[_game_variant_description_slayer] = { "slayer", _game_variant_description_slayer };
     variants[_game_variant_description_oddball] = { "oddball", _game_variant_description_oddball };
     variants[_game_variant_description_juggernaut] = { "juggernaut", _game_variant_description_juggernaut };
@@ -91,7 +91,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
     variants[_game_variant_description_territories] = { "territories", _game_variant_description_territories };
     
     size_t i;
-    for (i = 0; i < k_variant_count; ++i)
+    for (i = 0; i < k_base_game_variant_description_count; ++i)
     {
         if (!csstricmp(variant_name, variants[i].name))
         {
@@ -99,7 +99,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
         }
     }
 
-    if (i == k_variant_count)
+    if (i == k_base_game_variant_description_count)
     {
         error(2, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
         game_variant_create_default_new(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
