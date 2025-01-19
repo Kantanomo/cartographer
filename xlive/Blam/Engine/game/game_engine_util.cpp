@@ -31,7 +31,7 @@ bool game_engine_has_teams()
 {
 	if (current_game_engine())
 	{
-		return TEST_BIT(current_game_variant()->game_engine_flags, _game_engine_teams_bit);
+		return current_game_variant()->game_engine_flags.test(_game_engine_teams_bit);
 	}
 
 	return false;
