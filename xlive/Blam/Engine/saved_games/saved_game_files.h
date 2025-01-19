@@ -8,9 +8,10 @@
 #define k_maximum_enumerated_saved_game_files_any_type_per_memory_unit 4096
 #define k_maximum_enumerated_default_save_game_files 101
 #define k_maximum_enumerated_cached_save_game_files 4
+#define k_enumerated_salt_count 512
 
-#define ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_file_index) \
-	(((enumerated_file_index) & 0x200000) != 0)
+// 4197
+#define k_maximum_enumerated_total_save_game_files (k_maximum_enumerated_saved_game_files_any_type_per_memory_unit + k_maximum_enumerated_default_save_game_files)
 
 /* enums */
 
@@ -75,7 +76,7 @@ ASSERT_STRUCT_SIZE(s_saved_game_main_menu_globals_save_file_info, 0x234);
 
 struct s_saved_game_files_globals_cached_game_save
 {
-	uint32 enumerated_index;
+	enumerated_file_index enumerated_index;
 	s_saved_game_main_menu_globals_save_file_info file_info;
 };
 
@@ -114,7 +115,7 @@ s_saved_game_files_globals* saved_game_files_globals_get();
 
 e_global_string_id saved_game_get_type_string_id(e_saved_game_file_type type);
 
-bool saved_game_get_file_info(s_saved_game_main_menu_globals_save_file_info* out_info, uint32 enumerated_index);
+bool saved_game_get_file_info(s_saved_game_main_menu_globals_save_file_info* out_info, enumerated_file_index enumerated_index);
 
 uint32 saved_game_get_file_size_kb_for_type(e_saved_game_file_type type);
 
@@ -124,20 +125,22 @@ bool saved_game_new_main_menu_globals_save_file(s_saved_game_main_menu_globals_s
 
 bool __cdecl saved_game_add_save_to_cache(s_saved_game_main_menu_globals_save_file_info* new_save, uint32* out_save_index);
 
-void __fastcall saved_game_remove_save_from_cache(uint32 enumerated_file_index);
+void __fastcall saved_game_remove_save_from_cache(enumerated_file_index enumerated_file_index);
 
-void saved_game_get_display_name(uint32 enumerated_index, wchar_t* display_name);
+void saved_game_get_display_name(enumerated_file_index enumerated_index, wchar_t* display_name);
 
 bool __cdecl saved_game_get_display_name_for_type(wchar_t* display_name, e_saved_game_file_type saved_game_type, e_language language, wchar_t* full_display_name);
 
 bool __cdecl saved_game_create_save_game_directory(e_saved_game_file_type type, wchar_t* out_string);
 
-int32 saved_game_create_new_game_variant(e_controller_index origin_controller, e_saved_game_file_type type, wchar_t* name);
+enumerated_file_index saved_game_create_new_game_variant(e_controller_index origin_controller, e_saved_game_file_type type, wchar_t* name);
 
-int32 saved_game_create_file(e_saved_game_file_type type, e_controller_index originating_controller_index, wchar_t* new_file_name);
+enumerated_file_index saved_game_create_file(e_saved_game_file_type type, e_controller_index originating_controller_index, wchar_t* new_file_name);
 
-bool saved_game_load_game_variant(int32 enumerated_index, s_game_variant* out_variant);
+bool saved_game_load_game_variant(enumerated_file_index enumerated_index, s_game_variant* out_variant);
 
-void saved_game_new_failure_cleanup(e_saved_game_file_type type, uint32 enumerated_file_index);
+void saved_game_new_failure_cleanup(e_saved_game_file_type type, enumerated_file_index enumerated_file_index);
 
 void saved_game_files_apply_hooks();
+
+enumerated_file_index saved_game_enumerated_index_new(e_saved_game_file_type save_type, uint32 enumerated_index, bool is_default_save);

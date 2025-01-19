@@ -84,7 +84,7 @@ e_global_string_id saved_game_get_type_string_id(e_saved_game_file_type type)
 	return saved_game_file_type_string_ids[0];
 }
 
-bool saved_game_get_file_info(s_saved_game_main_menu_globals_save_file_info* out_info, uint32 enumerated_index)
+bool saved_game_get_file_info(s_saved_game_main_menu_globals_save_file_info* out_info, enumerated_file_index enumerated_index)
 {
 	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
 	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
@@ -94,7 +94,7 @@ bool saved_game_get_file_info(s_saved_game_main_menu_globals_save_file_info* out
 		// file is not a default save
 		if (!ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_index))
 		{
-			auto abs_index = (enumerated_index >> 8) & 0x1FFF;
+			auto abs_index = ENUMERATED_INDEX_GET_ABS_INDEX(enumerated_index);
 			auto last_index = saved_game_main_menu_globals->save_files.get_count() - 1;
 			if ((abs_index <= last_index || abs_index == last_index))
 			{
@@ -167,12 +167,12 @@ bool __cdecl saved_game_add_save_to_cache(s_saved_game_main_menu_globals_save_fi
 	//return INVOKE(0x427A7, 0, saved_game_add_save_to_cache, new_save, out_save_index);
 }
 
-void __fastcall saved_game_remove_save_from_cache(uint32 enumerated_file_index)
+void __fastcall saved_game_remove_save_from_cache(enumerated_file_index enumerated_file_index)
 {
 	INVOKE(0x3EEC3, 0, saved_game_remove_save_from_cache, enumerated_file_index);
 }
 
-void saved_game_get_display_name(uint32 enumerated_index, wchar_t* display_name)
+void saved_game_get_display_name(enumerated_file_index enumerated_index, wchar_t* display_name)
 {
 	ASSERT(display_name);
 
@@ -181,18 +181,15 @@ void saved_game_get_display_name(uint32 enumerated_index, wchar_t* display_name)
 
 	if (saved_game_main_menu_globals && ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_index))
 	{
-		uint32 absolute_index = (enumerated_index >> 8) & 0x1FFF;
+		uint32 absolute_index = ENUMERATED_INDEX_GET_ABS_INDEX(enumerated_index);
 		uint32 last_index = saved_game_main_menu_globals->default_save_files.get_count() - 1;
 		if (absolute_index <= last_index || absolute_index == last_index)
 		{
 			s_saved_game_main_menu_globals_default_save_file* default_save = saved_game_main_menu_globals->default_save_files[absolute_index];
 			s_saved_game_player_profile* default_profile = (s_saved_game_player_profile*)default_save->buffer;
-			if ((enumerated_index & 0xF) != 0)
+			if (IN_RANGE(ENUMERATED_INDEX_GET_TYPE(enumerated_index), _saved_game_file_type_profile, k_number_of_saved_game_file_types))
 			{
-				if ((enumerated_index & 0xF) <= 9)
-				{
-					csmemcpy(display_name, &default_save->buffer[0xC], 128);
-				}
+				csmemcpy(display_name, &default_save->buffer[0xC], 128);
 			}
 			else
 			{
@@ -264,7 +261,7 @@ bool __cdecl saved_game_create_save_game_directory(e_saved_game_file_type type, 
 	return INVOKE(0x4333A, 0, saved_game_create_save_game_directory, type, out_string);
 }
 
-int32 saved_game_create_file(e_saved_game_file_type type, e_controller_index originating_controller_index,
+enumerated_file_index saved_game_create_file(e_saved_game_file_type type, e_controller_index originating_controller_index,
 	wchar_t* new_file_name)
 {
 	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
@@ -318,7 +315,7 @@ int32 saved_game_create_file(e_saved_game_file_type type, e_controller_index ori
 				&& file_create(&filo)
 				&& saved_game_add_save_to_cache(&new_main_menu_save, &new_saved_game_index))
 			{
-				const int32 new_file_enumerated_file_index = type & 0xF | ((new_saved_game_index & 0x1FFF | ((saved_game_main_menu_globals->saved_game_file_index_salt & 0x1FF) << 14)) << 8);
+				const enumerated_file_index new_file_enumerated_file_index = saved_game_enumerated_index_new(type, new_saved_game_index, false);
 
 				if(new_file_enumerated_file_index != NONE)
 				{
@@ -343,10 +340,10 @@ int32 saved_game_create_file(e_saved_game_file_type type, e_controller_index ori
 	return NONE;
 }
 
-int32 saved_game_create_new_game_variant(e_controller_index origin_controller, e_saved_game_file_type type,
+enumerated_file_index saved_game_create_new_game_variant(e_controller_index origin_controller, e_saved_game_file_type type,
                                            wchar_t* name)
 {
-	const int32 enumerated_file_index = saved_game_create_file(type, origin_controller, name);
+	const enumerated_file_index enumerated_file_index = saved_game_create_file(type, origin_controller, name);
 
 	s_game_variant new_variant {};
 
@@ -480,7 +477,7 @@ void saved_game_main_menu_globals_initialize(void)
 	return;
 }
 
-void saved_game_new_failure_cleanup(e_saved_game_file_type type, uint32 enumerated_file_index)
+void saved_game_new_failure_cleanup(e_saved_game_file_type type, enumerated_file_index enumerated_file_index)
 {
 	if(enumerated_file_index != NONE)
 	{
@@ -494,19 +491,19 @@ void saved_game_new_failure_cleanup(e_saved_game_file_type type, uint32 enumerat
 
 		if(saved_game_get_file_info(&save_file_info, enumerated_file_index))
 		{
-			if((enumerated_file_index & 0x200000) == 0)
+			if(ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_file_index))
 			{
 				char flat_directory_path[MAX_PATH] {};
 
 				int8 drive_letter;
 
-				if(input_windows_drive_letter_test((enumerated_file_index >> 4) & 0xF, &drive_letter))
+				if(input_windows_drive_letter_test(ENUMERATED_INDEX_GET_MEMORY_UNIT(enumerated_file_index), &drive_letter))
 				{
 					wchar_t full_display_name[save_game_max_name]{};
 
 					saved_game_get_display_name_for_type(
 						save_file_info.display_name, 
-						(e_saved_game_file_type)(enumerated_file_index & 0xF), 
+						ENUMERATED_INDEX_GET_TYPE(enumerated_file_index),
 						(e_language)save_file_info.language_id, 
 						full_display_name);
 
@@ -537,4 +534,26 @@ void saved_game_files_memory_initialize(int32 unk)
 
 	saved_game_files_globals->memory_initialized_for_game = true;
 	return;
+}
+
+enumerated_file_index saved_game_enumerated_index_new(e_saved_game_file_type save_type, uint32 enumerated_index,
+	bool is_default_save)
+{
+	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
+
+	ASSERT(saved_game_main_menu_globals);
+	ASSERT(_saved_game_file_type_profile <= save_type && save_type < k_number_of_saved_game_file_types);
+	ASSERT(0 <= enumerated_index && enumerated_index <= k_maximum_enumerated_saved_game_files_any_type_per_memory_unit);
+	ASSERT(IN_RANGE(saved_game_main_menu_globals->saved_game_file_index_salt, 0, k_enumerated_salt_count - 1));
+
+	const enumerated_file_index result = (save_type & 0xF | (0x10 * (0 & 0xF | (0x10 * (enumerated_index & 0x1FFF | ((saved_game_main_menu_globals->saved_game_file_index_salt & 0x1FF) << 0xE))))));
+
+	if(is_default_save)
+	{
+		return result | 0x200000;
+	}
+	else
+	{
+		return result & ~0x200000;
+	}
 }
