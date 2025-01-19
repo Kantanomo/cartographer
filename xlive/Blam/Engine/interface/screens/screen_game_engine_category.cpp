@@ -341,7 +341,7 @@ void* c_screen_game_engine_category::load_settings(s_screen_parameters* paramete
 			parameters->user_flags,
 			_screen_game_engine_category_listing,
 			_screen_game_engine_category_settings,
-			0,
+			1,
 			0
 		);
 
