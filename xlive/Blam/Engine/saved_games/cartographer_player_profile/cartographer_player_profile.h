@@ -99,8 +99,8 @@ union s_saved_game_cartographer_player_profile_container
 
 struct s_cartographer_profile_run_time
 {
-	s_saved_game_cartographer_player_profile_container profile;
-	int32 enumerated_file_index;
+	s_saved_game_cartographer_player_profile profile;
+	enumerated_file_index enumerated_file_index;
 	e_controller_index controller_index;
 	int32 user_index;
 	uint32 gamepad_index;
@@ -120,7 +120,7 @@ s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_con
 
 s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_user_index(int32 user_index);
 
-void cartographer_player_profile_sign_in(e_controller_index controller_index, int32 enumerated_file_index);
+void cartographer_player_profile_sign_in(e_controller_index controller_index, enumerated_file_index enumerated_file_index);
 
 void cartographer_player_profile_sign_out(e_controller_index controller_index);
 

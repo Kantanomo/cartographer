@@ -47,7 +47,7 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 	input_abstraction_set_controller_settings_from_preferences(&input_preferences, &profile->input_preferences);
 }
 
-bool saved_game_player_profile_read_file(uint32 enumerated_file_index, s_saved_game_player_profile* profile)
+bool saved_game_player_profile_read_file(enumerated_file_index enumerated_file_index, s_saved_game_player_profile* profile)
 {
 	ASSERT(profile);
 
@@ -74,7 +74,7 @@ bool __cdecl saved_game_player_profile_read_post_verify_profile_traits(s_player_
 	return INVOKE(0x54f82, 0, saved_game_player_profile_read_post_verify_profile_traits, profile_traits);
 }
 
-bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_player_profile* profile)
+bool saved_game_player_profile_load(enumerated_file_index enumerated_file_index, s_saved_game_player_profile* profile)
 {
 	ASSERT(profile);
 

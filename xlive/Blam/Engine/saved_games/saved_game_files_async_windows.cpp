@@ -9,7 +9,7 @@
 
 /* typedefs */
 
-typedef bool(__cdecl* t_saved_games_async_helper_write_file)(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion);
+typedef bool(__cdecl* t_saved_games_async_helper_write_file)(enumerated_file_index enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion);
 t_saved_games_async_helper_write_file p_saved_games_async_helper_write_file;
 
 typedef bool(__cdecl* t_saved_games_async_helper_read_file_internal)(int enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion);
@@ -18,21 +18,21 @@ t_saved_games_async_helper_read_file_internal p_saved_games_async_helper_read_fi
 typedef void(__cdecl* t_saved_games_async_helper_read_file_callback)(int32 a1, int8* context, int32 data_size);
 t_saved_games_async_helper_read_file_callback p_saved_games_async_helper_read_file_callback;
 
-typedef void(__cdecl* t_saved_games_async_helper_read_file)(uint32 enumerated_index, int8* buffer, uint32 buffer_size);
+typedef void(__cdecl* t_saved_games_async_helper_read_file)(enumerated_file_index enumerated_index, int8* buffer, uint32 buffer_size);
 t_saved_games_async_helper_read_file p_saved_games_async_helper_read_file;
 
 /* prototypes */
 
 
-bool __cdecl saved_games_async_helper_write_file(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion);
+bool __cdecl saved_games_async_helper_write_file(enumerated_file_index enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion);
 bool __cdecl saved_games_async_helper_async_read_create_task(void* unk, void* buffer, uint32 buffer_size, bool unk_flag, s_async_completion* in_out_completion);
-bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion);
+bool __cdecl saved_games_async_helper_read_file_internal(enumerated_file_index enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion);
 void saved_games_async_helper_read_file_success(int8* a1, s_file_reference* file_reference, int8* buffer, uint32 buffer_size);
 void __cdecl saved_games_async_helper_read_file_callback(int32 a1, int8* context, int32 data_size);
-bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, uint32 buffer_size);
+bool saved_games_async_helper_read_file(enumerated_file_index enumerated_index, int8* buffer, uint32 buffer_size);
 bool __cdecl saved_games_async_helper_create_task_write_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion);
 bool __cdecl saved_games_async_helper_create_task_read_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion);
-bool __cdecl saved_games_async_helper_create_task_write_save_file(uint32 enumerated_file_index, wchar_t* display_name, void* data, uint32 data_size);
+bool __cdecl saved_games_async_helper_create_task_write_save_file(enumerated_file_index enumerated_file_index, wchar_t* display_name, void* data, uint32 data_size);
 
 /* public code */
 
@@ -45,7 +45,7 @@ void saved_games_async_helpers_apply_patches(void)
 	return;
 }
 
-void saved_games_async_helper_get_saved_game_bin_path(uint32 enumerated_file_index, const wchar_t* binary_name, wchar_t* out_path)
+void saved_games_async_helper_get_saved_game_bin_path(enumerated_file_index enumerated_file_index, const wchar_t* binary_name, wchar_t* out_path)
 {
 	ASSERT(out_path);
 	ASSERT(binary_name);
@@ -59,7 +59,7 @@ void saved_games_async_helper_get_saved_game_bin_path(uint32 enumerated_file_ind
 	return;
 }
 
-bool saved_games_async_helper_check_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index)
+bool saved_games_async_helper_check_saved_game_bin(const wchar_t* binary_name, enumerated_file_index enumerated_file_index)
 {
 	bool result = false;
 
@@ -83,7 +83,7 @@ bool saved_games_async_helper_check_saved_game_bin(const wchar_t* binary_name, u
 	return result;
 }
 
-bool saved_games_async_helper_write_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index, int8* buffer, uint32 buffer_size)
+bool saved_games_async_helper_write_saved_game_bin(const wchar_t* binary_name, enumerated_file_index enumerated_file_index, int8* buffer, uint32 buffer_size)
 {
 	s_async_completion in_out_completion{};
 	wchar_t bin_path[MAX_PATH]{};
@@ -97,7 +97,7 @@ bool saved_games_async_helper_write_saved_game_bin(const wchar_t* binary_name, u
 	return result;
 }
 
-bool saved_games_async_helper_read_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index, int8* buffer, uint32 buffer_size)
+bool saved_games_async_helper_read_saved_game_bin(const wchar_t* binary_name, enumerated_file_index enumerated_file_index, int8* buffer, uint32 buffer_size)
 {
 	bool result = false;
 	if (saved_games_async_helper_check_saved_game_bin(binary_name, enumerated_file_index))
@@ -114,7 +114,7 @@ bool saved_games_async_helper_read_saved_game_bin(const wchar_t* binary_name, ui
 	return result;
 }
 
-bool saved_games_async_helper_write_variant(uint32 enumerated_file_index, s_game_variant* variant)
+bool saved_games_async_helper_write_variant(enumerated_file_index enumerated_file_index, s_game_variant* variant)
 {
 	s_game_variant saving_variant{};
 
@@ -125,7 +125,7 @@ bool saved_games_async_helper_write_variant(uint32 enumerated_file_index, s_game
 
 /* private code */
 
-bool __cdecl saved_games_async_helper_write_file(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion)
+bool __cdecl saved_games_async_helper_write_file(enumerated_file_index enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion)
 {
 	return p_saved_games_async_helper_write_file(enumerated_index, new_display_name, buffer, buffer_size, completion);
 }
@@ -135,7 +135,7 @@ bool __cdecl saved_games_async_helper_async_read_create_task(void* unk, void* bu
 	return INVOKE(0x9b149, 0, saved_games_async_helper_async_read_create_task, unk, buffer, buffer_size, unk_flag, in_out_completion);
 }
 
-bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion)
+bool __cdecl saved_games_async_helper_read_file_internal(enumerated_file_index enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion)
 {
 	bool result = false;
 
@@ -144,7 +144,7 @@ bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, v
 	// 0x200000 in the index flags that the index is a default file
 	if (ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_index) && saved_game_globals)
 	{
-		uint32 abs_index = (enumerated_index >> 8) & 0x1FFF;
+		uint32 abs_index = ENUMERATED_INDEX_GET_ABS_INDEX(enumerated_index);
 		uint32 last_index = saved_game_globals->default_save_files.get_count() - 1;
 
 		// checking the size of the buffer is not specifically for player_profile it is whatever the
@@ -252,7 +252,7 @@ void __cdecl saved_games_async_helper_read_file_callback(int32 a1, int8* context
 	return;
 }
 
-bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, uint32 buffer_size)
+bool saved_games_async_helper_read_file(enumerated_file_index enumerated_index, int8* buffer, uint32 buffer_size)
 {
 	s_saved_game_files_globals* saved_game_globals = saved_game_files_globals_get();
 
@@ -279,7 +279,7 @@ bool __cdecl saved_games_async_helper_create_task_read_bin_file(wchar_t* full_pa
 	return INVOKE(0x9B67D, 0, saved_games_async_helper_create_task_read_bin_file, full_path, buffer, header_size, data, data_size, unk, completion);
 }
 
-bool saved_games_async_helper_create_task_write_save_file(uint32 enumerated_file_index, wchar_t* display_name, void* data, uint32 data_size)
+bool saved_games_async_helper_create_task_write_save_file(enumerated_file_index enumerated_file_index, wchar_t* display_name, void* data, uint32 data_size)
 {
 	return INVOKE(0x464DF, 0, saved_games_async_helper_create_task_write_save_file, enumerated_file_index, display_name, data, data_size);
 }
