@@ -65,6 +65,6 @@ void __cdecl saved_game_player_profile_set_default_variant(void* saved_game_vari
 void __cdecl saved_game_player_profile_set_input_preferences(s_gamepad_input_preferences* input_preferences, s_saved_game_profile_input_preferences* profile_input_preferences);
 
 void saved_game_player_profile_default_new(s_saved_game_player_profile* profile, int32 default_profile_type);
-bool saved_game_player_profile_read_file(uint32 enumerated_file_index, s_saved_game_player_profile* profile);
+bool saved_game_player_profile_read_file(enumerated_file_index enumerated_file_index, s_saved_game_player_profile* profile);
 bool __cdecl saved_game_player_profile_read_post_verify_profile_traits(s_player_profile_traits* profile);
-bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_player_profile* profile);
+bool saved_game_player_profile_load(enumerated_file_index enumerated_file_index, s_saved_game_player_profile* profile);
