@@ -19,7 +19,7 @@
 
 /* typedefs */
 
-typedef bool(__cdecl* t_user_interface_controller_sign_in)(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index);
+typedef bool(__cdecl* t_user_interface_controller_sign_in)(e_controller_index controller_index, s_saved_game_player_profile* profile, enumerated_file_index enumerated_file_index);
 typedef void(__cdecl* t_user_interface_controller_sign_out)(e_controller_index controller_index);
 
 /* globals */
@@ -216,7 +216,7 @@ uint32 __cdecl user_interface_controller_get_highest_campaign_level_in_signed_in
 	return INVOKE(0x2076F7, 0, user_interface_controller_get_highest_campaign_level_in_signed_in_controllers);
 }
 
-bool __cdecl user_interface_controller_sign_in(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index)
+bool __cdecl user_interface_controller_sign_in(e_controller_index controller_index, s_saved_game_player_profile* profile, enumerated_file_index enumerated_file_index)
 {
 	bool result = p_user_interface_controller_sign_in(controller_index, profile, enumerated_file_index);
 	if (result)

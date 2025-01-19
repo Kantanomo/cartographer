@@ -81,7 +81,7 @@ void __cdecl user_interface_enter_game_shell(int32 context)
 	return;
 }
 
-void user_interface_set_variant(uint32 enumerated_file_index, s_game_variant* variant)
+void user_interface_set_variant(enumerated_file_index enumerated_file_index, s_game_variant* variant)
 {
 	INVOKE(0x209A6E, 0, user_interface_set_variant, enumerated_file_index, variant);
 }
