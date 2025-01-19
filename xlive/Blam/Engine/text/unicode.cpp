@@ -429,6 +429,11 @@ size_t utf8_string_length(const utf8* src, size_t size)
 	return MultiByteToWideChar(CP_UTF8, 0, src, size, NULL, 0);
 }
 
+bool __cdecl validate_wchar_characters(wchar_t* string)
+{
+	return INVOKE(0x4C706, 0, validate_wchar_characters, string);
+}
+
 bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name)
 {
 	ASSERT(var_name);

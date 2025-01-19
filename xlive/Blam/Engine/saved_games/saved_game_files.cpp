@@ -30,6 +30,9 @@ const wchar_t* k_saved_game_file_type_strings[k_number_of_saved_game_file_types]
 typedef void(__cdecl* t_saved_games_load_save_file_information_from_disk)(c_static_array<s_saved_game_main_menu_globals_save_file_info, k_maximum_enumerated_saved_game_files_any_type_per_memory_unit>* save_files_storage);
 t_saved_games_load_save_file_information_from_disk p_saved_games_load_save_file_information_from_disk;
 
+typedef bool(__cdecl* t_saved_game_load_game_variant)(int32 enumerated_index, s_game_variant* out_variant);
+t_saved_game_load_game_variant p_saved_game_load_game_variant;
+
 /* prototypes */
 
 void saved_game_main_menu_globals_set(s_saved_game_main_menu_globals* new_globals);
@@ -43,6 +46,7 @@ void saved_game_files_memory_initialize(int32 unk);
 
 void saved_game_files_apply_hooks(void)
 {
+	DETOUR_ATTACH(p_saved_game_load_game_variant, Memory::GetAddress<t_saved_game_load_game_variant>(0x252291), saved_game_load_game_variant);
 	//WritePointer(Memory::GetAddress(0x39BD90), saved_game_files_memory_initialize);
 	//DETOUR_ATTACH(p_saved_games_load_save_file_information_from_disk, Memory::GetAddress<t_saved_games_load_save_file_information_from_disk>(0x46596), saved_game_load_save_file_information_from_disk);
 	return;
@@ -396,9 +400,31 @@ int32 saved_game_create_new_game_variant(e_controller_index origin_controller, e
 	//return INVOKE(0x5AB63, 0, saved_game_create_new_game_variant, origin_controller, type, name);
 }
 
-bool saved_game_load_game_variant(uint32 enumerated_index, s_game_variant* out_variant)
+
+bool __cdecl saved_game_load_game_variant(int32 enumerated_index, s_game_variant* out_variant)
 {
-	return INVOKE(0x5A96B, 0, saved_game_load_game_variant, enumerated_index, out_variant);
+	if (enumerated_index == NONE)
+		return false;
+
+	if (!saved_games_async_helper_read_file(enumerated_index, (int8*)out_variant, sizeof(s_game_variant)))
+		return false;
+
+	if(game_variant_validate(out_variant))
+	{
+		if(ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_index))
+		{
+			out_variant->flags |= 1u;
+		}
+		else
+		{
+			out_variant->flags &= 1u;
+		}
+
+		return true;
+	}
+
+	return false;
+	//return INVOKE(0x5A96B, 0, saved_game_load_game_variant, enumerated_index, out_variant);
 }
 
 /* private code */

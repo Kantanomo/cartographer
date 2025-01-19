@@ -43,7 +43,7 @@ class c_game_statborg
 	bool should_record_stats;
 	int8 pad_1[3];
 	s_statborg_player_data m_player_data[k_maximum_multiplayer_players];
-	s_statborg_team_data m_team_data[k_multiplayer_team_count];
+	s_statborg_team_data m_team_data[k_game_multiplayer_team_count];
 
 public:
 	void adjust_player_stat(datum player_datum, e_statborg_entry statistic, int16 count, int32 game_result_statistic, bool adjust_team_stat);
