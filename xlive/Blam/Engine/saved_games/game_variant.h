@@ -1,5 +1,7 @@
 #pragma once
 
+#define k_game_engine_oddball_maximum_balls 3
+
 /* enums */
 
 enum e_game_engine_type : int32
@@ -14,8 +16,10 @@ enum e_game_engine_type : int32
 	_game_engine_type_juggernaut,
 	_game_engine_type_territories,
 	_game_engine_type_assault,
-	_game_engine_type_stub,
-	k_game_engine_type_count
+	_game_engine_type_stub = 10,
+
+	k_game_engine_type_count,
+	k_game_engine_playable_types = 10
 };
 
 enum e_game_variant_description_index : int8
@@ -27,12 +31,15 @@ enum e_game_variant_description_index : int8
 	_game_variant_description_ctf = 4,
 	_game_variant_description_invasion = 5,
 	_game_variant_description_territories = 6,
+
 	k_base_game_variant_description_count = 7,
 
 	// cartographer added variant descriptions
 	_game_variant_description_zombies = 7,
 	_game_variant_description_headhunter = 8,
-	k_game_variant_description_count
+
+	k_game_variant_description_count,
+	k_game_variant_description_invalid = -1
 };
 
 enum e_game_engine_flags : int32
@@ -52,6 +59,9 @@ enum e_game_engine_flags : int32
 	_game_engine_extra_damage_bit = 12,
 	_game_engine_damage_resistant_bit = 13,
 	_game_engine_force_even_teams_bit = 14,
+	k_game_engine_flags_count,
+
+	k_game_engine_flags_clear_unused_bits = (_game_engine_force_even_teams_bit | _game_engine_damage_resistant_bit | _game_engine_extra_damage_bit | _game_engine_starting_grenades_bit | _game_engine_grenades_on_map_bit | _game_engine_invisibility_on_map_bit | _game_engine_overshields_on_map_bit | _game_engine_friendly_fire_bit | _game_engine_changing_teams_bit | _game_engine_observers_bit | _game_engine_tie_resolution_bit | _game_engine_round_switch_resets_map_bit | _game_engine_always_invisible_bit | _game_engine_motion_sensor_bit | _game_engine_teams_bit)
 };
 
 enum e_game_engine_round_setting
@@ -189,11 +199,18 @@ enum e_game_engine_starting_weapon : int8
 	_game_engine_starting_weapon_brute_plasma = 18,
 };
 
-enum e_game_engine_player_speed
+enum e_ctf_engine_player_speed
 {
-	_game_engine_player_speed_slow = 0,
-	_game_engine_player_speed_normal = 1,
-	_game_engine_player_speed_fast = 2,
+	_ctf_engine_player_speed_slow = 0,
+	_ctf_engine_player_speed_normal = 1,
+	_ctf_engine_player_speed_fast = 2,
+};
+
+enum e_oddball_player_speed : uint16
+{
+	_oddball_engine_player_speed_slow = 0,
+	_oddball_engine_player_speed_normal = 1,
+	_oddball_engine_player_speed_fast = 2,
 };
 
 enum e_game_engine_weapon_hit
@@ -202,11 +219,14 @@ enum e_game_engine_weapon_hit
 	_game_engine_multiplayer_weapon_hit_normal_damage = 1,
 };
 
-enum e_slayer_engine_flags
+enum e_slayer_engine_flags : uint32
 {
 	_slayer_engine_bonus_points_bit = 0,
 	_slayer_engine_suicide_point_loss_bit = 1,
 	_slayer_engine_death_point_loss_bit = 2,
+
+	k_slayer_engine_flags_count,
+	k_slayer_engine_clear_unused_bits_mask = (_slayer_engine_death_point_loss_bit | _slayer_engine_suicide_point_loss_bit | _slayer_engine_bonus_points_bit)
 };
 
 enum e_ctf_game_type
@@ -224,7 +244,7 @@ enum e_ctf_engine_home_flag_waypoint_flags
 	_ctf_engine_home_flag_waypoint_off = 3,
 };
 
-enum e_ctf_engine_enemy_bomb_waypoint_flags
+enum e_ctf_engine_enemy_bomb_waypoint_type : uint32
 {
 	_ctf_engine_enemy_bomb_waypoint_always_on = 0,
 	_ctf_engine_enemy_bomb_waypoint_uncontrolled = 1,
@@ -241,9 +261,10 @@ enum e_ctf_engine_flags : int8
 	_ctf_engine_sticky_arming_bit = 5,
 	_ctf_engine_carriers_damage_resistant_bit = 6,
 	_ctf_engine_carriers_invisible_bit = 7,
+	k_ctf_engine_flags_count
 };
 
-enum e_odball_engine_waypoint_flags
+enum e_oddball_engine_waypoint_type
 {
 	_oddball_waypoint_type_always_on = 0,
 	_oddball_waypoint_type_neutral = 1,
@@ -251,20 +272,26 @@ enum e_odball_engine_waypoint_flags
 	_oddball_waypoint_type_off = 3,
 };
 
-enum e_king_engine_flags
+enum e_king_engine_flags : uint32
 {
 	_king_engine_uncontested_hill_to_score_bit = 0,
 	_king_engine_team_multiplier_bit = 1,
 	_king_engine_extra_damage_on_hill_bit = 2,
 	_king_engine_damage_resistance_on_hill_bit = 3,
 	_king_engine_invis_on_hill_bit = 4,
+
+	k_king_engine_flags_count,
+	k_king_engine_clear_unused_bits_mask = (_king_engine_invis_on_hill_bit | _king_engine_damage_resistance_on_hill_bit | _king_engine_extra_damage_on_hill_bit | _king_engine_team_multiplier_bit | _king_engine_uncontested_hill_to_score_bit)
 };
 
-enum e_oddball_engine_flags
+enum e_oddball_engine_flags : uint32
 {
 	_oddball_engine_carriers_can_drive_and_gun_bit = 0,
 	_oddball_engine_carriers_always_invis_bit = 1,
 	_oddball_engine_carriers_damage_resistance_bit = 2,
+
+	k_oddball_engine_flags_count,
+	k_oddball_engine_clear_unused_bits_mask = (_oddball_engine_carriers_damage_resistance_bit | _oddball_engine_carriers_always_invis_bit | _oddball_engine_carriers_can_drive_and_gun_bit)
 };
 
 enum e_juggernaut_engine_flags
@@ -276,6 +303,9 @@ enum e_juggernaut_engine_flags
 	_juggernaut_does_extra_damage_bit = 4,
 	_juggernaut_has_infinite_ammo_bit = 5,
 	_juggernaut_is_damage_resistant_bit = 6,
+
+	k_juggernaut_engine_flags_count,
+	k_juggernaut_engine_clear_unused_bits_mask = (_juggernaut_is_damage_resistant_bit | _juggernaut_has_infinite_ammo_bit | _juggernaut_does_extra_damage_bit | _juggernaut_betrayal_point_loss_bit | _juggernaut_has_active_camo_bit | _juggernaut_has_supershield_bit | _juggernaut_has_motion_sensor_bit)
 };
 
 struct s_variant_description_map
@@ -284,14 +314,75 @@ struct s_variant_description_map
 	e_game_variant_description_index index;
 };
 
+struct s_ctf_variant_settings
+{
+	c_flags_no_init<e_ctf_engine_flags, uint8, k_ctf_engine_flags_count> flags;
+	uint32 flag_reset_time; // in seconds
+	e_ctf_engine_player_speed speed_with_flag;
+	e_game_engine_weapon_hit flag_hit_damage;
+	e_ctf_engine_enemy_bomb_waypoint_type waypoint_flags;
+	e_ctf_game_type game_type;
+	uint16 bomb_arming_time;
+	uint16 bomb_fuse_time;
+};
+
+struct s_slayer_variant_settings
+{
+	c_flags_no_init<e_slayer_engine_flags, uint32, k_slayer_engine_flags_count> flags;
+};
+
+struct s_oddball_variant_settings
+{
+	c_flags_no_init<e_oddball_engine_flags, uint32, k_oddball_engine_flags_count> flags;
+	uint16 ball_count;
+	e_game_engine_weapon_hit ball_hit_damage;
+	e_oddball_player_speed speed_with_ball;
+	e_oddball_engine_waypoint_type waypoint_to_ball;
+};
+
+struct s_king_variant_settings
+{
+	c_flags_no_init<e_king_engine_flags, uint32, k_king_engine_flags_count> flags;
+	uint16 hill_move_time;
+	int8 pad;
+};
+
+struct s_juggernaut_variant_settings
+{
+	c_flags_no_init<e_juggernaut_engine_flags, uint32, k_juggernaut_engine_flags_count> flags;
+	e_ctf_engine_player_speed juggernaut_movement_speed;
+	int8 pad;
+};
+
+struct s_territories_variant_settings
+{
+	uint16 territory_count;
+	uint16 territory_contest_time;
+	uint16 territory_capture_time;
+};
+
+union s_game_engine_variant
+{
+	int8 variant_storage[64];
+	s_ctf_variant_settings ctf;
+	s_slayer_variant_settings slayer;
+	s_oddball_variant_settings oddball;
+	s_king_variant_settings king;
+	s_juggernaut_variant_settings juggernaut;
+	s_territories_variant_settings territories;
+	s_ctf_variant_settings assault;
+};
+ASSERT_STRUCT_SIZE(s_game_engine_variant, 64);
+
+
 struct s_game_variant
 {
-	uint16 flags;
+	int16 flags;
 	int8 pad;
 	e_game_variant_description_index description_index;
 	wchar_t variant_name[32];
 	e_game_engine_type variant_game_engine_index;
-	e_game_engine_flags game_engine_flags;
+	c_flags_no_init<e_game_engine_flags, uint32, k_game_engine_flags_count> game_engine_flags;
 
 	/* match settings */
 	e_game_engine_round_setting round_setting;
@@ -336,7 +427,7 @@ struct s_game_variant
 	/* Maybe make use of these? */
 	int32 unused_settings[6];
 
-	int8 data[64];
+	s_game_engine_variant game_engine_variant;
 };
 ASSERT_STRUCT_SIZE(s_game_variant, 304);
 

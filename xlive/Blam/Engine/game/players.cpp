@@ -383,7 +383,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
 
     if (current_game_engine())
     {
-        if (TEST_BIT(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
+        if (get_game_variant()->game_engine_flags.test(_game_engine_teams_bit))
         {
             if (configuration_data->team_index != _game_team_none && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
             {

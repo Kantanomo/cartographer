@@ -136,7 +136,7 @@ int32 saved_game_create_new_game_variant(e_controller_index origin_controller, e
 
 int32 saved_game_create_file(e_saved_game_file_type type, e_controller_index originating_controller_index, wchar_t* new_file_name);
 
-bool saved_game_load_game_variant(uint32 enumerated_index, s_game_variant* out_variant);
+bool saved_game_load_game_variant(int32 enumerated_index, s_game_variant* out_variant);
 
 void saved_game_new_failure_cleanup(e_saved_game_file_type type, uint32 enumerated_file_index);
 
