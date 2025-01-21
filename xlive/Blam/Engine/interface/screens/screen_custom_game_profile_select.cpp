@@ -188,8 +188,79 @@ void c_custom_game_profile_list::handle_item_pressed_event(s_event_record** peve
 	//INVOKE_TYPE(0x251B7E, 0, void(__thiscall*)(c_custom_game_profile_list*, s_event_record**, datum*), this, pevent, pitem_index);
 }
 
+void c_custom_game_profile_list::perform_save_type_search()
+{
+	enumerated_file_index search_results[4197]{};
+	uint32 search_result_count = 0;
+
+	saved_game_files_search_by_type(
+		_controller_index_0, 
+		this->save_game_type,
+		&search_result_count,
+		search_results,
+		true);
+
+	datum_clear(this->m_list_data);
+
+	memset(this->enumerated_file_index_storage, 0xFF, sizeof(this->enumerated_file_index_storage));
+
+	if(this->data_2[0])
+	{
+		s_custom_game_profile_list_item* creation_item = (s_custom_game_profile_list_item*)datum_new(this->m_list_data);
+		creation_item->enumerated_index = NONE;
+		creation_item->description_text = _string_id_create_new_description_text;
+		creation_item->unk_1 = 0;
+	}
+
+	search_result_count = PIN(search_result_count, 0, k_maximum_enumerated_total_save_game_files);
+
+	if (search_result_count != 0)
+	{
+		s_game_variant search_variant {};
+		for (uint32 index = 0; index < search_result_count; ++index)
+		{
+			if (saved_game_load_game_variant(search_results[index], &search_variant) &&
+				(ENUMERATED_INDEX_IS_DEFAULT_SAVE(search_results[index]) ||
+					!uniswcntrl(search_variant.variant_name) &&
+					!wchar_has_double_pipe(search_variant.variant_name)))
+			{
+				s_custom_game_profile_list_item* next_item = (s_custom_game_profile_list_item*)datum_new(this->m_list_data);
+				next_item->enumerated_index = search_results[index];
+				next_item->unk_1 = 0;
+				next_item->description_text = _string_id_none;
+
+				if (ENUMERATED_INDEX_IS_DEFAULT_SAVE(search_results[index]))
+				{
+					uint8 description_index = PIN((uint8)(search_variant.description_index), 0, k_maximum_enumerated_default_save_game_files - 1);
+					if (description_index == (uint8)search_variant.description_index)
+						next_item->description_text = string_id_get_number_string(description_index);
+				}
+				this->enumerated_file_index_storage[index] = search_results[index];
+			}
+		}
+	}
+	this->setup_item_indices();
+}
+
+void c_custom_game_profile_list::sub_6515A6()
+{
+	INVOKE_TYPE(0x2515A6, 0, void(__thiscall*)(c_custom_game_profile_list*), this);
+}
+
 int32 c_custom_game_profile_list::setup_children()
 {
+	//this->perform_save_type_search();
+	//this->sub_613E7C((s_list_item_datum*)datum_next(this->m_list_data, NONE));
+	//user_interface_clear_variant();
+
+	//int32 result = c_list_widget::setup_children();
+
+	//if (!this->data_2[0] && !this->data_2[1])
+	//	sub_6515A6();
+
+	//this->field_A2 = 0;
+
+	//return result;
 	return INVOKE_TYPE(0x251AE9, 0, int32(__thiscall*)(c_custom_game_profile_list*), this);
 }
 

@@ -119,7 +119,7 @@ bool saved_game_get_file_info(s_saved_game_main_menu_globals_save_file_info* out
 }
 
 void saved_game_files_search_by_type(e_controller_index controller_index, e_saved_game_file_type save_type,
-	int32* number_of_profiles, enumerated_file_index* saved_game_file_indicies, bool search_default_profiles)
+	uint32* number_of_profiles, enumerated_file_index* saved_game_file_indicies, bool search_default_profiles)
 {
 	INVOKE(0x3F3BB, 0, saved_game_files_search_by_type, controller_index, save_type, number_of_profiles, saved_game_file_indicies, search_default_profiles);
 }
@@ -438,7 +438,11 @@ bool __cdecl saved_game_load_game_variant(int32 enumerated_index, s_game_variant
 	if (!saved_games_async_helper_read_file(enumerated_index, (int8*)out_variant, sizeof(s_game_variant)))
 		return false;
 
-	if(game_variant_validate(out_variant))
+	bool validation_result = game_variant_validate(out_variant);
+
+	ASSERT(validation_result);
+
+	if(validation_result)
 	{
 		if(ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_index))
 		{

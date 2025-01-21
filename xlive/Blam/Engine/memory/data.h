@@ -117,6 +117,8 @@ datum __cdecl datum_new(s_data_array* data_array);
 
 void __cdecl data_make_valid(s_data_array* data_array);
 void __cdecl datum_delete(s_data_array* data_array, datum datum_index);
+void* __cdecl datum_next(s_data_array* data_array, datum datum_index);
+void _cdecl datum_clear(s_data_array* data_array);
 
 uint32 datum_header_allocate(uint32 total_size, uint32 alignment_bits);
 bool __cdecl datum_header_deallocate(void* object);

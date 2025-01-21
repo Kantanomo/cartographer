@@ -42,6 +42,8 @@ public:
 	int8 data_3;
 	c_slot2<c_custom_game_profile_list, s_event_record*, datum> m_slot;
 	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
+	void perform_save_type_search();
+	void sub_6515A6(); // FO: 0x2515A6
 
 	c_custom_game_profile_list(int16 user_flags);
 

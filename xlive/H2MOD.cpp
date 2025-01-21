@@ -655,7 +655,7 @@ static void h2mod_apply_hooks(void)
 	network_transport_apply_patches();
 	network_session_apply_patches();
 	bitstream_serialization_apply_patches();
-
+	
 	network_memory_apply_patches();
 
 	simulation_apply_patches();
@@ -665,6 +665,8 @@ static void h2mod_apply_hooks(void)
 	network_configuration_apply_patches();
 	damage_apply_patches();
 	files_windows_apply_patches();
+
+	game_engine_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -752,6 +754,7 @@ static void h2mod_apply_hooks(void)
 		new_hud_draw_apply_patches();
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
+		game_variant_apply_patches();
 	}
 	return;
 }
