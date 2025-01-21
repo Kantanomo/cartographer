@@ -202,9 +202,9 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 			params.m_context = NULL;
 			params.user_flags = FLAG((*pevent)->controller);
 			params.m_channel_type = _user_interface_channel_type_gameshell_screen;
-			params.m_screen_state.field_0 = 0xFFFFFFFF;
-			params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-			params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+			params.m_screen_state.field_0 = NONE;
+			params.m_screen_state.m_last_focused_item_order = NONE;
+			params.m_screen_state.m_last_focused_item_index = NONE;
 
 			switch ((e_screen_game_engine_items)item->item_id)
 			{
@@ -212,66 +212,66 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 				if (this->type == _screen_game_engine_category_settings)
 					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_settings;
 				else if (!this->data[1])
-					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_settings_unused;
-				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_lobby;
+				else
+					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_unused;
 				break;
 			case _screen_game_engine_item_king:
 				if (this->type == _screen_game_engine_category_settings)
 					params.m_load_function = c_screen_custom_game_profile_select::load_king_settings;
 				else if (!this->data[1])
-					params.m_load_function = c_screen_custom_game_profile_select::load_king_settings_unused;
-				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_king_lobby;
+				else
+					params.m_load_function = c_screen_custom_game_profile_select::load_king_unused;
 				break;
 			case _screen_game_engine_item_oddball:
 				if (this->type == _screen_game_engine_category_settings)
 					params.m_load_function = c_screen_custom_game_profile_select::load_oddball_settings;
 				else if (!this->data[1])
-					params.m_load_function = c_screen_custom_game_profile_select::load_oddball_settings_unused;
-				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_oddball_lobby;
+				else
+					params.m_load_function = c_screen_custom_game_profile_select::load_oddball_unused;
 				break;
 			case _screen_game_engine_item_juggernaut:
 				if (this->type == _screen_game_engine_category_settings)
 					params.m_load_function = c_screen_custom_game_profile_select::load_juggernaut_settings;
 				else if (!this->data[1])
-					params.m_load_function = c_screen_custom_game_profile_select::load_juggernaut_settings_unused;
-				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_juggernaut_lobby;
+				else
+					params.m_load_function = c_screen_custom_game_profile_select::load_juggernaut_unused;
 				break;
 			case _screen_game_engine_item_ctf:
 				if (this->type == _screen_game_engine_category_settings)
 					params.m_load_function = c_screen_custom_game_profile_select::load_ctf_settings;
 				else if (!this->data[1])
-					params.m_load_function = c_screen_custom_game_profile_select::load_ctf_settings_unused;
-				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_ctf_lobby;
+				else
+					params.m_load_function = c_screen_custom_game_profile_select::load_ctf_unused;
 				break;
 			case _screen_game_engine_item_assault:
 				if (this->type == _screen_game_engine_category_settings)
 					params.m_load_function = c_screen_custom_game_profile_select::load_assault_settings;
 				else if (!this->data[1])
-					params.m_load_function = c_screen_custom_game_profile_select::load_assault_settings_unused;
-				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_assault_lobby;
+				else
+					params.m_load_function = c_screen_custom_game_profile_select::load_assault_unused;
 				break;
 			case _screen_game_engine_item_territories:
 				if (this->type == _screen_game_engine_category_settings)
 					params.m_load_function = c_screen_custom_game_profile_select::load_territories_settings;
 				else if (!this->data[1])
-					params.m_load_function = c_screen_custom_game_profile_select::load_territories_settings_unused;
-				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_territories_lobby;
+				else
+					params.m_load_function = c_screen_custom_game_profile_select::load_territories_unused;
 				break;
 			case _screen_game_engine_item_zombies:
 				// todo: new load functions for zombies
 				if (this->type == _screen_game_engine_category_settings)
 					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_settings;
 				else if (!this->data[1])
-					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_settings_unused;
-				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_lobby;
+				else
+					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_unused;
 				break;
 			case _screen_game_engine_item_headhunter:
 				// todo: new load function for headhunter
@@ -280,7 +280,7 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 				else if (!this->data[1])
 					params.m_load_function = c_screen_custom_game_profile_select::load_headhunter_lobby;
 				else
-					params.m_load_function = c_screen_custom_game_profile_select::load_headhunter_lobby;
+					params.m_load_function = c_screen_custom_game_profile_select::load_headhunter_unused;
 				break;
 			}
 
@@ -341,7 +341,7 @@ void* c_screen_game_engine_category::load_settings(s_screen_parameters* paramete
 			parameters->user_flags,
 			_screen_game_engine_category_listing,
 			_screen_game_engine_category_settings,
-			1,
+			0,
 			0
 		);
 

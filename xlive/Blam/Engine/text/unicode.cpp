@@ -32,6 +32,13 @@ wchar_t* ustrnzcat(wchar_t* dst, const wchar_t* src, size_t count)
 	return wcsncat(dst, src, count);
 }
 
+bool __cdecl uniswcntrl(wchar_t* string)
+{
+	ASSERT(string);
+
+	return INVOKE(0x4C792, 0, uniswcntrl, string);
+}
+
 int32 usnzprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
 {
 	va_list va_args;
