@@ -22,6 +22,9 @@ const wchar_t* ustrpbrk(const wchar_t* string, const wchar_t* character_set);
 
 const wchar_t* ustrrchr(const wchar_t* string, wchar_t c);
 
+bool __cdecl uniswcntrl(wchar_t* string);
+
+int32 usnzprintf(wchar_t* string, size_t size, const wchar_t* format, ...);
 size_t ustrspn(const wchar_t* string, const wchar_t* character_set);
 
 const wchar_t* ustrstr(const wchar_t* string, const wchar_t* character_set);

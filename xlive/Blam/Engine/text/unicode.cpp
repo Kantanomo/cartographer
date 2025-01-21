@@ -266,7 +266,14 @@ int32 uprintf(const wchar_t* format, ...)
 	return result;
 }
 
-int32 usnprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
+bool __cdecl uniswcntrl(wchar_t* string)
+{
+	ASSERT(string);
+
+	return INVOKE(0x4C792, 0, uniswcntrl, string);
+}
+
+int32 usnzprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
 {
 	va_list va_args;
 	va_start(va_args, format);

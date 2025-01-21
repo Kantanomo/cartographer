@@ -118,6 +118,12 @@ bool saved_game_get_file_info(s_saved_game_main_menu_globals_save_file_info* out
 	return false;
 }
 
+void saved_game_files_search_by_type(e_controller_index controller_index, e_saved_game_file_type save_type,
+	int32* number_of_profiles, enumerated_file_index* saved_game_file_indicies, bool search_default_profiles)
+{
+	INVOKE(0x3F3BB, 0, saved_game_files_search_by_type, controller_index, save_type, number_of_profiles, saved_game_file_indicies, search_default_profiles);
+}
+
 uint32 saved_game_get_file_size_kb_for_type(e_saved_game_file_type type)
 {
 	if (type == _saved_game_file_type_profile)
