@@ -91,8 +91,13 @@ s_game_variant* user_interface_get_variant()
 	return INVOKE(0x209A92, 0, user_interface_get_variant);
 }
 
+void user_interface_clear_variant()
+{
+	INVOKE(0x209A98, 0, user_interface_clear_variant);
+}
+
 bool __cdecl user_interface_construct_default_game_variant_from_file_type(s_game_variant* out_variant,
-	e_saved_game_file_type type)
+                                                                          e_saved_game_file_type type)
 {
 	e_game_variant_description_index variant_description = saved_game_type_to_variant_description(type);
 

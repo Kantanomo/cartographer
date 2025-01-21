@@ -22,6 +22,16 @@ void __cdecl datum_delete(s_data_array* data_array, datum datum_index)
 	return;
 }
 
+void* datum_next(s_data_array* data_array, datum datum_index)
+{
+	return INVOKE(0x66A15, 0, datum_next, data_array, datum_index);
+}
+
+void datum_clear(s_data_array* data_array)
+{
+	INVOKE(0x66715, 0, datum_clear, data_array);
+}
+
 void data_make_valid(s_data_array* data_array)
 {
 	// not entirely sure what this actually does

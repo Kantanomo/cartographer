@@ -73,3 +73,8 @@ bool __cdecl validate_wchar_characters(wchar_t* string)
 {
 	return INVOKE(0x4C706, 0, validate_wchar_characters, string);
 }
+
+bool wchar_has_double_pipe(wchar_t* string)
+{
+	return INVOKE(0x4BF26, 0, wchar_has_double_pipe, string);
+}

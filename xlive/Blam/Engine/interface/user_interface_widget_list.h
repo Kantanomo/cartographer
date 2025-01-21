@@ -67,6 +67,8 @@ public:
 	void set_focused_item_index(datum item_index);
 	void remove_focused_item_datum_from_data_array();
 	void remove_item_from_list(c_list_item_widget* item);
+	void setup_item_indices();
+	void sub_613E7C(s_list_item_datum* datum); // FO: 213E7C
 
 
 	// c_list_widget virtual functions
