@@ -49,18 +49,23 @@ struct s_saved_game_player_profile
 	int32 valid_maybe;
 	int32 unk;
 	wchar_t name[16];
-	int8 data[192];
-	s_saved_game_profile_variant_info variant;
-	int8 data2[20];
+	int8 data[193];
+	bool last_selected_variant_set;
+	int8 data2[6];
+	enumerated_file_index last_selected_file_index;
+	int8 data3[420];
+	wchar_t last_selected_variant_name[32];
+	int8 data4[20];
 	s_saved_game_profile_input_preferences input_preferences;
-	int8 data3[16];
+	int8 data5[16];
 	s_player_profile_traits profile_traits;
 	int8 gap2[176];
 };
 ASSERT_STRUCT_SIZE(s_saved_game_player_profile, 4616);
 
 
-void __cdecl saved_game_player_profile_set_default_variant(void* saved_game_variant);
+void __cdecl saved_game_player_profile_set_default_training_data(void* saved_game_variant);
+void __cdecl saved_game_player_profile_set_input_preferences(s_gamepad_input_preferences* input_preferences, s_saved_game_profile_input_preferences* profile_input_preferences);
 
 void saved_game_player_profile_default_new(s_saved_game_player_profile* profile, int32 default_profile_type);
 bool saved_game_player_profile_read_file(enumerated_file_index enumerated_file_index, s_saved_game_player_profile* profile);

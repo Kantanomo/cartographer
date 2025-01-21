@@ -135,6 +135,10 @@ bool __cdecl saved_game_get_display_name_for_type(wchar_t* display_name, e_saved
 
 bool __cdecl saved_game_create_save_game_directory(e_saved_game_file_type type, wchar_t* out_string);
 
+e_game_variant_description_index saved_game_type_to_variant_description(e_saved_game_file_type type);
+
+e_saved_game_file_type saved_game_get_variant_file_type(const s_game_variant* variant);
+
 enumerated_file_index saved_game_create_new_game_variant(e_controller_index origin_controller, e_saved_game_file_type type, wchar_t* name);
 
 enumerated_file_index saved_game_create_file(e_saved_game_file_type type, e_controller_index originating_controller_index, wchar_t* new_file_name);

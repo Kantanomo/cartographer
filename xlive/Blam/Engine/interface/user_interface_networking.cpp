@@ -69,6 +69,11 @@ e_session_protocol __cdecl user_interface_squad_get_active_protocol()
 	return INVOKE(0x215EA9, 0x0, user_interface_squad_get_active_protocol);
 }
 
+bool __cdecl user_interface_game_settings_set_game_variant(s_game_variant* variant)
+{
+    return INVOKE(0x216901, 0, user_interface_game_settings_set_game_variant, variant);
+}
+
 s_game_variant* __cdecl user_interface_session_get_game_variant(void)
 {
 	return INVOKE(0x215692, 0x0, user_interface_session_get_game_variant);
