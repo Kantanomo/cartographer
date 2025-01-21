@@ -24,7 +24,7 @@ struct s_custom_game_profile_list_item
 {
 	int8 data[2];
 	int16 unk_1;
-	int32 unk;
+	enumerated_file_index enumerated_index;
 	string_id description_text;
 };
 ASSERT_STRUCT_SIZE(s_custom_game_profile_list_item, 12);
@@ -36,7 +36,7 @@ public:
 	int32 enumerated_file_index_storage[k_maximum_enumerated_total_save_game_files];
 	e_saved_game_file_type save_game_type;
 	int32 unk_1;
-	int32 enumerated_file_index;
+	int32 enumerated_index;
 	int8 data_2[2];
 	bool unk_bool;
 	int8 data_3;
@@ -57,7 +57,7 @@ class c_screen_custom_game_profile_select : public c_screen_with_menu
 {
 protected:
 	c_custom_game_profile_list m_profile_list;
-	e_saved_game_file_type save_type;
+	e_saved_game_file_type save_game_type;
 	int8 unk_data[4];
 
 private:
@@ -81,6 +81,8 @@ public:
 	const void* load_proc() const override;
 
 	c_screen_custom_game_profile_select(e_user_interface_channel_type ui_channel, e_user_interface_render_window window_index, uint16 user_flags, e_user_interface_screen_id screen_id);
+
+	static void set_global_enumerated_index(enumerated_file_index enumerated_file_index);
 };
 
 ASSERT_STRUCT_SIZE(c_screen_custom_game_profile_select, 21648);

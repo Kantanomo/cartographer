@@ -86,5 +86,7 @@ protected:
 public:
 	static void apply_instance_patches();
 	static void apply_patches_on_map_load();
+	static void __cdecl globals_set_variant(s_game_variant* variant);
+	static void __cdecl globals_set_unk_flag(bool state);
 };
 ASSERT_STRUCT_SIZE(c_screen_multiplayer_pregame_lobby, 0x3594);

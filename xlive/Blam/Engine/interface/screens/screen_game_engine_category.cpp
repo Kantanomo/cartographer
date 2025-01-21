@@ -143,7 +143,7 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 					unk_type = 6;
 					break;
 				}
-				edit_profile->variant.data[0] = unk_type;
+				edit_profile->data[192] = unk_type;
 				user_interface_globals_save_edit_profile_to_disk();
 			}
 			if (!this->data[3])

@@ -4,9 +4,9 @@
 #include "saved_game_files.h"
 #include "saved_game_files_async_windows.h"
 
-void __cdecl saved_game_player_profile_set_default_variant(void* saved_game_variant)
+void __cdecl saved_game_player_profile_set_default_training_data(void* saved_game_variant)
 {
-	INVOKE(0x98FD, 0, saved_game_player_profile_set_default_variant, saved_game_variant);
+	INVOKE(0x98FD, 0, saved_game_player_profile_set_default_training_data, saved_game_variant);
 }
 
 void saved_game_player_profile_set_input_preferences(s_gamepad_input_preferences* input_preferences,
@@ -48,7 +48,7 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 		profile->input_preferences.controller_button_layout = 0;
 		profile->input_preferences.controller_thumbstick_layout = 0;
 	}
-	saved_game_player_profile_set_default_variant(&profile->variant);
+	saved_game_player_profile_set_default_training_data(&profile->data[192]);
 	input_abstraction_preferences_new(&input_preferences, 0, false, false);
 	saved_game_player_profile_set_input_preferences(&input_preferences, &profile->input_preferences);
 }

@@ -91,6 +91,36 @@ s_game_variant* user_interface_get_variant()
 	return INVOKE(0x209A92, 0, user_interface_get_variant);
 }
 
+bool __cdecl user_interface_construct_default_game_variant_from_file_type(s_game_variant* out_variant,
+	e_saved_game_file_type type)
+{
+	e_game_variant_description_index variant_description = saved_game_type_to_variant_description(type);
+
+	switch(variant_description)
+	{
+	case _game_variant_description_slayer:
+	case _game_variant_description_oddball:
+	case _game_variant_description_juggernaut:
+	case _game_variant_description_king:
+	case _game_variant_description_ctf:
+	case _game_variant_description_invasion:
+	case _game_variant_description_territories:
+		return INVOKE(0x20BCEE, 0, user_interface_construct_default_game_variant_from_file_type, out_variant, type);
+	//todo: add race
+	//case _game_variant_description_race
+	case _game_variant_description_zombies:
+	case _game_variant_description_headhunter:
+		// todo: create default variant constructor for types
+		// requires creating a hard defined copy instance of the goof tag
+		// the tag that controls default variants.
+		game_variant_create_default_new(out_variant, variant_description);
+		return game_variant_validate(out_variant);
+	}
+
+	game_variant_create_default_new(out_variant, _game_variant_description_slayer);
+	return game_variant_validate(out_variant);
+}
+
 
 void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface_render_window render_window, rectangle2d* out_rect2d)
 {
