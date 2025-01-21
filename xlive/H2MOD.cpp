@@ -101,6 +101,7 @@
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "interface/user_interface_networking.h"
 
 bool H2XFirerateEnabled = false;
 bool g_xbox_tickrate_enabled = false;
@@ -1132,6 +1133,7 @@ void H2MOD::ApplyHooks() {
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
 		game_variant_apply_patches();
+		user_interface_networking_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
