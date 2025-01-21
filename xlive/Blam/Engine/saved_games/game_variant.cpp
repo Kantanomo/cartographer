@@ -10,6 +10,20 @@
 
 #define variant_setting_pin(v, min, max)((v) = PIN(v, min, max))
 
+/* typedef */
+
+typedef void(__cdecl* t_game_variant_create_default_new)(s_game_variant*, e_game_variant_description_index);
+t_game_variant_create_default_new p_game_variant_create_default_new;
+
+typedef bool(__cdecl* t_game_variant_validate)(s_game_variant*);
+t_game_variant_validate p_game_variant_validate;
+
+void game_variant_apply_patches()
+{
+	DETOUR_ATTACH(p_game_variant_create_default_new, Memory::GetAddress<t_game_variant_create_default_new>(0x5B33D), game_variant_create_default_new);
+	DETOUR_ATTACH(p_game_variant_validate, Memory::GetAddress<t_game_variant_validate>(0x5B720), game_variant_validate);
+}
+
 s_game_variant* get_game_variant(void)
 {
 	return &game_options_get()->game_variant;
@@ -19,7 +33,8 @@ void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_var
 {
 	if (game_variant_type < k_base_game_variant_description_count)
 	{
-		INVOKE(0x5B33D, 0x3CF9D, game_variant_create_default_new, variant, game_variant_type);
+		p_game_variant_create_default_new(variant, game_variant_type);
+		//INVOKE(0x5B33D, 0x3CF9D, game_variant_create_default_new, variant, game_variant_type);
 	}
     else
     {
@@ -41,6 +56,10 @@ void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_var
 				variant->join_in_progress_setting = _game_engine_join_in_progress_on;
 
 				memset((int8*)&variant->max_players, 0, 12);
+
+				variant->max_players = k_maximum_players;
+				variant->max_living_players = k_maximum_players;
+				variant->maximum_allowable_teams = k_game_multiplayer_team_count;
 
 				variant->respawn_time = 5;
 				variant->suicide_penalty = 5;

@@ -652,6 +652,8 @@ static void h2mod_apply_hooks(void)
 	damage_apply_patches();
 	files_windows_apply_patches();
 
+	game_engine_apply_patches();
+
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
 	PatchCall(Memory::GetAddress(0x144919, 0x133769), OnPlayerDeath);
@@ -748,6 +750,7 @@ static void h2mod_apply_hooks(void)
 		new_hud_draw_apply_patches();
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
+		game_variant_apply_patches();
 	}
 	return;
 }

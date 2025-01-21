@@ -368,6 +368,8 @@ ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 168);
 
 /* prototypes */
 
+void game_engine_apply_patches();
+
 c_game_engine* current_game_engine(void);
 
 s_game_engine_globals* game_engine_globals_get(void);
@@ -379,8 +381,6 @@ s_simulation_player_netdebug_data* game_engine_get_netdebug_data(datum player_in
 void __cdecl game_engine_apply_map_patches(void);
 
 bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
-
-
 
 void __cdecl game_engine_player_activated(datum player_index);
 

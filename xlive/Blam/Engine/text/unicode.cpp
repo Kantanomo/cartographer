@@ -455,3 +455,8 @@ bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name)
 
 	return err == ERROR_SUCCESS;
 }
+
+bool wchar_has_double_pipe(wchar_t* string)
+{
+	return INVOKE(0x4BF26, 0, wchar_has_double_pipe, string);
+}

@@ -132,3 +132,5 @@ bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name);
 
 
 bool __cdecl validate_wchar_characters(wchar_t* string);
+
+bool __cdecl wchar_has_double_pipe(wchar_t* string);

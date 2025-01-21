@@ -117,7 +117,7 @@ e_global_string_id saved_game_get_type_string_id(e_saved_game_file_type type);
 
 bool saved_game_get_file_info(s_saved_game_main_menu_globals_save_file_info* out_info, enumerated_file_index enumerated_index);
 
-void saved_game_files_search_by_type(e_controller_index controller_index, e_saved_game_file_type save_type, int32* number_of_profiles, enumerated_file_index* saved_game_file_indicies, bool search_default_profiles);
+void saved_game_files_search_by_type(e_controller_index controller_index, e_saved_game_file_type save_type, uint32* number_of_profiles, enumerated_file_index* saved_game_file_indicies, bool search_default_profiles);
 
 uint32 saved_game_get_file_size_kb_for_type(e_saved_game_file_type type);
 
