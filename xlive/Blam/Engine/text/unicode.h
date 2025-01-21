@@ -29,3 +29,5 @@ void __cdecl utf8_string_to_wchar_string(const utf8* src, wchar_t* dst, int32 bu
 size_t utf8_string_length(const utf8* src, size_t size);
 
 bool __cdecl validate_wchar_characters(wchar_t* string);
+
+bool __cdecl wchar_has_double_pipe(wchar_t* string);
