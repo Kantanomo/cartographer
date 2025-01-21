@@ -639,6 +639,7 @@
     <ClCompile Include="Blam\Engine\interface\new_hud_draw.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_4way_signin.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_about_dialog.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_custom_game_map_select.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_custom_game_profile_select.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_error_dialog.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_audio_settings.cpp" />
@@ -650,6 +651,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_adapter.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_squad_browser.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_press_start_introduction.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_saved_game_file_actions.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_difficulty_select.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_level_select.cpp" />
@@ -938,6 +940,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screens_patches.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_4way_signin.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_about_dialog.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_custom_game_map_select.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_custom_game_profile_select.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_error_dialog.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_audio_settings.h" />
@@ -950,6 +953,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_adapter.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_squad_browser.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_press_start_introduction.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_saved_game_file_actions.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_difficulty_select.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_level_select.h" />

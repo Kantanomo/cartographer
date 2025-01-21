@@ -267,8 +267,62 @@ bool __cdecl saved_game_create_save_game_directory(e_saved_game_file_type type, 
 	return INVOKE(0x4333A, 0, saved_game_create_save_game_directory, type, out_string);
 }
 
+e_game_variant_description_index saved_game_type_to_variant_description(const e_saved_game_file_type type)
+{
+	switch (type)
+	{
+	case _saved_game_file_type_game_variant_slayer:
+		return _game_variant_description_slayer;
+	case _saved_game_file_type_game_variant_koth:
+		return _game_variant_description_king;
+	case _saved_game_file_type_game_variant_race:
+		return _game_variant_description_slayer; // todo: add race
+	case _saved_game_file_type_game_variant_oddball:
+		return _game_variant_description_oddball;
+	case _saved_game_file_type_game_variant_juggernaut:
+		return _game_variant_description_juggernaut;
+	case _saved_game_file_type_game_variant_headhunter:
+		return _game_variant_description_headhunter;
+	case _saved_game_file_type_game_variant_ctf:
+		return _game_variant_description_ctf;
+	case _saved_game_file_type_game_variant_assault:
+		return _game_variant_description_invasion;
+	case _saved_game_file_type_game_variant_territories:
+		return _game_variant_description_territories;
+	default:
+		return _game_variant_description_slayer;
+	}
+}
+
+e_saved_game_file_type saved_game_get_variant_file_type(const s_game_variant* variant)
+{
+	switch(variant->variant_game_engine_index)
+	{
+	case _game_engine_type_ctf:
+		return _saved_game_file_type_game_variant_ctf;
+	case _game_engine_type_slayer:
+		return _saved_game_file_type_game_variant_slayer;
+	case _game_engine_type_oddball:
+		return _saved_game_file_type_game_variant_oddball;
+	case _game_engine_type_koth:
+		return _saved_game_file_type_game_variant_koth;
+	case _game_engine_type_race:
+		return _saved_game_file_type_game_variant_race;
+	case _game_engine_type_headhunter:
+		return _saved_game_file_type_game_variant_headhunter;
+	case _game_engine_type_juggernaut:
+		return _saved_game_file_type_game_variant_juggernaut;
+	case _game_engine_type_territories:
+		return _saved_game_file_type_game_variant_territories;
+	case _game_engine_type_assault:
+		return _saved_game_file_type_game_variant_assault;
+	default:
+		return _saved_game_file_type_game_variant_slayer;
+	}
+}
+
 enumerated_file_index saved_game_create_file(e_saved_game_file_type type, e_controller_index originating_controller_index,
-	wchar_t* new_file_name)
+                                             wchar_t* new_file_name)
 {
 	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
 	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
@@ -356,36 +410,7 @@ enumerated_file_index saved_game_create_new_game_variant(e_controller_index orig
 	if (enumerated_file_index == NONE)
 		return NONE;
 
-	switch(type)
-	{
-		case _saved_game_file_type_game_variant_slayer:
-			game_variant_create_default_new(&new_variant, _game_variant_description_slayer);
-			break;
-		case _saved_game_file_type_game_variant_koth:
-			game_variant_create_default_new(&new_variant, _game_variant_description_king);
-			break;
-		case _saved_game_file_type_game_variant_race:
-			//game_variant_create_default_new(&new_variant, _game_variant_description_race);
-			break;
-		case _saved_game_file_type_game_variant_oddball:
-			game_variant_create_default_new(&new_variant, _game_variant_description_oddball);
-			break;
-		case _saved_game_file_type_game_variant_juggernaut:
-			game_variant_create_default_new(&new_variant, _game_variant_description_juggernaut);
-			break;
-		case _saved_game_file_type_game_variant_headhunter:
-			game_variant_create_default_new(&new_variant, _game_variant_description_headhunter);
-			break;
-		case _saved_game_file_type_game_variant_ctf:
-			game_variant_create_default_new(&new_variant, _game_variant_description_ctf);
-			break;
-		case _saved_game_file_type_game_variant_assault:
-			game_variant_create_default_new(&new_variant, _game_variant_description_invasion);
-			break;
-		case _saved_game_file_type_game_variant_territories:
-			game_variant_create_default_new(&new_variant, _game_variant_description_territories);
-			break;
-	}
+	game_variant_create_default_new(&new_variant, saved_game_type_to_variant_description(type));
 
 	new_variant.flags &= ~1u;
 

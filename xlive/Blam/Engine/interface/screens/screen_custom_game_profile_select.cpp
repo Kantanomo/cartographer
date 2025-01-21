@@ -1,9 +1,20 @@
 #include "stdafx.h"
 #include "screen_custom_game_profile_select.h"
 
+#include "screen_custom_game_map_select.h"
+#include "screen_error_dialog.h"
 #include "screen_game_engine_category.h"
+#include "screen_multiplayer_pregame_lobby.h"
+#include "screen_saved_game_file_actions.h"
+#include "screen_virtual_keyboard.h"
+#include "interface/user_interface_controller.h"
+#include "interface/user_interface_globals.h"
 #include "interface/user_interface_memory.h"
+#include "interface/user_interface_networking.h"
+#include "networking/logic/life_cycle_manager.h"
+#include "networking/session/network_session.h"
 #include "saved_games/saved_game_files.h"
+#include "text/unicode.h"
 
 #define create_game_engine_load_functions(name, save_type) \
 void* c_screen_custom_game_profile_select::load_##name##_settings(s_screen_parameters* parameters) { return load_settings(parameters, (save_type));  } \
@@ -22,7 +33,7 @@ c_custom_game_profile_list::c_custom_game_profile_list(int16 user_flags) :
 
 	this->save_game_type = _saved_game_file_type_game_variant_slayer;
 	this->unk_1 = NONE;
-	this->enumerated_file_index = NONE;
+	this->enumerated_index = NONE;
 	this->data_2[0] = 0;
 	this->data_2[1] = 0;
 	this->unk_bool = false;
@@ -33,7 +44,148 @@ c_custom_game_profile_list::c_custom_game_profile_list(int16 user_flags) :
 
 void c_custom_game_profile_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
 {
-	INVOKE_TYPE(0x251B7E, 0, void(__thiscall*)(c_custom_game_profile_list*, s_event_record**, datum*), this, pevent, pitem_index);
+	if (*pitem_index == NONE)
+		return;
+
+	s_saved_game_files_globals* files_globals = saved_game_files_globals_get();
+
+	ASSERT(files_globals);
+
+	s_custom_game_profile_list_item* selected_item = (s_custom_game_profile_list_item*)datum_get(this->m_list_data, *pitem_index);
+	s_game_variant variant{};
+
+
+	if(selected_item->enumerated_index != NONE && 
+		(!this->data_2[0] || !ENUMERATED_INDEX_IS_DEFAULT_SAVE(selected_item->enumerated_index)))
+	{
+		if(selected_item->unk_1 != NONE)
+		{
+			if(saved_game_load_game_variant(selected_item->enumerated_index, &variant))
+			{
+				if(this->data_2[0])
+				{
+					user_interface_set_variant(selected_item->enumerated_index, &variant);
+					s_screen_parameters params;
+					params.m_context = nullptr;
+					params.data_new(
+						0,
+						FLAG((*pevent)->controller),
+						_user_interface_channel_type_dialog,
+						_window_4,
+						c_screen_saved_game_file_actions::load_settings);
+
+					params.m_load_function(&params);
+
+					return;
+				}
+				if(this->data_2[1])
+				{
+					s_screen_parameters params;
+					params.m_context = nullptr;
+					params.data_new(
+						0,
+						FLAG((*pevent)->controller),
+						_user_interface_channel_type_gameshell_screen,
+						_window_4,
+						c_screen_custom_game_map_select::load_unused);
+
+					params.m_load_function(&params);
+
+					return;
+				}
+
+				c_network_session* network_session;
+				network_life_cycle_in_squad_session(&network_session);
+
+				if(!network_session->established() || ENUMERATED_INDEX_IS_DEFAULT_SAVE(selected_item->enumerated_index))
+				{
+					user_interface_game_settings_set_game_variant(&variant);
+				}
+				else
+				{
+					c_screen_multiplayer_pregame_lobby::globals_set_variant(&variant);
+					c_screen_multiplayer_pregame_lobby::globals_set_unk_flag(false);
+				}
+
+				if(this->unk_bool)
+				{
+					s_saved_game_player_profile* user_interface_profile = user_interface_globals_get_edit_player_profile();
+
+					if (ENUMERATED_INDEX_IS_DEFAULT_SAVE(selected_item->enumerated_index))
+						user_interface_profile->last_selected_file_index = selected_item->enumerated_index;
+					else
+						user_interface_profile->last_selected_file_index = NONE;
+
+					ustrncpy(user_interface_profile->last_selected_variant_name, variant.variant_name, NUMBEROF(variant.variant_name));
+
+					user_interface_globals_save_edit_profile_to_disk();
+
+					user_interface_profile->last_selected_variant_set = true;
+				}
+				user_interface_back_out_from_channel(this->get_parent_channel(), this->get_parent_render_window());
+				return;
+			}
+			this->data_3 = 1;
+		}
+		s_event_record* t_record = *pevent;
+		c_screen_custom_game_profile_select::set_global_enumerated_index(selected_item->enumerated_index);
+		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+			_user_interface_channel_type_game_error,
+			_window_4,
+			1 << ((*pevent)->controller),
+			nullptr, // todo: rewrite the mess of usercalls FO: 0x251578
+			_ui_error_confirm_corrupt_game_variant
+		);
+		return;
+	}
+
+	files_globals->saved_file_creation_result = _saved_gave_disk_result_success;
+
+	wchar_t saved_game_file_name[128]{};
+
+	if(saved_game_create_save_game_directory(this->save_game_type, saved_game_file_name))
+	{
+		 enumerated_file_index new_variant_index = saved_game_create_new_game_variant(
+			(*pevent)->controller,
+			this->save_game_type,
+			saved_game_file_name
+		);
+
+		if(new_variant_index == NONE)
+		{
+			user_interface_set_variant(new_variant_index, &variant);
+			s_game_variant* ui_variant = user_interface_get_variant();
+
+			user_interface_construct_default_game_variant_from_file_type(ui_variant, this->save_game_type);
+			ui_load_virtual_keyboard_variant(
+				(*pevent)->controller,
+				_vkbd_context_variant_name_entry,
+				saved_game_get_variant_file_type(ui_variant),
+				ui_variant->variant_name,
+				NUMBEROF(ui_variant->variant_name));
+			return;
+		}
+		else if(saved_game_load_game_variant(new_variant_index, &variant))
+		{
+			user_interface_set_variant(new_variant_index, &variant);
+			s_game_variant* ui_variant = user_interface_get_variant();
+
+			ui_variant->flags &= ~1u;
+
+			user_interface_construct_default_game_variant_from_file_type(ui_variant, this->save_game_type);
+			ui_load_virtual_keyboard_variant(
+				(*pevent)->controller,
+				_vkbd_context_variant_name_rename,
+				saved_game_get_variant_file_type(ui_variant),
+				ui_variant->variant_name,
+				NUMBEROF(ui_variant->variant_name));
+			return;
+		}
+	}
+
+	c_screen_error_dialog_ok::load_for_disk_result(this->m_controllers_mask, files_globals->saved_file_creation_result);
+
+	//INVOKE_TYPE(0x251B7E, 0, void(__thiscall*)(c_custom_game_profile_list*, s_event_record**, datum*), this, pevent, pitem_index);
 }
 
 int32 c_custom_game_profile_list::setup_children()
@@ -161,6 +313,11 @@ void* c_screen_custom_game_profile_select::load_unused(s_screen_parameters* para
 	}
 
 	return nullptr;
+}
+
+void c_screen_custom_game_profile_select::set_global_enumerated_index(enumerated_file_index enumerated_file_index)
+{
+	WriteValue(Memory::GetAddress(0x978E28), enumerated_file_index);
 }
 
 create_game_engine_load_functions(slayer, _saved_game_file_type_game_variant_slayer);
