@@ -103,6 +103,7 @@
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "interface/user_interface_networking.h"
 
 /* typedefs */
 
@@ -755,6 +756,7 @@ static void h2mod_apply_hooks(void)
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
 		game_variant_apply_patches();
+		user_interface_networking_apply_patches();
 	}
 	return;
 }
