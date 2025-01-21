@@ -1,5 +1,6 @@
 #pragma once
 #include "saved_games/game_variant.h"
+#include "saved_games/saved_game_files.h"
 
 /* enums */
 
@@ -385,6 +386,8 @@ void __cdecl user_interface_enter_game_shell(int32 context);
 
 void __cdecl user_interface_set_variant(enumerated_file_index enumerated_file_index, s_game_variant* variant);
 s_game_variant* __cdecl user_interface_get_variant();
+bool __cdecl user_interface_construct_default_game_variant_from_file_type(s_game_variant* out_variant, e_saved_game_file_type type);
+
 void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface_render_window render_window, rectangle2d* out_rect2d);
 
 void __cdecl user_interface_return_to_mainmenu(bool a1);

@@ -53,6 +53,11 @@ void* c_screen_error_dialog_ok::load_for_active_users(s_screen_parameters* param
 	return INVOKE(0x20E032, 0x0, c_screen_error_dialog_ok::load_for_active_users, parameters);
 }
 
+void c_screen_error_dialog_ok::load_for_disk_result(int16 controllers_mask, e_saved_game_disk_result disk_result)
+{
+	INVOKE_TYPE(0x209B0F, 0, void(__cdecl*)(int16, e_saved_game_disk_result), controllers_mask, disk_result);
+}
+
 void c_screen_error_dialog_ok::apply_patches()
 {
 	WritePointer(Memory::GetAddress(0x20E173) + 1, c_screen_error_dialog_ok::load_for_active_users);

@@ -205,6 +205,12 @@ void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_t
 	return virtual_keyboard;
 }
 
+void ui_load_virtual_keyboard_variant(e_controller_index controller_index, e_vkbd_context_type type,
+	e_saved_game_file_type save_type, wchar_t* text, uint32 text_size)
+{
+	return INVOKE(0x23CAB2, 0, ui_load_virtual_keyboard_variant, controller_index, type, save_type, text, text_size);
+}
+
 typedef bool(__thiscall* t_load_player_profile_edit)(c_screen_virtual_keyboard*);
 t_load_player_profile_edit p_load_player_profile_edit;
 
