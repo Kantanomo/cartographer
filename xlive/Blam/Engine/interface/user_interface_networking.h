@@ -11,6 +11,7 @@ enum e_session_protocol
 	_session_protocol_xbox_live_coop = 0x4,
 	_session_protocol_xbox_live_custom = 0x5,
 	_session_protocol_xbox_live_optimatch = 0x6,
+	_session_protocol_invalid = -1
 };
 
 /* forward declations*/
@@ -18,6 +19,8 @@ enum e_session_protocol
 struct s_game_variant;
 
 /* public methods */
+
+void __cdecl user_interface_networking_apply_patches();
 
 bool session_protocol_has_coop(e_session_protocol protocol);
 bool __cdecl user_interface_create_new_squad(bool a1, bool online);
