@@ -125,11 +125,11 @@ bool __cdecl user_interface_construct_default_game_variant_from_file_type(s_game
 		// requires creating a hard defined copy instance of the goof tag
 		// the tag that controls default variants.
 		game_variant_create_default_new(out_variant, variant_description);
-		return game_variant_validate(out_variant);
+		return game_variant_cleanup(out_variant);
 	}
 
 	game_variant_create_default_new(out_variant, _game_variant_description_slayer);
-	return game_variant_validate(out_variant);
+	return game_variant_cleanup(out_variant);
 }
 
 

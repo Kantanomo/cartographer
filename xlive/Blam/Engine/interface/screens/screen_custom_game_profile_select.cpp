@@ -185,7 +185,7 @@ void c_custom_game_profile_list::handle_item_pressed_event(s_event_record** peve
 
 	c_screen_error_dialog_ok::load_for_disk_result(this->m_controllers_mask, files_globals->saved_file_creation_result);
 
-	//INVOKE_TYPE(0x251B7E, 0, void(__thiscall*)(c_custom_game_profile_list*, s_event_record**, datum*), this, pevent, pitem_index);
+	INVOKE_TYPE(0x251B7E, 0, void(__thiscall*)(c_custom_game_profile_list*, s_event_record**, datum*), this, pevent, pitem_index);
 }
 
 void c_custom_game_profile_list::perform_save_type_search()

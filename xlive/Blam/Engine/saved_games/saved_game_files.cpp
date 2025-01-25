@@ -414,7 +414,7 @@ enumerated_file_index saved_game_create_new_game_variant(e_controller_index orig
 
 	new_variant.flags &= ~1u;
 
-	ASSERT(game_variant_validate(&new_variant));
+	ASSERT(game_variant_cleanup(&new_variant));
 	
 	wcsncpy(new_variant.variant_name, name, NUMBEROF(new_variant.variant_name));
 
@@ -438,7 +438,7 @@ bool __cdecl saved_game_load_game_variant(int32 enumerated_index, s_game_variant
 	if (!saved_games_async_helper_read_file(enumerated_index, (int8*)out_variant, sizeof(s_game_variant)))
 		return false;
 
-	bool validation_result = game_variant_validate(out_variant);
+	bool validation_result = game_variant_cleanup(out_variant);
 
 	ASSERT(validation_result);
 
