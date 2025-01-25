@@ -54,7 +54,7 @@ static_assert(sizeof(enumerated_file_index) == 4);
 #define k_kilo 1024
 #define k_unsigned_short_max 0xffff
 
-#define SIZEOF_BITS(value) (8 * sizeof(value))
+#define SIZEOF_BITS(value) (CHAR_BIT * sizeof(value))
 #define CHAR_BITS SIZEOF_BITS(int8)
 #define SHORT_BITS SIZEOF_BITS(int16)
 #define LONG_BITS SIZEOF_BITS(int32)
@@ -228,3 +228,16 @@ const char* csprintf(char* buffer, size_t size, const char* format, ...);
 * size_t max_count was added in vista to this function call
 */
 const char* csnprintf(char* buffer, size_t size, size_t max_count, const char* format, ...);
+
+constexpr uint32 bits_required_for(uint64 max_value)
+{
+	// minimum of 1 bit for 1 and 0
+
+	uint32 bits = 1;
+	while (max_value > 1)
+	{
+		max_value >>= 1;
+		++bits;
+	}
+	return bits;
+}

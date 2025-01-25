@@ -19,7 +19,8 @@ enum e_game_engine_type : int32
 	_game_engine_type_stub = 10,
 
 	k_game_engine_type_count,
-	k_game_engine_playable_types = 10
+	k_game_engine_playable_types = 10,
+	k_game_engine_type_bits_required = bits_required_for(k_game_engine_type_count - 1)
 };
 
 enum e_game_variant_description_index : int8
@@ -39,7 +40,11 @@ enum e_game_variant_description_index : int8
 	_game_variant_description_headhunter = 8,
 
 	k_game_variant_description_count,
-	k_game_variant_description_invalid = -1
+	k_game_variant_description_invalid = -1,
+
+	// todo: list all the mission game variant description indexes (over 100ish missing)
+	k_game_variant_description_bits_required = 7
+	//k_game_variant_description_bits_required = bits_required_for(k_game_variant_description_count - 1)
 };
 
 enum e_game_engine_flags : int32
@@ -59,9 +64,10 @@ enum e_game_engine_flags : int32
 	_game_engine_extra_damage_bit = 12,
 	_game_engine_damage_resistant_bit = 13,
 	_game_engine_force_even_teams_bit = 14,
-	k_game_engine_flags_count,
 
-	k_game_engine_flags_clear_unused_bits = (_game_engine_force_even_teams_bit | _game_engine_damage_resistant_bit | _game_engine_extra_damage_bit | _game_engine_starting_grenades_bit | _game_engine_grenades_on_map_bit | _game_engine_invisibility_on_map_bit | _game_engine_overshields_on_map_bit | _game_engine_friendly_fire_bit | _game_engine_changing_teams_bit | _game_engine_observers_bit | _game_engine_tie_resolution_bit | _game_engine_round_switch_resets_map_bit | _game_engine_always_invisible_bit | _game_engine_motion_sensor_bit | _game_engine_teams_bit)
+	k_game_engine_flags_count,
+	k_game_engine_flags_clear_unused_bits = FLAG(_game_engine_force_even_teams_bit | _game_engine_damage_resistant_bit | _game_engine_extra_damage_bit | _game_engine_starting_grenades_bit | _game_engine_grenades_on_map_bit | _game_engine_invisibility_on_map_bit | _game_engine_overshields_on_map_bit | _game_engine_friendly_fire_bit | _game_engine_changing_teams_bit | _game_engine_observers_bit | _game_engine_tie_resolution_bit | _game_engine_round_switch_resets_map_bit | _game_engine_always_invisible_bit | _game_engine_motion_sensor_bit | _game_engine_teams_bit),
+	k_game_engine_flags_bits_required = bits_required_for(FLAG(k_game_engine_flags_count - 1))
 };
 
 enum e_game_engine_round_setting
@@ -73,6 +79,9 @@ enum e_game_engine_round_setting
 	_game_engine_round_setting_first_to_2_rounds = 4,
 	_game_engine_round_setting_first_to_3_rounds = 5,
 	_game_engine_round_setting_first_to_4_rounds = 6,
+
+	k_game_engine_round_setting_count,
+	k_game_engine_round_setting_bits_required = bits_required_for(k_game_engine_round_setting_count - 1)
 };
 
 enum e_game_engine_join_in_progress
@@ -80,6 +89,9 @@ enum e_game_engine_join_in_progress
 	_game_engine_join_in_progress_on = 0,
 	_game_engine_join_in_progress_uneven = 1,
 	_game_engine_join_in_progress_off = 2,
+
+	k_game_engine_join_in_progress_count,
+	k_game_engine_join_in_progress_bits_required = bits_required_for(k_game_engine_join_in_progress_count - 1)
 };
 
 enum e_game_engine_shield_setting
@@ -87,6 +99,9 @@ enum e_game_engine_shield_setting
 	_game_engine_shield_normal = 0,
 	_game_engine_shield_off = 1,
 	_game_engine_shield_supershield = 2,
+
+	k_game_engine_shield_setting_count,
+	k_game_engine_shield_setting_bits_required = bits_required_for(k_game_engine_shield_setting_count - 1)
 };
 
 enum e_game_engine_team_score
@@ -94,6 +109,9 @@ enum e_game_engine_team_score
 	_game_engine_team_score_sum = 0,
 	_game_engine_team_score_min = 1,
 	_game_engine_team_score_max = 2,
+
+	k_game_engine_team_score_count,
+	k_game_engine_team_score_bits_required = bits_required_for(k_game_engine_team_score_count - 1)
 };
 
 enum e_game_engine_team_respawn
@@ -101,6 +119,9 @@ enum e_game_engine_team_respawn
 	_game_engine_team_respawn_inheritance = 0,
 	_game_engine_team_respawn_cycling = 1,
 	_game_engine_team_respawn_standard = 2,
+
+	k_game_engine_team_respawn_count,
+	k_game_engine_team_respawn_bits_required = bits_required_for(k_game_engine_team_respawn_count - 1)
 };
 
 enum e_game_engine_respawn_setting : int8
@@ -109,6 +130,9 @@ enum e_game_engine_respawn_setting : int8
 	_game_engine_respawn_setting_off = 1,
 	_game_engine_respawn_setting_half = 2,
 	_game_engine_respawn_setting_double = 3,
+
+	k_game_engine_respawn_setting_count,
+	k_game_engine_respawn_setting_bits_required = bits_required_for(k_game_engine_respawn_setting_count - 1)
 };
 
 enum e_game_engine_light_land_vehicle : int8
@@ -121,6 +145,9 @@ enum e_game_engine_light_land_vehicle : int8
 	_game_engine_light_land_vehicle_shadow = 5,
 	_game_engine_light_land_vehicle_random = 6,
 	_game_engine_light_land_vehicle_none = 7,
+
+	k_game_engine_light_land_vehicle_count,
+	k_game_engine_light_land_vehicle_bits_required = bits_required_for(k_game_engine_light_land_vehicle_count - 1)
 };
 
 enum e_game_engine_heavy_land_vehicle : int8
@@ -130,6 +157,9 @@ enum e_game_engine_heavy_land_vehicle : int8
 	_game_engine_heavy_land_vehicle_wraith = 2,
 	_game_engine_heavy_land_vehicle_random = 3,
 	_game_engine_heavy_land_vehicle_none = 4,
+
+	k_game_engine_heavy_land_vehicle_count,
+	k_game_engine_heavy_land_vehicle_bits_required = bits_required_for(k_game_engine_heavy_land_vehicle_count - 1)
 };
 
 enum e_game_engine_flying_vehicle : int8
@@ -139,6 +169,9 @@ enum e_game_engine_flying_vehicle : int8
 	_game_engine_flying_vehicle_falcon = 2,
 	_game_engine_flying_vehicle_random = 3,
 	_game_engine_flying_vehicle_none = 4,
+
+	k_game_engine_flying_vehicle_count,
+	k_game_engine_flying_vehicle_bits_required = bits_required_for(k_game_engine_flying_vehicle_count - 1)
 };
 
 enum e_game_engine_turret_vehicle : int8
@@ -150,6 +183,9 @@ enum e_game_engine_turret_vehicle : int8
 	_game_engine_turret_vehicle_covenant_av = 4,
 	_game_engine_turret_vehicle_random = 5,
 	_game_engine_turret_vehicle_none = 6,
+
+	k_game_engine_turret_vehicle_count,
+	k_game_engine_turret_vehicle_bits_required = bits_required_for(k_game_engine_turret_vehicle_count - 1)
 };
 
 enum e_game_engine_weapon_set : int8
@@ -174,6 +210,9 @@ enum e_game_engine_weapon_set : int8
 	_game_engine_weapon_set_covenant = 17,
 	_game_engine_weapon_set_sentinel = 18,
 	_game_engine_weapon_set_random = 19,
+
+	k_game_engine_weapon_set_count,
+	k_game_engine_weapon_set_bits_required = bits_required_for(k_game_engine_weapon_set_count - 1)
 };
 
 enum e_game_engine_starting_weapon : int8
@@ -197,6 +236,9 @@ enum e_game_engine_starting_weapon : int8
 	_game_engine_starting_weapon_fuel_rod_gun = 16,
 	_game_engine_starting_weapon_plasma_sword = 17,
 	_game_engine_starting_weapon_brute_plasma = 18,
+
+	k_game_engine_starting_weapon_count,
+	k_game_engine_starting_weapon_bits_required = bits_required_for(k_game_engine_starting_weapon_count - 1)
 };
 
 enum e_ctf_engine_player_speed
@@ -204,6 +246,9 @@ enum e_ctf_engine_player_speed
 	_ctf_engine_player_speed_slow = 0,
 	_ctf_engine_player_speed_normal = 1,
 	_ctf_engine_player_speed_fast = 2,
+
+	k_ctf_engine_player_speed_count,
+	k_ctf_engine_player_speed_bits_required = bits_required_for(k_ctf_engine_player_speed_count - 1)
 };
 
 enum e_oddball_player_speed : uint16
@@ -211,13 +256,20 @@ enum e_oddball_player_speed : uint16
 	_oddball_engine_player_speed_slow = 0,
 	_oddball_engine_player_speed_normal = 1,
 	_oddball_engine_player_speed_fast = 2,
+
+	k_oddball_player_speed_count,
+	k_oddball_player_speed_bits_required = bits_required_for(k_oddball_player_speed_count - 1)
 };
 
 enum e_game_engine_weapon_hit
 {
 	_game_engine_multiplayer_weapon_hit_extra_damage = 0,
 	_game_engine_multiplayer_weapon_hit_normal_damage = 1,
+
+	k_game_engine_weapon_hit_count,
+	k_game_engine_weapon_hit_bits_required = bits_required_for(k_game_engine_weapon_hit_count - 1)
 };
+
 
 enum e_slayer_engine_flags : uint32
 {
@@ -226,7 +278,9 @@ enum e_slayer_engine_flags : uint32
 	_slayer_engine_death_point_loss_bit = 2,
 
 	k_slayer_engine_flags_count,
-	k_slayer_engine_clear_unused_bits_mask = (_slayer_engine_death_point_loss_bit | _slayer_engine_suicide_point_loss_bit | _slayer_engine_bonus_points_bit)
+	k_slayer_engine_flags_bits_required = bits_required_for(FLAG(k_slayer_engine_flags_count - 1)),
+
+	k_slayer_engine_clear_all_bits_mask = FLAG(_slayer_engine_death_point_loss_bit | _slayer_engine_suicide_point_loss_bit | _slayer_engine_bonus_points_bit)
 };
 
 enum e_ctf_game_type
@@ -234,14 +288,20 @@ enum e_ctf_game_type
 	_ctf_game_type_multi_flag = 0,
 	_ctf_game_type_single_flag = 1,
 	_ctf_game_type_neutral_flag = 2,
+
+	k_ctf_game_type_count,
+	k_ctf_game_type_bits_required = bits_required_for(k_ctf_game_type_count - 1)
 };
 
-enum e_ctf_engine_home_flag_waypoint_flags
+enum e_ctf_engine_home_flag_waypoint_type
 {
 	_ctf_engine_home_flag_waypoint_neutral = 0,
 	_ctf_engine_home_flag_waypoint_on = 1,
 	_ctf_engine_home_flag_waypoint_away_from_home = 2,
 	_ctf_engine_home_flag_waypoint_off = 3,
+
+	k_ctf_engine_home_flag_waypoint_type_count,
+	k_ctf_engine_home_flag_waypoint_type_bits_required = bits_required_for(k_ctf_engine_home_flag_waypoint_type_count - 1)
 };
 
 enum e_ctf_engine_enemy_bomb_waypoint_type : uint32
@@ -250,6 +310,9 @@ enum e_ctf_engine_enemy_bomb_waypoint_type : uint32
 	_ctf_engine_enemy_bomb_waypoint_uncontrolled = 1,
 	_ctf_engine_enemy_bomb_waypoint_armed = 2,
 	_ctf_engine_enemy_bomb_waypoint_off = 3,
+
+	k_ctf_engine_enemy_bomb_waypoint_type_count,
+	k_ctf_engine_enemy_bomb_waypoint_type_bits_required = bits_required_for(k_ctf_engine_enemy_bomb_waypoint_type_count - 1)
 };
 
 enum e_ctf_engine_flags : int8
@@ -261,7 +324,9 @@ enum e_ctf_engine_flags : int8
 	_ctf_engine_sticky_arming_bit = 5,
 	_ctf_engine_carriers_damage_resistant_bit = 6,
 	_ctf_engine_carriers_invisible_bit = 7,
-	k_ctf_engine_flags_count
+
+	k_ctf_engine_flags_count,
+	k_ctf_engine_flags_bits_required = CHAR_BITS
 };
 
 enum e_oddball_engine_waypoint_type
@@ -270,6 +335,9 @@ enum e_oddball_engine_waypoint_type
 	_oddball_waypoint_type_neutral = 1,
 	_oddball_waypoint_type_team_control = 2,
 	_oddball_waypoint_type_off = 3,
+
+	k_oddball_waypoint_type_count,
+	k_oddball_waypoint_type_bits_required = bits_required_for(k_oddball_waypoint_type_count - 1)
 };
 
 enum e_king_engine_flags : uint32
@@ -281,7 +349,9 @@ enum e_king_engine_flags : uint32
 	_king_engine_invis_on_hill_bit = 4,
 
 	k_king_engine_flags_count,
-	k_king_engine_clear_unused_bits_mask = (_king_engine_invis_on_hill_bit | _king_engine_damage_resistance_on_hill_bit | _king_engine_extra_damage_on_hill_bit | _king_engine_team_multiplier_bit | _king_engine_uncontested_hill_to_score_bit)
+	k_king_engine_flags_bits_required = bits_required_for(FLAG(k_king_engine_flags_count - 1)),
+
+	k_king_engine_clear_unused_bits_mask = FLAG(_king_engine_invis_on_hill_bit | _king_engine_damage_resistance_on_hill_bit | _king_engine_extra_damage_on_hill_bit | _king_engine_team_multiplier_bit | _king_engine_uncontested_hill_to_score_bit)
 };
 
 enum e_oddball_engine_flags : uint32
@@ -291,7 +361,8 @@ enum e_oddball_engine_flags : uint32
 	_oddball_engine_carriers_damage_resistance_bit = 2,
 
 	k_oddball_engine_flags_count,
-	k_oddball_engine_clear_unused_bits_mask = (_oddball_engine_carriers_damage_resistance_bit | _oddball_engine_carriers_always_invis_bit | _oddball_engine_carriers_can_drive_and_gun_bit)
+	k_oddball_engine_flags_bits_required = bits_required_for(FLAG(k_oddball_engine_flags_count - 1)),
+	k_oddball_engine_clear_unused_bits_mask = FLAG(_oddball_engine_carriers_damage_resistance_bit | _oddball_engine_carriers_always_invis_bit | _oddball_engine_carriers_can_drive_and_gun_bit)
 };
 
 enum e_juggernaut_engine_flags
@@ -305,7 +376,8 @@ enum e_juggernaut_engine_flags
 	_juggernaut_is_damage_resistant_bit = 6,
 
 	k_juggernaut_engine_flags_count,
-	k_juggernaut_engine_clear_unused_bits_mask = (_juggernaut_is_damage_resistant_bit | _juggernaut_has_infinite_ammo_bit | _juggernaut_does_extra_damage_bit | _juggernaut_betrayal_point_loss_bit | _juggernaut_has_active_camo_bit | _juggernaut_has_supershield_bit | _juggernaut_has_motion_sensor_bit)
+	k_juggernaut_engine_flags_bits_required = bits_required_for(FLAG(k_juggernaut_engine_flags_count - 1)),
+	k_juggernaut_engine_clear_unused_bits_mask = FLAG(_juggernaut_is_damage_resistant_bit | _juggernaut_has_infinite_ammo_bit | _juggernaut_does_extra_damage_bit | _juggernaut_betrayal_point_loss_bit | _juggernaut_has_active_camo_bit | _juggernaut_has_supershield_bit | _juggernaut_has_motion_sensor_bit)
 };
 
 struct s_variant_description_map
@@ -320,7 +392,7 @@ struct s_ctf_variant_settings
 	uint32 flag_reset_time; // in seconds
 	e_ctf_engine_player_speed speed_with_flag;
 	e_game_engine_weapon_hit flag_hit_damage;
-	e_ctf_engine_enemy_bomb_waypoint_type waypoint_flags;
+	e_ctf_engine_enemy_bomb_waypoint_type waypoint_type;
 	e_ctf_game_type game_type;
 	uint16 bomb_arming_time;
 	uint16 bomb_fuse_time;
@@ -437,4 +509,6 @@ s_game_variant* get_game_variant(void);
 
 void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_variant_description_index game_variant_type);
 
-bool __cdecl game_variant_validate(s_game_variant* variant);
+bool __cdecl game_variant_cleanup(s_game_variant* variant);
+
+bool __cdecl game_variant_is_valid(s_game_variant* variant);

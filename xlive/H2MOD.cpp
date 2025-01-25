@@ -102,6 +102,7 @@
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "interface/user_interface_networking.h"
+#include "networking/network_game_definitions.h"
 
 bool H2XFirerateEnabled = false;
 bool g_xbox_tickrate_enabled = false;
@@ -1015,6 +1016,7 @@ void H2MOD::ApplyHooks() {
 	bitstream_serialization_apply_patches();
 	
 	network_memory_apply_patches();
+	network_game_definitions_apply_patches();
 
 	simulation_apply_patches();
 	simulation_players_apply_patches();
