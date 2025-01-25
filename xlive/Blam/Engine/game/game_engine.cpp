@@ -5,12 +5,16 @@
 
 void game_engine_apply_patches()
 {
-	test_replace_game_engine_mode(_game_engine_type_headhunter, g_test_engine_ptr);
+	test_replace_game_engine_mode(_game_engine_type_headhunter, &g_slayer_engine);
 }
 
 c_game_engine* current_game_engine(void)
 {
-	return get_game_mode_engines()[game_engine_globals_get()->game_engine_index];
+	s_game_engine_globals* game_engine_globals = game_engine_globals_get();
+
+	ASSERT(game_engine_globals);
+
+	return get_game_mode_engines()[game_engine_globals->game_engine_index];
 }
 
 s_game_engine_globals* game_engine_globals_get(void)

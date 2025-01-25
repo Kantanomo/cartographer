@@ -325,16 +325,16 @@ void game_info_initialize_for_new_map(s_game_options* options)
 	game_globals->options = *options;
 	game_globals->options.load_level_only = false;
 
-	if (game_is_multiplayer() || game_globals->options.game_variant.variant_game_engine_index)
-	{
-		game_engine_variant_cleanup(&game_globals->options.game_variant.flags);
-	}
-	random_math_set_seed(game_globals->options.random_seed);
-	game_globals->game_is_lost = false;
-	game_globals->game_is_finished = false;
-	game_globals->pvs_object_is_set = 0;
-	game_globals->game_ragdoll_count = 0;
-	return;
+    if (game_is_multiplayer() || game_globals->options.game_variant.variant_game_engine_index)
+    {
+        game_variant_cleanup(&game_globals->options.game_variant);
+    }
+    random_math_set_seed(game_globals->options.random_seed);
+    game_globals->game_is_lost = false;
+    game_globals->game_is_finished = false;
+    game_globals->pvs_object_is_set = 0;
+    game_globals->game_ragdoll_count = 0;
+    return;
 }
 
 void __cdecl game_initialize_for_new_map(s_game_options* options)

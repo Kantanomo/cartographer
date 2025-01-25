@@ -1032,6 +1032,7 @@
     <ClCompile Include="Blam\Engine\networking\messages\network_message_gateway.cpp" />
     <ClCompile Include="Blam\Engine\networking\messages\network_message_handler.cpp" />
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_game_definitions.cpp" />
     <ClCompile Include="Blam\Engine\networking\delivery\network_link.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_utilities.cpp" />
@@ -1724,6 +1725,7 @@
     <ClInclude Include="Blam\Engine\networking\messages\network_message_gateway.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_message_handler.h" />
     <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
+    <ClInclude Include="Blam\Engine\networking\network_game_definitions.h" />
     <ClInclude Include="Blam\Engine\networking\network_statistics.h" />
     <ClInclude Include="Blam\Engine\networking\network_utilities.h" />
     <ClInclude Include="Blam\Engine\Networking\online\online_account_xbox.h" />

@@ -451,6 +451,7 @@
     <ClCompile Include="Blam\Engine\filesys\pc_saved_game.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_saved_game_file_actions.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_custom_game_map_select.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_game_definitions.cpp" />
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
@@ -1937,6 +1938,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager_strings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_saved_game_file_actions.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_custom_game_map_select.h" />
+    <ClInclude Include="Blam\Engine\networking\network_game_definitions.h" />
     <ClInclude Include="Blam\Engine\items\projectiles.h" />
     <ClInclude Include="Blam\Engine\objects\object_location.h" />
     <ClInclude Include="Blam\Engine\game\player_constants.h" />

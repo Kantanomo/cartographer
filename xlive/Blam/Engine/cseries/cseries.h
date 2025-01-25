@@ -60,7 +60,7 @@ enum
 	k_unsigned_short_max = 0xffff
 };
 
-#define SIZEOF_BITS(value) (8 * sizeof(value))
+#define SIZEOF_BITS(value) (CHAR_BIT * sizeof(value))
 #define CHAR_BITS SIZEOF_BITS(int8)
 #define SHORT_BITS SIZEOF_BITS(int16)
 #define LONG_BITS SIZEOF_BITS(int32)
@@ -253,3 +253,16 @@ char* csstrnupr(char* s, size_t size);
 int32 csstricmp(const char* s1, const char* s2);
 
 int32 csstrncmp(const char* s1, const char* s2, size_t size);
+
+constexpr uint32 bits_required_for(uint64 max_value)
+{
+	// minimum of 1 bit for 1 and 0
+
+	uint32 bits = 1;
+	while (max_value > 1)
+	{
+		max_value >>= 1;
+		++bits;
+	}
+	return bits;
+}

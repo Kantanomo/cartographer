@@ -21,7 +21,7 @@ t_game_variant_validate p_game_variant_validate;
 void game_variant_apply_patches()
 {
 	DETOUR_ATTACH(p_game_variant_create_default_new, Memory::GetAddress<t_game_variant_create_default_new>(0x5B33D), game_variant_create_default_new);
-	DETOUR_ATTACH(p_game_variant_validate, Memory::GetAddress<t_game_variant_validate>(0x5B720), game_variant_validate);
+	DETOUR_ATTACH(p_game_variant_validate, Memory::GetAddress<t_game_variant_validate>(0x5B720), game_variant_cleanup);
 }
 
 s_game_variant* get_game_variant(void)
@@ -76,8 +76,14 @@ void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_var
 		}
     }
 }
-bool __cdecl game_variant_validate(s_game_variant* variant)
+bool __cdecl game_variant_cleanup(s_game_variant* variant)
 {
+	// todo: fix this, so it can just be the rewritten function its 1-1 rewrite but for some reason doesn't work.
+	// all default saves just end up going under slayer??
+
+	if(variant->variant_game_engine_index != _game_engine_type_headhunter)
+		return p_game_variant_validate(variant);
+
 	s_game_variant base_variant{};
 
 	memcpy(&base_variant, variant, sizeof(s_game_variant));
@@ -126,7 +132,7 @@ bool __cdecl game_variant_validate(s_game_variant* variant)
 		{
 		case _game_engine_type_slayer:
 			{
-				variant->game_engine_variant.slayer.flags.set_unsafe(variant->game_engine_variant.slayer.flags.get_unsafe() & k_slayer_engine_clear_unused_bits_mask);
+				variant->game_engine_variant.slayer.flags.set_unsafe(variant->game_engine_variant.slayer.flags.get_unsafe() & k_slayer_engine_clear_all_bits_mask);
 				break;
 			}
 		case _game_engine_type_oddball:
@@ -172,7 +178,7 @@ bool __cdecl game_variant_validate(s_game_variant* variant)
 				variant_setting_pin(variant->game_engine_variant.ctf.flag_reset_time, 0, SHRT_MAX);
 				variant_setting_pin(variant->game_engine_variant.ctf.speed_with_flag, _ctf_engine_player_speed_slow, _ctf_engine_player_speed_fast);
 				variant_setting_pin(variant->game_engine_variant.ctf.flag_hit_damage, _game_engine_multiplayer_weapon_hit_extra_damage, _game_engine_multiplayer_weapon_hit_normal_damage);
-				variant_setting_pin(variant->game_engine_variant.ctf.waypoint_flags, _ctf_engine_enemy_bomb_waypoint_always_on, _ctf_engine_enemy_bomb_waypoint_off);
+				variant_setting_pin(variant->game_engine_variant.ctf.waypoint_type, _ctf_engine_enemy_bomb_waypoint_always_on, _ctf_engine_enemy_bomb_waypoint_off);
 				variant_setting_pin(variant->game_engine_variant.ctf.game_type, _ctf_game_type_multi_flag, _ctf_game_type_single_flag);
 				break;
 			}
@@ -189,10 +195,10 @@ bool __cdecl game_variant_validate(s_game_variant* variant)
 	}
 
 	variant->unk = 0;
-	
+
+	bool k = validate_wchar_characters(variant->variant_name);
 	if (!memcmp(&base_variant, variant, sizeof(s_game_variant)) )
-		if(validate_wchar_characters(variant->variant_name))
-		return true;
+		return k;
 
 	memset(&base_variant, 0, sizeof(s_game_variant));
 
@@ -223,7 +229,15 @@ bool __cdecl game_variant_validate(s_game_variant* variant)
 	memcpy(variant, &base_variant, sizeof(s_game_variant));
 	return false;
 
-    //return INVOKE(0x5B720, 0x3D380, game_variant_validate, variant);
+    //return INVOKE(0x5B720, 0x3D380, game_variant_cleanup, variant);
+}
+
+bool game_variant_is_valid(s_game_variant* variant)
+{
+	s_game_variant temporary_variant{};
+	csmemcpy(&temporary_variant, variant, sizeof(s_game_variant));
+
+	return game_variant_cleanup(variant);
 }
 
 #undef variant_setting_pin
