@@ -33,6 +33,14 @@ static c_oddball_engine g_oddball_engine;
 static c_game_engine* g_test_engine_ptr = &g_test_engine;
 /* enums */
 
+enum e_network_game_simulation_protocol
+{
+	_network_game_simulation_protocol_offline = 0,
+	_network_game_simulation_protocol_synchronous = 1,
+	_network_game_simulation_protocol_distributed = 2,
+	k_network_game_simulation_protocol_count = 3,
+};
+
 enum e_game_engine_timer_type
 {
 
@@ -393,3 +401,5 @@ bool game_engine_in_round();
 c_game_engine** get_game_mode_engines();
 
 void test_replace_game_engine_mode(e_game_engine_type type, c_game_engine* engine);
+
+e_network_game_simulation_protocol game_engine_get_simulation_protocol(s_game_variant* variant);

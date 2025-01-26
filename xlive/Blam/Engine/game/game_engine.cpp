@@ -5,6 +5,9 @@
 
 void game_engine_apply_patches()
 {
+	// todo: server offset
+	PatchCall(Memory::GetAddress(0x1B1E38), game_engine_get_simulation_protocol);
+
 	test_replace_game_engine_mode(_game_engine_type_headhunter, &g_slayer_engine);
 }
 
@@ -35,6 +38,16 @@ c_game_engine** get_game_mode_engines()
 void test_replace_game_engine_mode(e_game_engine_type type, c_game_engine* engine)
 {
 	Memory::GetAddress<c_game_engine**>(0x4D8548, 0x4F3CE4)[type] = engine;
+}
+
+e_network_game_simulation_protocol game_engine_get_simulation_protocol(s_game_variant* variant)
+{
+	e_network_game_simulation_protocol result = _network_game_simulation_protocol_synchronous;
+
+	if (IN_RANGE(variant->variant_game_engine_index, _game_engine_type_ctf, k_game_engine_playable_types))
+		result = _network_game_simulation_protocol_distributed;
+
+	return result;
 }
 
 c_game_engine* get_slayer_engine()
