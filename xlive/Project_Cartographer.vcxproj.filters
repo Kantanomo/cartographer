@@ -463,6 +463,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_saved_game_file_actions.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_custom_game_map_select.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_game_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_search_option_variant_menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1931,6 +1932,8 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_saved_game_file_actions.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_custom_game_map_select.h" />
     <ClInclude Include="Blam\Engine\networking\network_game_definitions.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_search_option_variant_menu.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
