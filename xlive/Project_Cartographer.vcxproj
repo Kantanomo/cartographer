@@ -941,6 +941,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_squad_browser.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_press_start_introduction.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_saved_game_file_actions.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_search_option_variant_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_resolution.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_restore_video_defaults.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_safe_area_setting.cpp" />
@@ -1345,6 +1346,7 @@
     <ClInclude Include="Blam\Engine\interface\interface.h" />
     <ClInclude Include="Blam\Engine\interface\meter_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\motion_sensor.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_draw.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screens_patches.h" />
@@ -1373,6 +1375,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_squad_browser.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_press_start_introduction.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_saved_game_file_actions.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_search_option_variant_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_resolution.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_restore_video_defaults.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_safe_area_setting.h" />
