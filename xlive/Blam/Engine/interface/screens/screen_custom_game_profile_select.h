@@ -90,3 +90,4 @@ public:
 ASSERT_STRUCT_SIZE(c_screen_custom_game_profile_select, 21648);
 
 #undef create_game_engine_functions
+

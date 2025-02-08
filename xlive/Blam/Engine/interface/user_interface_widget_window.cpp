@@ -199,6 +199,7 @@ void* c_screen_widget::sub_60EC5C(s_screen_state* state)
 
 void c_screen_widget::sub_60ECC9(s_screen_state* state)
 {
+
 	INVOKE_TYPE(0x20ECC9, 0x0, void(__thiscall*)(c_screen_widget*, s_screen_state*), this, state);
 }
 
