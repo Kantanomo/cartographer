@@ -19,9 +19,8 @@ enum e_biped_flags : uint32
 
 };
 
-struct biped_datum
+struct _biped_datum
 {
-	unit_datum unit;
 	e_biped_flags biped_flags;
 	int8 gap364[124];
 	bool field_3E0;
@@ -31,7 +30,17 @@ struct biped_datum
 	e_biped_physics_mode biped_movement_type;
 	int8 gap1[139];
 };
+
+struct biped_datum
+{
+	datum definition_index;
+	_object_datum object;
+	_unit_datum unit;
+	_biped_datum biped;
+};
 ASSERT_STRUCT_SIZE(biped_datum, 0x480);
+
+/* prototypes */
 
 void bipeds_apply_patches(void);
 

@@ -83,25 +83,23 @@ struct unit_control_data
 	uint8 field_9;
 	uint16 grenade_index;
 	uint16 zoom_level;
-	char gap_E[2];
+	int8 gap_E[2];
 	int64 control_flags;
 	real_vector3d throttle;
-	float trigger;
-	float secondary_trigger;
-	real_vector3d desired_facing;
-	real_vector3d desired_aiming;
-	real_vector3d desired_looking;
+	real32 primary_trigger;
+	real32 secondary_trigger;
+	real_vector3d facing_vector;
+	real_vector3d aiming_vector;
+	real_vector3d looking_vector;
 	int32 field_50;
 	int32 field_54;
 	int32 field_58;
 	s_aim_assist_targeting_result target_info;
-
 };
 ASSERT_STRUCT_SIZE(unit_control_data, 0x80);
 
-struct unit_datum
+struct _unit_datum
 {
-	object_datum object;
 	int8 gap_12C[4];
 	datum actor_datum;
 	datum simulation_actor_index;
@@ -114,20 +112,18 @@ struct unit_datum
 	c_flags_no_init<e_unit_control_flags, uint32, k_unit_control_flags_count> control_flags;
 	uint32 control_flags_2;
 	string_id animation_state;
-	real_vector3d desired_facing;
-	real_vector3d desired_aiming;
+	real_vector3d desired_facing_vector;
+	real_vector3d desired_aiming_vector;
 	real_vector3d aiming_vector;
-	real_vector3d aiming_vector_velocity;
-	real_vector3d desired_looking;
+	real_vector3d aiming_velocity;
+	real_vector3d desired_looking_vector;
 	real_vector3d looking_vector;
-	real_vector3d looking_vector_velocity;
-	int32 field_1B0;
-	int32 field_1B4;
-	int32 field_1B8;
+	real_vector3d looking_velocity;
+	real_vector3d throttle;
 	real_vector3d vector_1BC;
 	int8 aiming_speed;
 	int8 gap_1C9[3];
-	real32 trigger;
+	real32 primary_trigger;
 	real32 secondary_trigger;
 	s_aim_assist_targeting_result target_info;
 	int32 field_1F8;
@@ -144,16 +140,16 @@ struct unit_datum
 	int16 parent_seat_index;
 	int8 gap_212[10];
 	real32 mouth_aperture;
-	int8 gap_220[4];
+	int32 last_entrance_attempt;
 	uint16 field_224;
 	int8 weapon_indices[2];
 	uint16 weapon_set_identifier;
 	int8 weapon_slots[2];
-	datum inventory[4];
-	int8 gap_23C[16];
-	datum item_index;
-	int8 grenade_type;
+	datum weapon_object_indices[4];
+	int32 weapon_last_used_at_game_time[4];
+	datum equipment_object_index;
 	int8 current_grenade_index;
+	int8 desired_grenade_index;
 	int8 grenade_counts[k_unit_grenade_types_count];
 	int8 zoom_level;
 	int8 gap_255;
@@ -201,6 +197,13 @@ struct unit_datum
 	object_header_block_reference udlg_block;
 	object_header_block_reference object_header_358;
 	int32 field_35C;
+};
+
+struct unit_datum
+{
+	datum definition_index;
+	_object_datum object;
+	_unit_datum unit;
 };
 ASSERT_STRUCT_SIZE(unit_datum, 864);
 

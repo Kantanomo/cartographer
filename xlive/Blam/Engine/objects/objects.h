@@ -122,9 +122,8 @@ struct object_attachment
 };
 ASSERT_STRUCT_SIZE(object_attachment, 8);
 
-struct object_datum
+struct _object_datum
 {
-	datum tag_definition_index;
 	c_flags_no_init<e_object_data_flags, uint32, k_object_data_flags_count> flags;
 	void* object_header_block;
 	datum next_index;
@@ -196,6 +195,12 @@ struct object_datum
 	object_header_block_reference damage_sections_block;
 	object_header_block_reference change_color_block;
 	object_header_block_reference animation_manager_block;
+};
+
+struct object_datum
+{
+	datum definition_index;
+	_object_datum object;
 };
 ASSERT_STRUCT_SIZE(object_datum, 300);
 

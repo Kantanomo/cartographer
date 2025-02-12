@@ -24,7 +24,7 @@ void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index,
 		// If object is a unit then we can grab the actor index
 		if (TEST_BIT(_object_mask_unit, header->type))
 		{
-			actor_index = object_get_fast_unsafe<unit_datum>(damage_data->owner.owner_object_index)->actor_datum;
+			actor_index = object_get_fast_unsafe<unit_datum>(damage_data->owner.owner_object_index)->unit.actor_datum;
 		}
 	}
 

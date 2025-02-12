@@ -20,11 +20,10 @@ struct s_weapon_magazine
 };
 ASSERT_STRUCT_SIZE(s_weapon_magazine, 16);
 
-struct weapon_datum
+struct _weapon_datum
 {
-	s_item_data_definition item;
 	int16 weapon_flags;
-	int16 weapon_control_flags;
+	uint16 control_flags;
 	int8 field_16C[12];
 	int16 first_person_animation_duration_ticks;
 	int8 field_17E[6];
@@ -36,6 +35,14 @@ struct weapon_datum
 	int16 field_222;
 	s_weapon_magazine magazines[2];
 	int8 field_22E[24];
+};
+
+struct weapon_datum
+{
+	datum definition_index;
+	_object_datum object;
+	_item_datum item;
+	_weapon_datum weapon;
 };
 ASSERT_STRUCT_SIZE(weapon_datum, 604);
 

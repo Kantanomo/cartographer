@@ -400,9 +400,9 @@ void __cdecl object_build_render_cache_and_info(
         {
             info->object_count++;
             object_datum* object = object_get_fast_unsafe(info->object_index[render_model_storage_index]);
-            if (object->cached_render_state_index != NONE)
+            if (object->object.cached_render_state_index != NONE)
             {
-                uint8* cached_object_render_state = (uint8*)datum_get(get_cached_object_render_states_array(), object->cached_render_state_index);
+                uint8* cached_object_render_state = (uint8*)datum_get(get_cached_object_render_states_array(), object->object.cached_render_state_index);
 
                 if (*(datum*)(cached_object_render_state + 4) == info->object_index[render_model_storage_index])
                 {

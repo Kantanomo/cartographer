@@ -693,7 +693,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	if (nearPlayerSpawn)
 	{
-		real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->position;
+		real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->object.position;
 		position.x = localPlayerPos->x + 0.5f;
 		position.y = localPlayerPos->y + 0.5f;
 		position.z = localPlayerPos->z + 0.5f;
@@ -814,7 +814,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 		{
 			object_placement_data new_object_placement;
 			datum localPlayerIdx = player_index_from_user_index(0);
-			real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->position;
+			real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->object.position;
 
 			if (object_idx != NONE)
 			{

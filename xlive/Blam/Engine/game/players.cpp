@@ -137,7 +137,7 @@ void s_player::set_player_unit_grenade_count(datum player_index, int16 type, int
             unit_delete_all_weapons(unit_datum_index);
         }
 
-        unit->grenade_counts[type] = count;
+        unit->unit.grenade_counts[type] = count;
         simulation_action_object_update(unit_datum_index, FLAG(_simulation_action_update_grenade_count_bit));
 
         LOG_TRACE_GAME("set_player_unit_grenade_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", abs_player_index, NetworkSession::GetPeerIndex(abs_player_index));
@@ -541,7 +541,7 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
     {
         biped_datum* player_unit = (biped_datum*)object_get_fast_unsafe(unit_index);
 
-        if (player_unit->unit.object.parent_object_index == NONE)
+        if (player_unit->object.parent_object_index == NONE)
         {
             // Search 1 includes weapons
             // Search 2 excludes weapons
@@ -553,8 +553,8 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
             // We have a shorter search radius for weapons than other objects
             const real32 search_radius_types[2]
             {
-                player_unit->unit.object.radius + 0.4f,
-                player_unit->unit.object.radius + 3.4f
+                player_unit->object.radius + 0.4f,
+                player_unit->object.radius + 3.4f
             };
 
             // Perform the two searches
@@ -570,8 +570,8 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
                 const int16 number_of_initial_objects = (int16)object_search_for_objects_in_radius(
                     0,
                     (search_type & ~objects_to_ignore),
-                    &player_unit->unit.object.location,
-                    &player_unit->unit.object.center,
+                    &player_unit->object.location,
+                    &player_unit->object.center,
                     search_radius,
                     nearby_objects,
                     NUMBEROF(nearby_objects));
@@ -583,15 +583,15 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
                 {
                     const datum nearby_object_index = nearby_objects[object_num];
                     const object_datum* object = (object_datum*)object_get_fast_unsafe(nearby_object_index);
-                    const e_object_type type = object->object_identifier.get_type();
+                    const e_object_type type = object->object.object_identifier.get_type();
                     
                     // If our object is not one of the objects we want to ignore
                     if (!TEST_BIT(objects_to_ignore, type))
                     {
                         real_vector3d delta;
-                        vector_from_points3d(&player_unit->unit.object.center, &object->center, &delta);
+                        vector_from_points3d(&player_unit->object.center, &object->object.center, &delta);
                         const real32 magnitude = magnitude_squared3d(&delta);
-                        const real32 combined_radius = object->radius + search_radius;
+                        const real32 combined_radius = object->object.radius + search_radius;
 
                         const uint32 object_type_requires_radius_check = _object_mask_weapon | _object_mask_machine | _object_mask_control;
 
@@ -616,7 +616,7 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
                             default:
                             {
                                 // Search through the children of the object and add them to the nearby objects array
-                                for (datum current_weapon_datum = object->current_weapon_datum; current_weapon_datum != NONE; ++nearby_object_num)
+                                for (datum current_weapon_datum = object->object.current_weapon_datum; current_weapon_datum != NONE; ++nearby_object_num)
                                 {
                                     if (nearby_object_num > NUMBEROF(nearby_objects))
                                     {
@@ -625,7 +625,7 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
 
                                     object_datum* t_object = object_get_fast_unsafe(current_weapon_datum);
                                     nearby_objects[nearby_object_num] = current_weapon_datum;
-                                    current_weapon_datum = t_object->next_index;
+                                    current_weapon_datum = t_object->object.next_index;
                                 }
                                 break;
                             }
