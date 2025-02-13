@@ -2,7 +2,9 @@
 
 #include "VariantSystem.h"
 
-#include "Variants.h"
+#include "GraveRobber/GraveRobber.h"
+#include "GunGame/GunGame.h"
+#include "Infection/Infection.h"
 
 ICustomGameVariant* currentRunningVariant;
 std::vector<ICustomGameVariant*> CustomVariantHandler::customVariants;
@@ -100,12 +102,6 @@ void CustomVariantHandler::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 {
 	if (GetCurrentGameVariant() != nullptr)
 		GetCurrentGameVariant()->OnPlayerDeath(execTime, playerIdx);
-}
-
-void CustomVariantHandler::OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4)
-{
-	if (GetCurrentGameVariant() != nullptr)
-		GetCurrentGameVariant()->OnObjectDamage(execTime, unitDatumIdx, a2, a3, a4);
 }
 
 bool CustomVariantHandler::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx)

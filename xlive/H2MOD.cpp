@@ -38,6 +38,7 @@
 #include "interface/user_interface_utilities.h"
 #include "interface/screens/screens_patches.h"
 #include "items/weapon_definitions.h"
+#include "kablam/kablam.h"
 #include "main/levels.h"
 #include "main/loading.h"
 #include "main/main_game.h"
@@ -104,19 +105,17 @@
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 
-bool H2XFirerateEnabled = false;
+/* globals */
+
+bool g_h2x_enabled = false;
 bool g_xbox_tickrate_enabled = false;
+
+/* */
 
 bool xbox_tickrate_is_enabled()
 {
 	return g_xbox_tickrate_enabled;
 }
-
-std::unordered_map<const wchar_t*, bool&> GametypesMap
-{
-	{ L"h2x", H2XFirerateEnabled },
-	{ L"ogh2", g_xbox_tickrate_enabled },
-};
 
 typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
 show_error_screen_t p_show_error_screen;
@@ -252,25 +251,6 @@ void __cdecl OnPlayerDeath(datum player_index)
 	CustomVariantHandler::OnPlayerDeath(ExecTime::_postEventExec, player_index);
 }
 
-/* This is technically closer to object death than player-death as it impacts anything with health at all. */
-typedef void(__cdecl* object_deplete_body_internal_t)(datum unit_datum_index, int a2, bool a3, bool a4);
-object_deplete_body_internal_t p_object_deplete_body_internal;
-
-void __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
-{
-	//LOG_TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
-
-	/* The first value within a2 ( *(DWORD*)(a2) ) appears to be the datum_index of a player from the gamestate_player_table */
-
-	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
-	CustomVariantHandler::OnObjectDamage(ExecTime::_preEventExec, unit_datum_index, a2, a3, a4);
-
-	p_object_deplete_body_internal(unit_datum_index, a2, a3, a4);
-
-	CustomVariantHandler::OnObjectDamage(ExecTime::_postEventExec, unit_datum_index, a2, a3, a4);
-	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
-}
-
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
 	auto p_auto_handle = Memory::GetAddress<int(_cdecl*)(datum, datum)>(0x57AA5, 0x5FF9D);
@@ -342,8 +322,8 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	toggle_xbox_tickrate(options, false);
 
 	// reset custom gametypes state
-	for (auto& gametype_it : GametypesMap)
-		gametype_it.second = false;
+	g_h2x_enabled = false;
+	g_xbox_tickrate_enabled = false;
 
 	bool game_mode_ui_shell = options->game_mode == _game_mode_ui_shell;
 
@@ -357,7 +337,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			screens_apply_patches_on_map_load();
 			main_tag_fixes();
 		}
-
 	}
 	else
 	{
@@ -378,19 +357,22 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			addDebugText("Engine type: Multiplayer");
 			load_special_event();
 
-			for (const auto& gametype_it : GametypesMap)
+			// TODO: depreciate variant name shennanagins after Kantanomo finishes custom variant settings
+			if (StrStrIW(variant_name, L"h2x"))
 			{
-				if (StrStrIW(variant_name, gametype_it.first)) {
-					LOG_INFO_GAME(L"{} - {} custom gametype turned on!", __FUNCTIONW__, gametype_it.first);
-					gametype_it.second = true;
-					break;
-				}
+				LOG_INFO_GAME(L"H2X turned on!");
+				g_h2x_enabled = true;
+			}
+			else if (StrStrIW(variant_name, L"ogh2"))
+			{
+				LOG_INFO_GAME(L"OGH2 turned on!");
+				g_xbox_tickrate_enabled = true;
 			}
 
 			toggle_xbox_tickrate(options, g_xbox_tickrate_enabled);
 			if (!g_xbox_tickrate_enabled)
 			{
-				H2X::ApplyMapLoadPatches(H2XFirerateEnabled);
+				H2X::ApplyMapLoadPatches(g_h2x_enabled);
 				ProjectileFix::ApplyProjectileVelocity();
 			}
 
@@ -470,12 +452,6 @@ void __cdecl user_interface_controller_set_desired_team_index_hook(e_controller_
 	p_user_interface_controller_set_desired_team_index(controller_index, team);
 }
 
-void __cdecl print_to_console(const char* output)
-{
-	std::string finalOutput("[HSC Print] "); finalOutput += output;
-	addDebugText(finalOutput.c_str());
-}
-
 bool GrenadeChainReactIsEngineMPCheck() {
 	return game_is_multiplayer();
 }
@@ -531,20 +507,6 @@ uint16 __cdecl get_enabled_team_flags(c_network_session* session)
 	}
 
 	return new_teams_enabled_flags;
-}
-
-typedef int(__cdecl* get_next_hill_index_t)(int previousHill);
-get_next_hill_index_t p_get_next_hill_index;
-int __cdecl get_next_hill_index(int previousHill)
-{
-	int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
-	if (previousHill + 1 >= hillCount) 
-	{
-		LOG_TRACE_GAME("[KoTH Behavior] Hill count: {} current hill: {} next hill: {}", hillCount, previousHill, 0);
-		return 0;
-	}
-	LOG_TRACE_GAME("[KoTH Behavior] Hill count: {} current hill: {} next hill: {}", hillCount, previousHill, previousHill + 1);
-	return previousHill + 1;
 }
 
 int32 get_active_count_from_bitflags(uint16 teams_bit_flags)
@@ -651,40 +613,6 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
 	}
 	return result;
-}
-
-// ### TODO: move this to kablam (internal name for dedicated server)
-void vip_lock(e_game_life_cycle state)
-{
-	if(state == _life_cycle_post_game)
-	{
-		ServerConsole::ClearVip();
-		*Memory::GetAddress<byte*>(0, 0x534850) = 0;
-	}
-	if(state == _life_cycle_in_game)
-	{
-		for (int i = 0; i < k_maximum_players; i++)
-		{
-			if (NetworkSession::PlayerIsActive(i))
-				ServerConsole::AddVip(NetworkSession::GetPlayerName(i));
-		}
-		*Memory::GetAddress<byte*>(0, 0x534850) = 2;
-	}
-}
-
-void H2MOD::RegisterEvents()
-{
-	if (Memory::IsDedicatedServer())
-	{
-		// Server only callbacks
-		// Setup Events for H2Config_vip_lock
-		if (H2Config_vip_lock)
-			EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
-	}
-	else 
-	{
-		// Client only callbacks	
-	}
 }
 
 static const real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
@@ -967,7 +895,6 @@ void H2MOD::ApplyHooks() {
 	// ### FIXME: this detours all cases where a player dies, including after a new round/teleporting (pseudo-kill)
 	//DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
-	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
 	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
 
 	// below hooks applied to specific executables
@@ -981,12 +908,6 @@ void H2MOD::ApplyHooks() {
 
 		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);		
 		DETOUR_ATTACH(p_user_interface_controller_set_desired_team_index, Memory::GetAddress<user_interface_controller_set_desired_team_index_t>(0x2068F2), user_interface_controller_set_desired_team_index_hook);
-
-		// hook the print command to redirect the output to our console
-		PatchCall(Memory::GetAddress(0xE9E50), print_to_console);
-
-		// set max model quality to L6
-		WriteValue(Memory::GetAddress(0x190B38 + 1), 5);
 
 		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Memory::GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
@@ -1056,7 +977,8 @@ void H2MOD::ApplyHooks() {
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
 	}
-	else {
+	else
+	{
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
 
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
@@ -1106,6 +1028,7 @@ void H2MOD::Initialize()
 	}
 	else
 	{
+		kablam_apply_patches();
 		playlist_loader::initialize();
 	}
 	cartographer_player_profile_initialize();
@@ -1118,7 +1041,6 @@ void H2MOD::Initialize()
 	ProjectileFix::ApplyPatches();
 	H2X::ApplyPatches();
 	H2MOD::ApplyHooks();
-	H2MOD::RegisterEvents();
 
 	//StatsHandler::Initialize();
 

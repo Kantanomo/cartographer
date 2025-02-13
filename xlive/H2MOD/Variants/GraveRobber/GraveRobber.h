@@ -35,7 +35,6 @@ public:
 	// on map load can be used as Initialize
 	virtual void OnMapLoad(ExecTime execTime, s_game_options* options) override;
 	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) override;
-	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) override {/*Unused*/ };
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) override;
 	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) override;
 	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat) override;

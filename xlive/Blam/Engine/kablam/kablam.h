@@ -1,8 +1,10 @@
 #pragma once
-
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandsUtil.h"
 
-enum e_server_console_commands {
+/* enums */
+
+enum e_server_console_commands
+{
 	_kablam_command_ban,
 	_kablam_command_description,
 	_kablam_command_exit,
@@ -20,9 +22,10 @@ enum e_server_console_commands {
 	_kablam_command_unban,
 	_kablam_command_vip,
 	_kablam_command_any,
-
 	k_kablam_command_count
 };
+
+/* classes */
 
 class c_kablam_interface
 {
@@ -78,3 +81,7 @@ namespace ServerConsole
 	void ClearVip();
 	void SendMsg(const wchar_t* message, bool timeout = false);
 }
+
+/* prototypes */
+
+void kablam_apply_patches(void);

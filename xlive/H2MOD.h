@@ -19,7 +19,6 @@ class H2MOD
 public:
 	static void Initialize();
 	static void ApplyHooks();
-	static void RegisterEvents();
 	static void RefreshTogglexDelay();
 
 	static void player_position_increase_client_position_margin_of_error(bool enable);

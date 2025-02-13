@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "kablam.h"
 
 #include "cseries/cseries_strings.h"
@@ -7,20 +6,79 @@
 
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/Shell/Config.h"
+
+/* typedefs */
 
 typedef void* (__cdecl* dedi_command_t)(wchar_t** a1, int32 a2, bool a3);
-dedi_command_t p_kablam_command_handler;
-
 typedef int32(__cdecl* kablam_vip_add_t)(LPCWSTR gamer_tag);
-kablam_vip_add_t p_kablam_vip_add;
-
 typedef int32(__cdecl* kablam_vip_clear_t)();
+
+/* globals */
+
+dedi_command_t p_kablam_command_handler;
+kablam_vip_add_t p_kablam_vip_add;
 kablam_vip_clear_t p_kablam_vip_clear;
+static const std::map<const wchar_t*, e_server_console_commands> g_commands_map =
+{
+	{L"ban", _kablam_command_ban},
+	{L"description", _kablam_command_description},
+	{L"exit", _kablam_command_exit},
+	{L"kick", _kablam_command_kick},
+	{L"live", _kablam_command_live},
+	{L"name", _kablam_command_name},
+	{L"players", _kablam_command_players},
+	{L"playing", _kablam_command_playing},
+	{L"privacy", _kablam_command_privacy},
+	{L"sendmsg", _kablam_command_sendmsg},
+	{L"skip", _kablam_command_skip},
+	{L"statsfolder", _kablam_command_statsfolder},
+	{L"status", _kablam_command_status},
+	{L"unban", _kablam_command_unban},
+	{L"vip", _kablam_command_vip},
+	{L"any", _kablam_command_any}
+};
 
-static std::map<const wchar_t*, e_server_console_commands> commands_map;
+/* prototypes */
 
-void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wide, int split_count, bool a3) {
+static void vip_lock(e_game_life_cycle state);
 
+static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wide, int split_count, bool a3);
+
+/* public code */
+
+void kablam_apply_patches(void)
+{
+	if (H2Config_vip_lock)
+	{
+		EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
+	}
+	return;
+}
+
+/* private code */
+
+static void vip_lock(e_game_life_cycle state)
+{
+	if (state == _life_cycle_post_game)
+	{
+		ServerConsole::ClearVip();
+		*Memory::GetAddress<byte*>(0, 0x534850) = 0;
+	}
+	if (state == _life_cycle_in_game)
+	{
+		for (int i = 0; i < k_maximum_players; i++)
+		{
+			if (NetworkSession::PlayerIsActive(i))
+				ServerConsole::AddVip(NetworkSession::GetPlayerName(i));
+		}
+		*Memory::GetAddress<byte*>(0, 0x534850) = 2;
+	}
+	return;
+}
+
+static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wide, int split_count, bool a3)
+{
 	wchar_t* command = command_line_split_wide[0];
 	if (command[0] == L'$') {
 		ServerConsole::LogToDedicatedServerConsoleWide(L"# running custom command: ");
@@ -86,13 +144,13 @@ void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wide, int
 	// all server command functions will be hooked in the future and these event executes will be removed.
 
 	bool playCommand = false;
-	auto playCommandFind = commands_map.find(lower_command.get_string());
-	if (playCommandFind != commands_map.end()
+	auto playCommandFind = g_commands_map.find(lower_command.get_string());
+	if (playCommandFind != g_commands_map.end()
 		&& playCommandFind->second == _kablam_command_play)
 		playCommand = true;
 
 	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, commands_map[lower_command.get_string()]);
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, g_commands_map.find(lower_command.get_string())->second);
 
 	void* result = p_kablam_command_handler(command_line_split_wide, split_count, a3);
 
@@ -100,7 +158,7 @@ void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wide, int
 	// all server command functions will be hooked in the future and these executes will be removed.
 	
 	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, commands_map[lower_command.get_string()]);
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, g_commands_map.find(lower_command.get_string())->second);
 
 	return result;
 }
@@ -121,23 +179,6 @@ void ServerConsole::ApplyHooks()
 {
 	if (!Memory::IsDedicatedServer())
 		return;
-	commands_map[L"ban"] = _kablam_command_ban;
-	commands_map[L"description"] = _kablam_command_description;
-	commands_map[L"exit"] = _kablam_command_exit;
-	commands_map[L"kick"] = _kablam_command_kick;
-	commands_map[L"live"] = _kablam_command_live;
-	commands_map[L"name"] = _kablam_command_name;
-	commands_map[L"play"] = _kablam_command_play;
-	commands_map[L"players"] = _kablam_command_players;
-	commands_map[L"playing"] = _kablam_command_playing;
-	commands_map[L"privacy"] = _kablam_command_privacy;
-	commands_map[L"sendmsg"] = _kablam_command_sendmsg;
-	commands_map[L"skip"] = _kablam_command_skip;
-	commands_map[L"statsfolder"] = _kablam_command_statsfolder;
-	commands_map[L"status"] = _kablam_command_status;
-	commands_map[L"unban"] = _kablam_command_unban;
-	commands_map[L"vip"] = _kablam_command_vip;
-	commands_map[L"any"] = _kablam_command_any;
 
 	p_kablam_command_handler = (dedi_command_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)kablam_command_handler_hook, 7);
 	p_kablam_vip_add = Memory::GetAddress<kablam_vip_add_t>(0, 0x1D932);
