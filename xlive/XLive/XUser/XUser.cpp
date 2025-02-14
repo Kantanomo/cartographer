@@ -151,29 +151,28 @@ XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 		dwUserIndex = 0;
 
 	XUSER_SIGNIN_STATE ret;
+	const char* state;
 
 	switch (usersSignInInfo[dwUserIndex].UserSigninState)
 	{
 	case eXUserSigninState_SignedInToLive:
 		ret = eXUserSigninState_SignedInToLive;
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninState() - Online");
+		state = "Online";
 		break;
 
 	case eXUserSigninState_SignedInLocally:
 		ret = eXUserSigninState_SignedInLocally;
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninState() - Local profile");
+		state = "Local profile";
 		break;
 
 	case eXUserSigninState_NotSignedIn:
-		ret = eXUserSigninState_NotSignedIn;
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninState() - Not signed in");
-		break;
-
 	default:
 		ret = eXUserSigninState_NotSignedIn;
+		state = "Not signed in";
 		break;
 	}
 
+	LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninState() - {}", state);
 	return ret;
 }
 
@@ -319,7 +318,7 @@ DWORD WINAPI XUserCreateStatsEnumeratorByRating(DWORD dwTitleId, LONGLONG i64Rat
 	return 1;
 }
 
-std::wstring XProfileSettingIdToString(DWORD settingId)
+const wchar_t* XProfileSettingIdToString(DWORD settingId)
 {
 	switch (settingId)
 	{
@@ -398,7 +397,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 			settingSize = (pdwSettingIds[lcv] >> 16) & 0xFFF;
 			settingId = (pdwSettingIds[lcv] >> 0) & 0x3FFF;
 
-			XUserProfileSettingsLog += (lcv == 0 ? L"id = (" : L", id: (" ) + XProfileSettingIdToString(settingId) + L")";
+			XUserProfileSettingsLog += (lcv == 0 ? L"id = (" : L", id: (" ) + std::wstring(XProfileSettingIdToString(settingId)) + L")";
 
 			if (settingType == XUSER_DATA_TYPE_BINARY || settingType == XUSER_DATA_TYPE_UNICODE)
 				size += settingSize;
@@ -442,27 +441,27 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 			settingSize = (pdwSettingIds[lcv] >> 16) & 0xFFF;
 			settingId = (pdwSettingIds[lcv] >> 0) & 0x3FFF;
 
+			const char* setting_log = NULL;
 			switch (settingId)
 			{
-
 			case 0x3FFF:
-				LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC1");
+				setting_log = "1";
 				break;
-
-
 			case 0x3FFE:
-				LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC2");
+				setting_log = "2";
 				break;
-
-
 			case 0x3FFD:
-				LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC3");
+				setting_log = "3";
 				break;
-
-
 			default:
 				break;
 			}
+
+			if (setting_log != NULL)
+			{
+				LOG_TRACE_XLIVE("- XPROFILE_TITLE_SPECIFIC{}", setting_log);
+			}
+
 
 			switch (settingType)
 			{
