@@ -15,8 +15,7 @@ enum e_screen_game_engine_items : uint16
 	_screen_game_engine_item_ctf = 4,
 	_screen_game_engine_item_assault = 5,
 	_screen_game_engine_item_territories = 6,
-	_screen_game_engine_item_zombies = 7,
-	_screen_game_engine_item_headhunter = 8,
+	_screen_game_engine_item_headhunter = 7,
 	k_screen_game_engine_item_count
 };
 
@@ -57,6 +56,7 @@ protected:
 	e_screen_game_engine_category_type m_type;
 	int8 data[4];
 public:
+	static void apply_on_map_load();
 	static void apply_patches();
 	static void* load_settings(s_screen_parameters* parameters);
 	static void* load_lobby(s_screen_parameters* parameters);
