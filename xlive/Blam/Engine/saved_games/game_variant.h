@@ -380,6 +380,16 @@ enum e_juggernaut_engine_flags
 	k_juggernaut_engine_clear_unused_bits_mask = FLAG(_juggernaut_is_damage_resistant_bit | _juggernaut_has_infinite_ammo_bit | _juggernaut_does_extra_damage_bit | _juggernaut_betrayal_point_loss_bit | _juggernaut_has_active_camo_bit | _juggernaut_has_supershield_bit | _juggernaut_has_motion_sensor_bit)
 };
 
+enum e_headhunter_dropped_token_fade_type : uint8
+{
+	_headhunter_dropped_token_fade_never,
+	_headhunter_dropped_token_fade_5_seconds,
+	_headhunter_dropped_token_fade_10_seconds,
+	_headhunter_dropped_token_fade_15_seconds,
+
+	k_headhunter_dropped_token_fade_count
+};
+
 struct s_variant_description_map
 {
 	const char* name;
@@ -426,6 +436,18 @@ struct s_juggernaut_variant_settings
 	int8 pad;
 };
 
+struct s_head_hunter_settings
+{
+	// Determine the length of time a token remains available before vanishing.
+	e_headhunter_dropped_token_fade_type dropped_token_fade;
+	// This setting makes token carriers run faster or slower than other players.
+	e_ctf_engine_player_speed speed_with_tokens;
+	// Tokens can be 1 point each, or mutiplied by the amount you deposit.
+	bool score_multiplier;
+	// This settings makes the bin move between locations.
+	bool moving_bin;
+};
+
 struct s_territories_variant_settings
 {
 	uint16 territory_count;
@@ -443,9 +465,9 @@ union s_game_engine_variant
 	s_juggernaut_variant_settings juggernaut;
 	s_territories_variant_settings territories;
 	s_ctf_variant_settings assault;
+	s_head_hunter_settings head_hunter;
 };
 ASSERT_STRUCT_SIZE(s_game_engine_variant, 64);
-
 
 struct s_game_variant
 {

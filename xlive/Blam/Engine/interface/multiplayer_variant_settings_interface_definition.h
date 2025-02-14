@@ -1,5 +1,6 @@
 #pragma once
 #include "saved_games/game_variant.h"
+#include "tag_files/global_string_ids.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
@@ -70,17 +71,22 @@ enum e_variant_setting_category_type : uint32
 	_variant_setting_category_type_team_territories,
 	_variant_setting_category_type_team_assault,
 
-	k_variant_setting_category_type_count
+	k_variant_setting_category_type_count,
+	_variant_setting_category_type_none = -1
 };
 
 static e_variant_setting_category_type g_variant_setting_category_type_match[k_game_engine_playable_types]
 {
+	_variant_setting_category_type_none,
 	_variant_setting_category_type_match_ctf,
 	_variant_setting_category_type_match_slayer,
 	_variant_setting_category_type_match_oddball,
 	_variant_setting_category_type_match_king,
-	_variant_setting_category_type_match_race,
-	_variant_setting_category_type_match_head_hunter,
+	// the settings for all of these are the same instead of duplicating data just reuse a different one
+	//_variant_setting_category_type_match_race,
+	//_variant_setting_category_type_match_head_hunter,
+	_variant_setting_category_type_match_slayer,
+	_variant_setting_category_type_match_slayer,
 	_variant_setting_category_type_match_juggernaut,
 	_variant_setting_category_type_match_territories,
 	_variant_setting_category_type_match_assault
@@ -88,6 +94,7 @@ static e_variant_setting_category_type g_variant_setting_category_type_match[k_g
 
 static e_variant_setting_category_type g_variant_setting_category_type_game_type[k_game_engine_playable_types]
 {
+	_variant_setting_category_type_none,
 	_variant_setting_category_type_game_ctf,
 	_variant_setting_category_type_game_slayer,
 	_variant_setting_category_type_game_oddball,
@@ -101,12 +108,16 @@ static e_variant_setting_category_type g_variant_setting_category_type_game_type
 
 static e_variant_setting_category_type g_variant_setting_category_type_quick_options[k_game_engine_playable_types]
 {
+	_variant_setting_category_type_none,
 	_variant_setting_category_type_quick_options_ctf,
 	_variant_setting_category_type_quick_options_slayer,
 	_variant_setting_category_type_quick_options_oddball,
 	_variant_setting_category_type_quick_options_king,
-	_variant_setting_category_type_quick_options_race,
-	_variant_setting_category_type_quick_options_head_hunter,
+	// the settings for all of these are the same instead of duplicating data just reuse a different one
+	//_variant_setting_category_type_quick_options_race,
+	//_variant_setting_category_type_quick_options_head_hunter,
+	_variant_setting_category_type_quick_options_slayer,
+	_variant_setting_category_type_quick_options_slayer,
 	_variant_setting_category_type_quick_options_juggernaut,
 	_variant_setting_category_type_quick_options_territories,
 	_variant_setting_category_type_quick_options_assault
@@ -114,12 +125,16 @@ static e_variant_setting_category_type g_variant_setting_category_type_quick_opt
 
 static e_variant_setting_category_type g_variant_setting_category_type_team[k_game_engine_playable_types]
 {
+	_variant_setting_category_type_none,
 	_variant_setting_category_type_team_ctf,
 	_variant_setting_category_type_team_slayer,
 	_variant_setting_category_type_team_oddball,
 	_variant_setting_category_type_team_king,
-	_variant_setting_category_type_team_race,
-	_variant_setting_category_type_team_head_hunter,
+	// the settings for all of these are the same instead of duplicating data just reuse a different one
+	//_variant_setting_category_type_team_race,
+	//_variant_setting_category_type_team_head_hunter,
+	_variant_setting_category_type_team_slayer,
+	_variant_setting_category_type_team_slayer,
 	_variant_setting_category_type_team_juggernaut,
 	_variant_setting_category_type_team_territories,
 	_variant_setting_category_type_team_assault
@@ -355,3 +370,10 @@ struct s_text_value_pair_definition // sily
 	tag_block<s_text_value_pair_reference_new> text_value_pairs;
 };
 ASSERT_STRUCT_SIZE(s_text_value_pair_definition, 36);
+
+
+s_variant_setting_edit_reference* __cdecl multiplayer_variant_settings_interface_get_reference(e_variant_setting_category_type category_type);
+
+int32 __cdecl multiplayer_variant_settings_interface_get_variant_setting_value(s_game_variant* variant, e_default_variant_setting_category_type type);
+
+s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_setting_label(s_text_value_pair_definition* text_value_pair, int32 value);

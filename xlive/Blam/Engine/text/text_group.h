@@ -33,6 +33,7 @@ private:
 };
 ASSERT_STRUCT_SIZE(c_language_pack, 28);
 
+void __cdecl text_group_get_unicode_string(datum unic_datum, string_id string_id, wchar_t* out_string);
 /* public code */
 
 void __cdecl string_list_get_normal_string(datum unic_datum, string_id id, wchar_t* out_string);

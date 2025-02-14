@@ -453,6 +453,10 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_custom_game_map_select.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_game_definitions.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_search_option_variant_menu.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_variant_editing_options.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_variant_options.cpp" />
+    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
+    <ClCompile Include="Blam\Engine\text\text_group.cpp" />
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
@@ -1942,6 +1946,8 @@
     <ClInclude Include="Blam\Engine\networking\network_game_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_search_option_variant_menu.h" />
     <ClInclude Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_variant_editing_options.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_variant_options.h" />
     <ClInclude Include="Blam\Engine\items\projectiles.h" />
     <ClInclude Include="Blam\Engine\objects\object_location.h" />
     <ClInclude Include="Blam\Engine\game\player_constants.h" />

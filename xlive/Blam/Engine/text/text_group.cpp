@@ -74,3 +74,11 @@ void __cdecl string_list_get_string_id_list(datum unic_datum, string_id* out_ids
 		game_globals->language_pack[current_language].get_string_ids(out_ids, out_count, list_reference->strings_index, list_reference->strings_count);
 	}
 }
+
+#include "stdafx.h"
+#include "text_group.h"
+
+void __cdecl text_group_get_unicode_string(datum unic_datum, string_id string_id, wchar_t* out_string)
+{
+	INVOKE(0x3E3AC, 0, text_group_get_unicode_string, unic_datum, string_id, out_string);
+}
