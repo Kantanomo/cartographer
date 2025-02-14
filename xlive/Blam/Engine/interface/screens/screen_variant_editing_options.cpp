@@ -2,8 +2,14 @@
 #include "screen_variant_editing_options.h"
 
 #include "screen_game_engine_category.h"
+#include "screen_variant_options.h"
 #include "interface/multiplayer_variant_settings_interface_definition.h"
+#include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
+
+/* typedefs */
+proc_ui_screen_load_cb_t p_c_screen_variant_options_new;
+
 
 
 /* -------------------------------- */
@@ -41,13 +47,13 @@ void c_variant_editing_options_list::handle_item_pressed_event(s_event_record** 
 			default:
 				return;
 		}
-		//c_screen_variant_options::new();
+		c_screen_variant_options::new_instance(menu_type, _user_interface_channel_type_gameshell_screen, _window_4, 1 << (*pevent)->controller);
 	}
 }
 
 c_list_item_widget* c_variant_editing_options_list::get_list_items()
 {
-	return this->m_list;
+	return this->m_items;
 }
 
 int32 c_variant_editing_options_list::get_list_items_count()
@@ -98,6 +104,7 @@ void c_variant_editing_options_list::update_list_items(c_list_item_widget* item,
 				}
 				else
 					item_text->set_text_from_string_id(items_map[item_datum->item_id].item_text);
+				break;
 			}
 		default:
 			item_text->set_text_from_string_id(items_map[item_datum->item_id].item_text);
@@ -111,7 +118,7 @@ c_variant_editing_options_list::c_variant_editing_options_list(uint16 user_flags
 	m_slot(this, &c_variant_editing_options_list::handle_item_pressed_event)
 {
 	this->m_list_data = ui_list_data_new(k_variant_editing_options_list_name, k_variant_editing_options_item_count, sizeof(s_list_item_datum));
-
+	data_make_valid(this->m_list_data);
 	for(int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
 	{
 		((s_list_item_datum*)datum_get(this->m_list_data, datum_new(this->m_list_data)))->item_id = i;
@@ -126,7 +133,7 @@ c_variant_editing_options_list::c_variant_editing_options_list(uint16 user_flags
 /* ---------------------------------- */
 
 
-c_screen_variant_editing_options* c_screen_variant_editing_options::load_editor(s_screen_parameters* parameters)
+void* c_screen_variant_editing_options::load_editor(s_screen_parameters* parameters)
 {
 	c_screen_variant_editing_options* screen;
 
@@ -147,7 +154,7 @@ c_screen_variant_editing_options* c_screen_variant_editing_options::load_editor(
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	return screen;
@@ -158,9 +165,14 @@ const void* c_screen_variant_editing_options::load_proc() const
 	return &c_screen_variant_editing_options::load_editor;
 }
 
+void c_screen_variant_editing_options::apply_patches()
+{
+	DETOUR_ATTACH(p_c_screen_variant_options_new, Memory::GetAddress<proc_ui_screen_load_cb_t>(0x23CB1A), c_screen_variant_editing_options::load_editor);
+}
+
 c_screen_variant_editing_options::c_screen_variant_editing_options(e_user_interface_channel_type ui_channel, e_user_interface_render_window window_index, uint16 user_flags, e_user_interface_screen_id screen_id) :
 	c_screen_with_menu(screen_id, ui_channel, window_index, user_flags, &m_list),
 	m_list(user_flags)
 {
-
+	
 }

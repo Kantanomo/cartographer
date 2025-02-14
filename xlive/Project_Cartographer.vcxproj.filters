@@ -464,6 +464,10 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_custom_game_map_select.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_game_definitions.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_search_option_variant_menu.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_variant_editing_options.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_variant_options.cpp" />
+    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
+    <ClCompile Include="Blam\Engine\text\text_group.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1934,6 +1938,8 @@
     <ClInclude Include="Blam\Engine\networking\network_game_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_search_option_variant_menu.h" />
     <ClInclude Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_variant_editing_options.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_variant_options.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
