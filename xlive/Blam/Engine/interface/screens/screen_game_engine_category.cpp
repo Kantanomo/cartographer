@@ -9,6 +9,7 @@
 #include "main/game_preferences.h"
 #include "saved_games/saved_game_files.h"
 #include "tag_files/global_string_ids.h"
+#include "text/text_group.h"
 
 /* private */
 
@@ -30,9 +31,9 @@ e_saved_game_file_type get_saved_game_file_type_from_item_index(uint32 index)
 			return _saved_game_file_type_game_variant_assault;
 		case _screen_game_engine_item_territories:
 			return _saved_game_file_type_game_variant_territories;
-		case _screen_game_engine_item_zombies:
-			// todo: new default_string_id_type
-			return _saved_game_file_type_game_variant_slayer;
+		//case _screen_game_engine_item_zombies:
+		//	// todo: new default_string_id_type
+		//	return _saved_game_file_type_game_variant_slayer;
 		case _screen_game_engine_item_headhunter:
 			return _saved_game_file_type_game_variant_headhunter;
 	}
@@ -63,27 +64,15 @@ void c_screen_game_engine_category_list::update_list_items(c_list_item_widget* i
 	const static s_item_text_mapping items_map[k_screen_game_engine_item_count] =
 	{
 		{_screen_game_engine_item_slayer, _string_id_slayer},
-		{_screen_game_engine_item_king, _string_id_koth},
+		{_screen_game_engine_item_king, _string_id_king_of_the_hill},
 		{_screen_game_engine_item_oddball, _string_id_oddball},
 		{_screen_game_engine_item_juggernaut, _string_id_juggernaut},
-		{_screen_game_engine_item_ctf, _string_id_ctf},
+		{_screen_game_engine_item_ctf, _string_id_capture_the_flag},
 		{_screen_game_engine_item_assault, _string_id_assault},
 		{_screen_game_engine_item_territories, _string_id_territories},
 		{_screen_game_engine_item_headhunter, _string_id_headhunter}
 	};
 
-	const static wchar_t* zombies_strings[k_language_count]
-	{
-		L"Zombies",
-		L"ゾンビ",
-		L"Zombies",
-		L"Zombi",
-		L"Zombi",
-		L"Zombi",
-		L"좀비",
-		L"僵尸",
-		L"Zumbis"
-	};
 	if (item == nullptr)
 		return;
 
@@ -92,16 +81,15 @@ void c_screen_game_engine_category_list::update_list_items(c_list_item_widget* i
 	{
 		s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item->get_last_data_index());
 		const e_language language = get_current_language();
-		switch((e_screen_game_engine_items)item_datum->item_id)
-		{
-			case _screen_game_engine_item_zombies:
-				// TODO: if we ever do a map recompile grab the text from the stringid again
-				item_text->set_text(zombies_strings[language]);
-				break;
-			default:
-				item_text->set_text_from_string_id(items_map[item_datum->item_id].item_text);
-				break;
-		}
+		wchar_t temp[512] {};
+
+		s_user_interface_shared_globals* user_interface_shared_globals = user_interface_shared_globals_get();
+
+		ASSERT(user_interface_shared_globals);
+
+		text_group_get_unicode_string(user_interface_shared_globals->game_type_strings.index, items_map[item_datum->item_id].item_text, temp);
+
+		item_text->set_text(temp);
 	}
 }
 
@@ -263,15 +251,6 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 					params.m_load_function = c_screen_custom_game_profile_select::load_territories_lobby;
 				else
 					params.m_load_function = c_screen_custom_game_profile_select::load_territories_unused;
-				break;
-			case _screen_game_engine_item_zombies:
-				// todo: new load functions for zombies
-				if (this->type == _screen_game_engine_category_settings)
-					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_settings;
-				else if (!this->data[1])
-					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_lobby;
-				else
-					params.m_load_function = c_screen_custom_game_profile_select::load_slayer_unused;
 				break;
 			case _screen_game_engine_item_headhunter:
 				// todo: new load function for headhunter
@@ -554,6 +533,11 @@ const void* c_screen_game_engine_category::load_proc() const
 }
 
 __declspec(naked) void jmp_c_screen_game_engine_category_load_proc() { __asm { jmp c_screen_game_engine_category::load_proc } };
+
+void c_screen_game_engine_category::apply_on_map_load()
+{
+
+}
 
 void c_screen_game_engine_category::apply_patches()
 {

@@ -94,15 +94,15 @@ void c_variant_editing_options_list::update_list_items(c_list_item_widget* item,
 		{
 		case _variant_editing_options_item_game_type:
 			{
-				s_game_variant* ui_variant = user_interface_get_variant();
-				// TODO: REVERSE STRING_ID PARSING TO ADD THE ABILITY TO ADD NEW SLUGS
-				// SO WE DO NOT HAVE TO DO THIS
-				if(ui_variant->variant_game_engine_index == _game_engine_type_headhunter)
-				{
-					const e_language language = get_current_language();
-					item_text->set_text(head_hunter_strings[language]);
-				}
-				else
+				//s_game_variant* ui_variant = user_interface_get_variant();
+				//// TODO: REVERSE STRING_ID PARSING TO ADD THE ABILITY TO ADD NEW SLUGS
+				//// SO WE DO NOT HAVE TO DO THIS
+				//if(ui_variant->variant_game_engine_index == _game_engine_type_headhunter)
+				//{
+				//	const e_language language = get_current_language();
+				//	item_text->set_text(head_hunter_strings[language]);
+				//}
+				//else
 					item_text->set_text_from_string_id(items_map[item_datum->item_id].item_text);
 				break;
 			}
