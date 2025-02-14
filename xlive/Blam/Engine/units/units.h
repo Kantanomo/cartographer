@@ -3,10 +3,14 @@
 #include "game/game_allegiance.h"
 #include "objects/objects.h"
 
+/* constants */
+
 #define MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS 2
 #define NUMBER_OF_UNIT_HUD_TYPES 2
 #define k_powered_seats_count 2
 #define MAXIMUM_INITIAL_WEAPONS_PER_UNIT 4
+
+/* enums */
 
 enum e_weapon_addition_method : int16
 {
@@ -68,6 +72,8 @@ enum e_unit_control_flags : uint32
 
 	k_unit_control_flags_count
 };
+
+/* structures */
 
 struct s_unit_304
 {
@@ -207,11 +213,20 @@ struct unit_datum
 };
 ASSERT_STRUCT_SIZE(unit_datum, 864);
 
+/* prototypes */
+
+void unit_apply_patches(void);
+
 void __cdecl unit_delete_all_weapons(datum unit_datum_index);
+
 datum __cdecl unit_inventory_next_weapon(datum unit_datum_index);
+
 bool __cdecl unit_add_weapon_to_inventory(datum unit_datum_index, datum weapon_datum_index, e_weapon_addition_method weapon_addition_method);
+
 float __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera_field_of_view, int16 zoom_level);
+
 bool unit_is_dual_wielding(datum unit_index);
+
 datum __cdecl unit_inventory_get_weapon(datum unit_index, int16 weapon_slot);
 
 datum player_index_from_unit_index(datum unit_index);
@@ -225,5 +240,3 @@ void __cdecl unit_control(datum unit_index, unit_control_data* control_data);
 e_game_team unit_get_team_index(datum unit_index);
 
 bool __cdecl unit_desires_tight_camera_track(datum unit_index);
-
-void unit_apply_patches(void);

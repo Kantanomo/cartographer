@@ -3,6 +3,26 @@
 
 #include "tag_files/global_string_ids.h"
 
+/* prototypes */
+
+// Replace calls to use interpolated functions
+static void unit_get_camera_position_patch_mass_functions(void);
+
+// Replace calls to use interpolated functions
+static void unit_get_camera_position_patch_marker_functions(void);
+
+// Replace calls to use interpolated functions
+static void unit_get_head_position_patch_functions(void);
+
+static void unit_apply_interpolation_patches(void);
+
+/* public code */
+
+void unit_apply_patches(void)
+{
+	unit_apply_interpolation_patches();
+	return;
+}
 
 void __cdecl unit_delete_all_weapons(datum unit_datum_index)
 {
@@ -75,8 +95,10 @@ bool __cdecl unit_desires_tight_camera_track(datum unit_index)
 	return INVOKE(0x13F63B, 0, unit_desires_tight_camera_track, unit_index);
 }
 
+/* private code */
+
 // Replace calls to use interpolated functions
-void unit_get_camera_position_patch_mass_functions(void)
+static void unit_get_camera_position_patch_mass_functions(void)
 {
 	PatchCall(Memory::GetAddress(0x90C98, 0x48F98), object_get_center_of_mass_interpolated);
 	PatchCall(Memory::GetAddress(0x13D406, 0x12C255), object_get_center_of_mass_interpolated);
@@ -84,7 +106,7 @@ void unit_get_camera_position_patch_mass_functions(void)
 }
 
 // Replace calls to use interpolated functions
-void unit_get_camera_position_patch_marker_functions(void)
+static void unit_get_camera_position_patch_marker_functions(void)
 {
 	PatchCall(Memory::GetAddress(0x13D3CF, 0x12C21E), object_get_markers_by_string_id);
 	PatchCall(Memory::GetAddress(0x13D48D, 0x12C2DC), object_get_markers_by_string_id);
@@ -92,7 +114,7 @@ void unit_get_camera_position_patch_marker_functions(void)
 }
 
 // Replace calls to use interpolated functions
-void unit_get_head_position_patch_functions(void)
+static void unit_get_head_position_patch_functions(void)
 {
 	PatchCall(Memory::GetAddress(0x6C759), unit_get_head_position_interpolated);
 	PatchCall(Memory::GetAddress(0x6EAB6), unit_get_head_position_interpolated);
@@ -100,16 +122,10 @@ void unit_get_head_position_patch_functions(void)
 	return;
 }
 
-void unit_apply_interpolation_patches()
+static void unit_apply_interpolation_patches(void)
 {
 	unit_get_camera_position_patch_mass_functions();
 	unit_get_camera_position_patch_marker_functions();
 	unit_get_head_position_patch_functions();
-	return;
-}
-
-void unit_apply_patches(void)
-{
-	unit_apply_interpolation_patches();
 	return;
 }
