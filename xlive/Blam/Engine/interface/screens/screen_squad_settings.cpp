@@ -2,6 +2,7 @@
 #include "screen_squad_settings.h"
 #include "screen_single_player_difficulty_select.h"
 #include "screen_single_player_level_select.h"
+#include "screen_variant_options.h"
 
 #include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
@@ -372,7 +373,20 @@ void c_squad_settings_list::handle_item_change_difficulty(s_event_record** peven
 }
 void c_squad_settings_list::handle_item_quick_options(s_event_record** pevent)
 {
-	return INVOKE_TYPE(0x24EF79, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
+	c_network_session* network_session;
+	if (network_life_cycle_in_squad_session(&network_session))
+	{
+		e_game_engine_type type = network_session->m_session_parameters.game_variant.variant_game_engine_index;
+		if(IN_RANGE(type, _game_engine_type_ctf, k_game_engine_playable_types))
+		{
+			c_screen_variant_options::new_instance(
+				g_variant_setting_category_type_quick_options[type],
+				_user_interface_channel_type_online_menu,
+				_window_4,
+				1 << (*pevent)->controller
+			);
+		}
+	}
 }
 void c_squad_settings_list::handle_item_switch_to_coop(s_event_record** pevent)
 {
