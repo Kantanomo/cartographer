@@ -216,69 +216,107 @@ ASSERT_STRUCT_SIZE(object_marker, 112);
 
 /* prototypes */
 
-s_data_array* object_header_data_get(void);
-
-static object_header_datum* object_get_header(datum object_idx)
-{
-	return (object_header_datum*)datum_get(object_header_data_get(), object_idx);
-}
-
 // Get the object fast, with no validation from datum index
+// TODO: remove and replace with proper OBJECT_GET macro
 template<typename T = object_datum>
 static T* object_get_fast_unsafe(datum object_idx)
 {
-	object_header_datum* header = object_get_header(object_idx);
+	object_header_datum* header = (object_header_datum*)datum_get(object_header_data_get(), object_idx);
 	return (T*)header->datum;
 }
 
+s_data_array* object_header_data_get(void);
+
+void objects_apply_patches(void);
 
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
 void* __cdecl object_try_and_get_and_verify_type(datum object_index, int32 object_type_flags);
 
 void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference);
+
 void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count);
 
 void __cdecl object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, s_damage_owner* damage_owner);
 
-void object_initialize_for_interpolation(datum object_index);
+bool __cdecl object_is_connected_to_map(datum object_index);
+
+void __cdecl object_update_collision_culling(datum object_datum);
+
+bool __cdecl object_header_block_allocate(datum object_datum, int16 offset, int16 padded_size, int16 alignment_bits);
+
+// Sets the mode_tag_index and coll_tag_index parameters (if they exist)
+// Returns whether or not the render model has PRT or Lighting Info
+bool __cdecl object_is_prt_and_lightmapped(datum object_datum, datum* mode_tag_index, datum* coll_tag_index);
+
+pixel32 __cdecl object_set_initial_change_colors(datum object_index, uint32 change_color_override_mask, real_rgb_color* colour);
+
+// Initializes health and shields for the given object based on two floats passed to it
+// If the floats for vitality are NULL we just initialize them to the default values in the damage info block in the model tag
+void __cdecl object_initialize_vitality(datum object_index, const real32* new_vitality, const real32* new_shield_vitality);
+
+// Wakes object by adding the _object_header_awake_bit to every object and all parents of that object
+void __cdecl object_wake(datum object_index);
+
+void __cdecl object_activate(datum object_index);
+
+void __cdecl object_deactivate(datum object_index);
+
+void __cdecl object_compute_node_matrices_with_children(datum object_index);
+
+void __cdecl object_reconnect_to_physics(datum object_index);
 
 datum __cdecl object_new(object_placement_data* placement_data);
+
 void __cdecl object_delete(datum object_idx);
 
 real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d* point);
 
-datum object_get_damage_owner(datum damaged_unit_index);
-
-int32 object_get_entity_index(datum object_idx);
+void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool interpolated);
 
 void object_get_origin_interpolated(datum object_index, real_point3d* point_out);
 
 real_matrix4x3* object_get_node_matrix(datum object_datum, int16 node_index);
 
-int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_matrix_count, real_matrix4x3* object_skinning_matrices, real_matrix4x3* out_object_skinning_matrices);
-
 real_matrix4x3* object_try_get_node_matrix_interpolated(datum object_index, int16 node_index, real_matrix4x3* out_mat);
 
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count);
 
-void __cdecl object_apply_function_overlay_node_orientations(datum object_index, 
-	render_model_definition* render_model, 
-	c_animation_manager* animation_manager, 
-	int32 a4, 
-	int32 orientation_count, 
+int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_matrix_count, real_matrix4x3* object_skinning_matrices, real_matrix4x3* out_object_skinning_matrices);
+
+datum object_get_damage_owner(datum damaged_unit_index);
+
+int32 object_get_entity_index(datum object_idx);
+
+void __cdecl object_apply_function_overlay_node_orientations(datum object_index,
+	render_model_definition* render_model,
+	c_animation_manager* animation_manager,
+	int32 a4,
+	int32 orientation_count,
 	real_orientation* orientations);
 
-void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool interpolated);
 real_point3d* object_get_center_of_mass_interpolated(datum object_datum, real_point3d* center_of_mass);
 
 datum __cdecl object_get_parent_recursive(datum parent_index);
 
-int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count);
+void __cdecl object_pre_delete_recursive(datum object_index);
+
+void __cdecl object_delete_recursive(datum object_index, bool remove_from_map_before_deletion);
+
+void __cdecl objects_garbage_collection(void);
 
 void __cdecl objects_purge_deleted_objects(void);
 
 void __cdecl object_get_velocities(datum object_index, real_vector3d* translational_velocity, real_vector3d* angular_velocity);
 
-uint32 __cdecl object_search_for_objects_in_radius(int32 search_flags, uint32 object_type_flags, s_location* location, real_point3d* center, real32 radius, datum* out_object_indices, uint32 object_count);
+uint32 __cdecl object_search_for_objects_in_radius(
+	int32 search_flags,
+	uint32 object_type_flags,
+	s_location* location,
+	real_point3d* center,
+	real32 radius,
+	datum* out_object_indices,
+	uint32 object_count);
 
-void objects_apply_patches(void);
+void __cdecl objects_post_update(void);
+
+int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count);

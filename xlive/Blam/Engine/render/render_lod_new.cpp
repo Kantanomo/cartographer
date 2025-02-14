@@ -217,7 +217,7 @@ void __cdecl object_build_render_cache_and_info(
         render_model_count = 0;
     }
 
-    object_header_datum* object = object_get_header(object_index);
+    const object_header_datum* object = (object_header_datum*)datum_get(object_header_data_get(), object_index);
 
     if (object->type == _object_type_scenery)
     {
