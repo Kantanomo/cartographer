@@ -1,4 +1,5 @@
 #pragma once
+#include "user_interface_shared_globals.h"
 #include "math/color_math.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
@@ -301,75 +302,6 @@ enum e_button_key_type : short
     button_key_type_a_ok = 22
 };
 
-enum e_animation_index : short
-{
-    none = 0,
-    animation_index_00 = 1,
-    animation_index_01 = 2,
-    animation_index_02 = 3,
-    animation_index_03 = 4,
-    animation_index_04 = 5,
-    animation_index_05 = 6,
-    animation_index_06 = 7,
-    animation_index_07 = 8,
-    animation_index_08 = 9,
-    animation_index_09 = 10,
-    animation_index_10 = 11,
-    animation_index_11 = 12,
-    animation_index_12 = 13,
-    animation_index_13 = 14,
-    animation_index_14 = 15,
-    animation_index_15 = 16,
-    animation_index_16 = 17,
-    animation_index_17 = 18,
-    animation_index_18 = 19,
-    animation_index_19 = 20,
-    animation_index_20 = 21,
-    animation_index_21 = 22,
-    animation_index_22 = 23,
-    animation_index_23 = 24,
-    animation_index_24 = 25,
-    animation_index_25 = 26,
-    animation_index_26 = 27,
-    animation_index_27 = 28,
-    animation_index_28 = 29,
-    animation_index_29 = 30,
-    animation_index_30 = 31,
-    animation_index_31 = 32,
-    animation_index_32 = 33,
-    animation_index_33 = 34,
-    animation_index_34 = 35,
-    animation_index_35 = 36,
-    animation_index_36 = 37,
-    animation_index_37 = 38,
-    animation_index_38 = 39,
-    animation_index_39 = 40,
-    animation_index_40 = 41,
-    animation_index_41 = 42,
-    animation_index_42 = 43,
-    animation_index_43 = 44,
-    animation_index_44 = 45,
-    animation_index_45 = 46,
-    animation_index_46 = 47,
-    animation_index_47 = 48,
-    animation_index_48 = 49,
-    animation_index_49 = 50,
-    animation_index_50 = 51,
-    animation_index_51 = 52,
-    animation_index_52 = 53,
-    animation_index_53 = 54,
-    animation_index_54 = 55,
-    animation_index_55 = 56,
-    animation_index_56 = 57,
-    animation_index_57 = 58,
-    animation_index_58 = 59,
-    animation_index_59 = 60,
-    animation_index_60 = 61,
-    animation_index_61 = 62,
-    animation_index_62 = 63,
-    animation_index_63 = 64
-};
-
 enum e_text_flags : int
 {
     text_flag_left_justify_text = FLAG(0),
@@ -585,91 +517,6 @@ struct s_text_block_reference
 };
 ASSERT_STRUCT_SIZE(s_text_block_reference, 44);
 
-enum e_bitmap_block_reference_flags : int
-{
-    bitmap_block_reference_flag_ignore_for_list_skin_size_calculation = FLAG(0),
-    bitmap_block_reference_flag_swap_on_relative_list_position = FLAG(1),
-    bitmap_block_reference_flag_render_as_progress_bar = FLAG(2)
-};
-
-enum e_bitmap_blend_method : short
-{
-    bitmap_blend_method_standard = 0,
-    bitmap_blend_method_multiply = 1,
-    bitmap_blend_method_unused = 2,
-};
-
-#define k_maximum_number_of_bitmap_blocks 64
-struct s_bitmap_block_reference
-{
-    e_bitmap_block_reference_flags flags;
-    e_animation_index animation_index;
-    short intro_animation_delay_milliseconds;
-    e_bitmap_blend_method bitmap_blend_method;
-    short initial_sprite_frame;
-    point2d topleft;
-    float horiz_texture_wrapssecond;
-    float vert_texture_wrapssecond;
-
-    // bitm
-    tag_reference bitmap_tag;
-    short render_depth_bias;
-    short pad;
-    float sprite_animation_speed_fps;
-    point2d progress_bottomleft;
-    string_id string_identifier;
-    real_vector2d progress_scale;
-};
-ASSERT_STRUCT_SIZE(s_bitmap_block_reference, 56);
-
-enum e_ui_model_scene_reference_flags : int
-{
-    ui_model_scene_reference_flag_unused = FLAG(0)
-};
-
-#define k_maximum_lights_per_ui_scene 8
-struct s_ui_light_reference
-{
-    char name[32];
-};
-ASSERT_STRUCT_SIZE(s_ui_light_reference, 32);
-
-#define k_maximum_objects_per_ui_scene 32
-struct s_ui_object_reference
-{
-    char name[32];
-};
-ASSERT_STRUCT_SIZE(s_ui_object_reference, 32);
-
-#define k_maximum_object_scenes_per_screen 32
-struct s_ui_model_scene_reference
-{
-    /* Explaination("NOTE on coordinate systems", "Halo y-axis=ui z-axis, and Halo z-axis=ui y-axis.
-    As a convention, let's always place objects in the ui scenario such that
-    they are facing in the '-y' direction, and the camera such that is is
-    facing the '+y' direction.This way the ui animation for models(which
-    gets applied to the camera) will always be consisitent.")*/
-
-    e_ui_model_scene_reference_flags flags;
-    e_animation_index animation_index;
-
-    short intro_animation_delay_milliseconds;
-    short render_depth_bias;
-    short pad;
-
-    tag_block<s_ui_object_reference> objects;
-
-    tag_block<s_ui_light_reference> lights;
-
-    real_vector3d animation_scale_factor;
-    real_point3d camera_position;
-    float fov_degress;
-    rectangle2d ui_viewport;
-    string_id unused_intro_anim;
-    string_id unused_outro_anim;
-    string_id unused_ambient_anim;
-};
-ASSERT_STRUCT_SIZE(s_ui_model_scene_reference, 76);
 
 #define k_maximum_text_value_pairs_per_block 100
 struct s_text_value_pair_block_UNUSED

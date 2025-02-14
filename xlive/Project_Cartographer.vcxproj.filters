@@ -1939,6 +1939,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_variant_options.h" />
     <ClInclude Include="Blam\Engine\items\projectiles.h" />
     <ClInclude Include="Blam\Engine\objects\object_location.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

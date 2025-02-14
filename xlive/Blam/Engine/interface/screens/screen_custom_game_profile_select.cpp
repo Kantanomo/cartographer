@@ -11,6 +11,7 @@
 #include "interface/user_interface_globals.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_networking.h"
+#include "interface/user_interface_shared_globals.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/session/network_session.h"
 #include "saved_games/saved_game_files.h"

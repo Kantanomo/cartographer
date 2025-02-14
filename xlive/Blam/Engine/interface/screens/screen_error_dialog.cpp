@@ -4,9 +4,9 @@
 #include "interface/user_interface_controller.h"
 
 
-typedef void(__cdecl* ok_cancel_dialog_t)(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8);
+typedef void(__cdecl* ok_cancel_dialog_t)(e_user_interface_channel_type channel_type, e_ui_error_type error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8);
 ok_cancel_dialog_t p_ok_cancel_dialog;
-void __cdecl ok_cancel_dialog_show_hook(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8)
+void __cdecl ok_cancel_dialog_show_hook(e_user_interface_channel_type channel_type, e_ui_error_type error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8)
 {
 	//ALL_USERS_MASK
 	if ((user_flags & 0xFF) == (uint8)NONE)

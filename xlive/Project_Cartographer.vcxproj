@@ -671,6 +671,7 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_model_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_profile_select.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_player_widget.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_shared_globals.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_text_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_utilities.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_widget.cpp" />
@@ -983,6 +984,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_profile_select.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_player_widget.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
@@ -1369,7 +1371,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
     <ClInclude Include="Blam\Engine\networking\network_game_definitions.h" />
