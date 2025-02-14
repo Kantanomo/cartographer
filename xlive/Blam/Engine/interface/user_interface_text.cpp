@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "user_interface_text.h"
 
+#include "networking/logic/life_cycle_manager.h"
 #include "interface/hud.h"
 
 c_user_interface_text::c_user_interface_text()
@@ -69,6 +70,26 @@ float get_ui_text_label_scale()
 void set_ui_text_label_scale(float scale)
 {
 	ui_text_label_scaling = scale;
+}
+
+void __cdecl user_interface_parse_private_use_character_game_type(int32 a1, wchar_t* buffer)
+{
+	// TODO: rewrite to support new game engines after string table addons
+	INVOKE(0x22E42F, 0, user_interface_parse_private_use_character_game_type, a1, buffer);
+
+	//c_network_session* network_session;
+	//if (network_life_cycle_in_squad_session(&network_session))
+	//{
+	//	s_game_variant* variant = &network_session->m_session_parameters.game_variant;
+	//	switch(variant->variant_game_engine_index)
+	//	{
+	//		case _game_engine_type_headhunter:
+	//			break;
+	//	default:
+
+	//		break;
+	//	}
+	//}
 }
 
 bool __cdecl user_interface_parse_string(wchar_t* string, size_t max_length, char a3)
