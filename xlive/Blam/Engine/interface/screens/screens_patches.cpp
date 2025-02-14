@@ -23,6 +23,7 @@ void screens_apply_patches_on_map_load()
 	c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load();
 	c_screen_squad_settings::apply_patches_on_map_load();
 	c_screen_settings::apply_patches_on_map_load();
+	c_screen_game_engine_category::apply_on_map_load();
 }
 
 void screens_apply_patches()

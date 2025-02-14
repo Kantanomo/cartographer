@@ -3,12 +3,15 @@
 
 #include "screen_custom_game_profile_select.h"
 #include "screen_virtual_keyboard.h"
+#include "cache/cache_files.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_globals.h"
 #include "interface/user_interface_memory.h"
+#include "interface/user_interface_screen_widget_definition.h"
 #include "main/game_preferences.h"
 #include "saved_games/saved_game_files.h"
 #include "tag_files/global_string_ids.h"
+#include "tag_files/tag_loader/tag_injection.h"
 #include "text/text_group.h"
 
 /* private */
@@ -536,7 +539,94 @@ __declspec(naked) void jmp_c_screen_game_engine_category_load_proc() { __asm { j
 
 void c_screen_game_engine_category::apply_on_map_load()
 {
+	datum settings_screen_datum = tag_loaded(_tag_group_user_interface_screen_widget_definition, "ui\\screens\\game_shell\\mp_game_select\\game_engine_category_listing");
 
+	if (settings_screen_datum != NONE)
+	{
+		s_user_interface_screen_widget_definition* screen_definition = (s_user_interface_screen_widget_definition*)tag_get_fast(settings_screen_datum);
+
+		if (screen_definition)
+		{
+			s_window_pane_reference* slayer_pane = screen_definition->panes[0];
+
+			s_window_pane_reference* headhunter_pane = (s_window_pane_reference*)tag_injection_extend_block(&screen_definition->panes, sizeof(s_window_pane_reference), 1);
+			memcpy(headhunter_pane, slayer_pane, sizeof(s_window_pane_reference));
+
+			// storage variable
+			uint32 out_data_offset = 0;
+
+
+			if (slayer_pane->list_block.count)
+			{
+				s_list_reference* headhunter_list_references = (s_list_reference*)tag_injection_reserve_cache_memory(sizeof(s_list_reference) * slayer_pane->list_block.count, &out_data_offset);
+				headhunter_pane->list_block.data = out_data_offset;
+				csmemcpy(headhunter_list_references, slayer_pane->list_block[0], sizeof(s_list_reference) * slayer_pane->list_block.count);
+			}
+
+			if (slayer_pane->text_blocks.count)
+			{
+				s_text_block_reference* headhunter_text_references = (s_text_block_reference*)tag_injection_reserve_cache_memory(sizeof(s_text_block_reference) * slayer_pane->text_blocks.count, &out_data_offset);
+				headhunter_pane->text_blocks.data = out_data_offset;
+				csmemcpy(headhunter_text_references, slayer_pane->text_blocks[0], sizeof(s_text_block_reference) * slayer_pane->text_blocks.count);
+			}
+
+			if (slayer_pane->bitmap_blocks.count)
+			{
+				s_bitmap_block_reference* headhunter_bitmap_references = (s_bitmap_block_reference*)tag_injection_reserve_cache_memory(sizeof(s_bitmap_block_reference) * slayer_pane->bitmap_blocks.count, &out_data_offset);
+				headhunter_pane->bitmap_blocks.data = out_data_offset;
+				csmemcpy(headhunter_bitmap_references, slayer_pane->bitmap_blocks[0], sizeof(s_bitmap_block_reference) * slayer_pane->bitmap_blocks.count);
+			}
+
+			headhunter_pane->text_blocks[0]->string = _string_id_headhunter_description_text;
+			headhunter_pane->text_blocks[1]->string = _string_id_headhunter;
+
+			headhunter_pane->bitmap_blocks[4]->initial_sprite_frame = 2;
+		}
+	}
+
+	datum lobby_screen_datum = tag_loaded(_tag_group_user_interface_screen_widget_definition, "ui\\screens\\game_shell\\mp_game_select\\game_engine_category_listing_lobby");
+
+	if(lobby_screen_datum != NONE)
+	{
+		s_user_interface_screen_widget_definition* screen_definition = (s_user_interface_screen_widget_definition*)tag_get_fast(lobby_screen_datum);
+		if (screen_definition)
+		{
+			s_window_pane_reference* slayer_pane = screen_definition->panes[0];
+
+			s_window_pane_reference* headhunter_pane = (s_window_pane_reference*)tag_injection_extend_block(&screen_definition->panes, sizeof(s_window_pane_reference), 1);
+			memcpy(headhunter_pane, slayer_pane, sizeof(s_window_pane_reference));
+
+			// storage variable
+			uint32 out_data_offset = 0;
+
+
+			if (slayer_pane->list_block.count)
+			{
+				s_list_reference* headhunter_list_references = (s_list_reference*)tag_injection_reserve_cache_memory(sizeof(s_list_reference) * slayer_pane->list_block.count, &out_data_offset);
+				headhunter_pane->list_block.data = out_data_offset;
+				csmemcpy(headhunter_list_references, slayer_pane->list_block[0], sizeof(s_list_reference) * slayer_pane->list_block.count);
+			}
+
+			if (slayer_pane->text_blocks.count)
+			{
+				s_text_block_reference* headhunter_text_references = (s_text_block_reference*)tag_injection_reserve_cache_memory(sizeof(s_text_block_reference) * slayer_pane->text_blocks.count, &out_data_offset);
+				headhunter_pane->text_blocks.data = out_data_offset;
+				csmemcpy(headhunter_text_references, slayer_pane->text_blocks[0], sizeof(s_text_block_reference) * slayer_pane->text_blocks.count);
+			}
+
+			if (slayer_pane->bitmap_blocks.count)
+			{
+				s_bitmap_block_reference* headhunter_bitmap_references = (s_bitmap_block_reference*)tag_injection_reserve_cache_memory(sizeof(s_bitmap_block_reference) * slayer_pane->bitmap_blocks.count, &out_data_offset);
+				headhunter_pane->bitmap_blocks.data = out_data_offset;
+				csmemcpy(headhunter_bitmap_references, slayer_pane->bitmap_blocks[0], sizeof(s_bitmap_block_reference) * slayer_pane->bitmap_blocks.count);
+			}
+
+			headhunter_pane->text_blocks[0]->string = _string_id_headhunter_description_text;
+			headhunter_pane->text_blocks[1]->string = _string_id_headhunter;
+
+			headhunter_pane->bitmap_blocks[0]->initial_sprite_frame = 2;
+		}
+	}
 }
 
 void c_screen_game_engine_category::apply_patches()

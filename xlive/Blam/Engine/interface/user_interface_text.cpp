@@ -81,9 +81,6 @@ static wchar_t g_user_interface_parse_private_use_charater_game_type_buffer[512]
 
 void __cdecl user_interface_parse_private_use_character_game_type(int32 a1, wchar_t* buffer)
 {
-	// TODO: rewrite to support new game engines after string table addons
-	INVOKE(0x22E42F, 0, user_interface_parse_private_use_character_game_type, a1, buffer);
-
 	s_user_interface_shared_globals* user_interface_shared_globals = user_interface_shared_globals_get();
 
 	ASSERT(user_interface_shared_globals);
