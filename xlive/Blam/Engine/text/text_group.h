@@ -20,3 +20,5 @@ private:
 	bool m_loaded;
 	byte m_pad[3];
 };
+
+void __cdecl text_group_get_unicode_string(datum unic_datum, string_id string_id, wchar_t* out_string);

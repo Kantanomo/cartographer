@@ -3,6 +3,8 @@
 #include "user_interface_screen_widget_definition.h"
 #include "bitmaps/bitmap_group.h"
 
+/* enums */
+
 /* classes */
 
 class c_bitmap_widget : public c_user_interface_widget
@@ -38,3 +40,5 @@ public:
 	virtual c_user_interface_text* get_interface() override;
 };
 ASSERT_STRUCT_SIZE(c_bitmap_widget, 0x98);
+
+void __cdecl user_interface_set_bitmap_from_variant(s_game_variant* variant, c_bitmap_widget* widget);
