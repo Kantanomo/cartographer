@@ -447,7 +447,6 @@
     <ClCompile Include="Blam\Engine\input\input_process.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_error_dialog.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
-    <ClCompile Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\_compiled_shader_table.cpp" />
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
   </ItemGroup>
@@ -623,7 +622,6 @@
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
-    <ClInclude Include="H2MOD\Variants\Variants.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
@@ -1898,7 +1896,6 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\water_world.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\weather_particle_world.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\weather_plate_world.h" />
-    <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\_compiled_shader_table.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\debug_screenspace_world.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_ProdigyCleanTTF.h" />
     <ClInclude Include="Blam\Engine\items\projectiles.h" />
