@@ -1,6 +1,5 @@
 #pragma once
 #include "user_interface_shared_globals.h"
-
 #include "math/color_math.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
@@ -301,75 +300,6 @@ enum e_button_key_type : short
 	button_key_type_y_xbox_live_players_b_cancel = 20,
 	button_key_type_x_delete_a_select_b_back = 21,
 	button_key_type_a_ok = 22
-};
-
-enum e_animation_index : short
-{
-	none = 0,
-	animation_index_00 = 1,
-	animation_index_01 = 2,
-	animation_index_02 = 3,
-	animation_index_03 = 4,
-	animation_index_04 = 5,
-	animation_index_05 = 6,
-	animation_index_06 = 7,
-	animation_index_07 = 8,
-	animation_index_08 = 9,
-	animation_index_09 = 10,
-	animation_index_10 = 11,
-	animation_index_11 = 12,
-	animation_index_12 = 13,
-	animation_index_13 = 14,
-	animation_index_14 = 15,
-	animation_index_15 = 16,
-	animation_index_16 = 17,
-	animation_index_17 = 18,
-	animation_index_18 = 19,
-	animation_index_19 = 20,
-	animation_index_20 = 21,
-	animation_index_21 = 22,
-	animation_index_22 = 23,
-	animation_index_23 = 24,
-	animation_index_24 = 25,
-	animation_index_25 = 26,
-	animation_index_26 = 27,
-	animation_index_27 = 28,
-	animation_index_28 = 29,
-	animation_index_29 = 30,
-	animation_index_30 = 31,
-	animation_index_31 = 32,
-	animation_index_32 = 33,
-	animation_index_33 = 34,
-	animation_index_34 = 35,
-	animation_index_35 = 36,
-	animation_index_36 = 37,
-	animation_index_37 = 38,
-	animation_index_38 = 39,
-	animation_index_39 = 40,
-	animation_index_40 = 41,
-	animation_index_41 = 42,
-	animation_index_42 = 43,
-	animation_index_43 = 44,
-	animation_index_44 = 45,
-	animation_index_45 = 46,
-	animation_index_46 = 47,
-	animation_index_47 = 48,
-	animation_index_48 = 49,
-	animation_index_49 = 50,
-	animation_index_50 = 51,
-	animation_index_51 = 52,
-	animation_index_52 = 53,
-	animation_index_53 = 54,
-	animation_index_54 = 55,
-	animation_index_55 = 56,
-	animation_index_56 = 57,
-	animation_index_57 = 58,
-	animation_index_58 = 59,
-	animation_index_59 = 60,
-	animation_index_60 = 61,
-	animation_index_61 = 62,
-	animation_index_62 = 63,
-	animation_index_63 = 64
 };
 
 enum e_text_flags : int

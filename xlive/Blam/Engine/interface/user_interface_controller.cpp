@@ -519,8 +519,8 @@ static void user_interface_controller_removed_handler(void)
 	}
 	if (!user_inteface_controller_has_removed_screen_active() && user_interface_error_display_allowed())
 	{
-		//e_ui_error_types error_msg = _ui_error_keyboard_removed; // use when we add support for multiple kbm?
-		e_ui_error_types error_msg = _ui_error_controller_removed;
+		//e_ui_error_type error_msg = _ui_error_keyboard_removed; // use when we add support for multiple kbm?
+		e_ui_error_type error_msg = _ui_error_controller_removed;
 		switch (detached_controller)
 		{
 		case _controller_index_0:
@@ -563,7 +563,7 @@ static void user_interface_controller_boot_to_dash_check(void)
 		&& input_windows_key_frames_down(WM_SYSKEYDOWN) != 0)
 		|| *g_input_windows_request_terminate == true)
 	{
-		e_ui_error_types error_id = _ui_error_confirm_boot_to_dash;
+		e_ui_error_type error_id = _ui_error_confirm_boot_to_dash;
 		void* exit_callback = user_interface_exit_to_dash;
 
 		if (user_interface_globals_get_map_type() == scenario_type_singleplayer)

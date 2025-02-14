@@ -1982,6 +1982,7 @@
     <ClInclude Include="Blam\Engine\saved_games\cartographer_player_profile\cartographer_player_profile_weapon_offsets.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_config.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_log.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
