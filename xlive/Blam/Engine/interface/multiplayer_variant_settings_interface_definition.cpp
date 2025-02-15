@@ -54,7 +54,7 @@ static void multiplayer_variant_settings_interface_parse_headhunter_max_heads_ca
 	*(real32*)out_variable = 1.0f;
 }
 
-static void multiplayer_variant_settings_interface_variant_setting_label_boolean_value(int32 value, wchar_t* out_string)
+static void multiplayer_variant_settings_interface_variant_parameter_label_boolean_value(int32 value, wchar_t* out_string)
 {
 	if (value == 1)
 		usnzprintf(out_string, 512, L"On");
@@ -75,37 +75,42 @@ void multiplayer_variant_settings_interface_apply_patches()
 	WritePointer(Memory::GetAddress(0x464E1C), &multiplayer_variant_settings_interface_parse_headhunter_max_heads_carried);
 }
 
-s_variant_setting_edit_reference* __cdecl multiplayer_variant_settings_interface_get_reference(e_variant_setting_category_type category_type)
+s_variant_setting_edit_reference* __cdecl multiplayer_variant_settings_interface_get_category_reference(e_variant_setting_category_type category_type)
 {
-	return INVOKE(0x23ACDC, 0, multiplayer_variant_settings_interface_get_reference, category_type);
+	return INVOKE(0x23ACDC, 0, multiplayer_variant_settings_interface_get_category_reference, category_type);
 }
 
-int32 __cdecl multiplayer_variant_settings_interface_get_variant_setting_value(s_game_variant* variant,	e_default_variant_setting_category_type type)
+s_text_value_pair_definition* multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(e_variant_setting_parameter_type parameter_type)
 {
-	return INVOKE(0x23AA54, 0, multiplayer_variant_settings_interface_get_variant_setting_value, variant, type);
+	return INVOKE(0x23ABCC, 0, multiplayer_variant_settings_interface_get_text_value_pair_for_parameter, parameter_type);
 }
 
-s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_setting_label(s_text_value_pair_definition* text_value_pair, int32 value)
+int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value(s_game_variant* variant,	e_variant_setting_parameter_type type)
 {
-	return INVOKE(0x23AD57, 0, multiplayer_variant_settings_interface_get_variant_setting_label, text_value_pair, value);
+	return INVOKE(0x23AA54, 0, multiplayer_variant_settings_interface_get_variant_parameter_value, variant, type);
 }
 
-void multiplayer_variant_settings_interface_get_variant_setting_label_direct(s_game_variant* variant, e_default_variant_setting_category_type type, wchar_t* out_string)
+s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_parameter_label(s_text_value_pair_definition* text_value_pair, int32 value)
 {
-	int32 value = multiplayer_variant_settings_interface_get_variant_setting_value(variant, type);
+	return INVOKE(0x23AD57, 0, multiplayer_variant_settings_interface_get_variant_parameter_label, text_value_pair, value);
+}
+
+void multiplayer_variant_settings_interface_get_variant_parameter_label_direct(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string)
+{
+	int32 value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, type);
 
 	switch(type)
 	{
-		case _default_variant_setting_category_type_headhunter_moving_head_bin:
-		case _default_variant_setting_category_type_headhunter_point_multiplier:
-		case _default_variant_setting_category_type_headhunter_suicide_point_loss:
-		case _default_variant_setting_category_type_headhunter_death_point_loss:
-		case _default_variant_setting_category_type_headhunter_uncontested_bin:
+		case _variant_setting_parameter_type_headhunter_moving_head_bin:
+		case _variant_setting_parameter_type_headhunter_point_multiplier:
+		case _variant_setting_parameter_type_headhunter_suicide_point_loss:
+		case _variant_setting_parameter_type_headhunter_death_point_loss:
+		case _variant_setting_parameter_type_headhunter_uncontested_bin:
 		{
-			multiplayer_variant_settings_interface_variant_setting_label_boolean_value(value, out_string);
+			multiplayer_variant_settings_interface_variant_parameter_label_boolean_value(value, out_string);
 			return;
 		}
-		case _default_variant_setting_category_type_headhunter_speed_with_heads:
+		case _variant_setting_parameter_type_headhunter_speed_with_heads:
 		{
 			switch ((e_ctf_engine_player_speed)value)
 			{
@@ -120,7 +125,7 @@ void multiplayer_variant_settings_interface_get_variant_setting_label_direct(s_g
 					return;
 			}
 		}
-		case _default_variant_setting_category_type_headhunter_max_heads_carried:
+		case _variant_setting_parameter_type_headhunter_max_heads_carried:
 		{
 			switch ((e_headhunter_max_heads_carried)value)
 			{

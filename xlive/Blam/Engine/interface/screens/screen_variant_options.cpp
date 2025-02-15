@@ -23,15 +23,15 @@ const static wchar_t* headhunter_option_strings[k_variant_options_headhunter_lis
 	L"Max heads carried"
 };
 
-const static e_default_variant_setting_category_type headhunter_option_types[k_variant_options_headhunter_list_item_count]
+const static e_variant_setting_parameter_type headhunter_option_types[k_variant_options_headhunter_list_item_count]
 {
-	_default_variant_setting_category_type_headhunter_moving_head_bin,
-	_default_variant_setting_category_type_headhunter_point_multiplier,
-	_default_variant_setting_category_type_headhunter_suicide_point_loss,
-	_default_variant_setting_category_type_headhunter_death_point_loss,
-	_default_variant_setting_category_type_headhunter_uncontested_bin,
-	_default_variant_setting_category_type_headhunter_speed_with_heads,
-	_default_variant_setting_category_type_headhunter_max_heads_carried
+	_variant_setting_parameter_type_headhunter_moving_head_bin,
+	_variant_setting_parameter_type_headhunter_point_multiplier,
+	_variant_setting_parameter_type_headhunter_suicide_point_loss,
+	_variant_setting_parameter_type_headhunter_death_point_loss,
+	_variant_setting_parameter_type_headhunter_uncontested_bin,
+	_variant_setting_parameter_type_headhunter_speed_with_heads,
+	_variant_setting_parameter_type_headhunter_max_heads_carried
 };
 
 
@@ -45,7 +45,7 @@ int32 c_variant_options_list::link_item_widgets()
 
 	if (this->m_variant_setting_category_type != _variant_setting_category_type_game_head_hunter)
 	{
-		s_variant_setting_edit_reference* variant_reference = multiplayer_variant_settings_interface_get_reference(this->m_variant_setting_category_type);
+		s_variant_setting_edit_reference* variant_reference = multiplayer_variant_settings_interface_get_category_reference(this->m_variant_setting_category_type);
 
 		if (variant_reference && variant_reference->options.count > 0)
 		{
@@ -144,8 +144,8 @@ void c_variant_options_list::update_list_items(c_list_item_widget* item, int32 s
 					}
 					if (variant)
 					{
-						int32 variant_setting_value = multiplayer_variant_settings_interface_get_variant_setting_value(variant, list_item->sily_definition->parameter);
-						s_text_value_pair_reference_new* variant_setting_label = multiplayer_variant_settings_interface_get_variant_setting_label(list_item->sily_definition, variant_setting_value);
+						int32 variant_setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, list_item->sily_definition->parameter);
+						s_text_value_pair_reference_new* variant_setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(list_item->sily_definition, variant_setting_value);
 						temp_string[0] = '\0';
 						if (variant_setting_label)
 						{
@@ -179,7 +179,7 @@ void c_variant_options_list::update_list_items(c_list_item_widget* item, int32 s
 				}
 				if (variant)
 				{
-					multiplayer_variant_settings_interface_get_variant_setting_label_direct(variant, headhunter_option_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())], temp_string);
+					multiplayer_variant_settings_interface_get_variant_parameter_label_direct(variant, headhunter_option_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())], temp_string);
 					value_text->set_text(temp_string);
 				}
 			}
