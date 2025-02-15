@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "multiplayer_variant_settings_interface_definition.h"
 
+#include "multiplayer_variant_interface_headhunter_strings.h"
 #include "text/unicode.h"
 
 /* private code */
@@ -54,12 +55,48 @@ static void multiplayer_variant_settings_interface_parse_headhunter_max_heads_ca
 	*(real32*)out_variable = 1.0f;
 }
 
-static void multiplayer_variant_settings_interface_variant_parameter_label_boolean_value(int32 value, wchar_t* out_string)
+static void multiplayer_variant_settings_interface_get_variant_parameter_label_headhunter(int32 value, e_variant_setting_parameter_type type, wchar_t* out_string)
 {
-	if (value == 1)
-		usnzprintf(out_string, 512, L"On");
-	else
-		usnzprintf(out_string, 512, L"Off");
+	const wchar_t* string = L"";
+
+	switch (type)
+	{
+		case _variant_setting_parameter_type_headhunter_moving_head_bin:
+		case _variant_setting_parameter_type_headhunter_point_multiplier:
+		case _variant_setting_parameter_type_headhunter_suicide_point_loss:
+		case _variant_setting_parameter_type_headhunter_death_point_loss:
+		case _variant_setting_parameter_type_headhunter_uncontested_bin:
+		{
+			string = g_multiplayer_variant_interface_bool_value_strings[get_current_language()][value];
+			break;
+		}
+		case _variant_setting_parameter_type_headhunter_speed_with_heads:
+		{
+			switch ((e_ctf_engine_player_speed)value)
+			{
+				case _ctf_engine_player_speed_normal:
+				case _ctf_engine_player_speed_fast:
+				case _ctf_engine_player_speed_slow:
+					string = g_multiplayer_variant_interface_headhunter_speed_with_head_strings[get_current_language()][value];
+					break;
+			}
+			break;
+		}
+		case _variant_setting_parameter_type_headhunter_max_heads_carried:
+		{
+			switch ((e_headhunter_max_heads_carried)value)
+			{
+				case _headhunter_max_heads_carried_none:
+				case _headhunter_max_heads_carried_one:
+				case _headhunter_max_heads_carried_five:
+				case _headhunter_max_heads_carried_ten:
+					string = g_multiplayer_variant_interface_headhunter_max_heads_carried_strings[get_current_language()][value];
+					break;
+			}
+			break;
+		}
+	}
+	usnzprintf(out_string, 512, string);
 }
 
 /* public code */
@@ -90,6 +127,11 @@ int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value
 	return INVOKE(0x23AA54, 0, multiplayer_variant_settings_interface_get_variant_parameter_value, variant, type);
 }
 
+void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(s_game_variant* variant, e_variant_setting_parameter_type parameter_type, int32 value)
+{
+	INVOKE(0x23A8C2, 0, multiplayer_variant_settings_interface_set_variant_parameter_value, variant, parameter_type, value);
+}
+
 s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_parameter_label(s_text_value_pair_definition* text_value_pair, int32 value)
 {
 	return INVOKE(0x23AD57, 0, multiplayer_variant_settings_interface_get_variant_parameter_label, text_value_pair, value);
@@ -99,50 +141,24 @@ void multiplayer_variant_settings_interface_get_variant_parameter_label_direct(s
 {
 	int32 value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, type);
 
-	switch(type)
+	switch(variant->variant_game_engine_index)
 	{
-		case _variant_setting_parameter_type_headhunter_moving_head_bin:
-		case _variant_setting_parameter_type_headhunter_point_multiplier:
-		case _variant_setting_parameter_type_headhunter_suicide_point_loss:
-		case _variant_setting_parameter_type_headhunter_death_point_loss:
-		case _variant_setting_parameter_type_headhunter_uncontested_bin:
-		{
-			multiplayer_variant_settings_interface_variant_parameter_label_boolean_value(value, out_string);
-			return;
-		}
-		case _variant_setting_parameter_type_headhunter_speed_with_heads:
-		{
-			switch ((e_ctf_engine_player_speed)value)
-			{
-				case _ctf_engine_player_speed_slow:
-					usnzprintf(out_string, 512, L"Slow");
-					return;
-				case _ctf_engine_player_speed_normal:
-					usnzprintf(out_string, 512, L"Normal");
-					return;
-				case _ctf_engine_player_speed_fast:
-					usnzprintf(out_string, 512, L"Fast");
-					return;
-			}
-		}
-		case _variant_setting_parameter_type_headhunter_max_heads_carried:
-		{
-			switch ((e_headhunter_max_heads_carried)value)
-			{
-			case _headhunter_max_heads_carried_none:
-				usnzprintf(out_string, 512, L"Unlimited");
-				return;
-			case _headhunter_max_heads_carried_one:
-				usnzprintf(out_string, 512, L"One");
-				return;
-			case _headhunter_max_heads_carried_five:
-				usnzprintf(out_string, 512, L"Five");
-				return;
-			case _headhunter_max_heads_carried_ten:
-				usnzprintf(out_string, 512, L"Ten");
-				return;
-			}	
-		}
+		case _game_engine_type_headhunter:
+			multiplayer_variant_settings_interface_get_variant_parameter_label_headhunter(value, type, out_string);
+			break;
+		default:
+			usnzprintf(out_string, 512, L"");
+			break;
 	}
-	usnzprintf(out_string, 512, L"");
+}
+
+const wchar_t* multiplayer_variant_settings_interface_get_variant_parameter_title_direct(s_game_variant* variant, int32 index)
+{
+	switch (variant->variant_game_engine_index)
+	{
+		case _game_engine_type_headhunter:
+			return g_multiplayer_variant_interface_headhunter_parameter_title_strings[get_current_language()][index];
+		default:
+			return L"";
+	}
 }

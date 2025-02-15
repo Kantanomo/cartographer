@@ -1,4 +1,5 @@
-#pragma once
+﻿#pragma once
+#include "main/game_preferences.h"
 #include "saved_games/game_variant.h"
 #include "tag_files/global_string_ids.h"
 #include "tag_files/string_id.h"
@@ -10,6 +11,58 @@
 #define k_maximum_text_value_pairs_new_per_block k_maximum_text_value_pair_blocks
 #define k_maximum_default_variants 100
 #define k_number_of_editable_game_variant_parameters 112
+
+/* const */
+
+const static wchar_t* g_multiplayer_variant_interface_bool_value_strings[k_language_count][2] =
+{
+	// English
+	{
+		L"Off",
+		L"On"
+	},
+	// Japanese
+	{
+		L"オフ",
+		L"オン"
+	},
+	// German
+	{
+		L"Aus",
+		L"An"
+	},
+	// French
+	{
+		L"Désactivé",
+		L"Activé"
+	},
+	// Spanish
+	{
+		L"Desactivado",
+		L"Activado"
+	},
+	// Italian
+	{
+		L"Disattivato",
+		L"Attivato"
+	},
+	// Korean
+	{
+		L"꺼짐",
+		L"켜짐"
+	},
+	// Chinese
+	{
+		L"关闭",
+		L"开启"
+	},
+	// Portuguese
+	{
+		L"Desativado",
+		L"Ativado"
+	}
+};
+
 
 /* enums */
 
@@ -278,6 +331,17 @@ enum e_multiplayer_variant_setting_interface_conversion_type : uint32
 	_multiplayer_variant_setting_interface_conversion_type_real32 = 6,
 };
 
+static constexpr e_variant_setting_parameter_type headhunter_option_types[k_multiplayer_variant_headhunter_parameter_count]
+{
+	_variant_setting_parameter_type_headhunter_moving_head_bin,
+	_variant_setting_parameter_type_headhunter_point_multiplier,
+	_variant_setting_parameter_type_headhunter_suicide_point_loss,
+	_variant_setting_parameter_type_headhunter_death_point_loss,
+	_variant_setting_parameter_type_headhunter_uncontested_bin,
+	_variant_setting_parameter_type_headhunter_speed_with_heads,
+	_variant_setting_parameter_type_headhunter_max_heads_carried
+};
+
 /* structure */
 
 // max: k_number_of_editable_game_variant_parameters
@@ -391,6 +455,10 @@ s_text_value_pair_definition* __cdecl multiplayer_variant_settings_interface_get
 
 int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value(s_game_variant* variant, e_variant_setting_parameter_type type);
 
+void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(s_game_variant* variant, e_variant_setting_parameter_type parameter_type, int32 value);
+
 s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_parameter_label(s_text_value_pair_definition* text_value_pair, int32 value);
 
 void multiplayer_variant_settings_interface_get_variant_parameter_label_direct(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string);
+
+const wchar_t* multiplayer_variant_settings_interface_get_variant_parameter_title_direct(s_game_variant* variant, int32 parameter_index);

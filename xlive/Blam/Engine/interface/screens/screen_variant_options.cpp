@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "screen_variant_options.h"
 
+#include "screen_variant_parameter_setting.h"
 #include "cache/cache_files.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_memory.h"
@@ -12,27 +13,7 @@
 /* -c_variant_options_list- */
 /* ------------------------ */
 
-const static wchar_t* headhunter_option_strings[k_variant_options_headhunter_list_item_count]
-{
-	L"Moving Bin",
-	L"Point Multiplier",
-	L"Suicide Point Loss",
-	L"Death Point Loss",
-	L"Uncontested Bin",
-	L"Speed with Heads",
-	L"Max heads carried"
-};
 
-const static e_variant_setting_parameter_type headhunter_option_types[k_variant_options_headhunter_list_item_count]
-{
-	_variant_setting_parameter_type_headhunter_moving_head_bin,
-	_variant_setting_parameter_type_headhunter_point_multiplier,
-	_variant_setting_parameter_type_headhunter_suicide_point_loss,
-	_variant_setting_parameter_type_headhunter_death_point_loss,
-	_variant_setting_parameter_type_headhunter_uncontested_bin,
-	_variant_setting_parameter_type_headhunter_speed_with_heads,
-	_variant_setting_parameter_type_headhunter_max_heads_carried
-};
 
 
 
@@ -82,7 +63,7 @@ int32 c_variant_options_list::link_item_widgets()
 	}
 	else
 	{
-		this->m_list_data = ui_list_data_new(k_variant_options_list_name, k_variant_options_headhunter_list_item_count, sizeof(s_variant_options_list_item));
+		this->m_list_data = ui_list_data_new(k_variant_options_list_name, k_multiplayer_variant_headhunter_parameter_count, sizeof(s_variant_options_list_item));
 		data_make_valid(this->m_list_data);
 		if(this->m_list_data->datum_max_elements > 0)
 		{
@@ -158,28 +139,30 @@ void c_variant_options_list::update_list_items(c_list_item_widget* item, int32 s
 		}
 		else
 		{
-			if(title_text)
-			{
-				title_text->set_text(headhunter_option_strings[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())]);
-			}
-			if(value_text)
-			{
-				wchar_t temp_string[512] {};
-				s_game_variant* variant;
+			s_game_variant* variant;
 
-				if (!this->m_is_quick_options)
-					variant = user_interface_get_variant();
+			if (!this->m_is_quick_options)
+				variant = user_interface_get_variant();
+			else
+			{
+				c_network_session* network_session;
+				if (network_life_cycle_in_squad_session(&network_session))
+					variant = &network_session->m_session_parameters.game_variant;
 				else
+					variant = nullptr;
+			}
+			if (variant)
+			{
+				if (title_text)
 				{
-					c_network_session* network_session;
-					if (network_life_cycle_in_squad_session(&network_session))
-						variant = &network_session->m_session_parameters.game_variant;
-					else
-						variant = nullptr;
+					title_text->set_text(multiplayer_variant_settings_interface_get_variant_parameter_title_direct(variant, DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())));
 				}
-				if (variant)
+				if (value_text)
 				{
-					multiplayer_variant_settings_interface_get_variant_parameter_label_direct(variant, headhunter_option_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())], temp_string);
+					wchar_t temp_string[512]{};
+
+					multiplayer_variant_settings_interface_get_variant_parameter_label_direct(variant, g_multiplayer_variant_interface_headhunter_parameter_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())], temp_string);
+
 					value_text->set_text(temp_string);
 				}
 			}
@@ -200,7 +183,22 @@ void c_variant_options_list::set_variant_setting_category_type(e_variant_setting
 
 void c_variant_options_list::handle_item_pressed_event(s_event_record** event, datum* pitem_index)
 {
-	INVOKE_TYPE(0x2585EC, 0, void(__thiscall*)(c_variant_options_list*, s_event_record**, datum*), this, event, pitem_index);
+	//INVOKE_TYPE(0x2585EC, 0, void(__thiscall*)(c_variant_options_list*, s_event_record**, datum*), this, event, pitem_index);
+
+	s_variant_options_list_item* item = (s_variant_options_list_item*)datum_get(this->m_list_data, *pitem_index);
+	if(item)
+	{
+		if(item->sily_definition)
+		{
+			c_screen_variant_parameter_setting::new_instance(
+				item->sily_definition->parameter,
+				_user_interface_channel_type_online_menu,
+				_window_4,
+				this->m_controllers_mask,
+				this->m_is_quick_options
+			);
+		}
+	}
 }
 
 c_variant_options_list::c_variant_options_list(uint16 user_flags):

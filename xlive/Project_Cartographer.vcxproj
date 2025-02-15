@@ -1350,6 +1350,7 @@
     <ClInclude Include="Blam\Engine\interface\interface.h" />
     <ClInclude Include="Blam\Engine\interface\meter_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\motion_sensor.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_interface_headhunter_strings.h" />
     <ClInclude Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_draw.h" />

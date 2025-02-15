@@ -455,7 +455,6 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_search_option_variant_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_editing_options.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_options.cpp" />
-    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
     <ClCompile Include="Blam\Engine\text\text_group.cpp" />
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
@@ -494,6 +493,7 @@
     <ClCompile Include="Blam\Engine\kablam\kablam_log.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_shared_globals.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_parameter_setting.cpp" />
+    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1987,6 +1987,7 @@
     <ClInclude Include="Blam\Engine\kablam\kablam_log.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_variant_parameter_setting.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_interface_headhunter_strings.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
