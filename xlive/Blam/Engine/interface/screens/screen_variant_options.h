@@ -8,6 +8,7 @@
 #define k_variant_options_list_name "variant category options list"
 #define k_variant_options_list_empty_name "EMPTY variant category options list"
 #define k_variant_options_list_item_count 12
+#define k_variant_options_headhunter_list_item_count 7
 
 struct s_variant_options_list_item
 {

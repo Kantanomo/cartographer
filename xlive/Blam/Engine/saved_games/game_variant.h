@@ -380,14 +380,23 @@ enum e_juggernaut_engine_flags
 	k_juggernaut_engine_clear_unused_bits_mask = FLAG(_juggernaut_is_damage_resistant_bit | _juggernaut_has_infinite_ammo_bit | _juggernaut_does_extra_damage_bit | _juggernaut_betrayal_point_loss_bit | _juggernaut_has_active_camo_bit | _juggernaut_has_supershield_bit | _juggernaut_has_motion_sensor_bit)
 };
 
-enum e_headhunter_dropped_token_fade_type : uint8
+enum e_headhunter_max_heads_carried : uint8
 {
-	_headhunter_dropped_token_fade_never,
-	_headhunter_dropped_token_fade_5_seconds,
-	_headhunter_dropped_token_fade_10_seconds,
-	_headhunter_dropped_token_fade_15_seconds,
+	_headhunter_max_heads_carried_none,
+	_headhunter_max_heads_carried_one,
+	_headhunter_max_heads_carried_five,
+	_headhunter_max_heads_carried_ten,
+};
 
-	k_headhunter_dropped_token_fade_count
+enum e_headhunter_engine_flags : uint32
+{
+	_headhunter_engine_flag_moving_bin,
+	_headhunter_engine_flag_point_multiplier,
+	_headhunter_engine_flag_suicide_point_loss,
+	_headhunter_engine_flag_death_point_loss,
+	_headhunter_engine_flag_uncontested_bin,
+
+	k_headhunter_engine_flags_count
 };
 
 struct s_variant_description_map
@@ -438,14 +447,9 @@ struct s_juggernaut_variant_settings
 
 struct s_head_hunter_settings
 {
-	// Determine the length of time a token remains available before vanishing.
-	e_headhunter_dropped_token_fade_type dropped_token_fade;
-	// This setting makes token carriers run faster or slower than other players.
-	e_ctf_engine_player_speed speed_with_tokens;
-	// Tokens can be 1 point each, or mutiplied by the amount you deposit.
-	bool score_multiplier;
-	// This settings makes the bin move between locations.
-	bool moving_bin;
+	c_flags_no_init<e_headhunter_engine_flags, uint32, k_headhunter_engine_flags_count> flags;
+	e_ctf_engine_player_speed speed_with_heads;
+	e_headhunter_max_heads_carried max_heads_carried;
 };
 
 struct s_territories_variant_settings
