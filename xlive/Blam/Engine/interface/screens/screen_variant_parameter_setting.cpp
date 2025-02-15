@@ -2,6 +2,8 @@
 #include "screen_variant_parameter_setting.h"
 
 #include "interface/user_interface_memory.h"
+#include "interface/user_interface_networking.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "text/text_group.h"
 
 
@@ -9,27 +11,54 @@
 /* -c_variant_parameter_setting_list- */
 /* ---------------------------------- */
 
-c_variant_parameter_setting_list::c_variant_parameter_setting_list(uint16 user_flags) :
-	c_list_widget(user_flags),
-	m_slot(this, &c_variant_parameter_setting_list::handle_item_pressed_event),
-	m_variant_setting_parameter_type(_variant_setting_parameter_type_invalid),
-	sily_definition(nullptr),
-	field_3E8(0)
+void c_variant_parameter_setting_list::handle_item_pressed_event(s_event_record** event, datum* pitem_index)
 {
+	s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, *pitem_index);
+
+	if(list_item)
+	{
+		s_game_variant* variant;
+
+		if (!this->m_is_quick_options)
+			variant = user_interface_get_variant();
+		else
+		{
+			c_network_session* network_session;
+			if (network_life_cycle_in_squad_session(&network_session))
+				variant = &network_session->m_session_parameters.game_variant;
+			else
+				variant = nullptr;
+		}
+
+		if(variant)
+		{
+			multiplayer_variant_settings_interface_set_variant_parameter_value(variant, this->m_variant_setting_parameter_type, list_item->text_value_pair_reference->value);
+
+			if(this->m_is_quick_options)
+			{
+				user_interface_game_settings_set_game_variant(variant);
+				if(IN_RANGE(variant->variant_game_engine_index, _game_engine_type_ctf, k_game_engine_playable_types))
+				{
+					user_interface_back_out_from_channel(this->get_parent_screen()->get_channel(), this->get_parent_screen()->get_render_window());
+				}
+			}
+		}
+	}
+	this->get_parent_screen()->start_widget_animation(3);
 }
 
 int32 c_variant_parameter_setting_list::link_item_widgets()
 {
 	if (this->m_variant_setting_parameter_type == _variant_setting_parameter_type_invalid)
-		this->m_variant_setting_parameter_type = g_previous_variant_setting_category;
+		this->m_variant_setting_parameter_type = g_previous_variant_setting_parameter;
 	else
-		g_previous_variant_setting_category = this->m_variant_setting_parameter_type;
+		g_previous_variant_setting_parameter = this->m_variant_setting_parameter_type;
 
-	this->sily_definition = multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(this->m_variant_setting_parameter_type);
+	this->m_sily_definition = multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(this->m_variant_setting_parameter_type);
 
-	if(this->sily_definition && this->sily_definition->text_value_pairs.count)
+	if(this->m_sily_definition && this->m_sily_definition->text_value_pairs.count)
 	{
-		this->m_list_data = ui_list_data_new(k_variant_parameter_setting_list_name, this->sily_definition->text_value_pairs.count, sizeof(s_variant_parameter_setting_list_item));
+		this->m_list_data = ui_list_data_new(k_variant_parameter_setting_list_name, this->m_sily_definition->text_value_pairs.count, sizeof(s_variant_parameter_setting_list_item));
 		data_make_valid(this->m_list_data);
 
 		if(this->m_list_data->datum_max_elements)
@@ -37,7 +66,7 @@ int32 c_variant_parameter_setting_list::link_item_widgets()
 			for(int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
 			{
 				s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
-				list_item->text_value_pair_reference = this->sily_definition->text_value_pairs[i];
+				list_item->text_value_pair_reference = this->m_sily_definition->text_value_pairs[i];
 			}
 		}
 
@@ -55,6 +84,8 @@ int32 c_variant_parameter_setting_list::link_item_widgets()
 		this->linker_type2.link(&this->m_slot);
 		c_list_widget::link_item_widgets();
 	}
+
+	return 1;
 }
 
 c_list_item_widget* c_variant_parameter_setting_list::get_list_items()
@@ -74,15 +105,80 @@ void c_variant_parameter_setting_list::update_list_items(c_list_item_widget* ite
 		s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, item->get_last_data_index());
 		c_text_widget* text_widget = item->try_find_text_widget(0);
 
-		if(this->sily_definition && this->sily_definition->string_list.index != NONE && text_widget && list_item->text_value_pair_reference)
+		if(this->m_sily_definition && this->m_sily_definition->string_list.index != NONE && text_widget && list_item->text_value_pair_reference)
 		{
 			wchar_t temp_string[512]{};
 
-			text_group_get_unicode_string(this->sily_definition->string_list.index, list_item->text_value_pair_reference->label_string, temp_string);
+			text_group_get_unicode_string(this->m_sily_definition->string_list.index, list_item->text_value_pair_reference->label_string, temp_string);
 
 			text_widget->set_text(temp_string);
 		}
 	}
+}
+
+void c_variant_parameter_setting_list::update_selected_list_item()
+{
+	s_game_variant* variant;
+
+	if (!this->m_is_quick_options)
+		variant = user_interface_get_variant();
+	else
+	{
+		c_network_session* network_session;
+		if (network_life_cycle_in_squad_session(&network_session))
+			variant = &network_session->m_session_parameters.game_variant;
+		else
+			variant = nullptr;
+	}
+
+	if(variant)
+	{
+		int32 parameter_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, this->m_variant_setting_parameter_type);
+
+		s_data_iterator<s_variant_parameter_setting_list_item> it(this->m_list_data);
+
+		while(it.get_next_datum())
+		{
+			s_variant_parameter_setting_list_item* current_item = it.get_current_datum();
+			if(current_item->text_value_pair_reference)
+			{
+				if (current_item->text_value_pair_reference->value == parameter_value)
+				{
+					this->set_focused_item_index(it.get_current_datum_index());
+					break;
+				}
+			}
+		}
+	}
+}
+
+void c_variant_parameter_setting_list::set_variant_parameter_type(e_variant_setting_parameter_type type)
+{
+	this->m_variant_setting_parameter_type = type;
+}
+
+e_variant_setting_parameter_type c_variant_parameter_setting_list::get_variant_parameter_type() const
+{
+	return this->m_variant_setting_parameter_type;
+}
+
+void c_variant_parameter_setting_list::set_is_quick_options(bool state)
+{
+	this->m_is_quick_options = state;
+}
+
+bool c_variant_parameter_setting_list::get_is_quick_options() const
+{
+	return this->m_is_quick_options;
+}
+
+c_variant_parameter_setting_list::c_variant_parameter_setting_list(uint16 user_flags) :
+	c_list_widget(user_flags),
+	m_slot(this, &c_variant_parameter_setting_list::handle_item_pressed_event),
+	m_variant_setting_parameter_type(_variant_setting_parameter_type_invalid),
+	m_sily_definition(nullptr),
+	m_is_quick_options(false)
+{
 }
 
 
@@ -90,25 +186,121 @@ void c_variant_parameter_setting_list::update_list_items(c_list_item_widget* ite
 /* -c_screen_variant_parameter_setting- */
 /* ------------------------------------ */
 
-c_screen_variant_parameter_setting::c_screen_variant_parameter_setting(e_user_interface_channel_type ui_channel, e_user_interface_render_window window_index, uint16 user_flags, e_user_interface_screen_id screen_id) :
-	c_screen_with_menu(screen_id, ui_channel, window_index, user_flags, &this->m_list),
-	m_list(user_flags)
-{
-}
-
 void c_screen_variant_parameter_setting::post_initialize()
 {
+	c_text_widget* header_text = this->try_find_text_widget(0);
+	c_text_widget* description_text = this->try_find_text_widget(2);
+
+	s_text_value_pair_definition* value_reference = multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(this->m_list.get_variant_parameter_type());
+
+	wchar_t temp_string[512]{};
+
+	if(value_reference && value_reference->string_list.index != NONE)
+	{
+		if(header_text)
+		{
+			text_group_get_unicode_string(value_reference->string_list.index, value_reference->header_text, temp_string);
+			header_text->set_text(temp_string);
+		}
+
+		if(description_text)
+		{
+			text_group_get_unicode_string(value_reference->string_list.index, value_reference->description_test, temp_string);
+			description_text->set_text(temp_string);
+		}
+	}
+
+	this->m_list.update_selected_list_item();
+
 	c_screen_with_menu::post_initialize();
 }
 
 const void* c_screen_variant_parameter_setting::load_proc() const
 {
+	if (this->m_list.get_is_quick_options())
+		return &c_screen_variant_parameter_setting::load_quick_options;
+
+	return &c_screen_variant_parameter_setting::load_settings;
 }
+
 
 void* c_screen_variant_parameter_setting::load_quick_options(s_screen_parameters* parameters)
 {
+	c_screen_variant_parameter_setting* screen;
+
+	void* pool = ui_pool_allocate_space(sizeof(c_screen_variant_parameter_setting), 1);
+
+	if (pool)
+	{
+		screen = new (pool) c_screen_variant_parameter_setting(
+			parameters->m_channel_type,
+			parameters->m_window_index,
+			parameters->user_flags,
+			_screen_variant_param_setting_format
+		);
+
+		screen->m_allocated = true;
+		screen->m_list.set_is_quick_options(true);
+
+		user_interface_register_screen_to_channel(screen, parameters);
+	}
+	else
+		return nullptr;
+
+	return screen;
 }
 
 void* c_screen_variant_parameter_setting::load_settings(s_screen_parameters* parameters)
+{
+	c_screen_variant_parameter_setting* screen;
+
+	void* pool = ui_pool_allocate_space(sizeof(c_screen_variant_parameter_setting), 1);
+
+	if (pool)
+	{
+		screen = new (pool) c_screen_variant_parameter_setting(
+			parameters->m_channel_type,
+			parameters->m_window_index,
+			parameters->user_flags,
+			_screen_variant_param_setting_format
+		);
+
+		screen->m_allocated = true;
+		screen->m_list.set_is_quick_options(false);
+
+		user_interface_register_screen_to_channel(screen, parameters);
+	}
+	else
+		return nullptr;
+
+	return screen;
+}
+
+void c_screen_variant_parameter_setting::new_instance(e_variant_setting_parameter_type parameter_type,
+	e_user_interface_channel_type ui_channel, e_user_interface_render_window ui_window, uint16 user_flags,
+	bool is_quick_options)
+{
+	proc_ui_screen_load_cb_t load_func = c_screen_variant_parameter_setting::load_settings;
+
+	if (is_quick_options)
+		load_func = c_screen_variant_parameter_setting::load_quick_options;
+
+	s_screen_parameters params;
+	params.m_flags = 0;
+	params.m_window_index = ui_window;
+	params.m_context = NULL;
+	params.user_flags = user_flags;
+	params.m_channel_type = ui_channel;
+	params.m_screen_state.field_0 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+	params.m_load_function = load_func;
+
+	((c_screen_variant_parameter_setting*)params.ui_screen_load_proc_exec())->m_list.set_variant_parameter_type(parameter_type);
+}
+
+c_screen_variant_parameter_setting::c_screen_variant_parameter_setting(e_user_interface_channel_type ui_channel, e_user_interface_render_window window_index, uint16 user_flags, e_user_interface_screen_id screen_id) :
+	c_screen_with_menu(screen_id, ui_channel, window_index, user_flags, &this->m_list),
+	m_list(user_flags)
 {
 }

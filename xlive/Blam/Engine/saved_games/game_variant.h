@@ -1,6 +1,7 @@
 #pragma once
 
 #define k_game_engine_oddball_maximum_balls 3
+#define k_multiplayer_variant_headhunter_parameter_count 7
 
 /* enums */
 
@@ -386,6 +387,8 @@ enum e_headhunter_max_heads_carried : uint8
 	_headhunter_max_heads_carried_one,
 	_headhunter_max_heads_carried_five,
 	_headhunter_max_heads_carried_ten,
+
+	k_headhunter_max_heads_carried_count
 };
 
 enum e_headhunter_engine_flags : uint32
