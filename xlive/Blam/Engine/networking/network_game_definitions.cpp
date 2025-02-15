@@ -4,15 +4,164 @@
 #include "game/game_engine_territories.h"
 #include "game/players.h"
 
+// TODO: rewrite network_game_definitions_encode_game_variant
+
 /* typedef */
-typedef bool(__cdecl* t_network_game_definitions_decode_game_variant)(c_bitstream* packet, s_game_variant* variant);
-t_network_game_definitions_decode_game_variant p_network_game_definitions_decode_game_variant;
+typedef bool(__cdecl* t_network_game_definitions_game_variant)(c_bitstream* packet, s_game_variant* variant);
+t_network_game_definitions_game_variant p_network_game_definitions_decode_game_variant;
+t_network_game_definitions_game_variant p_network_game_definitions_encode_game_variant;
 
 /* public */
 
 void network_game_definitions_apply_patches()
 {
-	DETOUR_ATTACH(p_network_game_definitions_decode_game_variant, Memory::GetAddress<t_network_game_definitions_decode_game_variant>(0x1E2F74, 0x1B45BC), network_game_definitions_decode_game_variant);
+	DETOUR_ATTACH(p_network_game_definitions_decode_game_variant, Memory::GetAddress<t_network_game_definitions_game_variant>(0x1E2F74, 0x1B45BC), network_game_definitions_decode_game_variant);
+	DETOUR_ATTACH(p_network_game_definitions_encode_game_variant, Memory::GetAddress<t_network_game_definitions_game_variant>(0x1E2865, 0), network_game_definitions_encode_game_variant);
+}
+
+void network_game_definitions_encode_game_variant(c_bitstream* packet, s_game_variant* variant)
+{
+	if (!variant->variant_game_engine_index)
+		return;
+
+	packet->write_integer("variant-game-engine-index", variant->variant_game_engine_index, k_game_engine_type_bits_required);
+
+	packet->write_integer("variant-flags", variant->flags, 1);
+
+	packet->write_string_wchar("variant->desc", variant->variant_name, NUMBEROF(variant->variant_name));
+
+	packet->write_integer("description-index", variant->description_index, k_game_variant_description_bits_required);
+
+	packet->write_integer("flags", variant->game_engine_flags.get_unsafe(), k_game_engine_flags_bits_required);
+
+	packet->write_integer("round-setting", variant->round_setting, k_game_engine_round_setting_bits_required);
+
+	packet->write_integer("score-to-win-round", variant->score_to_win_round, SHORT_BITS);
+
+	packet->write_integer("round-time-limit", variant->round_time_limit, SHORT_BITS);
+
+	packet->write_integer("join-in-progress", variant->join_in_progress_setting, k_game_engine_join_in_progress_bits_required);
+
+	packet->write_integer("max-players", variant->max_players, bits_required_for(k_maximum_players));
+
+	packet->write_integer("max-living-players", variant->max_living_players, bits_required_for(k_maximum_players));
+
+	packet->write_integer("lives-per-round", variant->lives_per_round, SHORT_BITS);
+
+	packet->write_integer("respawn-time", variant->respawn_time, SHORT_BITS);
+
+	packet->write_integer("suicide-penalty", variant->suicide_penalty, SHORT_BITS);
+
+	packet->write_integer("shield-setting", variant->shield_setting, k_game_engine_shield_setting_bits_required);
+
+	packet->write_integer("team-score-setting", variant->team_score_setting, k_game_engine_team_score_bits_required);
+
+	packet->write_integer("team-respawn-setting", variant->team_respawn_setting, k_game_engine_team_respawn_bits_required);
+
+	packet->write_integer("betrayal-penalty", variant->betrayal_penalty, SHORT_BITS);
+
+	packet->write_integer("max-allowable-teams", variant->maximum_allowable_teams, bits_required_for(k_game_multiplayer_team_count));
+
+	packet->write_integer("vehicle-respawn-setting", variant->vehicle_respawn_setting, k_game_engine_respawn_setting_bits_required);
+
+	packet->write_integer("player-light-land-vehicle", variant->primary_light_land_vehicle, k_game_engine_light_land_vehicle_bits_required);
+
+	packet->write_integer("secondary-light-land-vehicle", variant->secondary_light_land_vehicle, k_game_engine_light_land_vehicle_bits_required);
+
+	packet->write_integer("primary-heavy-land-vehicle", variant->primary_heavy_land_vehicle, k_game_engine_heavy_land_vehicle_bits_required);
+
+	packet->write_integer("primary-flying-vehicle", variant->primary_flying_vehicle, k_game_engine_flying_vehicle_bits_required);
+
+	packet->write_integer("secondary-heavy-land-vehicle", variant->secondary_heavy_land_vehicle, k_game_engine_heavy_land_vehicle_bits_required);
+
+	packet->write_integer("primary-turret-vehicle", variant->primary_turret_vehicle, k_game_engine_turret_vehicle_bits_required);
+
+	packet->write_integer("secondary-turret-vehicle", variant->secondary_turret_vehicle, k_game_engine_turret_vehicle_bits_required);
+
+	packet->write_integer("weapon-set", variant->weapon_set, k_game_engine_weapon_set_bits_required);
+
+	packet->write_integer("weapon-respawn-setting", variant->weapon_respawn_setting, k_game_engine_respawn_setting_bits_required);
+
+	packet->write_integer("starting-equipment-primary", variant->starting_equipment_primary, k_game_engine_starting_weapon_bits_required);
+
+	packet->write_integer("starting-equipment-secondary", variant->starting_equipment_secondary, k_game_engine_starting_weapon_bits_required);
+
+	switch (variant->variant_game_engine_index)
+	{
+		case _game_engine_type_ctf:
+		{
+			packet->write_integer("flags", variant->game_engine_variant.ctf.flags.get_unsafe(), k_ctf_engine_flags_bits_required);
+			packet->write_integer("flag-reset-time", variant->game_engine_variant.ctf.flag_reset_time, SHORT_BITS);
+			packet->write_integer("speed-with-flag", variant->game_engine_variant.ctf.speed_with_flag, k_ctf_engine_player_speed_bits_required);
+			packet->write_integer("flag-hit-damage", variant->game_engine_variant.ctf.flag_hit_damage, k_game_engine_weapon_hit_bits_required);
+			packet->write_integer("waypoint-to-home-flag-type", variant->game_engine_variant.ctf.waypoint_type, k_ctf_engine_enemy_bomb_waypoint_type_bits_required);
+			packet->write_integer("game-type", variant->game_engine_variant.ctf.game_type, k_ctf_game_type_bits_required);
+			break;
+		}
+		case _game_engine_type_slayer:
+		{
+			packet->write_integer("flags", variant->game_engine_variant.slayer.flags.get_unsafe(), k_slayer_engine_flags_bits_required);
+			break;
+		}
+		case _game_engine_type_oddball:
+		{
+			packet->write_integer("flags", variant->game_engine_variant.oddball.flags.get_unsafe(), k_oddball_engine_flags_bits_required);
+			packet->write_integer("ball-count", variant->game_engine_variant.oddball.ball_count, bits_required_for(k_game_engine_oddball_maximum_balls));
+			packet->write_integer("ball-hit-damage", variant->game_engine_variant.oddball.ball_hit_damage, k_game_engine_weapon_hit_bits_required);
+			packet->write_integer("speed-with-ball", variant->game_engine_variant.oddball.speed_with_ball, k_oddball_player_speed_bits_required);
+			packet->write_integer("waypoint-to-ball", variant->game_engine_variant.oddball.waypoint_to_ball, k_oddball_waypoint_type_bits_required);
+			break;
+		}
+		case _game_engine_type_koth:
+		{
+			packet->write_integer("flags", variant->game_engine_variant.king.flags.get_unsafe(), k_king_engine_flags_bits_required);
+			packet->write_integer("hill-move-time", variant->game_engine_variant.king.hill_move_time, SHORT_BITS);
+			break;
+		}
+		case _game_engine_type_race:
+		{
+			// No additional parameters for race mode.
+			break;
+		}
+		case _game_engine_type_headhunter:
+		{
+			// TODO: Encode headhunter parameters when implemented.
+			break;
+		}
+		case _game_engine_type_juggernaut:
+		{
+			packet->write_integer("flags", variant->game_engine_variant.juggernaut.flags.get_unsafe(), k_juggernaut_engine_flags_bits_required);
+			packet->write_integer("juggernaut-movement-speed", variant->game_engine_variant.juggernaut.juggernaut_movement_speed, k_ctf_engine_player_speed_bits_required);
+			break;
+		}
+		case _game_engine_type_territories:
+		{
+			packet->write_integer("territory-count", variant->game_engine_variant.territories.territory_count, bits_required_for(k_maximum_territories_flags));
+			packet->write_integer("territory-contest-time", variant->game_engine_variant.territories.territory_contest_time, SHORT_BITS);
+			packet->write_integer("territory-capture-time", variant->game_engine_variant.territories.territory_capture_time, SHORT_BITS);
+			break;
+		}
+		case _game_engine_type_assault:
+		{
+			packet->write_integer("bomb-arming-time", variant->game_engine_variant.assault.bomb_arming_time, SHORT_BITS);
+			packet->write_integer("bomb-fuse-time", variant->game_engine_variant.assault.bomb_fuse_time, SHORT_BITS);
+			packet->write_integer("flags", variant->game_engine_variant.assault.flags.get_unsafe(), k_ctf_engine_flags_bits_required);
+			packet->write_integer("flag-reset-time", variant->game_engine_variant.assault.flag_reset_time, SHORT_BITS);
+			packet->write_integer("speed-with-flag", variant->game_engine_variant.assault.speed_with_flag, k_ctf_engine_player_speed_bits_required);
+			packet->write_integer("flag-hit-damage", variant->game_engine_variant.assault.flag_hit_damage, k_game_engine_weapon_hit_bits_required);
+			packet->write_integer("waypoint-to-home-flag-type", variant->game_engine_variant.assault.waypoint_type, k_ctf_engine_enemy_bomb_waypoint_type_bits_required);
+			packet->write_integer("game-type", variant->game_engine_variant.assault.game_type, k_ctf_game_type_bits_required);
+			break;
+		}
+		case _game_engine_type_none:
+		{
+			// Native behavior (or coop mode) requires no additional engine-specific encoding.
+			break;
+		}
+		default:
+			// Optionally handle an unknown game engine type.
+			break;
+	}
 }
 
 bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_variant* variant)
@@ -123,6 +272,7 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 		}
 	case _game_engine_type_headhunter:
 		{
+			// TODO: dencode parameters
 			break;
 		}
 	case _game_engine_type_juggernaut:
