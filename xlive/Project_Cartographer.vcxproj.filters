@@ -468,6 +468,8 @@
     <ClCompile Include="Blam\Engine\text\text_group.cpp" />
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_shared_globals.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_variant_parameter_setting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -554,7 +556,6 @@
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
@@ -1940,6 +1941,7 @@
     <ClInclude Include="Blam\Engine\items\projectiles.h" />
     <ClInclude Include="Blam\Engine\objects\object_location.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_variant_parameter_setting.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
