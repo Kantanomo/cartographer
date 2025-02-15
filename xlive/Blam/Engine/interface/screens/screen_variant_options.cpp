@@ -12,6 +12,30 @@
 /* -c_variant_options_list- */
 /* ------------------------ */
 
+const static wchar_t* headhunter_option_strings[k_variant_options_headhunter_list_item_count]
+{
+	L"Moving Bin",
+	L"Point Multiplier",
+	L"Suicide Point Loss",
+	L"Death Point Loss",
+	L"Uncontested Bin",
+	L"Speed with Heads",
+	L"Max heads carried"
+};
+
+const static e_default_variant_setting_category_type headhunter_option_types[k_variant_options_headhunter_list_item_count]
+{
+	_default_variant_setting_category_type_headhunter_moving_head_bin,
+	_default_variant_setting_category_type_headhunter_point_multiplier,
+	_default_variant_setting_category_type_headhunter_suicide_point_loss,
+	_default_variant_setting_category_type_headhunter_death_point_loss,
+	_default_variant_setting_category_type_headhunter_uncontested_bin,
+	_default_variant_setting_category_type_headhunter_speed_with_heads,
+	_default_variant_setting_category_type_headhunter_max_heads_carried
+};
+
+
+
 int32 c_variant_options_list::link_item_widgets()
 {
 	if (this->m_variant_setting_category_type == _variant_setting_category_type_none)
@@ -19,37 +43,54 @@ int32 c_variant_options_list::link_item_widgets()
 	else
 		g_previous_variant_setting_category = this->m_variant_setting_category_type;
 
-	s_variant_setting_edit_reference* variant_reference = multiplayer_variant_settings_interface_get_reference(this->m_variant_setting_category_type);
-
-	if(variant_reference && variant_reference->options.count > 0)
+	if (this->m_variant_setting_category_type != _variant_setting_category_type_game_head_hunter)
 	{
-		this->m_list_data = ui_list_data_new(k_variant_options_list_name, variant_reference->options.count, sizeof(s_variant_options_list_item));
+		s_variant_setting_edit_reference* variant_reference = multiplayer_variant_settings_interface_get_reference(this->m_variant_setting_category_type);
+
+		if (variant_reference && variant_reference->options.count > 0)
+		{
+			this->m_list_data = ui_list_data_new(k_variant_options_list_name, variant_reference->options.count, sizeof(s_variant_options_list_item));
+			data_make_valid(this->m_list_data);
+			if (this->m_list_data->datum_max_elements > 0)
+			{
+				for (int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
+				{
+					tag_reference* sily_reference = variant_reference->options[i];
+					s_variant_options_list_item* list_item = (s_variant_options_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
+
+					if (sily_reference->index != NONE)
+						list_item->sily_definition = (s_text_value_pair_definition*)tag_get_fast(sily_reference->index);
+					else
+						list_item->sily_definition = nullptr;
+				}
+			}
+			this->linker_type2.link(&this->m_slot);
+			c_list_widget::link_item_widgets();
+		}
+		else
+		{
+			this->m_list_data = ui_list_data_new(k_variant_options_list_empty_name, 1, sizeof(s_variant_options_list_item));
+			data_make_valid(this->m_list_data);
+
+			s_variant_options_list_item* list_item = (s_variant_options_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
+
+			list_item->sily_definition = nullptr;
+
+			this->linker_type2.link(&this->m_slot);
+			c_list_widget::link_item_widgets();
+		}
+	}
+	else
+	{
+		this->m_list_data = ui_list_data_new(k_variant_options_list_name, k_variant_options_headhunter_list_item_count, sizeof(s_variant_options_list_item));
 		data_make_valid(this->m_list_data);
 		if(this->m_list_data->datum_max_elements > 0)
 		{
 			for(int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
 			{
-				tag_reference* sily_reference = variant_reference->options[i];
 				s_variant_options_list_item* list_item = (s_variant_options_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
-
-				if (sily_reference->index != NONE)
-					list_item->sily_definition = (s_text_value_pair_definition*)tag_get_fast(sily_reference->index);
-				else
-					list_item->sily_definition = nullptr;
 			}
 		}
-		this->linker_type2.link(&this->m_slot);
-		c_list_widget::link_item_widgets();
-	}
-	else
-	{
-		this->m_list_data = ui_list_data_new(k_variant_options_list_empty_name, 1, sizeof(s_variant_options_list_item));
-		data_make_valid(this->m_list_data);
-
-		s_variant_options_list_item* list_item = (s_variant_options_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
-
-		list_item->sily_definition = nullptr;
-
 		this->linker_type2.link(&this->m_slot);
 		c_list_widget::link_item_widgets();
 	}
@@ -76,17 +117,54 @@ void c_variant_options_list::update_list_items(c_list_item_widget* item, int32 s
 		c_text_widget* title_text = item->try_find_text_widget(0);
 		c_text_widget* value_text = item->try_find_text_widget(1);
 
-		if(list_item && list_item->sily_definition && list_item->sily_definition->string_list.index != NONE)
+		if (this->m_variant_setting_category_type != _variant_setting_category_type_game_head_hunter)
 		{
-			wchar_t temp_string[512];
+			if (list_item && list_item->sily_definition && list_item->sily_definition->string_list.index != NONE)
+			{
+				wchar_t temp_string[512];
+				if (title_text)
+				{
+					temp_string[0] = '\0';
+					text_group_get_unicode_string(list_item->sily_definition->string_list.index, list_item->sily_definition->title_text, temp_string);
+					title_text->set_text(temp_string);
+				}
+				if (value_text)
+				{
+					s_game_variant* variant;
+
+					if (!this->m_is_quick_options)
+						variant = user_interface_get_variant();
+					else
+					{
+						c_network_session* network_session;
+						if (network_life_cycle_in_squad_session(&network_session))
+							variant = &network_session->m_session_parameters.game_variant;
+						else
+							variant = nullptr;
+					}
+					if (variant)
+					{
+						int32 variant_setting_value = multiplayer_variant_settings_interface_get_variant_setting_value(variant, list_item->sily_definition->parameter);
+						s_text_value_pair_reference_new* variant_setting_label = multiplayer_variant_settings_interface_get_variant_setting_label(list_item->sily_definition, variant_setting_value);
+						temp_string[0] = '\0';
+						if (variant_setting_label)
+						{
+							text_group_get_unicode_string(list_item->sily_definition->string_list.index, variant_setting_label->label_string, temp_string);
+							value_text->set_text(temp_string);
+						}
+					}
+				}
+			}
+		}
+		else
+		{
 			if(title_text)
 			{
-				temp_string[0] = '\0';
-				text_group_get_unicode_string(list_item->sily_definition->string_list.index, list_item->sily_definition->title_text, temp_string);
-				title_text->set_text(temp_string);
+				title_text->set_text(headhunter_option_strings[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())]);
 			}
 			if(value_text)
 			{
+				wchar_t temp_string[512] {};
 				s_game_variant* variant;
 
 				if (!this->m_is_quick_options)
@@ -99,16 +177,10 @@ void c_variant_options_list::update_list_items(c_list_item_widget* item, int32 s
 					else
 						variant = nullptr;
 				}
-				if(variant)
+				if (variant)
 				{
-					int32 variant_setting_value = multiplayer_variant_settings_interface_get_variant_setting_value(variant, list_item->sily_definition->parameter);
-					s_text_value_pair_reference_new* variant_setting_label = multiplayer_variant_settings_interface_get_variant_setting_label(list_item->sily_definition, variant_setting_value);
-					temp_string[0] = '\0';
-					if(variant_setting_label)
-					{
-						text_group_get_unicode_string(list_item->sily_definition->string_list.index, variant_setting_label->label_string, temp_string);
-						value_text->set_text(temp_string);
-					}
+					multiplayer_variant_settings_interface_get_variant_setting_label_direct(variant, headhunter_option_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())], temp_string);
+					value_text->set_text(temp_string);
 				}
 			}
 		}

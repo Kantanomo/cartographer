@@ -266,6 +266,17 @@ enum e_text_value_pair_reference_flags : uint32
 	k_text_value_pair_reference_flags_count
 };
 
+enum e_multiplayer_variant_setting_interface_conversion_type : uint32
+{
+	_multiplayer_variant_setting_interface_conversion_type_flags_16 = 0,
+	_multiplayer_variant_setting_interface_conversion_type_flags_32 = 1,
+	_multiplayer_variant_setting_interface_conversion_type_boolean = 2,
+	_multiplayer_variant_setting_interface_conversion_type_int8 = 3,
+	_multiplayer_variant_setting_interface_conversion_type_int16 = 4,
+	_multiplayer_variant_setting_interface_conversion_type_int32 = 5,
+	_multiplayer_variant_setting_interface_conversion_type_real32 = 6,
+};
+
 /* structure */
 
 // max: k_number_of_editable_game_variant_parameters
@@ -371,9 +382,12 @@ struct s_text_value_pair_definition // sily
 };
 ASSERT_STRUCT_SIZE(s_text_value_pair_definition, 36);
 
+void multiplayer_variant_settings_interface_apply_patches();
 
 s_variant_setting_edit_reference* __cdecl multiplayer_variant_settings_interface_get_reference(e_variant_setting_category_type category_type);
 
 int32 __cdecl multiplayer_variant_settings_interface_get_variant_setting_value(s_game_variant* variant, e_default_variant_setting_category_type type);
 
 s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_setting_label(s_text_value_pair_definition* text_value_pair, int32 value);
+
+void multiplayer_variant_settings_interface_get_variant_setting_label_direct(s_game_variant* variant, e_default_variant_setting_category_type type, wchar_t* out_string);
