@@ -331,7 +331,7 @@ enum e_multiplayer_variant_setting_interface_conversion_type : uint32
 	_multiplayer_variant_setting_interface_conversion_type_real32 = 6,
 };
 
-static constexpr e_variant_setting_parameter_type headhunter_option_types[k_multiplayer_variant_headhunter_parameter_count]
+static const e_variant_setting_parameter_type g_multiplayer_variant_interface_headhunter_parameter_types[k_multiplayer_variant_headhunter_parameter_count]
 {
 	_variant_setting_parameter_type_headhunter_moving_head_bin,
 	_variant_setting_parameter_type_headhunter_point_multiplier,
@@ -459,6 +459,14 @@ void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(
 
 s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_parameter_label(s_text_value_pair_definition* text_value_pair, int32 value);
 
-void multiplayer_variant_settings_interface_get_variant_parameter_label_direct(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string);
 
-const wchar_t* multiplayer_variant_settings_interface_get_variant_parameter_title_direct(s_game_variant* variant, int32 parameter_index);
+
+bool multiplayer_variant_settings_interface_parameter_is_custom(s_game_variant* variant, e_variant_setting_parameter_type type);
+
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_label(s_game_variant* variant, e_variant_setting_parameter_type type, int32 value, wchar_t* out_string);
+
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s_game_variant* variant, int32 parameter_index, wchar_t* out_string);
+
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string);
+
+int32 multiplayer_variant_settings_interface_get_custom_variant_parameter_value_count(s_game_variant* variant, e_variant_setting_parameter_type type);

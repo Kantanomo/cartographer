@@ -13,8 +13,9 @@ struct s_variant_options_list_item
 {
 	int32 unk;
 	s_text_value_pair_definition* sily_definition;
+	e_variant_setting_parameter_type parameter_type;
 };
-ASSERT_STRUCT_SIZE(s_variant_options_list_item, 8);
+ASSERT_STRUCT_SIZE(s_variant_options_list_item, 12);
 
 static e_variant_setting_category_type g_previous_variant_setting_category;
 

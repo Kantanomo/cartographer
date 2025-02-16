@@ -13,10 +13,6 @@
 /* -c_variant_options_list- */
 /* ------------------------ */
 
-
-
-
-
 int32 c_variant_options_list::link_item_widgets()
 {
 	if (this->m_variant_setting_category_type == _variant_setting_category_type_none)
@@ -40,9 +36,15 @@ int32 c_variant_options_list::link_item_widgets()
 					s_variant_options_list_item* list_item = (s_variant_options_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
 
 					if (sily_reference->index != NONE)
+					{
 						list_item->sily_definition = (s_text_value_pair_definition*)tag_get_fast(sily_reference->index);
+						list_item->parameter_type = list_item->sily_definition->parameter;
+					}
 					else
+					{
 						list_item->sily_definition = nullptr;
+						list_item->parameter_type = _variant_setting_parameter_type_invalid;
+					}
 				}
 			}
 			this->linker_type2.link(&this->m_slot);
@@ -56,6 +58,7 @@ int32 c_variant_options_list::link_item_widgets()
 			s_variant_options_list_item* list_item = (s_variant_options_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
 
 			list_item->sily_definition = nullptr;
+			list_item->parameter_type = _variant_setting_parameter_type_invalid;
 
 			this->linker_type2.link(&this->m_slot);
 			c_list_widget::link_item_widgets();
@@ -70,6 +73,7 @@ int32 c_variant_options_list::link_item_widgets()
 			for(int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
 			{
 				s_variant_options_list_item* list_item = (s_variant_options_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
+				list_item->parameter_type = g_multiplayer_variant_interface_headhunter_parameter_types[i];
 			}
 		}
 		this->linker_type2.link(&this->m_slot);
@@ -153,15 +157,19 @@ void c_variant_options_list::update_list_items(c_list_item_widget* item, int32 s
 			}
 			if (variant)
 			{
+				wchar_t temp_string[512]{};
+
 				if (title_text)
 				{
-					title_text->set_text(multiplayer_variant_settings_interface_get_variant_parameter_title_direct(variant, DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())));
+					multiplayer_variant_settings_interface_get_custom_variant_parameter_title(variant, DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()), temp_string);
+					title_text->set_text(temp_string);
 				}
 				if (value_text)
 				{
-					wchar_t temp_string[512]{};
 
-					multiplayer_variant_settings_interface_get_variant_parameter_label_direct(variant, g_multiplayer_variant_interface_headhunter_parameter_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())], temp_string);
+					int32 variant_setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, g_multiplayer_variant_interface_headhunter_parameter_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())]);
+
+					multiplayer_variant_settings_interface_get_custom_variant_parameter_label(variant, g_multiplayer_variant_interface_headhunter_parameter_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())], variant_setting_value, temp_string);
 
 					value_text->set_text(temp_string);
 				}
@@ -186,12 +194,12 @@ void c_variant_options_list::handle_item_pressed_event(s_event_record** event, d
 	//INVOKE_TYPE(0x2585EC, 0, void(__thiscall*)(c_variant_options_list*, s_event_record**, datum*), this, event, pitem_index);
 
 	s_variant_options_list_item* item = (s_variant_options_list_item*)datum_get(this->m_list_data, *pitem_index);
-	if(item)
+	if (item)
 	{
-		if(item->sily_definition)
+		if (item->parameter_type != _variant_setting_parameter_type_invalid)
 		{
 			c_screen_variant_parameter_setting::new_instance(
-				item->sily_definition->parameter,
+				item->parameter_type,
 				_user_interface_channel_type_online_menu,
 				_window_4,
 				this->m_controllers_mask,

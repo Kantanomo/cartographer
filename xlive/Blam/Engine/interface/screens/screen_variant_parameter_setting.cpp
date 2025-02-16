@@ -32,7 +32,7 @@ void c_variant_parameter_setting_list::handle_item_pressed_event(s_event_record*
 
 		if(variant)
 		{
-			multiplayer_variant_settings_interface_set_variant_parameter_value(variant, this->m_variant_setting_parameter_type, list_item->text_value_pair_reference->value);
+			/*multiplayer_variant_settings_interface_set_variant_parameter_value(variant, this->m_variant_setting_parameter_type, list_item->text_value_pair_reference->value);
 
 			if(this->m_is_quick_options)
 			{
@@ -41,7 +41,7 @@ void c_variant_parameter_setting_list::handle_item_pressed_event(s_event_record*
 				{
 					user_interface_back_out_from_channel(this->get_parent_screen()->get_channel(), this->get_parent_screen()->get_render_window());
 				}
-			}
+			}*/
 		}
 	}
 	this->get_parent_screen()->start_widget_animation(3);
@@ -54,35 +54,85 @@ int32 c_variant_parameter_setting_list::link_item_widgets()
 	else
 		g_previous_variant_setting_parameter = this->m_variant_setting_parameter_type;
 
-	this->m_sily_definition = multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(this->m_variant_setting_parameter_type);
+	s_game_variant* variant;
 
-	if(this->m_sily_definition && this->m_sily_definition->text_value_pairs.count)
+	if (!this->m_is_quick_options)
+		variant = user_interface_get_variant();
+	else
 	{
-		this->m_list_data = ui_list_data_new(k_variant_parameter_setting_list_name, this->m_sily_definition->text_value_pairs.count, sizeof(s_variant_parameter_setting_list_item));
-		data_make_valid(this->m_list_data);
+		c_network_session* network_session;
+		if (network_life_cycle_in_squad_session(&network_session))
+			variant = &network_session->m_session_parameters.game_variant;
+		else
+			variant = nullptr;
+	}
 
-		if(this->m_list_data->datum_max_elements)
+	if (!variant)
+		return 1;
+
+	if (!multiplayer_variant_settings_interface_parameter_is_custom(variant, this->m_variant_setting_parameter_type))
+	{
+		this->m_sily_definition = multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(this->m_variant_setting_parameter_type);
+
+		if (this->m_sily_definition && this->m_sily_definition->text_value_pairs.count)
 		{
-			for(int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
-			{
-				s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
-				list_item->text_value_pair_reference = this->m_sily_definition->text_value_pairs[i];
-			}
-		}
+			this->m_list_data = ui_list_data_new(k_variant_parameter_setting_list_name, this->m_sily_definition->text_value_pairs.count, sizeof(s_variant_parameter_setting_list_item));
+			data_make_valid(this->m_list_data);
 
-		this->linker_type2.link(&this->m_slot);
-		c_list_widget::link_item_widgets();
+			if (this->m_list_data->datum_max_elements)
+			{
+				for (int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
+				{
+					s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
+					list_item->text_value_pair_reference = this->m_sily_definition->text_value_pairs[i];
+				}
+			}
+
+			this->linker_type2.link(&this->m_slot);
+			c_list_widget::link_item_widgets();
+		}
+		else
+		{
+			this->m_list_data = ui_list_data_new(k_variant_parameter_setting_list_empty_name, 1, sizeof(s_variant_parameter_setting_list_item));
+			data_make_valid(this->m_list_data);
+
+			s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
+			list_item->text_value_pair_reference = nullptr;
+
+			this->linker_type2.link(&this->m_slot);
+			c_list_widget::link_item_widgets();
+		}
 	}
 	else
 	{
-		this->m_list_data = ui_list_data_new(k_variant_parameter_setting_list_empty_name, 1, sizeof(s_variant_parameter_setting_list_item));
-		data_make_valid(this->m_list_data);
+		int32 item_count = multiplayer_variant_settings_interface_get_custom_variant_parameter_value_count(variant, this->m_variant_setting_parameter_type);
+		if(item_count)
+		{
+			this->m_list_data = ui_list_data_new(k_variant_parameter_setting_list_name, item_count, sizeof(s_variant_parameter_setting_list_item));
+			data_make_valid(this->m_list_data);
 
-		s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
-		list_item->text_value_pair_reference = nullptr;
+			if(this->m_list_data->datum_max_elements)
+			{
+				for(int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
+				{
+					s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
+				}
+			}
 
-		this->linker_type2.link(&this->m_slot);
-		c_list_widget::link_item_widgets();
+			this->linker_type2.link(&this->m_slot);
+			c_list_widget::link_item_widgets();
+		}
+		else
+		{
+			this->m_list_data = ui_list_data_new(k_variant_parameter_setting_list_empty_name, 1, sizeof(s_variant_parameter_setting_list_item));
+			data_make_valid(this->m_list_data);
+
+			s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
+			list_item->text_value_pair_reference = nullptr;
+
+			this->linker_type2.link(&this->m_slot);
+			c_list_widget::link_item_widgets();
+		}
 	}
 
 	return 1;
@@ -102,14 +152,40 @@ void c_variant_parameter_setting_list::update_list_items(c_list_item_widget* ite
 {
 	if(item->get_last_data_index() != NONE)
 	{
+		s_game_variant* variant;
+
+		if (!this->m_is_quick_options)
+			variant = user_interface_get_variant();
+		else
+		{
+			c_network_session* network_session;
+			if (network_life_cycle_in_squad_session(&network_session))
+				variant = &network_session->m_session_parameters.game_variant;
+			else
+				variant = nullptr;
+		}
+
+		if (!variant)
+			return;
+
+		wchar_t temp_string[512]{};
+
+
 		s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, item->get_last_data_index());
 		c_text_widget* text_widget = item->try_find_text_widget(0);
 
-		if(this->m_sily_definition && this->m_sily_definition->string_list.index != NONE && text_widget && list_item->text_value_pair_reference)
+		if (!multiplayer_variant_settings_interface_parameter_is_custom(variant, this->m_variant_setting_parameter_type))
 		{
-			wchar_t temp_string[512]{};
+			if (this->m_sily_definition && this->m_sily_definition->string_list.index != NONE && text_widget && list_item->text_value_pair_reference)
+			{
+				text_group_get_unicode_string(this->m_sily_definition->string_list.index, list_item->text_value_pair_reference->label_string, temp_string);
 
-			text_group_get_unicode_string(this->m_sily_definition->string_list.index, list_item->text_value_pair_reference->label_string, temp_string);
+				text_widget->set_text(temp_string);
+			}
+		}
+		else
+		{
+			multiplayer_variant_settings_interface_get_custom_variant_parameter_label(variant, this->m_variant_setting_parameter_type, DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()), temp_string);
 
 			text_widget->set_text(temp_string);
 		}
@@ -193,20 +269,44 @@ void c_screen_variant_parameter_setting::post_initialize()
 
 	s_text_value_pair_definition* value_reference = multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(this->m_list.get_variant_parameter_type());
 
+	s_game_variant* variant;
+
+	if (!this->m_list.get_is_quick_options())
+		variant = user_interface_get_variant();
+	else
+	{
+		c_network_session* network_session;
+		if (network_life_cycle_in_squad_session(&network_session))
+			variant = &network_session->m_session_parameters.game_variant;
+		else
+			variant = nullptr;
+	}
+
 	wchar_t temp_string[512]{};
 
-	if(value_reference && value_reference->string_list.index != NONE)
+	if (!multiplayer_variant_settings_interface_parameter_is_custom(variant, this->m_list.get_variant_parameter_type()))
+	{
+		if (value_reference && value_reference->string_list.index != NONE)
+		{
+			if (header_text)
+			{
+				text_group_get_unicode_string(value_reference->string_list.index, value_reference->header_text, temp_string);
+				header_text->set_text(temp_string);
+			}
+
+			if (description_text)
+			{
+				text_group_get_unicode_string(value_reference->string_list.index, value_reference->description_test, temp_string);
+				description_text->set_text(temp_string);
+			}
+		}
+	}
+	else
 	{
 		if(header_text)
 		{
-			text_group_get_unicode_string(value_reference->string_list.index, value_reference->header_text, temp_string);
+			multiplayer_variant_settings_interface_get_custom_variant_parameter_title(variant, this->m_list.get_variant_parameter_type(), temp_string);
 			header_text->set_text(temp_string);
-		}
-
-		if(description_text)
-		{
-			text_group_get_unicode_string(value_reference->string_list.index, value_reference->description_test, temp_string);
-			description_text->set_text(temp_string);
 		}
 	}
 
