@@ -326,12 +326,7 @@ void InitH2Startup() {
 	// after localAppData filepath initialized, we can initialize OnScreenDebugLog
 	InitOnScreenDebugText();
 
-	if (Memory::IsDedicatedServer()) {
-		addDebugText("Process is Dedi-Server");
-	}
-	else {
-		addDebugText("Process is Client");
-	}
+	addDebugText(Memory::IsDedicatedServer() ? "Process is Dedi-Server" : "Process is Client");
 
 	if (ArgList != NULL)
 	{

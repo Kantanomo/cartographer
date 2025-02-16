@@ -69,7 +69,6 @@
 #include "saved_games/cartographer_player_profile.h"
 #include "saved_games/game_state_procs.h"
 #include "scenario/scenario.h"
-#include "shell/shell_windows.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_players.h"
 #include "simulation/game_interface/simulation_game_objects.h"
@@ -112,7 +111,6 @@ typedef bool(__cdecl* map_cache_load_t)(s_game_options* map_load_settings);
 typedef bool(__cdecl* player_spawn_t)(datum playerDatumIndex);
 typedef uint16(__cdecl* get_enabled_teams_flags_t)(c_network_session*);
 typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
-typedef int(__cdecl* hookServ1_t)(HKEY, LPCWSTR);
 
 /* globals */
 
@@ -124,7 +122,6 @@ player_spawn_t p_player_spawn;
 get_enabled_teams_flags_t p_get_enabled_teams_flags;
 show_error_screen_t p_show_error_screen;
 int(__cdecl* sub_20E1D8)(int, int, int, int, int, int);
-hookServ1_t p_hookServ1;
 
 bool g_h2x_enabled = false;
 bool g_xbox_tickrate_enabled = false;
@@ -151,8 +148,6 @@ static void h2mod_apply_tweaks(void);
 
 static void __cdecl update_keyboard_buttons_state_hook(BYTE* a1, WORD* a2, BYTE* a3, bool a4, int a5);
 
-static bool __cdecl should_start_pregame_countdown_hook(void);
-
 static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6);
 
 static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6);
@@ -175,10 +170,6 @@ static bool GrenadeChainReactIsEngineMPCheck(void);
 static bool BansheeBombIsEngineMPCheck(void);
 
 static bool FlashlightIsEngineSPCheck(void);
-
-static int32 get_active_count_from_bitflags(uint16 teams_bit_flags);
-
-static int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey);
 
 static BOOL WINAPI IsDebuggerPresent_hook(void);
 
@@ -682,7 +673,8 @@ static void h2mod_apply_hooks(void)
 	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
 
 	// below hooks applied to specific executables
-	if (!Memory::IsDedicatedServer()) {
+	if (!Memory::IsDedicatedServer())
+	{
 		/* These hooks are only built for the client, don't enable them on the server! */
 
 		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
@@ -760,21 +752,6 @@ static void h2mod_apply_hooks(void)
 		new_hud_draw_apply_patches();
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
-	}
-	else
-	{
-		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
-
-		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
-
-		// set the additional post-game carnage report time
-		WriteValue<uint8>(Memory::GetAddress(0, 0xE590) + 2, H2Config_additional_pcr_time);
-
-		// fix human turret variant setting not working on dedicated servers
-		WriteValue<int32>(Memory::GetAddress(0x0, 0x3557FC), 1);
-
-		PatchCall(Memory::GetAddress(0x0, 0xBF43), should_start_pregame_countdown_hook);
-		ServerConsole::ApplyHooks();
 	}
 	return;
 }
@@ -877,82 +854,6 @@ static void __cdecl update_keyboard_buttons_state_hook(BYTE* a1, WORD* a2, BYTE*
 				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], false, a5);
 	}
 	return;
-}
-
-static bool __cdecl should_start_pregame_countdown_hook(void)
-{
-	// dedicated server only
-	auto p_should_start_pregame_countdown = Memory::GetAddress<decltype(&should_start_pregame_countdown_hook)>(0x0, 0xBC2A);
-
-	c_network_session* session = NULL;
-	network_life_cycle_in_squad_session(&session);
-
-	// if the game already thinks the game timer doesn't need to start, return false and skip any processing
-	if (!p_should_start_pregame_countdown()
-		|| !session->is_local_peer_session_leader())
-		return false;
-
-	bool minimumPlayersConditionMet = true;
-	if (H2Config_minimum_player_start > 0)
-	{
-		if (session->get_player_count() >= H2Config_minimum_player_start)
-		{
-			LOG_INFO_GAME(L"{} - minimum Player count met", __FUNCTIONW__);
-			minimumPlayersConditionMet = true;
-		}
-		else
-		{
-			minimumPlayersConditionMet = false;
-			ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
-		}
-	}
-
-	if (!minimumPlayersConditionMet)
-		return false;
-
-	/*if (H2Config_even_shuffle_teams
-		&& NetworkSession::IsVariantTeamPlay())
-	{
-		std::mt19937 mt_rand(rd());
-		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
-		uint16 activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
-
-		int32 max_teams = PIN(get_active_count_from_bitflags(activeTeamsFlags), 2, (int32)k_game_multiplayer_team_count);
-		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
-
-		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
-
-		int32 maxPlayersPerTeam = MAX(1, NetworkSession::GetPlayerCount() / max_teams);
-		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
-
-		for (int32 i = 0; i < k_game_multiplayer_team_count; i++)
-		{
-			int32 currentTeamPlayers = 0;
-
-			if (activePlayersIndices.empty())
-				break;
-
-			// check if the team is available for play
-			if (!TEST_BIT(activeTeamsFlags, i))
-				continue;
-
-			std::uniform_int_distribution<int32> dist(0, activePlayersIndices.size() - 1);
-
-			for (; currentTeamPlayers < maxPlayersPerTeam; currentTeamPlayers++)
-			{
-				int32 vecPlayerIdx = dist(mt_rand);
-				int32 playerIndexSelected = activePlayersIndices[vecPlayerIdx];
-				// swap the player index with the last one, then just pop the last element
-				std::swap(activePlayersIndices[vecPlayerIdx], activePlayersIndices[activePlayersIndices.size() - 1]);
-				activePlayersIndices.pop_back();
-
-				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndexSelected), (e_game_team)i);
-			}
-		}
-	}*/
-
-	EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
-	return true;
 }
 
 static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6)
@@ -1080,28 +981,6 @@ static bool BansheeBombIsEngineMPCheck(void)
 static bool FlashlightIsEngineSPCheck(void)
 {
 	return game_is_campaign();
-}
-
-static int32 get_active_count_from_bitflags(uint16 teams_bit_flags)
-{
-	int32 count = 0;
-	for (int32 i = 0; i < _game_team_neutral; i++)
-	{
-		if (TEST_BIT(teams_bit_flags, i))
-			count++;
-	}
-	return count;
-}
-
-static int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey)
-{
-	char result = p_hookServ1(hKey, lpSubKey);
-	addDebugText("Post Server Registry Read.");
-	if (strlen(H2Config_dedi_server_playlist) > 0) {
-		wchar_t* ServerPlaylist = Memory::GetAddress<wchar_t*>(0, 0x3B3704);
-		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
-	}
-	return result;
 }
 
 static BOOL WINAPI IsDebuggerPresent_hook(void)

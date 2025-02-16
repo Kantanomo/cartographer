@@ -1,5 +1,4 @@
 #pragma once
-#include "H2MOD/GUI/ImGui_Integration/Console/CommandsUtil.h"
 
 /* enums */
 
@@ -68,19 +67,6 @@ public:
 	}
 };
 ASSERT_STRUCT_SIZE(c_kablam_command_send_msg, 260);
-
-namespace ServerConsole
-{
-	static int __cdecl OutputCb(StringHeaderFlags flags, const char* fmt, ...);
-
-	void ApplyHooks();
-	int LogToDedicatedServerConsoleWide(const wchar_t* fmt, ...);
-	int LogToDedicatedServerConsole(const char* fmt, ...);
-	void SendCommand(wchar_t** command, int32 split_commands_size, bool a3);
-	void AddVip(std::wstring gamerTag);
-	void ClearVip();
-	void SendMsg(const wchar_t* message, bool timeout = false);
-}
 
 /* prototypes */
 

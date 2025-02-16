@@ -6,6 +6,7 @@
 
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
 /* typedefs */
@@ -13,13 +14,12 @@
 typedef void* (__cdecl* dedi_command_t)(wchar_t** a1, int32 a2, bool a3);
 typedef int32(__cdecl* kablam_vip_add_t)(LPCWSTR gamer_tag);
 typedef int32(__cdecl* kablam_vip_clear_t)();
+typedef int(__cdecl* hookServ1_t)(HKEY, LPCWSTR);
+typedef bool(__cdecl kablam_command_play_t)(wchar_t* playlist_file_path, int32 a2);
 
-/* globals */
+/* constants */
 
-dedi_command_t p_kablam_command_handler;
-kablam_vip_add_t p_kablam_vip_add;
-kablam_vip_clear_t p_kablam_vip_clear;
-static const std::map<const wchar_t*, e_server_console_commands> g_commands_map =
+static const std::map<const wchar_t*, e_server_console_commands> k_commands_map =
 {
 	{L"ban", _kablam_command_ban},
 	{L"description", _kablam_command_description},
@@ -39,16 +39,63 @@ static const std::map<const wchar_t*, e_server_console_commands> g_commands_map 
 	{L"any", _kablam_command_any}
 };
 
+/* globals */
+
+dedi_command_t p_kablam_command_handler;
+kablam_vip_add_t p_kablam_vip_add;
+kablam_vip_clear_t p_kablam_vip_clear;
+kablam_command_play_t* p_kablam_command_play;
+hookServ1_t p_hookServ1;
+
+static int32 g_message_timeout = 0;
+
 /* prototypes */
 
 static void vip_lock(e_game_life_cycle state);
 
+static int __cdecl dedi_registry_hook(HKEY hKey, LPCWSTR lpSubKey);
+
+static bool __cdecl should_start_pregame_countdown_hook(void);
+
+static int32 get_active_count_from_bitflags(uint16 teams_bit_flags);
+
 static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wide, int split_count, bool a3);
+
+static bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int32 a2);
+
+static void server_console_apply_hooks(void);
+
+static int server_console_log_to_dedicated_server_console_wide(const wchar_t* fmt, ...);
+
+static int server_console_log_to_dedicated_server_console(const char* fmt, ...);
+
+static void server_console_send_command(wchar_t** command, int32 split_commands_size, bool a3);
+
+static void server_console_add_vip(std::wstring gamerTag);
+
+static void server_console_clear_vip(void);
+
+static void server_console_send_msg(const wchar_t* message, bool timeout);
+
+static int __cdecl server_console_output_cb(StringHeaderFlags flags, const char* fmt, ...);
 
 /* public code */
 
 void kablam_apply_patches(void)
 {
+	// fix human turret variant setting not working on dedicated servers
+	WriteValue<int32>(Memory::GetAddress(0x0, 0x3557FC), 1);
+
+	// set the additional post-game carnage report time
+	WriteValue<uint8>(Memory::GetAddress(0, 0xE590) + 2, H2Config_additional_pcr_time);
+
+	p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)dedi_registry_hook, 11);
+
+	PatchCall(Memory::GetAddress(0x0, 0xBF43), should_start_pregame_countdown_hook);
+
+
+	server_console_apply_hooks();
+
 	if (H2Config_vip_lock)
 	{
 		EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
@@ -62,7 +109,7 @@ static void vip_lock(e_game_life_cycle state)
 {
 	if (state == _life_cycle_post_game)
 	{
-		ServerConsole::ClearVip();
+		server_console_clear_vip();
 		*Memory::GetAddress<byte*>(0, 0x534850) = 0;
 	}
 	if (state == _life_cycle_in_game)
@@ -70,18 +117,119 @@ static void vip_lock(e_game_life_cycle state)
 		for (int i = 0; i < k_maximum_players; i++)
 		{
 			if (NetworkSession::PlayerIsActive(i))
-				ServerConsole::AddVip(NetworkSession::GetPlayerName(i));
+			{
+				server_console_add_vip(NetworkSession::GetPlayerName(i));
+			}
 		}
 		*Memory::GetAddress<byte*>(0, 0x534850) = 2;
 	}
 	return;
 }
 
+static int __cdecl dedi_registry_hook(HKEY hKey, LPCWSTR lpSubKey)
+{
+	char result = p_hookServ1(hKey, lpSubKey);
+	addDebugText("Post Server Registry Read.");
+	if (strlen(H2Config_dedi_server_playlist) > 0)
+	{
+		wchar_t* ServerPlaylist = Memory::GetAddress<wchar_t*>(0, 0x3B3704);
+		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
+	}
+	return result;
+}
+
+static int32 get_active_count_from_bitflags(uint16 teams_bit_flags)
+{
+	int32 count = 0;
+	for (int32 i = 0; i < _game_team_neutral; i++)
+	{
+		if (TEST_BIT(teams_bit_flags, i))
+			count++;
+	}
+	return count;
+}
+
+static bool __cdecl should_start_pregame_countdown_hook(void)
+{
+	// dedicated server only
+	auto p_should_start_pregame_countdown = Memory::GetAddress<decltype(&should_start_pregame_countdown_hook)>(0x0, 0xBC2A);
+
+	c_network_session* session = NULL;
+	network_life_cycle_in_squad_session(&session);
+
+	// if the game already thinks the game timer doesn't need to start, return false and skip any processing
+	if (!p_should_start_pregame_countdown()
+		|| !session->is_local_peer_session_leader())
+		return false;
+
+	bool minimumPlayersConditionMet = true;
+	if (H2Config_minimum_player_start > 0)
+	{
+		if (session->get_player_count() >= H2Config_minimum_player_start)
+		{
+			LOG_INFO_GAME(L"{} - minimum Player count met", __FUNCTIONW__);
+			minimumPlayersConditionMet = true;
+		}
+		else
+		{
+			minimumPlayersConditionMet = false;
+			server_console_send_msg(L"Waiting for Players | Esperando a los jugadores", true);
+		}
+	}
+
+	if (!minimumPlayersConditionMet)
+		return false;
+
+	/*if (H2Config_even_shuffle_teams
+		&& NetworkSession::IsVariantTeamPlay())
+	{
+		std::mt19937 mt_rand(rd());
+		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
+		uint16 activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
+
+		int32 max_teams = PIN(get_active_count_from_bitflags(activeTeamsFlags), 2, (int32)k_game_multiplayer_team_count);
+		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
+
+		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
+
+		int32 maxPlayersPerTeam = MAX(1, NetworkSession::GetPlayerCount() / max_teams);
+		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
+
+		for (int32 i = 0; i < k_game_multiplayer_team_count; i++)
+		{
+			int32 currentTeamPlayers = 0;
+
+			if (activePlayersIndices.empty())
+				break;
+
+			// check if the team is available for play
+			if (!TEST_BIT(activeTeamsFlags, i))
+				continue;
+
+			std::uniform_int_distribution<int32> dist(0, activePlayersIndices.size() - 1);
+
+			for (; currentTeamPlayers < maxPlayersPerTeam; currentTeamPlayers++)
+			{
+				int32 vecPlayerIdx = dist(mt_rand);
+				int32 playerIndexSelected = activePlayersIndices[vecPlayerIdx];
+				// swap the player index with the last one, then just pop the last element
+				std::swap(activePlayersIndices[vecPlayerIdx], activePlayersIndices[activePlayersIndices.size() - 1]);
+				activePlayersIndices.pop_back();
+
+				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndexSelected), (e_game_team)i);
+			}
+		}
+	}*/
+
+	EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
+	return true;
+}
+
 static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wide, int split_count, bool a3)
 {
 	wchar_t* command = command_line_split_wide[0];
 	if (command[0] == L'$') {
-		ServerConsole::LogToDedicatedServerConsoleWide(L"# running custom command: ");
+		server_console_log_to_dedicated_server_console_wide(L"# running custom command: ");
 		
 		c_static_string<256> command_line;
 		c_static_wchar_string<256> token_wide;
@@ -105,7 +253,7 @@ static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wi
 			command_line.append(" ");
 		}
 
-		ConsoleCommand::HandleCommandLine(command_line.get_string(), command_line.length(), ServerConsole::OutputCb);
+		ConsoleCommand::HandleCommandLine(command_line.get_string(), command_line.length(), server_console_output_cb);
 		return 0;
 	}
 
@@ -144,13 +292,13 @@ static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wi
 	// all server command functions will be hooked in the future and these event executes will be removed.
 
 	bool playCommand = false;
-	auto playCommandFind = g_commands_map.find(lower_command.get_string());
-	if (playCommandFind != g_commands_map.end()
+	auto playCommandFind = k_commands_map.find(lower_command.get_string());
+	if (playCommandFind != k_commands_map.end()
 		&& playCommandFind->second == _kablam_command_play)
 		playCommand = true;
 
 	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, g_commands_map.find(lower_command.get_string())->second);
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, k_commands_map.find(lower_command.get_string())->second);
 
 	void* result = p_kablam_command_handler(command_line_split_wide, split_count, a3);
 
@@ -158,15 +306,13 @@ static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wi
 	// all server command functions will be hooked in the future and these executes will be removed.
 	
 	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, g_commands_map.find(lower_command.get_string())->second);
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, k_commands_map.find(lower_command.get_string())->second);
 
 	return result;
 }
 
-typedef bool(__cdecl kablam_command_play_t)(wchar_t* playlist_file_path, int32 a2);
-kablam_command_play_t* p_kablam_command_play;
 
-bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int32 a2)
+static bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int32 a2)
 {
 	LOG_INFO_GAME("[{}]: {}", __FUNCTION__, "");
 	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, _kablam_command_play);
@@ -175,7 +321,7 @@ bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int32 a2)
 	return res;
 }
 
-void ServerConsole::ApplyHooks()
+static void server_console_apply_hooks(void)
 {
 	if (!Memory::IsDedicatedServer())
 		return;
@@ -186,9 +332,10 @@ void ServerConsole::ApplyHooks()
 
 	p_kablam_command_play = Memory::GetAddress<kablam_command_play_t*>(0, 0xE7FA);
 	PatchCall(Memory::GetAddress(0, 0x724B), kablam_command_play);
+	return;
 }
 
-int ServerConsole::LogToDedicatedServerConsoleWide(const wchar_t* fmt, ...) 
+static int server_console_log_to_dedicated_server_console_wide(const wchar_t* fmt, ...) 
 {
 	if (!Memory::IsDedicatedServer())
 		return 0;
@@ -203,7 +350,7 @@ int ServerConsole::LogToDedicatedServerConsoleWide(const wchar_t* fmt, ...)
 	return result;
 }
 
-int ServerConsole::LogToDedicatedServerConsole(const char* fmt, ...)
+static int server_console_log_to_dedicated_server_console(const char* fmt, ...)
 {
 	if (!Memory::IsDedicatedServer())
 		return 0;
@@ -218,7 +365,7 @@ int ServerConsole::LogToDedicatedServerConsole(const char* fmt, ...)
 	return result;
 }
 
-void ServerConsole::SendCommand(wchar_t** command, int32 split_commands_size, bool a3)
+static void server_console_send_command(wchar_t** command, int32 split_commands_size, bool a3)
 {
 	typedef void(__cdecl* unk_func1_t)(void* a1);
 	auto p_fn_unk1 = Memory::GetAddress<unk_func1_t>(0, 0x1D6EA);
@@ -255,26 +402,30 @@ void ServerConsole::SendCommand(wchar_t** command, int32 split_commands_size, bo
 	BYTE v8 = (*(BYTE**)(threadparams + 8))[20];
 	*(BYTE*)(threadparams + 4) = v8;
 	if (!v8)
-		LogToDedicatedServerConsoleWide(L"\r\n");
+	{
+		server_console_log_to_dedicated_server_console_wide(L"\r\n");
+	}
+	return;
 }
 
-void ServerConsole::AddVip(std::wstring gamerTag)
+static void server_console_add_vip(std::wstring gamerTag)
 {
 	p_kablam_vip_add(gamerTag.c_str());
+	return;
 }
 
-void ServerConsole::ClearVip()
+static void server_console_clear_vip(void)
 {
 	p_kablam_vip_clear();
+	return;
 }
 
-static int32 message_timeout = 0;
-void ServerConsole::SendMsg(const wchar_t* message, bool timeout)
+static void server_console_send_msg(const wchar_t* message, bool timeout)
 {
 	bool should_execute = !timeout;
-	if (system_milliseconds() - message_timeout > 10 * 1000)
+	if (system_milliseconds() - g_message_timeout > 10 * 1000)
 	{
-		message_timeout = system_milliseconds();
+		g_message_timeout = system_milliseconds();
 		should_execute = true;
 	}
 
@@ -286,9 +437,10 @@ void ServerConsole::SendMsg(const wchar_t* message, bool timeout)
 		// send the message
 		sendMsgCommand.execute();
 	}
+	return;
 }
 
-static int __cdecl ServerConsole::OutputCb(StringHeaderFlags flags, const char* fmt, ...)
+static int __cdecl server_console_output_cb(StringHeaderFlags flags, const char* fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -297,3 +449,4 @@ static int __cdecl ServerConsole::OutputCb(StringHeaderFlags flags, const char* 
 	va_end(ap);
 	return 0;
 }
+
