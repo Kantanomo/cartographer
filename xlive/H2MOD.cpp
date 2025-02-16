@@ -673,6 +673,7 @@ static void h2mod_apply_hooks(void)
 	cache_files_apply_patches();
 	network_configuration_apply_patches();
 	damage_apply_patches();
+	files_windows_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -834,12 +835,6 @@ static void h2mod_apply_tweaks(void)
 		// ### TODO: turn on if you want to debug halo2.exe from start of process
 		// DETOUR_ATTACH(p_IsDebuggerPresent, IsDebuggerPresent, IsDebuggerPresent_hook);
 	}
-
-	// disables profiles/game saves encryption
-	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
-	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
-	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), file_write_encrypted_hook);
-
 	addDebugText("End Startup Tweaks.");
 	return;
 }

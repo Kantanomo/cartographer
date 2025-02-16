@@ -46,6 +46,8 @@ enum e_file_open_error : DWORD
 	_file_open_error_unknown = 6,
 };
 
+void files_windows_apply_patches(void);
+
 s_file_reference* __cdecl file_reference_create_from_path(s_file_reference* file_reference, const utf8* path, bool path_is_directory);
 
 void __cdecl file_create_parent_directories_if_not_present(s_file_reference* file_reference);
@@ -91,5 +93,3 @@ bool __cdecl file_set_hidden(s_file_reference* file_reference, bool hidden);
 // file_to_add: file reference for the file we want to add to the zip
 // path_in_zip: the file path (includes the filename) the file will be set as in the zip file
 bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const char* path_in_zip);
-
-bool __cdecl file_write_encrypted_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer);

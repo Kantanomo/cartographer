@@ -11,22 +11,81 @@
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Utils/Utils.h"
 
+/* globals */
+
 static LARGE_INTEGER g_startup_counter;
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 
-DWORD WINAPI timeGetTime_hook();
+/* prototypes */
+
+static DWORD WINAPI timeGetTime_hook();
 
 // WinMain replacement
-int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
+static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
 
 // Destroys global windows used by the game
-void destroy_windows(void);
+static void destroy_windows(void);
 
-void __cdecl show_fatal_error(int32 error_id);
+static void __cdecl show_fatal_error(int32 error_id);
 
-bool __cdecl pcc_get_properties(void);
+static bool __cdecl pcc_get_properties(void);
 
-LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+static LARGE_INTEGER shell_get_startup_counter(void);
+
+static unsigned long long shell_time_from_counter(LARGE_INTEGER counter, LARGE_INTEGER freq, unsigned long long denominator);
+
+static void shell_system_set_timer_resolution_max(bool enable);
+
+static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator);
+
+static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_time, int framerate);
+
+static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut);
+
+static BOOL WINAPI CryptProtectDataHook(
+	_In_       DATA_BLOB* pDataIn,
+	_In_opt_   LPCWSTR                   szDataDescr,
+	_In_opt_   DATA_BLOB* pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB* pDataOut
+);
+
+static BOOL WINAPI CryptUnprotectDataHook(
+	_In_       DATA_BLOB* pDataIn,
+	_Out_opt_  LPWSTR* ppszDataDescr,
+	_In_opt_   DATA_BLOB* pOptionalEntropy,
+	_Reserved_ PVOID                     pvReserved,
+	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT* pPromptStruct,
+	_In_       DWORD                     dwFlags,
+	_Out_      DATA_BLOB* pDataOut
+);
+
+/* public code */
+
+HWND* shell_windows_get_hwnd(void)
+{
+	return Memory::GetAddress<HWND*>(0x46D9C4);
+}
+
+// mess around with xlive (not calling XLiveInitialize etc)
+bool* should_initilize_xlive_get(void)
+{
+	return Memory::GetAddress<bool*>(0x4FAD98);
+}
+
+bool* xlive_initilized_get(void)
+{
+	return Memory::GetAddress<bool*>(0x4FAD99);
+}
+
+int32* fatal_error_id_get(void)
+{
+	return Memory::GetAddress<int32*>(0x46DAD4);
+}
 
 void shell_windows_apply_patches(void)
 {
@@ -35,6 +94,16 @@ void shell_windows_apply_patches(void)
 	{
 		WriteJmpTo(Memory::GetAddress(0x7E43), H2WinMain);
 	}
+
+	// disables profiles/game saves encryption
+	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
+	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
+	return;
+}
+
+void shell_windows_initialize(void)
+{
+	QueryPerformanceCounter(&g_startup_counter);
 	return;
 }
 
@@ -43,19 +112,9 @@ bool __cdecl game_is_minimized(void)
 	return INVOKE(0x28729, 0x248AB, game_is_minimized);
 }
 
-LARGE_INTEGER shell_get_startup_counter()
+uint32 __cdecl system_milliseconds(void)
 {
-	return g_startup_counter;
-}
-
-unsigned long long shell_time_from_counter(LARGE_INTEGER counter, LARGE_INTEGER freq, unsigned long long denominator)
-{
-	unsigned long long _Whole, _Part;
-
-	_Whole = (counter.QuadPart / freq.QuadPart) * denominator;
-	_Part = (counter.QuadPart % freq.QuadPart) * denominator / freq.QuadPart;
-
-	return _Whole + _Part;
+	return INVOKE(0x37E51, 0x2B4CE, system_milliseconds);
 }
 
 LARGE_INTEGER shell_time_counter_freq()
@@ -83,14 +142,6 @@ LARGE_INTEGER shell_time_counter_diff(LARGE_INTEGER c1, LARGE_INTEGER c2)
 	return c1;
 }
 
-unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator)
-{
-	LARGE_INTEGER counter, freq;
-	counter = shell_time_counter_now(&freq);
-	counter = shell_time_counter_diff(counter, t2);
-	return shell_time_from_counter(counter, freq, denominator);
-}
-
 unsigned long long shell_time_now(unsigned long long denominator)
 {
 	LARGE_INTEGER counter, freq;
@@ -106,102 +157,6 @@ unsigned long long shell_time_now_sec()
 unsigned long long shell_time_now_msec()
 {
 	return shell_time_now(k_shell_time_msec_denominator);
-}
-
-HWND* shell_windows_get_hwnd(void)
-{
-	return Memory::GetAddress<HWND*>(0x46D9C4);
-}
-
-// mess around with xlive (not calling XLiveInitialize etc)
-bool* should_initilize_xlive_get(void)
-{
-	return Memory::GetAddress<bool*>(0x4FAD98);
-}
-
-bool* xlive_initilized_get(void)
-{
-	return Memory::GetAddress<bool*>(0x4FAD99);
-}
-
-uint32 __cdecl system_milliseconds()
-{
-	return INVOKE(0x37E51, 0x2B4CE, system_milliseconds);
-}
-
-DWORD WINAPI timeGetTime_hook()
-{
-	unsigned long long current_time_msec = shell_time_now_msec();
-	return (DWORD)current_time_msec;
-}
-static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
-
-void shell_windows_initialize()
-{
-	QueryPerformanceCounter(&g_startup_counter);
-}
-
-static void shell_system_set_timer_resolution_max(bool enable)
-{
-	ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
-	NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
-	NtSetTimerResolutionHelper(ulMaximumResolution, enable, &ulCurrentResolution);
-}
-
-void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_time, int framerate)
-{
-	const int threadWaitTimePercentage = 90;
-	const int min_time_to_suspend_exec_usec = 3000;
-
-	unsigned long long min_frametime_usec = (unsigned long long)(1000000.f / (float)framerate);
-	unsigned long long dt_usec = shell_time_diff(last_time, k_shell_time_usec_denominator);
-
-	if (dt_usec < min_frametime_usec)
-	{
-		unsigned long long sleep_time_usec = min_frametime_usec - dt_usec;
-
-		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
-		long long system_yield_time_usec = (threadWaitTimePercentage * sleep_time_usec) / 100;
-
-		// sleep just the milliseconds part
-		// system_yield_time_usec = system_yield_time_usec - (system_yield_time_usec % 1000);
-
-		// skip CPU yield if time is lower than 3ms
-		// because the system timer isn't precise enough for our needs
-		if (system_yield_time_usec > min_time_to_suspend_exec_usec)
-		{
-			if (NULL != frame_limit_timer_handle)
-			{
-				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
-				NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
-
-				shell_system_set_timer_resolution_max(true);
-
-				if (10ll * system_yield_time_usec > ulMaximumResolution)
-				{
-					LARGE_INTEGER liDueTime;
-
-					liDueTime.QuadPart = -10ll * system_yield_time_usec;
-					if (SetWaitableTimer(frame_limit_timer_handle, &liDueTime, 0, NULL, NULL, TRUE))
-					{
-						// Wait for the timer.
-						NtWaitForSingleObjectHelper(frame_limit_timer_handle, FALSE, &liDueTime);
-					}
-				}
-			}
-
-			/*int sleepTimeMs = system_yield_time_usec / 1000ll;
-			if (sleepTimeMs >= 0)
-				Sleep(sleepTimeMs);*/
-		}
-
-		// spin-lock the remaining slice of time
-		while (true)
-		{
-			if (shell_time_diff(last_time, k_shell_time_usec_denominator) >= min_frametime_usec)
-				break;
-		}
-	}
 }
 
 void shell_windows_throttle_framerate(int desired_framerate)
@@ -254,12 +209,21 @@ void shell_windows_throttle_framerate(int desired_framerate)
 	last_counter = shell_time_counter_now(NULL);
 }
 
-int32* fatal_error_id_get(void)
+bool __cdecl gfwl_gamestore_initialize(void)
 {
-	return Memory::GetAddress<int32*>(0x46DAD4);
+	return INVOKE(0x202F3E, 0x0, gfwl_gamestore_initialize);
 }
 
-int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+/* private code */
+
+DWORD WINAPI timeGetTime_hook()
+{
+	unsigned long long current_time_msec = shell_time_now_msec();
+	return (DWORD)current_time_msec;
+}
+static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
+
+static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 	// set args
 	WriteValue(Memory::GetAddress(0x46D9BC), lpCmdLine); // command_line_args
@@ -320,7 +284,7 @@ int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	return result;
 }
 
-void destroy_windows(void)
+static void destroy_windows(void)
 {
 	HWND hWnd = *shell_windows_get_hwnd();
 	HWND d3d_window = *Memory::GetAddress<HWND*>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
@@ -337,24 +301,19 @@ void destroy_windows(void)
 	return;
 }
 
-void __cdecl show_fatal_error(int32 error_id)
+static void __cdecl show_fatal_error(int32 error_id)
 {
 	error(2, "error_id: %d", error_id);
 	INVOKE(0x4A2E, 0x0, show_fatal_error, error_id);
 	return;
 }
 
-bool __cdecl pcc_get_properties(void)
+static bool __cdecl pcc_get_properties(void)
 {
 	return INVOKE(0x260DDD, 0x0, pcc_get_properties);
 }
 
-bool __cdecl gfwl_gamestore_initialize(void)
-{
-	return INVOKE(0x202F3E, 0x0, gfwl_gamestore_initialize);
-}
-
-LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static FrequencyLimiter frqLimiter(150);
 	bool* window_in_focus = Memory::GetAddress<bool*>(0x46DAD9);
@@ -390,14 +349,99 @@ LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return result;
 }
 
-void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
+static LARGE_INTEGER shell_get_startup_counter(void)
+{
+	return g_startup_counter;
+}
+
+static unsigned long long shell_time_from_counter(LARGE_INTEGER counter, LARGE_INTEGER freq, unsigned long long denominator)
+{
+	unsigned long long _Whole, _Part;
+
+	_Whole = (counter.QuadPart / freq.QuadPart) * denominator;
+	_Part = (counter.QuadPart % freq.QuadPart) * denominator / freq.QuadPart;
+
+	return _Whole + _Part;
+}
+
+static void shell_system_set_timer_resolution_max(bool enable)
+{
+	ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+	NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+	NtSetTimerResolutionHelper(ulMaximumResolution, enable, &ulCurrentResolution);
+}
+
+static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator)
+{
+	LARGE_INTEGER counter, freq;
+	counter = shell_time_counter_now(&freq);
+	counter = shell_time_counter_diff(counter, t2);
+	return shell_time_from_counter(counter, freq, denominator);
+}
+
+static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_time, int framerate)
+{
+	const int threadWaitTimePercentage = 90;
+	const int min_time_to_suspend_exec_usec = 3000;
+
+	unsigned long long min_frametime_usec = (unsigned long long)(1000000.f / (float)framerate);
+	unsigned long long dt_usec = shell_time_diff(last_time, k_shell_time_usec_denominator);
+
+	if (dt_usec < min_frametime_usec)
+	{
+		unsigned long long sleep_time_usec = min_frametime_usec - dt_usec;
+
+		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
+		long long system_yield_time_usec = (threadWaitTimePercentage * sleep_time_usec) / 100;
+
+		// sleep just the milliseconds part
+		// system_yield_time_usec = system_yield_time_usec - (system_yield_time_usec % 1000);
+
+		// skip CPU yield if time is lower than 3ms
+		// because the system timer isn't precise enough for our needs
+		if (system_yield_time_usec > min_time_to_suspend_exec_usec)
+		{
+			if (NULL != frame_limit_timer_handle)
+			{
+				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+				NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+
+				shell_system_set_timer_resolution_max(true);
+
+				if (10ll * system_yield_time_usec > ulMaximumResolution)
+				{
+					LARGE_INTEGER liDueTime = {};
+					liDueTime.QuadPart = -10ll * system_yield_time_usec;
+					if (SetWaitableTimer(frame_limit_timer_handle, &liDueTime, 0, NULL, NULL, TRUE))
+					{
+						// Wait for the timer.
+						NtWaitForSingleObjectHelper(frame_limit_timer_handle, FALSE, &liDueTime);
+					}
+				}
+			}
+
+			/*int sleepTimeMs = system_yield_time_usec / 1000ll;
+			if (sleepTimeMs >= 0)
+				Sleep(sleepTimeMs);*/
+		}
+
+		// spin-lock the remaining slice of time
+		while (true)
+		{
+			if (shell_time_diff(last_time, k_shell_time_usec_denominator) >= min_frametime_usec)
+				break;
+		}
+	}
+}
+
+static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
 {
 	pDataOut->cbData = pDataIn->cbData;
 	pDataOut->pbData = static_cast<BYTE*>(LocalAlloc(LMEM_FIXED, pDataIn->cbData));
 	CopyMemory(pDataOut->pbData, pDataIn->pbData, pDataIn->cbData);
 }
 
-BOOL WINAPI CryptProtectDataHook(
+static BOOL WINAPI CryptProtectDataHook(
 	_In_       DATA_BLOB* pDataIn,
 	_In_opt_   LPCWSTR                   szDataDescr,
 	_In_opt_   DATA_BLOB* pOptionalEntropy,
@@ -412,7 +456,7 @@ BOOL WINAPI CryptProtectDataHook(
 	return TRUE;
 }
 
-BOOL WINAPI CryptUnprotectDataHook(
+static BOOL WINAPI CryptUnprotectDataHook(
 	_In_       DATA_BLOB* pDataIn,
 	_Out_opt_  LPWSTR* ppszDataDescr,
 	_In_opt_   DATA_BLOB* pOptionalEntropy,
