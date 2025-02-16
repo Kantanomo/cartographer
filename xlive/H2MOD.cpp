@@ -105,28 +105,88 @@
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 
+/* typedefs */
+
+typedef void(__cdecl* user_interface_controller_set_desired_team_index_t)(e_controller_index controller_index, e_game_team team);
+typedef bool(__cdecl* map_cache_load_t)(s_game_options* map_load_settings);
+typedef bool(__cdecl* player_spawn_t)(datum playerDatumIndex);
+typedef uint16(__cdecl* get_enabled_teams_flags_t)(c_network_session*);
+typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
+typedef int(__cdecl* hookServ1_t)(HKEY, LPCWSTR);
+
 /* globals */
+
+static BOOL(WINAPI* p_IsDebuggerPresent)() = IsDebuggerPresent;
+
+user_interface_controller_set_desired_team_index_t p_user_interface_controller_set_desired_team_index;
+map_cache_load_t p_map_cache_load;
+player_spawn_t p_player_spawn;
+get_enabled_teams_flags_t p_get_enabled_teams_flags;
+show_error_screen_t p_show_error_screen;
+int(__cdecl* sub_20E1D8)(int, int, int, int, int, int);
+hookServ1_t p_hookServ1;
 
 bool g_h2x_enabled = false;
 bool g_xbox_tickrate_enabled = false;
 
-/* */
+/* prototypes */
+
+static void toggle_xbox_tickrate(s_game_options* options, bool toggle);
+
+static void toggle_ai_multiplayer(bool toggle);
+
+static bool __cdecl shell_is_remote_desktop(void);
+
+static bool __cdecl OnPlayerSpawn(datum playerDatumIdx);
+
+static void __cdecl OnPlayerDeath(datum player_index);
+
+static bool __cdecl OnMapLoad(s_game_options* options);
+
+static uint16 __cdecl get_enabled_team_flags(c_network_session* session);
+
+static void h2mod_apply_hooks(void);
+
+static void h2mod_apply_tweaks(void);
+
+static void __cdecl update_keyboard_buttons_state_hook(BYTE* a1, WORD* a2, BYTE* a3, bool a4, int a5);
+
+static bool __cdecl should_start_pregame_countdown_hook(void);
+
+static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6);
+
+static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6);
+
+static void __cdecl user_interface_controller_set_desired_team_index_hook(e_controller_index controller_index, e_game_team team);
+
+static void bipeds_physics_apply_patches(void);
+
+static void __stdcall biped_ground_mode_update_hook(
+	void* thisx,
+	void* physics_output,
+	void* physics_input,
+	void* a4,
+	int32 a5);
+
+static int OnAutoPickUpHandler(datum player_datum, datum object_datum);
+
+static bool GrenadeChainReactIsEngineMPCheck(void);
+
+static bool BansheeBombIsEngineMPCheck(void);
+
+static bool FlashlightIsEngineSPCheck(void);
+
+static int32 get_active_count_from_bitflags(uint16 teams_bit_flags);
+
+static int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey);
+
+static BOOL WINAPI IsDebuggerPresent_hook(void);
+
+/* public code  */
 
 bool xbox_tickrate_is_enabled()
 {
 	return g_xbox_tickrate_enabled;
-}
-
-typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
-show_error_screen_t p_show_error_screen;
-
-int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6) {
-	if (widget_type == 0x117)
-	{
-		LOG_TRACE_FUNC("Ignoring need to reinstall maps");
-		return 0;
-	}
-	return p_show_error_screen(a1, widget_type, a3, a4, a5, a6);
 }
 
 #pragma region PlayerFunctions
@@ -240,49 +300,135 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		std::thread(playSound).detach();
 }
 
-typedef void(__cdecl* player_died_t)(datum player_index);
-player_died_t p_player_died;
-
-void __cdecl OnPlayerDeath(datum player_index)
-{
-	CustomVariantHandler::OnPlayerDeath(ExecTime::_preEventExec, player_index);
-	//p_player_died(player_index);
-	INVOKE(0x5587B, 0x5DD73, OnPlayerDeath, player_index);
-	CustomVariantHandler::OnPlayerDeath(ExecTime::_postEventExec, player_index);
+void H2MOD::RefreshTogglexDelay() {
+	BYTE xDelayJMP[] = { 0x74 };
+	if (!H2Config_xDelay)
+		xDelayJMP[0] = 0xEB;
+	WriteBytes(Memory::GetAddress(0x1c9d8e, 0x1a1316), xDelayJMP, sizeof(xDelayJMP));
 }
 
-int OnAutoPickUpHandler(datum player_datum, datum object_datum)
+static const real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
+
+void H2MOD::player_position_increase_client_position_margin_of_error(bool enable)
 {
-	auto p_auto_handle = Memory::GetAddress<int(_cdecl*)(datum, datum)>(0x57AA5, 0x5FF9D);
+	if (Memory::IsDedicatedServer())
+		return;
 
-	int result = 0;
+	const real32 k_default_biped_distance_error_margin = 2.5f;
+	const real32 k_default_vehicle_distance_error_margin = 7.5f;
 
-	bool handled = CustomVariantHandler::OnAutoPickupHandler(ExecTime::_preEventExec, player_datum, object_datum);
-
-	if (!handled)
-		result = p_auto_handle(player_datum, object_datum);
-
-	CustomVariantHandler::OnAutoPickupHandler(ExecTime::_postEventExec, player_datum, object_datum);
-
-	return result;
+	real32 biped_error_margin = !enable ? k_default_biped_distance_error_margin : 4.0f;
+	real32 vehicle_error_margin = !enable ? k_default_vehicle_distance_error_margin : 10.0f;
+	WriteValue<real32>(Memory::GetAddress(0x4F958C), biped_error_margin);
+	WriteValue<real32>(Memory::GetAddress(0x4F9594), vehicle_error_margin);
 }
 
-void toggle_xbox_tickrate(s_game_options* options, bool toggle)
+void H2MOD::Initialize()
+{
+	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
+	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
+
+	DETOUR_BEGIN();
+
+	h2mod_apply_tweaks();
+
+	// Apply patches
+	game_apply_pre_winmain_patches();
+
+	main_loop_apply_patches();
+
+	if (!Memory::IsDedicatedServer())
+	{
+		// TODO: remove this garbage
+		custom_language_initialize();
+
+		// Apply patches for the hud that need to be applied before WinMain is called
+		hud_apply_pre_winmain_patches();
+
+		// adds support for more monitor resolutions
+		rasterizer_settings_apply_hooks();
+
+		KeyboardInput::Initialize();
+		
+		RenderHooks::Initialize();
+		DirectorHooks::Initialize();
+		ImGuiHandler::WeaponOffsets::Initialize();
+		TEST_N_DEF(PC3);
+	}
+	else
+	{
+		kablam_apply_patches();
+		playlist_loader::initialize();
+	}
+	cartographer_player_profile_initialize();
+	tag_injection_initialize();
+	CommandCollection::InitializeCommands();
+	CustomVariantHandler::RegisterCustomVariants();
+	CustomVariantSettings::Initialize();
+	MapSlots::Initialize();
+	HaloScript::Initialize();
+	ProjectileFix::ApplyPatches();
+	H2X::ApplyPatches();
+	h2mod_apply_hooks();
+
+	//StatsHandler::Initialize();
+
+	DETOUR_COMMIT();
+
+	LOG_INFO_GAME("H2MOD - Initialized");
+	return;
+}
+
+/* private code */
+
+static void toggle_xbox_tickrate(s_game_options* options, bool toggle)
 {
 	options->game_tick_rate = toggle ? 30 : 60;
 	WriteValue<int32>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int32)options->game_tick_rate);
 	LOG_TRACE_GAME("[h2mod] set game options tickrate to {}", options->game_tick_rate);
+	return;
 }
 
-void H2MOD::toggle_ai_multiplayer(bool toggle)
+static void toggle_ai_multiplayer(bool toggle)
 {
 	WriteValue<BYTE>(Memory::GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
+	return;
 }
 
-typedef bool(__cdecl *map_cache_load_t)(s_game_options* map_load_settings);
-map_cache_load_t p_map_cache_load;
+static bool __cdecl shell_is_remote_desktop(void)
+{
+	LOG_TRACE_FUNC("check disabled");
+	return false;
+}
 
-bool __cdecl OnMapLoad(s_game_options* options)
+static void __cdecl OnPlayerDeath(datum player_index)
+{
+	CustomVariantHandler::OnPlayerDeath(ExecTime::_preEventExec, player_index);
+	INVOKE(0x5587B, 0x5DD73, OnPlayerDeath, player_index);
+	CustomVariantHandler::OnPlayerDeath(ExecTime::_postEventExec, player_index);
+	return;
+}
+
+static bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
+{
+	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
+
+	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, playerDatumIdx);
+	CustomVariantHandler::OnPlayerSpawn(ExecTime::_preEventExec, playerDatumIdx);
+
+	bool ret = p_player_spawn(playerDatumIdx);
+
+	// check if the spawn was successful
+	if (ret)
+	{
+		EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, playerDatumIdx);
+		CustomVariantHandler::OnPlayerSpawn(ExecTime::_postEventExec, playerDatumIdx);
+	}
+
+	return ret;
+}
+
+static bool __cdecl OnMapLoad(s_game_options* options)
 {
 	static bool resetAfterMatch = false;
 
@@ -318,7 +464,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	}
 
 	// reset everything
-	H2MOD::toggle_ai_multiplayer(false);
+	toggle_ai_multiplayer(false);
 	toggle_xbox_tickrate(options, false);
 
 	// reset custom gametypes state
@@ -376,7 +522,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				ProjectileFix::ApplyProjectileVelocity();
 			}
 
-			H2MOD::toggle_ai_multiplayer(true);
+			toggle_ai_multiplayer(true);
 			if (get_game_life_cycle() == _life_cycle_in_game)
 			{
 				// send server map checksums to client
@@ -412,62 +558,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	return result;
 }
 
-typedef bool(__cdecl* player_spawn_t)(datum playerDatumIndex);
-player_spawn_t p_player_spawn;
-
-bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
-{
-	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-	
-	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, playerDatumIdx);
-	CustomVariantHandler::OnPlayerSpawn(ExecTime::_preEventExec, playerDatumIdx);
-
-	bool ret = p_player_spawn(playerDatumIdx);
-
-	// check if the spawn was successful
-	if (ret)
-	{
-		EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, playerDatumIdx);
-		CustomVariantHandler::OnPlayerSpawn(ExecTime::_postEventExec, playerDatumIdx);
-	}
-
-	return ret;
-}
-
-typedef void(__cdecl* user_interface_controller_set_desired_team_index_t)(e_controller_index controller_index, e_game_team team);
-user_interface_controller_set_desired_team_index_t p_user_interface_controller_set_desired_team_index;
-
-void __cdecl user_interface_controller_set_desired_team_index_hook(e_controller_index controller_index, e_game_team team)
-{
-	c_network_session* session = NULL;
-	network_life_cycle_in_squad_session(&session);
-
-	// prevent team switch in the pregame lobby, when the game already started
-	if (session
-		&& session->session_mode() == _network_session_mode_in_game
-		&& get_game_life_cycle() == _life_cycle_pre_game) 
-	{
-			return;
-	}
-	p_user_interface_controller_set_desired_team_index(controller_index, team);
-}
-
-bool GrenadeChainReactIsEngineMPCheck() {
-	return game_is_multiplayer();
-}
-
-bool BansheeBombIsEngineMPCheck() {
-	return game_is_multiplayer();
-}
-
-bool FlashlightIsEngineSPCheck() {
-	return game_is_campaign();
-}
-
-typedef uint16(__cdecl* get_enabled_teams_flags_t)(c_network_session*);
-get_enabled_teams_flags_t p_get_enabled_teams_flags;
-
-uint16 __cdecl get_enabled_team_flags(c_network_session* session)
+static uint16 __cdecl get_enabled_team_flags(c_network_session* session)
 {
 	uint16 default_teams_enabled_flags = p_get_enabled_teams_flags(session);
 	uint16 new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
@@ -509,115 +600,7 @@ uint16 __cdecl get_enabled_team_flags(c_network_session* session)
 	return new_teams_enabled_flags;
 }
 
-int32 get_active_count_from_bitflags(uint16 teams_bit_flags)
-{
-	int32 count = 0;
-	for (int32 i = 0; i < _game_team_neutral; i++)
-	{
-		if (TEST_BIT(teams_bit_flags, i))
-			count++;
-	}
-	return count;
-}
-
-bool __cdecl should_start_pregame_countdown_hook()
-{
-	// dedicated server only
-	auto p_should_start_pregame_countdown = Memory::GetAddress<decltype(&should_start_pregame_countdown_hook)>(0x0, 0xBC2A);
-
-	c_network_session* session = NULL;
-	network_life_cycle_in_squad_session(&session);
-
-	// if the game already thinks the game timer doesn't need to start, return false and skip any processing
-	if (!p_should_start_pregame_countdown()
-		|| !session->is_local_peer_session_leader())
-		return false; 
-
-	bool minimumPlayersConditionMet = true;
-	if (H2Config_minimum_player_start > 0)
-	{
-		if (session->get_player_count() >= H2Config_minimum_player_start)
-		{
-			LOG_INFO_GAME(L"{} - minimum Player count met", __FUNCTIONW__);
-			minimumPlayersConditionMet = true;
-		}
-		else
-		{
-			minimumPlayersConditionMet = false;
-			ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
-		}
-	}
-
-	if (!minimumPlayersConditionMet)
-		return false;
-
-	/*if (H2Config_even_shuffle_teams
-		&& NetworkSession::IsVariantTeamPlay())
-	{
-		std::mt19937 mt_rand(rd());
-		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
-		uint16 activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
-
-		int32 max_teams = PIN(get_active_count_from_bitflags(activeTeamsFlags), 2, (int32)k_game_multiplayer_team_count);
-		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
-
-		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
-		
-		int32 maxPlayersPerTeam = MAX(1, NetworkSession::GetPlayerCount() / max_teams);
-		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
-
-		for (int32 i = 0; i < k_game_multiplayer_team_count; i++)
-		{
-			int32 currentTeamPlayers = 0;
-
-			if (activePlayersIndices.empty())
-				break;
-
-			// check if the team is available for play
-			if (!TEST_BIT(activeTeamsFlags, i))
-				continue;
-
-			std::uniform_int_distribution<int32> dist(0, activePlayersIndices.size() - 1);
-
-			for (; currentTeamPlayers < maxPlayersPerTeam; currentTeamPlayers++)
-			{
-				int32 vecPlayerIdx = dist(mt_rand);
-				int32 playerIndexSelected = activePlayersIndices[vecPlayerIdx];
-				// swap the player index with the last one, then just pop the last element
-				std::swap(activePlayersIndices[vecPlayerIdx], activePlayersIndices[activePlayersIndices.size() - 1]);
-				activePlayersIndices.pop_back();
-
-				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndexSelected), (e_game_team)i);
-			}
-		}
-	}*/
-
-	EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
-	return true;
-}
-
-void H2MOD::RefreshTogglexDelay() {
-	BYTE xDelayJMP[] = { 0x74 };
-	if (!H2Config_xDelay)
-		xDelayJMP[0] = 0xEB;
-	WriteBytes(Memory::GetAddress(0x1c9d8e, 0x1a1316), xDelayJMP, sizeof(xDelayJMP));
-}
-
-typedef int(__cdecl* hookServ1_t)(HKEY, LPCWSTR);
-hookServ1_t p_hookServ1;
-int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
-	char result = p_hookServ1(hKey, lpSubKey);
-	addDebugText("Post Server Registry Read.");
-	if (strlen(H2Config_dedi_server_playlist) > 0) {
-		wchar_t* ServerPlaylist = Memory::GetAddress<wchar_t*>(0, 0x3B3704);
-		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
-	}
-	return result;
-}
-
-static const real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
-
-__declspec(naked) void object_function_value_adjust_primary_firing()
+__declspec(naked) static void object_function_value_adjust_primary_firing(void)
 {
 	__asm
 	{
@@ -629,9 +612,9 @@ __declspec(naked) void object_function_value_adjust_primary_firing()
 		// adjust the value first
 		fld seconds_trigger_hold
 		push eax
-		fstp dword ptr [esp]
+		fstp dword ptr[esp]
 		call time_globals::seconds_to_ticks_real
-		fstp dword ptr [esp]
+		fstp dword ptr[esp]
 		cvttss2si esi, [esp]
 		add esp, 4
 		pop eax
@@ -647,206 +630,8 @@ __declspec(naked) void object_function_value_adjust_primary_firing()
 	}
 }
 
-void __stdcall biped_ground_mode_update_hook(
-	void* thisx,
-	void* physics_output,
-	void* physics_input,
-	void* a4,
-	int32 a5)
+static void h2mod_apply_hooks(void)
 {
-	const real32 edge_drop_value = 0.117f;
-
-	typedef void(__thiscall* biped_ground_mode_update_t)(void*, void*, void*, void*, int32, real32);
-	auto p_biped_ground_mode_update = Memory::GetAddress<biped_ground_mode_update_t>(0x1067F0, 0xF8B10);
-
-	float edge_drop_per_tick = 30.f * edge_drop_value * game_tick_length();
-
-	// push last parameter despite the function taking just 5 parameters
-	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edge_drop_per_tick);
-
-	// account for the last parameter that doesn't get handled by the actual function
-	__asm add esp, 4;
-}
-
-__declspec(naked) void biped_ground_mode_update_to_stdcall()
-{
-	__asm
-	{
-		pop eax // pop return address
-		push ecx // push ecx as first param
-		push eax // push the return address back on stack
-		jmp biped_ground_mode_update_hook
-	}
-}
-
-// fixes the biped unit movement physics from applying too much movement, especially when edge-dropping by adjusting the default constant (0.117) value to tickrate
-__declspec(naked) void update_biped_ground_mode_physics_constant()
-{
-#define _stack_pointer_offset 4h + 4Ch
-#define _last_param_offset 4h + 10h
-	__asm
-	{
-		movss xmm2, [esp + _stack_pointer_offset + _last_param_offset]
-		ret
-	}
-#undef _stack_pointer_offset
-#undef _last_param_offset
-}
-
-void bipeds_physics_apply_patches()
-{
-	// fixes edge drop fast fall when using higher tickrates than 30
-	PatchCall(Memory::GetAddress(0x1082B4, 0xFA5D4), biped_ground_mode_update_to_stdcall);
-	Codecave(Memory::GetAddress(0x106E23, 0xF9143), update_biped_ground_mode_physics_constant, 3);
-
-	// melee physics mode hooks
-	c_character_physics_mode_melee_datum::apply_hooks();
-}
-
-void H2MOD::player_position_increase_client_position_margin_of_error(bool enable)
-{
-	if (Memory::IsDedicatedServer())
-		return;
-
-	const real32 k_default_biped_distance_error_margin = 2.5f;
-	const real32 k_default_vehicle_distance_error_margin = 7.5f;
-
-	real32 biped_error_margin = !enable ? k_default_biped_distance_error_margin : 4.0f;
-	real32 vehicle_error_margin = !enable ? k_default_vehicle_distance_error_margin : 10.0f;
-	WriteValue<real32>(Memory::GetAddress(0x4F958C), biped_error_margin);
-	WriteValue<real32>(Memory::GetAddress(0x4F9594), vehicle_error_margin);
-}
-
-static BOOL(WINAPI* p_IsDebuggerPresent)() = IsDebuggerPresent;
-BOOL WINAPI IsDebuggerPresent_hook() {
-	return false;
-}
-
-bool __cdecl shell_is_remote_desktop()
-{
-	LOG_TRACE_FUNC("check disabled");
-	return false;
-}
-
-int(__cdecl* sub_20E1D8)(int, int, int, int, int, int);
-
-int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
-	//a2 == 0x5 - system link lost connection
-	if (a2 == 0xb9) {
-		//boot them offline.
-		XUserSignOut(0);
-		UpdateMasterLoginStatus();
-		H2Config_master_ip = inet_addr("127.0.0.1");
-		H2Config_master_port_relay = 2001;
-	}
-	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
-	return result;
-}
-
-void __cdecl update_keyboard_buttons_state_hook(BYTE* a1, WORD* a2, BYTE* a3, bool a4, int a5)
-{
-	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
-
-	BYTE keyboardState[256] = {};
-	if (!H2Config_disable_ingame_keyboard
-		&& GetKeyboardState(keyboardState))
-	{
-		for (int i = 0; i < 256; i++)
-		{
-			if (i != VK_SCROLL)
-			{
-				bool state = keyboardState[i] & 0x80;
-
-				// these keys need to be queried using GetAsyncKeyState because the Window Processing (WndProc) may consume the keys
-				if (i == VK_RSHIFT
-					|| i == VK_LSHIFT
-					|| i == VK_RCONTROL
-					|| i == VK_LCONTROL
-					|| i == VK_RMENU
-					|| i == VK_LMENU)
-				{
-					SHORT asyncKeyState = GetAsyncKeyState(i);
-
-					state = asyncKeyState & 0x8000;
-				}
-
-				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], state, a5);
-			}
-		}
-	}
-	else
-	{
-		for (int i = 0; i < 256; i++)
-			if (i != VK_SCROLL)
-				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], false, a5);
-	}
-}
-
-void h2mod_apply_tweaks() {
-	addDebugText("Begin Startup Tweaks.");
-
-	H2MOD::RefreshTogglexDelay();
-
-	if (Memory::IsDedicatedServer()) {
-	}
-	else {//is client
-
-		bool intro_high_quality_flag = true;//clients should set on halo2.exe -highquality
-
-		if (!H2Config_skip_intro && intro_high_quality_flag) {
-			BYTE assmIntroHQ[] = { 0xEB };
-			WriteBytes(Memory::GetAddress(0x221C29), assmIntroHQ, sizeof(assmIntroHQ));
-		}
-
-		//Set the LAN Server List Ping Frequency (milliseconds).
-		//WriteValue(Memory::GetAddress(0x001e9a89), 3000);
-		//Set the LAN Server List Delete Entry After (milliseconds).
-		//WriteValue(Memory::GetAddress(0x001e9b0a), 9000);
-
-		//hook the gui popup for when the player is booted.
-		sub_20E1D8 = Memory::GetAddress<int(__cdecl*)(int, int, int, int, int, int)>(0x20E1D8);
-		PatchCall(Memory::GetAddress(0x21754C), &sub_20E1D8_boot);
-
-		// patch to show game details menu in NETWORK serverlist too
-		//NopFill(Memory::GetAddress(0x219D6D), 2);
-
-		WriteJmpTo(Memory::GetAddress(0x39EA2), shell_is_remote_desktop);
-
-		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
-		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
-		NopFill(Memory::GetAddressRelative(0x66A092), 8);
-
-		// nop a call to SetCursor(), to improve the FPS framedrops when hovering the mouse around in the main menus or where the cursor is used, mainly when using mice that use 1000 polling rate
-		// it'll get called anyway by the D3D9Device::ShowCursor() API after
-		//NopFill(Memory::GetAddressRelative(0x48A99C), 8);
-
-		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
-		NopFill(Memory::GetAddressRelative(0x42FAB9), 8);
-		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
-
-		// don't mess with the cursor during loading screen
-		NopFill(Memory::GetAddressRelative(0x66BAEB), 5);
-
-		// disable symbol to emoji translation when dealing with player name
-		// works only in game for now, because the name in the pregame lobby uses c_text_widget
-		// and it's harder to deal with
-		NopFill(Memory::GetAddressRelative(0x46C7C7), 5);
-		NopFill(Memory::GetAddressRelative(0x45C338), 5);
-		NopFill(Memory::GetAddressRelative(0x473C61), 5);
-
-		// ### TODO: turn on if you want to debug halo2.exe from start of process
-		// DETOUR_ATTACH(p_IsDebuggerPresent, IsDebuggerPresent, IsDebuggerPresent_hook);
-	}
-
-	// disables profiles/game saves encryption
-	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
-	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
-	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), file_write_encrypted_hook);
-
-	addDebugText("End Startup Tweaks.");
-}
-
-void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
 	LOG_INFO_GAME("{} - applying hooks", __FUNCTION__);
@@ -892,8 +677,6 @@ void H2MOD::ApplyHooks() {
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
 	PatchCall(Memory::GetAddress(0x144919, 0x133769), OnPlayerDeath);
-	// ### FIXME: this detours all cases where a player dies, including after a new round/teleporting (pseudo-kill)
-	//DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
 	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
 
@@ -906,7 +689,7 @@ void H2MOD::ApplyHooks() {
 		// ### TODO dedi offset
 		Codecave(Memory::GetAddress(0x15E8DC, 0x0), object_function_value_adjust_primary_firing, 4);
 
-		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);		
+		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
 		DETOUR_ATTACH(p_user_interface_controller_set_desired_team_index, Memory::GetAddress<user_interface_controller_set_desired_team_index_t>(0x2068F2), user_interface_controller_set_desired_team_index_hook);
 
 		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
@@ -930,7 +713,7 @@ void H2MOD::ApplyHooks() {
 		font_group_apply_hooks();
 		screens_apply_patches();
 		aim_assist_apply_patches();
-		
+
 		levels_apply_patches();
 		main_game_apply_patches();
 		main_render_apply_patches();
@@ -992,59 +775,341 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Memory::GetAddress(0x0, 0xBF43), should_start_pregame_countdown_hook);
 		ServerConsole::ApplyHooks();
 	}
+	return;
 }
 
-void H2MOD::Initialize()
+static void h2mod_apply_tweaks(void)
 {
-	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
-	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
+	addDebugText("Begin Startup Tweaks.");
 
-	DETOUR_BEGIN();
+	H2MOD::RefreshTogglexDelay();
 
-	h2mod_apply_tweaks();
+	if (Memory::IsDedicatedServer()) {
+	}
+	else {//is client
 
-	// Apply patches
-	game_apply_pre_winmain_patches();
+		bool intro_high_quality_flag = true;//clients should set on halo2.exe -highquality
 
-	main_loop_apply_patches();
+		if (!H2Config_skip_intro && intro_high_quality_flag) {
+			BYTE assmIntroHQ[] = { 0xEB };
+			WriteBytes(Memory::GetAddress(0x221C29), assmIntroHQ, sizeof(assmIntroHQ));
+		}
 
-	if (!Memory::IsDedicatedServer())
+		//Set the LAN Server List Ping Frequency (milliseconds).
+		//WriteValue(Memory::GetAddress(0x001e9a89), 3000);
+		//Set the LAN Server List Delete Entry After (milliseconds).
+		//WriteValue(Memory::GetAddress(0x001e9b0a), 9000);
+
+		//hook the gui popup for when the player is booted.
+		sub_20E1D8 = Memory::GetAddress<int(__cdecl*)(int, int, int, int, int, int)>(0x20E1D8);
+		PatchCall(Memory::GetAddress(0x21754C), &sub_20E1D8_boot);
+
+		// patch to show game details menu in NETWORK serverlist too
+		//NopFill(Memory::GetAddress(0x219D6D), 2);
+
+		WriteJmpTo(Memory::GetAddress(0x39EA2), shell_is_remote_desktop);
+
+		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
+		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
+		NopFill(Memory::GetAddressRelative(0x66A092), 8);
+
+		// nop a call to SetCursor(), to improve the FPS framedrops when hovering the mouse around in the main menus or where the cursor is used, mainly when using mice that use 1000 polling rate
+		// it'll get called anyway by the D3D9Device::ShowCursor() API after
+		//NopFill(Memory::GetAddressRelative(0x48A99C), 8);
+
+		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
+		NopFill(Memory::GetAddressRelative(0x42FAB9), 8);
+		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
+
+		// don't mess with the cursor during loading screen
+		NopFill(Memory::GetAddressRelative(0x66BAEB), 5);
+
+		// disable symbol to emoji translation when dealing with player name
+		// works only in game for now, because the name in the pregame lobby uses c_text_widget
+		// and it's harder to deal with
+		NopFill(Memory::GetAddressRelative(0x46C7C7), 5);
+		NopFill(Memory::GetAddressRelative(0x45C338), 5);
+		NopFill(Memory::GetAddressRelative(0x473C61), 5);
+
+		// ### TODO: turn on if you want to debug halo2.exe from start of process
+		// DETOUR_ATTACH(p_IsDebuggerPresent, IsDebuggerPresent, IsDebuggerPresent_hook);
+	}
+
+	// disables profiles/game saves encryption
+	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
+	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
+	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), file_write_encrypted_hook);
+
+	addDebugText("End Startup Tweaks.");
+	return;
+}
+
+static void __cdecl update_keyboard_buttons_state_hook(BYTE* a1, WORD* a2, BYTE* a3, bool a4, int a5)
+{
+	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
+
+	BYTE keyboardState[256] = {};
+	if (!H2Config_disable_ingame_keyboard
+		&& GetKeyboardState(keyboardState))
 	{
-		// TODO: remove this garbage
-		custom_language_initialize();
+		for (int i = 0; i < 256; i++)
+		{
+			if (i != VK_SCROLL)
+			{
+				bool state = keyboardState[i] & 0x80;
 
-		// Apply patches for the hud that need to be applied before WinMain is called
-		hud_apply_pre_winmain_patches();
+				// these keys need to be queried using GetAsyncKeyState because the Window Processing (WndProc) may consume the keys
+				if (i == VK_RSHIFT
+					|| i == VK_LSHIFT
+					|| i == VK_RCONTROL
+					|| i == VK_LCONTROL
+					|| i == VK_RMENU
+					|| i == VK_LMENU)
+				{
+					SHORT asyncKeyState = GetAsyncKeyState(i);
 
-		// adds support for more monitor resolutions
-		rasterizer_settings_apply_hooks();
+					state = asyncKeyState & 0x8000;
+				}
 
-		KeyboardInput::Initialize();
-		
-		RenderHooks::Initialize();
-		DirectorHooks::Initialize();
-		ImGuiHandler::WeaponOffsets::Initialize();
-		TEST_N_DEF(PC3);
+				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], state, a5);
+			}
+		}
 	}
 	else
 	{
-		kablam_apply_patches();
-		playlist_loader::initialize();
+		for (int i = 0; i < 256; i++)
+			if (i != VK_SCROLL)
+				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], false, a5);
 	}
-	cartographer_player_profile_initialize();
-	tag_injection_initialize();
-	CommandCollection::InitializeCommands();
-	CustomVariantHandler::RegisterCustomVariants();
-	CustomVariantSettings::Initialize();
-	MapSlots::Initialize();
-	HaloScript::Initialize();
-	ProjectileFix::ApplyPatches();
-	H2X::ApplyPatches();
-	H2MOD::ApplyHooks();
+	return;
+}
 
-	//StatsHandler::Initialize();
+static bool __cdecl should_start_pregame_countdown_hook(void)
+{
+	// dedicated server only
+	auto p_should_start_pregame_countdown = Memory::GetAddress<decltype(&should_start_pregame_countdown_hook)>(0x0, 0xBC2A);
 
-	DETOUR_COMMIT();
+	c_network_session* session = NULL;
+	network_life_cycle_in_squad_session(&session);
 
-	LOG_INFO_GAME("H2MOD - Initialized");
+	// if the game already thinks the game timer doesn't need to start, return false and skip any processing
+	if (!p_should_start_pregame_countdown()
+		|| !session->is_local_peer_session_leader())
+		return false;
+
+	bool minimumPlayersConditionMet = true;
+	if (H2Config_minimum_player_start > 0)
+	{
+		if (session->get_player_count() >= H2Config_minimum_player_start)
+		{
+			LOG_INFO_GAME(L"{} - minimum Player count met", __FUNCTIONW__);
+			minimumPlayersConditionMet = true;
+		}
+		else
+		{
+			minimumPlayersConditionMet = false;
+			ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
+		}
+	}
+
+	if (!minimumPlayersConditionMet)
+		return false;
+
+	/*if (H2Config_even_shuffle_teams
+		&& NetworkSession::IsVariantTeamPlay())
+	{
+		std::mt19937 mt_rand(rd());
+		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
+		uint16 activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
+
+		int32 max_teams = PIN(get_active_count_from_bitflags(activeTeamsFlags), 2, (int32)k_game_multiplayer_team_count);
+		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
+
+		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
+
+		int32 maxPlayersPerTeam = MAX(1, NetworkSession::GetPlayerCount() / max_teams);
+		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
+
+		for (int32 i = 0; i < k_game_multiplayer_team_count; i++)
+		{
+			int32 currentTeamPlayers = 0;
+
+			if (activePlayersIndices.empty())
+				break;
+
+			// check if the team is available for play
+			if (!TEST_BIT(activeTeamsFlags, i))
+				continue;
+
+			std::uniform_int_distribution<int32> dist(0, activePlayersIndices.size() - 1);
+
+			for (; currentTeamPlayers < maxPlayersPerTeam; currentTeamPlayers++)
+			{
+				int32 vecPlayerIdx = dist(mt_rand);
+				int32 playerIndexSelected = activePlayersIndices[vecPlayerIdx];
+				// swap the player index with the last one, then just pop the last element
+				std::swap(activePlayersIndices[vecPlayerIdx], activePlayersIndices[activePlayersIndices.size() - 1]);
+				activePlayersIndices.pop_back();
+
+				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndexSelected), (e_game_team)i);
+			}
+		}
+	}*/
+
+	EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
+	return true;
+}
+
+static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6)
+{
+	if (widget_type == 0x117)
+	{
+		LOG_TRACE_FUNC("Ignoring need to reinstall maps");
+		return 0;
+	}
+	return p_show_error_screen(a1, widget_type, a3, a4, a5, a6);
+}
+
+static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6)
+{
+	//a2 == 0x5 - system link lost connection
+	if (a2 == 0xb9) {
+		//boot them offline.
+		XUserSignOut(0);
+		UpdateMasterLoginStatus();
+		H2Config_master_ip = inet_addr("127.0.0.1");
+		H2Config_master_port_relay = 2001;
+	}
+	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
+	return result;
+}
+
+static void __cdecl user_interface_controller_set_desired_team_index_hook(e_controller_index controller_index, e_game_team team)
+{
+	c_network_session* session = NULL;
+	network_life_cycle_in_squad_session(&session);
+
+	// prevent team switch in the pregame lobby, when the game already started
+	if (session
+		&& session->session_mode() == _network_session_mode_in_game
+		&& get_game_life_cycle() == _life_cycle_pre_game)
+	{
+		return;
+	}
+	p_user_interface_controller_set_desired_team_index(controller_index, team);
+}
+
+__declspec(naked) static void biped_ground_mode_update_to_stdcall(void)
+{
+	__asm
+	{
+		pop eax // pop return address
+		push ecx // push ecx as first param
+		push eax // push the return address back on stack
+		jmp biped_ground_mode_update_hook
+	}
+}
+
+// fixes the biped unit movement physics from applying too much movement, especially when edge-dropping by adjusting the default constant (0.117) value to tickrate
+__declspec(naked) static void update_biped_ground_mode_physics_constant(void)
+{
+#define _stack_pointer_offset 4h + 4Ch
+#define _last_param_offset 4h + 10h
+	__asm
+	{
+		movss xmm2, [esp + _stack_pointer_offset + _last_param_offset]
+		ret
+	}
+#undef _stack_pointer_offset
+#undef _last_param_offset
+}
+
+static void bipeds_physics_apply_patches(void)
+{
+	// fixes edge drop fast fall when using higher tickrates than 30
+	PatchCall(Memory::GetAddress(0x1082B4, 0xFA5D4), biped_ground_mode_update_to_stdcall);
+	Codecave(Memory::GetAddress(0x106E23, 0xF9143), update_biped_ground_mode_physics_constant, 3);
+
+	// melee physics mode hooks
+	c_character_physics_mode_melee_datum::apply_hooks();
+	return;
+}
+
+static void __stdcall biped_ground_mode_update_hook(
+	void* thisx,
+	void* physics_output,
+	void* physics_input,
+	void* a4,
+	int32 a5)
+{
+	const real32 edge_drop_value = 0.117f;
+
+	typedef void(__thiscall* biped_ground_mode_update_t)(void*, void*, void*, void*, int32, real32);
+	auto p_biped_ground_mode_update = Memory::GetAddress<biped_ground_mode_update_t>(0x1067F0, 0xF8B10);
+
+	float edge_drop_per_tick = 30.f * edge_drop_value * game_tick_length();
+
+	// push last parameter despite the function taking just 5 parameters
+	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edge_drop_per_tick);
+
+	// account for the last parameter that doesn't get handled by the actual function
+	__asm add esp, 4;
+}
+
+static int OnAutoPickUpHandler(datum player_datum, datum object_datum)
+{
+	auto p_auto_handle = Memory::GetAddress<int(_cdecl*)(datum, datum)>(0x57AA5, 0x5FF9D);
+
+	int result = 0;
+
+	bool handled = CustomVariantHandler::OnAutoPickupHandler(ExecTime::_preEventExec, player_datum, object_datum);
+
+	if (!handled)
+		result = p_auto_handle(player_datum, object_datum);
+
+	CustomVariantHandler::OnAutoPickupHandler(ExecTime::_postEventExec, player_datum, object_datum);
+
+	return result;
+}
+
+static bool GrenadeChainReactIsEngineMPCheck(void)
+{
+	return game_is_multiplayer();
+}
+
+static bool BansheeBombIsEngineMPCheck(void)
+{
+	return game_is_multiplayer();
+}
+
+static bool FlashlightIsEngineSPCheck(void)
+{
+	return game_is_campaign();
+}
+
+static int32 get_active_count_from_bitflags(uint16 teams_bit_flags)
+{
+	int32 count = 0;
+	for (int32 i = 0; i < _game_team_neutral; i++)
+	{
+		if (TEST_BIT(teams_bit_flags, i))
+			count++;
+	}
+	return count;
+}
+
+static int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey)
+{
+	char result = p_hookServ1(hKey, lpSubKey);
+	addDebugText("Post Server Registry Read.");
+	if (strlen(H2Config_dedi_server_playlist) > 0) {
+		wchar_t* ServerPlaylist = Memory::GetAddress<wchar_t*>(0, 0x3B3704);
+		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
+	}
+	return result;
+}
+
+static BOOL WINAPI IsDebuggerPresent_hook(void)
+{
+	return false;
 }
