@@ -959,6 +959,7 @@ void H2MOD::ApplyHooks() {
 
 	cache_files_apply_patches();
 	network_configuration_apply_patches();
+	damage_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -1054,7 +1055,6 @@ void H2MOD::ApplyHooks() {
 		new_hud_draw_apply_patches();
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
-		damage_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
