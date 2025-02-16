@@ -469,4 +469,6 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s
 
 void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string);
 
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_description(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string);
+
 int32 multiplayer_variant_settings_interface_get_custom_variant_parameter_value_count(s_game_variant* variant, e_variant_setting_parameter_type type);

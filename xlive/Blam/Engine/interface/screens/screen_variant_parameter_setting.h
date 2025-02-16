@@ -13,8 +13,9 @@ struct s_variant_parameter_setting_list_item
 {
 	int32 unk;
 	s_text_value_pair_reference_new* text_value_pair_reference;
+	int32 value;
 };
-ASSERT_STRUCT_SIZE(s_variant_parameter_setting_list_item, 8);
+ASSERT_STRUCT_SIZE(s_variant_parameter_setting_list_item, 12);
 
 static e_variant_setting_parameter_type g_previous_variant_setting_parameter;
 

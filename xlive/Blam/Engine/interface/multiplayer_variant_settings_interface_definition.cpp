@@ -207,6 +207,26 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s
 	usnzprintf(out_string, 512, L"");
 }
 
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_description(s_game_variant* variant,e_variant_setting_parameter_type type, wchar_t* out_string)
+{
+	switch (variant->variant_game_engine_index)
+	{
+	case _game_engine_type_headhunter:
+	{
+		for (int32 i = 0; i < k_multiplayer_variant_headhunter_parameter_count; ++i)
+		{
+			if (g_multiplayer_variant_interface_headhunter_parameter_types[i] == type)
+			{
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_headhunter_parameter_description_strings[get_current_language()][i]);
+				return;
+			}
+		}
+	}
+	}
+
+	usnzprintf(out_string, 512, L"");
+}
+
 int32 multiplayer_variant_settings_interface_get_custom_variant_parameter_value_count(s_game_variant* variant, e_variant_setting_parameter_type type)
 {
 	switch (variant->variant_game_engine_index)
