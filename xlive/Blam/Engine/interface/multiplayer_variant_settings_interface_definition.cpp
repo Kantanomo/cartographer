@@ -99,6 +99,29 @@ static void multiplayer_variant_settings_interface_get_variant_parameter_label_h
 	usnzprintf(out_string, 512, string);
 }
 
+static int32 multiplayer_variant_settings_interface_get_variant_parameter_value_count_headhnter(e_variant_setting_parameter_type type)
+{
+	switch (type)
+	{
+		case _variant_setting_parameter_type_headhunter_moving_head_bin:
+		case _variant_setting_parameter_type_headhunter_point_multiplier:
+		case _variant_setting_parameter_type_headhunter_suicide_point_loss:
+		case _variant_setting_parameter_type_headhunter_death_point_loss:
+		case _variant_setting_parameter_type_headhunter_uncontested_bin:
+		{
+			return 2;
+		}
+		case _variant_setting_parameter_type_headhunter_speed_with_heads:
+		{
+			return k_ctf_engine_player_speed_count;
+		}
+		case _variant_setting_parameter_type_headhunter_max_heads_carried:
+		{
+			return k_headhunter_max_heads_carried_count;
+		}
+	}
+}
+
 /* public code */
 
 void multiplayer_variant_settings_interface_apply_patches()
@@ -137,28 +160,74 @@ s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_
 	return INVOKE(0x23AD57, 0, multiplayer_variant_settings_interface_get_variant_parameter_label, text_value_pair, value);
 }
 
-void multiplayer_variant_settings_interface_get_variant_parameter_label_direct(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string)
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_label(s_game_variant* variant, e_variant_setting_parameter_type type, int32 value, wchar_t* out_string)
 {
-	int32 value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, type);
-
 	switch(variant->variant_game_engine_index)
 	{
 		case _game_engine_type_headhunter:
+		{
 			multiplayer_variant_settings_interface_get_variant_parameter_label_headhunter(value, type, out_string);
-			break;
-		default:
-			usnzprintf(out_string, 512, L"");
-			break;
+			return;
+		}
 	}
-}
 
-const wchar_t* multiplayer_variant_settings_interface_get_variant_parameter_title_direct(s_game_variant* variant, int32 index)
+	usnzprintf(out_string, 512, L"");
+}
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s_game_variant* variant, int32 index, wchar_t* out_string)
 {
 	switch (variant->variant_game_engine_index)
 	{
 		case _game_engine_type_headhunter:
-			return g_multiplayer_variant_interface_headhunter_parameter_title_strings[get_current_language()][index];
-		default:
-			return L"";
+		{
+			usnzprintf(out_string, 512, g_multiplayer_variant_interface_headhunter_parameter_title_strings[get_current_language()][index]);
+			return;
+		}
 	}
+
+	usnzprintf(out_string, 512, L"");
+}
+
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string)
+{
+	switch (variant->variant_game_engine_index)
+	{
+		case _game_engine_type_headhunter:
+		{
+			for (int32 i = 0; i < k_multiplayer_variant_headhunter_parameter_count; ++i)
+			{
+				if (g_multiplayer_variant_interface_headhunter_parameter_types[i] == type)
+				{
+					usnzprintf(out_string, 512, g_multiplayer_variant_interface_headhunter_parameter_title_strings[get_current_language()][i]);
+					return;
+				}
+			}
+		}
+	}
+
+	usnzprintf(out_string, 512, L"");
+}
+
+int32 multiplayer_variant_settings_interface_get_custom_variant_parameter_value_count(s_game_variant* variant, e_variant_setting_parameter_type type)
+{
+	switch (variant->variant_game_engine_index)
+	{
+		case _game_engine_type_headhunter:
+			return multiplayer_variant_settings_interface_get_variant_parameter_value_count_headhnter(type);
+	}
+
+	return 1;
+}
+
+bool multiplayer_variant_settings_interface_parameter_is_custom(s_game_variant* variant, e_variant_setting_parameter_type type)
+{
+	switch(variant->variant_game_engine_index)
+	{
+		case _game_engine_type_headhunter:
+		{
+			for (const auto headhunter_parameter_type : g_multiplayer_variant_interface_headhunter_parameter_types)
+				if (headhunter_parameter_type == type)
+					return true;
+		}
+	}
+	return false;
 }
