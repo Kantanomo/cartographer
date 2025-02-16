@@ -7,8 +7,9 @@
 #include "items/weapon_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
+/* public code */
 
-void mook_event_map_load()
+void mook_event_map_load(void)
 {
 	datum ball_weapon_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball");
 	datum bomb_weapon_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
@@ -28,4 +29,5 @@ void mook_event_map_load()
 		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, mook_ball_weapon->object.model.index, mook_ball_weapon->object.model.index);
 		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, mook_ball_weapon->object.model.index, mook_ball_weapon->object.model.index);
 	}
+	return;
 }

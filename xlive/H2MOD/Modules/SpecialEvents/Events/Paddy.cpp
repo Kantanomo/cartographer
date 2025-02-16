@@ -10,7 +10,9 @@
 #include "objects/scenery.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
-void paddy_event_map_load()
+/* public code */
+
+void paddy_event_map_load(void)
 {
 	tag_injection_set_active_map(k_events_map);
 
@@ -71,4 +73,5 @@ void paddy_event_map_load()
 			bomb_weapon->object.sweetener_size = _sweetener_size_medium;
 		}
 	}
+	return;
 }

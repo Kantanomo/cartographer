@@ -2,7 +2,6 @@
 #include "object_type_list.h"
 #include "object_placement.h"
 
-#include "math/matrix_math.h"
 #include "structures/cluster_partitions.h"
 
 /* constants */

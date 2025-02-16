@@ -7,7 +7,9 @@
 #include "tag_files/tag_loader/tag_injection.h"
 #include "tag_files/tag_groups.h"
 
-void birthday_event_map_load()
+/* public code */
+
+void birthday_event_map_load(void)
 {
 	tag_injection_set_active_map(k_events_map);
 	if (tag_injection_active_map_verified())
@@ -42,4 +44,5 @@ void birthday_event_map_load()
 			replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, fp_bday_cake_datum, bday_cake_datum);
 		}
 	}
+	return;
 }

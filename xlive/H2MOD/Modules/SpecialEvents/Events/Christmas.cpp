@@ -12,6 +12,7 @@
 #include "tag_files/tag_loader/tag_injection.h"
 #include "units/biped_definitions.h"
 
+/* public code */
 
 void christmas_event_map_load(void)
 {

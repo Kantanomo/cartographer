@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "simulation_encoding.h"
 
+/* public code */
+
 void __cdecl simulation_player_update_encode(c_bitstream* stream, const simulation_player_update* player_update)
 {
 	INVOKE(0x1E06AB, 0x1C7B6B, simulation_player_update_encode, stream, player_update);

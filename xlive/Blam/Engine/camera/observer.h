@@ -1,6 +1,6 @@
 #pragma once
 #include "math/real_math.h"
-#include "objects/object_placement.h"
+#include "objects/object_location.h"
 
 #define k_observer_command_values 6
 
