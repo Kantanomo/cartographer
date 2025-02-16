@@ -166,7 +166,6 @@ void c_variant_options_list::update_list_items(c_list_item_widget* item, int32 s
 				}
 				if (value_text)
 				{
-
 					int32 variant_setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, g_multiplayer_variant_interface_headhunter_parameter_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())]);
 
 					multiplayer_variant_settings_interface_get_custom_variant_parameter_label(variant, g_multiplayer_variant_interface_headhunter_parameter_types[DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index())], variant_setting_value, temp_string);

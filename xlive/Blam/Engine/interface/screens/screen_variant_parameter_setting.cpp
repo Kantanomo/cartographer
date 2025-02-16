@@ -32,8 +32,7 @@ void c_variant_parameter_setting_list::handle_item_pressed_event(s_event_record*
 
 		if(variant)
 		{
-			/*multiplayer_variant_settings_interface_set_variant_parameter_value(variant, this->m_variant_setting_parameter_type, list_item->text_value_pair_reference->value);
-
+			multiplayer_variant_settings_interface_set_variant_parameter_value(variant, this->m_variant_setting_parameter_type, list_item->value);
 			if(this->m_is_quick_options)
 			{
 				user_interface_game_settings_set_game_variant(variant);
@@ -41,7 +40,7 @@ void c_variant_parameter_setting_list::handle_item_pressed_event(s_event_record*
 				{
 					user_interface_back_out_from_channel(this->get_parent_screen()->get_channel(), this->get_parent_screen()->get_render_window());
 				}
-			}*/
+			}
 		}
 	}
 	this->get_parent_screen()->start_widget_animation(3);
@@ -85,6 +84,7 @@ int32 c_variant_parameter_setting_list::link_item_widgets()
 				{
 					s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
 					list_item->text_value_pair_reference = this->m_sily_definition->text_value_pairs[i];
+					list_item->value = list_item->text_value_pair_reference->value;
 				}
 			}
 
@@ -98,6 +98,7 @@ int32 c_variant_parameter_setting_list::link_item_widgets()
 
 			s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
 			list_item->text_value_pair_reference = nullptr;
+			list_item->value = 0;
 
 			this->linker_type2.link(&this->m_slot);
 			c_list_widget::link_item_widgets();
@@ -116,6 +117,7 @@ int32 c_variant_parameter_setting_list::link_item_widgets()
 				for(int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
 				{
 					s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
+					list_item->value = i;
 				}
 			}
 
@@ -307,6 +309,12 @@ void c_screen_variant_parameter_setting::post_initialize()
 		{
 			multiplayer_variant_settings_interface_get_custom_variant_parameter_title(variant, this->m_list.get_variant_parameter_type(), temp_string);
 			header_text->set_text(temp_string);
+		}
+
+		if(description_text)
+		{
+			multiplayer_variant_settings_interface_get_custom_variant_parameter_description(variant, this->m_list.get_variant_parameter_type(), temp_string);
+			description_text->set_text(temp_string);
 		}
 	}
 
