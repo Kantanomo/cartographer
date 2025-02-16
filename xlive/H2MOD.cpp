@@ -1054,6 +1054,7 @@ void H2MOD::ApplyHooks() {
 		new_hud_draw_apply_patches();
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
+		damage_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
