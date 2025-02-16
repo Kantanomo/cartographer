@@ -10,6 +10,15 @@
 #include "structures/structure_bsp_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
+/* globals */
+
+// Explanation:
+// Hud tags are packaged using the data saver option which will cause h2tool to reuse tag blocks
+// this will cause the offset fix to apply multiple times to individual blocks here we are just keeping
+// a temporary map of all the blocks that have already been adjusted.
+int32 g_already_adjusted_blocks[k_maximum_hud_bitmap_widgets_per_tag + k_maximum_hud_text_widgets_per_tag + k_maximum_hud_screen_effect_widgets_per_tag];
+uint32 g_adjusted_blocks_count = 0;
+
 /* prototypes */
 
 //Fix incorrect values on Masterchief shaders
@@ -204,17 +213,10 @@ static void tag_fixes_misty_rain(void)
 	return;
 }
 
-// Explanation:
-// Hud tags are packaged using the data saver option which will cause h2tool to reuse tag blocks
-// this will cause the offset fix to apply multiple times to individual blocks here we are just keeping
-// a temporary map of all the blocks that have already been adjusted.
-int32* already_adjusted_blocks;
-uint32 adjusted_blocks_count = 0;
-
 static bool tag_fixes_split_screen_block_adjusted(int32 block_offset)
 {
-	for(uint32 index = 0; index < adjusted_blocks_count; index++)
-		if (already_adjusted_blocks[index] == block_offset)
+	for(uint32 index = 0; index < g_adjusted_blocks_count; index++)
+		if (g_already_adjusted_blocks[index] == block_offset)
 			return true;
 
 	return false;
@@ -222,10 +224,7 @@ static bool tag_fixes_split_screen_block_adjusted(int32 block_offset)
 
 static void tag_fixes_split_screen_hud(void)
 {
-	already_adjusted_blocks = (int32*)malloc(sizeof(int32) * 255);
-	adjusted_blocks_count = 0;
-
-	ASSERT(already_adjusted_blocks);
+	g_adjusted_blocks_count = 0;
 
 	tag_iterator hud_iterator;
 	tag_iterator_new(&hud_iterator, _tag_group_new_hud_definition);
@@ -255,7 +254,7 @@ static void tag_fixes_split_screen_hud(void)
 				//}
 			}
 
-			already_adjusted_blocks[adjusted_blocks_count++] = hud->bitmap_widgets.data;
+			g_already_adjusted_blocks[g_adjusted_blocks_count++] = hud->bitmap_widgets.data;
 		}
 
 		if (!tag_fixes_split_screen_block_adjusted(hud->text_widgets.data))
@@ -269,7 +268,7 @@ static void tag_fixes_split_screen_hud(void)
 				text_widget->quarterscreen_offset.y *= 2;
 			}
 
-			already_adjusted_blocks[adjusted_blocks_count++] = hud->text_widgets.data;
+			g_already_adjusted_blocks[g_adjusted_blocks_count++] = hud->text_widgets.data;
 		}
 
 		if (!tag_fixes_split_screen_block_adjusted(hud->screen_effect_widgets.data))
@@ -283,11 +282,10 @@ static void tag_fixes_split_screen_hud(void)
 				effect_widget->quarterscreen_offset.y *= 2;
 			}
 
-			already_adjusted_blocks[adjusted_blocks_count++] = hud->screen_effect_widgets.data;
+			g_already_adjusted_blocks[g_adjusted_blocks_count++] = hud->screen_effect_widgets.data;
 		}
 	}
 
-	free(already_adjusted_blocks);
 	return;
 }
 
