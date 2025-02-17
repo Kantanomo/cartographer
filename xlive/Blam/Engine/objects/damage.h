@@ -4,11 +4,29 @@
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 
+/* enums */
+
+// Unverified, taken from H1
+enum e_damage_data_flags : uint32
+{
+	_damage_area_of_effect_bit = 0x0,
+	_damage_create_localized_effect_bit = 0x1,
+	_damage_kill_instantly_bit = 0x2,
+	_damage_from_weapon_bit = 0x3,
+	_damage_silent_bit = 0x4,
+	_damage_bypasses_shields_bit = 0x5,
+	_damage_damaged_one_object_bit = 0x6,
+	_damage_no_statistics_bit = 0x7,
+	NUMBER_OF_DAMAGE_DATA_FLAGS = 0x8,
+};
+
+/* structures */
+
 struct s_damage_owner
 {
-	datum owner_index;
-	datum entity_index;
-	uint16 target_model_abs_index;
+	datum owner_player_index;
+	datum owner_object_index;
+	e_game_team owner_team_index;
 	int16 pad;
 };
 ASSERT_STRUCT_SIZE(s_damage_owner, 12);
@@ -16,29 +34,29 @@ ASSERT_STRUCT_SIZE(s_damage_owner, 12);
 struct s_damage_data
 {
 	datum definition_index;
-	uint32 flags;
-	datum owner_player_index;
-	datum owner_object_index;
-	e_game_team owner_team_index;
-	int16 pad;
+	e_damage_data_flags flags;
+	s_damage_owner owner;
+	int32 field_1C;
+	datum inventory_owner_unit_index;
 	s_location location;
-	int field_1C;					// 0x1C
-	BYTE gap_20[4];					// 0x20
-	DWORD field_24;					// 0x24
-	DWORD field_28;					// 0x28
-	DWORD field_2C;					// 0x2C
-	DWORD field_30;					// 0x30
-	DWORD field_34;					// 0x34
-	DWORD field_38;					// 0x38
 	real_point3d origin;
 	real_point3d epicenter;
-	real_point3d direction;
-	BYTE gap_60[24];				// 0x60
-	float field_78;					// 0x78
-	__int16 field_7C;				// 0x7C
-	signed __int16 field_7E;		// 0x7E
-	BYTE gap_80[4];					// 0x80
-	char field_84;					// 0x84
+	real_vector3d direction;
+	real32 field_48;
+	int32 field_4C[2];
+	real32 scale;
+	int32 field_58;
+	real32 multiplier;
+	int8 gap_60[8];
+	bool damage_disabled;
+	int8 pad0[3];
+	real_vector3d projectile_direction;
+	real32 material_effect_scale;
+	int16 material_type;
+	int16 field_7E;
+	int8 gap_80[4];
+	bool valid_damage_reporting_type;
+	int8 pad[3];
 };
 ASSERT_STRUCT_SIZE(s_damage_data, 0x88);
 

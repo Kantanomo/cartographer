@@ -73,7 +73,7 @@ ASSERT_STRUCT_SIZE(unused_structure_node, 6);
 struct structure_collision_material
 {
     tag_reference old_shader; // shad
-    int16 pad_1;
+    int16 global_material_index;
     // BlockIndex1("structure_bsp_conveyor_surface_block")
     uint16 conveyor_surface_index;
     tag_reference new_shader; // shad

@@ -564,9 +564,9 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 		object_update_collision_culling(object_index);
 	}
 
-	object->damage_owner_target_model_abs_index = data->damage_owner.target_model_abs_index;
-	object->damage_owner_owner_index = data->damage_owner.owner_index;
-	object->damage_owner_object_index = data->damage_owner.entity_index;
+	object->damage_owner_target_model_abs_index = data->damage_owner.owner_team_index;
+	object->damage_owner_owner_index = data->damage_owner.owner_player_index;
+	object->damage_owner_object_index = data->damage_owner.owner_object_index;
 	object->model_variant_id = NONE;
 	object->cached_render_state_index = NONE;
 	object->field_D0 = NONE;
