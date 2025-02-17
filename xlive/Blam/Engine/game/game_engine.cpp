@@ -8,7 +8,7 @@ void game_engine_apply_patches()
 	// todo: server offset
 	PatchCall(Memory::GetAddress(0x1B1E38), game_engine_get_simulation_protocol);
 
-	test_replace_game_engine_mode(_game_engine_type_headhunter, &g_slayer_engine);
+	test_replace_game_engine_mode(_game_engine_type_headhunter, &g_headhunter_engine);
 }
 
 c_game_engine* current_game_engine(void)

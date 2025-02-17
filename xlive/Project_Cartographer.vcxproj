@@ -615,6 +615,7 @@
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_ctf.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_default.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_headhuntercpp.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_juggernaut.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_king.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_oddball.cpp" />
@@ -909,6 +910,7 @@
     <ClInclude Include="Blam\Engine\game\game_allegiance.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_ctf.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_default.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_headhunter.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_juggernaut.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_king.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_oddball.h" />
@@ -2257,6 +2259,7 @@
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_action.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_damage.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_device_machines.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_globals.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_player.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_entities.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_events.h" />
