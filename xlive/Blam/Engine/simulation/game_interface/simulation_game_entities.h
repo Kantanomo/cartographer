@@ -77,14 +77,6 @@ public:
 	virtual bool promote_game_entity_to_authority(s_simulation_game_entity* entity) = 0;
 	virtual void* build_object_creation_data(datum object_index, int32 creation_data_size, void* creation_data) = 0;
 	virtual void* handle_object_update(datum object_index, uint32 update_mask, int32 state_data_size, void* state_data) = 0;
-	virtual void* object_required_to_join_game(datum object_index) = 0;
-	virtual void* create_object(int32 creation_data_size, void* creation_data, uint32* flags, int32 internal_state_data_size, void* initial_state_data) = 0;
-	virtual void* unk31(int32 a1) = 0;
-	virtual void* apply_object_update(datum object_index, uint32 entity_sync_flag, int32 state_data_size, const void* state_data) = 0;
-	virtual void* promote_object_to_authority(datum object_index) = 0;
-	virtual void* ensure_object_position_update_quantization_inside_bsp(void) = 0;
-	virtual void* object_interpolation_data_out(int32 a1, void* a2, void* a3) = 0;
-	virtual void* object_interpolation_data(int32 a1, void* a2, void* a3) = 0;
 };
 
 
