@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game_engine_ctf.h"
+#include "game_engine_headhunter.h"
 #include "game_engine_juggernaut.h"
 #include "game_engine_king.h"
 #include "game_engine_oddball.h"
@@ -31,6 +32,7 @@ static c_king_engine g_king_engine;
 static c_territories_engine g_territories_engine;
 static c_oddball_engine g_oddball_engine;
 static c_game_engine* g_test_engine_ptr = &g_test_engine;
+static c_headhunter_engine* g_headhunter_engine_ptr = &g_headhunter_engine;
 /* enums */
 
 enum e_network_game_simulation_protocol
