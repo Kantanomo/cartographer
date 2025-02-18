@@ -80,7 +80,7 @@ namespace ImGuiHandler
 			motd_texture_load_in_progress = true;
 
 			c_static_wchar_string<MAX_PATH> motd_path_wide;
-			const wchar_t* motd_initial_path = H2Portable ? L".\\" : H2AppDataLocal;	// Use process path if portable, Appdata otherwise
+			const wchar_t* motd_initial_path = H2Portable ? L".\\" : g_h2_appdata_local_path;	// Use process path if portable, Appdata otherwise
 			motd_path_wide.set(motd_initial_path);
 			motd_path_wide.append(k_motd_filename);
 

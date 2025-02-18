@@ -94,10 +94,10 @@ void SaveH2Accounts() {
 
 		wchar_t fileConfigPath[1024];
 		if (H2Portable) {
-			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2ProcessFilePath);
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, g_h2_process_file_path);
 		}
 		else {
-			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2AppDataLocal);
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, g_h2_appdata_local_path);
 		}
 
 		wchar_t fileConfigPathLog[1124];
@@ -290,10 +290,10 @@ bool ReadH2Accounts() {
 	wchar_t fileConfigPath[1024];
 
 	if (H2Portable) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2ProcessFilePath);
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, g_h2_process_file_path);
 	}
 	else {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, H2AppDataLocal);
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, g_h2_appdata_local_path);
 	}
 
 	addDebugText(L"Reading Accounts: \"%ws\"", fileConfigPath);

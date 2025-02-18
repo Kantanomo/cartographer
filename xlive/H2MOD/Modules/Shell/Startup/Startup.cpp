@@ -43,9 +43,9 @@ h2log *onscreendebug_log = nullptr;
 // Console logger, receives output from all loggers
 h2log *console_log = nullptr;
 
-wchar_t* H2ProcessFilePath = 0;
-wchar_t* H2AppDataLocal = 0;
-wchar_t* FlagFilePathConfig = 0;
+
+wchar_t g_h2_process_file_path[MAX_PATH];
+wchar_t g_h2_appdata_local_path[MAX_PATH];
 
 void PostH2Config() {
 
@@ -187,14 +187,9 @@ bool configureXinput() {
 void InitLocalAppData() {
 	addDebugText("Find AppData Local.");
 
-	if (H2AppDataLocal != 0) {
-		free(H2AppDataLocal);
-		H2AppDataLocal = 0;
-	}
-
 	wchar_t* userprofile = _wgetenv(L"USERPROFILE");
 
-	wchar_t local2[1024];
+	wchar_t local2[MAX_PATH];
 
 	swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\", userprofile);
 	struct _stat64i32 sb;
@@ -212,8 +207,7 @@ void InitLocalAppData() {
 			int fperrno1 = GetLastError();
 			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 				int appdatabuflen = wcslen(local2) + 1;
-				H2AppDataLocal = (wchar_t*)calloc(appdatabuflen, sizeof(wchar_t));
-				wcscpy_s(H2AppDataLocal, appdatabuflen, local2);
+				wcscpy_s(g_h2_appdata_local_path, appdatabuflen, local2);
 			}
 		}
 	}
@@ -232,21 +226,19 @@ void InitLocalAppData() {
 			int fperrno1 = GetLastError();
 			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 				int appdatabuflen = wcslen(local2) + 1;
-				H2AppDataLocal = (wchar_t*)calloc(appdatabuflen, sizeof(wchar_t));
-				wcscpy_s(H2AppDataLocal, appdatabuflen, local2);
+				wcscpy_s(g_h2_appdata_local_path, appdatabuflen, local2);
 			}
 		}
 	}
 
-	if (H2AppDataLocal == nullptr) {
-		int appdatabuflen = wcslen(H2ProcessFilePath) + 1;
-		H2AppDataLocal = (wchar_t*)calloc(appdatabuflen, sizeof(wchar_t));
-		wcscpy_s(H2AppDataLocal, appdatabuflen, H2ProcessFilePath);
+	if (g_h2_appdata_local_path == nullptr) {
+		int appdatabuflen = wcslen(g_h2_process_file_path) + 1;
+		wcscpy_s(g_h2_appdata_local_path, appdatabuflen, g_h2_process_file_path);
 		addDebugText("ERROR: Could not find AppData Local. Using Process File Path:");
-		addDebugText(H2AppDataLocal);
+		addDebugText(g_h2_appdata_local_path);
 	}
 	else {
-		addDebugText("Found AppData Local: %s", H2AppDataLocal);
+		addDebugText("Found AppData Local: %s", g_h2_appdata_local_path);
 	}
 }
 
@@ -257,7 +249,7 @@ CRITICAL_SECTION log_section;
 void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path, bool useAppDataLocalPath) {
 	const wchar_t* process_name = Memory::IsDedicatedServer() ? k_server_process_name : k_client_process_name;
 	
-	path->set(useAppDataLocalPath ? H2AppDataLocal : L"");
+	path->set(useAppDataLocalPath ? g_h2_appdata_local_path : L"");
 
 	wchar_t instance_string[3] = {};
 	swprintf(instance_string, NUMBEROF(instance_string), L"%d", _Shell::GetInstanceId());
@@ -304,13 +296,11 @@ void InitH2Startup() {
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
-	H2ProcessFilePath = (wchar_t*)calloc(wcslen(ArgList[0]) + 1, sizeof(wchar_t));
-	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], H2ProcessFilePath);
+	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], g_h2_process_file_path);
 	if (rtncodepath == -1) {
 		std::wstring path = GetExeDirectoryWide();
 		path.append(L"\\");
-		H2ProcessFilePath = (wchar_t*)calloc(path.length() + 1, sizeof(wchar_t));
-		_swprintf(H2ProcessFilePath, path.c_str());
+		_swprintf(g_h2_process_file_path, path.c_str());
 	}
 
 	// fix the game not finding the files it needs if the current directory is not the install directory
@@ -327,22 +317,6 @@ void InitH2Startup() {
 	InitOnScreenDebugText();
 
 	addDebugText(Memory::IsDedicatedServer() ? "Process is Dedi-Server" : "Process is Client");
-
-	if (ArgList != NULL)
-	{
-		for (int i = 0; i < ArgCnt; i++)
-		{
-			if (wcsstr(ArgList[i], L"-h2config=") != NULL)
-			{
-				if (wcslen(ArgList[i]) < 255)
-				{
-					int pfcbuflen = wcslen(ArgList[i] + 10) + 1;
-					FlagFilePathConfig = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
-					swprintf(FlagFilePathConfig, pfcbuflen, ArgList[i] + 10);
-				}
-			}
-		}
-	}
 
 	InitH2Config();
 	PostH2Config();
@@ -403,8 +377,5 @@ void DeinitH2Startup() {
 	DeinitCustomLanguage();
 	DeinitH2Accounts();
 	DeinitH2Config();
-
-	free(H2AppDataLocal);
-	free(H2ProcessFilePath);
 	return;
 }

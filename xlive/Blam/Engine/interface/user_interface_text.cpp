@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "user_interface_text.h"
 
-#include "Blam/Engine/interface/hud.h"
+#include "interface/hud.h"
 
 c_user_interface_text::c_user_interface_text()
 {

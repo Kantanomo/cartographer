@@ -762,7 +762,8 @@ static void h2mod_apply_tweaks(void)
 
 	H2MOD::RefreshTogglexDelay();
 
-	if (Memory::IsDedicatedServer()) {
+	if (Memory::IsDedicatedServer())
+	{
 	}
 	else {//is client
 
