@@ -79,6 +79,9 @@ void rasterizer_settings_apply_hooks(void)
 
 	//DETOUR_ATTACH(p_rasterizer_get_video_mode_refresh_rate, Memory::GetAddress<t_rasterizer_get_video_mode_refresh_rate>(0x263CA8), rasterizer_get_video_mode_refresh_rate_hook);
 
+	// set max model quality to L6
+	WriteValue(Memory::GetAddress(0x190B38 + 1), 5);
+
 	atexit(rasterizer_discard_refresh_rate);
 
 	// fix (or workaround) the refresh rate being unset

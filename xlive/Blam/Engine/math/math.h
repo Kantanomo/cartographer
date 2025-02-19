@@ -1,9 +1,4 @@
 #pragma once
-#ifndef _DEBUG
-#define BLAM_MATH_INL __forceinline
-#else
-#define BLAM_MATH_INL 
-#endif
 
 // Returns the maximum of the two values
 #define MAX(a, b) ((a) > (b) ? (a) : (b))

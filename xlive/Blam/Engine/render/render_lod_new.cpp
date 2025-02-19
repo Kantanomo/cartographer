@@ -61,7 +61,11 @@ void render_object_update_change_colors(datum object_index, bool a2)
     return;
 }
 
-int16 sub_59CC02_to_usercall(
+// Disable illegal instruction size warnings,
+// It generates the correct code...
+#pragma warning( push )
+#pragma warning( disable : 4409)
+int16 __cdecl sub_59CC02_to_usercall(
     datum object_index,
     real32 a2,
     int32 a3,
@@ -86,11 +90,10 @@ int16 sub_59CC02_to_usercall(
         add esp, 4 * 6
         mov result, ax
     }
-
     return result;
 }
 
-bool sub_59D024_to_usercall(
+bool __cdecl sub_59D024_to_usercall(
     int32* region_count,
     int16* desired_lod,
     uint8* section_indices,
@@ -116,9 +119,9 @@ bool sub_59D024_to_usercall(
         add esp, 4 * 4
         mov result, al
     }
-
     return result;
 }
+#pragma warning( pop ) 
 
 int32 sub_77DCF6_get_unk_count(datum model_index, int32 level_of_detail, uint8* region_section_indices)
 {
@@ -214,7 +217,7 @@ void __cdecl object_build_render_cache_and_info(
         render_model_count = 0;
     }
 
-    object_header_datum* object = object_get_header(object_index);
+    const object_header_datum* object = (object_header_datum*)datum_get(object_header_data_get(), object_index);
 
     if (object->type == _object_type_scenery)
     {
@@ -400,9 +403,9 @@ void __cdecl object_build_render_cache_and_info(
         {
             info->object_count++;
             object_datum* object = object_get_fast_unsafe(info->object_index[render_model_storage_index]);
-            if (object->cached_render_state_index != NONE)
+            if (object->object.cached_render_state_index != NONE)
             {
-                uint8* cached_object_render_state = (uint8*)datum_get(get_cached_object_render_states_array(), object->cached_render_state_index);
+                uint8* cached_object_render_state = (uint8*)datum_get(get_cached_object_render_states_array(), object->object.cached_render_state_index);
 
                 if (*(datum*)(cached_object_render_state + 4) == info->object_index[render_model_storage_index])
                 {

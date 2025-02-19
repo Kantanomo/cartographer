@@ -57,8 +57,8 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 
 		object_placement_data_new(&nObject, e_weapons_datum_index::ball, -1, 0);
 
-		nObject.position = biped_unit->position;
-		nObject.translational_velocity = biped_unit->translational_velocity;
+		nObject.position = biped_unit->object.position;
+		nObject.translational_velocity = biped_unit->object.translational_velocity;
 
 		datum new_object_datum = object_new(&nObject);
 		if (new_object_datum != NONE)
@@ -218,7 +218,7 @@ bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum 
 	{
 	case ExecTime::_preEventExec:
 
-		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weapon->item.object.tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weapon->definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
 		{
 			GraveRobber::PickupSkull(playerIdx, objectIdx);
 			handled = true;

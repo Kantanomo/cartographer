@@ -21,7 +21,6 @@ public:
 	bool ShouldStopDownload();
 	void StopDownload();
 
-	std::string m_clientMapFilename;
 	std::wstring m_clientMapFilenameWide;
 	std::atomic<bool> m_downloadFinished = false;
 	std::atomic<bool> m_readyToDownload = false;

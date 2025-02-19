@@ -183,5 +183,3 @@ private:
 	static std::mutex removeServerMutex;
 	static std::mutex getServerCountsMutex;
 };
-
-extern std::vector<std::pair<HANDLE, CServerList*>> serverListRequests;

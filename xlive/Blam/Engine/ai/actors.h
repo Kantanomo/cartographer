@@ -5,8 +5,8 @@
 
 #include "game/game_allegiance.h"
 #include "memory/data.h"
-#include "objects/object_placement.h"
-
+#include "objects/object_location.h"
+#include "tag_files/string_id.h"
 
 /*
    TODO: Reverse engineer more of the actor struct and fill this data in appropriately.

@@ -30,7 +30,6 @@ public:
 	virtual ~IGameEngineEvent() = default;
 	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) = 0;
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) = 0;
-	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) = 0;
 	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) = 0;
 	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat) = 0;
 };
@@ -54,7 +53,6 @@ namespace CustomVariantHandler
 	void OnMapLoad(ExecTime execTime, s_game_options* gameOptions);
 	void OnPlayerSpawn(ExecTime execTime, datum playerIdx);
 	void OnPlayerDeath(ExecTime execTime, datum playerIdx);
-	void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4);
 	bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx);
 	bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat);
 	void DisposeGameVariant();

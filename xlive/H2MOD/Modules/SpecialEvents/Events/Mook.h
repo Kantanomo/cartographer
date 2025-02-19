@@ -1,3 +1,5 @@
 #pragma once
 
-void mook_event_map_load();
+/* prototypes */
+
+void mook_event_map_load(void);

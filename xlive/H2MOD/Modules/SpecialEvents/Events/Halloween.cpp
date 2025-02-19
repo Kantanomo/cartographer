@@ -22,74 +22,13 @@ datum candle_fire_datum = NONE;
 datum large_candle_datum = NONE;
 datum pump_datum = NONE;
 
-void halloween_game_life_cycle_update(e_game_life_cycle state)
-{
-	if (state == _life_cycle_in_game)
-	{
-		object_placement_data placement;
+/* prototypes */
 
-		scenery_definition* pump = (scenery_definition*)tag_get_fast(pump_datum);
-		s_model_definition* pump_hmlt = (s_model_definition*)tag_get_fast(pump->object.model.index);
+static void halloween_game_life_cycle_update(e_game_life_cycle state);
 
-		const s_cache_header* cache_header = cache_files_get_header();
-		if (!strcmp(cache_header->name, "coagulation"))
-		{
-			for (auto& scen_place : coag_scen_places)
-			{
-				// Set type of object and variant
-				switch (scen_place.type)
-				{
-				case 0:
-					object_placement_data_new(&placement, pump_datum, -1, 0);
-					placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name;
-					break;
-				case 1:
-					object_placement_data_new(&placement, candle_datum, -1, 0);
-					placement.variant_name = 0;
-					break;
-				case 2:
-					object_placement_data_new(&placement, large_candle_datum, -1, 0);
-					placement.variant_name = 0;
-					break;
-				}
-				// Set location orientation and scale
-				placement.position = scen_place.position;
-				vectors3d_from_euler_angles3d(&placement.forward, &placement.up, &scen_place.rotation);
-				placement.scale = scen_place.scale;
+/* public code */
 
-				// Create the new object
-				object_new(&placement);
-			}
-		}
-		else if (!strcmp(cache_header->name, "lockout"))
-		{
-			for (auto& scen_place : lockout_scen_places)
-			{
-				// Set type of object and variant
-				switch (scen_place.type)
-				{
-				case 0:
-					object_placement_data_new(&placement, pump_datum, -1, 0);
-					placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name;
-					break;
-				case 1:
-					object_placement_data_new(&placement, candle_datum, -1, 0);
-					placement.variant_name = 0;
-					break;
-				}
-				// Set location orientation and scale
-				placement.position = scen_place.position;
-				vectors3d_from_euler_angles3d(&placement.forward, &placement.up, &scen_place.rotation);
-				placement.scale = scen_place.scale;
-
-				// Create the new object
-				object_new(&placement);
-			}
-		}
-	}
-}
-
-void halloween_event_map_load()
+void halloween_event_map_load(void)
 {
 	// Load specific tags from shared and modify placements depending on the map being played
 
@@ -159,4 +98,75 @@ void halloween_event_map_load()
 			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::blue_screen, EventExecutionType::execute_after, true);
 		}
 	}
+	return;
+}
+
+/* private code */
+
+static void halloween_game_life_cycle_update(e_game_life_cycle state)
+{
+	if (state == _life_cycle_in_game)
+	{
+		object_placement_data placement;
+
+		scenery_definition* pump = (scenery_definition*)tag_get_fast(pump_datum);
+		s_model_definition* pump_hmlt = (s_model_definition*)tag_get_fast(pump->object.model.index);
+
+		const s_cache_header* cache_header = cache_files_get_header();
+		if (!strcmp(cache_header->name, "coagulation"))
+		{
+			for (auto& scen_place : coag_scen_places)
+			{
+				// Set type of object and variant
+				switch (scen_place.type)
+				{
+				case 0:
+					object_placement_data_new(&placement, pump_datum, -1, 0);
+					placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name;
+					break;
+				case 1:
+					object_placement_data_new(&placement, candle_datum, -1, 0);
+					placement.variant_name = 0;
+					break;
+				case 2:
+					object_placement_data_new(&placement, large_candle_datum, -1, 0);
+					placement.variant_name = 0;
+					break;
+				}
+				// Set location orientation and scale
+				placement.position = scen_place.position;
+				vectors3d_from_euler_angles3d(&placement.forward, &placement.up, &scen_place.rotation);
+				placement.scale = scen_place.scale;
+
+				// Create the new object
+				object_new(&placement);
+			}
+		}
+		else if (!strcmp(cache_header->name, "lockout"))
+		{
+			for (auto& scen_place : lockout_scen_places)
+			{
+				// Set type of object and variant
+				switch (scen_place.type)
+				{
+				case 0:
+					object_placement_data_new(&placement, pump_datum, -1, 0);
+					placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name;
+					break;
+				case 1:
+					object_placement_data_new(&placement, candle_datum, -1, 0);
+					placement.variant_name = 0;
+					break;
+				}
+				// Set location orientation and scale
+				placement.position = scen_place.position;
+				vectors3d_from_euler_angles3d(&placement.forward, &placement.up, &scen_place.rotation);
+				placement.scale = scen_place.scale;
+
+				// Create the new object
+				object_new(&placement);
+			}
+		}
+	}
+	return;
 }

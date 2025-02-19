@@ -7,7 +7,6 @@
 #include "interface/user_interface_controller.h"
 #include "items/item_collection_definition.h"
 #include "scenario/scenario.h"
-#include "networking/logic/life_cycle_manager.h"
 #include "units/units.h"
 
 #include "H2MOD.h"

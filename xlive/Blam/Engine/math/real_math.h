@@ -188,77 +188,77 @@ extern const real_rectangle3d* const global_null_rectangle3d;
 
 /* public code */
 
-static BLAM_MATH_INL real32 square_root(real32 f)
+inline real32 square_root(real32 f)
 {
 	return sqrt(f);
 }
 
-static BLAM_MATH_INL real32 reciprocal_square_root(real32 f)
+inline real32 reciprocal_square_root(real32 f)
 {
 	return 1.0f / square_root(f);
 }
 
-static BLAM_MATH_INL real32 dot_product2d(const real_vector2d* a, const real_vector2d* b)
+inline real32 dot_product2d(const real_vector2d* a, const real_vector2d* b)
 {
 	return (a->i * b->i) + (a->j * b->j);
 }
 
-static BLAM_MATH_INL real32 dot_product3d(const real_vector3d* a, const real_vector3d* b)
+inline real32 dot_product3d(const real_vector3d* a, const real_vector3d* b)
 {
 	return a->i * b->i + a->j * b->j + a->k * b->k;
 }
 
-static BLAM_MATH_INL real32 dot_product4d_quaternion(const real_quaternion* a, const real_quaternion* b)
+inline real32 dot_product4d_quaternion(const real_quaternion* a, const real_quaternion* b)
 {
 	return a->v.i * b->v.i + a->v.j * b->v.j + a->v.k * b->v.k + a->w * b->w;
 }
 
-static BLAM_MATH_INL real32 magnitude_squared2d(const real_vector2d* vector)
+inline real32 magnitude_squared2d(const real_vector2d* vector)
 {
 	return vector->i * vector->i + vector->j * vector->j;
 }
 
-static BLAM_MATH_INL real32 magnitude2d(const real_vector2d* vector)
+inline real32 magnitude2d(const real_vector2d* vector)
 {
 	real32 magnitude_squared = magnitude_squared2d(vector);
 	return square_root(magnitude_squared);
 }
 
-static BLAM_MATH_INL real32 magnitude_squared3d(const real_vector3d* vector)
+inline real32 magnitude_squared3d(const real_vector3d* vector)
 {
 	return vector->i * vector->i + vector->j * vector->j + vector->k * vector->k;
 }
 
-static BLAM_MATH_INL real32 magnitude3d(const real_vector3d* v)
+inline real32 magnitude3d(const real_vector3d* v)
 {
 	real32 magnitude_squared = magnitude_squared3d(v);
 	return square_root(magnitude_squared);
 }
 
-static BLAM_MATH_INL bool valid_real(real32 value)
+inline bool valid_real(real32 value)
 {
 	int32 value_as_int = *(int32*)&value;
 	return (value_as_int & 0x7F800000) != 0x7F800000;
 }
 
-static BLAM_MATH_INL bool valid_realcmp(real32 a, real32 b)
+inline bool valid_realcmp(real32 a, real32 b)
 {
 	real32 result = a - b;
 	return valid_real(result) && fabs(result) < 0.01f;
 }
 
-static BLAM_MATH_INL bool valid_real_normal3d(const real_vector3d* normal)
+inline bool valid_real_normal3d(const real_vector3d* normal)
 {
 	real32 magnitude = magnitude_squared3d(normal);
 	return valid_realcmp(magnitude, 1.0f);
 }
 
-static BLAM_MATH_INL bool valid_real_point3d(real_point3d const* p)
+inline bool valid_real_point3d(real_point3d const* p)
 {
 	return valid_real(p->x) && valid_real(p->y) && valid_real(p->z);
 }
 
-static BLAM_MATH_INL bool valid_real_vector3d_axes3(const real_vector3d* f, const real_vector3d* l, const real_vector3d* u)
+inline bool valid_real_vector3d_axes3(const real_vector3d* f, const real_vector3d* l, const real_vector3d* u)
 {
 	return 
 		valid_real_normal3d(f) &&
@@ -269,7 +269,7 @@ static BLAM_MATH_INL bool valid_real_vector3d_axes3(const real_vector3d* f, cons
 		valid_realcmp(dot_product3d(u, f), 0.f);
 }
 
-static BLAM_MATH_INL bool valid_real_matrix4x3(real_matrix4x3 const *matrix)
+inline bool valid_real_matrix4x3(real_matrix4x3 const *matrix)
 {
 	return 
 		valid_real(matrix->scale) &&
@@ -277,14 +277,14 @@ static BLAM_MATH_INL bool valid_real_matrix4x3(real_matrix4x3 const *matrix)
 		valid_real_point3d(&matrix->position);
 }
 
-static BLAM_MATH_INL real_vector2d* scale_vector2d(const real_vector2d* in, real32 scale, real_vector2d* out)
+inline real_vector2d* scale_vector2d(const real_vector2d* in, real32 scale, real_vector2d* out)
 {
 	out->i = in->i * scale;
 	out->j = in->j * scale;
 	return out;
 }
 
-static BLAM_MATH_INL real_vector3d* scale_vector3d(const real_vector3d* in, real32 scale, real_vector3d* out)
+inline real_vector3d* scale_vector3d(const real_vector3d* in, real32 scale, real_vector3d* out)
 {
 	out->i = in->i * scale;
 	out->j = in->j * scale;
@@ -292,7 +292,7 @@ static BLAM_MATH_INL real_vector3d* scale_vector3d(const real_vector3d* in, real
 	return out;
 }
 
-static BLAM_MATH_INL real_vector3d* negate_vector3d(const real_vector3d* in, real_vector3d* out)
+inline real_vector3d* negate_vector3d(const real_vector3d* in, real_vector3d* out)
 {
 	out->i = -in->i;
 	out->j = -in->j;
@@ -300,7 +300,7 @@ static BLAM_MATH_INL real_vector3d* negate_vector3d(const real_vector3d* in, rea
 	return out;
 }
 
-static BLAM_MATH_INL void scale_vector4d(const real_vector4d* in, real32 scale, real_vector4d* out)
+inline void scale_vector4d(const real_vector4d* in, real32 scale, real_vector4d* out)
 {
 	out->i = in->i * scale;
 	out->j = in->j * scale;
@@ -309,7 +309,7 @@ static BLAM_MATH_INL void scale_vector4d(const real_vector4d* in, real32 scale, 
 	return;
 }
 
-static BLAM_MATH_INL real_vector3d* add_vectors3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* out)
+inline real_vector3d* add_vectors3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* out)
 {
 	out->i = a->i + b->i;
 	out->j = a->j + b->j;
@@ -317,7 +317,7 @@ static BLAM_MATH_INL real_vector3d* add_vectors3d(const real_vector3d* a, const 
 	return out;
 }
 
-static BLAM_MATH_INL real_vector3d* multiply_vectors3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* out)
+inline real_vector3d* multiply_vectors3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* out)
 {
 	out->i = a->i * b->i;
 	out->j = a->j * b->j;
@@ -325,7 +325,7 @@ static BLAM_MATH_INL real_vector3d* multiply_vectors3d(const real_vector3d* a, c
 	return out;
 }
 
-static BLAM_MATH_INL real_vector3d* subtract_vectors3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* result)
+inline real_vector3d* subtract_vectors3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* result)
 {
 	result->i = a->i - b->i;
 	result->j = a->j - b->j;
@@ -333,7 +333,7 @@ static BLAM_MATH_INL real_vector3d* subtract_vectors3d(const real_vector3d* a, c
 	return result;
 }
 
-static BLAM_MATH_INL real_vector3d* vector_from_points3d(const real_point3d* a, const real_point3d* b, real_vector3d* result)
+inline real_vector3d* vector_from_points3d(const real_point3d* a, const real_point3d* b, real_vector3d* result)
 {
 	result->i = b->x - a->x;
 	result->j = b->y - a->y;
@@ -341,7 +341,7 @@ static BLAM_MATH_INL real_vector3d* vector_from_points3d(const real_point3d* a, 
 	return result;
 }
 
-static BLAM_MATH_INL real_point3d* point_from_line3d(const real_point3d* p, const real_vector3d* v, real32 t, real_point3d* result)
+inline real_point3d* point_from_line3d(const real_point3d* p, const real_vector3d* v, real32 t, real_point3d* result)
 {
 	real_vector3d direction_scaled;
 	scale_vector3d(v, t, &direction_scaled);
@@ -351,7 +351,7 @@ static BLAM_MATH_INL real_point3d* point_from_line3d(const real_point3d* p, cons
 	return result;
 }
 
-static BLAM_MATH_INL real32 normalize3d(real_vector3d* v1)
+inline real32 normalize3d(real_vector3d* v1)
 {
 	real32 length = magnitude3d(v1);
 	if (abs(length) >= k_real_epsilon)
@@ -365,7 +365,7 @@ static BLAM_MATH_INL real32 normalize3d(real_vector3d* v1)
 	return length;
 }
 
-static BLAM_MATH_INL real_vector3d* cross_product3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* result)
+inline real_vector3d* cross_product3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* result)
 {
 	result->i = a->j * b->k - a->k * b->j;
 	result->j = a->k * b->i - a->i * b->k;
@@ -373,7 +373,7 @@ static BLAM_MATH_INL real_vector3d* cross_product3d(const real_vector3d* a, cons
 	return result;
 }
 
-static BLAM_MATH_INL void set_real_point3d(real_point3d* point, real32 x, real32 y, real32 z)
+inline void set_real_point3d(real_point3d* point, real32 x, real32 y, real32 z)
 {
 	point->x = x;
 	point->y = y;
@@ -381,22 +381,22 @@ static BLAM_MATH_INL void set_real_point3d(real_point3d* point, real32 x, real32
 	return;
 }
 
-static BLAM_MATH_INL real32 cosine(real32 x)
+inline real32 cosine(real32 x)
 {
 	return cos(x);
 }
 
-static BLAM_MATH_INL real32 sine(real32 x)
+inline real32 sine(real32 x)
 {
 	return sin(x);
 }
 
-static BLAM_MATH_INL real32 tangent(real32 x)
+inline real32 tangent(real32 x)
 {
 	return tan(x);
 }
 
-static BLAM_MATH_INL real32 arccosine(real32 x)
+inline real32 arccosine(real32 x)
 {
 	ASSERT(x >= -1.f - k_real_epsilon && x <= +1.f + k_real_epsilon);
 
@@ -404,7 +404,7 @@ static BLAM_MATH_INL real32 arccosine(real32 x)
 	return acos(PIN(x, -1.f, 1.f));
 }
 
-static BLAM_MATH_INL real32 arcsine(real32 x)
+inline real32 arcsine(real32 x)
 {
 	ASSERT(x >= -1.f - k_real_epsilon && x <= +1.f + k_real_epsilon);
 
@@ -412,7 +412,7 @@ static BLAM_MATH_INL real32 arcsine(real32 x)
 	return asin(PIN(x, -1.f, 1.0f));
 }
 
-static BLAM_MATH_INL real32 arctangent(real32 a, real32 b)
+inline real32 arctangent(real32 a, real32 b)
 {
 	return atan2(a, b);
 }

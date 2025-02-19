@@ -1,3 +1,5 @@
 #pragma once
 
-void birthday_event_map_load();
+/* prototypes */
+
+void birthday_event_map_load(void);

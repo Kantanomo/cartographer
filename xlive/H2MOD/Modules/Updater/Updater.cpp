@@ -296,10 +296,10 @@ static void FetchUpdateDetails() {
 
 				wchar_t* existingfpdir = dir_temp_h2;
 				if (UpdateFileEntries[i]->location_id == 1) {
-					existingfpdir = H2ProcessFilePath;
+					existingfpdir = g_h2_process_file_path;
 				}
 				else if (UpdateFileEntries[i]->location_id == 2) {
-					existingfpdir = H2AppDataLocal;
+					existingfpdir = g_h2_appdata_local_path;
 				}
 
 				swprintf(existingfilepath, ARRAYSIZE(existingfilepath), L"%ws%hs", existingfpdir, UpdateFileEntries[i]->local_name);
@@ -478,10 +478,10 @@ void GSDownloadInstall() {
 
 			wchar_t* existingfpdir = 0;
 			if (UpdateFileEntries[i]->location_id == 1) {
-				existingfpdir = H2ProcessFilePath;
+				existingfpdir = g_h2_process_file_path;
 			}
 			else if (UpdateFileEntries[i]->location_id == 2) {
-				existingfpdir = H2AppDataLocal;
+				existingfpdir = g_h2_appdata_local_path;
 			}
 
 			snprintf(existingfilepath, 1024 + 260, "%ws%hs", existingfpdir, UpdateFileEntries[i]->local_name);

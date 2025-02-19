@@ -3,6 +3,18 @@
 
 // TODO create an extended version of s_file_reference that supports MAX_PATH and wide strings
 
+/* prototypes */
+
+static bool __cdecl file_write_encrypted_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer);
+
+/* public code */
+
+void files_windows_apply_patches(void)
+{
+	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), file_write_encrypted_hook);
+	return;
+}
+
 s_file_reference* __cdecl file_reference_create_from_path(s_file_reference* file_reference, const utf8* path, bool path_is_directory)
 {
 	return INVOKE(0x8C409, 0x86D37, file_reference_create_from_path, file_reference, path, path_is_directory);
@@ -151,7 +163,9 @@ bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const
 	return result;
 }
 
-bool __cdecl file_write_encrypted_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
+/* private code */
+
+static bool __cdecl file_write_encrypted_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
 {
 	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
 

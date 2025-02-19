@@ -488,16 +488,16 @@ int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, Con
 	{
 		if (session->is_session_player_active(player_index))
 		{
-			std::wstring playerNameWide(session->get_player_name(player_index));
-			std::string playerName(playerNameWide.begin(), playerNameWide.end());
+			char player_name[XUSER_NAME_SIZE * 2];
+			wchar_string_to_utf8_string(session->get_player_name(player_index), player_name, NUMBEROF(player_name));
+
 			std::string outStr = "# Player index=" + std::to_string(player_index);
 			outStr += ", Peer index=" + std::to_string(NetworkSession::GetPeerIndex(player_index));
-			outStr += ", PlayerName=" + playerName;
+			outStr += ", PlayerName=" + std::string(player_name);
 
-			playerNameWide = s_player::get_name(player_index);
-			playerName = std::string(playerNameWide.begin(), playerNameWide.end());
+			wchar_string_to_utf8_string(s_player::get_name(player_index), player_name, NUMBEROF(player_name));
 
-			outStr += ", Name from game player state=" + playerName;
+			outStr += ", Name from game player state=" + std::string(player_name);
 			outStr += ", Team=" + std::to_string(NetworkSession::GetPlayerTeam(player_index));
 			outStr += ", Identifier=" + std::to_string(NetworkSession::GetPlayerId(player_index));
 
@@ -532,24 +532,23 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 	{
 		auto peer_observer_channel = &observer->m_observer_channels[session->m_session_peers[peer_index].observer_channel_index];
 
-		std::wstring peerNameWide(session->m_session_membership.membership_peers[peer_index].name);
-		std::string peerName(peerNameWide.begin(), peerNameWide.end());
+		char name[XUSER_NAME_SIZE * 2];
+		wchar_string_to_utf8_string(session->m_session_membership.membership_peers[peer_index].name, name, NUMBEROF(name));
 
 		std::string outStr = "# Peer index=" + std::to_string(peer_index);
-		outStr += ", Peer Name=" + peerName;
+		outStr += ", Peer Name=" + std::string(name);
 		outStr += ", Connection Status=" + std::to_string(peer_observer_channel->state);
 		outStr += ", Peer map state: " + std::to_string(session->m_session_membership.membership_peers[peer_index].map_status);
 		datum player_index = session->m_session_membership.membership_peers[peer_index].local_players_indexes[0];
 		if (player_index != NONE)
 		{
-			std::wstring playerNameWide(session->get_player_membership(player_index)->properties[0].player_name);
-			std::string playerName(playerNameWide.begin(), playerNameWide.end());
-			outStr += ", Player index=" + std::to_string(player_index);
-			outStr += ", Player name=" + playerName;
+			wchar_string_to_utf8_string(session->get_player_membership(player_index)->properties[0].player_name, name, NUMBEROF(name));
 
-			playerNameWide = s_player::get_name(player_index);
-			playerName = std::string(playerNameWide.begin(), playerNameWide.end());
-			outStr += ", Name from game player state=" + playerName;
+			outStr += ", Player index=" + std::to_string(player_index);
+			outStr += ", Player name=" + std::string(name);
+
+			wchar_string_to_utf8_string(s_player::get_name(player_index), name, NUMBEROF(name));
+			outStr += ", Name from game player state=" + std::string(name);
 		}
 		outputCb(StringFlag_None, outStr.c_str());
 	}
@@ -693,7 +692,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	if (nearPlayerSpawn)
 	{
-		real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->position;
+		real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->object.position;
 		position.x = localPlayerPos->x + 0.5f;
 		position.y = localPlayerPos->y + 0.5f;
 		position.z = localPlayerPos->z + 0.5f;
@@ -814,7 +813,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 		{
 			object_placement_data new_object_placement;
 			datum localPlayerIdx = player_index_from_user_index(0);
-			real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->position;
+			real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->object.position;
 
 			if (object_idx != NONE)
 			{

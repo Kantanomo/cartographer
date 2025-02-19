@@ -117,7 +117,7 @@ bool simulation_in_progress()
 
 bool simulation_query_object_is_predicted(datum object_datum)
 {
-    return game_is_predicted() && object_get_fast_unsafe(object_datum)->simulation_entity_index != NONE;
+    return game_is_predicted() && object_get_fast_unsafe(object_datum)->object.simulation_entity_index != NONE;
 }
 
 void __cdecl simulation_process_input(uint32 player_action_mask, const player_action* player_actions)

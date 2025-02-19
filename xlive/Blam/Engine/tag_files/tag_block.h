@@ -18,7 +18,7 @@ struct tag_block
 		return sizeof(T);
 	}
 
-	BLAM_MATH_INL T* operator[](int32 index) const
+	inline T* operator[](int32 index) const
 	{
 		return (T*)tag_block_get_element_with_size((s_tag_block*)this, index, sizeof(T));
 	}

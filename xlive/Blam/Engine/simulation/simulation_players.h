@@ -4,6 +4,8 @@
 #include "game/player_control.h"
 #include "game/players.h"
 
+/* enums */
+
 enum e_simulation_player_type   //TODO: determine actual names for this enum field
 {
 	simulation_player_type_local_authority = 0x0,
@@ -14,6 +16,26 @@ enum e_simulation_player_type   //TODO: determine actual names for this enum fie
 	simulation_player_type_foreign_distributed = 0x5,
 	k_simulation_player_type_count = 0x6,
 };
+
+/* structures */
+
+struct simulation_player_update
+{
+	int32 player_index;
+	s_player_identifier player_identifier;
+	int32 update_type;
+	s_machine_identifier machine_identifier;
+	int32 user_index;
+	int32 controller_index;
+	bool player_left_game;
+	int8 pad[3];
+	s_player_properties properties;
+	int32 swap_player_index;
+	s_player_identifier swap_player_identifier;
+};
+ASSERT_STRUCT_SIZE(simulation_player_update, 0xB4);
+
+/* classes */
 
 #pragma pack(push, 1)
 struct c_simulation_player
@@ -34,21 +56,7 @@ struct c_simulation_player
 #pragma pack(pop)
 ASSERT_STRUCT_SIZE(c_simulation_player, 0x88);
 
-struct simulation_player_update
-{
-	int32 player_index;
-	s_player_identifier player_identifier;
-	int32 update_type;
-	s_machine_identifier machine_identifier;
-	int32 user_index;
-	int32 controller_index;
-	bool player_left_game;
-	int8 pad[3];
-	s_player_properties properties;
-	int32 swap_player_index;
-	s_player_identifier swap_player_identifier;
-};
-ASSERT_STRUCT_SIZE(simulation_player_update, 0xB4);
+/* prototypes */
 
 void simulation_players_apply_patches(void);
 

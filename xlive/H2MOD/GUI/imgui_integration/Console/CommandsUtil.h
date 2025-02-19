@@ -86,8 +86,8 @@ struct StringLineHeader
 enum StringHeaderFlags_
 {
     StringFlag_None,
-    StringFlag_History = 1 << 0, // when going through history with key up/key down, it'll be displayed in the input console
-    StringFlag_CopyToClipboard = 1 << 1, // when set, it'll copy this string to clipboard, then unset the flag
+    StringFlag_History = FLAG(0),			// when going through history with key up/key down, it'll be displayed in the input console
+    StringFlag_CopyToClipboard = FLAG(1),	// when set, it'll copy this string to clipboard, then unset the flag
 };
 
 // pretty much a circular buffer

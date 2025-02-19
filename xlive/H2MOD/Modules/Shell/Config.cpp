@@ -212,15 +212,12 @@ void SaveH2Config() {
 		H2Config_language.code_variant = current_language_sub;
 	}
 
-	wchar_t fileConfigPath[1024];
-	if (FlagFilePathConfig) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
-	}
-	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], H2ProcessFilePath, _Shell::GetInstanceId());
+	wchar_t fileConfigPath[MAX_PATH];
+	if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], g_h2_process_file_path, _Shell::GetInstanceId());
 	}
 	else {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], H2AppDataLocal, _Shell::GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], g_h2_appdata_local_path, _Shell::GetInstanceId());
 	}
 
 	addDebugText(L"Saving config: \"%ws\"", fileConfigPath);
@@ -540,39 +537,34 @@ void ReadH2Config() {
 	addDebugText("Reading H2Configuration file...");
 
 	int readInstanceIdFile = _Shell::GetInstanceId();
-	wchar_t local[1024];
-	wcscpy_s(local, ARRAYSIZE(local), H2AppDataLocal);
+	wchar_t local[MAX_PATH];
+	wcscpy_s(local, ARRAYSIZE(local), g_h2_appdata_local_path);
 	H2Config_isConfigFileAppDataLocal = false;
 
 	errno_t err = 0;
 	FILE* fileConfig = nullptr;
 	wchar_t fileConfigPath[1024];
 
-	if (FlagFilePathConfig) {
-		wcscpy_s(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
-		addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
+	do
+	{
+		wchar_t* checkFilePath = g_h2_process_file_path;
+		if (H2Config_isConfigFileAppDataLocal) {
+			checkFilePath = local;
+		}
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], checkFilePath, readInstanceIdFile);
+		addDebugText(L"Reading config: \"%ws\"", fileConfigPath);
 		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
-	}
-	else {
-		do {
-			wchar_t* checkFilePath = H2ProcessFilePath;
-			if (H2Config_isConfigFileAppDataLocal) {
-				checkFilePath = local;
-			}
-			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], checkFilePath, readInstanceIdFile);
-			addDebugText(L"Reading config: \"%ws\"", fileConfigPath);
-			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
-			if (err) {
-				addDebugText("H2Configuration file does not exist, error code: 0x%x", err);
-			}
-			H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
-			if (err && !H2Config_isConfigFileAppDataLocal) {
-				--readInstanceIdFile;
-			}
-		} while (err && readInstanceIdFile > 0);
+		if (err) {
+			addDebugText("H2Configuration file does not exist, error code: 0x%x", err);
+		}
 		H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
-	}
+		if (err && !H2Config_isConfigFileAppDataLocal) {
+			--readInstanceIdFile;
+		}
+	} 
+	while (err && readInstanceIdFile > 0);
+	H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
 
 	if (err) {
 		addDebugText("ERROR: No H2Configuration files could be found!");

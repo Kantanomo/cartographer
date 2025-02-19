@@ -17,7 +17,7 @@ object_type_definition* object_type_definition_get(e_object_type object_type)
 
 object_type_definition* get_game_object_type_definition(datum object_datum)
 {
-	return object_type_definition_get(object_get_fast_unsafe(object_datum)->object_identifier.get_type());
+	return object_type_definition_get(object_get_fast_unsafe(object_datum)->object.object_identifier.get_type());
 }
 
 void __cdecl object_type_adjust_placement(object_placement_data* placement_data)

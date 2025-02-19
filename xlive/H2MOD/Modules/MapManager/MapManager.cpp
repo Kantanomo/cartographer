@@ -10,7 +10,7 @@
 #include "main/game_preferences.h"
 #include "networking/NetworkMessageTypeCollection.h"
 #include "networking/logic/life_cycle_manager.h"
-
+#include "text/unicode.h"
 
 std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());
 
@@ -368,20 +368,22 @@ bool MapDownloadQuery::DownloadFromRepo() {
 	CURL* curl = nullptr;
 	CURLcode res;
 
-	std::wstring mapFilePathWide(get_custom_map_folder_path());
-	std::string nonUnicodeMapFilePath(mapFilePathWide.begin(), mapFilePathWide.end());
-	nonUnicodeMapFilePath += m_clientMapFilename;
+	c_static_wchar_string<MAX_PATH> map_path(get_custom_map_folder_path());
+	map_path.append(m_clientMapFilenameWide.c_str());
 
 	curl = curl_interface_init_no_verify();
 	if (curl) {
-		fp = fopen(nonUnicodeMapFilePath.c_str(), "wb");
+		fp = _wfopen(map_path.get_string(), L"wb");
 		if (fp == nullptr) {
-			LOG_TRACE_GAME("{} - unable to open map file at: {}", __FUNCTION__, nonUnicodeMapFilePath.c_str());
+			LOG_TRACE_GAME(L"{} - unable to open map file at: {}", __FUNCTIONW__, map_path.get_string());
 			curl_easy_cleanup(curl);
 			return false;
 		}
 
-		char* url_encoded_map_filename = curl_easy_escape(curl, m_clientMapFilename.c_str(), m_clientMapFilename.length());
+		utf8 utf8_path[MAX_PATH * 2];
+		wchar_string_to_utf8_string(map_path.get_string(), utf8_path, NUMBEROF(utf8_path));
+
+		char* url_encoded_map_filename = curl_easy_escape(curl, utf8_path, csstrnlen(utf8_path, NUMBEROF(utf8_path)));
 		url.append(url_encoded_map_filename);
 		curl_free(url_encoded_map_filename);
 
@@ -402,7 +404,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 
 		if (res == CURLE_OK)
 		{
-			if (http_code != 404 && get_custom_map_manager()->add_custom_map_entry_by_map_file_path(mapFilePathWide + m_clientMapFilenameWide)) {
+			if (http_code != 404 && get_custom_map_manager()->add_custom_map_entry_by_map_file_path(map_path.get_string())) {
 				//if we succesfully downloaded the map, return true
 				return true;
 			}
@@ -414,7 +416,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 			if (res == CURLE_ABORTED_BY_CALLBACK)
 				addDebugText("Map downloading aborted because of user input!");
 
-			remove(nonUnicodeMapFilePath.c_str());
+			remove(utf8_path);
 
 			return false;
 		}
@@ -439,7 +441,7 @@ void MapDownloadQuery::StartMapDownload()
 		*mapDownloadStatus = NONE;
 
 		if (m_readyToDownload) {
-			LOG_TRACE_GAME("[h2mod-mapmanager] map file to download: {}", m_clientMapFilename);
+			LOG_TRACE_GAME(L"[h2mod-mapmanager] map file to download: {}", m_clientMapFilenameWide.c_str());
 
 			//TODO: set map filesize
 			//TODO: if downloading from repo files, try p2p
@@ -450,7 +452,7 @@ void MapDownloadQuery::StartMapDownload()
 					STRINGIFY(handle_map_download_callback),
 					STRINGIFY(DownloadFromRepo));
 
-				addDebugText("Failed to download custom map %s .", m_clientMapFilename.c_str());
+				addDebugText("Failed to download custom map.");
 				NetworkSession::LeaveSession(); // download has failed
 			}
 		}
@@ -478,7 +480,6 @@ void MapDownloadQuery::SetMapNameToDownload(const std::wstring& _mapNameToDownlo
 	if (!_mapNameToDownloadWide.empty())
 	{
 		m_clientMapFilenameWide = _mapNameToDownloadWide;
-		m_clientMapFilename = std::string(_mapNameToDownloadWide.begin(), _mapNameToDownloadWide.end());
 		m_readyToDownload = true;
 	}
 }

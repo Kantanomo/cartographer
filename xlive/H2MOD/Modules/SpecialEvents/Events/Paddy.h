@@ -1,3 +1,5 @@
 #pragma once
 
-void paddy_event_map_load();
+/* prototypes */
+
+void paddy_event_map_load(void);

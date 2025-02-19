@@ -15,11 +15,6 @@ public:
 	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) override;
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) override;
 
-	// unused below
-	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) override
-	{
-	}
-
 	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) override
 	{
 		return false;

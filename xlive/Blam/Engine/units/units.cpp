@@ -3,6 +3,26 @@
 
 #include "tag_files/global_string_ids.h"
 
+/* prototypes */
+
+// Replace calls to use interpolated functions
+static void unit_get_camera_position_patch_mass_functions(void);
+
+// Replace calls to use interpolated functions
+static void unit_get_camera_position_patch_marker_functions(void);
+
+// Replace calls to use interpolated functions
+static void unit_get_head_position_patch_functions(void);
+
+static void unit_apply_interpolation_patches(void);
+
+/* public code */
+
+void unit_apply_patches(void)
+{
+	unit_apply_interpolation_patches();
+	return;
+}
 
 void __cdecl unit_delete_all_weapons(datum unit_datum_index)
 {
@@ -34,14 +54,14 @@ real32 __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera
 bool unit_is_dual_wielding(datum unit_index)
 {
 	unit_datum* unit = (unit_datum*)object_get_fast_unsafe(unit_index);
-	return unit->weapon_indices[0] != NONE && unit->weapon_indices[1] != NONE;
+	return unit->unit.weapon_indices[0] != NONE && unit->unit.weapon_indices[1] != NONE;
 }
 
 datum player_index_from_unit_index(datum unit_index)
 {
 	unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);
 
-	return (unit ? unit->controlling_player_index : NONE);
+	return (unit ? unit->unit.controlling_player_index : NONE);
 }
 
 void __cdecl unit_get_head_position_interpolated(datum unit_index, real_point3d* position)
@@ -67,7 +87,7 @@ void __cdecl unit_control(datum unit_index, unit_control_data* control_data)
 e_game_team unit_get_team_index(datum unit_index)
 {
 	const unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);
-	return (unit ? unit->unit_team : _game_team_none);
+	return (unit ? unit->unit.unit_team : _game_team_none);
 }
 
 bool __cdecl unit_desires_tight_camera_track(datum unit_index)
@@ -75,8 +95,10 @@ bool __cdecl unit_desires_tight_camera_track(datum unit_index)
 	return INVOKE(0x13F63B, 0, unit_desires_tight_camera_track, unit_index);
 }
 
+/* private code */
+
 // Replace calls to use interpolated functions
-void unit_get_camera_position_patch_mass_functions(void)
+static void unit_get_camera_position_patch_mass_functions(void)
 {
 	PatchCall(Memory::GetAddress(0x90C98, 0x48F98), object_get_center_of_mass_interpolated);
 	PatchCall(Memory::GetAddress(0x13D406, 0x12C255), object_get_center_of_mass_interpolated);
@@ -84,7 +106,7 @@ void unit_get_camera_position_patch_mass_functions(void)
 }
 
 // Replace calls to use interpolated functions
-void unit_get_camera_position_patch_marker_functions(void)
+static void unit_get_camera_position_patch_marker_functions(void)
 {
 	PatchCall(Memory::GetAddress(0x13D3CF, 0x12C21E), object_get_markers_by_string_id);
 	PatchCall(Memory::GetAddress(0x13D48D, 0x12C2DC), object_get_markers_by_string_id);
@@ -92,7 +114,7 @@ void unit_get_camera_position_patch_marker_functions(void)
 }
 
 // Replace calls to use interpolated functions
-void unit_get_head_position_patch_functions(void)
+static void unit_get_head_position_patch_functions(void)
 {
 	PatchCall(Memory::GetAddress(0x6C759), unit_get_head_position_interpolated);
 	PatchCall(Memory::GetAddress(0x6EAB6), unit_get_head_position_interpolated);
@@ -100,16 +122,10 @@ void unit_get_head_position_patch_functions(void)
 	return;
 }
 
-void unit_apply_interpolation_patches()
+static void unit_apply_interpolation_patches(void)
 {
 	unit_get_camera_position_patch_mass_functions();
 	unit_get_camera_position_patch_marker_functions();
 	unit_get_head_position_patch_functions();
-	return;
-}
-
-void unit_apply_patches(void)
-{
-	unit_apply_interpolation_patches();
 	return;
 }

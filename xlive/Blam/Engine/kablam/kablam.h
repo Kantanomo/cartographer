@@ -1,8 +1,9 @@
 #pragma once
 
-#include "H2MOD/GUI/ImGui_Integration/Console/CommandsUtil.h"
+/* enums */
 
-enum e_server_console_commands {
+enum e_server_console_commands
+{
 	_kablam_command_ban,
 	_kablam_command_description,
 	_kablam_command_exit,
@@ -20,9 +21,10 @@ enum e_server_console_commands {
 	_kablam_command_unban,
 	_kablam_command_vip,
 	_kablam_command_any,
-
 	k_kablam_command_count
 };
+
+/* classes */
 
 class c_kablam_interface
 {
@@ -66,15 +68,6 @@ public:
 };
 ASSERT_STRUCT_SIZE(c_kablam_command_send_msg, 260);
 
-namespace ServerConsole
-{
-	static int __cdecl OutputCb(StringHeaderFlags flags, const char* fmt, ...);
+/* prototypes */
 
-	void ApplyHooks();
-	int LogToDedicatedServerConsoleWide(const wchar_t* fmt, ...);
-	int LogToDedicatedServerConsole(const char* fmt, ...);
-	void SendCommand(wchar_t** command, int32 split_commands_size, bool a3);
-	void AddVip(std::wstring gamerTag);
-	void ClearVip();
-	void SendMsg(const wchar_t* message, bool timeout = false);
-}
+void kablam_apply_patches(void);

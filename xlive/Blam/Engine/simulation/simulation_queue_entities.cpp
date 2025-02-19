@@ -251,8 +251,8 @@ void dump_entity_unit_creation_to_file(
 		FILE* fp;
 		c_static_wchar_string<MAX_PATH> path;
 
-		extern wchar_t* H2AppDataLocal;
-		path.set(H2AppDataLocal);
+		extern wchar_t g_h2_appdata_local_path[MAX_PATH];
+		path.set(g_h2_appdata_local_path);
 		path.append(L"entity_update_unit_creation_state.bin");
 
 		if (!_wfopen_s(&fp, path.get_string(), L"wb"))

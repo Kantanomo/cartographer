@@ -98,27 +98,26 @@ s_discord_globals g_discord_globals =
 /* prototypes */
 
 // Entry point for discord thread
-unsigned __stdcall discord_thread_proc(void* pArguments);
+static unsigned __stdcall discord_thread_proc(void* pArguments);
 
 // Main loop for discord logic
-uint32 discord_update(s_discord_data* discord);
+static uint32 discord_update(s_discord_data* discord);
 
 // Update function for rich presence
-void discord_rich_presence_update(s_discord_data* discord);
+static void discord_rich_presence_update(s_discord_data* discord);
 
 // Returns true if the scenario name has a valid discord image associated with it
-bool discord_interface_scenario_name_vaild(const utf8* scnr_name);
+static bool discord_interface_scenario_name_vaild(const utf8* scnr_name);
 
 // Encode xsession info as a string
-void discord_interface_encode_xsession_info(XSESSION_INFO* session_info);
+static void discord_interface_encode_xsession_info(XSESSION_INFO* session_info);
 
-void discord_interface_update_details(void);
+static void discord_interface_update_details(void);
 
-void DISCORD_CALLBACK on_user_updated(void* data);
-void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret);
-void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message);
-void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res);
-
+static void DISCORD_CALLBACK on_user_updated(void* data);
+static void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret);
+static void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message);
+static void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res);
 
 /* public code */
 
@@ -249,7 +248,7 @@ void discord_interface_set_player_counts(void)
 
 /* private code */
 
-unsigned __stdcall discord_thread_proc(void* pArguments)
+static unsigned __stdcall discord_thread_proc(void* pArguments)
 {
 	// Set discord instance based on instance ID
 #ifdef TEST_DISCORD_INSTANCE
@@ -307,7 +306,7 @@ unsigned __stdcall discord_thread_proc(void* pArguments)
 	return result;
 }
 
-uint32 discord_update(s_discord_data* discord)
+static uint32 discord_update(s_discord_data* discord)
 {
 	discord->core->run_callbacks(discord->core);
 
@@ -320,7 +319,7 @@ uint32 discord_update(s_discord_data* discord)
 	return 50;
 }
 
-void discord_rich_presence_update(s_discord_data* discord)
+static void discord_rich_presence_update(s_discord_data* discord)
 {
 	g_discord_globals.activity.application_id = k_discord_client_id;
 	g_discord_globals.activity.supported_platforms = DiscordActivitySupportedPlatformFlags_Desktop;
@@ -357,7 +356,7 @@ void discord_rich_presence_update(s_discord_data* discord)
 	return;
 }
 
-bool discord_interface_scenario_name_vaild(const utf8* scnr_name)
+static bool discord_interface_scenario_name_vaild(const utf8* scnr_name)
 {
 	bool result = false;
 	for (size_t i = 0; i < k_valid_scenario_name_count; i++)
@@ -372,7 +371,7 @@ bool discord_interface_scenario_name_vaild(const utf8* scnr_name)
 	return result;
 }
 
-void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
+static void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
 {
 	uint8* session_bytes = (uint8*)session_info;
 
@@ -386,7 +385,7 @@ void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
 	return;
 }
 
-void discord_interface_update_details(void)
+static void discord_interface_update_details(void)
 {
 	c_static_string<128> details;
 	details.set(g_discord_globals.activity.assets.small_text);
@@ -398,7 +397,7 @@ void discord_interface_update_details(void)
 	return;
 }
 
-void DISCORD_CALLBACK on_user_updated(void* data)
+static void DISCORD_CALLBACK on_user_updated(void* data)
 {
 	s_discord_data* discord = (s_discord_data*)data;
 	DiscordUser user;
@@ -407,7 +406,7 @@ void DISCORD_CALLBACK on_user_updated(void* data)
 	return;
 }
 
-void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret)
+static void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret)
 {
 	XSESSION_INFO session;
 	uint8* session_bytes = (uint8*)&session;
@@ -423,13 +422,13 @@ void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret)
 	return;
 }
 
-void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message)
+static void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message)
 {
 	error(0, message);
 	return;
 }
 
-void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res)
+static void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res)
 {
 	ASSERT(res == DiscordResult_Ok);
 	return;

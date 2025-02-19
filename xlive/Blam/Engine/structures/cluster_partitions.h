@@ -3,9 +3,13 @@
 #include "tag_files/tag_block.h"
 
 #include "memory/data.h"
-#include "objects/object_placement.h"
+#include "objects/object_location.h"
+
+/* constants */
 
 #define MAXIMUM_CLUSTERS_PER_STRUCTURE 512
+
+/* structures */
 
 // max count: MAXIMUM_CLUSTERS_PER_STRUCTURE 512
 struct s_scenario_cluster_property
@@ -40,6 +44,8 @@ struct cluster_partition
 	s_data_array* array0;
 	s_data_array* array1;
 };
+
+/* prototypes */
 
 void __cdecl cluster_partition_reconnect(cluster_partition* partition,
 	datum object_datum,

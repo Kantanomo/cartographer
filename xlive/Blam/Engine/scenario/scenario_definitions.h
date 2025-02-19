@@ -22,6 +22,7 @@
 #include "math/periodic_functions.h"
 #include "objects/light_definitions.h"
 #include "objects/object_identifier.h"
+#include "objects/object_placement.h"
 #include "sound/sound_scenery.h"
 #include "structures/cluster_partitions.h"
 #include "structures/structure_audibility.h"
