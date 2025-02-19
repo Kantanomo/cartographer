@@ -8,43 +8,22 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const 
 std::string GetVKeyCodeString(int vkey);
 int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath);
 LONG GetDWORDRegKey(HKEY hKey, const wchar_t* strValueName, DWORD* nValue);
+
 ///FREE MEMOERY in returned char*
 char* custom_label_escape(char* label_literal);
-bool FloatIsNaN(float vagueFloat);
-bool isFloat(std::string myString);
-bool isFloat(std::wstring myString);
-bool isInteger(std::string myString);
+
 bool isInteger(std::wstring myString);
+bool isFloat(std::wstring myString);
 
 bool HexStrToBytes(const std::string& hexStr, uint8_t* byteBuf, size_t bufLen);
 std::string ByteToHexStr(const uint8_t* buffer, size_t size);
 
 char* encode_rfc3986(const char* label_literal, size_t label_literal_length = 0u);
-std::string ToNarrow(const wchar_t *s, char dfault = '?', const std::locale& loc = std::locale());
 
 ///FREE MEMOERY in rtn_response if returned 0 (success).
 int MasterHttpResponse(const char* url, const char* http_request, char** rtn_response);
 
 void CreateDirTree(const wchar_t* path);
-
-int TrimRemoveConsecutiveSpaces(char* text);
-
-//Converts int types to string given a format std::oct, std::dec, std::hex.
-template<class T>
-std::string IntToString(T t, std::ios_base & (*f)(std::ios_base&) = std::dec)
-{
-	std::ostringstream stream;
-	(stream << f << t);
-	return std::string(stream.str().c_str());
-}
-template<class T>
-std::wstring IntToWString(T t, std::ios_base & (*f)(std::ios_base&))
-{
-	auto out = IntToString(t, f);
-	return std::wstring(out.begin(), out.end());
-}
-
-bool FileTypeCheck(const std::string& file_path, const std::string& file_type);
 
 class FrequencyLimiter
 {

@@ -85,7 +85,7 @@ void set_secondary_hud_scale(real32 scale)
 
 void set_crosshair_offset(real32 offset)
 {
-	if (!FloatIsNaN(offset))
+	if (!isnan(offset))
 	{
 		scenario_get_game_globals()->player_control[0]->crosshair_location.y = offset;
 	}

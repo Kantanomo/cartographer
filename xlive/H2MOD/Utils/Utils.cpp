@@ -1,10 +1,7 @@
 #include "stdafx.h"
 #include "Utils.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-
-#include <sys/timeb.h>
 
 int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);
@@ -242,22 +239,11 @@ char* custom_label_escape(char* label_literal) {
 	return label_escaped;
 }
 
-bool FloatIsNaN(float vagueFloat) {
-	DWORD* vague = (DWORD*)&vagueFloat;
-	if ((*vague >= 0x7F800000 && *vague <= 0x7FFFFFFF) || (*vague >= 0xFF800000 && *vague <= 0xFFFFFFFF)) {
-		return true;
-	}
-	return false;
+bool isInteger(std::wstring myString)
+{
+	return myString.find_first_not_of(L"0123456789") == std::wstring::npos;
 }
 
-bool isFloat(std::string myString)
-{
-	std::istringstream iss(myString);
-	float f;
-	iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
-	// Check the entire string was consumed and if either failbit or badbit is set
-	return iss.eof() && !iss.fail();
-}
 bool isFloat(std::wstring myString)
 {
 	std::wistringstream iss(myString);
@@ -265,16 +251,6 @@ bool isFloat(std::wstring myString)
 	iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
 	// Check the entire string was consumed and if either failbit or badbit is set
 	return iss.eof() && !iss.fail();
-}
-
-bool isInteger(std::string myString)
-{
-	return myString.find_first_not_of("0123456789") == std::string::npos;
-}
-
-bool isInteger(std::wstring myString)
-{
-	return myString.find_first_not_of(L"0123456789") == std::wstring::npos;
 }
 
 DWORD crc32buf(const char* buf, size_t len)
@@ -368,16 +344,6 @@ char* encode_rfc3986(const char* label_literal, size_t label_literal_length) {
 	}
 	label_escaped[escaped_buff_i] = 0;
 	return label_escaped;
-}
-
-std::string ToNarrow(const wchar_t *s, char dfault,	const std::locale& loc)
-{
-	std::ostringstream stm;
-
-	while (*s != L'\0') {
-		stm << std::use_facet< std::ctype<wchar_t> >(loc).narrow(*s++, dfault);
-	}
-	return stm.str();
 }
 
 struct stringMe {
@@ -481,30 +447,6 @@ void CreateDirTree(const wchar_t* path) {
 	free(temp_path);
 }
 
-int TrimRemoveConsecutiveSpaces(char* text) {
-	int text_pos = 0;
-	size_t text_len = strlen(text);
-	for (size_t j = 0; j < text_len; j++) {
-		if (text_pos == 0) {
-			if (text[j] != ' ')
-				text[text_pos++] = text[j];
-			continue;
-		}
-		if (!(text[j] == ' ' && text[text_pos - 1] == ' '))
-			text[text_pos++] = text[j];
-	}
-	text[text_pos] = 0;
-	if (text[text_pos - 1] == ' ')
-		text[--text_pos] = 0;
-	return text_pos;//new length
-}
-
-bool FileTypeCheck(const std::string& file_path, const std::string& file_type)
-{
-	auto a = file_path.substr(file_path.find_last_of('.') + 1, file_path.length() - file_path.find_last_of('.') - 1);
-	return a == file_type;
-}
-
 // possible format: '0Xx01234556789ABCDEFabcdefHh'
 bool HexStrToBytes(const char* hexStr, size_t hexStrLen, uint8_t* outByteBuf, size_t outBufLen)
 {
@@ -581,7 +523,7 @@ bool HexStrToBytes(const char* hexStr, size_t hexStrLen, uint8_t* outByteBuf, si
 }
 
 // TODO: this function checks the input hexStr before converting it to bytes
-// hence being slower if we don't trust the input
+// thus being slower if the input is validated
 bool HexStrToBytes(const std::string& hexStr, uint8_t* byteBuf, size_t bufLen) {
 	return HexStrToBytes(hexStr.c_str(), hexStr.length(), byteBuf, bufLen);
 }
