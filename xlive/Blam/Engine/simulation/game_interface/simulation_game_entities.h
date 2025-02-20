@@ -60,7 +60,7 @@ public:
 	virtual int32  sub_A9004D(int a1, int a2, DWORD a3) = 0;
 	virtual int8 creation_minimum_required_bits(s_simulation_game_entity* entity, void* a3, int32* minimum_required_bits) = 0;
 	virtual void write_creation_description_to_string(s_simulation_game_entity* entity, void* tel_data, int32 buffer_size, char* buffer) = 0;
-	virtual int32 calculate_update_relevance(int a1, int a2, DWORD* a3) = 0;
+	virtual void calculate_update_relevance(int a1, int32* buffer_size, int32* out_relevance) = 0;
 	virtual void entity_creation_encode(uint32 creation_data_size, void* creation_data, void* telemetry_data, c_bitstream* packet) = 0;
 	virtual bool entity_creation_decode(uint32 creation_data_size, void* creation_data, c_bitstream* packet) = 0;
 	virtual bool entity_update_encode(bool a1, uint32 update_mask, uint32* update_mask_written, uint32 state_data_size, void* state_data, void* telemetry_data, c_bitstream* packet, int32 required_leave_space_bits) = 0;
@@ -76,7 +76,39 @@ public:
 	virtual bool delete_game_entity(s_simulation_game_entity* entity) = 0;
 	virtual bool promote_game_entity_to_authority(s_simulation_game_entity* entity) = 0;
 	virtual void* build_object_creation_data(datum object_index, int32 creation_data_size, void* creation_data) = 0;
-	virtual void* handle_object_update(datum object_index, uint32 update_mask, int32 state_data_size, void* state_data) = 0;
+};
+
+class c_simulation_entity_definition_new
+{
+public:
+	virtual e_simulation_entity_type entity_type() = 0;
+	virtual const char* entity_type_name() = 0;
+	virtual uint32 creation_data_size() = 0;
+	virtual uint32 function_4() = 0;
+	virtual uint32 update_flag_count() = 0;
+	virtual uint32 initial_update_mask() = 0;
+	virtual int8 function_7(s_simulation_game_entity* entity) = 0;
+	virtual void function_8(int32 a1) = 0;
+	virtual int8 function_9(int32 a1, int32 a2, int32 a3) = 0;
+	virtual void function_10(int32 a1, int32 a2, int32* a3, int32* a4) = 0;
+	virtual void get_creation_relevance_string(int32 a1, int32* a3, char* out_string) = 0;
+	virtual void function_12(int32 a1, int32* a2, int32* a3) = 0;
+	virtual bool function_13(int32 a1, int32 a2, int32 a3, int32 a4) = 0;
+	virtual bool function_14(int32 a1, int32 a2, int32 a3, int32 a4) = 0;
+	virtual bool function_15(int32 a1, int32 a2, int32 a3) = 0;
+	virtual bool function_16(int32 a1, int32* a2, int32 a3, uint16* a4, int32 a5, c_bitstream* packet, int32 a8) = 0;
+	virtual bool function_17(int32* a1, int32 a2, uint16* a3, c_bitstream* packet) = 0;
+	virtual bool function_18(int32* a1, int32* a2) = 0;
+	virtual bool function_19(int32* a1, int32* a2) = 0;
+	virtual void function_10(int32 a1, int32 a2) = 0;
+	virtual bool function_21(int32 a1, int32 a2, int32 a3, int32 a4) = 0;
+	virtual bool function_22(int32 a1, int32 a2, int32 a3) = 0;
+	virtual void function_23(int32* a1) = 0;
+	virtual void function_24(s_simulation_game_entity* entity, int32 a2, int32 a3, int32 a4, int32 a5) = 0;
+	virtual bool function_25(int32 a1, int32 a2, int32 a3, int32 a4) = 0;
+	virtual bool function_26(s_simulation_game_entity* entity) = 0;
+	virtual bool function_27(s_simulation_game_entity* entity) = 0;
+	
 };
 
 

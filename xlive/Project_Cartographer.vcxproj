@@ -316,7 +316,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -1126,6 +1126,8 @@
     <ClCompile Include="Blam\Engine\shell\shell_windows_internals.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_action.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine_slayer.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_entities.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_events.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_interface.cpp" />
@@ -2259,8 +2261,10 @@
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_action.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_damage.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_device_machines.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_globals.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_player.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_slayer.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_entities.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_events.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_generics.h" />

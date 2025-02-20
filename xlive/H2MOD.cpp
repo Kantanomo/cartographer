@@ -106,6 +106,7 @@
 #include "interface/multiplayer_variant_settings_interface_definition.h"
 #include "interface/user_interface_networking.h"
 #include "networking/network_game_definitions.h"
+#include "simulation/game_interface/simulation_game_engine_slayer.h"
 
 /* typedefs */
 
@@ -761,6 +762,9 @@ static void h2mod_apply_hooks(void)
 		game_variant_apply_patches();
 		user_interface_networking_apply_patches();
 		multiplayer_variant_settings_interface_apply_patches();
+
+		WritePointer(Memory::GetAddress(0x1DAF49 + 1), g_simulation_slayer_engine_definition_ptr);
+		//WritePointer(Memory::GetAddress(0x4635B8), g_simulation_slayer_engine_definition_ptr);
 	}
 	return;
 }
