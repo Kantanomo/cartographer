@@ -16,30 +16,29 @@ void damage_apply_patches(void)
 
 void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index, int16 node_index, int16 region_index, int16 material_index, real_vector3d* object_normal)
 {
-	// Obtain the actor index so we can determine whether or not to disable damage
-	datum actor_index = NONE;
-	if (damage_data->owner.owner_object_index != NONE)
+	bool prevent_guardian_glitch = false;
+
+	// Only run the patch if we're in multiplayer and friendly fire is off
+	if (game_is_multiplayer() && TEST_BIT(game_options_get()->game_variant.game_engine_flags, _game_engine_friendly_fire_bit) == 0)
 	{
-		const object_header_datum* header = (object_header_datum*)datum_get(object_header_data_get(), damage_data->owner.owner_object_index);
+		// Obtain the actor index so we can determine whether or not to disable damage
 		// If object is a unit then we can grab the actor index
-		if (TEST_BIT(_object_mask_unit, header->type))
+		const unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(damage_data->owner.owner_object_index, _object_mask_unit);
+		const datum actor_index = unit != NULL ? unit->unit.actor_datum : NONE;
+
+		// Disable damage if all are true:
+		// 1. Not coming from an actor (actor index is none)
+		// 2. Does not have a valid player index or team
+		if (actor_index == NONE && (damage_data->owner.owner_player_index == NONE || damage_data->owner.owner_team_index == _game_team_none))
 		{
-			actor_index = object_get_fast_unsafe<unit_datum>(damage_data->owner.owner_object_index)->unit.actor_datum;
+			LOG_TRACE_GAME("GUARDIAN GLITCH PREVENTED");
+			prevent_guardian_glitch = true;
 		}
 	}
 
-	// Disable damage if all are true:
-	// 1. In multiplayer
-	// 2. Not coming from an actor (actor index is none)
-	// 3. Does not have a valid player index or team
-	if (game_is_multiplayer() && actor_index == NONE && (damage_data->owner.owner_player_index == NONE || damage_data->owner.owner_team_index == _game_team_none))
-	{
-		LOG_TRACE_GAME("GUARDIAN GLITCH PREVENTED");
-	}
-	else
+	if (!prevent_guardian_glitch)
 	{
 		INVOKE(0x17AD81, 0x1525E1, object_cause_damage, damage_data, object_index, node_index, region_index, material_index, object_normal);
 	}
-
 	return;
 }
