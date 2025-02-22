@@ -133,6 +133,7 @@ static char current_location_id = 0;
 
 bool updater_has_files_to_download = false;
 bool updater_has_files_to_install = false;
+bool updater_has_up_to_date = false;
 
 
 static int interpretUpdateEntry(char* fileLine, char* version, int lineNumber) {
@@ -268,6 +269,7 @@ static void FetchUpdateDetails() {
 
 	updater_has_files_to_download = false;
 	updater_has_files_to_install = false;
+	updater_has_up_to_date = false;
 
 	addDebugText("Fetching Update Details.");
 	char* rtn_result = 0;
@@ -335,15 +337,22 @@ static void FetchUpdateDetails() {
 	//prompt user with changes
 
 	entry_count = UpdateFileEntries.size();
-	for (int i = 0; i < entry_count; i++) {
-		if (UpdateFileEntries[i]->need_to_update == 2) {
-			updater_has_files_to_download = true;
+	if (entry_count > 0)
+	{
+		for (int i = 0; i < entry_count; i++) {
+			if (UpdateFileEntries[i]->need_to_update == 2) {
+				updater_has_files_to_download = true;
+			}
+			if (UpdateFileEntries[i]->need_to_update == 1 && UpdateFileEntries[i]->location_id > 0) {
+				updater_has_files_to_install = true;
+			}
+			if (updater_has_files_to_download && updater_has_files_to_install)
+				break;
 		}
-		if (UpdateFileEntries[i]->need_to_update == 1 && UpdateFileEntries[i]->location_id > 0) {
-			updater_has_files_to_install = true;
-		}
-		if (updater_has_files_to_download && updater_has_files_to_install)
-			break;
+	}
+	else
+	{
+		updater_has_up_to_date = true;
 	}
 
 	std::string im_lazy = "";
