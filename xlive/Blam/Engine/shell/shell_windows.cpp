@@ -16,6 +16,8 @@
 static LARGE_INTEGER g_startup_counter;
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 
+static bool g_custom_mouse_cursor_enabled = false;
+
 /* prototypes */
 
 static DWORD WINAPI timeGetTime_hook();
@@ -255,7 +257,6 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 
 	*should_initilize_xlive_get() = true;
 
-
 	// intialize some basic game subsystems
 	if (shell_initialize())
 	{
@@ -313,38 +314,61 @@ static bool __cdecl pcc_get_properties(void)
 	return INVOKE(0x260DDD, 0x0, pcc_get_properties);
 }
 
+static void shell_disable_cursor()
+{
+	if (g_custom_mouse_cursor_enabled)
+	{
+		INVOKE(0x497B, 0x0, shell_disable_cursor);
+		g_custom_mouse_cursor_enabled = false;
+	}
+}
+
+static void shell_enable_cursor()
+{
+	if (!g_custom_mouse_cursor_enabled)
+	{
+		INVOKE(0x2EDC4, 0x0, shell_enable_cursor);
+		g_custom_mouse_cursor_enabled = true;
+	}
+}
+
 static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	static FrequencyLimiter frqLimiter(150);
 	bool* window_in_focus = Memory::GetAddress<bool*>(0x46DAD9);
-	bool* unk_condition1 = Memory::GetAddress<bool*>(0x46DAD8);
+	bool* shell_window_proc_game_message_during_map_load = Memory::GetAddress<bool*>(0x46DAD8);
 	WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
 
-	LRESULT result;
-	if (uMsg != WM_SETCURSOR)
+	LRESULT result = 1;
+
+	bool exec_base_wndproc = true;
+
+	switch (uMsg)
 	{
+	case WM_SETFOCUS:
+		g_custom_mouse_cursor_enabled = false;
+		break;
+	case WM_KILLFOCUS:
+		g_custom_mouse_cursor_enabled = true;
+		break;
+	case WM_SETCURSOR:
+		if (GetCursor() == NULL)
+		{
+			g_custom_mouse_cursor_enabled = false;
+		}
+		exec_base_wndproc = false;
+		if (*shell_window_proc_game_message_during_map_load)
+		{
+			shell_disable_cursor();
+		}
+		else
+		{
+			shell_enable_cursor();
+		}
+		break;
+	}
+
+	if (exec_base_wndproc)
 		result = g_WndProc(hWnd, uMsg, wParam, lParam);
-	}
-	else
-	{
-		// if we have to set the cursor, limit the frequency of the cursor being set
-		// because it's very heavy on the CPU
-		bool enable_cursor = *window_in_focus && !*unk_condition1;
-		// if the cursor is about to get disabled, reset the frqLimiter
-		// and allow the cursor to be disabled
-		if (!enable_cursor)
-		{
-			frqLimiter.Reset();
-		}
-
-		result = 1;
-
-		// ShouldUpdate also updates the state of the frqLimiter
-		if (frqLimiter.ShouldUpdate())
-		{
-			result = g_WndProc(hWnd, uMsg, wParam, lParam);
-		}
-	}
 
 	return result;
 }

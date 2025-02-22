@@ -25,45 +25,6 @@ int MasterHttpResponse(const char* url, const char* http_request, char** rtn_res
 
 void CreateDirTree(const wchar_t* path);
 
-class FrequencyLimiter
-{
-	using _time = std::chrono::high_resolution_clock;
-
-public:
-	FrequencyLimiter(unsigned int _frequency_per_sec) :
-		m_maxUpdateRateHz(_frequency_per_sec)
-	{
-		lastTime = _time::now();
-		m_maxUpdateRateMsec = std::chrono::milliseconds(int(1000.f / (float)m_maxUpdateRateHz));
-		m_initialUpdate = true;
-	}
-
-	bool ShouldUpdate()
-	{
-		bool result = m_initialUpdate
-			|| _time::now() - lastTime > m_maxUpdateRateMsec;
-
-		if (result)
-		{
-			m_initialUpdate = false;
-			lastTime = _time::now();
-		}
-
-		return result;
-	}
-
-	void Reset()
-	{
-		m_initialUpdate = true;
-	}
-
-private:
-	bool m_initialUpdate;
-	unsigned int m_maxUpdateRateHz;
-	std::chrono::milliseconds m_maxUpdateRateMsec;
-	_time::time_point lastTime;
-};
-
 // Copyright (C) 1986 Gary S. Brown.  You may use this program, or
 // code or tables extracted from it, as desired without restriction.
 typedef DWORD UNS_32_BITS;
