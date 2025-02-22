@@ -494,6 +494,11 @@ void c_cartographer_update_edit_list::set_status(e_cartographer_update_status st
 
 void c_cartographer_update_edit_list::update_updater_status()
 {
+	if (updater_has_up_to_date)
+	{
+		m_update_status = _cartographer_update_status_pending_check_for_update;
+	}
+
 	if (m_update_status < _cartographer_update_status_pending_download_update && updater_has_files_to_download)
 	{
 		m_update_status = _cartographer_update_status_pending_download_update;

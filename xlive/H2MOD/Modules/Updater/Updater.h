@@ -11,5 +11,6 @@ void GSDownloadCancel();
 
 extern bool updater_has_files_to_download;
 extern bool updater_has_files_to_install;
+extern bool updater_has_up_to_date;
 extern long long sizeOfDownload;
 extern long long sizeOfDownloaded;

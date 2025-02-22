@@ -792,16 +792,9 @@ static void h2mod_apply_tweaks(void)
 		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
 		NopFill(Memory::GetAddressRelative(0x66A092), 8);
 
-		// nop a call to SetCursor(), to improve the FPS framedrops when hovering the mouse around in the main menus or where the cursor is used, mainly when using mice that use 1000 polling rate
-		// it'll get called anyway by the D3D9Device::ShowCursor() API after
-		//NopFill(Memory::GetAddressRelative(0x48A99C), 8);
-
 		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
 		NopFill(Memory::GetAddressRelative(0x42FAB9), 8);
 		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
-
-		// don't mess with the cursor during loading screen
-		NopFill(Memory::GetAddressRelative(0x66BAEB), 5);
 
 		// disable symbol to emoji translation when dealing with player name
 		// works only in game for now, because the name in the pregame lobby uses c_text_widget
