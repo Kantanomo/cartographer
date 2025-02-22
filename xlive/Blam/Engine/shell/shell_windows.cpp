@@ -356,7 +356,7 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			g_custom_mouse_cursor_enabled = false;
 		}
 		exec_base_wndproc = false;
-		if (*shell_window_proc_game_message_during_map_load)
+		if (*window_in_focus && *shell_window_proc_game_message_during_map_load)
 		{
 			shell_disable_cursor();
 		}
