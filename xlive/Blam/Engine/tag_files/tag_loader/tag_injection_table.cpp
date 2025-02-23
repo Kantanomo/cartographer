@@ -3,7 +3,7 @@
 
 enum
 {
-	k_injection_table_entry_count_per_resize = 100
+	k_injection_table_entry_count_per_resize = 200
 };
 
 c_tag_injection_table::c_tag_injection_table(void)
@@ -102,6 +102,8 @@ bool c_tag_injection_table::has_entry_by_cache_index(datum datum_index) const
 	return false;
 }
 
+// todo: this breaks when resizing mid injection because there will be pointers in the stack to the old table
+// need to figure out a better way to do this maybe, for now just increased the size of the injection table..
 void c_tag_injection_table::resize_table()
 {
 	// Allocate new larger buffer

@@ -4,11 +4,14 @@
 #include "cache/cache_files.h"
 #include "game/game_globals.h"
 #include "interface/new_hud_definitions.h"
+#include "models/models.h"
+#include "models/render_model_definitions.h"
 #include "scenario/scenario.h"
 #include "shaders/shader_definitions.h"
 #include "sound/sound_classes.h"
 #include "structures/structure_bsp_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
+#include "units/biped_definitions.h"
 
 /* globals */
 
@@ -48,6 +51,8 @@ static void tag_fixes_split_screen_hud(void);
 // Change sound_classes data to equivalents in original halo 2
 static void sound_classes_fix_values(void);
 
+static void tag_fixes_elite_mp(void);
+
 /* public code */
 
 void main_tag_fixes(void)
@@ -60,6 +65,9 @@ void main_tag_fixes(void)
 	tag_fixes_misty_rain();
 	tag_fixes_split_screen_hud();
 	sound_classes_fix_values();
+
+	// disabled till z-fighting is fixed.
+	//tag_fixes_elite_mp();
 	return;
 }
 
@@ -210,6 +218,79 @@ static void tag_fixes_misty_rain(void)
 			}
 		}
 	}
+	return;
+}
+
+static void tag_fixes_elite_mp(void)
+{
+	const s_game_globals* game_globals = scenario_get_game_globals();
+	s_game_globals_player_representation* player_rep = game_globals->player_representation[_character_type_elite];
+	if (player_rep->third_person_unit.index != NONE)
+	{
+		const biped_definition* elite_biped = (biped_definition*)tag_get_fast(player_rep->third_person_unit.index);
+		if (elite_biped->object.model.index != NONE)
+		{
+			s_model_definition* elite_model = (s_model_definition*)tag_get_fast(elite_biped->object.model.index);
+
+			const static char* elite_shader_map[6]
+			{
+				"objects\\characters\\elite\\shaders\\head_mp",
+				"objects\\characters\\elite\\shaders\\helmet_mp",
+				"objects\\characters\\elite\\shaders\\arms_mp",
+				"objects\\characters\\elite\\shaders\\torso_mp",
+				"objects\\characters\\elite\\shaders\\legs_mp",
+				"objects\\characters\\elite\\shaders\\inset_lights_mp"
+			};
+
+			const static char* sp_elite_shader_map[6]
+			{
+				"objects\\characters\\elite\\shaders\\head",
+				"objects\\characters\\elite\\shaders\\helmet",
+				"objects\\characters\\elite\\shaders\\arms",
+				"objects\\characters\\elite\\shaders\\torso",
+				"objects\\characters\\elite\\shaders\\legs",
+				"objects\\characters\\elite\\shaders\\inset_lights"
+			};
+
+			render_model_definition* elite_render_model = (render_model_definition*)tag_get_fast(elite_model->render_model.index);
+
+			tag_injection_set_active_map(L"shared");
+			if (tag_injection_active_map_verified())
+			{
+				for (int32 index = 0; index < elite_render_model->materials.count; ++index)
+				{
+					geometry_material* material = elite_render_model->materials[index];
+
+					for (int32 k = 0; k < 6; ++k)
+					{
+						if (!_stricmp(tag_get_name(material->shader.index), elite_shader_map[k]))
+						{
+							datum new_shader = tag_loaded(_tag_group_shader, sp_elite_shader_map[k]);
+
+							if (new_shader != NONE)
+							{
+								material->shader.index = new_shader;
+								break;
+							}
+							else
+							{
+								new_shader = tag_injection_load(_tag_group_shader, sp_elite_shader_map[k], true);
+
+								if(new_shader != NONE)
+								{
+									material->shader.index = new_shader;
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				tag_injection_inject();
+			}
+		}
+	}
+
 	return;
 }
 
