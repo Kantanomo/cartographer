@@ -187,7 +187,7 @@ bool scenario_tags_load_process_shared_tags()
 		return false;
 
 	unmasked_tag_header->tag_group_link_set = (s_tag_group_link*)&unmasked_tag_header[1];
-	unmasked_tag_header->tag_instances = (cache_file_tag_instance*)(((char*)&unmasked_tag_header[1]) + 0xC * unmasked_tag_header->tag_group_link_set_count);
+	unmasked_tag_header->tag_instances = (cache_file_tag_instance*)(((char*)&unmasked_tag_header[1]) + sizeof(s_tag_group_link) * unmasked_tag_header->tag_group_link_set_count);
 
 	if(tag_header->tag_count >= FIRST_SHARED_TAG_INSTANCE_INDEX)
 	{

@@ -117,16 +117,16 @@ void c_xml_definition_block::allocate_buffers()
 
 #if TAG_INJECTION_DEBUG
 	if (this->m_tag_reference_count)
-		this->m_tag_reference_names = (c_static_string64*)malloc(sizeof(c_static_string64) * this->m_tag_reference_count);
+		this->m_tag_reference_names = new c_static_string<64>[this->m_tag_reference_count];
 
 	if (this->m_classless_tag_reference_count)
-		this->m_classless_tag_reference_names = (c_static_string64*)malloc(sizeof(c_static_string64) * this->m_classless_tag_reference_count);
+		this->m_classless_tag_reference_names = new c_static_string<64>[this->m_classless_tag_reference_count];
 
 	if (this->m_data_reference_count)
-		this->m_data_reference_names = (c_static_string64*)malloc(sizeof(c_static_string64) * this->m_data_reference_count);
+		this->m_data_reference_names = new c_static_string<64>[this->m_data_reference_count];
 
 	if (this->m_tag_block_count)
-		this->m_tag_block_names = (c_static_string64*)malloc(sizeof(c_static_string64) * this->m_tag_block_count);
+		this->m_tag_block_names = new c_static_string<64>[this->m_tag_block_count];
 #endif
 }
 
@@ -226,16 +226,16 @@ void c_xml_definition_block::clear()
 
 #if TAG_INJECTION_DEBUG
 	if (this->m_tag_reference_count)
-		free(this->m_tag_reference_names);
+		delete[] this->m_tag_reference_names;
 
 	if (this->m_classless_tag_reference_count)
-		free(this->m_classless_tag_reference_names);
+		delete[] this->m_classless_tag_reference_names;
 
-	if (this->m_tag_reference_count)
-		free(this->m_data_reference_names);
+	if (this->m_data_reference_count)
+		delete[] this->m_data_reference_names;
 
 	if (this->m_tag_block_count)
-		free(this->m_tag_reference_names);
+		delete[] this->m_tag_block_names;
 #endif
 
 	if (this->m_tag_block_count)
@@ -317,22 +317,22 @@ c_xml_definition_block* c_xml_definition_block::get_tag_block(uint32 index) cons
 
 #if TAG_INJECTION_DEBUG
 
-c_static_string64* c_xml_definition_block::get_tag_reference_name(uint32 index) const
+c_static_string<64>* c_xml_definition_block::get_tag_reference_name(uint32 index) const
 {
 	return &this->m_tag_reference_names[index];
 }
 
-c_static_string64* c_xml_definition_block::get_classless_tag_reference_name(uint32 index) const
+c_static_string<64>* c_xml_definition_block::get_classless_tag_reference_name(uint32 index) const
 {
 	return &this->m_classless_tag_reference_names[index];
 }
 
-c_static_string64* c_xml_definition_block::get_data_reference_name(uint32 index) const
+c_static_string<64>* c_xml_definition_block::get_data_reference_name(uint32 index) const
 {
 	return &this->m_data_reference_names[index];
 }
 
-c_static_string64* c_xml_definition_block::get_tag_block_name(uint32 index) const
+c_static_string<64>* c_xml_definition_block::get_tag_block_name(uint32 index) const
 {
 	return &this->m_tag_block_names[index];
 }

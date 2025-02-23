@@ -71,6 +71,11 @@ void c_xml_definition_loader::load_cache_info()
 
 	this->m_instance = instance;
 	this->m_file_offset = tag_data_start_offset + this->m_instance.data_offset - this->m_scenario_instance_offset;
+
+
+#if TAG_INJECTION_DEBUG
+	LOG_DEBUG_GAME("[c_xml_definition_loader::load_cache_info] instance class {} data-offset {:x} file-offset {:x}", this->m_instance.group_tag.string, this->m_instance.data_offset, this->m_file_offset);
+#endif
 }
 
 uint32 c_xml_definition_loader::resolve_cache_tag_data_offset(uint32 offset) const
@@ -199,6 +204,16 @@ void c_xml_definition_loader::initialize_arrays(void)
 		this->m_tag_references = lazy_malloc_buffer(datum, (this->m_tag_reference_offset_count + this->m_classless_tag_reference_offset_count));
 
 	this->m_data = (int8*)calloc(this->m_total_data_size, sizeof(int8));
+
+
+#if TAG_INJECTION_DEBUG
+	LOG_DEBUG_GAME("[c_xml_definition_loader::initialize_arrays] tag_r {} ctag_r {} dat_r {} str_id {} tblock {}", 
+		m_tag_reference_offset_count,
+		m_classless_tag_reference_offset_count,
+		m_data_reference_offset_count,
+		m_string_id_offset_count,
+		m_tag_block_offset_count);
+#endif
 	return;
 }
 

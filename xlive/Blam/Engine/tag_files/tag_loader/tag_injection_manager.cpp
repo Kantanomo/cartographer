@@ -13,6 +13,7 @@
 #include "physics/collision_model_definitions.h"
 #include "physics/physics_model_definitions.h"
 #include "render/weather_definitions.h"
+#include "scenario/scenario_definitions.h"
 #include "units/biped_definitions.h"
 #include "units/vehicle_definitions.h"
 
@@ -142,10 +143,20 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 
 	// Read the scenario instance from map file
 	cache_file_tag_instance temp_instance;
-	file_seek_and_read(this->m_active_map_file_handle, m_active_map_instance_table_offset, sizeof(cache_file_tag_instance), 1, &temp_instance);
 
-	this->m_active_map_scenario_instance_offset = temp_instance.data_offset;
+	
 
+	// fix for multiplayer shared cache type, where the tag table was intentionally made to be pushed farther down to prevent collisions.
+	if ((e_scenario_type)this->m_active_map_cache_header.type == scenario_type_multiplayer_shared)
+	{
+		// The hired gun special
+		this->m_active_map_scenario_instance_offset = this->m_active_map_cache_header.data_offset;
+	}
+	else
+	{
+		file_seek_and_read(this->m_active_map_file_handle, m_active_map_instance_table_offset, sizeof(cache_file_tag_instance), 1, &temp_instance);
+		this->m_active_map_scenario_instance_offset = temp_instance.data_offset;
+	}
 }
 
 bool c_tag_injecting_manager::get_active_map_verified() const
@@ -218,7 +229,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 	}
 
 #if TAG_INJECTION_DEBUG
-	c_static_string260 str;
+	c_static_string<MAX_PATH> str;
 	this->get_name_by_tag_datum(tag_info->group_tag.group, this->m_table.get_entry_by_injected_index(injected_index)->cache_index, str.get_buffer());
 	LOG_DEBUG_GAME("[c_tag_injecting_mananger::load_raw] loading {} index {:x}", str.get_string(), injected_index);
 #endif
@@ -348,9 +359,15 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 	int32 next_offset = 0;
 	uint32 current_size = 0;
 	char name_buffer[MAX_PATH] = {};
+	int32 start_index = 0;
 
-	for(int32 current_index = 0; current_index < this->m_active_map_cache_header.debug_tag_name_count; ++current_index)
+	// fix for multiplayer shared cache type, where the tag table was intentionally made to be pushed farther down to prevent collisions.
+	if ((e_scenario_type)this->m_active_map_cache_header.type == scenario_type_multiplayer_shared)
+		start_index = FIRST_SHARED_TAG_INSTANCE_INDEX;
+
+	for(int32 current_index = start_index; current_index < this->m_active_map_cache_header.debug_tag_name_count; ++current_index)
 	{
+
 		if (current_index + 1 != this->m_active_map_cache_header.debug_tag_name_count)
 		{
 			// Get the offset of the current index
@@ -556,7 +573,7 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, const char* tag_name,
 datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bool load_dependencies)
 {
 	if (this->m_table.has_entry_by_cache_index(cache_datum))
-		return NONE;
+		return this->m_table.get_entry_by_cache_index(cache_datum)->injected_index;
 
 	s_tag_injecting_table_entry* new_entry = this->m_table.init_entry(cache_datum, group);
 
@@ -596,6 +613,7 @@ void c_tag_injecting_manager::load_tag_internal(
 	bool load_dependencies)
 {
 	cache_file_tag_instance inst = manager->get_tag_instance_from_cache(cache_datum);
+
 	if (inst.tag_index != cache_datum || inst.group_tag.group != group.group)
 		return;
 
@@ -606,7 +624,7 @@ void c_tag_injecting_manager::load_tag_internal(
 		return;
 
 #if TAG_INJECTION_DEBUG
-	c_static_string260 name;
+	c_static_string<MAX_PATH> name;
 	manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
 
 	char tag_class[5];
@@ -632,6 +650,10 @@ void c_tag_injecting_manager::load_tag_internal(
 
 	if (load_dependencies)
 	{
+#if TAG_INJECTION_DEBUG
+		LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependencies for {} {}", name.get_string(), tag_class);
+#endif
+
 		c_tag_injecting_manager::load_dependencies(manager, new_entry);
 	}
 	return;
@@ -663,7 +685,7 @@ void c_tag_injecting_manager::inject_tags()
 		tag_class[2] = entry->type.string[1];
 		tag_class[3] = entry->type.string[0];
 		tag_class[4] = '\0';
-		c_static_string260 tag_name;
+		c_static_string<MAX_PATH> tag_name;
 		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
 		LOG_DEBUG_GAME("[table_dump]: cache_index: {:x} injected_index: {:x} type: {} tag_name: {}", entry->cache_index, entry->injected_index, tag_class, tag_name.get_string());
 	}
@@ -704,7 +726,7 @@ void c_tag_injecting_manager::inject_tags()
 		tag_class[3] = entry->type.string[0];
 		tag_class[4] = '\0';
 
-		c_static_string260 tag_name;
+		c_static_string<MAX_PATH> tag_name;
 		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
 
 		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {} datum: {:x}", tag_class, injection_offset, injection_instance->size, tag_name.get_string(), entry->injected_index);
