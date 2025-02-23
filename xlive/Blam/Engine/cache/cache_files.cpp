@@ -402,13 +402,13 @@ void tag_add_name(datum tag_index, const char* name)
 
 	int32 new_name_offset = cache_file_memory_globals->header.tag_name_buffer_size;
 
-	int32 string_length = csstrnlen(name, MAX_PATH);
+	int32 string_length = csstrnlen(name, MAX_PATH) + 1;
 
-	csstrnzcpy(&g_cache_file_debug_globals.debug_tag_name_buffer[new_name_offset], name, string_length + 1);
+	csstrnzcpy(&g_cache_file_debug_globals.debug_tag_name_buffer[new_name_offset], name, string_length);
 	g_cache_file_debug_globals.debug_tag_name_offsets[tag_name_index] = new_name_offset;
 
 	++cache_file_memory_globals->header.debug_tag_name_count;
-	cache_file_memory_globals->header.tag_name_buffer_size += string_length + 1;
+	cache_file_memory_globals->header.tag_name_buffer_size += string_length;
 }
 
 cache_file_tag_instance* tag_instance_get(datum tag_index)

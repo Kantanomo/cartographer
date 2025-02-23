@@ -745,11 +745,10 @@ void c_tag_injecting_manager::inject_tags()
 		if (entry->type.group == _tag_group_shader_template)
 			this->initialize_shader_template(entry->injected_index);
 
+		char tag_name[MAX_PATH];
+		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name);
 
-		c_static_string<MAX_PATH> tag_name;
-		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
-
-		tag_add_name(entry->injected_index, tag_name.get_buffer());
+		tag_add_name(entry->injected_index, tag_name);
 
 		this->m_injectable_used_size += entry->loaded_data->get_total_size();
 	}
