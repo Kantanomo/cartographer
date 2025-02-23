@@ -384,7 +384,7 @@ const char* tag_get_name(datum tag_index)
 
 	s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
 	ASSERT(g_cache_file_memory_globals->tags_loaded);
-	//ASSERT(IN_RANGE(tag_name_index, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1));
+	ASSERT(IN_RANGE(tag_name_index, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1));
 
 	int32 tag_name_offset = g_cache_file_debug_globals.debug_tag_name_offsets[tag_name_index];
 
