@@ -565,6 +565,7 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, const char* tag_name,
 #if TAG_INJECTION_DEBUG
 		LOG_DEBUG_GAME("[c_tag_injecting_mananger::load_tag] loading {} with depencies {} datum {}", tag_name, load_dependencies, cache_datum);
 #endif
+
 		return this->load_tag(group, cache_datum, load_dependencies);
 	}
 	return NONE;
@@ -647,6 +648,8 @@ void c_tag_injecting_manager::load_tag_internal(
 		&manager->m_active_map_tags_header,
 		manager->m_active_map_scenario_instance_offset,
 		cache_datum);
+
+	
 
 	if (load_dependencies)
 	{
@@ -741,6 +744,11 @@ void c_tag_injecting_manager::inject_tags()
 
 		if (entry->type.group == _tag_group_shader_template)
 			this->initialize_shader_template(entry->injected_index);
+
+		char tag_name[MAX_PATH];
+		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name);
+
+		tag_add_name(entry->injected_index, tag_name);
 
 		this->m_injectable_used_size += entry->loaded_data->get_total_size();
 	}
