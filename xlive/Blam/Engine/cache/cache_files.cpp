@@ -384,13 +384,31 @@ const char* tag_get_name(datum tag_index)
 
 	s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
 	ASSERT(g_cache_file_memory_globals->tags_loaded);
-	ASSERT(IN_RANGE(tag_name_index, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1));
+	//ASSERT(IN_RANGE(tag_name_index, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1));
 
 	int32 tag_name_offset = g_cache_file_debug_globals.debug_tag_name_offsets[tag_name_index];
 
 	ASSERT(IN_RANGE(tag_name_offset, 0, NUMBEROF(g_cache_file_debug_globals.debug_tag_name_buffer) - 1));
 
 	return &g_cache_file_debug_globals.debug_tag_name_buffer[tag_name_offset];
+}
+
+void tag_add_name(datum tag_index, const char* name)
+{
+	uint16 tag_name_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index);
+
+	s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
+	ASSERT(cache_file_memory_globals->tags_loaded);
+
+	int32 new_name_offset = cache_file_memory_globals->header.tag_name_buffer_size;
+
+	int32 string_length = csstrnlen(name, MAX_PATH);
+
+	csstrnzcpy(&g_cache_file_debug_globals.debug_tag_name_buffer[new_name_offset], name, string_length + 1);
+	g_cache_file_debug_globals.debug_tag_name_offsets[tag_name_index] = new_name_offset;
+
+	++cache_file_memory_globals->header.debug_tag_name_count;
+	cache_file_memory_globals->header.tag_name_buffer_size += string_length + 1;
 }
 
 cache_file_tag_instance* tag_instance_get(datum tag_index)

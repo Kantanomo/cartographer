@@ -180,4 +180,6 @@ datum tag_loaded(uint32 group_tag, const char* name);
 
 const char* tag_get_name(datum tag_name_index);
 
+void tag_add_name(datum tag_index, const char* name);
+
 cache_file_tag_instance* tag_instance_get(datum tag_index);
