@@ -61,7 +61,7 @@ void create_reports_path(c_static_wchar_string<MAX_PATH>* dump_path, c_static_wc
 	dump_path->set(k_initial_dump_path_wide);			// Create the folder initially in the C:\Temp folder and then move to our own folder
 	CreateDirectoryW(dump_path->get_string(), NULL);	// Make sure Temp exists
 
-	dump_path->append(L"crash_file_archive\\");			// Set path to our own folder for the report
+	dump_path->append(L"crash_file_archive");			// Set path to our own folder for the report
 	CreateDirectoryW(dump_path->get_string(), NULL);	// Make sure our specific report path exists
 
 	// Make sure the reports path that will have our text files exists
@@ -71,6 +71,7 @@ void create_reports_path(c_static_wchar_string<MAX_PATH>* dump_path, c_static_wc
 	CreateDirectoryW(reports_path.get_string(), NULL);
 
 	minidump_file_path->set(dump_path->get_string());
+	minidump_file_path->append(L"\\");
 	minidump_file_path->append(k_crash_minidump_file_name_wide);
 	return;
 }
@@ -166,7 +167,7 @@ void crash_archive_add_crash_report_files(zipFile zip_file)
 {
 	for (uint32 i = 0; i < k_report_text_file_type_count; i++)
 	{
-		const wchar_t* path = get_crash_info_text_file_path((e_report_file_type)i);
+		const wchar_t* path = g_report_text_file_paths[i].get_string();
 		utf8 utf8_path[MAX_PATH];
 		wchar_string_to_utf8_string(path, utf8_path, MAX_PATH);
 
@@ -186,6 +187,8 @@ void crash_archive_add_crash_report_files(zipFile zip_file)
 		}
 	}
 
+	// Cleanup paths
+	delete[] g_report_text_file_paths;
 	return;
 }
 

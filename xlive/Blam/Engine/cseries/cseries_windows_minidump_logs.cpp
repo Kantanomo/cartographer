@@ -12,11 +12,12 @@
 /* constants */
 
 #define k_crash_message_header_break L"=============================================\n"
+const wchar_t* k_reports_path = L"\\reports\\";
 const wchar_t *const k_report_text_file_names[k_report_text_file_type_count] = { L"exception_info.txt", L"cpu_info.txt", L"game_options.txt", L"game_globals.txt", L"rasterizer.txt"};
 
 // globals
 
-static c_static_wchar_string<MAX_PATH>* g_report_text_file_paths = { NULL };
+c_static_wchar_string<MAX_PATH>* g_report_text_file_paths = NULL;
 
 /* prototypes */
 
@@ -46,11 +47,6 @@ static bool minidump_info_verify_pointers(FILE* file, const MINIDUMP_EXCEPTION_I
 
 /* public code */
 
-const wchar_t* get_crash_info_text_file_path(e_report_file_type type)
-{
-    return g_report_text_file_paths[type].get_string();
-}
-
 void crash_info_text_files_create(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info)
 {
     g_report_text_file_paths = new c_static_wchar_string<MAX_PATH>[k_report_text_file_type_count]();
@@ -60,8 +56,6 @@ void crash_info_text_files_create(const wchar_t* reports_path, const MINIDUMP_EX
     setup_game_options_text(reports_path);
     setup_game_global_text(reports_path);
     setup_rasterizer_text(reports_path);
-
-    delete[] g_report_text_file_paths;
     return;
 }
 

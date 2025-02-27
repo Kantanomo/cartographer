@@ -114,18 +114,26 @@ void crash_window_message_create(const wchar_t* reports_path, const wchar_t* arc
         crash_window_set_text(reports_path, g_crash_message);
     }
 
+    // Have to use a new wchar buffer than the one passed:
+    // pFrom needs to be a double null terminated string in order for th`e SHFileOperationW call to work
+    wchar_t new_path[MAX_PATH + 1];
+    csmemset(new_path, 0, sizeof(new_path));
+    ustrncpy(new_path, reports_path, ustrnlen(reports_path, MAX_PATH) + 1);
+
     // Delete temp report path after we read the data
-    SHFILEOPSTRUCT file_op = {
-            NULL,
-            FO_DELETE,
-            reports_path,
-            L"",
-            FOF_NOCONFIRMATION |
-            FOF_NOERRORUI |
-            FOF_SILENT,
-            false,
-            0,
-            L"" };
+    SHFILEOPSTRUCT file_op =
+    {
+        NULL,
+        FO_DELETE,
+        new_path,
+        L"",
+        FOF_NOCONFIRMATION |
+        FOF_NOERRORUI |
+        FOF_SILENT,
+        false,
+        0,
+        L""
+    };
     int32 result = SHFileOperationW(&file_op);
     if (result)
     {
