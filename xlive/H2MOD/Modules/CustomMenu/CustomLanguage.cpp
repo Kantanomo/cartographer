@@ -2,6 +2,8 @@
 
 #include "main/game_preferences.h"
 
+#include "game/game.h"
+
 #include "CustomLanguage.h"
 #include "text/unicode.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -456,41 +458,32 @@ void setGameLanguage() {
 	*HasLoadedLanguage = true;
 }
 
-void* pfn_c00031b97 = NULL;
-
-char* __cdecl cave_c00031b97(char* result, int buff_len)//Font Table Filename Override
+char* __cdecl get_font_filename_hook(char* result, int32 buff_len) //Font Table Filename Override
 {
+	void* get_font_filename_usercall = Memory::GetAddress<void*>(0x00031b97);
+
+	__asm
+	{
+		mov esi, dword ptr [result]
+		mov eax, dword ptr [buff_len]
+		push eax
+		call get_font_filename_usercall
+		add esp, 4h
+	}
+
 	strcpy_s(result, buff_len, current_language->font_table_filename);
 	return result;
 }
 
 //__usercall - edi a1, stack a2
-__declspec(naked) char* nak_c00031b97()
+__declspec(naked) char* get_font_filename_to_cdecl()
 {
 	__asm {
-		push ebp
+		mov eax, [esp + 4]
+		push eax //buff_len
 		push edi
-		push esi
-		push ecx
-		push ebx
-
-		mov eax, [esp + 18h]
-		push eax//buff_len
-
-		push eax
-		call pfn_c00031b97
-		add esp, 4h
-
-		push eax//result
-		call cave_c00031b97
+		call get_font_filename_hook
 		add esp, 8h
-
-		pop ebx
-		pop ecx
-		pop esi
-		pop edi
-		pop ebp
-
 		retn
 	}
 }
@@ -508,10 +501,9 @@ void setCustomLanguage(int main, int variant) {
 	
 	setGameLanguage();
 
-	int GameGlobals = (int)*(int*)((char*)Memory::GetAddress() + 0x482D3C);
-	if (GameGlobals) {
-		BYTE& EngineMode = *(BYTE*)(GameGlobals + 0x8);
-		EngineMode = 1;
+	s_main_game_globals* game_globals = get_main_game_globals();
+	if (game_globals) {
+		game_globals->options.game_mode = _game_mode_campaign;
 		BYTE& QuitLevel = *(BYTE*)((char*)Memory::GetAddress() + 0x482251);
 		QuitLevel = 1;
 	}
@@ -527,7 +519,7 @@ void setCustomLanguage(int main, int variant) {
 
 	addDebugText("language_code = %dx%d", current_language_main, current_language_sub);
 
-	if (GameGlobals) {
+	if (game_globals) {
 		BYTE* LoadedFonts = (BYTE*)((char*)Memory::GetAddress() + 0x47e7c0);
 		*LoadedFonts = 0;
 		void*(*sub_31dff)() = (void*(*)())((char*)Memory::GetAddress() + 0x31dff);
@@ -622,9 +614,7 @@ void custom_language_initialize() {
 
 		pH2GetLabel = (H2GetLabel_t)DetourClassFunc((BYTE*)Memory::GetAddress() + 0x3defd, (BYTE*)H2GetLabel, 8);
 
-		//Hook the function that sets the font table filename.
-		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)Memory::GetAddress() + 0x00031b97);
-		PatchCall(Memory::GetAddress() + 0x00031e89, nak_c00031b97);
+		PatchCall(Memory::GetAddress() + 0x00031e89, get_font_filename_to_cdecl);
 
 		bool redoCapture = H2Config_custom_labels_capture_missing;
 		setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
