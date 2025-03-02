@@ -9,7 +9,6 @@
 #include "math/math.h"
 
 #include "H2MOD/Modules/Shell/H2MODShell.h"
-#include "H2MOD/Utils/Utils.h"
 
 /* globals */
 
