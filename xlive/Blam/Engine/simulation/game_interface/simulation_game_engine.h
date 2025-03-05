@@ -1,11 +1,23 @@
 #pragma once
 #include "simulation_game_entities.h"
 
+enum e_game_engine_state_data_flags
+{
+	_game_engine_state_data_flag_team_mapping_exists,
+	_game_engine_state_data_flag_current_state_exists,
+	_game_engine_state_data_flag_game_finished_exists,
+	_game_engine_state_data_flag_current_round_exists,
+	_game_engine_state_data_flag_round_timer_exists,
+
+	k_game_engine_state_data_flag_count,
+	k_game_engine_state_data_initial_update_mask = MASK(k_game_engine_state_data_flag_count)
+};
+
 struct s_game_engine_state_data
 {
 	uint16 initial_teams;
 	uint16 valid_designators;
-	uint16 vaid_teams;
+	uint16 valid_teams;
 	uint16 active_teams;
 	uint16 ever_active_teams;
 	int16 initial_team_count;
@@ -22,7 +34,7 @@ public:
 	virtual uint32 creation_data_size() override;
 	virtual int8 entity_replication_required_for_view_activation(s_simulation_game_entity* entity) override;
 	virtual int8 get_object_index(s_simulation_game_entity* entity) override;
-	virtual int32 sub_A9004D(int a1, int a2, DWORD a3) override;
+	virtual int32 sub_A9004D(int a2, DWORD a3) override;
 	virtual int8 creation_minimum_required_bits(s_simulation_game_entity* entity, void* a3, int32* minimum_required_bits) override;
 	virtual void write_creation_description_to_string(s_simulation_game_entity* entity, void* tel_data, int32 buffer_size, char* buffer) override;
 	virtual void entity_creation_encode(uint32 creation_data_size, void* creation_data, void* telemetry_data, c_bitstream* packet) override;

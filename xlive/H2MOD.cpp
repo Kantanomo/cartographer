@@ -759,8 +759,10 @@ static void h2mod_apply_hooks(void)
 		user_interface_networking_apply_patches();
 		multiplayer_variant_settings_interface_apply_patches();
 
-		WritePointer(Memory::GetAddress(0x1DAF49 + 1), g_simulation_slayer_engine_definition_ptr);
+		//WritePointer(Memory::GetAddress(0x1DAF49 + 1), g_simulation_slayer_engine_definition_ptr);
 		//WritePointer(Memory::GetAddress(0x4635B8), g_simulation_slayer_engine_definition_ptr);
+		//simulation_slayer_engine_globals_definition_apply_patches();
+		simulation_type_collection_apply_patches();
 	}
 	return;
 }

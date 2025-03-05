@@ -1,13 +1,19 @@
 #pragma once
 #include "simulation_game_engine.h"
 
-#define k_simulation_slayer_engine_entity_name "slayer-engine-globals"
+#define k_simulation_headhunter_entity_name "headhunter-engine-globals"
 
-struct s_slayer_engine_state_data : s_game_engine_state_data {};
+enum e_headhunter_engine_state_component_flags
+{
+	
+};
 
+struct s_headhunter_engine_state_data : s_game_engine_state_data
+{
+	
+};
 
-
-class c_simulation_slayer_engine_globals_definition : c_simulation_game_engine_definition
+class c_simulation_headhunter_engine_globals_definition : public c_simulation_game_engine_definition
 {
 public:
 	virtual e_simulation_entity_type entity_type() override;
@@ -23,7 +29,4 @@ public:
 	virtual void* build_object_creation_data(datum object_index, int32 creation_data_size, void* creation_data) override;
 };
 
-static c_simulation_slayer_engine_globals_definition g_simulation_slayer_engine_definition;
-static c_simulation_slayer_engine_globals_definition* g_simulation_slayer_engine_definition_ptr = &g_simulation_slayer_engine_definition;
-
-void simulation_slayer_engine_globals_definition_apply_patches();
+c_simulation_headhunter_engine_globals_definition* get_global_headhunter_engine_globals_definition();
