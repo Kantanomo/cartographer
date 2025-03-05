@@ -470,6 +470,11 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_shared_globals.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_parameter_setting.cpp" />
     <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_headhunter.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine_headhunter.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine_slayer.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_entity_update_encode_helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1943,6 +1948,12 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_variant_parameter_setting.h" />
     <ClInclude Include="Blam\Engine\interface\multiplayer_variant_interface_headhunter_strings.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_headhunter.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_globals.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_headhunter.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_slayer.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_entity_update_encode_helper.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

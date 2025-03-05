@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "main/game_preferences.h"
 #include "saved_games/game_variant.h"
 

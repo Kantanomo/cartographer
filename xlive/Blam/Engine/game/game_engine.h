@@ -112,6 +112,12 @@ enum e_multiplayer_event_sound_flags : int16
 
 /* structures */
 
+struct s_candy_monitor
+{
+	int32 object_index;
+	int32 counter;
+};
+
 struct s_game_engine_global_player_info
 {
 	bool valid;
@@ -138,20 +144,21 @@ struct s_game_engine_globals
 {
 	uint32 flags;
 	int16 team_flags;
-	uint16 field_6;
-	uint16 field_8;
+	uint16 initial_teams;
+	uint16 valid_designators;
 	uint16 team_bitmask;
-	uint16 field_C;
-	int16 field_E;
-	uint16 field_10;
-	uint16 field_12[8];
+	uint16 active_teams;
+	int16 ever_active_teams;
+	uint16 initial_team_count;
+	uint16 team_designators[8];
 	uint32 field_24;
 	uint32 field_28;
 	int32 player_entity_index[k_maximum_players];
-	int16 field_6C;
+	int16 current_state;
 	int16 round_index;
 	int16 field_72;
-	uint32 gap_74[28];
+	uint32 gap_74[27];
+	int8 round_timer;
 	real32 unk_local_player_hud_field[k_number_of_users];
 	uint8 field_F4;
 	uint8 pad_F5[4];
@@ -160,11 +167,10 @@ struct s_game_engine_globals
 	s_game_engine_global_player_info player_info[k_maximum_players];
 	uint32 ticks;
 	s_simulation_player_netdebug_data netdebug_data[k_maximum_players];
-	uint8 gap81C[1064];
-	int32 field_C44;
-	uint8 gap_C48[12];
-	int32 game_engine_index;
-	uint8 gapC58[132];
+	s_candy_monitor m_candy_monitors[100];
+	BYTE gap81C[280];
+	DWORD game_engine_index;
+	BYTE gapC58[132];
 };
 ASSERT_STRUCT_SIZE(s_game_engine_globals, 0xCDC);
 

@@ -5,6 +5,7 @@
 #include "game/game_time.h"
 #include "game/players.h"
 #include "render/render.h"
+#include "multiplayer_variant_interface_headhunter_strings.h"
 
 /* constants */
 
@@ -19,6 +20,7 @@ real32 g_motion_sensor_sweeper_accumulator = 0.f;
 
 void __cdecl motion_sensor_update_examine_nearby_players()
 {
+	auto a = &g_multiplayer_variant_interface_headhunter_max_heads_carried_strings;
 	INVOKE(0x22BAE6, 0, motion_sensor_update_examine_nearby_players);
 }
 

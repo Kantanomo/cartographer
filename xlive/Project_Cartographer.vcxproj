@@ -615,7 +615,7 @@
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_ctf.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_default.cpp" />
-    <ClCompile Include="Blam\Engine\game\game_engine_headhuntercpp.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_headhunter.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_juggernaut.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_king.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_oddball.cpp" />
@@ -1127,6 +1127,7 @@
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_action.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine_headhunter.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine_slayer.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_entities.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_events.cpp" />
@@ -1138,6 +1139,7 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_actors.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_encoding.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_entity_database.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_entity_update_encode_helper.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_event_handler.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_gamestate_entities.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_players.cpp" />
@@ -2263,6 +2265,7 @@
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_device_machines.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_globals.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_headhunter.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_player.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_slayer.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_entities.h" />
@@ -2282,6 +2285,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_actors.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_encoding.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_entity_database.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_entity_update_encode_helper.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_event_handler.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_gamestate_entities.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_players.h" />
