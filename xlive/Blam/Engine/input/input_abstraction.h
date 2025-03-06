@@ -11,7 +11,8 @@
 #define THUMBSTICK_POINT_TO_PERCENTAGE(_point) \
 	(((real32)_point / (real32)INT16_MAX) * 100.f)
 
-#define k_maximum_number_of_game_function_binds 8
+#define k_key_hold_threshold_msec 0xE9
+
 #define k_last_used_device_was_gamepad 1
 
 #define k_default_right_thumbstick_deadzone_axial_percentage_x THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
@@ -21,6 +22,8 @@
 #define k_default_right_thumbstick_deadzone_radial_percentage THUMBSTICK_POINT_TO_PERCENTAGE(THUMBSTICK_PERCENTAGE_TO_POINT(8))
 
 #define NUMBER_OF_GAMEPAD_STICKS 2
+
+#define MAX_BUTTONS_PER_CONTROL 8
 
 /* enums */
 
@@ -52,10 +55,10 @@ enum e_button_preset_types : int8
 
 enum e_custom_keyboard_preset_types : int8
 {
-	_custom_keyboard_preset_right_hold,
-	_custom_keyboard_preset_right_split,
-	_custom_keyboard_preset_left_hold,
-	_custom_keyboard_preset_left_split,
+	_custom_keyboard_preset_right_hold,	//default
+	_custom_keyboard_preset_right_split,//skirmish
+	_custom_keyboard_preset_left_hold,	//southpaw
+	_custom_keyboard_preset_left_split,	//southpaw_boxer
 	_custom_keyboard_preset_custom
 };
 
@@ -164,6 +167,30 @@ enum e_gamepad_buttons
 	NUMBER_OF_GAMEPAD_BUTTON_STRINGS = 0x18,
 };
 
+enum e_mouse_buttons
+{
+	_mouse_button_left = 0x0,
+	_mouse_button_middle = 0x1,
+	_mouse_button_right = 0x2,
+	_mouse_button_4 = 0x3,
+	_mouse_button_5 = 0x4,
+	_mouse_button_6 = 0x5,
+	_mouse_button_7 = 0x6,
+	_mouse_button_8 = 0x7,
+	NUMBER_OF_MOUSE_BUTTONS,
+
+
+	_mouse_delta_x_left = 0x8,
+	_mouse_delta_x_right = 0x9,
+	_mouse_delta_y_up = 0xA,
+	_mouse_delta_y_down = 0xB,
+	_mouse_delta_w_forward = 0xC,
+	_mouse_delta_w_back = 0xD,
+
+	NUMBER_OF_MOUSE_BUTTON_STRINGS = 0xE,
+};
+
+
 /* structures */
 
 struct s_input_button
@@ -174,10 +201,15 @@ struct s_input_button
 };
 ASSERT_STRUCT_SIZE(s_input_button, 0xC);
 
-struct c_input_control
+class c_input_control
 {
+public:
 	uint32 button_count;
-	s_input_button buttons[k_maximum_number_of_game_function_binds];
+	s_input_button buttons[MAX_BUTTONS_PER_CONTROL];
+
+	bool add_button(e_input_device_types device_type, uint32 keycode, uint32 held_time, bool return_value_handled);
+	bool remove_button(uint32 button_index);
+
 };
 ASSERT_STRUCT_SIZE(c_input_control, 0x64);
 
@@ -267,7 +299,7 @@ void __cdecl input_abstraction_get_controller_preferences(e_controller_index con
 void __cdecl input_abstraction_get_input_state(e_controller_index controller_index, s_game_input_state* state);
 void __cdecl input_abstraction_get_player_look_angular_velocity(e_controller_index controller_index, real_euler_angles2d* angular_velocity);
 void __cdecl input_abstraction_get_player_look_angular_velocity_for_mouse(e_controller_index controller_index, real_euler_angles2d* angular_velocity);
-void __cdecl input_abstraction_get_default_preferences(s_gamepad_input_preferences* out_preference, e_joystick_preset_types thumbstick_layout, e_button_preset_types button_preset_type, e_custom_keyboard_preset_types kb_layout);
+void __cdecl input_abstraction_get_default_preferences(s_gamepad_input_preferences* out_preference, e_joystick_preset_types thumbstick_layout, e_button_preset_types button_preset_type, e_custom_keyboard_preset_types kb_layout, int32 unused);
 void __cdecl input_abstraction_set_controller_settings_from_preferences(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings);
 void __cdecl input_abstraction_set_preferences_from_controller_settings(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings);
 void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller, real32 value);

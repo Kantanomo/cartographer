@@ -411,6 +411,7 @@ public:
 	void verify_and_load_from_layout(datum widget_tag, s_interface_expected_screen_layout* expected_layout);
 	void apply_new_representations_to_players(c_player_widget_representation* representations, int32 player_count);
 	void initialize_button_keys_text(bool add_new_child);
+	void set_list_arrows_widget(c_bitmap_widget* up_arrow, c_bitmap_widget* down_arrow);
 	void* get_screen_definition();
 	
 	

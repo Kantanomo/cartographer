@@ -89,6 +89,13 @@ void c_screen_widget::initialize_button_keys_text(bool add_new_child)
 	return INVOKE_TYPE(0x20FF73, 0x0, void(__thiscall*)(c_screen_widget*, bool), this, add_new_child);
 }
 
+void c_screen_widget::set_list_arrows_widget(c_bitmap_widget* up_arrow, c_bitmap_widget* down_arrow)
+{
+	//INVOKE_TYPE(0x20EF47, 0x0, void(__thiscall*)(c_screen_widget*, c_bitmap_widget*, c_bitmap_widget*), this, up_arrow, down_arrow);;
+	m_special_widgets[_special_widget_type_0] = (c_user_interface_widget*)up_arrow;
+	m_special_widgets[_special_widget_type_0] = (c_user_interface_widget*)down_arrow;
+}
+
 void* c_screen_widget::get_screen_definition()
 {
 	return INVOKE_TYPE(0x20E8A6, 0x0, void*(__thiscall*)(c_screen_widget*), this);

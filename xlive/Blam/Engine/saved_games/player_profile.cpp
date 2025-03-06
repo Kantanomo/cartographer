@@ -44,7 +44,7 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 		profile->input_preferences.controller_thumbstick_layout = _joystick_preset_default;
 	}
 	saved_game_player_profile_set_default_variant(&profile->variant);
-	input_abstraction_get_default_preferences(&input_preferences, _joystick_preset_default, _button_preset_default, _custom_keyboard_preset_right_hold);
+	input_abstraction_get_default_preferences(&input_preferences, _joystick_preset_default, _button_preset_default, _custom_keyboard_preset_right_hold, 0);
 	input_abstraction_set_controller_settings_from_preferences(&input_preferences, &profile->input_preferences);
 }
 
