@@ -293,20 +293,19 @@ static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wi
 
 	bool playCommand = false;
 	auto playCommandFind = k_commands_map.find(lower_command.get_string());
-	if (playCommandFind != k_commands_map.end()
-		&& playCommandFind->second == _kablam_command_play)
+	if (playCommandFind != k_commands_map.end() && playCommandFind->second == _kablam_command_play)
 		playCommand = true;
 
-	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, k_commands_map.find(lower_command.get_string())->second);
+	if (!playCommand && playCommandFind != k_commands_map.end())
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, k_commands_map.at(lower_command.get_string()));
 
 	void* result = p_kablam_command_handler(command_line_split_wide, split_count, a3);
 
 	// Temporary if statement to prevent double calling events,
 	// all server command functions will be hooked in the future and these executes will be removed.
 	
-	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, k_commands_map.find(lower_command.get_string())->second);
+	if (!playCommand && playCommandFind != k_commands_map.end())
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, k_commands_map.at(lower_command.get_string()));
 
 	return result;
 }
