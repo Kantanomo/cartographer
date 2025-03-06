@@ -27,23 +27,22 @@ enum e_saved_game_profile_input_preference_flags : uint32
 
 struct s_saved_game_profile_input_binds
 {
-	uint32 m_bind_count;
-	s_game_function_bind binds[5];
+	uint32 button_count;
+	s_input_button buttons[5];
 };
 
-#pragma pack(push, 1)
 struct s_saved_game_profile_input_preferences
 {
 	c_flags_no_init<e_saved_game_profile_input_preference_flags, uint32, k_saved_game_profile_input_preferences_count> flags;
-	int8 controller_button_layout;
-	int8 controller_thumbstick_layout;
+	e_button_preset_types controller_button_layout;
+	e_joystick_preset_types controller_thumbstick_layout;
 	int8 controller_sensitivity;
 	int8 mouse_sensitivity;
-	int8 data[4];
-	s_saved_game_profile_input_binds input_binds[57];
+	e_custom_keyboard_preset_types keyboard_preset_type;
+	int8 pad[3];
+	s_saved_game_profile_input_binds input_binds[NUMBER_OF_EXTENDED_CONTROL_BUTTONS];
 };
-#pragma pack(pop)
-
+ASSERT_STRUCT_SIZE(s_saved_game_profile_input_preferences, 3660);
 
 struct s_saved_game_player_profile
 {
@@ -62,7 +61,6 @@ ASSERT_STRUCT_SIZE(s_saved_game_player_profile, 4616);
 
 
 void __cdecl saved_game_player_profile_set_default_variant(void* saved_game_variant);
-void __cdecl saved_game_player_profile_set_input_preferences(s_gamepad_input_preferences* input_preferences, s_saved_game_profile_input_preferences* profile_input_preferences);
 
 void saved_game_player_profile_default_new(s_saved_game_player_profile* profile, int32 default_profile_type);
 bool saved_game_player_profile_read_file(uint32 enumerated_file_index, s_saved_game_player_profile* profile);
