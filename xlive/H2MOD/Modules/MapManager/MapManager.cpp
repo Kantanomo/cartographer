@@ -381,7 +381,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 		}
 
 		utf8 utf8_path[MAX_PATH * 2];
-		wchar_string_to_utf8_string(map_path.get_string(), utf8_path, NUMBEROF(utf8_path));
+		wchar_string_to_utf8_string(m_clientMapFilenameWide.c_str(), utf8_path, NUMBEROF(utf8_path));
 
 		char* url_encoded_map_filename = curl_easy_escape(curl, utf8_path, csstrnlen(utf8_path, NUMBEROF(utf8_path)));
 		url.append(url_encoded_map_filename);
