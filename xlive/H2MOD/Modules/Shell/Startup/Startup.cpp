@@ -47,6 +47,8 @@ h2log *console_log = nullptr;
 wchar_t g_h2_process_file_path[MAX_PATH];
 wchar_t g_h2_appdata_local_path[MAX_PATH];
 
+wchar_t* g_h2_config_path_override = NULL;
+
 void PostH2Config() {
 
 	wchar_t mutexName2[256];
@@ -318,6 +320,24 @@ void InitH2Startup() {
 
 	addDebugText(Memory::IsDedicatedServer() ? "Process is Dedi-Server" : "Process is Client");
 
+	// DO NOT FUCKING TOUCH THIS
+	if (ArgList != NULL)
+	{
+		for (int i = 0; i < ArgCnt; i++)
+		{
+			if (wcsstr(ArgList[i], L"-h2config=") != NULL)
+			{
+				if (wcslen(ArgList[i]) < 255)
+				{
+					int pfcbuflen = wcslen(ArgList[i] + 10) + 1;
+					g_h2_config_path_override = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
+					swprintf(g_h2_config_path_override, pfcbuflen, ArgList[i] + 10);
+				}
+			}
+		}
+	}
+	// END OF THE COMMENT ABOVE
+
 	InitH2Config();
 	PostH2Config();
 
@@ -377,5 +397,7 @@ void DeinitH2Startup() {
 	DeinitCustomLanguage();
 	DeinitH2Accounts();
 	DeinitH2Config();
+
+	free(g_h2_config_path_override);
 	return;
 }

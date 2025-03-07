@@ -213,7 +213,10 @@ void SaveH2Config() {
 	}
 
 	wchar_t fileConfigPath[MAX_PATH];
-	if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
+	if (g_h2_config_path_override != NULL) {
+		wcsncpy(fileConfigPath, g_h2_config_path_override, ARRAYSIZE(fileConfigPath));
+	}
+	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], g_h2_process_file_path, _Shell::GetInstanceId());
 	}
 	else {
@@ -545,26 +548,33 @@ void ReadH2Config() {
 	FILE* fileConfig = nullptr;
 	wchar_t fileConfigPath[1024];
 
-	do
-	{
-		wchar_t* checkFilePath = g_h2_process_file_path;
-		if (H2Config_isConfigFileAppDataLocal) {
-			checkFilePath = local;
-		}
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], checkFilePath, readInstanceIdFile);
-		addDebugText(L"Reading config: \"%ws\"", fileConfigPath);
+	if (g_h2_config_path_override != NULL) {
+		wcsncpy(fileConfigPath, g_h2_config_path_override, ARRAYSIZE(fileConfigPath));
+		addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
 		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
+	}
+	else
+	{
+		do
+		{
+			wchar_t* checkFilePath = g_h2_process_file_path;
+			if (H2Config_isConfigFileAppDataLocal) {
+				checkFilePath = local;
+			}
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], checkFilePath, readInstanceIdFile);
+			addDebugText(L"Reading config: \"%ws\"", fileConfigPath);
+			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
-		if (err) {
-			addDebugText("H2Configuration file does not exist, error code: 0x%x", err);
-		}
+			if (err) {
+				addDebugText("H2Configuration file does not exist, error code: 0x%x", err);
+			}
+			H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
+			if (err && !H2Config_isConfigFileAppDataLocal) {
+				--readInstanceIdFile;
+			}
+		} while (err && readInstanceIdFile > 0);
 		H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
-		if (err && !H2Config_isConfigFileAppDataLocal) {
-			--readInstanceIdFile;
-		}
-	} 
-	while (err && readInstanceIdFile > 0);
-	H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
+	}
 
 	if (err) {
 		addDebugText("ERROR: No H2Configuration files could be found!");
