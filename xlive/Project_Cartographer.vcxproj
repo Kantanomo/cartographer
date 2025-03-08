@@ -2630,6 +2630,7 @@
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_globals.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_headhunter.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_king.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_player.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_slayer.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_entities.h" />

@@ -334,9 +334,11 @@ struct s_game_engine_globals
 	uint32 ticks;
 	s_simulation_player_netdebug_data netdebug_data[k_maximum_players];
 	s_candy_monitor m_candy_monitors[100];
-	BYTE gap81C[280];
-	DWORD game_engine_index;
-	BYTE gapC58[132];
+	BYTE gapB3C[264];
+	int32 field_C44;
+	int8 gap_C45[0xC];
+	int32 game_engine_index;
+	int8 gapC58[132];
 };
 ASSERT_STRUCT_SIZE(s_game_engine_globals, 0xCDC);
 
