@@ -9,7 +9,7 @@
 bool game_engine_in_round()
 {
 	return current_game_engine() != NULL
-		&& game_engine_globals_get()->field_6C == 1
+		&& game_engine_globals_get()->current_state == 1
 		&& (game_is_predicted() || game_engine_globals_get()->field_C44 == 1);
 }
 

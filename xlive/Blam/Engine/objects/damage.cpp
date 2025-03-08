@@ -19,7 +19,7 @@ void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index,
 	bool prevent_guardian_glitch = false;
 
 	// Only run the patch if we're in multiplayer and friendly fire is off
-	if (game_is_multiplayer() && TEST_BIT(game_options_get()->game_variant.game_engine_flags, _game_engine_friendly_fire_bit) == 0)
+	if (game_is_multiplayer() && !game_options_get()->game_variant.game_engine_flags.test(_game_engine_friendly_fire_bit))
 	{
 		// Obtain the actor index so we can determine whether or not to disable damage
 		// If object is a unit then we can grab the actor index

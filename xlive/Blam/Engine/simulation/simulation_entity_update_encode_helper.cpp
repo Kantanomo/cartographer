@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "simulation_entity_update_encode_helper.h"
 
-bool c_entity_update_encode_helper::new_instance(c_bitstream* bitstream, uint32 required_leave_space_bits,	uint32 update_component_first_index, uint32 update_component_count, uint32 update_mask)
+bool c_entity_update_encode_helper::setup(c_bitstream* bitstream, uint32 required_leave_space_bits,	uint32 update_component_first_index, uint32 update_component_count, uint32 update_mask)
 {
 	this->m_update_considered_mask = 0;
 	this->m_update_written_mask = 0;

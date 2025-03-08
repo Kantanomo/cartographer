@@ -3,14 +3,19 @@
 
 #define k_simulation_headhunter_entity_name "headhunter-engine-globals"
 
-enum e_headhunter_engine_state_component_flags
+enum e_headhunter_engine_state_flags
 {
-	
+	_headhunter_engine_state_flag_bin_id_exists = 5,
+
+	k_headhunter_engine_state_data_flags_count = 1,
+	k_headhunter_engine_state_data_flags_total_count = k_headhunter_engine_state_data_flags_count + k_game_engine_state_data_flag_count,
+	k_headhunter_engine_state_data_initial_update_mask = MASK(k_headhunter_engine_state_data_flags_total_count),
+	k_headhunter_engine_state_data_flags_mask = FLAG(_headhunter_engine_state_flag_bin_id_exists)
 };
 
 struct s_headhunter_engine_state_data : s_game_engine_state_data
 {
-	
+	uint16 bin_id;
 };
 
 class c_simulation_headhunter_engine_globals_definition : public c_simulation_game_engine_definition

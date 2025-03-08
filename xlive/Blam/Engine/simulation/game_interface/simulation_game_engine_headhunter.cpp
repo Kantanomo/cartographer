@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "simulation_game_engine_headhunter.h"
 
+#include "simulation/simulation_entity_update_encode_helper.h"
+
 static c_simulation_headhunter_engine_globals_definition g_simulation_headhunter_engine_globals_definition;
 
 e_simulation_entity_type c_simulation_headhunter_engine_globals_definition::entity_type()
@@ -20,12 +22,12 @@ uint32 c_simulation_headhunter_engine_globals_definition::state_data_size()
 
 int32 c_simulation_headhunter_engine_globals_definition::update_flag_count()
 {
-	return k_game_engine_state_data_flag_count;
+	return k_headhunter_engine_state_data_flags_total_count;
 }
 
 uint32 c_simulation_headhunter_engine_globals_definition::initial_update_mask()
 {
-	return k_game_engine_state_data_initial_update_mask;
+	return k_headhunter_engine_state_data_initial_update_mask;
 }
 
 void c_simulation_headhunter_engine_globals_definition::calculate_update_relevance(int a1, void* update_data,
@@ -38,15 +40,69 @@ bool c_simulation_headhunter_engine_globals_definition::entity_update_encode(boo
 	uint32* update_mask_written, uint32 state_data_size, void* state_data, void* telemetry_data, c_bitstream* packet,
 	int32 required_leave_space_bits)
 {
-	return INVOKE_TYPE(0x201864, 0, bool(__thiscall*)(c_simulation_headhunter_engine_globals_definition*, bool, uint32, uint32*, uint32, void*, void*, c_bitstream*, int32),
-		this, a1, update_mask, update_mask_written, state_data_size, state_data, telemetry_data, packet, required_leave_space_bits);
+	if(!c_simulation_game_engine_definition::entity_update_encode(
+		a1, 
+		update_mask & k_game_engine_state_data_flags_mask, 
+		update_mask_written, 
+		state_data_size, 
+		state_data, 
+		telemetry_data, 
+		packet, 
+		required_leave_space_bits))
+	{
+		return false;
+	}
+
+	c_entity_update_encode_helper helper{};
+	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
+
+	if(!helper.setup(
+		packet, 
+		required_leave_space_bits, 
+		_headhunter_engine_state_flag_bin_id_exists, 
+		k_headhunter_engine_state_data_flags_count, 
+		update_mask & k_headhunter_engine_state_data_flags_mask))
+	{
+		return false;
+	}
+
+	if(helper.set_component_flag(_headhunter_engine_state_flag_bin_id_exists, "bin-id-exists"))
+	{
+		packet->write_integer("bin-id", game_state_data->bin_id, 4);
+	}
+	helper.commit();
+
+	helper.set_update_mask(update_mask_written);
+
+	return true;
+	//return INVOKE_TYPE(0x201864, 0, bool(__thiscall*)(c_simulation_headhunter_engine_globals_definition*, bool, uint32, uint32*, uint32, void*, void*, c_bitstream*, int32),
+	//	this, a1, update_mask, update_mask_written, state_data_size, state_data, telemetry_data, packet, required_leave_space_bits);
 }
 
 bool c_simulation_headhunter_engine_globals_definition::entity_update_decode(bool a1, uint32* out_update_mask,
 	uint32 state_data_size, void* state_data, c_bitstream* packet)
 {
-	return INVOKE_TYPE(0x201885, 0, bool(__thiscall*)(c_simulation_headhunter_engine_globals_definition*, bool, uint32*, uint32, void*, c_bitstream*),
-		this, a1, out_update_mask, state_data_size, state_data, packet);
+	if(!c_simulation_game_engine_definition::entity_update_decode(
+		a1, 
+		out_update_mask, 
+		state_data_size, 
+		state_data, 
+		packet))
+	{
+		return false;
+	}
+
+	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
+
+	if(packet->read_bool("bin-id-exists"))
+	{
+		game_state_data->bin_id = packet->read_integer("bin-id", 4);
+		*out_update_mask |= FLAG(_headhunter_engine_state_flag_bin_id_exists);
+	}
+
+	return true;
+	//return INVOKE_TYPE(0x201885, 0, bool(__thiscall*)(c_simulation_headhunter_engine_globals_definition*, bool, uint32*, uint32, void*, c_bitstream*),
+	//	this, a1, out_update_mask, state_data_size, state_data, packet);
 }
 
 bool c_simulation_headhunter_engine_globals_definition::entity_state_lossy_compare(void* a1, void* a2, int32 a3)
