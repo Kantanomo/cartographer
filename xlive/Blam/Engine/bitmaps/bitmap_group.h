@@ -183,6 +183,9 @@ enum e_bitmap_cache_usage : byte
 };
 
 #define MAXIMUM_BITMAPS_PER_BITMAP_GROUP 65536
+
+// force 4 byte alignment because (int64 frame_cached) causes it to become 8 byte aligned
+#pragma pack(push, 4)
 struct bitmap_data
 {
     char signature[4];
@@ -217,8 +220,7 @@ struct bitmap_data
     datum parent_bitmap_tag;        // References the parent bitmap tag this bitmap data is located in
     IDirect3DTexture9* d3dtexture;
     uint8* base_address;
-    int32 field_58;
-    int32 field_5C;
+    int64 frame_cached;
     int32 low_detail_offset;
     int32 low_detail_size;
     e_bitmap_data_format low_detail_format;
@@ -227,6 +229,7 @@ struct bitmap_data
     int16 low_detail_depth;
     int32* field_70;
 };
+#pragma pack(pop)
 ASSERT_STRUCT_SIZE(bitmap_data, 116);
 
 enum e_color_subsampling : byte
