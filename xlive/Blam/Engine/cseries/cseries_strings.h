@@ -1,6 +1,8 @@
 #pragma once
 #include "text/unicode.h"
 
+// TODO: delete and move contents to proper location
+
 #define MAXIMUM_STRING_SIZE 262144
 
 template<size_t string_length>
@@ -9,7 +11,7 @@ struct c_static_string
 public:
 	c_static_string(void)
 	{
-		text[0] = '\0';
+		m_string[0] = '\0';
 	}
 	
 	c_static_string(const char* string)
@@ -32,7 +34,7 @@ public:
 	bool is_equal(const char* string) const;
 
 private:
-	char text[string_length];
+	char m_string[string_length];
 };
 
 template<size_t string_length>
@@ -41,7 +43,7 @@ class c_static_wchar_string
 public:
 	c_static_wchar_string(void)
 	{
-		text[0] = L'\0';
+		m_string[0] = L'\0';
 	}
 
 	c_static_wchar_string(const wchar_t* string)
@@ -63,28 +65,29 @@ public:
 	int last_index_of(const wchar_t* src) const;
 	bool is_equal(const wchar_t* string) const;
 	errno_t to_lower(void);
+	wchar_t* print(wchar_t const* format, ...);
 
 private:
-	wchar_t text[string_length];
+	wchar_t m_string[string_length];
 };
 
 template<size_t T>
 inline const char* c_static_string<T>::get_string(void) const
 {
-	return this->text;
+	return this->m_string;
 }
 
 template<size_t T>
 inline char* c_static_string<T>::get_buffer(void)
 {
-	return this->text;
+	return this->m_string;
 }
 
 template<size_t T>
 inline char* c_static_string<T>::clear(void)
 {
-	this->text[0] = '\0';
-	return this->text;
+	this->m_string[0] = '\0';
+	return this->m_string;
 }
 
 template<size_t T>
@@ -164,26 +167,26 @@ int c_static_string<T>::last_index_of(const char* src) const
 template<size_t T>
 bool c_static_string<T>::is_equal(const char* string) const
 {
-	return !strncmp(text, string, T);
+	return !strncmp(m_string, string, T);
 }
 
 template<size_t T>
 inline const wchar_t* c_static_wchar_string<T>::get_string(void) const
 {
-	return this->text;
+	return this->m_string;
 }
 
 template<size_t T>
 inline wchar_t* c_static_wchar_string<T>::get_buffer(void)
 {
-	return this->text;
+	return this->m_string;
 }
 
 template<size_t T>
 inline wchar_t* c_static_wchar_string<T>::clear(void)
 {
-	this->text[0] = L'\0';
-	return this->text;
+	this->m_string[0] = L'\0';
+	return this->m_string;
 }
 
 template<size_t T>
@@ -263,13 +266,23 @@ int c_static_wchar_string<T>::last_index_of(const wchar_t* src) const
 template<size_t T>
 bool c_static_wchar_string<T>::is_equal(const wchar_t* string) const
 {
-	return !ustrncmp(text, string, T);
+	return !ustrncmp(m_string, string, T);
 }
 
 template<size_t T>
 errno_t c_static_wchar_string<T>::to_lower(void)
 {
-	return _wcslwr_s(text, T);
+	return _wcslwr_s(m_string, T);
+}
+
+template<size_t T>
+wchar_t* c_static_wchar_string<T>::print(const wchar_t *const format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	ASSERT(format);
+	uvsnprintf(this->m_string, 512, format, args);
+	return this->m_string;
 }
 
 size_t csstrnlen(const char* s, size_t size);

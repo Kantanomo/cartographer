@@ -25,3 +25,5 @@ void __cdecl utf8_string_to_wchar_string(const utf8* src, wchar_t* dst, int32 bu
 
 // Returns length (in characters) of utf8 string
 size_t utf8_string_length(const utf8* src, size_t size);
+
+int32 uvsnprintf(wchar_t* string, size_t size, const wchar_t* format, char* ap);

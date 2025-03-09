@@ -61,3 +61,11 @@ size_t utf8_string_length(const utf8* src, size_t size)
 {
 	return MultiByteToWideChar(CP_UTF8, 0, src, size, NULL, 0);
 }
+
+int32 uvsnprintf(wchar_t* string, size_t size, const wchar_t* format, char* ap)
+{
+	ASSERT(string && format);
+	ASSERT(size > 0);
+	
+	return (int32)_vsnwprintf_s(string, size - 1, UINT_MAX, format, ap);
+}
