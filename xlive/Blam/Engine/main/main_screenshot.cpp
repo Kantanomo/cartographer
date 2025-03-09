@@ -139,7 +139,7 @@ bool __cdecl screenshot_render(window_bound* window)
 			
 			bitmap_data* bitmap_0;
 			bitmap_data* bitmap_1;
-			bitmap_data* bitmap_secondary;
+			bitmap_data* bitmap_secondary = NULL;
 
 			if (screenshot_globals->capture_cubemap)
 			{
@@ -227,7 +227,7 @@ bool __cdecl screenshot_render(window_bound* window)
 					file_create_parent_directories_if_not_present(&file_reference_depth);
 				}
 
-				void* tiff_data;
+				void* tiff_data = NULL;
 				if (tiled && !screenshot_globals->save_as_tga)
 				{
 					tiff_export_begin_tiled(&file_reference_normal,

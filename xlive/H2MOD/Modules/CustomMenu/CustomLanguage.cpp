@@ -183,8 +183,8 @@ bool read_custom_labels() {
 						int lang_base = -1;
 						int lang_variant = -1;
 						bool other = false;
-						char* name;
-						char* fontFilename;
+						char* name = NULL;
+						char* fontFilename = NULL;
 						int ele_end = -1;
 						int ele_start = -1;
 						int ele_id = -2;
@@ -274,9 +274,16 @@ bool read_custom_labels() {
 							}
 						}
 
-						if (free_building) {
-							free(name);
-							free(fontFilename);
+						if (free_building)
+						{
+							if (name)
+							{
+								free(name);
+							}
+							if (fontFilename)
+							{
+								free(fontFilename);
+							}
 						}
 					}
 				}
