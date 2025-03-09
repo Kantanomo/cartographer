@@ -413,6 +413,11 @@ public:
 		return m_session_membership.player_count;
 	}
 
+	uint64 get_player_id(datum player_index)
+	{
+		return get_player_membership(player_index)->identifier;
+	}
+
 	const wchar_t* get_player_name(datum player_index)
 	{
 		return get_player_membership(player_index)->properties[0].player_name;

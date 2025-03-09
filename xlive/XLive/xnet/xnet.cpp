@@ -148,7 +148,7 @@ int WINAPI XNetGetSystemLinkPort(WORD* pwSystemLinkPort)
 // #84: XNetSetSystemLinkPort
 DWORD WINAPI XNetSetSystemLinkPort(WORD wSystemLinkPort)
 {
-	LOG_TRACE_NETWORK("XNetSetSystemLinkPort  (a1 = {:x})", ntohs(wSystemLinkPort));
+	LOG_TRACE_NETWORK("XNetSetSystemLinkPort  (a1 = {})", ntohs(wSystemLinkPort));
 
 	if (wSystemLinkPort == 0)
 	{

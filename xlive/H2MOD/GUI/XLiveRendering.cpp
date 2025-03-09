@@ -11,7 +11,6 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 
 
-
 extern void initialize_instance();
 extern LRESULT IMGUI_IMPL_API ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -19,8 +18,6 @@ bool doDrawIMGUI = false;
 
 HWND H2hWnd;
 D3DPRESENT_PARAMETERS g_d3dPresentParameters;
-
-IDirect3DTexture9* Primitive = NULL;
 
 char g_cartographer_build_text[256] = {};
 

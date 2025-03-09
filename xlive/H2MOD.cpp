@@ -932,12 +932,12 @@ static void __stdcall biped_ground_mode_update_hook(
 	void* a4,
 	int32 a5)
 {
-	const real32 edge_drop_value = 0.117f;
+	const real32 k_edge_drop_value = 0.117f;
 
 	typedef void(__thiscall* biped_ground_mode_update_t)(void*, void*, void*, void*, int32, real32);
 	auto p_biped_ground_mode_update = Memory::GetAddress<biped_ground_mode_update_t>(0x1067F0, 0xF8B10);
 
-	float edge_drop_per_tick = 30.f * edge_drop_value * game_tick_length();
+	real32 edge_drop_per_tick = 30.f * k_edge_drop_value * game_tick_length();
 
 	// push last parameter despite the function taking just 5 parameters
 	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edge_drop_per_tick);

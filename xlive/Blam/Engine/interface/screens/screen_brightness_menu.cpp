@@ -20,7 +20,7 @@ void* __cdecl c_brightness_menu::open_brightness_menu(s_screen_parameters* param
 	c_brightness_menu* ui_buffer = (c_brightness_menu*)ui_pool_allocate_space(sizeof(c_brightness_menu), 0);
 
 	if (ui_buffer) {
-		brightness_menu = new (ui_buffer) c_brightness_menu(parameters->m_channel_type, parameters->m_window_index, parameters->user_flags); // manually call the constructor
+		brightness_menu = new (ui_buffer) c_brightness_menu(parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
 		brightness_menu->m_allocated = true;
 	}
 

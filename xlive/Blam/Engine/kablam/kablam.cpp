@@ -12,7 +12,7 @@
 /* typedefs */
 
 typedef void* (__cdecl* dedi_command_t)(wchar_t** a1, int32 a2, bool a3);
-typedef int32(__cdecl* kablam_vip_add_t)(LPCWSTR gamer_tag);
+typedef int32(__cdecl* kablam_vip_add_t)(const wchar_t* player_name);
 typedef int32(__cdecl* kablam_vip_clear_t)();
 typedef int(__cdecl* hookServ1_t)(HKEY, LPCWSTR);
 typedef bool(__cdecl kablam_command_play_t)(wchar_t* playlist_file_path, int32 a2);
@@ -71,7 +71,7 @@ static int server_console_log_to_dedicated_server_console(const char* fmt, ...);
 
 static void server_console_send_command(wchar_t** command, int32 split_commands_size, bool a3);
 
-static void server_console_add_vip(std::wstring gamerTag);
+static void server_console_add_vip(const wchar_t* player_name);
 
 static void server_console_clear_vip(void);
 
@@ -107,22 +107,28 @@ void kablam_apply_patches(void)
 
 static void vip_lock(e_game_life_cycle state)
 {
-	if (state == _life_cycle_post_game)
+	c_network_session* session;
+
+	if (network_life_cycle_in_squad_session(&session))
 	{
-		server_console_clear_vip();
-		*Memory::GetAddress<byte*>(0, 0x534850) = 0;
-	}
-	if (state == _life_cycle_in_game)
-	{
-		for (int i = 0; i < k_maximum_players; i++)
+		if (state == _life_cycle_post_game)
 		{
-			if (NetworkSession::PlayerIsActive(i))
-			{
-				server_console_add_vip(NetworkSession::GetPlayerName(i));
-			}
+			server_console_clear_vip();
+			session->m_session_parameters.party_privacy = 0;
 		}
-		*Memory::GetAddress<byte*>(0, 0x534850) = 2;
+		if (state == _life_cycle_in_game)
+		{
+			for (int32 i = 0; i < k_maximum_players; i++)
+			{
+				if (NetworkSession::PlayerIsActive(i))
+				{
+					server_console_add_vip(NetworkSession::GetPlayerName(i));
+				}
+			}
+			session->m_session_parameters.party_privacy = 2;
+		}
 	}
+	
 	return;
 }
 
@@ -130,7 +136,7 @@ static int __cdecl dedi_registry_hook(HKEY hKey, LPCWSTR lpSubKey)
 {
 	char result = p_hookServ1(hKey, lpSubKey);
 	addDebugText("Post Server Registry Read.");
-	if (strlen(H2Config_dedi_server_playlist) > 0)
+	if (csstrnlen(H2Config_dedi_server_playlist, 256) > 0)
 	{
 		wchar_t* ServerPlaylist = Memory::GetAddress<wchar_t*>(0, 0x3B3704);
 		swprintf(ServerPlaylist, 256, L"%hs", H2Config_dedi_server_playlist);
@@ -407,9 +413,9 @@ static void server_console_send_command(wchar_t** command, int32 split_commands_
 	return;
 }
 
-static void server_console_add_vip(std::wstring gamerTag)
+static void server_console_add_vip(const wchar_t* player_name)
 {
-	p_kablam_vip_add(gamerTag.c_str());
+	p_kablam_vip_add(player_name);
 	return;
 }
 
@@ -431,10 +437,10 @@ static void server_console_send_msg(const wchar_t* message, bool timeout)
 	if (should_execute) {
 
 		// first we construct kablam_command_send_msg, by manually passing the vtable pointer, and the message to be copied
-		c_kablam_command_send_msg sendMsgCommand(message);
+		c_kablam_command_send_msg send_message(message);
 
 		// send the message
-		sendMsgCommand.execute();
+		send_message.execute();
 	}
 	return;
 }

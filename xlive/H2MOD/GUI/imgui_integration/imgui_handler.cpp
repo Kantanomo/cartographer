@@ -2,6 +2,7 @@
 #include "imgui_handler.h"
 
 #include "game/player_control.h"
+#include "interface/user_interface_guide.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "imgui.h"
@@ -88,8 +89,8 @@ namespace ImGuiHandler
 
 	void SetGameInputState(bool enable)
 	{
-		// TODO move this function somewhere else
-		*Memory::GetAddress<bool*>(0x9712C8 + 4) = !enable;
+		// ### TODO move this function somewhere else
+		user_interface_guide_state_manager_get()->m_block_game_input = !enable;
 	}
 
 	void DrawImgui()

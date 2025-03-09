@@ -25,6 +25,14 @@ int MasterHttpResponse(const char* url, const char* http_request, char** rtn_res
 
 void CreateDirTree(const wchar_t* path);
 
+inline std::string str_tolower(std::string s)
+{
+	std::transform(s.begin(), s.end(), s.begin(),
+		[](unsigned char c) { return std::tolower(c); }
+	);
+	return s;
+}
+
 // Copyright (C) 1986 Gary S. Brown.  You may use this program, or
 // code or tables extracted from it, as desired without restriction.
 typedef DWORD UNS_32_BITS;

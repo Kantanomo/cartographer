@@ -15,13 +15,13 @@ class c_user_interface_guide_state_manager
 {
 public:
 	HANDLE m_xnotify_listener;
-	bool m_unk_bool_4;
+	bool m_block_game_input;
 	char m_pad_5[3];
 	XUSER_SIGNIN_STATE m_sign_in_state;
 	char m_field_C;
-	bool m_unk_bool_D;
+	bool m_field_D;
 	char m_pad_E;
-	bool m_unk_bool_F;
+	bool m_field_F;
 	bool m_strings_initialized;
 	XSESSION_INFO m_xsession_info;
 	bool m_from_game_invite;
@@ -30,12 +30,12 @@ public:
 	void* m_callback_task;
 	uint8 gap_64[1160];
 	s_user_interface_guide_state_manager_string m_strings[4];
-	char m_gap_5DC[12];
+	char gap_5DC[12];
 	XOVERLAPPED m_xoverlapped;
 	int m_field_604;
-	bool m_unk_bool_608;
-	bool m_unk_bool_609;
-	char m_pad_609[6];
+	bool m_field_608;
+	bool m_field_609;
+	char gap_609[6];
 
 	void add_user_signin_task(bool sign_to_live, void* signin_callback);
 };

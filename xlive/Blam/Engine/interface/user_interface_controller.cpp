@@ -386,7 +386,6 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 				format,
 				guest_no,
 				guide->m_gamertag);
-
 		}
 		else
 		{
@@ -394,7 +393,6 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 				NUMBEROF(controller->player_name),
 				L"%hs",
 				guide->m_gamertag);
-
 		}
 
 		//todo move this out of here and figure out why the guide live signin fails to set the bit

@@ -1,4 +1,7 @@
 #pragma once
+
+#include "H2MOD/Utils/Utils.h"
+
 extern std::string empty;
 
 /// Command Variable
@@ -87,14 +90,12 @@ public:
 	static bool ToBoolean(const std::string& str)
 	{
 		bool result = false;
-		if (str != "true"
-			&& str != "false"
-			&& str != "1"
-			&& str != "0"
+		if (str_tolower(str) != "true"
+			&& str_tolower(str) != "false"
 			)
 			throw std::runtime_error("error: invalid boolean format (must be true/false)");
 		else
-			result = str == "true" ? true : false;
+			result = str_tolower(str) == "true" ? true : false;
 
 		return result;
 	}

@@ -108,22 +108,22 @@ IN_ADDR NetworkSession::GetLocalNetworkAddress()
 
 int32 NetworkSession::GetPeerIndex(datum player_index)
 {
-	return GetPlayerInformation(player_index)->peer_index;
+	return GetActiveNetworkSession()->get_player_membership(player_index)->peer_index;
 }
 
 int32 NetworkSession::GetPlayerCount()
 {
-	return GetActiveNetworkSession()->m_session_membership.player_count;
+	return GetActiveNetworkSession()->get_player_count();
 }
 
 s_membership_player* NetworkSession::GetPlayerInformation(datum player_index)
 {
-	return &GetActiveNetworkSession()->m_session_membership.players[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)];
+	return GetActiveNetworkSession()->get_player_membership(player_index);
 }
 
 const wchar_t* NetworkSession::GetPlayerName(datum player_index)
 {
-	return GetPlayerInformation(player_index)->properties[0].player_name;
+	return GetActiveNetworkSession()->get_player_name(player_index);
 }
 
 uint64 NetworkSession::GetPlayerId(datum player_index)

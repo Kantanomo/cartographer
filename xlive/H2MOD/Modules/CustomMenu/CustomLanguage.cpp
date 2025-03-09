@@ -1,16 +1,16 @@
 #include "stdafx.h"
 
-#include "main/game_preferences.h"
-
-#include "game/game.h"
-
 #include "CustomLanguage.h"
+
+#include "main/game_preferences.h"
+#include "game/game.h"
 #include "text/unicode.h"
+#include "text/font_group.h"
+
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Utils/Utils.h"
-
 
 
 // ### TODO remove this code off the face of the earth
@@ -522,8 +522,7 @@ void setCustomLanguage(int main, int variant) {
 	if (game_globals) {
 		BYTE* LoadedFonts = (BYTE*)((char*)Memory::GetAddress() + 0x47e7c0);
 		*LoadedFonts = 0;
-		void*(*sub_31dff)() = (void*(*)())((char*)Memory::GetAddress() + 0x31dff);
-		sub_31dff();
+		font_initialize();
 	}
 	if (current_language_isGarbage) {
 		delete_custom_language(old_language);
