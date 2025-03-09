@@ -387,7 +387,7 @@ protected:
 	c_normal_text_widget m_screen_button_key_text;
 	int16 m_pane_index;
 	bool field_9FA;
-	bool field_9FB;
+	int8 field_9FB;
 	bool m_disable_overlay_effect;
 	bool field_9FD;
 	bool field_9FE;

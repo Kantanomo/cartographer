@@ -50,7 +50,9 @@ enum e_button_preset_types : int8
 	_button_preset_south_paw,
 	_button_preset_boxer,
 	_button_preset_green_thumb,
-	_button_preset_unused4
+	//_button_preset_unused4,
+	_button_preset_jumpy,
+	_button_preset_unused5,
 };
 
 enum e_custom_keyboard_preset_types : int8

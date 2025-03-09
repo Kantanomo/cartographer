@@ -143,7 +143,7 @@ void __cdecl input_abstraction_get_default_preferences(s_gamepad_input_preferenc
 
 	//--- gamepad input settings --- //
 
-	if (thumbstick_layout != _joystick_preset_unused4 && button_preset_type != _button_preset_unused4)
+	if (thumbstick_layout != _joystick_preset_unused4 && button_preset_type != _button_preset_unused5)
 	{
 		//add baseline controls		
 		preference->game_controls_to_hardware[_button_start].add_button(_input_device_type_gamepad, _gamepad_binary_button_start, 0, 0);
@@ -296,6 +296,41 @@ void __cdecl input_abstraction_get_default_preferences(s_gamepad_input_preferenc
 			preference->game_controls_to_hardware[_button_dual_wield_primary_fire].add_button(_input_device_type_gamepad, _gamepad_analog_button_right_trigger, 0, 0);
 			preference->game_controls_to_hardware[_button_vehicle_primary_fire].add_button(_input_device_type_gamepad, _gamepad_analog_button_right_trigger, 0, 0);
 			preference->game_controls_to_hardware[_button_scope_zoom].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, 0, 0);
+			preference->game_controls_to_hardware[_button_dual_wield_secondary_fire].add_button(_input_device_type_gamepad, _gamepad_analog_button_left_trigger, 0, 0);
+			preference->game_controls_to_hardware[_button_vehicle_secondary_fire].add_button(_input_device_type_gamepad, _gamepad_analog_button_left_trigger, 0, 0);
+			break;
+		case _button_preset_jumpy:
+			preference->game_controls_to_hardware[_button_jump].add_button(_input_device_type_gamepad, _gamepad_binary_button_left_shoulder, 0, 0);			
+			preference->game_controls_to_hardware[_button_trick].add_button(_input_device_type_gamepad, _gamepad_binary_button_left_shoulder, 0, 0);
+			preference->game_controls_to_hardware[_button_brake].add_button(_input_device_type_gamepad, _gamepad_binary_button_left_shoulder, 0, 0);
+			preference->game_controls_to_hardware[_button_switch_grenade].add_button(_input_device_type_gamepad, _gamepad_binary_button_dpad_right, 0, 0);
+			preference->game_controls_to_hardware[_button_flip_vehicle].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, 0, 0);
+			preference->game_controls_to_hardware[_button_reload].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, 0, 0);
+			preference->game_controls_to_hardware[_button_exit_vehicle].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, 0, 0);
+			preference->game_controls_to_hardware[_button_touch_device].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, k_key_hold_threshold_msec, 0);
+			preference->game_controls_to_hardware[_button_enter_vehicle].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, k_key_hold_threshold_msec, 0);
+			preference->game_controls_to_hardware[_button_board_vehicle].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, k_key_hold_threshold_msec, 0);
+			preference->game_controls_to_hardware[_button_evict_from_vehicle].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, k_key_hold_threshold_msec, 0);
+			preference->game_controls_to_hardware[_button_trade_weapon].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, k_key_hold_threshold_msec, 0);
+			preference->game_controls_to_hardware[_button_pick_up_primary_weapon].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, k_key_hold_threshold_msec, 0);
+			preference->game_controls_to_hardware[_button_pick_up_primary_multiplayer_weapon].add_button(_input_device_type_gamepad, _gamepad_binary_button_b, k_key_hold_threshold_msec, 0);
+			preference->game_controls_to_hardware[_button_put_away_secondary_weapon].add_button(_input_device_type_gamepad, _gamepad_binary_button_y, 0, 0);
+			preference->game_controls_to_hardware[_button_put_away_or_drop_secondary_weapon].add_button(_input_device_type_gamepad, _gamepad_binary_button_y, 0, 0);
+			preference->game_controls_to_hardware[_button_switch_weapon].add_button(_input_device_type_gamepad, _gamepad_binary_button_y, 0, 0);
+			preference->game_controls_to_hardware[_button_pick_up_secondary_weapon].add_button(_input_device_type_gamepad, _gamepad_binary_button_a, k_key_hold_threshold_msec, 0);
+			preference->game_controls_to_hardware[_button_pick_up_secondary_multiplayer_weapon].add_button(_input_device_type_gamepad, _gamepad_binary_button_a, k_key_hold_threshold_msec, 0);
+			preference->game_controls_to_hardware[_button_team_voice].add_button(_input_device_type_gamepad, _gamepad_binary_button_dpad_up, 0, 0);
+			preference->game_controls_to_hardware[_button_flashlight].add_button(_input_device_type_gamepad, _gamepad_binary_button_dpad_up, 0, 0);
+
+
+			preference->game_controls_to_hardware[_button_melee_attack].add_button(_input_device_type_gamepad, _gamepad_binary_button_right_shoulder, 0, 0);
+			preference->game_controls_to_hardware[_button_throw_grenade].add_button(_input_device_type_gamepad, _gamepad_analog_button_left_trigger, 0, 0);
+			preference->game_controls_to_hardware[_button_speed_boost].add_button(_input_device_type_gamepad, _gamepad_analog_button_left_trigger, 0, 0);
+			preference->game_controls_to_hardware[_button_e_brake].add_button(_input_device_type_gamepad, _gamepad_analog_button_left_trigger, 0, 0);
+			preference->game_controls_to_hardware[_button_fire].add_button(_input_device_type_gamepad, _gamepad_analog_button_right_trigger, 0, 0);
+			preference->game_controls_to_hardware[_button_dual_wield_primary_fire].add_button(_input_device_type_gamepad, _gamepad_analog_button_right_trigger, 0, 0);
+			preference->game_controls_to_hardware[_button_vehicle_primary_fire].add_button(_input_device_type_gamepad, _gamepad_analog_button_right_trigger, 0, 0);
+			preference->game_controls_to_hardware[_button_scope_zoom].add_button(_input_device_type_gamepad, _gamepad_binary_button_right_thumb, 0, 0);
 			preference->game_controls_to_hardware[_button_dual_wield_secondary_fire].add_button(_input_device_type_gamepad, _gamepad_analog_button_left_trigger, 0, 0);
 			preference->game_controls_to_hardware[_button_vehicle_secondary_fire].add_button(_input_device_type_gamepad, _gamepad_analog_button_left_trigger, 0, 0);
 			break;

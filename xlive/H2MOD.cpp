@@ -483,6 +483,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 		if (!Memory::IsDedicatedServer())
 		{
 			hud_patches_on_map_load();
+			screens_apply_patches_on_mp_map_load();
 			main_tag_fixes();
 			hud_draw_on_map_load();
 		}

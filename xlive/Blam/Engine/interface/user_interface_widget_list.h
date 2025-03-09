@@ -43,7 +43,7 @@ protected:
 	uint16 m_up_arrow_transition_time;
 	uint16 m_down_arrow_transition_time;
 	int32 m_intro_delay_milliseconds;
-	uint16 m_tabbing_count;
+	int16 m_tabbing_count;
 	uint8 gap_7E[2];
 	real_rectangle2d m_up_arrow_position;
 	real_rectangle2d m_down_arrow_position;
