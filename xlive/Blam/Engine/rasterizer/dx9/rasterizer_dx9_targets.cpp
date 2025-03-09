@@ -756,7 +756,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
     }
 
     uint32 g_motion_sensor_texture_size = *motion_sensor_texture_size_get();
-    rasterizer_dx9_create_texture(g_motion_sensor_texture_size,
+    rasterizer_dx9_create_2d_texture(g_motion_sensor_texture_size,
         g_motion_sensor_texture_size,
         0,
         1,
@@ -783,7 +783,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
     dx9_globals->global_d3d_sun_height = (uint32)(d3d_viewport.Height * g_sun_size);
 
     result &=
-        rasterizer_dx9_create_texture(
+        rasterizer_dx9_create_2d_texture(
             dx9_globals->global_d3d_sun_width,
             dx9_globals->global_d3d_sun_height,
             0,
@@ -793,7 +793,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
             &dx9_globals->global_d3d_texture_sun_glow_primary) &&
         SUCCEEDED(dx9_globals->global_d3d_texture_sun_glow_primary->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_sun_glow_primary)) &&
 
-        rasterizer_dx9_create_texture(
+        rasterizer_dx9_create_2d_texture(
             dx9_globals->global_d3d_sun_width,
             dx9_globals->global_d3d_sun_height,
             0,
