@@ -3,7 +3,7 @@
 
 #include "cutscene/cinematics.h"
 #include "game/game_time.h"
-
+#include "game/players.h"
 #include "units/bipeds.h"
 
 s_frame_data_storage* g_frame_data_storage = NULL;

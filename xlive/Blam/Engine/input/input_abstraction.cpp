@@ -2,7 +2,7 @@
 
 #include "input_abstraction.h"
 
-#include "game/players.h"
+#include "game/player_constants.h"
 #include "saved_games/cartographer_player_profile.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "game/players.h"
+#include "game/player_constants.h"
 #include "models/render_models.h"
 
 #define k_interpolation_first_person_weapon_slot_count 4

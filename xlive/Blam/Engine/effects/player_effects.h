@@ -1,6 +1,6 @@
 #pragma once
 #include "camera/observer.h"
-#include "game/players.h"
+#include "game/player_constants.h"
 #include "math/color_math.h"
 #include "math/periodic_functions.h"
 

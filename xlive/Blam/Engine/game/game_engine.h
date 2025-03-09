@@ -1,6 +1,8 @@
 #pragma once
-#include "game/game_allegiance.h"
 #include "game_statborg.h"
+
+#include "game/game_allegiance.h"
+#include "game/players.h"
 #include "math/color_math.h"
 #include "saved_games/game_variant.h"
 #include "tag_files/string_id.h"

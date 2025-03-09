@@ -1,5 +1,5 @@
 #pragma once
-#include "game/players.h"
+#include "game/player_constants.h"
 
 #define k_maximum_multiplayer_players k_maximum_players
 

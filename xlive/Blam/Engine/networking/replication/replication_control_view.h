@@ -1,5 +1,5 @@
 #pragma once
-#include "game/players.h"
+#include "game/player_constants.h"
 #include "networking/player_prediction.h"
 
 enum e_network_memory_block : int16

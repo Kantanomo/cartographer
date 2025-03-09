@@ -1,5 +1,5 @@
 #pragma once
-#include "game/players.h"
+#include "game/player_constants.h"
 
 enum e_motion_sensor_blip_size : int16
 {

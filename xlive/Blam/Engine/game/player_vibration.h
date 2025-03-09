@@ -1,5 +1,5 @@
 #pragma once
-#include "game/players.h"
+#include "game/player_constants.h"
 #include "math/function_definitions.h"
 
 #define k_count_of_effects_that_effect_vibration 8 

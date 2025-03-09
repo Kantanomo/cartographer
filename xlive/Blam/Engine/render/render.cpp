@@ -17,7 +17,6 @@
 #include "effects/beam.h"
 #include "effects/player_effects.h"
 #include "game/game_engine.h"
-#include "game/players.h"
 #include "interface/hud.h"
 #include "interface/user_interface.h"
 #include "math/color_math.h"

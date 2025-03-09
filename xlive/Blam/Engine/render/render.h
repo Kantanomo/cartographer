@@ -4,6 +4,7 @@
 #include "render_layers.h"
 #include "render_visibility_collection.h"
 
+#include "input/controllers.h"
 #include "effects/player_effects.h"
 #include "scenario/scenario_fog.h"
 
