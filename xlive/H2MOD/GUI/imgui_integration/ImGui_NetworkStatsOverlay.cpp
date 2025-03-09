@@ -95,32 +95,33 @@ void ShowNetworkStatsOverlay(bool* p_open)
 
 		if (localIp->m_valid)
 		{
-			const XnIpPckTransportStats* local_user_net_metrics;
-			localIp->PckGetStats(&local_user_net_metrics);
-
-			localIp->m_pckStats.PckDataSampleUpdate();
-
-			int currentSentPerSecIdx = local_user_net_metrics->pckCurrentSendPerSecIdx;
-			int currentRecvdPerSecIdx = local_user_net_metrics->pckCurrentRecvdPerSecIdx;
-
-			if (currentSentPerSecIdx != -1)
+			const XnIpPckTransportStats* local_user_net_metrics = NULL;
+			if (localIp->PckGetStats(&local_user_net_metrics))
 			{
-				net_bandwidth_display_data bandwidth_usage = get_net_bandwidth_display_data(local_user_net_metrics->pckBytesSentPerSec[currentSentPerSecIdx]);
+				localIp->m_pckStats.PckDataSampleUpdate();
 
-				ImGui::Text("Network pck xmit:  %d pck/s bandwidth:  %.3g %s/s",
-					local_user_net_metrics->pckSentPerSec[currentSentPerSecIdx],
-					bandwidth_usage.val,
-					bandwidth_usage.unit_str);
-			}
+				int currentSentPerSecIdx = local_user_net_metrics->pckCurrentSendPerSecIdx;
+				int currentRecvdPerSecIdx = local_user_net_metrics->pckCurrentRecvdPerSecIdx;
 
-			if (currentRecvdPerSecIdx != -1)
-			{
-				net_bandwidth_display_data bandwidth_usage = get_net_bandwidth_display_data(local_user_net_metrics->pckBytesRecvdPerSec[currentRecvdPerSecIdx]);
+				if (currentSentPerSecIdx != -1)
+				{
+					net_bandwidth_display_data bandwidth_usage = get_net_bandwidth_display_data(local_user_net_metrics->pckBytesSentPerSec[currentSentPerSecIdx]);
 
-				ImGui::Text("Network pck recvd: %d pck/s bandwidth: %.3g %s/s",
-					local_user_net_metrics->pckRecvdPerSec[currentRecvdPerSecIdx],
-					bandwidth_usage.val,
-					bandwidth_usage.unit_str);
+					ImGui::Text("Network pck xmit:  %d pck/s bandwidth:  %.3g %s/s",
+						local_user_net_metrics->pckSentPerSec[currentSentPerSecIdx],
+						bandwidth_usage.val,
+						bandwidth_usage.unit_str);
+				}
+
+				if (currentRecvdPerSecIdx != -1)
+				{
+					net_bandwidth_display_data bandwidth_usage = get_net_bandwidth_display_data(local_user_net_metrics->pckBytesRecvdPerSec[currentRecvdPerSecIdx]);
+
+					ImGui::Text("Network pck recvd: %d pck/s bandwidth: %.3g %s/s",
+						local_user_net_metrics->pckRecvdPerSec[currentRecvdPerSecIdx],
+						bandwidth_usage.val,
+						bandwidth_usage.unit_str);
+				}
 			}
 		}
 

@@ -262,13 +262,14 @@ public:
 
 	bool PckGetStats(const XnIpPckTransportStats** outPckStats) const
 	{
+		bool result = false;
 		if (m_pckStats.initialized)
 		{
 			*outPckStats = &m_pckStats;
-			return true;
+			result = true;
 		}
 
-		return false;
+		return result;
 	}
 
 	IN_ADDR GetOnlineIpAddr() const
@@ -347,9 +348,9 @@ public:
 
 	static int GetConnectionIndex(IN_ADDR connectionId);
 
-	void SavePortMapping(XVirtualSocket* xsocket, WORD virtualPort, const sockaddr_in* addr);
+	void SavePortMapping(XVirtualSocket* xsocket, WORD virtualPort, const sockaddr_in* addr) const;
 	void HandleConnectionPacket(XVirtualSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
-	void HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr); // TODO:
+	void HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr) const; // TODO:
 	void UpdateNonceKeyFromPacket(const XNetRequestPacket* reqPacket);
 
 	/* sends a request over the socket to the other socket end, with the same identifier */
@@ -382,7 +383,7 @@ public:
 		return NULL;
 	}
 
-	void UpdatePortMapping(WORD virtualPort, const sockaddr_in* addr)
+	void UpdatePortMapping(WORD virtualPort, const sockaddr_in* addr) const
 	{
 		NetElement* elem = m_netAddrMappings.first();
 		while (elem)
@@ -481,19 +482,19 @@ public:
 	static void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* machineUID, const char* abOnline);
 
 	// Performance counters
-	void UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount);
-	
+	void UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount) const;
+
 	// Packet handlers
 	int HandleRecvdPacket(XVirtualSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD bytesRecvdCount);
 	void HandleXNetRequestPacket(XVirtualSocket* xsocket, const XNetRequestPacket* reqPaket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
-	void HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr);
+	void HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr) const;
 
 	// XnIp handling function
 	XnIp* XnIpLookup(const XNADDR* pxna, const XNKID* xnkid) const;
 	int CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier);
 	int RegisterNewXnIp(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
-	void UnregisterXnIpIdentifier(const IN_ADDR ina);
-	
+	void UnregisterXnIpIdentifier(const IN_ADDR ina) const;
+
 	// Key functions
 	int RegisterKey(XNKID*, XNKEY*);
 	void UnregisterKey(const XNKID* xnkid);

@@ -3,8 +3,6 @@
 #include "XnIp.h"
 
 #include "H2MOD/Utils/Utils.h"
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Startup/Startup.h"
 
 #include "XLive/Cryptography/Rc4.h"
 #include "XLive/xnet/NIC.h"
@@ -62,7 +60,7 @@ XnIp* XnIpManager::GetConnection(const IN_ADDR ina) const
 	return xnIp->IsValid(ina) ? xnIp : nullptr;
 }
 
-void XnIpManager::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount)
+void XnIpManager::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount) const
 {
 	XnIp* xnIp = GetConnection(ipIdentifier);
 	if (xnIp != nullptr)
@@ -96,18 +94,20 @@ void XnIpManager::LogConnectionsToConsole(TextOutputCb* outputCb) const
 		if (xnIp->m_valid)
 		{
 			const XnIpPckTransportStats* pckStats;
-			xnIp->PckGetStats(&pckStats);
+			if (xnIp->PckGetStats(&pckStats))
+			{
+				logString +=
+					"		Index: " + std::to_string(i) + " " +
+					"Packets sent: " + std::to_string(pckStats->pckBytesSent) + " " +
+					"Packets received: " + std::to_string(pckStats->pckBytesRecvd) + " " +
+					"Connect status: " + std::to_string(xnIp->GetConnectStatus()) + " " +
+					"Connection initiator: " + (xnIp->InitiatedConnectRequest() ? "yes" : "no") + " " +
+					"Time since last interaction: " + std::to_string((float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f) + " " +
+					"Time since last packet received: " + std::to_string((float)(timeGetTime() - pckStats->lastPacketReceivedTime) / 1000.f);
 
-			logString +=
-				"		Index: " + std::to_string(i) + " " +
-				"Packets sent: " + std::to_string(pckStats->pckBytesSent) + " " +
-				"Packets received: " + std::to_string(pckStats->pckBytesRecvd) + " " +
-				"Connect status: " + std::to_string(xnIp->GetConnectStatus()) + " " +
-				"Connection initiator: " + (xnIp->InitiatedConnectRequest() ? "yes" : "no") + " " +
-				"Time since last interaction: " + std::to_string((float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f) + " " +
-				"Time since last packet received: " + std::to_string((float)(timeGetTime() - pckStats->lastPacketReceivedTime) / 1000.f);
+				LOG_CRITICAL_NETWORK(logString);
+			}
 
-			LOG_CRITICAL_NETWORK(logString);
 			if (outputCb)
 				outputCb(StringFlag_None, "# %s", logString.c_str());
 		}
@@ -152,17 +152,18 @@ void XnIpManager::LogConnectionsErrorDetails(const sockaddr_in* address, int err
 			if (xnIp->m_valid)
 			{
 				const XnIpPckTransportStats* pckStats;
-				xnIp->PckGetStats(&pckStats);
-
-				float connectionLastInteractionSeconds = (float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
-				float connectionLastPacketReceivedSeconds = (float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
-				LOG_CRITICAL_NETWORK("{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds, time since last packet receive: {:.4f} seconds",
-					__FUNCTION__,
-					i,
-					pckStats->pckSent,
-					pckStats->pckRecvd,
-					connectionLastInteractionSeconds,
-					connectionLastPacketReceivedSeconds);
+				if (xnIp->PckGetStats(&pckStats))
+				{
+					float connectionLastInteractionSeconds = (float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
+					float connectionLastPacketReceivedSeconds = (float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
+					LOG_CRITICAL_NETWORK("{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds, time since last packet receive: {:.4f} seconds",
+						__FUNCTION__,
+						i,
+						pckStats->pckSent,
+						pckStats->pckRecvd,
+						connectionLastInteractionSeconds,
+						connectionLastPacketReceivedSeconds);
+				}
 			}
 			else
 			{
@@ -405,6 +406,12 @@ void XnIpManager::HandleXNetRequestPacket(XVirtualSocket* xsocket, const XNetReq
 	}
 }
 
+void XnIpManager::HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr) const
+{
+	// TODO: implement
+	return;
+}
+
 XnIp* XnIpManager::XnIpLookup(const XNADDR* pxna, const XNKID* xnkid) const
 {
 	XnKeyPair* keyPair = KeyPairLookup(xnkid);
@@ -632,17 +639,19 @@ int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const X
 	}
 }
 
-void XnIpManager::UnregisterXnIpIdentifier(const IN_ADDR ina)
+void XnIpManager::UnregisterXnIpIdentifier(const IN_ADDR ina) const
 {
 	// TODO: let the other connection end know that the connection has to be closed
 	XnIp* xnIp = GetConnection(ina);
 	if (xnIp != nullptr)
 	{
 		const XnIpPckTransportStats* pckStats;
-		xnIp->PckGetStats(&pckStats);
-		LOG_INFO_NETWORK("{} - packets sent: {}, packets recv'd {}", __FUNCTION__,
-			pckStats->pckSent,
-			pckStats->pckRecvd);
+		if (xnIp->PckGetStats(&pckStats))
+		{
+			LOG_INFO_NETWORK("{} - packets sent: {}, packets recv'd {}", __FUNCTION__,
+				pckStats->pckSent,
+				pckStats->pckRecvd);
+		}
 		LOG_INFO_NETWORK("{} - Unregistered connection index: {}, identifier: {:X}",
 			__FUNCTION__,
 			XnIp::GetConnectionIndex(ina),
@@ -735,7 +744,7 @@ int XnIp::GetConnectionIndex(IN_ADDR connectionId)
 	return (int)(connectionId.s_addr >> 24);
 }
 
-void XnIp::SavePortMapping(XVirtualSocket* xsocket, WORD virtualPort, const sockaddr_in* addr)
+void XnIp::SavePortMapping(XVirtualSocket* xsocket, WORD virtualPort, const sockaddr_in* addr) const
 {
 	LOG_TRACE_NETWORK("{} - socket: {}, connection index: {}, identifier: {:X}", __FUNCTION__,
 		xsocket->systemSocketHandle, XnIp::GetConnectionIndex(GetConnectionId()), GetConnectionId().s_addr);
@@ -907,7 +916,7 @@ void XnIp::HandleConnectionPacket(XVirtualSocket* xsocket, const XNetRequestPack
 	} // switch (reqPacket->data.reqType)
 }
 
-void XnIp::HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr)
+void XnIp::HandleDisconnectPacket(XVirtualSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr) const
 {
 	// TODO: implement graceful connection disconnect
 }
