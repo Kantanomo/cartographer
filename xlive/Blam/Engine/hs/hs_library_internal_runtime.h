@@ -23,9 +23,9 @@ enum e_syntax_node_flags : WORD
 // max count: k_maximum_hs_syntax_nodes_per_scenario 36864
 struct hs_syntax_node
 {
-    WORD salt;
-    short opcode;
-    e_hs_type type;
+	WORD salt;
+	short opcode;
+	e_hs_type type;
 	
 	e_syntax_node_flags expression_type;
 	datum next_expression;

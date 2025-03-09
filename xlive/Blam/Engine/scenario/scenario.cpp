@@ -25,12 +25,12 @@ scenario* global_scenario_get(void)
 
 void set_global_scenario(scenario* _scenario)
 {
-    *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430) = _scenario;
+	*Memory::GetAddress<scenario**>(0x479E74, 0x4A6430) = _scenario;
 }
 
 collision_bsp* global_collision_bsp_get(void)
 {
-    return *Memory::GetAddress<collision_bsp**>(0x479E64, 0x4A6420);
+	return *Memory::GetAddress<collision_bsp**>(0x479E64, 0x4A6420);
 }
 
 void scenario_apply_patches(void)
@@ -47,39 +47,39 @@ uint32 scenario_netgame_equipment_size(void)
 
 void location_invalidate(s_location* object_location)
 {
-    object_location->leaf_index = NONE;
-    object_location->cluster_index = NONE;
-    object_location->bsp_index = get_global_structure_bsp_index();
-    return;
+	object_location->leaf_index = NONE;
+	object_location->cluster_index = NONE;
+	object_location->bsp_index = get_global_structure_bsp_index();
+	return;
 }
 
 void __cdecl scenario_location_from_point(s_location* location, real_point3d* point)
 {
-    INVOKE(0x281EE, 0x30CB1, scenario_location_from_point, location, point);
-    return;
+	INVOKE(0x281EE, 0x30CB1, scenario_location_from_point, location, point);
+	return;
 }
 
 bool __cdecl scenario_location_underwater(s_location* location, real_point3d* point, int16* global_material_index)
 {
-    return INVOKE(0x27A03, 0x304C6, scenario_location_underwater, location, point, global_material_index);
+	return INVOKE(0x27A03, 0x304C6, scenario_location_underwater, location, point, global_material_index);
 }
 
 void __cdecl scenario_location_from_leaf(s_location* location, int32 leaf_index)
 {
-    INVOKE(0x2819D, 0x30C60, scenario_location_from_leaf, location, leaf_index);
-    return;
+	INVOKE(0x2819D, 0x30C60, scenario_location_from_leaf, location, leaf_index);
+	return;
 }
 
 /* private code */
 
 static void __cdecl scenario_tags_postprocess(void)
 {
-    tag_iterator itr;
-    tag_iterator_new(&itr, _tag_group_none);
-    
-    for (datum i = tag_iterator_next(&itr); i != NONE; i = tag_iterator_next(&itr))
-    {
-        tag_group group = tag_instance_get(i)->group_tag;
+	tag_iterator itr;
+	tag_iterator_new(&itr, _tag_group_none);
+	
+	for (datum i = tag_iterator_next(&itr); i != NONE; i = tag_iterator_next(&itr))
+	{
+		tag_group group = tag_instance_get(i)->group_tag;
 		switch (group.group)
 		{
 		case _tag_group_biped:
@@ -116,7 +116,7 @@ static void __cdecl scenario_tags_postprocess(void)
 			break;
 		}
 
-    }
+	}
 	scenario_apply_level_patches();
 	game_engine_apply_map_patches();
 	return;

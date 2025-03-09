@@ -6,43 +6,43 @@
 
 enum e_environment_object_reference_flags : short
 {
-    environment_object_reference_flag_mobile = FLAG(0)
+	environment_object_reference_flag_mobile = FLAG(0)
 };
 
 // max count: MAXIMUM_BSPS_PER_COLLISION_REGION*MAXIMUM_REGIONS_PER_MODEL 1024
 struct environment_object_bsp_reference
 {
-    int bsp_reference;
-    int first_sector;
-    int last_sector;
-    short nodeindex;
-    short pad;
+	int bsp_reference;
+	int first_sector;
+	int last_sector;
+	short nodeindex;
+	short pad;
 };
 ASSERT_STRUCT_SIZE(environment_object_bsp_reference, 16);
 
 enum e_projection_sign_flag : byte
 {
-    projection_sign_flag_projection_sign = FLAG(0)
+	projection_sign_flag_projection_sign = FLAG(0)
 };
 
 // max count: MAXIMUM_NODES_PER_MODEL 255
 struct environment_object_node_reference
 {
-    short reference_frame_index;
-    byte projection_axis;
-    e_projection_sign_flag projection_sign;
+	short reference_frame_index;
+	byte projection_axis;
+	e_projection_sign_flag projection_sign;
 };
 ASSERT_STRUCT_SIZE(environment_object_node_reference, 4);
 
 // max count: k_maximum_environment_objects_per_scenario 2000
 struct environment_object_reference
 {
-    e_environment_object_reference_flags flags;
-    short pad;
-    int first_sector;
-    int last_sector;
+	e_environment_object_reference_flags flags;
+	short pad;
+	int first_sector;
+	int last_sector;
 
-    tag_block<environment_object_bsp_reference> bsps;
-    tag_block<environment_object_node_reference> nodes;
+	tag_block<environment_object_bsp_reference> bsps;
+	tag_block<environment_object_node_reference> nodes;
 };
 ASSERT_STRUCT_SIZE(environment_object_reference, 28);

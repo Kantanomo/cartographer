@@ -67,7 +67,7 @@ const pixel32 global_yellow_pixel32 = D3DCOLOR_ARGB(255, 255, 255, 0);
 
 pixel32 real_argb_color_to_pixel32(const real_argb_color* color)
 {
-    return D3DCOLOR_ARGB(
+	return D3DCOLOR_ARGB(
 		(int32)(color->alpha * 255),
 		(int32)(color->red * 255),
 		(int32)(color->green * 255),
@@ -76,13 +76,13 @@ pixel32 real_argb_color_to_pixel32(const real_argb_color* color)
 
 void pixel32_to_real_rgb_color(pixel32 pixel_color, real_rgb_color* out_color)
 {
-    INVOKE(0x75FE2, 0, pixel32_to_real_rgb_color, pixel_color, out_color);
-    return;
+	INVOKE(0x75FE2, 0, pixel32_to_real_rgb_color, pixel_color, out_color);
+	return;
 }
 
 pixel32 real_alpha_to_pixel32(real32 alpha)
 {
-    ASSERT(alpha >= 0.f && alpha <= 1.f);
-    pixel32 color = (int32)(alpha * 255.f) << 24;
-    return color;
+	ASSERT(alpha >= 0.f && alpha <= 1.f);
+	pixel32 color = (int32)(alpha * 255.f) << 24;
+	return color;
 }

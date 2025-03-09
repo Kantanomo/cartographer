@@ -125,7 +125,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	}
 
-    /*if ((g_listener[curlist].area & XNOTIFY_CUSTOM) &&
+	/*if ((g_listener[curlist].area & XNOTIFY_CUSTOM) &&
 		dwMsgFilter == 0)
 	{
 		if (0) // change this to if player kicked...

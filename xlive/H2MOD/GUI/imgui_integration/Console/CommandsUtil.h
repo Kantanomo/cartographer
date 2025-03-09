@@ -62,32 +62,32 @@ static bool InputTextContainsCommandSubstring(const char* command, const char* i
 template<typename T>
 static inline bool tokenize(const char* str, size_t str_length, const char* delimiters, std::vector<T>& out, int tokenize_count = 0)
 {
-    out.clear();
-    size_t beg, pos = 0;
-    std::string _str(str, str_length);
-    while ((beg = _str.find_first_not_of(delimiters, pos)), beg != std::string::npos)
-    {
-        pos = _str.find_first_of(delimiters, beg);
-        out.push_back(_str.substr(beg, pos - beg));
-        if (tokenize_count > 0 && out.size() == tokenize_count)
-            break;
-    }
+	out.clear();
+	size_t beg, pos = 0;
+	std::string _str(str, str_length);
+	while ((beg = _str.find_first_not_of(delimiters, pos)), beg != std::string::npos)
+	{
+		pos = _str.find_first_of(delimiters, beg);
+		out.push_back(_str.substr(beg, pos - beg));
+		if (tokenize_count > 0 && out.size() == tokenize_count)
+			break;
+	}
 
-    return !out.empty();
+	return !out.empty();
 }
 
 struct StringLineHeader
 {
-    size_t idx;
-    size_t size;
-    StringHeaderFlags flags;
+	size_t idx;
+	size_t size;
+	StringHeaderFlags flags;
 };
 
 enum StringHeaderFlags_
 {
-    StringFlag_None,
-    StringFlag_History = FLAG(0),			// when going through history with key up/key down, it'll be displayed in the input console
-    StringFlag_CopyToClipboard = FLAG(1),	// when set, it'll copy this string to clipboard, then unset the flag
+	StringFlag_None,
+	StringFlag_History = FLAG(0),			// when going through history with key up/key down, it'll be displayed in the input console
+	StringFlag_CopyToClipboard = FLAG(1),	// when set, it'll copy this string to clipboard, then unset the flag
 };
 
 // pretty much a circular buffer

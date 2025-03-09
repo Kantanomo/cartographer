@@ -6,8 +6,8 @@
 
 struct s_rasterizer_dx9_driver_globals
 {
-    bool using_amd_or_ati_gpu;
-    bool disable_amd_or_ati_patches;
+	bool using_amd_or_ati_gpu;
+	bool disable_amd_or_ati_patches;
 };
 
 /* classes */
@@ -15,49 +15,49 @@ struct s_rasterizer_dx9_driver_globals
 template <size_t size>
 class c_rasterizer_constant_4f_cache
 {
-    real_vector4d values[size];
+	real_vector4d values[size];
 public:
-    bool test_cache(uint32 index, const real_vector4d* constants, uint32 count)
-    {
-        ASSERT(index < size && index + count <= size);
+	bool test_cache(uint32 index, const real_vector4d* constants, uint32 count)
+	{
+		ASSERT(index < size && index + count <= size);
 
-        bool result = false;
+		bool result = false;
 
-        if (count)
-        {
-            bool contents_match = false;
+		if (count)
+		{
+			bool contents_match = false;
 
-            // Loop through values and constants and xor to determine if values are different
-            uint32 i = 0;
-            for (;
-                !(
-                    *(uint32*)&values[index + i].i ^ *(uint32*)&constants[i].i |
-                    *(uint32*)&values[index + i].j ^ *(uint32*)&constants[i].j |
-                    *(uint32*)&values[index + i].k ^ *(uint32*)&constants[i].k |
-                    *(uint32*)&values[index + i].l ^ *(uint32*)&constants[i].l
-                    );
-                )
-            {
-                if (++i >= count)
-                {
-                    contents_match = true;
-                    break;
-                }
-            }
+			// Loop through values and constants and xor to determine if values are different
+			uint32 i = 0;
+			for (;
+				!(
+					*(uint32*)&values[index + i].i ^ *(uint32*)&constants[i].i |
+					*(uint32*)&values[index + i].j ^ *(uint32*)&constants[i].j |
+					*(uint32*)&values[index + i].k ^ *(uint32*)&constants[i].k |
+					*(uint32*)&values[index + i].l ^ *(uint32*)&constants[i].l
+					);
+				)
+			{
+				if (++i >= count)
+				{
+					contents_match = true;
+					break;
+				}
+			}
 
-            // Copy over the rest of the constants if the values don't match
-            if (!contents_match)
-            {
-                for (; i < count; ++i)
-                {
-                    values[index + i] = constants[i];
-                }
-                result = true;
-            }
-        }
+			// Copy over the rest of the constants if the values don't match
+			if (!contents_match)
+			{
+				for (; i < count; ++i)
+				{
+					values[index + i] = constants[i];
+				}
+				result = true;
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 };
 
 /* globals */

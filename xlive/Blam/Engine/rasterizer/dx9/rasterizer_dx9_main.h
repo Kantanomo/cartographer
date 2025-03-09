@@ -27,39 +27,39 @@ enum e_framebuffer_blend_function : int16
 
 struct s_rasterizer_dx9_main_globals
 {
-    IDirect3D9Ex* global_d3d_interface;
-    D3DMULTISAMPLE_TYPE global_d3d_primary_multisampletype;
-    uint32 global_d3d_primary_multisamplequality;
-    IDirect3DSurface9* global_d3d_surface_render_primary;
-    IDirect3DSurface9* global_d3d_surface_render_primary_z;
-    IDirect3DSurface9* global_d3d_surface_render_z_as_target_z;
-    IDirect3DTexture9* global_d3d_texture_render_resolved;
-    IDirect3DSurface9* global_d3d_surface_render_resolved;
-    IDirect3DSurface9* global_d3d_surface_screenshot;
-    IDirect3DTexture9* global_d3d_texture_render_primary;
-    IDirect3DTexture9* global_d3d_texture_backbuffer;
-    IDirect3DSurface9* global_d3d_surface_backbuffer;
-    uint32 global_d3d_sun_height;
-    uint32 global_d3d_sun_width;
-    IDirect3DTexture9* global_d3d_texture_sun_glow_primary;
-    IDirect3DSurface9* global_d3d_surface_sun_glow_primary;
-    IDirect3DTexture9* global_d3d_texture_sun_glow_secondary;
-    IDirect3DSurface9* global_d3d_surface_sun_glow_secondary;
-    IDirect3DTexture9* global_d3d_texture_motion_sensor;
-    IDirect3DSurface9* global_d3d_surface_motion_sensor;
+	IDirect3D9Ex* global_d3d_interface;
+	D3DMULTISAMPLE_TYPE global_d3d_primary_multisampletype;
+	uint32 global_d3d_primary_multisamplequality;
+	IDirect3DSurface9* global_d3d_surface_render_primary;
+	IDirect3DSurface9* global_d3d_surface_render_primary_z;
+	IDirect3DSurface9* global_d3d_surface_render_z_as_target_z;
+	IDirect3DTexture9* global_d3d_texture_render_resolved;
+	IDirect3DSurface9* global_d3d_surface_render_resolved;
+	IDirect3DSurface9* global_d3d_surface_screenshot;
+	IDirect3DTexture9* global_d3d_texture_render_primary;
+	IDirect3DTexture9* global_d3d_texture_backbuffer;
+	IDirect3DSurface9* global_d3d_surface_backbuffer;
+	uint32 global_d3d_sun_height;
+	uint32 global_d3d_sun_width;
+	IDirect3DTexture9* global_d3d_texture_sun_glow_primary;
+	IDirect3DSurface9* global_d3d_surface_sun_glow_primary;
+	IDirect3DTexture9* global_d3d_texture_sun_glow_secondary;
+	IDirect3DSurface9* global_d3d_surface_sun_glow_secondary;
+	IDirect3DTexture9* global_d3d_texture_motion_sensor;
+	IDirect3DSurface9* global_d3d_surface_motion_sensor;
 
-    /* TODO: these cubemap surfaces are unused, eventually remove these once we gain ownership */
-    IDirect3DTexture9* global_d3d_texture_cubemap;
-    IDirect3DSurface9* global_d3d_surface_cubemap_pos_x;
-    IDirect3DSurface9* global_d3d_surface_cubemap_neg_x;
-    IDirect3DSurface9* global_d3d_surface_cubemap_pos_y;
-    IDirect3DSurface9* global_d3d_surface_cubemap_neg_y;
-    IDirect3DSurface9* global_d3d_surface_cubemap_pos_z;
-    IDirect3DSurface9* global_d3d_surface_cubemap_neg_z;
-    IDirect3DSurface9* global_d3d_surface_cubemap_depth;
+	/* TODO: these cubemap surfaces are unused, eventually remove these once we gain ownership */
+	IDirect3DTexture9* global_d3d_texture_cubemap;
+	IDirect3DSurface9* global_d3d_surface_cubemap_pos_x;
+	IDirect3DSurface9* global_d3d_surface_cubemap_neg_x;
+	IDirect3DSurface9* global_d3d_surface_cubemap_pos_y;
+	IDirect3DSurface9* global_d3d_surface_cubemap_neg_y;
+	IDirect3DSurface9* global_d3d_surface_cubemap_pos_z;
+	IDirect3DSurface9* global_d3d_surface_cubemap_neg_z;
+	IDirect3DSurface9* global_d3d_surface_cubemap_depth;
 
-    uint32 global_d3d_palette_count;
-    IDirect3DDevice9Ex* global_d3d_device;
+	uint32 global_d3d_palette_count;
+	IDirect3DDevice9Ex* global_d3d_device;
 };
 
 /* globals */
@@ -122,10 +122,10 @@ void __cdecl rasterizer_dx9_set_texture(uint16 stage, e_bitmap_type type, uint32
 bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameters, bool display_blackness);
 
 void __cdecl rasterizer_dx9_initialize_camera_projection(
-    bool is_texture_camera,
-    const render_camera* camera,
-    const render_projection* projection,
-    e_rasterizer_target rasterizer_target);
+	bool is_texture_camera,
+	const render_camera* camera,
+	const render_projection* projection,
+	e_rasterizer_target rasterizer_target);
 
 bool __cdecl rasterizer_dx9_initialize(void);
 

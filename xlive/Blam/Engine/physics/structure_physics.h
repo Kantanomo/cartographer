@@ -19,14 +19,14 @@ ASSERT_STRUCT_SIZE(s_structure_physics_breakable_surface_key_value, 32);
 // max: 1
 struct s_structure_physics
 {
-    /****************************************
+	/****************************************
 	* definition_name: mopp_code_data
 	* flags: 0
 	* alignment_bit: 16
 	* byteswap_proc: 0x00531b20
 	****************************************/
 	// DataSize(1048576)
-    data_reference mopp_code;
+	data_reference mopp_code;
 
 	int32 pad;
 

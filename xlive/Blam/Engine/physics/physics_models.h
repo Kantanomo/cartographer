@@ -22,40 +22,40 @@ enum e_physics_model_shape_flags : int16
 
 struct s_physics_model_shape
 {
-    string_id name;
-    int16 material;		// Block Index: materials_block
-    e_physics_model_shape_flags flags;
-    real32 relative_mass_scale;
-    real32 friction;
-    real32 restitution;
-    real32 volume;
-    real32 mass;
-    int16 mass_distribution_index;
-    int8 phantom_type_index;
-    int8 collision_group;
+	string_id name;
+	int16 material;		// Block Index: materials_block
+	e_physics_model_shape_flags flags;
+	real32 relative_mass_scale;
+	real32 friction;
+	real32 restitution;
+	real32 volume;
+	real32 mass;
+	int16 mass_distribution_index;
+	int8 phantom_type_index;
+	int8 collision_group;
 };
 ASSERT_STRUCT_SIZE(s_physics_model_shape, 32);
 
 struct s_physics_model_capsule
 {
-    hkCapsuleShape shape;
+	hkCapsuleShape shape;
 };
 ASSERT_STRUCT_SIZE(s_physics_model_capsule, 48);
 
 struct s_physics_model_translation
 {
-    hkTransformShape transform;
+	hkTransformShape transform;
 };
 ASSERT_STRUCT_SIZE(s_physics_model_translation, 80);
 
 // max count: k_maximum_shapes_per_physics_model 1024
 struct s_physics_model_sphere
 {
-    s_physics_model_shape shape;
+	s_physics_model_shape shape;
 
-    hkSphereShape sphere;
+	hkSphereShape sphere;
 
-    s_physics_model_translation translate;
+	s_physics_model_translation translate;
 };
 ASSERT_STRUCT_SIZE(s_physics_model_sphere, 128);
 
@@ -63,7 +63,7 @@ ASSERT_STRUCT_SIZE(s_physics_model_sphere, 128);
 // max count: k_maximum_shapes_per_physics_model 1024
 struct s_physics_model_pill
 {
-    s_physics_model_shape shape;
-    s_physics_model_capsule capsule;
+	s_physics_model_shape shape;
+	s_physics_model_capsule capsule;
 };
 ASSERT_STRUCT_SIZE(s_physics_model_pill, 80);

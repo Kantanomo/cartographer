@@ -380,11 +380,11 @@ void SaveH2Config() {
 				"\n# By default, 25 seconds are added to post game carnage time from the playlist setting."
 				"\n# Now you have the possibility to change it to your preference."
 				"\n\n"
-        
-		        "# minimum_player_start options (Server):"
-		        "\n# Changes the starting behaviour of the countdown, setting this to any value (1-16) will cause the"
-		        "\n# Server to not start until the player count is equal to or above the given value. A value of 0 will disable this setting."
-		        "\n\n"
+		
+				"# minimum_player_start options (Server):"
+				"\n# Changes the starting behaviour of the countdown, setting this to any value (1-16) will cause the"
+				"\n# Server to not start until the player count is equal to or above the given value. A value of 0 will disable this setting."
+				"\n\n"
 
 				"# vip_lock (Server):"
 				"\n# This flag tells the server to lock the game to VIP mode when the game starts"
@@ -412,7 +412,7 @@ void SaveH2Config() {
 				"\n# This flag will enable anti-cheat on your server."
 				"\n\n"
 			);
-      
+	  
 		}
 
 		if (!Memory::IsDedicatedServer()) {
@@ -769,7 +769,7 @@ void ReadH2Config() {
 				}
 
 				CONFIG_GET(&ini, "additional_pcr_time", "25", &H2Config_additional_pcr_time);
-        
+		
 				CONFIG_GET(&ini, "minimum_player_start", "0", &H2Config_minimum_player_start);
 				CONFIG_GET(&ini, "vip_lock", "false", &H2Config_vip_lock);
 				CONFIG_GET(&ini, "shuffle_even_teams", "false", &H2Config_even_shuffle_teams);

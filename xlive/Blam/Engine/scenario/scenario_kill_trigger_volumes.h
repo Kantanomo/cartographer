@@ -4,7 +4,7 @@
 // max count: MAXIMUM_TRIGGER_VOLUMES_PER_SCENARIO 256
 struct s_scenario_kill_trigger_volume
 {
-    short trigger_volume;       // Block Index: scenario_trigger_volume
+	short trigger_volume;       // Block Index: scenario_trigger_volume
 };
 ASSERT_STRUCT_SIZE(s_scenario_kill_trigger_volume, 2);
 
