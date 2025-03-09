@@ -49,14 +49,14 @@ enum e_material_type : int16
 
 enum e_sweetener_inheritance_flags : int32
 {
-    _sweetener_inheritance_sound_small = FLAG(0),
-    _sweetener_inheritance_sound_medium = FLAG(1),
-    _sweetener_inheritance_sound_large = FLAG(2),
-    _sweetener_inheritance_sound_rolling = FLAG(3),
-    _sweetener_inheritance_sound_grinding = FLAG(4),
-    _sweetener_inheritance_sound_melee = FLAG(5),
+	_sweetener_inheritance_sound_small = FLAG(0),
+	_sweetener_inheritance_sound_medium = FLAG(1),
+	_sweetener_inheritance_sound_large = FLAG(2),
+	_sweetener_inheritance_sound_rolling = FLAG(3),
+	_sweetener_inheritance_sound_grinding = FLAG(4),
+	_sweetener_inheritance_sound_melee = FLAG(5),
 	_sweetener_inheritance_flag_6 = FLAG(6),
-    _sweetener_inheritance_effect_small = FLAG(7),
+	_sweetener_inheritance_effect_small = FLAG(7),
 	_sweetener_inheritance_effect_medium = FLAG(8),
 	_sweetener_inheritance_effect_large = FLAG(9),
 	_sweetener_inheritance_effect_rolling = FLAG(10),
@@ -69,16 +69,16 @@ enum e_sweetener_inheritance_flags : int32
 // max count: NUMBER_OF_MATERIAL_TYPES
 struct material_definition
 {
-    string_id new_material_name;
-    string_id new_general_material_name;
+	string_id new_material_name;
+	string_id new_general_material_name;
 
-    // Explaination("vehicle terrain parameters", "the following fields modify the way a vehicle drives over terrain of this material type.")
-    real32 ground_friction_scale;           // fraction of original velocity parallel to the ground after one tick
-    real32 ground_friction_normal_k1_scale; // cosine of angle at which friction falls off
-    real32 ground_friction_normal_k0_scale; // cosine of angle at which friction is zero
-    real32 ground_depth_scale;              // depth a point mass rests in the ground
-    real32 ground_damp_fraction_scale;      // fraction of original velocity perpendicular to the ground after one tick
-    tag_reference melee_hit_sound;          // snd!
+	// Explaination("vehicle terrain parameters", "the following fields modify the way a vehicle drives over terrain of this material type.")
+	real32 ground_friction_scale;           // fraction of original velocity parallel to the ground after one tick
+	real32 ground_friction_normal_k1_scale; // cosine of angle at which friction falls off
+	real32 ground_friction_normal_k0_scale; // cosine of angle at which friction is zero
+	real32 ground_depth_scale;              // depth a point mass rests in the ground
+	real32 ground_damp_fraction_scale;      // fraction of original velocity perpendicular to the ground after one tick
+	tag_reference melee_hit_sound;          // snd!
 };
 ASSERT_STRUCT_SIZE(material_definition, 36);
 
@@ -95,22 +95,22 @@ ASSERT_STRUCT_SIZE(s_material_physics_properties, 16);
 // max count: 1
 struct s_global_material_sweeteners_definition
 {
-    tag_reference sound_sweetener_small;		// snd!
-    tag_reference sound_sweetener_medium;		// snd!
-    tag_reference sound_sweetener_large;		// snd!
-    tag_reference sound_sweetener_rolling;		// lsnd
-    tag_reference sound_sweetener_grinding;		// lsnd
-    tag_reference sound_sweetener_melee;		// snd!
-    tag_reference unknown;
-    tag_reference effect_sweetener_small;		// effe
-    tag_reference effect_sweetener_medium;		// effe
-    tag_reference effect_sweetener_large;		// effe
-    tag_reference effect_sweetener_rolling;		// effe
-    tag_reference effect_sweetener_grinding;	// effe
-    tag_reference effect_sweetener_melee;		// effe
-    tag_reference unknown1;
+	tag_reference sound_sweetener_small;		// snd!
+	tag_reference sound_sweetener_medium;		// snd!
+	tag_reference sound_sweetener_large;		// snd!
+	tag_reference sound_sweetener_rolling;		// lsnd
+	tag_reference sound_sweetener_grinding;		// lsnd
+	tag_reference sound_sweetener_melee;		// snd!
+	tag_reference unknown;
+	tag_reference effect_sweetener_small;		// effe
+	tag_reference effect_sweetener_medium;		// effe
+	tag_reference effect_sweetener_large;		// effe
+	tag_reference effect_sweetener_rolling;		// effe
+	tag_reference effect_sweetener_grinding;	// effe
+	tag_reference effect_sweetener_melee;		// effe
+	tag_reference unknown1;
 
-    // Explaination("sweetener inheritance flags", "when a sweetener inheritance flag is set the sound\effect is not inherited from the parent material.  If you leave the sweetener blank and set the flag than no effect\sound will play")
+	// Explaination("sweetener inheritance flags", "when a sweetener inheritance flag is set the sound\effect is not inherited from the parent material.  If you leave the sweetener blank and set the flag than no effect\sound will play")
 	e_sweetener_inheritance_flags sweetener_inheritance_flags;
 };
 

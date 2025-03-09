@@ -8,7 +8,7 @@
 
 enum e_comment_type : int32
 {
-    _comment_type_generic = 0
+	_comment_type_generic = 0
 };
 
 /* structures */
@@ -16,9 +16,9 @@ enum e_comment_type : int32
 // max count: MAXIMUM_EDITOR_COMMENTS 65536
 struct editor_comment_definition
 {
-    real_point3d position;
-    e_comment_type type;
-    char name[32];
-    char comment[256];
+	real_point3d position;
+	e_comment_type type;
+	char name[32];
+	char comment[256];
 };
 ASSERT_STRUCT_SIZE(editor_comment_definition, 304);

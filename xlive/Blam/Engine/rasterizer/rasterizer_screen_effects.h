@@ -4,8 +4,8 @@
 /* public code */
 
 e_rasterizer_target __cdecl rasterizer_screen_effects_render(
-    datum screen_effect_tag_index,
-    real32* interpolator_results,
-    int32 input_count,
-    int32 input_count_1,
-    real32* mesh_data);
+	datum screen_effect_tag_index,
+	real32* interpolator_results,
+	int32 input_count,
+	int32 input_count_1,
+	real32* mesh_data);

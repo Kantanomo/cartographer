@@ -72,7 +72,7 @@ bool ConsoleCommand::ExecCommand(const char* commandLine, size_t cmdLineLength, 
 // static function, used to execute commands
 bool ConsoleCommand::HandleCommandLine(const char* commandLine, size_t commandLineLength, TextOutputCb* consoleOutputCb)
 {
-    bool result = false;
+	bool result = false;
 
 	const char* delimiters = " ";
 	std::vector<std::string> commandTokens;
@@ -100,5 +100,5 @@ bool ConsoleCommand::HandleCommandLine(const char* commandLine, size_t commandLi
 		}
 	}
 
-    return result;
+	return result;
 }

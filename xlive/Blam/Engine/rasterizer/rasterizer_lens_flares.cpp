@@ -8,8 +8,8 @@
 
 struct s_ray_of_buddha_data
 {
-    datum tag_index;
-    real_point3d point;
+	datum tag_index;
+	real_point3d point;
 };
 ASSERT_STRUCT_SIZE(s_ray_of_buddha_data, 16);
 
@@ -31,7 +31,7 @@ void rasterizer_lens_flares_apply_patches(void)
 	real32* rasterizer_near_clip_distance = Memory::GetAddress<real32*>(0x468150);
 	*rasterizer_near_clip_distance = 0.0601f;
 
-    PatchCall(Memory::GetAddress(0x1913AD), rasterizer_suns_glow_occlude);
+	PatchCall(Memory::GetAddress(0x1913AD), rasterizer_suns_glow_occlude);
 	return;
 }
 
@@ -39,49 +39,49 @@ void rasterizer_lens_flares_apply_patches(void)
 
 e_rasterizer_target __cdecl rasterizer_suns_glow_occlude(e_rasterizer_target rasterizer_target)
 {
-    if (g_hs_rasterizer_ray_of_buddha)
-    {
-        uint32 g_sun_count = *global_sun_count_get();
+	if (g_hs_rasterizer_ray_of_buddha)
+	{
+		uint32 g_sun_count = *global_sun_count_get();
 
-        for (uint32 i = 0; i < g_sun_count; i++)
-        {
-            s_ray_of_buddha_data* data = &global_ray_of_buddha_data_get()[i];
-            rasterizer_dx9_sun_glow_occlude(data->tag_index, &data->point, rasterizer_target);
-        }
-    }
+		for (uint32 i = 0; i < g_sun_count; i++)
+		{
+			s_ray_of_buddha_data* data = &global_ray_of_buddha_data_get()[i];
+			rasterizer_dx9_sun_glow_occlude(data->tag_index, &data->point, rasterizer_target);
+		}
+	}
 
-    return rasterizer_target;
+	return rasterizer_target;
 }
 
 e_rasterizer_target rasterizer_suns_glow_draw(e_rasterizer_target rasterizer_target)
 {
-    if (g_hs_rasterizer_ray_of_buddha)
-    {
-        uint32 g_sun_count = *global_sun_count_get();
+	if (g_hs_rasterizer_ray_of_buddha)
+	{
+		uint32 g_sun_count = *global_sun_count_get();
 
-        for (uint32 i = 0; i < g_sun_count; i++)
-        {
-            s_ray_of_buddha_data* data = &global_ray_of_buddha_data_get()[i];
-            rasterizer_dx9_sun_glow_draw(data->tag_index, &data->point, rasterizer_target);
-        }
-    }
+		for (uint32 i = 0; i < g_sun_count; i++)
+		{
+			s_ray_of_buddha_data* data = &global_ray_of_buddha_data_get()[i];
+			rasterizer_dx9_sun_glow_draw(data->tag_index, &data->point, rasterizer_target);
+		}
+	}
 
-    return rasterizer_target;	
+	return rasterizer_target;	
 }
 
 e_rasterizer_target __cdecl lens_flares_draw(e_rasterizer_target rasterizer_target)
 {
-    return INVOKE(0x26E5AB, 0x0, lens_flares_draw, rasterizer_target);
+	return INVOKE(0x26E5AB, 0x0, lens_flares_draw, rasterizer_target);
 }
 
 /* private code */
 
 s_ray_of_buddha_data* global_ray_of_buddha_data_get(void)
 {
-    return Memory::GetAddress<s_ray_of_buddha_data*>(0xA4B020);
+	return Memory::GetAddress<s_ray_of_buddha_data*>(0xA4B020);
 }
 
 uint32* global_sun_count_get(void)
 {
-    return Memory::GetAddress<uint32*>(0xA4B030);
+	return Memory::GetAddress<uint32*>(0xA4B030);
 }
