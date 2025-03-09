@@ -9,9 +9,9 @@ enum e_text_justification : uint16
 
 enum e_font_index : int8
 {
-	font_index_defualt = 0,
-	font_index_number_font = 1,
-	font_index_invalid = -1
+    _font_index_defualt = 0,
+    _font_index_number_font = 1,
+    _font_index_invalid = NONE
 };
 
 enum e_text_font : uint16

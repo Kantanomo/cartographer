@@ -36,7 +36,7 @@ void __cdecl draw_string_set_draw_mode(int32 font, int32 style, int32 justificat
 	INVOKE(0x98AC4, 0, draw_string_set_draw_mode, font, style, justification, flags, color, shadow_color, wrap_horizontally);
 }
 
-bool __cdecl draw_string_set_string(wchar_t* string)
+bool __cdecl draw_string_set_string(const wchar_t* string)
 {
 	return INVOKE(0x99D59, 0, draw_string_set_string, string);
 }
@@ -46,18 +46,13 @@ void __cdecl draw_string_set_position(int16 x, int16 y)
 	INVOKE(0x98833, 0, draw_string_set_position, x, y);
 }
 
-void __cdecl draw_string_calculate_bounds(rectangle2d* bounds, wchar_t* string, rectangle2d* out_draw_string_bounds, int32* out_unk_2,
-	real32 scale)
+void __cdecl draw_string_compute_bounds(const rectangle2d* bounds, const wchar_t* string, rectangle2d* text_bounds, rectangle2d* cursor_bounds, real32 scale)
 {
-	INVOKE(0x99D97, 0, draw_string_calculate_bounds, bounds, string, out_draw_string_bounds, out_unk_2, scale);
+	INVOKE(0x99D97, 0, draw_string_compute_bounds, bounds, string, text_bounds, cursor_bounds, scale);
+	return;
 }
 
-void draw_string_draw(rectangle2d* bounds, wchar_t* string, real32 scale)
-{
-	INVOKE(0x271b74, 0, draw_string_draw, bounds, string, scale);
-}
-
-void __cdecl draw_string_reset()
+void __cdecl draw_string_reset(void)
 {
 	INVOKE(0x98CDC, 0, draw_string_reset);
 }

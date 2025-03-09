@@ -6,3 +6,5 @@
 void __cdecl rasterizer_draw_unicode_string(rectangle2d const* bounds, wchar_t const* string);
 
 bool __cdecl rasterizer_text_cache_initialize(void);
+
+void __cdecl rasterizer_draw_string(const rectangle2d* bounds, const wchar_t* string, real32 scale);

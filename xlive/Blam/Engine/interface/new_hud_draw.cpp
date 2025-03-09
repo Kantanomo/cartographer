@@ -9,12 +9,13 @@
 #include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
 #include "camera/camera.h"
+#include "cseries/cseries_strings.h"
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
+#include "rasterizer/rasterizer_text.h"
 #include "render/render.h"
 #include "saved_games/cartographer_player_profile.h"
 #include "text/draw_string.h"
-#include "text/unicode.h"
 
 /* globals */
 
@@ -572,76 +573,80 @@ int32 draw_hud_get_draw_string_font_index(int32 font_index)
 	return NONE;
 }
 
-void draw_hud_text_get_string(s_draw_hud_widget_input_results* widget_function_results, s_hud_text_widget_definition* text_widget, s_new_hud_temporary_user_state* user_state, wchar_t* out_string, int32* out_font)
+void draw_hud_text_get_string(s_draw_hud_widget_input_results* widget_function_results, s_hud_text_widget_definition* text_widget, s_new_hud_temporary_user_state* user_state, c_static_wchar_string<512>* out_string, int32* out_font)
 {
 	s_draw_hud_widget_input_results* hud_input_results = global_hud_draw_widget_function_results_get();
-	memcpy(hud_input_results, widget_function_results, sizeof(int32) * 4);
+	*hud_input_results = *widget_function_results;
 
-	if(text_widget->flags.test(text_widget_flag_string_is_a_number))
+	if (text_widget->flags.test(text_widget_flag_string_is_a_number))
 	{
 		int32 value = (int32)draw_hud_widget_get_value(-1, text_widget->string);
 		if (text_widget->flags.test(text_widget_flag_force_2digit_number))
 		{
 			if (value < 0)
 			{
-				usnzprintf(out_string, 512, L"0%d", 0);
+				out_string->print(L"0%d", 0);
 			}
 			else if (value > 99)
 			{
-				usnzprintf(out_string, 512, L"%d", 99);
+				out_string->print(L"%d", 99);
 			}
 			else if (value < 10)
 			{
-				usnzprintf(out_string, 512, L"0%d", value);
+				out_string->print(L"0%d", value);
 			}
 			else
 			{
-				usnzprintf(out_string, 512, L"%d", value);
+				out_string->print(L"%d", value);
 			}
 		}
 		else if (text_widget->flags.test(text_widget_flag_force_3digit_number))
 		{
 			if (value < 0)
 			{
-				usnzprintf(out_string, 512, L"00%d", 0);
+				out_string->print(L"00%d", 0);
 			}
 			else if (value > 999)
 			{
-				usnzprintf(out_string, 512, L"%d", 999);
+				out_string->print(L"%d", 999);
 			}
 			else if (value < 10)
 			{
-				usnzprintf(out_string, 512, L"00%d", value);
+				out_string->print(L"00%d", value);
 			}
 			else if (value < 100)
 			{
-				usnzprintf(out_string, 512, L"0%d", value);
+				out_string->print(L"0%d", value);
 			}
 			else
 			{
-				usnzprintf(out_string, 512, L"%d", value);
+				out_string->print(L"%d", value);
 			}
 		}
 		else
 		{
-			usnzprintf(out_string, 512, L"%d", value);
+			out_string->print(L"%d", value);
 		}
 	}
 	else if(text_widget->flags.test(text_widget_flag_talking_player_hack))
 	{
 		if(user_state->player_talking && user_state->player_index != NONE)
 		{
-			s_player* player = (s_player*)datum_get(s_player::get_data(), user_state->player_index);
-			usnzprintf(out_string, 512, L"%s", player->properties[0].player_name);
+			const s_player* player = (s_player*)datum_get(s_player::get_data(), user_state->player_index);
+			out_string->print(L"%s", player->properties[0].player_name);
+		}
+		else
+		{
+			out_string->print(L"%s", L"\0");
 		}
 	}
 	else
 	{
-		draw_hud_resolve_string_id_to_value(text_widget->string, out_string);
-		draw_hud_fixup_private_characters(out_string);
+		draw_hud_resolve_string_id_to_value(text_widget->string, out_string->get_buffer());
+		draw_hud_fixup_private_characters(out_string->get_buffer());
 	}
 
-	*out_font = font_index_invalid;
+	*out_font = _font_index_invalid;
 	uint32 split_screen_font_type = draw_hud_text_get_split_screen_font_type(text_widget->anchor);
 	switch(split_screen_font_type)
 	{
@@ -663,12 +668,12 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 	if (!text_widget->string != 0 || text_widget->shader.index == NONE)
 		return;
 
-	wchar_t widget_string[512]{};
 	int32 draw_string_font_index = NONE;
+	c_static_wchar_string<512> widget_string;
 
-	draw_hud_text_get_string(widget_function_results, text_widget, user_state, widget_string, &draw_string_font_index);
+	draw_hud_text_get_string(widget_function_results, text_widget, user_state, &widget_string, &draw_string_font_index);
 	draw_string_set_draw_mode(draw_string_font_index, NONE, 0,0, global_real_argb_white, global_real_argb_black, false);
-	if(draw_string_set_string(widget_string))
+	if (draw_string_set_string(widget_string.get_string()))
 	{
 		rasterizer_flags_unknown_function_1();
 		rasterizer_flags_unknown_function_2(0);
@@ -708,15 +713,15 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 
 		real_point2d final_location{ final_location_x, final_location_y };
 
-		rectangle2d text_bounds{ 0, 0, 1000, 1000 };
-		rectangle2d draw_string_bounds;
-		int32 draw_string_unk_2;
-		draw_string_calculate_bounds(&text_bounds, widget_string, &draw_string_bounds, &draw_string_unk_2, 1.f);
+		rectangle2d bounds{ 0, 0, 1000, 1000 };
+		rectangle2d text_bounds;
+		rectangle2d cursor_bounds;
+		draw_string_compute_bounds(&bounds, widget_string.get_string(), &text_bounds, &cursor_bounds, 1.f);
 
-		int32 text_width = rectangle2d_width(&draw_string_bounds);
+		int32 text_width = rectangle2d_width(&text_bounds);
 		real32 calc_text_width = (text_width * *get_primary_hud_scale()) * scale_result.x;
 
-		int32 text_height = rectangle2d_height(&draw_string_bounds);
+		int32 text_height = rectangle2d_height(&text_bounds);
 		real32 calc_text_height = (text_height * *get_primary_hud_scale()) * scale_result.y;
 
 		int32 ceil_text_width = (int32)ceil(calc_text_width);
@@ -728,26 +733,26 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		switch(text_widget->justification)
 		{
 		case text_justification_center:
-			text_bounds.left = (int16)(final_location.x - (real32)(ceil_text_width >> 1));
-			text_bounds.top = (int16)final_location.y;
-			text_bounds.right = (int16)(final_location.x + (real32)(ceil_text_width - (ceil_text_width >> 1)));
-			text_bounds.bottom = (int16)(ceil_text_height + final_location.y);
+			bounds.left = (int16)(final_location.x - (real32)(ceil_text_width >> 1));
+			bounds.top = (int16)final_location.y;
+			bounds.right = (int16)(final_location.x + (real32)(ceil_text_width - (ceil_text_width >> 1)));
+			bounds.bottom = (int16)(ceil_text_height + final_location.y);
 			break;
 		case text_justification_right:
-			text_bounds.left = (int16)(final_location.x - ceil_text_width);
-			text_bounds.top = (int16)final_location.y;
-			text_bounds.right = (int16)final_location.x;
-			text_bounds.bottom = (int16)(final_location_y + ceil_text_height);
+			bounds.left = (int16)(final_location.x - ceil_text_width);
+			bounds.top = (int16)final_location.y;
+			bounds.right = (int16)final_location.x;
+			bounds.bottom = (int16)(final_location_y + ceil_text_height);
 			break;
 		default:
-			text_bounds.left = (int16)final_location.x;
-			text_bounds.top = (int16)final_location.y;
-			text_bounds.right = (int16)(ceil_text_width + final_location.x);
-			text_bounds.bottom = (int16)(ceil_text_height + final_location.y);
+			bounds.left = (int16)final_location.x;
+			bounds.top = (int16)final_location.y;
+			bounds.right = (int16)(ceil_text_width + final_location.x);
+			bounds.bottom = (int16)(ceil_text_height + final_location.y);
 			break;
 		}
 
-		draw_string_draw(&text_bounds, widget_string, *get_primary_hud_scale());
+		rasterizer_draw_string(&bounds, widget_string.get_string(), *get_primary_hud_scale());
 	}
 }
 
