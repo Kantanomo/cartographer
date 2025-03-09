@@ -449,6 +449,7 @@
     <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
+    <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
