@@ -40,7 +40,7 @@ public:
 	uint16 datum_salt;
 	real32 update_dt;
 	real32 duration_in_ticks;
-	c_flags<e_particle_system_flags, uint16, k_particle_system_flags_count> flags;
+	c_flags_no_init<e_particle_system_flags, uint16, k_particle_system_flags_count> flags;
 	int16 event_particle_system_index;
 	datum tag_index;
 	int16 effect_event_index;

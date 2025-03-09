@@ -107,13 +107,13 @@ struct s_damage_effect_definition
 {
 	real_vector2d radius;
 	real32 cutoff_scale;
-	c_flags<e_damage_effect_flags, uint32, k_damage_effect_flag_count> flags;
+	c_flags_no_init<e_damage_effect_flags, uint32, k_damage_effect_flag_count> flags;
 
 	// Explaination("damage", "EMPTY STRING")
 
 	e_side_effect side_effect;
 	e_damage_category category;
-	c_flags<e_damage_flags, uint32, k_damage_flag_count> damage_flags;
+	c_flags_no_init<e_damage_flags, uint32, k_damage_flag_count> damage_flags;
 
 	real32 aoe_core_radius;				// (World Units) if this is area of effect damage
 	real32 damage_lower_bound;

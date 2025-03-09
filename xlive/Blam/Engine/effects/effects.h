@@ -40,7 +40,7 @@ struct s_effect_struct
 struct effect_datum
 {
     int8 gap_0[2];
-    c_flags<e_effect_datum_flags, uint16, k_effect_datum_flag_count> flags;
+    c_flags_no_init<e_effect_datum_flags, uint16, k_effect_datum_flag_count> flags;
     datum tag_index;
     datum object_looping_sound_index;
     string_id input_marker_name;

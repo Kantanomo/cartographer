@@ -254,7 +254,7 @@ struct structure_environment_object_palette_entry
 {
     tag_reference definition;   // scen
     tag_reference model;        // mode
-    c_flags<e_object_type, uint32, k_object_types_count> object_flags;
+    c_flags_no_init<e_object_type, uint32, k_object_types_count> object_flags;
 };
 ASSERT_STRUCT_SIZE(structure_environment_object_palette_entry, 20);
 

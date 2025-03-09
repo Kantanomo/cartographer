@@ -96,7 +96,7 @@ ASSERT_STRUCT_SIZE(object_header_block_reference, 4);
 struct object_header_datum
 {
 	int16 identifier;
-	c_flags<e_object_header_flags, uint8, k_object_header_flags> flags;
+	c_flags_no_init<e_object_header_flags, uint8, k_object_header_flags> flags;
 	int8/*e_object_type*/ type;
 	int16 cluster_index;
 	int16 data_size;
@@ -160,7 +160,7 @@ struct _object_datum
 	datum havok_datum;
 	datum early_mover_index;
 	uint32 unkBC;
-	c_flags<e_object_physics_flags, uint16, k_object_physics_flags_count> physics_flags;
+	c_flags_no_init<e_object_physics_flags, uint16, k_object_physics_flags_count> physics_flags;
 	uint16 damage_owner_target_model_abs_index;
 	datum damage_owner_owner_index;
 	datum damage_owner_object_index;
