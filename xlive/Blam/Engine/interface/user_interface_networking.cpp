@@ -4,6 +4,7 @@
 #include "user_interface.h"
 #include "user_interface_controller.h"
 
+#include "game/player_constants.h"
 #include "networking/logic/life_cycle_manager.h"
 
 bool* byte_D6840E_get(void)

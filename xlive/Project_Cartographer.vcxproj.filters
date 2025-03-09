@@ -449,6 +449,7 @@
     <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
+    <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1900,6 +1901,7 @@
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_ProdigyCleanTTF.h" />
     <ClInclude Include="Blam\Engine\items\projectiles.h" />
     <ClInclude Include="Blam\Engine\objects\object_location.h" />
+    <ClInclude Include="Blam\Engine\game\player_constants.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

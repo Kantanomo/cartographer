@@ -143,7 +143,7 @@ enum e_controller_state_flags
 
 struct s_user_interface_controller
 {
-	c_flags<e_controller_state_flags, uint32, k_controller_state_flags_count> m_flags;
+	c_flags_no_init<e_controller_state_flags, uint32, k_controller_state_flags_count> m_flags;
 	uint32 user_index;
 	s_player_identifier controller_user_identifier;
 	PAD32;

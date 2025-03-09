@@ -839,7 +839,7 @@ static datum object_allocate_header(datum tag_definition_index)
 static void free_object_memory(datum object_index)
 {
 	object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
-	object_header->flags = (e_object_header_flags)0;
+	object_header->flags.set_unsafe(0);
 	if (object_header->datum != NULL)
 	{
 		memory_pool_block_free(get_object_table(), &object_header->datum);

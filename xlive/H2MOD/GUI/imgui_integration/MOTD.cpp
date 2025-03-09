@@ -2,7 +2,7 @@
 #include "imgui_handler.h"
 
 #include "cseries/cseries_strings.h"
-#include "game/players.h"
+#include "game/player_constants.h"
 #include "input/input_abstraction.h"
 #include "input/input_windows.h"
 

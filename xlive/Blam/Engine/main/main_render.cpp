@@ -4,6 +4,7 @@
 #include "main_screenshot.h"
 
 #include "cutscene/cinematics.h"
+#include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/rasterizer_main.h"
 #include "render/render_cartographer_ingame_ui.h"

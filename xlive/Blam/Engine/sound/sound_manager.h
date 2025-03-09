@@ -1,5 +1,5 @@
 #pragma once
-#include "networking/logic/life_cycle_manager.h"
+#include "game/player_constants.h"
 
 #define MAXIMUM_SOUND_INSTANCES_PER_DEFINITION 16
 #define MAXIMUM_SOUND_INSTANCES_PER_OBJECT_PER_DEFINITION MAXIMUM_SOUND_INSTANCES_PER_DEFINITION

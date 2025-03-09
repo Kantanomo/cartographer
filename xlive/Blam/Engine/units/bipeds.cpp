@@ -2,11 +2,11 @@
 #include "bipeds.h"
 
 #include "cache/cache_files.h"
+#include "game/players.h"
 #include "main/interpolator.h"
 #include "math/periodic_functions.h"
 #include "physics/collisions.h"
 #include "units/biped_definitions.h"
-
 
 
 bool __cdecl biped_is_running_invisible_crouched_uber_melee(datum object_index)

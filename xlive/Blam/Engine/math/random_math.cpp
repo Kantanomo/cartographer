@@ -82,6 +82,6 @@ int16 _random_integer(uint32* seed)
 real_vector3d* _random_direction3d(uint32* seed, const char* type, char* file, int32 line, real_vector3d* direction)
 {
 	int32 index = _random_range(seed, 0, k_random_direction_table_size);
-	*direction = g_random_direction_table[index];
+	*direction = k_random_direction_table[index];
 	return direction;
 }

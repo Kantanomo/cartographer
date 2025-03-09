@@ -167,7 +167,7 @@ ASSERT_STRUCT_SIZE(s_scenario_light_datum, 48);
 
 struct light_definition
 {
-	c_flags<e_light_definition_flags, uint32, k_light_definition_flag_count> flags;
+	c_flags_no_init<e_light_definition_flags, uint32, k_light_definition_flag_count> flags;
 	e_light_type type;
 	int16 pad_1;
 

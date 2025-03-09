@@ -1,5 +1,5 @@
 #pragma once
-
+#include "game/players.h"
 #include "networking/session/network_session.h"
 #include "networking/transport/network_observer.h"
 

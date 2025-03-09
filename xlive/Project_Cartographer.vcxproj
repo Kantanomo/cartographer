@@ -707,6 +707,7 @@
     <ClCompile Include="Blam\Engine\math\math.cpp" />
     <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
     <ClCompile Include="Blam\Engine\math\periodic_functions.cpp" />
+    <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
     <ClCompile Include="Blam\Engine\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\math\real_quantization.cpp" />
     <ClCompile Include="Blam\Engine\memory\data.cpp" />
@@ -897,6 +898,7 @@
     <ClInclude Include="Blam\Engine\game\game_results.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
     <ClInclude Include="Blam\Engine\game\materials.h" />
+    <ClInclude Include="Blam\Engine\game\player_constants.h" />
     <ClInclude Include="Blam\Engine\game\player_vibration.h" />
     <ClInclude Include="Blam\Engine\game\preferences.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />

@@ -1,14 +1,12 @@
 #pragma once
-#include "game/game_allegiance.h"
+#include "game_allegiance.h"
+#include "player_constants.h"
+
 #include "input/controllers.h"
 #include "memory/data.h"
 #include "objects/damage_reporting.h"
 #include "objects/emblems.h"
 #include "simulation/machine_id.h"
-
-#define k_number_of_users 4
-#define k_maximum_players 16
-#define k_player_index_bit_count 4	// 4 because 4 bits can store 16 players in k_maximum_players
 
 enum e_player_color : int8
 {

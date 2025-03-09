@@ -1,6 +1,6 @@
 #pragma once
 #include "camera/observer.h"
-#include "game/players.h"
+#include "game/player_constants.h"
 #include "math/color_math.h"
 #include "math/periodic_functions.h"
 
@@ -112,7 +112,7 @@ struct s_player_effect_user_globals
 	int8 field_85;
 	int8 damage_indicator;
 	int8 field_87;
-	c_flags<e_player_effect_user_global_flags, uint8, k_player_effect_user_global_flag_count> flags;
+	c_flags_no_init<e_player_effect_user_global_flags, uint8, k_player_effect_user_global_flag_count> flags;
 	int8 field_89;
 	int16 pad_8A;
 	real_point3d origin;
@@ -131,7 +131,7 @@ struct s_player_effect_globals
 	real32 max_intensity;
 	int16 attack_time_passed_ticks;
 	int16 attack_max_time_in_ticks;
-	c_flags<e_player_effect_global_flags, uint32, k_player_effect_global_flag_count> flags;
+	c_flags_no_init<e_player_effect_global_flags, uint32, k_player_effect_global_flag_count> flags;
 	uint32 current_time_ticks;
 	s_player_effect_user_globals user_effects[k_number_of_users];
 };
