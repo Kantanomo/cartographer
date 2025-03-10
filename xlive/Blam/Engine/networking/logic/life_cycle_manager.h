@@ -1,5 +1,5 @@
 #pragma once
-#include "game/players.h"
+
 #include "networking/session/network_session.h"
 #include "networking/transport/network_observer.h"
 
@@ -159,6 +159,11 @@ public:
 	static c_game_life_cycle_manager* get();
 	
 
+	void update()
+	{
+		INVOKE_TYPE(0x1D7738, 0x1BCDA8, void(__thiscall*)(c_game_life_cycle_manager*), this);
+	}
+
 	e_game_life_cycle get_life_cycle() const;
 	bool get_active_session(c_network_session** out_session);
 	
@@ -170,3 +175,5 @@ ASSERT_STRUCT_SIZE(c_game_life_cycle_manager, 68);
 
 bool game_life_cycle_initialized();
 bool network_life_cycle_in_squad_session(c_network_session** out_network_session);
+
+void game_life_cycle_apply_patches();

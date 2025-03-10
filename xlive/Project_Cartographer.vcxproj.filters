@@ -74,7 +74,6 @@
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
-    <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
@@ -111,7 +110,6 @@
     <ClCompile Include="Blam\Engine\units\units.cpp" />
     <ClCompile Include="Blam\Engine\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\game\cheats.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_definitions.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud.cpp" />
@@ -450,6 +448,8 @@
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
+    <ClCompile Include="Blam\Engine\networking\logic\life_cycle_manager.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -545,7 +545,6 @@
     <ClInclude Include="Blam\Engine\networking\session\network_session.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
@@ -620,7 +619,6 @@
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="Blam\Engine\physics\physics_constants.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
-    <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
@@ -1902,6 +1900,8 @@
     <ClInclude Include="Blam\Engine\items\projectiles.h" />
     <ClInclude Include="Blam\Engine\objects\object_location.h" />
     <ClInclude Include="Blam\Engine\game\player_constants.h" />
+    <ClInclude Include="3rdparty\SimpleIni\SimpleIni.h" />
+    <ClInclude Include="Blam\Engine\networking\network_utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

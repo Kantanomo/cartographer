@@ -1,7 +1,24 @@
 #include "stdafx.h"
 #include "main.h"
 
+#include "simulation/simulation.h"
+
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+
+/* typedefs */
+typedef void(__cdecl* t_main_game_reset_map)();
+
+/* prototypes */
+static void __cdecl main_game_reset_map_blue_screen_detection();
+
+/* globals */
+
 /* public code */
+
+void main_apply_patches()
+{
+	PatchCall(Memory::GetAddress(0x397F6, 0x4130F), main_game_reset_map_blue_screen_detection);
+}
 
 bool __cdecl cinematic_sound_sync_complete(void)
 {
@@ -30,4 +47,26 @@ void __cdecl main_loop_pregame(int32 a1, int32 a2)
 {
 	INVOKE(0x3948C, 0x0, main_loop_pregame, a1, a2);
 	return;
+}
+
+void __cdecl main_reset_map_immediate()
+{
+	INVOKE(0x9763, 0x1FA4E, main_reset_map_immediate);
+	return;
+}
+
+/* private code */
+
+static void __cdecl main_game_reset_map_blue_screen_detection()
+{
+	s_simulation_globals* sim_globals = simulation_get_globals();
+	if (sim_globals->simulation_reset_in_progress)
+	{
+		EventHandler::BlueScreenEventExecute(EventExecutionType::execute_before);
+	}
+	main_reset_map_immediate();
+	if (sim_globals->simulation_reset_in_progress)
+	{
+		EventHandler::BlueScreenEventExecute(EventExecutionType::execute_after);
+	}
 }

@@ -717,10 +717,17 @@
     <ClCompile Include="Blam\Engine\memory\rockall_heap_manager.cpp" />
     <ClCompile Include="Blam\Engine\models\render_models.cpp" />
     <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
+    <ClCompile Include="Blam\Engine\networking\logic\life_cycle_manager.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_utilities.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Blam\Engine\Networking\online\online_account_xbox.cpp" />
     <ClCompile Include="Blam\Engine\networking\online\online_task_xbox.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_achievements.cpp" />
@@ -1134,7 +1141,6 @@
     <ClCompile Include="Blam\Engine\units\vehicle_definitions.cpp" />
     <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
     <ClCompile Include="Blam\Engine\widgets\liquid.cpp" />
-    <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.cpp" />
@@ -1342,6 +1348,7 @@
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
     <ClInclude Include="Blam\Engine\networking\network_statistics.h" />
+    <ClInclude Include="Blam\Engine\networking\network_utilities.h" />
     <ClInclude Include="Blam\Engine\Networking\online\online_account_xbox.h" />
     <ClInclude Include="Blam\Engine\networking\online\online_task_xbox.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_achievements.h" />
@@ -2299,7 +2306,6 @@
     <ClInclude Include="Blam\Engine\widgets\cloth.h" />
     <ClInclude Include="Blam\Engine\widgets\liquid.h" />
     <ClInclude Include="CartographerDllConf.h" />
-    <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\AdvancedSettingsStringTable.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h" />

@@ -39,11 +39,13 @@
 #include "interface/screens/screens_patches.h"
 #include "items/weapon_definitions.h"
 #include "kablam/kablam.h"
+#include "main/main.h"
 #include "main/levels.h"
 #include "main/loading.h"
 #include "main/main_game.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
+#include "networking/network_utilities.h"
 #include "networking/memory/networking_memory.h"
 #include "networking/network_configuration.h"
 #include "networking/Transport/transport.h"
@@ -80,7 +82,6 @@
 #include "widgets/liquid.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
-#include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
@@ -627,8 +628,6 @@ static void h2mod_apply_hooks(void)
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
 	LOG_INFO_GAME("{} - applying hooks", __FUNCTION__);
 
-	EngineHooks::ApplyHooks();
-
 	MapManager::ApplyPatches();
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
@@ -655,6 +654,8 @@ static void h2mod_apply_hooks(void)
 	network_transport_apply_patches();
 	network_session_apply_patches();
 	bitstream_serialization_apply_patches();
+	game_life_cycle_apply_patches();
+	main_apply_patches();
 
 	network_memory_apply_patches();
 
@@ -663,6 +664,7 @@ static void h2mod_apply_hooks(void)
 
 	cache_files_apply_patches();
 	network_configuration_apply_patches();
+	network_utilities_apply_patches();
 	damage_apply_patches();
 	files_windows_apply_patches();
 
