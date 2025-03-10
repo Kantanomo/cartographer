@@ -404,7 +404,7 @@ void tag_add_name(datum tag_index, const char* name)
 
 	int32 string_length = csstrnlen(name, MAX_PATH) + 1;
 
-	csstrnzcpy(&g_cache_file_debug_globals.debug_tag_name_buffer[new_name_offset], name, string_length);
+	csstrncpy(&g_cache_file_debug_globals.debug_tag_name_buffer[new_name_offset], name, string_length);
 	g_cache_file_debug_globals.debug_tag_name_offsets[tag_name_index] = new_name_offset;
 
 	++cache_file_memory_globals->header.debug_tag_name_count;

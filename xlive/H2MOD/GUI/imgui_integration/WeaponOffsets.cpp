@@ -3,7 +3,7 @@
 #include "WeaponOffsetsStringTable.h"
 
 #include "cache/cache_files.h"
-#include "cseries/cseries_strings.h"
+
 #include "game/game.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/WeaponOffsets/WeaponOffsetConfig.h"

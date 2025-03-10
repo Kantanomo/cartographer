@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "cseries_windows_debug_pc.h"
 
-#include "cseries_strings.h"
 #include "cseries_windows_minidump.h"
 
 #include "shell/windows/crash_report_window/crash_report_window.h"

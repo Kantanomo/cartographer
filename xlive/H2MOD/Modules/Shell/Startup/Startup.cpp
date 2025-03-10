@@ -4,7 +4,7 @@
 #include "../Config.h"
 #include "../H2MODShell.h"
 
-#include "cseries/cseries_strings.h"
+
 #include "cseries/cseries_windows_debug_pc.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"

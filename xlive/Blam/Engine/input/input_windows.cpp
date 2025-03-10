@@ -6,7 +6,6 @@
 
 #include "interface/user_interface_controller.h"
 #include "shell/shell_windows.h"
-#include "render/render.h"
 
 extern input_device** g_xinput_devices;
 extern s_input_abstraction_globals* input_abstraction_globals;

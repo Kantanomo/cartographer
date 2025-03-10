@@ -2,7 +2,7 @@
 #include "rasterizer_dx9_vertex_shaders.h"
 
 #include "cache/cache_files.h"
-#include "cseries/cseries_strings.h"
+
 #include "rasterizer/dx9/vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/_compiled_shader_table.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_vertex_shader_definitions.h"

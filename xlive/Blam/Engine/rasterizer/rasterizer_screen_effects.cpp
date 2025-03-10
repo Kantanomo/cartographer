@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "rasterizer_screen_effects.h"
 
-#include "rasterizer/dx9/rasterizer_dx9_targets.h"
-
 /* public code */
 
 e_rasterizer_target __cdecl rasterizer_screen_effects_render(

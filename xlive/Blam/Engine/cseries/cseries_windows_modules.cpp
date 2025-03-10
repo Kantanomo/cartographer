@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "cseries_windows_modules.h"
 
-#include "cseries_strings.h"
-
 s_loaded_module_info g_module_info[k_recorded_module_count];
 
 
@@ -11,10 +9,10 @@ s_loaded_module_info* get_loaded_module_info()
 	return g_module_info;
 }
 
-uint32 module_info_populate(uint32 process_id, s_loaded_module_info* module_info)
+size_t module_info_populate(uint32 process_id, s_loaded_module_info* module_info)
 {
 	HMODULE temp_module_handle[k_recorded_module_count];
-	uint32 module_count = 0;
+	size_t module_count = 0;
 
 	// Get a handle to the process.
 	HANDLE process_handle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, process_id);
@@ -27,7 +25,7 @@ uint32 module_info_populate(uint32 process_id, s_loaded_module_info* module_info
 			module_count = total_size / sizeof(HMODULE);
 
 			// Loop through every module and allocate the memory for their name and list the handles
-			for (uint32 i = 0; i < module_count; i++)
+			for (size_t i = 0; i < module_count; i++)
 			{
 				// Get the full path to the module's file.
 				if (GetModuleFileNameExW(process_handle, temp_module_handle[i], module_info[i].module_path.get_buffer(), MAX_PATH) == false)

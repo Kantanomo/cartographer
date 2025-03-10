@@ -585,10 +585,9 @@
     <ClCompile Include="Blam\Engine\creatures\creature_definitions.cpp" />
     <ClCompile Include="Blam\Engine\cseries\async.cpp" />
     <ClCompile Include="Blam\Engine\cseries\async_helpers.cpp" />
-    <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\discord\discord_interface.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_errors.cpp" />
-    <ClCompile Include="Blam\Engine\cseries\cseries_strings.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_system_memory.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
@@ -2364,7 +2363,6 @@
     <ClInclude Include="version.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
-    <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />

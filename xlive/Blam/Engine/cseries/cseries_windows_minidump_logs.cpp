@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "cseries_windows_minidump_logs.h"
 
-#include "cseries_strings.h"
 #include "cseries_windows_modules.h"
 #include "cseries_windows_debug_pc.h"
 
