@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Config.h"
 
+#include "simpleini/SimpleIni.h"
+
 #include "cartographer/twizzler/twizzler.h"
 #include "render/render_lod_new.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
@@ -13,7 +15,6 @@
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Utils/Utils.h"
-#include "Util/SimpleIni.h"
 
 #pragma region Config IO
 

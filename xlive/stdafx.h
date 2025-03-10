@@ -97,11 +97,9 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include "Util/Hooks/Hook.h"
 #include "Util/log.h"
 #include "Util/Memory.h"
-#include "Util/remove_all_ptr.h"
 
 #include "xliveless.h"
 #include "xlivedefs.h"
-
 
 #include <contrib/minizip/zip.h>
 

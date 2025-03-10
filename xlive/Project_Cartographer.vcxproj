@@ -2354,7 +2354,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\curl-interface.h" />
     <ClInclude Include="Util\Memory.h" />
-    <ClInclude Include="Util\SimpleIni.h" />
+    <ClInclude Include="3rdparty\SimpleIni\SimpleIni.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
