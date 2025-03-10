@@ -7,6 +7,7 @@
 #include "interface/user_interface_bitmap_block.h"
 #include "tag_files/global_string_ids.h"
 #include "tag_files/tag_loader/tag_injection.h"
+#include "text/text_group.h"
 
 /* macro defines */
 
@@ -139,78 +140,41 @@ enum e_jumpy_ingame_pane_bitmap_blocks //qtr_screen
 
 };
 
-
-enum e_button_settings_multilingual_unicode_string_list : uint32
+enum e_button_settings_multilingual_unicode_string_list
 {
-	_string_id_l_header = 0x6000234,
-	_string_id_l_default = _string_id_default,
-	_string_id_l_south_paw = _string_id_south_paw,
-	_string_id_l_jumpy = 0x5001A09,
-	_string_id_l_boxer = _string_id_boxer,
-	_string_id_l_green_thumb = _string_id_green_thumb,
-	_string_id_l_button_fire = 0xB001A34,
-	_string_id_l_button_throw_grenade = 0x14001A30,
-	_string_id_l_button_reload = 0xD001A35,
-	_string_id_l_button_switch_weapons = 0x15001A36,
-	_string_id_l_button_melee = 0xC001A37,
-	_string_id_l_button_jump = 0xB001A38,
-	_string_id_l_button_swap_grenades = 0x14001A3A,
-	_string_id_l_button_flashlight = 0x11001A39,
-	_string_id_l_button_zoom = 0xB001A3B,
-	_string_id_l_button_crouch = 0xD001A31,
-	_string_id_l_button_score = 0xC001A32,
-	_string_id_l_button_pause = 0xC001A33,
-	_string_id_l_button_lean_left = 0x10001A41,
-	_string_id_l_button_lean_right = 0x11001A42,
-	_string_id_l_standard_help = 0xD002653,
-	_string_id_l_southpaw_help = 0xD001A3C,
-	_string_id_l_jumpy_help = 0xA001A43,
-	_string_id_l_boxer_help = 0xA001A3D,
-	_string_id_l_greenthumb_help = 0xF001A40,
-	_string_id_l_default_ingame = 0xE002644,
-	_string_id_l_south_paw_ingame = 0x10002661,
-	_string_id_l_jumpy_ingame = 0xC001A45,
-	_string_id_l_boxer_ingame = 0xC002665,
-	_string_id_l_green_thumb_ingame = 0x12002667,
-	_string_id_l_button_boxer_grenade = 0x14001A3F,
-	_string_id_l_button_boxer_melee = 0x12001A3E,
-};
-
-
-enum e_button_settings_ingame_multilingual_unicode_string_list : uint32
-{
-	_string_id_l_ig_header = 0x6000234,
-	_string_id_l_ig_default = _string_id_default,
-	_string_id_l_ig_south_paw = _string_id_south_paw,
-	_string_id_l_ig_jumpy = 0x5001A09,
-	_string_id_l_ig_boxer = _string_id_boxer,
-	_string_id_l_ig_green_thumb = _string_id_green_thumb,
-	_string_id_l_ig_button_fire = 0xB002658,
-	_string_id_l_ig_button_throw_grenade = 0x14002654,
-	_string_id_l_ig_button_reload = 0xD002659,
-	_string_id_l_ig_button_switch_weapons = 0x1500265A,
-	_string_id_l_ig_button_melee = 0xC00265B,
-	_string_id_l_ig_button_jump = 0xB00265C,
-	_string_id_l_ig_button_swap_grenades = 0x1400265E,
-	_string_id_l_ig_button_flashlight = 0x1100265D,
-	_string_id_l_ig_button_zoom = 0xB00265F,
-	_string_id_l_ig_button_crouch = 0xD002655,
-	_string_id_l_ig_button_score = 0xC002656,
-	_string_id_l_ig_button_pause = 0xC002657,
-	_string_id_l_ig_button_lean_left = 0x1000267B,
-	_string_id_l_ig_button_lean_right = 0x1100267C,
-	_string_id_l_ig_standard_help = 0xD002653,
-	_string_id_l_ig_southpaw_help = 0xD002660,
-	_string_id_l_ig_jumpy_help = 0xA00267D,
-	_string_id_l_ig_boxer_help = 0xA002662,
-	_string_id_l_ig_greenthumb_help = 0xF002666,
-	_string_id_l_ig_default_ingame = 0xE002644,
-	_string_id_l_ig_south_paw_ingame = 0x10002661,
-	_string_id_l_ig_jumpy_ingame = 0xC00267E,
-	_string_id_l_ig_boxer_ingame = 0xC002665,
-	_string_id_l_ig_green_thumb_ingame = 0x12002667,
-	_string_id_l_ig_button_boxer_grenade = 0x14002664,
-	_string_id_l_ig_button_boxer_melee = 0x12002663,
+	_string_id_l_header,
+	_string_id_l_default,
+	_string_id_l_south_paw,
+	_string_id_l_jumpy,
+	_string_id_l_boxer,
+	_string_id_l_green_thumb,
+	_string_id_l_button_fire,
+	_string_id_l_button_throw_grenade,
+	_string_id_l_button_reload,
+	_string_id_l_button_switch_weapons,
+	_string_id_l_button_melee,
+	_string_id_l_button_jump,
+	_string_id_l_button_swap_grenades,
+	_string_id_l_button_flashlight,
+	_string_id_l_button_zoom,
+	_string_id_l_button_crouch,
+	_string_id_l_button_score,
+	_string_id_l_button_pause,
+	_string_id_l_button_lean_left,
+	_string_id_l_button_lean_right,
+	_string_id_l_standard_help,
+	_string_id_l_southpaw_help,
+	_string_id_l_jumpy_help,
+	_string_id_l_boxer_help,
+	_string_id_l_greenthumb_help,
+	_string_id_l_default_ingame,
+	_string_id_l_south_paw_ingame,
+	_string_id_l_jumpy_ingame,
+	_string_id_l_boxer_ingame,
+	_string_id_l_green_thumb_ingame,
+	_string_id_l_button_boxer_grenade,
+	_string_id_l_button_boxer_melee,
+	k_number_of_button_settings_multilingual_unicode_string_list
 };
 
 /* constants */
@@ -227,6 +191,11 @@ const wchar_t* g_jumpy_text_button_swap_left_string[k_language_count]
 	L"交换左武器",
 	L"Trocar Arma Esquerda"
 };
+
+/* globals */
+
+// generate string_ids on runtime instead of hardcoding them
+string_id strings_array[k_number_of_button_settings_multilingual_unicode_string_list] = {};
 
 /* prototypes */
 
@@ -275,22 +244,22 @@ void c_button_settings_edit_list::update_list_items(c_list_item_widget* item, in
 		switch (DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()))
 		{
 		case _item_standard:
-			item_text->set_text_from_string_id(_string_id_l_default);
+			item_text->set_text_from_string_id(strings_array[_string_id_l_default]);
 			break;
 		case _item_south_paw:
-			item_text->set_text_from_string_id(_string_id_l_south_paw);
+			item_text->set_text_from_string_id(strings_array[_string_id_l_south_paw]);
 			break;
 		case _item_boxer:
-			item_text->set_text_from_string_id(_string_id_l_boxer);
+			item_text->set_text_from_string_id(strings_array[_string_id_l_boxer]);
 			break;
 		case _item_green_thumb:
-			item_text->set_text_from_string_id(_string_id_l_green_thumb);
+			item_text->set_text_from_string_id(strings_array[_string_id_l_green_thumb]);
 			break;
 		case _item_jumpy:
-			item_text->set_text_from_string_id(_string_id_l_jumpy);
+			item_text->set_text_from_string_id(strings_array[_string_id_l_jumpy]);
 			break;
 		default:
-			item_text->set_text_from_string_id(_string_id_invalid);
+			item_text->set_text_from_string_id(strings_array[_string_id_invalid]);
 			break;
 		}
 	}
@@ -542,13 +511,16 @@ void c_screen_button_settings_menu::apply_patches_on_ui_map_load()
 		csmemcpy(jumpy_pane->text_blocks[0], standard_pane->text_blocks[0], sizeof(s_text_block_reference) * standard_pane->text_blocks.count);
 	}
 
+
 	//start adjusting texts for jumpy
-	jumpy_pane->text_blocks[_jumpy_pane_text_help]->string = _string_id_l_jumpy_help;
-	jumpy_pane->text_blocks[_jumpy_pane_text_button_reload]->string = _string_id_l_button_reload;
-	jumpy_pane->text_blocks[_jumpy_pane_text_button_melee]->string = _string_id_l_button_melee;
-	jumpy_pane->text_blocks[_jumpy_pane_text_button_jump]->string = _string_id_l_button_jump;
-	jumpy_pane->text_blocks[_jumpy_pane_text_button_flashlight]->string = _string_id_l_button_flashlight;
-	jumpy_pane->text_blocks[_jumpy_pane_text_button_swap_grenades]->string = _string_id_l_button_swap_grenades;
+	string_list_get_string_id_list(main_widget_tag->string_list_tag.index, strings_array, NUMBEROF(strings_array));
+	
+	jumpy_pane->text_blocks[_jumpy_pane_text_help]->string = strings_array[_string_id_l_jumpy_help];
+	jumpy_pane->text_blocks[_jumpy_pane_text_button_reload]->string = strings_array[_string_id_l_button_reload];
+	jumpy_pane->text_blocks[_jumpy_pane_text_button_melee]->string = strings_array[_string_id_l_button_melee];
+	jumpy_pane->text_blocks[_jumpy_pane_text_button_jump]->string = strings_array[_string_id_l_button_jump];
+	jumpy_pane->text_blocks[_jumpy_pane_text_button_flashlight]->string = strings_array[_string_id_l_button_flashlight];
+	jumpy_pane->text_blocks[_jumpy_pane_text_button_swap_grenades]->string = strings_array[_string_id_l_button_swap_grenades];
 
 	//reposition
 	jumpy_pane->text_blocks[_jumpy_pane_text_button_flashlight]->text_bounds = { -60 ,-600,-100,-266 };
@@ -592,14 +564,18 @@ void c_screen_button_settings_menu::apply_patches_on_mp_map_load()
 		csmemcpy(jumpy_pane->text_blocks[0], standard_pane->text_blocks[0], sizeof(s_text_block_reference) * standard_pane->text_blocks.count);
 	}
 
+	
+
 	//start adjusting texts for jumpy
-	jumpy_pane->text_blocks[_jumpy_ig_pane_text_help]->string = _string_id_l_ig_jumpy_help;
-	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_reload]->string = _string_id_l_ig_button_reload;
-	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_melee]->string = _string_id_l_ig_button_melee;
-	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_jump]->string = _string_id_l_ig_button_jump;
-	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_flashlight]->string = _string_id_l_ig_button_flashlight;
-	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_swap_grenades]->string = _string_id_l_ig_button_swap_grenades;
-	jumpy_pane->text_blocks[_jumpy_ig_pane_text_header]->string = _string_id_l_ig_jumpy_ingame;
+	string_list_get_string_id_list(main_widget_tag->string_list_tag.index, strings_array, NUMBEROF(strings_array));
+	
+	jumpy_pane->text_blocks[_jumpy_ig_pane_text_help]->string = strings_array[_string_id_l_jumpy_help];
+	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_reload]->string = strings_array[_string_id_l_button_reload];
+	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_melee]->string = strings_array[_string_id_l_button_melee];
+	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_jump]->string = strings_array[_string_id_l_button_jump];
+	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_flashlight]->string = strings_array[_string_id_l_button_flashlight];
+	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_swap_grenades]->string = strings_array[_string_id_l_button_swap_grenades];
+	jumpy_pane->text_blocks[_jumpy_ig_pane_text_header]->string = strings_array[_string_id_l_jumpy_ingame];
 
 	//reposition
 	jumpy_pane->text_blocks[_jumpy_ig_pane_text_button_flashlight]->text_bounds = { 40 ,-540,0,-170 };
