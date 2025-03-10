@@ -274,8 +274,8 @@ void __cdecl particle_system_remove_from_effects_cache(datum effect_index, datum
 
 void apply_particle_system_patches()
 {
-	p_c_particle_system_frame_advance = (c_particle_system_frame_advance_t)DetourClassFunc((uint8*)Memory::GetAddress(0xC43F9), (uint8*)c_particle_system::frame_advance, 10);
-	p_c_particle_system__restart = (t_c_particle_system__update_location_time)DetourClassFunc((uint8*)Memory::GetAddress(0xC3E32), (uint8*)c_particle_system::restart, 11);
+	p_c_particle_system_frame_advance = (c_particle_system_frame_advance_t)DetourClassFunc(Memory::GetAddress<uint8*>(0xC43F9), (uint8*)c_particle_system::frame_advance, 10);
+	p_c_particle_system__restart = (t_c_particle_system__update_location_time)DetourClassFunc(Memory::GetAddress<uint8*>(0xC3E32), (uint8*)c_particle_system::restart, 11);
 
 	DETOUR_ATTACH(p_update_position, Memory::GetAddress<t_c_particle_system__update_position>(0xC376A), jmp_c_particle_system_update_position);
 

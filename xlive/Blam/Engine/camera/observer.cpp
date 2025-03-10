@@ -67,7 +67,7 @@ void __cdecl observer_validate_camera_command(s_observer_command* observer_comma
 }
 
 void observer_pass_time_to_usercall(int32 user_index) {
-	void* observer_pass_time_usercall = (void*)Memory::GetAddress(0x838A1);
+	void* observer_pass_time_usercall = Memory::GetAddress<void*>(0x838A1);
 	__asm {
 		mov edi, user_index
 		call observer_pass_time_usercall
@@ -75,7 +75,7 @@ void observer_pass_time_to_usercall(int32 user_index) {
 }
 
 void observer_update_command_to_usercall(int32 user_index) {
-	void* observer_update_command = (void*)Memory::GetAddress(0x82B7F);
+	void* observer_update_command = Memory::GetAddress<void*>(0x82B7F);
 	__asm {
 		mov eax, user_index
 		call observer_update_command
