@@ -2,6 +2,7 @@
 
 enum e_language : uint32
 {
+	_language_invalid = (uint32)NONE,
 	_language_english = 0,
 	_language_japanese = 1,
 	_language_german = 2,

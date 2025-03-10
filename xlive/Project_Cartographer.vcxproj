@@ -1134,6 +1134,7 @@
     <ClCompile Include="Blam\Engine\text\draw_string.cpp" />
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
     <ClCompile Include="Blam\Engine\text\font_group.cpp" />
+    <ClCompile Include="Blam\Engine\text\text_group.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
     <ClCompile Include="Blam\Engine\units\bipeds.cpp" />
     <ClCompile Include="Blam\Engine\units\biped_definitions.cpp" />
