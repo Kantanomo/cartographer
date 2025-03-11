@@ -34,8 +34,8 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 		{
 			profile->input_preferences.controller_button_layout = _button_preset_default;
 			profile->input_preferences.controller_thumbstick_layout = _joystick_preset_default;
-			profile->input_preferences.flags.set(_saved_game_profile_input_preference_flag_controller_look_inversion, true);
-			profile->input_preferences.flags.set(_saved_game_profile_input_preference_flag_mouse_look_inversion, true);
+			profile->input_preferences.flags.set(_saved_game_profile_input_preference_bit_controller_look_inversion, true);
+			profile->input_preferences.flags.set(_saved_game_profile_input_preference_bit_mouse_look_inversion, true);
 		}
 	}
 	else

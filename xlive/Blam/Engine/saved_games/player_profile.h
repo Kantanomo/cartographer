@@ -14,13 +14,13 @@ struct s_saved_game_profile_variant_info
 
 enum e_saved_game_profile_input_preference_flags : uint32
 {
-	_saved_game_profile_input_preference_flag_controller_look_inversion = 0x1,
-	_saved_game_profile_input_preference_flag_mouse_look_inversion = 0x2,
-	_saved_game_profile_input_preference_flag_vibration_disabled = 0x3,
-	_saved_game_profile_input_preference_flag_4 = 0x4,
-	_saved_game_profile_input_preference_flag_controller_auto_look_centering = 0x5,
-	_saved_game_profile_input_preference_flag_mouse_auto_look_centering = 0x6,
-	_saved_game_profile_input_preference_flag_mouse_dual_wield_inversion = 0x7,
+	_saved_game_profile_input_preference_bit_controller_look_inversion = 0x0,
+	_saved_game_profile_input_preference_bit_mouse_look_inversion = 0x1,
+	_saved_game_profile_input_preference_bit_vibration_disabled = 0x2,
+	_saved_game_profile_input_preference_bit_4 = 0x3,
+	_saved_game_profile_input_preference_bit_controller_auto_look_centering = 0x4,
+	_saved_game_profile_input_preference_bit_mouse_auto_look_centering = 0x5,
+	_saved_game_profile_input_preference_bit_mouse_dual_wield_inversion = 0x6,
 	k_saved_game_profile_input_preferences_count
 };
 

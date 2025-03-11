@@ -16,6 +16,13 @@ enum e_default_list_skin_texts
 	k_number_of_default_list_skin_texts,
 };
 
+enum e_settings_list_skin_texts
+{
+	_settings_list_skin_text_header = 0,
+	_settings_list_skin_text_value = 1,
+	k_number_of_settings_list_skin_texts,
+};
+
 
 /* structures */
 

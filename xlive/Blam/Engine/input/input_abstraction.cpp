@@ -824,11 +824,9 @@ static void input_abstraction_set_global_input_preferences(s_gamepad_input_prefe
 	preference->mouse_acceleration = 0.7f;
 	preference->binary_yaw_rate = 1.f;
 	preference->binary_pitch_rate = 1.f;
-	preference->gamepad_axial_deadzone_left.x = 0x1EA9;
-	preference->gamepad_axial_deadzone_left.y = 0x1EA9;
+	preference->gamepad_axial_deadzone_left = { XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE,XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE };
 	preference->stick_threshold = 0.25f;
-	preference->gamepad_axial_deadzone_right.x = 0x21F1;
-	preference->gamepad_axial_deadzone_right.y = 0x21F1;
+	preference->gamepad_axial_deadzone_right = { XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE,XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE };
 	preference->gamepad_invert_look = false;
 	preference->mouse_invert_look = false;
 	preference->invert_aircraft_control = false;

@@ -632,6 +632,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_4way_signin.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_about_dialog.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_button_settings.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_controller_settings_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_error_dialog.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_audio_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_bungie_news.cpp" />
@@ -931,6 +932,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_4way_signin.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_about_dialog.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_button_settings.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_controller_settings_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_error_dialog.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_audio_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_bungie_news.h" />

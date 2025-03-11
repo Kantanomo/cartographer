@@ -19,7 +19,7 @@ public:
 	utf8* get_string_utf8(string_id id, int32 starting_index, int32 max_count);
 	const int32 get_num_of_strings() const;
 	
-	void string_list_get_normal_string(c_language_pack* locale, string_id id, wchar_t* out_string, int32 strings_start_index, int32 strings_count);
+	void string_list_get_normal_string(string_id id, wchar_t* out_string, int32 strings_start_index, int32 strings_count);
 	void get_string_ids(string_id* array, int32 array_size, int32 starting_index, int32 max_count);
 
 private:
