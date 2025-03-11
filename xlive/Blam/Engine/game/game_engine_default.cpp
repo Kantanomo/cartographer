@@ -175,14 +175,14 @@ void c_game_engine::function_42(void* unk)
 	INVOKE_TYPE(0x1112A7, 0, void(__thiscall*)(c_game_engine*, void*), this, unk);
 }
 
-void c_game_engine::function_43(int8 flags, void* unk, void* unk_2)
+void c_game_engine::function_43(uint32 flags, void* unk, void* unk_2)
 {
-	INVOKE_TYPE(0x111750, 0, void(__thiscall*)(c_game_engine*, int8, void*, void*), this, flags, unk, unk_2);
+	INVOKE_TYPE(0x111750, 0, void(__thiscall*)(c_game_engine*, uint32, void*, void*), this, flags, unk, unk_2);
 }
 
-bool c_game_engine::function_44(int8 flags, void* unk)
+bool c_game_engine::function_44(uint32 flags, void* unk)
 {
-	return INVOKE_TYPE(0x111965, 0, bool(__thiscall*)(c_game_engine*, int8, void*), this, flags, unk);
+	return INVOKE_TYPE(0x111965, 0, bool(__thiscall*)(c_game_engine*, uint32, void*), this, flags, unk);
 }
 
 void c_game_engine::set_player_simulation_baseline_data(int32 unused, int32 unused_2, void* unk)

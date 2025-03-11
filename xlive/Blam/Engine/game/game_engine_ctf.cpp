@@ -140,17 +140,17 @@ void c_ctf_engine::function_41()
 	INVOKE_TYPE(0xD7E9C, 0, void(__thiscall*)(c_game_engine*), this);
 }
 
-void c_ctf_engine::set_simulation_baseline_data(int32 unused, void* unk)
+void c_ctf_engine::set_simulation_baseline_data(int32 unused, void* state_data)
 {
-	INVOKE_TYPE(0xD4091, 0, void(__thiscall*)(c_game_engine*, int32, void*), this, unused, unk);
+	INVOKE_TYPE(0xD4091, 0, void(__thiscall*)(c_game_engine*, int32, void*), this, unused, state_data);
 }
 
-void c_ctf_engine::build_simulation_update(void* unk, int32 unused, void* unk_2)
+void c_ctf_engine::build_simulation_update(uint32* unk, int32 unused, void* state_data)
 {
-	INVOKE_TYPE(0xD575E, 0, void(__thiscall*)(c_game_engine*, void*, int32, void*), this, unk, unused, unk_2);
+	INVOKE_TYPE(0xD575E, 0, void(__thiscall*)(c_game_engine*, uint32*, int32, void*), this, unk, unused, state_data);
 }
 
-bool c_ctf_engine::apply_simulation_update(int16 flags, int32 unused, void* unk)
+bool c_ctf_engine::apply_simulation_update(uint32 flags, int32 unused, void* state_data)
 {
-	return INVOKE_TYPE(0xD5BE6, 0, bool(__thiscall*)(c_game_engine*, int16, int32, void*), this, flags, unused, unk);
+	return INVOKE_TYPE(0xD5BE6, 0, bool(__thiscall*)(c_game_engine*, uint32, int32, void*), this, flags, unused, state_data);
 }

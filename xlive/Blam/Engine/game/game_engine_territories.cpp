@@ -91,19 +91,19 @@ void c_territories_engine::function_41()
 	INVOKE_TYPE(0x10C9AE, 0x0, void(__thiscall*)(c_game_engine*), this);
 }
 
-void c_territories_engine::set_simulation_baseline_data(int32 unused, void* unk)
+void c_territories_engine::set_simulation_baseline_data(int32 unused, void* state_data)
 {
-	INVOKE_TYPE(0x10C9AF, 0x0, void(__thiscall*)(c_game_engine*, int32, void*), this, unused, unk);
+	INVOKE_TYPE(0x10C9AF, 0x0, void(__thiscall*)(c_game_engine*, int32, void*), this, unused, state_data);
 }
 
-void c_territories_engine::build_simulation_update(void* unk, int32 unused, void* unk_2)
+void c_territories_engine::build_simulation_update(uint32* unk, int32 unused, void* state_data)
 {
-	INVOKE_TYPE(0x10D420, 0x0, void(__thiscall*)(c_game_engine*, void*, int32, void*), this, unk, unused, unk_2);
+	INVOKE_TYPE(0x10D420, 0x0, void(__thiscall*)(c_game_engine*, uint32*, int32, void*), this, unk, unused, state_data);
 }
 
-bool c_territories_engine::apply_simulation_update(int16 flags, int32 unused, void* unk)
+bool c_territories_engine::apply_simulation_update(uint32 flags, int32 unused, void* state_data)
 {
-	return INVOKE_TYPE(0x10D815, 0x0, bool(__thiscall*)(c_game_engine*, int16, int32, void*), this, flags, unused, unk);
+	return INVOKE_TYPE(0x10D815, 0x0, bool(__thiscall*)(c_game_engine*, uint32, int32, void*), this, flags, unused, state_data);
 }
 
 uint32 c_territories_engine::get_territory_name(wchar_t* a1, int32 a2, int32 a3, wchar_t* a4, wchar_t* a5)
