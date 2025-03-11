@@ -25,8 +25,8 @@ public:
 	virtual bool function_35(int32 unk_index) override;
 	virtual uint32 get_game_engine_entity_type() override;
 	virtual void function_41() override;
-	virtual void set_simulation_baseline_data(int32 unused, void* unk) override;
-	virtual void build_simulation_update(void* unk, int32 unused, void* unk_2) override;
-	virtual bool apply_simulation_update(int16 flags, int32 unused, void* unk) override;
+	virtual void set_simulation_baseline_data(int32 unused, void* state_data) override;
+	virtual void build_simulation_update(uint32* unk, int32 unused, void* state_data) override;
+	virtual bool apply_simulation_update(uint32 flags, int32 unused, void* state_data) override;
 	virtual uint32 get_territory_name(wchar_t* a1, int32 a2, int32 a3, wchar_t* a4, wchar_t* a5) override;
 };

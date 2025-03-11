@@ -60,11 +60,11 @@ public:
 	virtual uint32 get_game_engine_entity_type();
 	virtual void function_41() = 0;
 	virtual void function_42(void* unk);
-	virtual void function_43(int8 flags, void* unk, void* unk_2);
-	virtual bool function_44(int8 flags, void* unk);
-	virtual void set_simulation_baseline_data(int32 unused, void* unk) = 0;
-	virtual void build_simulation_update(void* unk, int32 unused, void* unk_2) = 0;
-	virtual bool apply_simulation_update(int16 flags, int32 unused, void* unk) = 0;
+	virtual void function_43(uint32 flags, void* unk, void* unk_2);
+	virtual bool function_44(uint32 flags, void* unk);
+	virtual void set_simulation_baseline_data(int32 unused, void* state_data) = 0;
+	virtual void build_simulation_update(uint32* update_mask, int32 unused, void* state_data)  = 0;
+	virtual bool apply_simulation_update(uint32 update_mask, int32 unused, void* state_data) = 0;
 	virtual void set_player_simulation_baseline_data(int32 unused, int32 unused_2, void* unk);
 	virtual void build_player_simulation_update(int16 abs_player_index, void* unk, int32 unused, void* unk_2);
 	virtual bool apply_player_simulation_update(int16 abs_player_index, int8 flags, int32 unused, void* unk);
