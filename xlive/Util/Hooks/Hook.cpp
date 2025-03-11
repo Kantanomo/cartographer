@@ -84,13 +84,7 @@ void RetourClassFunc(BYTE *src, BYTE *restore, const unsigned int len)
 	);
 }
 
-void *VTableFunction(void *ClassPtr, size_t index)
-{
-	void **pVtable = *(void***)ClassPtr;
-	return pVtable[index];
-}
-
-void WriteBytes(size_t destAddress, LPVOID bytesToWrite, const unsigned int numBytes)
+void WriteBytes(uintptr_t destAddress, LPVOID bytesToWrite, const unsigned int numBytes)
 {
 	VirtualProtectAndExecutePatch((LPVOID)destAddress, numBytes, PAGE_EXECUTE_READWRITE,
 
@@ -98,12 +92,12 @@ void WriteBytes(size_t destAddress, LPVOID bytesToWrite, const unsigned int numB
 	);
 }
 
-void PatchCall(size_t call_addr, size_t new_function_ptr) {
-	size_t callRelative = new_function_ptr - (call_addr + 5);
+void PatchCall(uintptr_t call_addr, uintptr_t new_function_ptr) {
+	uintptr_t callRelative = new_function_ptr - (call_addr + 5);
 	WritePointer(call_addr + 1, reinterpret_cast<void*>(callRelative));
 }
 
-void NopFill(size_t address, const unsigned int length)
+void NopFill(uintptr_t address, const unsigned int length)
 {
 	VirtualProtectAndExecutePatch((LPVOID)address, length, PAGE_EXECUTE_READWRITE,
 
@@ -111,7 +105,7 @@ void NopFill(size_t address, const unsigned int length)
 	);
 }
 
-void ReadBytesProtected(size_t address, BYTE* buf, BYTE count)
+void ReadBytesProtected(uintptr_t address, BYTE* buf, BYTE count)
 {
 	VirtualProtectAndExecutePatch((LPVOID)address, count, PAGE_EXECUTE_READWRITE,
 
@@ -119,11 +113,11 @@ void ReadBytesProtected(size_t address, BYTE* buf, BYTE count)
 	);
 }
 
-void WritePointer(size_t offset, const void *ptr) {
-	WriteValue<size_t>(offset, *(size_t*)&ptr);
+void WritePointer(uintptr_t offset, const void *ptr) {
+	WriteValue<uintptr_t>(offset, *(uintptr_t*)&ptr);
 }
 
-void PatchWinAPICall(size_t call_addr, size_t new_function_ptr)
+void PatchWinAPICall(uintptr_t call_addr, uintptr_t new_function_ptr)
 {
 	BYTE call = 0xE8;
 	WriteValue(call_addr, call);
@@ -135,7 +129,7 @@ void PatchWinAPICall(size_t call_addr, size_t new_function_ptr)
 	WriteValue(call_addr + 5, padding);
 }
 
-VOID Codecave(size_t destAddress, VOID(*func)(VOID), BYTE nopCount)
+VOID Codecave(uintptr_t destAddress, VOID(*func)(VOID), BYTE nopCount)
 {
 	DWORD offset = (PtrToUlong(func) - destAddress) - 5;
 
