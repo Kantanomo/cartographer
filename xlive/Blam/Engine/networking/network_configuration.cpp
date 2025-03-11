@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "network_configuration.h"
 
-#include "cseries/cseries_strings.h"
+
 #include "text/unicode.h"
 
 /* constants */
@@ -164,7 +164,7 @@ void network_adapter_populate_globals(IP_ADAPTER_ADDRESSES* adapter_address)
 			if (!network_adapter_is_duplicate(adapter_address))
 			{
 				s_network_adapter* adapter = &network_adapters_get()[*network_adapter_count];
-				csstrnzcpy(adapter->adapter_name, adapter_address->AdapterName, NUMBEROF(s_network_adapter::adapter_name));
+				csstrncpy(adapter->adapter_name, adapter_address->AdapterName, NUMBEROF(s_network_adapter::adapter_name));
 				ustrncpy(adapter->friendly_name, adapter_address->FriendlyName, NUMBEROF(s_network_adapter::friendly_name));
 				ustrncpy(adapter->description, adapter_address->Description, NUMBEROF(s_network_adapter::description));
 				++*network_adapter_count;

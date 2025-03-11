@@ -88,7 +88,7 @@ void christmas_event_map_load(void)
 		structure_weather_palette_entry* weat_block = (structure_weather_palette_entry*)tag_injection_extend_block(&bsp_definition->weather_palette, bsp_definition->weather_palette.type_size(), 1);
 
 		const char new_name[] = "snow_cs";
-		csstrnzcpy(weat_block->name, new_name, NUMBEROF(new_name));
+		csstrncpy(weat_block->name, new_name, NUMBEROF(new_name));
 		weat_block->weather_system.group.group = _tag_group_weather_system;
 		weat_block->weather_system.index = snow_datum;
 

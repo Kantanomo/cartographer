@@ -3,8 +3,8 @@
 
 #include <discord_game_sdk.h>
 
-#include "cseries/cseries_strings.h"
 #include "main/main_game.h"
+
 #include "game/game.h"
 #include "networking/logic/life_cycle_manager.h" 
 
@@ -139,7 +139,7 @@ void discord_game_status_dispose(void)
 
 void discord_interface_set_details(const char* details)
 {
-	csstrnzcpy(g_discord_globals.activity.details, details, sizeof(g_discord_globals.activity.details));
+	csstrncpy(g_discord_globals.activity.details, details, sizeof(g_discord_globals.activity.details));
 	g_discord_globals.update_rich_presence = true;
 	return;
 }
@@ -147,23 +147,23 @@ void discord_interface_set_details(const char* details)
 void discord_interface_set_state(const char* state)
 {
 	discord_interface_set_player_counts();
-	csstrnzcpy(g_discord_globals.activity.state, state, sizeof(g_discord_globals.activity.state));
+	csstrncpy(g_discord_globals.activity.state, state, sizeof(g_discord_globals.activity.state));
 	g_discord_globals.update_rich_presence = true;
 	return;
 }
 
 void discord_interface_set_small_image(const char* small_image, const char* small_text)
 {
-	csstrnzcpy(g_discord_globals.activity.assets.small_image, small_image, sizeof(g_discord_globals.activity.assets.small_image));
-	csstrnzcpy(g_discord_globals.activity.assets.small_text, small_text, sizeof(g_discord_globals.activity.assets.small_text));
+	csstrncpy(g_discord_globals.activity.assets.small_image, small_image, sizeof(g_discord_globals.activity.assets.small_image));
+	csstrncpy(g_discord_globals.activity.assets.small_text, small_text, sizeof(g_discord_globals.activity.assets.small_text));
 	g_discord_globals.update_rich_presence = true;
 	return;
 }
 
 void discord_interface_set_large_image(const char* large_image, const char* large_text)
 {
-	csstrnzcpy(g_discord_globals.activity.assets.large_image, large_image, sizeof(g_discord_globals.activity.assets.large_image));
-	csstrnzcpy(g_discord_globals.activity.assets.large_text, large_text, sizeof(g_discord_globals.activity.assets.large_text));
+	csstrncpy(g_discord_globals.activity.assets.large_image, large_image, sizeof(g_discord_globals.activity.assets.large_image));
+	csstrncpy(g_discord_globals.activity.assets.large_text, large_text, sizeof(g_discord_globals.activity.assets.large_text));
 	g_discord_globals.update_rich_presence = true;
 	return;
 }
@@ -216,8 +216,8 @@ void discord_interface_set_difficulty(int16 difficulty)
 	difficulty_image_name.append(number_string);
 
 	// Set image name and text
-	csstrnzcpy(g_discord_globals.activity.assets.small_image, difficulty_image_name.get_string(), difficulty_image_name.max_length());
-	csstrnzcpy(g_discord_globals.activity.assets.small_text, k_discord_difficulty_names[difficulty], 16);
+	csstrncpy(g_discord_globals.activity.assets.small_image, difficulty_image_name.get_string(), difficulty_image_name.max_length());
+	csstrncpy(g_discord_globals.activity.assets.small_text, k_discord_difficulty_names[difficulty], 16);
 	discord_interface_update_details();
 	return;
 }
@@ -361,7 +361,7 @@ static bool discord_interface_scenario_name_vaild(const utf8* scnr_name)
 	bool result = false;
 	for (size_t i = 0; i < k_valid_scenario_name_count; i++)
 	{
-		if (!csstricmp(scnr_name, k_valid_scenario_names[i]))
+		if (!csstrncmp(scnr_name, k_valid_scenario_names[i], 256))
 		{
 			result = true;
 			break;

@@ -134,7 +134,6 @@
     <ClCompile Include="Blam\Engine\decorators\decorator_definitions.cpp" />
     <ClCompile Include="Blam\Engine\game\aim_assist.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_debug_pc.cpp" />
-    <ClCompile Include="Blam\Engine\cseries\cseries_strings.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
@@ -186,7 +185,6 @@
     <ClCompile Include="Blam\Engine\shell\shell.cpp" />
     <ClCompile Include="Blam\Engine\shell\shell_windows.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\H2MODShell.cpp" />
-    <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_state.cpp" />
     <ClCompile Include="Blam\Engine\main\main.cpp" />
     <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
@@ -450,6 +448,7 @@
     <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_utilities.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -689,7 +688,6 @@
     <ClInclude Include="Blam\Engine\math\random_math.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
-    <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
     <ClInclude Include="Blam\Engine\animations\animation_definitions.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />

@@ -146,7 +146,7 @@ Memory::GetAddress<_type>(_addr_client, _addr_server)(__VA_ARGS__)
 // It does this by taking the FLAG value of bit - 1 and using logical OR on it with one of two choices:
 // 0 if the bit passed is less than or equal to 1, otherwise 1 minus the FLAG value of bit - 1
 // Ex. MASK(12) sets bit 11 to bit 0 to 1
-#define MASK(bit) ( (FLAG(bit-1)) | (bit <= 1 ? 0 : ( (FLAG(bit-1) - 1) )) )
+#define MASK(bit) ( (FLAG((bit)-1)) | ((bit) <= 1 ? 0 : ( (FLAG((bit)-1) - 1) )) )
 
 #define ASSERT_STRUCT_SIZE(STRUCT, _SIZE)\
 static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") expected size (" #_SIZE")");
@@ -220,3 +220,14 @@ const char* csprintf(char* buffer, size_t size, const char* format, ...);
 * size_t max_count was added in vista to this function call
 */
 const char* csnprintf(char* buffer, size_t size, size_t max_count, const char* format, ...);
+
+
+size_t csstrnlen(const char* s, size_t size);
+
+char* csstrncpy(char* s1, const char* s2, size_t size);
+
+char* csstrncat(char* s1, char const* s2, size_t size);
+
+int32 csstricmp(const char* s1, const char* s2);
+
+int32 csstrncmp(const char* s1, const char* s2, size_t size);

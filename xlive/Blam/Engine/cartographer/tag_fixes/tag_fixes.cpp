@@ -202,7 +202,7 @@ static void tag_fixes_misty_rain(void)
 				scenario* scenario_definition = global_scenario_get();
 				structure_weather_palette_entry* palette = scenario_definition->weather_palette[0];
 				const char name[] = "misty_cs";
-				csstrnzcpy(palette->name, name, NUMBEROF(name));
+				csstrncpy(palette->name, name, NUMBEROF(name));
 				palette->weather_system.group.group = _tag_group_weather_system;
 				palette->weather_system.index = misty_rain_datum;
 
@@ -211,7 +211,7 @@ static void tag_fixes_misty_rain(void)
 				{
 					structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(global_scenario_get()->structure_bsps[i]->structure_bsp.index);
 					structure_weather_palette_entry* bsp_palette = bsp_definition->weather_palette[0];
-					csstrnzcpy(bsp_palette->name, name, NUMBEROF(name));
+					csstrncpy(bsp_palette->name, name, NUMBEROF(name));
 					bsp_palette->weather_system.group.group = _tag_group_weather_system;
 					bsp_palette->weather_system.index = misty_rain_datum;
 				}

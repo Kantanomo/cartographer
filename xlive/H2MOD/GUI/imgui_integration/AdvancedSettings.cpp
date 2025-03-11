@@ -6,7 +6,7 @@
 #include "AdvancedSettingsStringTable.h"
 
 #include "cartographer/twizzler/twizzler.h"
-#include "cseries/cseries_strings.h"
+
 #include "game/cheats.h"
 #include "game/game.h"
 #include "input/input_abstraction.h"

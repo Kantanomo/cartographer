@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WeaponOffsetConfig.h"
 
-#include "cseries/cseries_strings.h"
+
 
 /* constants */
 

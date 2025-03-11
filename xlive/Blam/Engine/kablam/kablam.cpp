@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "kablam.h"
 
-#include "cseries/cseries_strings.h"
+
 #include "shell/shell_windows.h"
 
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"

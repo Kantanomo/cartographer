@@ -11,7 +11,8 @@ enum
 {
 	MAXIMUM_MEMCPY_SIZE = 0x20000000,
 	MAXIMUM_MEMMOVE_SIZE = 0x20000000,
-	MAXIMUM_MEMSET_SIZE = 0x20000000
+	MAXIMUM_MEMSET_SIZE = 0x20000000,
+	MAXIMUM_STRING_SIZE = 0x40000,
 };
 
 /* globals */
@@ -37,13 +38,13 @@ if (!(STATEMENT))					\
 	error(3, "");					\
 	if (is_debugger_present())		\
 	{								\
-		error(3, "%s(%d): %s: %s", __FILE__, __LINE__, "ASSERT", #STATEMENT);	\
+		error(3, "%s(%d): %s: %s", __FILE__, __LINE__, "ASSERT", #STATEMENT"");	\
 	}											\
 	else										\
 	{											\
 		error(3, "%s", shell_get_version());	\
 		error(3, "%s at %s,#%d", "### ASSERTION FAILED: ", __FILE__, __LINE__);	\
-		error(3, "  %s", #STATEMENT);			\
+		error(3, "  %s", #STATEMENT"");			\
 	}											\
 	/* TODO: error callback call here */		\
 	if (!is_debugger_present())					\
@@ -99,13 +100,13 @@ int32 vsprintf(char* buffer, size_t size, const char* format, va_list va_args)
 	return result;
 }
 
-int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, va_list va_args)
+int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format, char* ap)
 {
 	CSERIES_ASSERT(buffer);
 	CSERIES_ASSERT(format);
 	CSERIES_ASSERT(size > 0);
 
-	const int32 result = (int32)_vsnprintf_s(buffer, size, max_count, format, va_args);
+	const int32 result = (int32)_vsnprintf_s(buffer, size, max_count, format, ap);
 	return result;
 }
 
@@ -125,4 +126,52 @@ const char* csnprintf(char* buffer, size_t size, size_t max_count, const char* f
 	(void)vsnprintf(buffer, size, max_count, format, va_args);
 	va_end(va_args);
 	return buffer;
+}
+
+size_t csstrnlen(const char* s, size_t size)
+{
+	CSERIES_ASSERT(s);
+	CSERIES_ASSERT(size >= 0 && size < MAXIMUM_STRING_SIZE);
+
+	// Do a manual loop through every character until we reach the null terminator to get the size
+	// This is originally how it was in h2
+	const char* current = s;
+	size_t length = 0;
+	for (; length < size; ++length)
+	{
+		if (current[length] == '\0')
+		{
+			break;
+		}
+	}
+	return length;
+}
+
+char* csstrncpy(char* s1, const char* s2, size_t size)
+{
+	CSERIES_ASSERT(s1 && s2);
+	CSERIES_ASSERT(size > 0 && size < MAXIMUM_STRING_SIZE);
+	strncpy_s(s1, size, s2, UINT_MAX);
+	return s1;
+}
+
+char* csstrncat(char* s1, char const* s2, size_t size)
+{
+	CSERIES_ASSERT(s1 && s2);
+	CSERIES_ASSERT(size > 0 && size <= MAXIMUM_STRING_SIZE);
+	strncat_s(s1, size, s2, UINT_MAX);
+	return s1;
+}
+
+int32 csstricmp(const char* s1, const char* s2)
+{
+	CSERIES_ASSERT(s1 && s2);
+	return strcmp(s1, s2);
+}
+
+int32 csstrncmp(const char* s1, const char* s2, size_t size)
+{
+	CSERIES_ASSERT(s1 && s2);
+	CSERIES_ASSERT(size >= 0 && size < MAXIMUM_STRING_SIZE);
+	return strncmp(s1, s2, size);
 }

@@ -1,5 +1,4 @@
 #pragma once
-#include "cseries/cseries_strings.h"
 #include "main/game_preferences.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"

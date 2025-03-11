@@ -249,7 +249,7 @@ static void map_slots_get_multiplayer_level_data(FILE* map_handle, s_multiplayer
 	//Fix incase the maps level data is incorrectly setup
 	if (strlen(multiplayer_level_data->path) == 0)
 	{
-		csstrnzcpy(multiplayer_level_data->path, cache_header.scenario_path, NUMBEROF(multiplayer_level_data->path));
+		csstrncpy(multiplayer_level_data->path, cache_header.scenario_path, NUMBEROF(multiplayer_level_data->path));
 	}
 
 	return;

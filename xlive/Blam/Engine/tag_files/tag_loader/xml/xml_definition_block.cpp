@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "xml_definition_block.h"
 
-#include "cseries/cseries_strings.h"
+
 
 c_xml_definition_block::c_xml_definition_block(tinyxml2::XMLElement* base_element, uint32 offset, uint32 size)
 {

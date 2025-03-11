@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "crash_report_window.h"
 
-#include "cseries/cseries_strings.h"
+
 #include "cseries/cseries_windows.h"
 #include "cseries/cseries_windows_minidump_logs.h"
 #include "text/unicode.h"

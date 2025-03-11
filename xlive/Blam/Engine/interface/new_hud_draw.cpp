@@ -9,7 +9,7 @@
 #include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
 #include "camera/camera.h"
-#include "cseries/cseries_strings.h"
+
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "rasterizer/rasterizer_text.h"
@@ -254,7 +254,9 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 			hud_scale = *get_secondary_hud_scale() * profile_settings->crosshair_scale;
 		}
 		else
+		{
 			hud_scale = *get_secondary_hud_scale();
+		}
 	}
 
 	real_point2d anchor_point{};

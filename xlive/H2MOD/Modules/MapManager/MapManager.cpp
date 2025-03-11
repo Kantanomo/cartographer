@@ -5,7 +5,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-#include "cseries/cseries_strings.h"
+
 #include "main/map_repository.h"
 #include "main/game_preferences.h"
 #include "networking/NetworkMessageTypeCollection.h"

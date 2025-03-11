@@ -7,7 +7,7 @@
 #include "bitmaps/tiff_file.h"
 #include "cache/pc_geometry_cache.h"
 #include "cache/pc_texture_cache.h"
-#include "cseries/cseries_strings.h"
+
 #include "game/game_time.h"
 #include "main/main.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
@@ -95,7 +95,7 @@ void screenshot_cubemap(const char* name)
 	screenshot_globals->capture_cubemap = true;
 	screenshot_globals->cubemap_screenshot = true;
 	screenshot_globals->camera_name_set = false;
-	csstrnzcpy(screenshot_globals->camera_name, name, NUMBEROF(screenshot_globals->camera_name));
+	csstrncpy(screenshot_globals->camera_name, name, NUMBEROF(screenshot_globals->camera_name));
 	return;
 }
 

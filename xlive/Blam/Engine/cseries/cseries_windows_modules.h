@@ -1,5 +1,5 @@
 #pragma once
-#include "cseries_strings.h"
+
 
 // constants
 
@@ -21,7 +21,7 @@ s_loaded_module_info* get_loaded_module_info();
 // Gets the loaded module names and handles and stores them in the module_info parameter
 // Make sure whenever you call this function to call the free_loaded_module_info function afterwards to free the memory allocated
 // Returns the amount of modules currently loaded
-uint32 module_info_populate(uint32 processID, s_loaded_module_info* module_info);
+size_t module_info_populate(uint32 processID, s_loaded_module_info* module_info);
 
 // Compares module handle values
 int compare_loaded_module_info(const void* a, const void* b);
