@@ -1,29 +1,31 @@
 #pragma once
-
 #include "controllers.h"
 #include "input_windows.h"
 
-/* macro defines*/
+/* macros */
 
-#define THUMBSTICK_PERCENTAGE_TO_POINT(_percentage) \
-	((real32)INT16_MAX * ((_percentage) / 100.f))
+#define THUMBSTICK_PERCENTAGE_TO_POINT(_percentage) ((real32)INT16_MAX * ((_percentage) / 100.f))
+#define THUMBSTICK_POINT_TO_PERCENTAGE(_point) (((real32)_point / (real32)INT16_MAX) * 100.f)
 
-#define THUMBSTICK_POINT_TO_PERCENTAGE(_point) \
-	(((real32)_point / (real32)INT16_MAX) * 100.f)
+/* forward declarations */
 
-#define k_key_hold_threshold_msec 0xE9
+struct s_saved_game_profile_input_preferences;
 
-#define k_last_used_device_was_gamepad 1
+/* constants */
 
-#define k_default_right_thumbstick_deadzone_axial_percentage_x THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
-#define k_default_right_thumbstick_deadzone_axial_percentage_y THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+enum
+{
+	k_key_hold_threshold_msec = 233,
+	k_last_used_device_was_gamepad = 1,
+	NUMBER_OF_GAMEPAD_STICKS = 2,
+	MAX_BUTTONS_PER_CONTROL = 8,
+};
 
-// set this to a default of 8
-#define k_default_right_thumbstick_deadzone_radial_percentage THUMBSTICK_POINT_TO_PERCENTAGE(THUMBSTICK_PERCENTAGE_TO_POINT(8))
+// Set this to a default of 8
+const real32 k_default_right_thumbstick_deadzone_radial_percentage = THUMBSTICK_POINT_TO_PERCENTAGE(THUMBSTICK_PERCENTAGE_TO_POINT(8));
 
-#define NUMBER_OF_GAMEPAD_STICKS 2
-
-#define MAX_BUTTONS_PER_CONTROL 8
+const real32 k_default_right_thumbstick_deadzone_axial_percentage_x = THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
+const real32 k_default_right_thumbstick_deadzone_axial_percentage_y = THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
 
 /* enums */
 
@@ -288,20 +290,21 @@ struct s_input_abstraction_globals
 };
 ASSERT_STRUCT_SIZE(s_input_abstraction_globals, 0x5EB8);
 
+/* globals */
 
-extern s_input_abstraction_globals* input_abstraction_globals;
+extern s_input_abstraction_globals* g_input_abstraction_globals;
 
-struct s_saved_game_profile_input_preferences;
+/* prototypes */
 
-
-void __cdecl input_abstraction_initialize();
-void __cdecl input_abstraction_dispose();
+void input_abstraction_patches_apply(void);
+void __cdecl input_abstraction_initialize(void);
+void __cdecl input_abstraction_dispose(void);
 void __cdecl input_abstraction_handle_device_change(uint32 flags);
 void __cdecl input_abstraction_get_controller_preferences(e_controller_index controller_index, s_gamepad_input_preferences* preferences);
 void __cdecl input_abstraction_get_input_state(e_controller_index controller_index, s_game_input_state* state);
 void __cdecl input_abstraction_get_player_look_angular_velocity(e_controller_index controller_index, real_euler_angles2d* angular_velocity);
 void __cdecl input_abstraction_get_player_look_angular_velocity_for_mouse(e_controller_index controller_index, real_euler_angles2d* angular_velocity);
-void __cdecl input_abstraction_get_default_preferences(s_gamepad_input_preferences* out_preference, e_joystick_preset_types thumbstick_layout, e_button_preset_types button_preset_type, e_custom_keyboard_preset_types kb_layout, int32 unused);
+void __cdecl input_abstraction_get_default_preferences(s_gamepad_input_preferences* out_preference, e_joystick_preset_types thumbstick_layout, e_button_preset_types button_preset_type, e_custom_keyboard_preset_types kb_layout, bool caller_handles_failures);
 void __cdecl input_abstraction_set_controller_settings_from_preferences(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings);
 void __cdecl input_abstraction_set_preferences_from_controller_settings(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings);
 void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller, real32 value);
@@ -310,8 +313,7 @@ void input_abstraction_set_controller_right_thumb_deadzone(e_controller_index co
 bool __cdecl input_abstraction_controller_button_test(e_controller_index controller_index, e_button_action button_index);
 e_button_action __cdecl input_abstraction_get_primary_fire_button(datum unit);
 e_button_action __cdecl input_abstraction_get_secondary_fire_button(datum unit);
-void __cdecl input_abstraction_update();
+void __cdecl input_abstraction_update(void);
 void __cdecl input_abstraction_update_input_state(e_controller_index controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state);
 uint32 s_input_abstraction_globals_sub_45E501(e_button_action button, void* a3);
 int32 __cdecl input_abstraction_get_last_used_device(e_controller_index controller);
-void input_abstraction_patches_apply();
