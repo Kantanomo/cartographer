@@ -54,7 +54,7 @@ void c_ctf_engine::handle_player_objective_touch_interaction(datum player_index,
 	INVOKE_TYPE(0xD7509, 0, void(__thiscall*)(c_game_engine*, datum, datum), this, player_index, object_index);
 }
 
-void c_ctf_engine::function_19()
+void c_ctf_engine::update()
 {
 	INVOKE_TYPE(0xD7EA1, 0, void(__thiscall*)(c_game_engine*), this);
 }

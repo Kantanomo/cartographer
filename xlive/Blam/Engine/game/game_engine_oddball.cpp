@@ -31,7 +31,7 @@ void c_oddball_engine::function_16(datum player_index)
 	INVOKE_TYPE(0x110781, 0x0, void(__thiscall*)(c_game_engine*, datum), this, player_index);
 }
 
-void c_oddball_engine::function_19()
+void c_oddball_engine::update()
 {
 	INVOKE_TYPE(0x110B6C, 0x0, void(__thiscall*)(c_game_engine*), this);
 }

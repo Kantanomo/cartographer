@@ -36,7 +36,7 @@ public:
 	virtual void function_16(datum player_index) = 0;
 	virtual bool player_can_interact_with_weapon(datum player_index, datum weapon_index);
 	virtual void handle_player_objective_touch_interaction(datum player_index, datum object_index);
-	virtual void function_19();
+	virtual void update();
 	virtual real32 get_player_speed_modifier(datum player_index);
 	virtual uint32 function_21(datum object_index);
 	virtual void update_object_color_change(datum object_index);

@@ -15,7 +15,7 @@ public:
 	virtual void function_14(datum player_index) override;
 	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
-	virtual void function_19() override;
+	virtual void update() override;
 	virtual real32 get_player_speed_modifier(datum player_index) override;
 	virtual bool is_team_enemy(e_game_team a, e_game_team b) override;
 	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/multiplayer_globals_definition.h"
 #include "memory/bitstream.h"
 
 enum e_simulation_event_type
@@ -68,3 +69,20 @@ public:
 	virtual bool decode(int32 payload_size, void* data, c_bitstream* packet);
 	virtual bool perform(int32 entity_reference_count, int32* entity_references, uint32 payload_size, uint8* data);
 };
+
+struct s_game_engine_event
+{
+	e_multiplayer_event_response_game_type game_type;
+	int16 pad;
+	e_multiplayer_event_response_event event_type;
+	uint32 player_index;
+	int32 field_C;
+	int32 field_10;
+	int32 field_14;
+	int32 field_18;
+	int32 field_1C;
+	int32 field_20;
+};
+ASSERT_STRUCT_SIZE(s_game_engine_event, 36);
+
+void game_engine_event_new(e_multiplayer_event_response_game_type game_type, e_multiplayer_event_response_event event_type, s_game_engine_event* event);

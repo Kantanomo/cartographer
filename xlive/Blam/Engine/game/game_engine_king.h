@@ -1,5 +1,41 @@
 #pragma once
 #include "game_engine_default.h"
+#include "math/color_math.h"
+
+class c_king_engine_globals
+{
+public:
+	int32 m_netgame_flag_indices[16];
+	int32 m_differences[8];
+	int32 m_even_count;
+	real_point2d m_hill_points[32];
+	real_point3d m_center;
+	real32 m_max_xy_distance;
+	real32 m_min_z;
+	real32 m_max_z;
+	real32 m_total_perimeter;
+	uint32 m_team_score_accumulator[k_game_multiplayer_team_count];
+	int32 m_hill_id;
+	uint32 m_ticks_till_hill_move;
+	uint16 m_players_in_hill;
+	uint16 m_pad;
+	real_rgb_color m_color_1;
+	real_rgb_color m_color_2;
+	real_rgb_color m_color_3;
+	real_rgb_color m_color_4;
+
+	void setup();
+	void setup_colors();
+	uint32 get_next_hill_index() const;
+	void setup_points(uint32 hill_index);
+
+	static uint32 get_hill_count();
+	static void set_hill_count(uint32 count);
+	static uint16* get_hill_indices();
+
+};
+ASSERT_STRUCT_SIZE(c_king_engine_globals, 0x1DC)
+
 
 class c_king_engine : c_game_engine
 {
@@ -12,7 +48,7 @@ public:
 	virtual void function_14(datum player_index) override;
 	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
-	virtual void function_19() override;
+	virtual void update() override;
 	virtual void get_multiplayer_score_string(wchar_t* out_string) override;
 	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
 	virtual void function_33(datum player_index, void* unk) override;

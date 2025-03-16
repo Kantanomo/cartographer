@@ -21,7 +21,7 @@ enum e_multiplayer_event_response_game_type : uint16
 	_multiplayer_event_response_game_type_slayer = 2,
 	_multiplayer_event_response_game_type_capture_the_flag = 3,
 	_multiplayer_event_response_game_type_oddball = 4,
-	_multiplayer_event_response_game_type_unused_5 = 5,
+	_multiplayer_event_response_game_type_headhunter = 5,
 	_multiplayer_event_response_game_type_king_of_the_hill = 6,
 	_multiplayer_event_response_game_type_unused_7 = 7,
 	_multiplayer_event_response_game_type_juggernaut = 8,
@@ -128,8 +128,13 @@ enum e_multiplayer_event_response_event : uint16
 	_multiplayer_event_response_oddball_ball_reset = 4,
 	_multiplayer_event_response_oddball_ball_tick = 5,
 
+	// headhunter
+	_multiplayer_event_response_headhunter_game_start = 0,
+	_multiplayer_event_response_headhunter_hill_tick = 3,
+	_multiplayer_event_response_headhunter_hill_move = 4,
+
 	// king
-	_multiplayer_event_response_king_GameStart = 0,
+	_multiplayer_event_response_king_game_start = 0,
 	_multiplayer_event_response_king_hill_controlled = 1,
 	_multiplayer_event_response_king_hill_contested = 2,
 	_multiplayer_event_response_king_hill_tick = 3,

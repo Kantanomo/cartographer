@@ -1,8 +1,14 @@
 #include "stdafx.h"
 #include "game_engine_headhunter.h"
 
+#include "game_engine.h"
+#include "game_time.h"
+#include "simulation/game_interface/simulation_game_action.h"
 #include "simulation/game_interface/simulation_game_engine_headhunter.h"
 #include "simulation/game_interface/simulation_game_entities.h"
+#include "simulation/game_interface/simulation_game_events.h"
+
+static c_headhunter_engine_globals* g_headhunter_engine_globals {};
 
 e_game_engine_type c_headhunter_engine::get_type()
 {
@@ -12,6 +18,57 @@ e_game_engine_type c_headhunter_engine::get_type()
 bool c_headhunter_engine::function_34(datum player_index, void* unk)
 {
 	return false;
+}
+
+bool c_headhunter_engine::setup()
+{
+	s_game_engine_globals* game_engine_globals = game_engine_globals_get();
+
+	g_headhunter_engine_globals = (c_headhunter_engine_globals*)game_engine_globals->game_engine_globals;
+
+	memset(g_headhunter_engine_globals, 0, sizeof(c_headhunter_engine_globals));
+
+	g_headhunter_engine_globals->setup();
+
+	return c_slayer_engine::setup();
+}
+
+void c_headhunter_engine::update()
+{
+	if(--g_headhunter_engine_globals->m_ticks_till_hill_move <= 0)
+	{
+		g_headhunter_engine_globals->m_ticks_till_hill_move = time_globals::seconds_to_ticks_round(5);
+
+		uint32 next_hill_index = g_headhunter_engine_globals->get_next_hill_index();
+
+		if (next_hill_index != NONE)
+		{
+			while (true)
+			{
+				g_headhunter_engine_globals->setup_points(next_hill_index);
+
+				if (g_headhunter_engine_globals->m_even_count >= 4 & (g_headhunter_engine_globals->m_even_count & 1) == 0)
+					break;
+
+				next_hill_index = g_headhunter_engine_globals->get_next_hill_index();
+
+				if(next_hill_index == NONE)
+				{
+					simulation_action_game_engine_globals_update(32);
+					return;
+				}
+			}
+			if(g_headhunter_engine_globals->m_hill_id != next_hill_index)
+			{
+				s_game_engine_event event{};
+				game_engine_event_new(_multiplayer_event_response_game_type_headhunter, _multiplayer_event_response_headhunter_hill_move, &event);
+
+			}
+		}
+	}
+
+
+	c_slayer_engine::update();
 }
 
 uint32 c_headhunter_engine::get_game_engine_entity_type()
