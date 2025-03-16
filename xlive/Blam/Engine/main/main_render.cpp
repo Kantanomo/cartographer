@@ -46,7 +46,7 @@ void main_render_apply_patches(void)
 
 void __cdecl main_render(void)
 {
-	uint32 player_window_count;
+	int32 player_window_count;
 	if (cinematic_in_progress())
 	{
 		player_window_count = 1;
@@ -60,7 +60,7 @@ void __cdecl main_render(void)
 		player_window_count = 1;
 	}
 
-	uint32 window_count = player_window_count + 1;
+	int32 window_count = player_window_count + 1;
 
 	ASSERT(player_window_count <= MAXIMUM_PLAYER_WINDOWS);
 	ASSERT(window_count <= MAXIMUM_RENDERED_WINDOWS);
@@ -80,7 +80,7 @@ void __cdecl main_render(void)
 
 	int32 user_index = NONE;
 	window_bound* player_windows = &g_window_bounds[1];
-	for (uint32 window_num = 0; window_num < player_window_count; ++window_num)
+	for (int32 window_num = 0; window_num < player_window_count; ++window_num)
 	{
 		s_observer_result* observer_result = NULL;
 		if (g_debug_force_all_player_views_to_default)
@@ -90,25 +90,26 @@ void __cdecl main_render(void)
 
 		// TODO: another debug global condition here:
 
-
-		if (++user_index < k_number_of_users)
+		user_index += 1;
+		if (user_index < k_number_of_users)
 		{
 			while (!players_user_is_active(user_index))
 			{
-				if (++user_index >= 4)
+				if (++user_index >= k_number_of_users)
 				{
 					user_index = NONE;
+					break;
 				}
+			}
+
+			if (user_index != NONE)
+			{
+				observer_result = observer_get_camera(user_index);
 			}
 		}
 		else
 		{
 			user_index = NONE;
-		}
-
-		if (user_index != NONE)
-		{
-			observer_result = observer_get_camera(user_index);
 		}
 
 		compute_window_bounds_to_usercall(&player_windows[window_num], 0, user_index, window_num, player_window_count, display_split_type, observer_result);
