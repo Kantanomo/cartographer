@@ -56,7 +56,7 @@ bool c_territories_engine::player_can_interact_with_weapon(datum player_index, d
 	return INVOKE_TYPE(0x10C94B, 0x0, bool(__thiscall*)(c_game_engine*, datum, datum), this, player_index, weapon_index);
 }
 
-void c_territories_engine::function_19()
+void c_territories_engine::update()
 {
 	INVOKE_TYPE(0x10DE8A, 0x0, void(__thiscall*)(c_game_engine*), this);
 }

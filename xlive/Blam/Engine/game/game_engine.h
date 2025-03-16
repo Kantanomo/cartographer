@@ -328,7 +328,8 @@ struct s_game_engine_globals
 	real32 unk_local_player_hud_field[k_number_of_users];
 	uint8 field_F4;
 	uint8 pad_F5[4];
-	uint8 gapF9[523];
+	uint8 gapF9[3];
+	int8 game_engine_globals[520];
 	c_game_statborg game_statborg;
 	s_game_engine_global_player_info player_info[k_maximum_players];
 	uint32 ticks;
@@ -352,37 +353,6 @@ struct s_multiplayer_event_sound_response_definition
 };
 ASSERT_STRUCT_SIZE(s_multiplayer_event_sound_response_definition, 80);
 
-// max count: k_maximum_game_engine_event_responses_per_type
-struct s_multiplayer_event_response_definition
-{
-	e_multiplayer_event_response_flags flags;
-	e_multiplayer_event_response_game_type type;
-	e_multiplayer_event_response_event event;
-	e_multiplayer_event_response_audience audience;
-
-	int16 pad1;
-	int16 pad2;
-
-	string_id display_string;
-	
-	e_multiplayer_event_response_audience_filter required_field;
-	e_multiplayer_event_response_audience_filter excluded_audience;
-
-	string_id primary_string;
-	int32 primary_string_duration;	// seconds
-
-	string_id display_string_plural;
-	int32 pad3[7];
-
-	// announcer only
-	real32 sound_delay;
-
-	s_multiplayer_event_sound_response_definition primary_sound;
-
-	int8 pad_5[16];
-	tag_block<s_multiplayer_event_sound_response_definition> sound_permutations;
-};
-ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 168);
 
 /* prototypes */
 

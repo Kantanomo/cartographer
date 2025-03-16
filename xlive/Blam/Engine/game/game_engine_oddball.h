@@ -10,7 +10,7 @@ public:
 	virtual void function_13() override;
 	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
-	virtual void function_19() override;
+	virtual void update() override;
 	virtual real32 get_player_speed_modifier(datum player_index) override;
 	virtual void update_object_color_change(datum object_index) override;
 	virtual void handle_object_taken_event(datum weapon_index, datum biped_index) override;

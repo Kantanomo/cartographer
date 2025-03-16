@@ -1,6 +1,7 @@
 #pragma once
 #include "game_engine.h"
 #include "materials.h"
+#include "multiplayer_globals_definition.h"
 
 #include "bitmaps/bitmap_group.h"
 #include "camera/camera_track_definition.h"

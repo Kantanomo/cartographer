@@ -18,7 +18,7 @@ public:
 	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
 	virtual bool player_can_interact_with_weapon(datum player_index, datum weapon_index) override;
-	virtual void function_19() override;
+	virtual void update() override;
 	virtual void update_object_color_change(datum object_index) override;
 	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
 	virtual void function_33(datum player_index, void* unk) override;

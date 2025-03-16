@@ -51,7 +51,7 @@ void c_juggernaut_engine::function_16(datum player_index)
 	INVOKE_TYPE(0xD33F9, 0x0, void(__thiscall*)(c_game_engine*, datum), this, player_index);
 }
 
-void c_juggernaut_engine::function_19()
+void c_juggernaut_engine::update()
 {
 	INVOKE_TYPE(0xD3A71, 0x0, void(__thiscall*)(c_game_engine*), this);
 }

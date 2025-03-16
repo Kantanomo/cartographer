@@ -71,7 +71,7 @@ void c_game_engine::handle_player_objective_touch_interaction(datum player_index
 
 }
 
-void c_game_engine::function_19()
+void c_game_engine::update()
 {
 
 }
