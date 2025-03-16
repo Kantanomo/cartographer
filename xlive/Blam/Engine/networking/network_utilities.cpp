@@ -54,7 +54,7 @@ bool __cdecl check_executable_type_hook(int32 executable_type)
 	// will not display servers that don't match this in server list
 	int32 current_executable_type, current_executable_version, current_compatible_version;
 	network_utilities_get_game_version(&current_executable_type, &current_executable_version, &current_compatible_version);
-	return current_executable_type == EXECUTABLE_TYPE;
+	return executable_type == current_executable_type;
 }
 
 bool __cdecl check_joining_session_version_hook(int32 executable_type, int32 executable_version, int32 compatible_version)
@@ -68,6 +68,6 @@ bool __cdecl check_joining_session_version_hook(int32 executable_type, int32 exe
 bool __stdcall network_locator_parse_search_result(void* thisx, int a2, s_network_locator_result* session_out)
 {
 	bool valid = p_xlocator_parse_search_result(thisx, a2, session_out)
-		&& check_joining_session_version_hook((uint8)session_out->executable_type, (uint16)session_out->executable_version, (uint16)session_out->compatible_version);
+		&& check_joining_session_version_hook(session_out->executable_type, session_out->executable_version, session_out->compatible_version);
 	return valid;
 }

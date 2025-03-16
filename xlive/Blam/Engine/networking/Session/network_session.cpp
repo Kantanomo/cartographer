@@ -116,11 +116,6 @@ int32 NetworkSession::GetPlayerCount()
 	return GetActiveNetworkSession()->get_player_count();
 }
 
-s_membership_player* NetworkSession::GetPlayerInformation(datum player_index)
-{
-	return GetActiveNetworkSession()->get_player_membership(player_index);
-}
-
 const wchar_t* NetworkSession::GetPlayerName(datum player_index)
 {
 	return GetActiveNetworkSession()->get_player_name(player_index);
@@ -128,12 +123,12 @@ const wchar_t* NetworkSession::GetPlayerName(datum player_index)
 
 uint64 NetworkSession::GetPlayerId(datum player_index)
 {
-	return GetPlayerInformation(player_index)->identifier;
+	return GetActiveNetworkSession()->get_player_id(player_index);
 }
 
 int8 NetworkSession::GetPlayerTeam(datum player_index)
 {
-	return GetPlayerInformation(player_index)->properties[0].team_index;
+	return GetActiveNetworkSession()->get_player_membership(player_index)->properties[0].team_index;
 }
 
 int32 NetworkSession::GetPeerIndexFromId(uint64 xuid)

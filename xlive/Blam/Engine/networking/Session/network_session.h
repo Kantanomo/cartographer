@@ -108,7 +108,6 @@ namespace NetworkSession
 
 	int8 GetPlayerTeam(datum player_index);
 	int32 GetPeerIndexFromId(uint64 xuid);
-	s_membership_player* GetPlayerInformation(datum player_index);
 
 	wchar_t* GetGameVariantName();
 
