@@ -289,7 +289,8 @@ public:
 	int next_index_of(const char* src, size_t starting_index) const;
 	int last_index_of(const char* src) const;
 	bool is_equal(const char* string) const;
-	char* print(const char* format, ...);
+	const char* print(const char* format, ...);
+	const char* append_print(const char* format, ...);
 
 private:
 	char m_string[string_length];
@@ -323,7 +324,8 @@ public:
 	int last_index_of(const wchar_t* src) const;
 	bool is_equal(const wchar_t* string) const;
 	errno_t to_lower(void);
-	wchar_t* print(const wchar_t* format, ...);
+	const wchar_t* print(const wchar_t* format, ...);
+	const wchar_t* append_print(const wchar_t* format, ...);
 
 private:
 	wchar_t m_string[string_length];
@@ -429,13 +431,31 @@ bool c_static_string<T>::is_equal(const char* string) const
 }
 
 template<size_t T>
-char* c_static_string<T>::print(const char* format, ...)
+const char* c_static_string<T>::print(const char* format, ...)
 {
 	va_list args;
 	va_start(args, format);
 	ASSERT(format);
-	vsnprintf(this->m_string, T, format, args);
-	return this->m_string;
+	vsnprintf(m_string, T, format, args);
+
+	va_end(args);
+	return m_string;
+}
+
+template<size_t T>
+const char* c_static_string<T>::append_print(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+
+	const size_t current_length = this->length();
+
+	ASSERT(format);
+	ASSERT(current_length >= 0 && current_length < NUMBEROF(m_string));
+
+	vsprintf(&m_string[current_length], T - current_length, format, args);
+	va_end(args);
+	return m_string;
 }
 
 template<size_t T>
@@ -543,11 +563,27 @@ errno_t c_static_wchar_string<T>::to_lower(void)
 }
 
 template<size_t T>
-wchar_t* c_static_wchar_string<T>::print(const wchar_t* format, ...)
+const wchar_t* c_static_wchar_string<T>::print(const wchar_t* format, ...)
 {
 	va_list args;
 	va_start(args, format);
 	ASSERT(format);
 	uvsnprintf(this->m_string, T, format, args);
 	return this->m_string;
+}
+
+template<size_t T>
+const wchar_t* c_static_wchar_string<T>::append_print(const wchar_t* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+
+	const size_t current_length = this->length();
+
+	ASSERT(format);
+	ASSERT(current_length >= 0 && current_length < NUMBEROF(m_string));
+
+	uvsnprintf(&m_string[current_length], T - current_length, a2, args);
+	va_end(args);
+	return m_string;
 }

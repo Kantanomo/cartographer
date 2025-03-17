@@ -74,6 +74,23 @@ void* csmemmove(void* destination, void* source, size_t size)
 	return memmove(destination, source, size);
 }
 
+void memmove_guarded(void* write_start, const void* src, size_t size, void* bounds_lower, size_t bounds_size)
+{
+	if (size > 0)
+	{
+		const void* write_end = (int8*)write_start + size - 1;
+		const void* bounds_upper = (int8*)bounds_lower + bounds_size - 1;
+		
+		CSERIES_ASSERT(bounds_upper >= bounds_lower);
+		CSERIES_ASSERT(bounds_size > 0);
+		CSERIES_ASSERT((write_start >= bounds_lower) && (write_start <= bounds_upper));
+		CSERIES_ASSERT((write_end >= bounds_lower) && (write_end <= bounds_upper));
+
+		memmove(write_start, src, size);
+	}
+	return;
+}
+
 void* csmemset(void* destination, int32 val, size_t size)
 {
 	CSERIES_ASSERT(size == 0 || destination);
