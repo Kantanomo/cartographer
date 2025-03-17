@@ -2,6 +2,7 @@
 #include "Utils.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include <sstream>
 
 int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);
@@ -162,17 +163,21 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const 
 	}
 }
 
-std::string GetVKeyCodeString(int vkey) {
-	std::ostringstream strStream;
-	strStream << "0x" << std::hex << vkey;
-	if (vkey >= 0x70 && vkey <= 0x87) {
+void GetVKeyCodeString(int vkey, c_static_string<64>* string)
+{
+	string->append_print("0x%x", vkey);
+
+	if (vkey >= 0x70 && vkey <= 0x87)
+	{
 		int func_num = vkey - 0x70 + 1;
-		strStream << " - VK_F" << std::dec << func_num;
+		string->append_print(" - VK_F%d", func_num);
 	}
-	else if (vkey == 0x24) {
-		strStream << " - VK_Home";
+	else if (vkey == 0x24)
+	{
+		string->append(" - VK_Home");
 	}
-	return strStream.str();
+
+	return;
 }
 
 int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath) {
@@ -242,15 +247,6 @@ char* custom_label_escape(char* label_literal) {
 bool isInteger(std::wstring myString)
 {
 	return myString.find_first_not_of(L"0123456789") == std::wstring::npos;
-}
-
-bool isFloat(std::wstring myString)
-{
-	std::wistringstream iss(myString);
-	float f;
-	iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
-	// Check the entire string was consumed and if either failbit or badbit is set
-	return iss.eof() && !iss.fail();
 }
 
 DWORD crc32buf(const char* buf, size_t len)

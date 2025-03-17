@@ -1,6 +1,6 @@
 #pragma once
 
-enum e__emblem_foreground : uint8
+enum e_emblem_foreground : uint8
 {
 	_emblem_foreground_seventh_column = 0,
 	_emblem_foreground_bullseye = 1,
@@ -68,7 +68,7 @@ enum e__emblem_foreground : uint8
 	_emblem_foreground_number9 = 63
 };
 
-enum e__emblem_background : uint8
+enum e_emblem_background : uint8
 {
 	_emblem_background_solid = 0,
 	_emblem_background_vertical_split = 1,
@@ -111,8 +111,8 @@ enum e_emblem_flags : uint8
 
 struct s_emblem_info
 {
-	e__emblem_foreground foreground_emblem;
-	e__emblem_background background_emblem;
+	e_emblem_foreground foreground_emblem;
+	e_emblem_background background_emblem;
 	e_emblem_flags emblem_flags;
 };
 ASSERT_STRUCT_SIZE(s_emblem_info, 3);

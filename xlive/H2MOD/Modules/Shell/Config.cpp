@@ -514,12 +514,31 @@ void SaveH2Config() {
 
 		if (!Memory::IsDedicatedServer()) {
 
-			CONFIG_SET_C(&ini, "hotkey_help", H2Config_hotkeyIdHelp, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdHelp)).c_str());
-			CONFIG_SET_C(&ini, "hotkey_align_window", H2Config_hotkeyIdAlignWindow, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdAlignWindow)).c_str());
-			CONFIG_SET_C(&ini, "hotkey_window_mode", H2Config_hotkeyIdWindowMode, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdWindowMode)).c_str());
-			CONFIG_SET_C(&ini, "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat)).c_str());
-			CONFIG_SET_C(&ini, "hotkey_guide", H2Config_hotkeyIdGuide, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdGuide)).c_str());
-			CONFIG_SET_C(&ini, "hotkey_console", H2Config_hotkeyIdConsole, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdConsole)).c_str());
+			c_static_string<64> vkstring;
+			vkstring.set("#");
+			GetVKeyCodeString(H2Config_hotkeyIdHelp, &vkstring);
+			CONFIG_SET_C(&ini, "hotkey_help", H2Config_hotkeyIdHelp, vkstring.get_string());
+
+			vkstring.set("#");
+			GetVKeyCodeString(H2Config_hotkeyIdAlignWindow, &vkstring);
+			CONFIG_SET_C(&ini, "hotkey_align_window", H2Config_hotkeyIdAlignWindow, vkstring.get_string());
+
+			vkstring.set("#");
+			GetVKeyCodeString(H2Config_hotkeyIdWindowMode, &vkstring);
+			CONFIG_SET_C(&ini, "hotkey_window_mode", H2Config_hotkeyIdWindowMode, vkstring.get_string());
+
+			vkstring.set("#");
+			GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat, &vkstring);
+			CONFIG_SET_C(&ini, "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, vkstring.get_string());
+
+			vkstring.set("#");
+			GetVKeyCodeString(H2Config_hotkeyIdGuide, &vkstring);
+			CONFIG_SET_C(&ini, "hotkey_guide", H2Config_hotkeyIdGuide, vkstring.get_string());
+			vkstring.clear();
+
+			vkstring.set("#");
+			GetVKeyCodeString(H2Config_hotkeyIdConsole, &vkstring);
+			CONFIG_SET_C(&ini, "hotkey_console", H2Config_hotkeyIdConsole, vkstring.get_string());
 		}
 
 		CONFIG_SET_DEBUG_KEY(&ini, "debug_log", &H2Config_debug_log);

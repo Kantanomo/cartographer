@@ -1222,7 +1222,6 @@
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="util\filesys.cpp" />
-    <ClCompile Include="Util\hash.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
@@ -2397,7 +2396,6 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="util\filesys.h" />
-    <ClInclude Include="Util\hash.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
     <ClInclude Include="Util\log.h" />
     <ClInclude Include="xlivedefs.h" />

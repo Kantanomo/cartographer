@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "XSocket.h"
-#include "XLive/xnet/upnp.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
@@ -110,7 +109,9 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long* argp)
 {
 	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
-	LOG_TRACE_NETWORK("XSocketIOCTLSocket() - cmd: {}", IOCTLSocket_cmd_string(cmd).c_str());
+	char string[64];
+	IOCTLSocket_cmd_string(cmd, string);
+	LOG_TRACE_NETWORK("XSocketIOCTLSocket() - cmd: {}", string);
 	int ret = ioctlsocket(xsocket->systemSocketHandle, cmd, argp);
 
 	if (ret == NO_ERROR)
@@ -136,8 +137,11 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char* optva
 {
 	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
+	char string[64];
+	sockOpt_string(optname, string);
+
 	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {:x}, level = {}, optname = {},  optlen = {})",
-		xsocket->systemSocketHandle, level, sockOpt_string(optname), optlen);
+		xsocket->systemSocketHandle, level, string, optlen);
 
 	if (optname == SO_SNDBUF
 		|| optname == SO_RCVBUF)
@@ -886,7 +890,9 @@ int XVirtualSocket::SetBufferSize(int optname, INT bufSize)
 		return SOCKET_ERROR;
 	}
 
-	LOG_TRACE_NETWORK("{} - getsockopt() - {}: {} - {}", __FUNCTION__, sockOpt_string(optname), bufOpt, bufSize);
+	char string[64];
+	sockOpt_string(optname, string);
+	LOG_TRACE_NETWORK("{} - getsockopt() - {}: {} - {}", __FUNCTION__, string, bufOpt, bufSize);
 
 	// this may only affect Windows 7/Server 2008 R2 and below, as Windows 10 uses an 64K buffer already
 	if (bufOpt < bufSize)

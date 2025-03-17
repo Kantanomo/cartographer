@@ -6,7 +6,6 @@
 #include "math/color_math.h"
 #include "math/function_definitions.h"
 
-#include "objects/object_types.h"
 #include "tag_files/string_id.h"
 
 #define k_maximum_object_functions 256

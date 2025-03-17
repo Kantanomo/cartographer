@@ -181,7 +181,7 @@ void __cdecl biped_get_sight_position(
 		real_vector3d direction;
 		scale_vector3d(&origin_vector, -0.25f, &direction);
 
-		e_collision_test_flags flags = (e_collision_test_flags)(
+		const e_collision_test_flags flags = (e_collision_test_flags)(
 			FLAG(_collision_test_bit_26) | 
 			FLAG(_collision_test_bit_23) |
 			FLAG(_collision_test_bit_15) | 

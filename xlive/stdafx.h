@@ -71,8 +71,6 @@ static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_
 #include <vector>
 #include <random>
 #include <numeric>
-#include <sstream>
-#include <iomanip>
 #include <unordered_map>
 #include <filesystem>
 
@@ -109,23 +107,11 @@ static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_
 
 extern std::random_device rd;
 
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || (defined(__cplusplus) && (__cplusplus >= 201703L)))
-#define CONSTEXPR constexpr
-#else
-#define CONSTEXPR
-#endif
-
 #define COMPILE_WITH_VOICE 0
 
 #pragma region Warnings as errors
 #pragma warning(error: 4700)
 #pragma endregion
-
-#if ((!defined(_M_FP_FAST)) || !_M_FP_FAST)
-#define FLOATING_POINT_ENV_ACCESS() _Pragma("fenv_access (on)")
-#else
-#define FLOATING_POINT_ENV_ACCESS()
-#endif
 
 // use this macro to define _time and _clock namespaces
 #define STD_CHRONO_DEFINE_TIME_AND_CLOCK(_time_name, _clock_name) \

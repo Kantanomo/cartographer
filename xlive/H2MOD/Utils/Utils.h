@@ -5,7 +5,7 @@ int FindLineStart(FILE* fp, int lineStrLen);
 bool GetFileLine(FILE* fp, char** fileLine);
 char CmpVersions(const char* version_base, const char* version_alt);
 void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber));
-std::string GetVKeyCodeString(int vkey);
+void GetVKeyCodeString(int vkey, c_static_string<64>* string);
 int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath);
 LONG GetDWORDRegKey(HKEY hKey, const wchar_t* strValueName, DWORD* nValue);
 
@@ -13,7 +13,6 @@ LONG GetDWORDRegKey(HKEY hKey, const wchar_t* strValueName, DWORD* nValue);
 char* custom_label_escape(char* label_literal);
 
 bool isInteger(std::wstring myString);
-bool isFloat(std::wstring myString);
 
 bool HexStrToBytes(const std::string& hexStr, uint8_t* byteBuf, size_t bufLen);
 std::string ByteToHexStr(const uint8_t* buffer, size_t size);

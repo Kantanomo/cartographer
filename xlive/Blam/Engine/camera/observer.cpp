@@ -217,3 +217,8 @@ s_observer_result* __cdecl observer_get_camera(int32 user_index)
 {
 	return INVOKE(0x81EBA, 0x0, observer_get_camera, user_index);
 }
+
+s_observer_result* __cdecl observer_try_and_get_camera(int32 user_index)
+{
+	return INVOKE(0x818D6, 0x0, observer_try_and_get_camera, user_index);
+}

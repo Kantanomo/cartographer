@@ -1,26 +1,24 @@
 #include "stdafx.h"
-
 #include "net_utils.h"
 
 #define STRINGIFY_AND_RET_CASE(_case) \
-case _case: \
-	return #_case; \
+case _case:											\
+	csstrncpy(string, #_case, NUMBEROF(#_case));	\
+	break
 
-std::string IOCTLSocket_cmd_string(unsigned long cmd)
+void IOCTLSocket_cmd_string(unsigned long cmd, char* string)
 {
 	switch (cmd)
 	{
 		STRINGIFY_AND_RET_CASE(FIONBIO);
 		STRINGIFY_AND_RET_CASE(FIONREAD);
-
 	default:
-		std::stringstream strstream; 
-		strstream << "UNKNOWN: " << std::hex << cmd;
-		return strstream.str();
+		csnprintf(string, 32, 32, "UNKNOWN: %x", cmd);
 	}
+	return;
 }
 
-std::string sockOpt_string(int optName)
+void sockOpt_string(int optName, char* string)
 {
 	switch (optName)
 	{
@@ -47,10 +45,9 @@ std::string sockOpt_string(int optName)
 		STRINGIFY_AND_RET_CASE(SO_TYPE);
 
 	default:
-		std::stringstream strstream;
-		strstream << "UNKNOWN: " << std::hex << optName;
-		return strstream.str();
+		csnprintf(string, 32, 32, "UNKNOWN: %x", optName);
 	}
+	return;
 }
 
 bool Ipv4AddressIsReservedOrLocalhost(const IN_ADDR ipv4Addr)

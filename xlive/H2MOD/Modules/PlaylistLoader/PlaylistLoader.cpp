@@ -62,9 +62,8 @@ namespace playlist_loader
 	}
 	real32 custom_settings_real_check(playlist_entry* playlist_entry, wchar_t* value)
 	{
-		if (isFloat(value))
-			return std::stof(value);
-
+		return wcstof(value, NULL);
+		/*
 		p_playlist_loader_invalid_entry(
 			playlist_entry,
 			4,
@@ -74,6 +73,7 @@ namespace playlist_loader
 			L'\0');
 
 		return NAN;
+		*/
 	}
 	template <typename T = void*>
 	T custom_settings_enum_check(playlist_entry* playlist_entry, wchar_t* value, const wchar_t** values, int values_size)

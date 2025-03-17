@@ -1,10 +1,15 @@
 #pragma once
+#include "tag_injection_manager.h"
 #include "tag_files/tag_groups.h"
 
 /* constants */
 
 #define k_carto_shared_map L"carto_shared"
 #define k_events_map k_carto_shared_map
+
+/* globals */
+
+extern c_tag_injecting_manager* g_tag_injection_manager;
 
 /* prototypes */
 

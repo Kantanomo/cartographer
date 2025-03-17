@@ -72,11 +72,27 @@ void KeyboardInput::ExecuteHotkey(WPARAM message)
 void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
 	addDebugText("Options:");
-	addDebugText("%s - Print and show this help text.", GetVKeyCodeString(H2Config_hotkeyIdHelp).c_str());
-	addDebugText("%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(H2Config_hotkeyIdAlignWindow).c_str());
-	addDebugText("%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(H2Config_hotkeyIdWindowMode).c_str());
-	addDebugText("%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat).c_str());
-	addDebugText("%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
+
+	c_static_string<64> vkstring;
+	GetVKeyCodeString(H2Config_hotkeyIdHelp, &vkstring);
+	addDebugText("%s - Print and show this help text.", vkstring.get_string());
+	vkstring.clear();
+
+	GetVKeyCodeString(H2Config_hotkeyIdAlignWindow, &vkstring);
+	addDebugText("%s - Align/Correct window positioning (into Borderless).", vkstring.get_string());
+	vkstring.clear();
+
+	GetVKeyCodeString(H2Config_hotkeyIdWindowMode, &vkstring);
+	addDebugText("%s - Toggle Windowed/Borderless mode.", vkstring.get_string());
+	vkstring.clear();
+
+	GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat, &vkstring);
+	addDebugText("%s - Toggles hiding the in-game chat menu.", vkstring.get_string());
+	vkstring.clear();
+
+	GetVKeyCodeString(H2Config_hotkeyIdConsole, &vkstring);
+	addDebugText("%s - Toggles hiding the Console Menu.", vkstring.get_string());
+
 	addDebugText("------------------------------");
 
 	if (!ImGuiHandler::IsWindowActive(k_cartographer_console_window_name))
