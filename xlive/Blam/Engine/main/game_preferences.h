@@ -2,6 +2,7 @@
 
 enum e_language : uint32
 {
+	_language_invalid = (uint32)NONE,
 	_language_english = 0,
 	_language_japanese = 1,
 	_language_german = 2,
@@ -19,3 +20,5 @@ e_language get_current_language(void);
 void __cdecl global_preferences_initialize(void);
 
 void __cdecl game_preferences_flag_dirty(void);
+
+int32 __cdecl language_get_international_key(e_language lang, int32 value);

@@ -179,7 +179,7 @@ namespace ImGuiHandler
 
 				for (uint16 gamepad_index = 0; gamepad_index < k_number_of_users; gamepad_index++)
 				{
-					if (input_abstraction_globals->input_has_gamepad[gamepad_index] &&
+					if (g_input_abstraction_globals->input_has_gamepad[gamepad_index] &&
 						input_get_gamepad_state(gamepad_index)->button_frames_down[_xinput_gamepad_a])
 					{
 						ImGuiHandler::ToggleWindow(k_motd_window_name);

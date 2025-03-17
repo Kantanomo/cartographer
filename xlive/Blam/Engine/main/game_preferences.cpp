@@ -17,3 +17,8 @@ void __cdecl game_preferences_flag_dirty(void)
 	INVOKE(0x323D2, 0x25994, game_preferences_flag_dirty);
 	return;
 }
+
+int32 __cdecl language_get_international_key(e_language lang, int32 value)
+{
+	return INVOKE(0x5E88E, 0x0, language_get_international_key, lang, value);
+}

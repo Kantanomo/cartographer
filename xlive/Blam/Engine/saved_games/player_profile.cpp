@@ -9,11 +9,6 @@ void __cdecl saved_game_player_profile_set_default_variant(void* saved_game_vari
 	INVOKE(0x98FD, 0, saved_game_player_profile_set_default_variant, saved_game_variant);
 }
 
-void saved_game_player_profile_set_input_preferences(s_gamepad_input_preferences* input_preferences,
-	s_saved_game_profile_input_preferences* profile_input_preferences)
-{
-	INVOKE(0x61B62, 0, saved_game_player_profile_set_input_preferences, input_preferences, profile_input_preferences);
-}
 
 void saved_game_player_profile_default_new(s_saved_game_player_profile* profile, int32 default_profile_type)
 {
@@ -37,20 +32,20 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 	{
 		if(default_profile_type == 1)
 		{
-			profile->input_preferences.controller_button_layout = 0;
-			profile->input_preferences.controller_thumbstick_layout = 0;
-			profile->input_preferences.flags.set(_saved_game_profile_input_preference_flag_controller_look_inversion, true);
-			profile->input_preferences.flags.set(_saved_game_profile_input_preference_flag_mouse_look_inversion, true);
+			profile->input_preferences.controller_button_layout = _button_preset_default;
+			profile->input_preferences.controller_thumbstick_layout = _joystick_preset_default;
+			profile->input_preferences.flags.set(_saved_game_profile_input_preference_bit_controller_look_inversion, true);
+			profile->input_preferences.flags.set(_saved_game_profile_input_preference_bit_mouse_look_inversion, true);
 		}
 	}
 	else
 	{
-		profile->input_preferences.controller_button_layout = 0;
-		profile->input_preferences.controller_thumbstick_layout = 0;
+		profile->input_preferences.controller_button_layout = _button_preset_default;
+		profile->input_preferences.controller_thumbstick_layout = _joystick_preset_default;
 	}
 	saved_game_player_profile_set_default_variant(&profile->variant);
-	input_abstraction_preferences_new(&input_preferences, 0, false, false);
-	saved_game_player_profile_set_input_preferences(&input_preferences, &profile->input_preferences);
+	input_abstraction_get_default_preferences(&input_preferences, _joystick_preset_default, _button_preset_default, _custom_keyboard_preset_right_hold, 0);
+	input_abstraction_set_controller_settings_from_preferences(&input_preferences, &profile->input_preferences);
 }
 
 bool saved_game_player_profile_read_file(uint32 enumerated_file_index, s_saved_game_player_profile* profile)

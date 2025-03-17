@@ -41,7 +41,7 @@ void* __cdecl death_cam_get_controller_input(e_controller_index controller)
 
 	// instead we return abstracted_input_state
 	// then we test for abstracted _button_jump in the caller
-	return &input_abstraction_globals->input_states[controller];
+	return &g_input_abstraction_globals->input_states[controller];
 }
 
 // allows keyboards/gamepads/any device to switch death b/w targets

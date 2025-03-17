@@ -449,6 +449,7 @@
     <ClCompile Include="Blam\Engine\networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_utilities.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_button_settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1900,6 +1901,7 @@
     <ClInclude Include="Blam\Engine\game\player_constants.h" />
     <ClInclude Include="3rdparty\SimpleIni\SimpleIni.h" />
     <ClInclude Include="Blam\Engine\networking\network_utilities.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_button_settings.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

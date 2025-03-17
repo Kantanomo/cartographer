@@ -16,6 +16,13 @@ enum e_default_list_skin_texts
 	k_number_of_default_list_skin_texts,
 };
 
+enum e_settings_list_skin_texts
+{
+	_settings_list_skin_text_header = 0,
+	_settings_list_skin_text_value = 1,
+	k_number_of_settings_list_skin_texts,
+};
+
 
 /* structures */
 
@@ -43,7 +50,7 @@ protected:
 	uint16 m_up_arrow_transition_time;
 	uint16 m_down_arrow_transition_time;
 	int32 m_intro_delay_milliseconds;
-	uint16 m_tabbing_count;
+	int16 m_tabbing_count;
 	uint8 gap_7E[2];
 	real_rectangle2d m_up_arrow_position;
 	real_rectangle2d m_down_arrow_position;

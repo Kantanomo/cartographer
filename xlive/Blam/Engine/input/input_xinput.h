@@ -23,6 +23,12 @@ public:
 };
 ASSERT_STRUCT_SIZE(xinput_device, 0x1C);
 
+/* globals */
+
+extern uint16 g_controller_radial_deadzones[k_number_of_controllers];
+
+/* prototypes */
+
 int16 input_xinput_adjust_thumb_axis_deadzone(int16 thumb_axis, int16 thumb_deadzone);
 
 void input_xinput_adjust_thumb_radial_deadzones(uint32 gamepad_index, s_gamepad_input_button_state* gamepad_state);

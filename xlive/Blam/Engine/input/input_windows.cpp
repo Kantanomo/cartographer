@@ -8,7 +8,7 @@
 #include "shell/shell_windows.h"
 
 extern input_device** g_xinput_devices;
-extern s_input_abstraction_globals* input_abstraction_globals;
+extern s_input_abstraction_globals* g_input_abstraction_globals;
 
 /* globals */
 
