@@ -6,28 +6,41 @@
 #include "GunGame/GunGame.h"
 #include "Infection/Infection.h"
 
-ICustomGameVariant* currentRunningVariant;
-std::vector<ICustomGameVariant*> CustomVariantHandler::customVariants;
+/* constants */
 
-std::unordered_map<const wchar_t*, CustomVariantId> customGameVarStr =
+const wchar_t* k_custom_variant_strings[5]
 {
-	{ L"infection",		CustomVariantId::_id_infection	},
-	{ L"zombies",		CustomVariantId::_id_infection	},
-	{ L"gungame",		CustomVariantId::_id_gungame	},
-	{ L"headhunter",	CustomVariantId::_id_graverobber },
-	{ L"graverobber",	CustomVariantId::_id_graverobber },
+	L"infection",
+	L"zombies",
+	L"gungame",
+	L"headhunter",
+	L"graverobber"
 };
+
+const CustomVariantId k_custom_variant_ids[5]
+{
+	CustomVariantId::_id_infection,
+	CustomVariantId::_id_infection,
+	CustomVariantId::_id_gungame,
+	CustomVariantId::_id_graverobber,
+	CustomVariantId::_id_graverobber
+};
+
+/* globals */
+
+ICustomGameVariant* g_custom_variants[3];
+ICustomGameVariant* g_current_running_variant;
 
 void CustomVariantHandler::RegisterCustomVariants()
 {
-	customVariants.push_back(new Infection());
-	customVariants.push_back(new GunGame());
-	customVariants.push_back(new GraveRobber());
+	g_custom_variants[0] = new Infection();
+	g_custom_variants[1] = new GunGame();
+	g_custom_variants[2] = new GraveRobber();
 }
 
 ICustomGameVariant* CustomVariantHandler::GetGameVariant(CustomVariantId variantId)
 {
-	for (auto& variant : customVariants)
+	for (auto& variant : g_custom_variants)
 	{
 		if (variant->GetVariantId() == variantId)
 			return variant;
@@ -38,31 +51,30 @@ ICustomGameVariant* CustomVariantHandler::GetGameVariant(CustomVariantId variant
 
 ICustomGameVariant* CustomVariantHandler::GetCurrentGameVariant()
 {
-	return currentRunningVariant;
+	return g_current_running_variant;
 }
 
 void CustomVariantHandler::GameVarianEnable(const wchar_t* variant)
 {
 	CustomVariantId variantId = _id_unknown;
 
-	for (auto& varIds : customGameVarStr)
+	for (size_t i = 0; i < NUMBEROF(k_custom_variant_strings); ++i)
 	{
-		if (StrStrIW(variant, varIds.first))
+		if (StrStrIW(variant, k_custom_variant_strings[i]))
 		{
-			variantId = varIds.second;
+			variantId = k_custom_variant_ids[i];
 			break;
 		}
 	}
 
-	currentRunningVariant = GetGameVariant(variantId);
+	g_current_running_variant = GetGameVariant(variantId);
 }
 
 bool CustomVariantHandler::ContainsGameVariant(const wchar_t* variant, CustomVariantId variantId)
 {
-	for (auto& varIds : customGameVarStr)
+	for (size_t i = 0; i < NUMBEROF(k_custom_variant_strings); ++i)
 	{
-		if (StrStrIW(variant, varIds.first) 
-			&& varIds.second == variantId)
+		if (StrStrIW(variant, k_custom_variant_strings[i]) && k_custom_variant_ids[i] == variantId)
 		{
 			return true;
 		}
@@ -73,9 +85,9 @@ bool CustomVariantHandler::ContainsGameVariant(const wchar_t* variant, CustomVar
 
 void CustomVariantHandler::DisposeGameVariant()
 {
-	if (currentRunningVariant != nullptr)
-		currentRunningVariant->Dispose();
-	currentRunningVariant = nullptr;
+	if (g_current_running_variant != nullptr)
+		g_current_running_variant->Dispose();
+	g_current_running_variant = nullptr;
 }
 
 bool CustomVariantHandler::VariantEnabled(CustomVariantId variantId)

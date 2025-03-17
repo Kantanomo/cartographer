@@ -60,8 +60,6 @@ namespace CustomVariantHandler
 
 	ICustomGameVariant* GetCurrentGameVariant();
 	ICustomGameVariant* GetGameVariant(CustomVariantId variantId);
-
-	extern std::vector<ICustomGameVariant*> customVariants;
 };
 
 // TODO move this out/remove by using tag interface
