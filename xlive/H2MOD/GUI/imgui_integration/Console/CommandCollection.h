@@ -34,7 +34,7 @@ namespace CommandCollection
 	int DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	int SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int drop(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	
 	int Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
@@ -54,7 +54,5 @@ namespace CommandCollection
 	int SetPortNumber(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 
 	// misc
-	void ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, float randomMultiplier, bool sameTeam);
-	void ReadObjectDatumIdx();
 	void DeleteObject(datum objectDatumIdx);
 }

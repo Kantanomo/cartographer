@@ -63,8 +63,6 @@ static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
-#include <set>
-#include <unordered_set>
 #include <map>
 #include <mutex>
 #include <string>

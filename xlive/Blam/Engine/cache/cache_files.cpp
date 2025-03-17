@@ -375,7 +375,7 @@ datum tag_loaded(uint32 group_tag, const char* name)
 	}
 	
 	// CARTO ADDITION:
-	// Parse the injected tag instanceswhen checking if a tag is loaded
+	// Parse the injected tag instances when checking if a tag is loaded
 	if (result == NONE)
 	{
 		const uint16 last_injected_index = k_first_injected_datum + g_tag_injection_manager->get_table()->get_entry_count();
@@ -405,7 +405,7 @@ const char* tag_get_name(datum tag_index)
 	s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
 	ASSERT(g_cache_file_memory_globals->tags_loaded);
 	
-	// We added a second check if the first one fails, since the tag table was split it'll try and access a name outside of the range
+	// We added a second check if the first one fails, since we're going to be passing it tag indexes in the injected tag area
 	ASSERT(IN_RANGE(tag_name_index, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1) || IN_RANGE(tag_name_index - k_first_injected_datum, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1));
 
 	int32 tag_name_offset = g_cache_file_debug_globals.debug_tag_name_offsets[tag_name_index];

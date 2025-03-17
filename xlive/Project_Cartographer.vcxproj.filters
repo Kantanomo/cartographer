@@ -35,7 +35,6 @@
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="util\filesys.cpp" />
-    <ClCompile Include="Util\hash.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
@@ -450,6 +449,7 @@
     <ClCompile Include="Blam\Engine\networking\network_utilities.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_button_settings.cpp" />
+    <ClCompile Include="Blam\Engine\main\console.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -573,7 +573,6 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="util\filesys.h" />
-    <ClInclude Include="Util\hash.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
     <ClInclude Include="Util\log.h" />
     <ClInclude Include="xlivedefs.h" />
@@ -691,7 +690,6 @@
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\animations\animation_definitions.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
-    <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
     <ClInclude Include="Blam\Engine\interface\hud.h" />
     <ClInclude Include="Blam\Engine\interface\motion_sensor.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud.h" />
@@ -1902,6 +1900,7 @@
     <ClInclude Include="3rdparty\SimpleIni\SimpleIni.h" />
     <ClInclude Include="Blam\Engine\networking\network_utilities.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_button_settings.h" />
+    <ClInclude Include="Blam\Engine\main\console.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

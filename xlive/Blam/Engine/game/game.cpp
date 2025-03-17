@@ -18,6 +18,13 @@
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
+/* typedefs */
+
+typedef void(__cdecl* game_frame_t)(real32);
+
+/* globals */
+
+game_frame_t p_game_frame;
 
 s_game_systems* get_game_systems()
 {
@@ -324,11 +331,9 @@ void __cdecl game_initialize_for_new_map(s_game_options* options)
 	}
 	game_globals->initializing = false;
 	game_globals->map_active = true;
+	return;
 }
 
-
-typedef void(__cdecl* game_frame_t)(real32);
-game_frame_t p_game_frame;
 void __cdecl game_frame(real32 dt)
 {
 	halo_interpolator_update_delta();

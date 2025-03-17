@@ -229,6 +229,8 @@ s_data_array* object_header_data_get(void);
 
 void objects_apply_patches(void);
 
+void __cdecl objects_initialize_for_new_map(void);
+
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
 void* __cdecl object_try_and_get_and_verify_type(datum object_index, int32 object_type_flags);
 
@@ -320,3 +322,13 @@ uint32 __cdecl object_search_for_objects_in_radius(
 void __cdecl objects_post_update(void);
 
 int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count);
+
+bool __cdecl object_force_inside_bsp(datum object_index, const real_point3d* known_good_point, int32 ignore_object_index);
+
+void* object_get_and_verify_type(datum object_index, uint32 object_type_mask);
+
+#ifdef OBJECT_OVERRIDE_ENABLED
+void object_override_set_shader(datum object_index, datum shader_tag_index);
+
+datum object_override_get_shader(datum object_index);
+#endif

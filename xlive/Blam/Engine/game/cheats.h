@@ -1,4 +1,7 @@
 #pragma once
+#include "tag_files/tag_groups.h"
+
+/* enums */
 
 //	Explanation about the Cow Bell and Whuppopotamus skull incase anyone else gets confused by how it's originally setup
 //	=============================================================================================================================================
@@ -28,13 +31,20 @@ enum e_skull_type : uint32
 	k_skull_count
 };
 
+/* globals */
+
+extern bool g_cheats_skull_enabled[k_skull_count];
+
+/* prototypes */
+
+void cheats_apply_patches(void);
+
 // Returns true if skull type paramater passed is activated, the skull type paramater passed is valid, and the game is campaign
 bool __cdecl ice_cream_flavor_available(const e_skull_type skull);
 
 // Activates the skull type passed to the function
 void __cdecl ice_cream_flavor_stock(const e_skull_type skull);
 
-// Gets the activation array for the skulls
-bool* get_ice_cream_activation();
+void cheat_drop_tag_name(const char* name);
 
-void cheats_apply_patches();
+bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error);

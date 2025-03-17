@@ -275,6 +275,8 @@ s_players_globals* get_players_globals();
 
 datum __cdecl player_index_from_user_index(int32 user_index);
 
+int32 players_first_active_user(void);
+
 e_controller_index players_get_controller_index_from_user_index(int32 user_index);
 
 bool __cdecl player_user_is_elite_or_dervish(int32 user_index);

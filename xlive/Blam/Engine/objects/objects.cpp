@@ -15,6 +15,7 @@
 #include "main/interpolator.h"
 #include "memory/memory_pool.h"
 #include "models/models.h"
+#include "objects/lights.h"
 #include "objects/widgets/widgets.h"
 #include "physics/collisions.h"
 #include "physics/havok.h"
@@ -24,10 +25,36 @@
 #include "structures/cluster_partitions.h"
 #include "tag_files/tag_files.h"
 
+/* constants */
+
+enum
+{
+	k_maximum_object_override_count = 16
+};
+
+/* structures */
+
+#ifdef OBJECT_OVERRIDE_ENABLED
+struct s_object_override_data
+{
+	bool valid;
+	int8 pad[3];
+	datum object_index;
+	datum shader_tag_index;
+};
+#endif
+
+/* globals */
+
+#ifdef OBJECT_OVERRIDE_ENABLED
+s_object_override_data g_object_override_data[k_maximum_object_override_count];
+#endif
 
 /* prototypes */
 
 static s_memory_pool* get_object_table(void);
+
+static datum** game_state_object_name_list_get(void);
 
 static void objects_apply_interpolation_patches(void);
 
@@ -86,6 +113,12 @@ static void object_reset_interpolation(datum object_index);
 
 static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count, bool is_unit);
 
+static s_object_override_data* object_override_data_get(size_t override_index);
+
+static int32 object_find_override_index(datum object_index);
+
+static int32 object_get_override_index(datum object_index);
+
 /* public code */
 
 s_data_array* object_header_data_get(void)
@@ -96,6 +129,35 @@ s_data_array* object_header_data_get(void)
 void objects_apply_patches(void)
 {
 	objects_apply_interpolation_patches();
+
+	s_game_systems* g_game_systems = get_game_systems();
+	WritePointer((uintptr_t)&g_game_systems[28].reset_proc, objects_initialize_for_new_map);
+	return;
+}
+
+void __cdecl objects_initialize_for_new_map(void)
+{
+	damage_initialize_for_new_map();
+	widgets_initialize_for_new_map();
+	object_types_initialize_for_new_map();
+	lights_initialize_for_new_map();
+	data_make_valid(object_header_data_get());
+	csmemset(*game_state_object_name_list_get(), NONE, 2560);
+	cluster_partition_make_valid(collideable_object_cluster_partition_get());
+	cluster_partition_make_valid(noncollideable_object_cluster_partition_get());
+	s_object_globals* object_globals = object_globals_get();
+	object_globals->objects_updating = 0;
+	object_globals->field_8 = NONE;
+	object_globals->active_garbage_object_count = 0;
+	object_globals->field_C = 0;
+	object_globals->field_10 = 0;
+	object_globals->total_game_time_ticks = 0;
+	object_globals->object_custom_animations_prevent_lipsync_head_movement = false;
+	object_globals->object_custom_animations_hold_on_last_frame = false;
+
+#ifdef OBJECT_OVERRIDE_ENABLED
+	csmemset(g_object_override_data, 0, sizeof(g_object_override_data));
+#endif
 	return;
 }
 
@@ -557,7 +619,7 @@ void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool
 {
 	real_point3d point;
 	real_point3d interpolated_object_position;
-	object_datum* object = object_get_fast_unsafe(object_index);
+	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, NONE);
 	if (interpolated && halo_interpolator_interpolate_object_position(object_index, &interpolated_object_position))
 	{
 		point = interpolated_object_position;
@@ -754,12 +816,63 @@ int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id mark
 	return internal_object_get_markers_by_string_id(object_index, marker, marker_object, count, false);
 }
 
+bool __cdecl object_force_inside_bsp(datum object_index, const real_point3d* known_good_point, int32 ignore_object_index)
+{
+	return INVOKE(0x137BCC, 0x0, object_force_inside_bsp, object_index, known_good_point, ignore_object_index);
+}
+
+void* object_get_and_verify_type(datum object_index, uint32 object_type_mask)
+{
+	const object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	const object_datum* object = (object_datum*)object_header->datum;
+	const e_object_type type = object->object.object_identifier.get_type();
+
+#ifdef ASSERTS_ENABLED
+	if (!TEST_BIT(object_type_mask, type))
+	{
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "got an object type we didn't expect (expected one of 0x%08x but got #%d).", object_type_mask, type);
+		DISPLAY_ASSERT(string);
+	}
+#endif
+
+	return (void*)object;
+}
+
+#ifdef OBJECT_OVERRIDE_ENABLED
+void object_override_set_shader(datum object_index, datum shader_tag_index)
+{
+	const int32 override_index = object_get_override_index(object_index);
+	if (override_index != NONE)
+	{
+		object_override_data_get(override_index)->shader_tag_index = shader_tag_index;
+	}
+	return;
+}
+
+datum object_override_get_shader(datum object_index)
+{
+	const int32 override_index = object_find_override_index(object_index);
+
+	datum override_shader = NONE;
+	if (override_index != NONE)
+	{
+		override_shader = object_override_data_get(override_index)->shader_tag_index;
+	}
+	return override_shader;
+}
+#endif
+
 /* private code */
 
 static s_memory_pool* get_object_table(void)
 {
 	return *Memory::GetAddress<s_memory_pool**>(0x4E4610, 0x50C8E0);
 };
+
+static datum** game_state_object_name_list_get(void)
+{
+	return Memory::GetAddress<datum**>(0x4E2614);
+}
 
 static void objects_apply_interpolation_patches(void)
 {
@@ -1217,3 +1330,96 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 
 	return (marker != 0 ? (int16)marker_index : 1);
 }
+
+#ifdef OBJECT_OVERRIDE_ENABLED
+static s_object_override_data* object_override_data_get(size_t override_index)
+{
+	ASSERT(override_index >= 0 && override_index < k_maximum_object_override_count);
+	return &g_object_override_data[override_index];
+}
+
+static int32 object_find_override_index(datum object_index)
+{
+	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, NONE);
+	int32 override_index = NONE;
+	
+	if (object->object.flags.test(_object_has_override_bit))
+	{
+		// Find the object override with the same object index
+		for (int32 i = 0; i < k_maximum_object_override_count; ++i)
+		{
+			const s_object_override_data* override = object_override_data_get(i);
+			ASSERT(override_index >= 0 && override_index < k_maximum_object_override_count);
+			if (override[i].valid && override[i].object_index == object_index)
+			{
+				override_index = i;
+				break;
+			}
+		}
+	}
+
+	ASSERT(object->object.flags.test(_object_has_override_bit) == (override_index != NONE));
+	return override_index;
+}
+
+static int32 object_get_override_index(datum object_index)
+{
+	object_datum* object = (object_datum*)object_get_and_verify_type(object_index, NONE);
+	int32 override_index = object_find_override_index(object_index);
+	if (override_index == NONE)
+	{
+		ASSERT(!object->object.flags.test(_object_has_override_bit));
+
+		// Initialize the first object override that isn't valid
+		for (int32 i = 0; i < k_maximum_object_override_count; ++i)
+		{
+			s_object_override_data* override = object_override_data_get(i);
+			if (!override->valid)
+			{
+				override_index = i;
+				override->valid = true;
+				override->object_index = object_index;
+				override->shader_tag_index = NONE;
+				break;
+			}
+		}
+
+		if (override_index == NONE)
+		{
+			s_object_override_data* override = object_override_data_get(0);
+			ASSERT(override->valid);
+			ASSERT(override->object_index != NONE);
+
+			object_header_datum* object_header = (object_header_datum*)datum_try_and_get(object_header_data_get(), g_object_override_data[0].object_index);
+			if (object_header)
+			{
+				if (TEST_BIT(0, object_header->type))
+				{
+					object_datum* override_object = (object_datum*)object_header->datum;
+					if (override_object)
+					{
+						override_object->object.flags.set(_object_has_override_bit, false);
+					}
+				}
+			}
+
+			memmove_guarded(
+				g_object_override_data,
+				&g_object_override_data[1],
+				sizeof(s_object_override_data) * k_maximum_object_override_count - 1,
+				g_object_override_data,
+				sizeof(s_object_override_data) * k_maximum_object_override_count);
+
+			override = object_override_data_get(k_maximum_object_override_count - 1);
+			override->valid = true;
+			override->object_index = object_index;
+			override->shader_tag_index = NONE;
+			override_index = k_maximum_object_override_count - 1;
+		}
+		object->object.flags.set(_object_has_override_bit, true);
+	}
+
+	ASSERT(object->object.flags.test(_object_has_override_bit) == (override_index != NONE));
+	return override_index;
+}
+#endif

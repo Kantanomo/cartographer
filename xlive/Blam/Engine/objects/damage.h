@@ -83,4 +83,6 @@ ASSERT_STRUCT_SIZE(s_damage_group_definition, 16);
 
 void damage_apply_patches(void);
 
+void damage_initialize_for_new_map(void);
+
 void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index, int16 node_index, int16 region_index, int16 material_index, real_vector3d* object_normal);

@@ -467,6 +467,14 @@ if (!valid_real(value))				\
 }									\
 (void)0
 
+#define assert_valid_real_normal3d(normal)		\
+if (!valid_real_normal3d(normal))				\
+{												\
+	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_normal3d(%f, %f, %f)", #normal, normal->i, normal->j, normal->k);	\
+	DISPLAY_ASSERT(string);						\
+}												\
+(void)0
+
 #define assert_valid_real_matrix4x3(matrix)		\
 if (!valid_real_matrix4x3(matrix))				\
 {												\
@@ -528,5 +536,6 @@ if (!valid_real_matrix4x3(matrix))				\
 (void)0
 #else
 #define assert_valid_real(value)			(void)0
+#define assert_valid_real_normal3d(normal)	(void)0
 #define assert_valid_real_matrix4x3(matrix)	(void)0
 #endif

@@ -1,6 +1,24 @@
 #include "stdafx.h"
 #include "cluster_partitions.h"
 
+/* public code */
+
+cluster_partition* collideable_object_cluster_partition_get(void)
+{
+	return Memory::GetAddress<cluster_partition*>(0x4E4604, 0x50C8D4);
+}
+
+cluster_partition* noncollideable_object_cluster_partition_get(void)
+{
+	return Memory::GetAddress<cluster_partition*>(0x4E45F8, 0x50C8C8);
+}
+
+void __cdecl cluster_partition_make_valid(cluster_partition* partition)
+{
+	INVOKE(0x37A07D, 0x0, cluster_partition_make_valid, partition);
+	return;
+}
+
 void __cdecl cluster_partition_reconnect(cluster_partition* partition,
 	datum object_datum,
 	int32* first_cluster_reference,
@@ -16,12 +34,3 @@ void __cdecl cluster_partition_reconnect(cluster_partition* partition,
 	return;
 }
 
-cluster_partition* collideable_object_cluster_partition_get(void)
-{
-	return Memory::GetAddress<cluster_partition*>(0x4E4604, 0x50C8D4);
-}
-
-cluster_partition* noncollideable_object_cluster_partition_get(void)
-{
-	return Memory::GetAddress<cluster_partition*>(0x4E45F8, 0x50C8C8);
-}

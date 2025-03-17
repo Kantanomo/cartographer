@@ -20,6 +20,12 @@ object_type_definition* get_game_object_type_definition(datum object_datum)
 	return object_type_definition_get(object_get_fast_unsafe(object_datum)->object.object_identifier.get_type());
 }
 
+void __cdecl object_types_initialize_for_new_map(void)
+{
+	INVOKE(0x185A9C, 0x0, object_types_initialize_for_new_map);
+	return;
+}
+
 void __cdecl object_type_adjust_placement(object_placement_data* placement_data)
 {
 	INVOKE(0x1863EA, 0x170486, object_type_adjust_placement, placement_data);
