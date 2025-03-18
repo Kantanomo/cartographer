@@ -125,11 +125,15 @@ void __cdecl biped_get_sight_position(
 	real_vector3d* desired_gun_offset,
 	real_point3d* sight_position)
 {
+	ASSERT((estimate_mode == _unit_estimate_none) || (estimated_body_position != NULL));
+
 	if (estimate_mode)
 	{
+		ASSERT((estimate_mode != _unit_estimate_gun_position) || (desired_facing_vector != NULL));
 		*sight_position = *estimated_body_position;
 		if (estimate_mode == _unit_estimate_gun_position)
 		{
+			ASSERT(desired_facing_vector && desired_gun_offset);
 			const real_vector3d direction = { -desired_facing_vector->j, desired_facing_vector->i, 0.0f };
 			point_from_line3d(sight_position, desired_facing_vector, desired_gun_offset->i, sight_position);
 			point_from_line3d(sight_position, &direction, desired_gun_offset->j, sight_position);
@@ -142,8 +146,11 @@ void __cdecl biped_get_sight_position(
 		object_get_origin_interpolated(biped_index, sight_position);
 	}
 
-	biped_datum* biped = (biped_datum*)object_get_fast_unsafe(biped_index);
-	biped_definition* biped_def = (biped_definition*)tag_get_fast(biped->definition_index);
+	biped_datum* biped = (biped_datum*)object_get_and_verify_type(biped_index, _object_mask_biped);
+	ASSERT(biped);
+
+	struct biped_definition* biped_definition = (struct biped_definition*)tag_get_fast(biped->definition_index);
+	ASSERT(biped_definition);
 
 	real32 crouching = 0.0f;
 
@@ -161,8 +168,8 @@ void __cdecl biped_get_sight_position(
 	}
 
 	// Camera height calculations
-	real32 standing_camera_height = (1.f - crouching) * biped_def->biped.standing_camera_height;
-	real32 crouching_camera_height = biped_def->biped.crouching_camera_height * crouching;
+	real32 standing_camera_height = (1.f - crouching) * biped_definition->biped.standing_camera_height;
+	real32 crouching_camera_height = biped_definition->biped.crouching_camera_height * crouching;
 	sight_position->z += (standing_camera_height + crouching_camera_height) * biped->object.scale;
 
 	real_point3d origin_copy = *sight_position;

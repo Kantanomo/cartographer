@@ -166,10 +166,13 @@ void observer_update_internal(int32 user_index)
 		normalize3d_with_default(&up, global_forward3d);
 		if (!valid_real_vector3d_axes2(&forward, &up))
 		{
+			error(2, "camera effect matrix was bad, cannot recover");
 			forward = *global_forward3d;
 			up = *global_up3d;
 		}
 	}
+
+	assert_valid_real_vector3d_axes2(&forward, &up);
 
 	if (!TEST_BIT(observer->pending_command.flags, 4))
 	{

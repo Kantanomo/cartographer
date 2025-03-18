@@ -436,7 +436,7 @@ real_quaternion* fast_quaternion_interpolate_and_normalize(const real_quaternion
 
 real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b);
 
-bool valid_real_vector3d_axes2(real_vector3d* forward, real_vector3d* up);
+bool valid_real_vector3d_axes2(const real_vector3d* forward, const real_vector3d* up);
 
 real32 distance_squared3d(const real_point3d* p1, const real_point3d* p2);
 
@@ -470,9 +470,17 @@ if (!valid_real(value))				\
 #define assert_valid_real_normal3d(normal)		\
 if (!valid_real_normal3d(normal))				\
 {												\
-	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_normal3d(%f, %f, %f)", #normal, normal->i, normal->j, normal->k);	\
+	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_normal3d(%f, %f, %f)", #normal, (*normal).i, (*normal).j, (*normal).k);	\
 	DISPLAY_ASSERT(string);						\
 }												\
+(void)0
+
+#define assert_valid_real_vector3d_axes2(forward, up)	\
+if (!valid_real_vector3d_axes2(forward, up))			\
+{														\
+	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s, %s: assert_valid_real_vector3d_axes2(%f, %f, %f / %f, %f, %f)", #forward, #up, (*forward).i, (*forward).j, (*forward).k, (*up).i, (*up).j, (*up).k);	\
+	DISPLAY_ASSERT(string);								\
+}														\
 (void)0
 
 #define assert_valid_real_matrix4x3(matrix)		\
@@ -535,7 +543,8 @@ if (!valid_real_matrix4x3(matrix))				\
 }												\
 (void)0
 #else
-#define assert_valid_real(value)			(void)0
-#define assert_valid_real_normal3d(normal)	(void)0
-#define assert_valid_real_matrix4x3(matrix)	(void)0
+#define assert_valid_real(value)						(void)0
+#define assert_valid_real_normal3d(normal)				(void)0
+#define assert_valid_real_vector3d_axes2(forward, up)	(void)0
+#define assert_valid_real_matrix4x3(matrix)				(void)0
 #endif

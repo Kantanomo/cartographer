@@ -5,6 +5,7 @@
 #include "game/game_globals.h"
 #include "main/main_game.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
 #include "sound/sound_cache_file_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "tag_files/tag_loader/tag_injection_manager.h"
@@ -246,12 +247,25 @@ bool scenario_tags_load_debug(void)
 bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 {
 	s_cache_header* cache_header = cache_files_get_header();
-
 	s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
 
+	const bool custom_map = cache_file_memory_globals->custom_map;
 	const uint32 aligned_tag_size_read = cache_header->tag_size + cache_header->tag_offset_mask;
 
-	if(!cache_header_verify(cache_header)|| csstrnlen(cache_header->version_string, NUMBEROF(cache_header->version_string)) > 32)
+	bool is_compatible = false;
+	if (cache_header_verify(cache_header) && csstrnlen(cache_header->version_string, NUMBEROF(cache_header->version_string)) < 32)
+	{
+		if (shell_build_string_is_compatible(cache_header->version_string))
+		{
+			is_compatible = true;
+		}
+		else if (!custom_map)
+		{
+			error(3, "the cache file '%s' belongs to an incompatible build (%s)", cache_file_memory_globals->header.name, cache_file_memory_globals->header.version_string);
+		}
+	}
+
+	if (!is_compatible)
 	{
 		scenario_tags_load_internal_panic();
 		return false;
@@ -263,6 +277,8 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 
 	if(!cache_file_memory_globals->tag_cache_base_address)
 	{
+		error(3, "failed to allocate the physical memory for the tags");
+		error(3, "cache file header is invalid");
 		scenario_tags_load_internal_panic();
 		return false;
 	}
