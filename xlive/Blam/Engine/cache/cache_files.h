@@ -136,6 +136,9 @@ struct tag_iterator
 };
 ASSERT_STRUCT_SIZE(tag_iterator, 20);
 
+/* globals */
+
+
 /* prototypes */
 
 void cache_files_apply_patches(void);

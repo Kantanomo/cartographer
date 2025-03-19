@@ -2,7 +2,14 @@
 #include "math/real_math.h"
 #include "objects/object_location.h"
 
-#define k_observer_command_values 6
+/* constants */
+
+enum
+{
+	k_observer_command_values = 6
+};
+
+/* enums */
 
 enum e_observer_command_flags : uint8
 {
@@ -11,6 +18,8 @@ enum e_observer_command_flags : uint8
 	_observer_command_bit_2 = 2,
 	_observer_command_bit_3 = 3
 };
+
+/* structures */
 
 struct s_observer_result
 {
@@ -94,16 +103,23 @@ struct s_observer
 };
 ASSERT_STRUCT_SIZE(s_observer, 856);
 
+/* prototypes */
+
+void observer_apply_patches(void);
+
 s_observer* observer_get_from_user(int32 user_index);
+
+void __cdecl observer_update(real32 dt);
 
 void __cdecl observer_validate_camera_command(s_observer_command* observer_command);
 
 // Gets the FOV value for the observer camera
-float observer_suggested_field_of_view();
+real32 observer_suggested_field_of_view(void);
 
 // Sets the FOV value for the observer camera
-void observer_set_suggested_field_of_view(float fov);
+void observer_set_suggested_field_of_view(real32 fov);
 
 s_observer_result* __cdecl observer_get_camera(int32 user_index);
 
-void observer_apply_patches(void);
+s_observer_result* __cdecl observer_try_and_get_camera(int32 user_index);
+

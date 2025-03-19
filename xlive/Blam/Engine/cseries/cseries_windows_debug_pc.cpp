@@ -89,7 +89,7 @@ LPTOP_LEVEL_EXCEPTION_FILTER WINAPI SetUnhandledExceptionFilterHook(LPTOP_LEVEL_
 }
 static_assert(std::is_same_v<decltype(&SetUnhandledExceptionFilterHook), decltype(&SetUnhandledExceptionFilter)>, "invalid type of RedirectedSetUnhandledExceptionFilter");
 
-void cseries_debug_initialize()
+void cseries_windows_debug_initialize()
 {
 	pfn_SecondaryExceptionFilter = SetUnhandledExceptionFilter(debug_unhandled_exception_cb);
 

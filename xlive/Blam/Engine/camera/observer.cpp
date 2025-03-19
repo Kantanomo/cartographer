@@ -12,32 +12,36 @@
 #include "render/render_visibility_collection.h"
 #include "scenario/scenario.h"
 
+/* constants */
 
-real32 g_camera_speed = 1.0f;
-
-s_observer* observer_user_globals_get(void);
-real32* observer_get_speed_dt(void);
-bool* observer_get_initial_update(void);
-void __cdecl observer_validate_camera_command(s_observer_command* observer_command);
-void observer_pass_time_to_usercall(int32 user_index);
-void observer_update_command_to_usercall(int32 user_index);
-void __cdecl observer_postcheck(int32 user_index);
-void __cdecl observer_update(real32 dt);
-void observer_update_internal(int32 user_index);
-
-s_observer* observer_get_from_user(int32 user_index)
+enum
 {
-	return &observer_user_globals_get()[user_index];
-}
+	OBSERVER_SIGNATURE = 'rad!'
+};
 
-void observer_apply_interpolation_patches()
-{
-	if (!Memory::IsDedicatedServer())
-	{
-		PatchCall(Memory::GetAddress(0x39D5D, 0xC0EC), observer_update);
-		PatchCall(Memory::GetAddress(0x97C93, 0xB6D47), observer_update);
-	}
-}
+/* globals */
+
+static real32 g_camera_speed = 1.0f;
+
+/* prototypes */
+
+static void observer_apply_interpolation_patches(void);
+
+static s_observer* observer_user_globals_get(void);
+
+static real32* observer_get_speed_dt(void);
+
+static bool* observer_get_initial_update(void);
+
+static void observer_pass_time_to_usercall(int32 user_index);
+
+static void observer_update_command_to_usercall(int32 user_index);
+
+static void __cdecl observer_postcheck(int32 user_index);
+
+static void observer_update_internal(int32 user_index);
+
+/* public code */
 
 void observer_apply_patches(void)
 {
@@ -45,47 +49,9 @@ void observer_apply_patches(void)
 	return;
 }
 
-s_observer* observer_user_globals_get(void)
+s_observer* observer_get_from_user(int32 user_index)
 {
-	return Memory::GetAddress<s_observer*>(0x4C071C, 0x4CDE64);
-}
-
-real32* observer_get_speed_dt(void)
-{
-	return Memory::GetAddress<real32*>(0x4C0718, 0x4CDE60);
-}
-
-bool* observer_get_initial_update(void)
-{
-	return Memory::GetAddress<bool*>(0x4C147C, 0x4CEBC4);
-}
-
-void __cdecl observer_validate_camera_command(s_observer_command* observer_command)
-{
-	INVOKE(0x824F7, 0x4636A, observer_validate_camera_command, observer_command);
-	return;
-}
-
-void observer_pass_time_to_usercall(int32 user_index) {
-	void* observer_pass_time_usercall = Memory::GetAddress<void*>(0x838A1);
-	__asm {
-		mov edi, user_index
-		call observer_pass_time_usercall
-	}
-}
-
-void observer_update_command_to_usercall(int32 user_index) {
-	void* observer_update_command = Memory::GetAddress<void*>(0x82B7F);
-	__asm {
-		mov eax, user_index
-		call observer_update_command
-	}
-}
-
-void __cdecl observer_postcheck(int32 user_index)
-{
-	INVOKE(0x8391F, 0x47792, observer_postcheck, user_index);
-	return;
+	return &observer_user_globals_get()[user_index];
 }
 
 void __cdecl observer_update(real32 dt)
@@ -100,6 +66,11 @@ void __cdecl observer_update(real32 dt)
 		if (players_user_is_active(user_index))
 		{
 			s_observer* observer = observer_get_from_user(user_index);
+
+			ASSERT(VALID_INDEX(user_index, k_number_of_users));
+			ASSERT(observer->header_signature == OBSERVER_SIGNATURE && observer->trailer_signature == OBSERVER_SIGNATURE);
+			ASSERT(!observer->updated_for_frame);
+
 			observer->updated_for_frame = true;
 			observer_update_command_to_usercall(user_index);
 			if (*observer_speed_dt != 0.0f)
@@ -125,6 +96,8 @@ void __cdecl observer_update(real32 dt)
 					predicted_resources_precache(bsp_point.cluster_index);
 				}
 			}
+			
+			ASSERT(observer->header_signature == OBSERVER_SIGNATURE && observer->trailer_signature == OBSERVER_SIGNATURE);
 		}
 	}
 
@@ -132,7 +105,99 @@ void __cdecl observer_update(real32 dt)
 	return;
 }
 
-void observer_update_internal(int32 user_index)
+void __cdecl observer_validate_camera_command(s_observer_command* observer_command)
+{
+	INVOKE(0x824F7, 0x4636A, observer_validate_camera_command, observer_command);
+	return;
+}
+
+real32 observer_suggested_field_of_view(void)
+{
+	return *Memory::GetAddress<real32*>(0x413780, 0x3B5300);
+}
+
+void observer_set_suggested_field_of_view(real32 fov)
+{
+	// Don't change the fov if it's 0 or greater than 110
+	if (fov <= 0 || fov > 110) return;
+
+	float final_fov_rad;
+	if (currentVariantSettings.forced_fov == 0)
+	{
+		final_fov_rad = DEGREES_TO_RADIANS(fov);
+	}
+	else
+	{
+		final_fov_rad = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
+	}
+	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = final_fov_rad;
+	return;
+}
+
+s_observer_result* __cdecl observer_get_camera(int32 user_index)
+{
+	return INVOKE(0x81EBA, 0x0, observer_get_camera, user_index);
+}
+
+s_observer_result* __cdecl observer_try_and_get_camera(int32 user_index)
+{
+	return INVOKE(0x818D6, 0x0, observer_try_and_get_camera, user_index);
+}
+
+/* private code */
+
+static void observer_apply_interpolation_patches(void)
+{
+	if (!Memory::IsDedicatedServer())
+	{
+		PatchCall(Memory::GetAddress(0x39D5D, 0xC0EC), observer_update);
+		PatchCall(Memory::GetAddress(0x97C93, 0xB6D47), observer_update);
+	}
+	return;
+}
+
+static s_observer* observer_user_globals_get(void)
+{
+	return Memory::GetAddress<s_observer*>(0x4C071C, 0x4CDE64);
+}
+
+static real32* observer_get_speed_dt(void)
+{
+	return Memory::GetAddress<real32*>(0x4C0718, 0x4CDE60);
+}
+
+static bool* observer_get_initial_update(void)
+{
+	return Memory::GetAddress<bool*>(0x4C147C, 0x4CEBC4);
+}
+
+static void observer_pass_time_to_usercall(int32 user_index)
+{
+	void* observer_pass_time_usercall = Memory::GetAddress<void*>(0x838A1);
+	__asm
+	{
+		mov edi, user_index
+		call observer_pass_time_usercall
+	}
+}
+
+static void observer_update_command_to_usercall(int32 user_index)
+{
+	void* observer_update_command = Memory::GetAddress<void*>(0x82B7F);
+	__asm 
+	{
+		mov eax, user_index
+		call observer_update_command
+	}
+}
+
+static void __cdecl observer_postcheck(int32 user_index)
+{
+	INVOKE(0x8391F, 0x47792, observer_postcheck, user_index);
+	return;
+}
+
+static void observer_update_internal(int32 user_index)
 {
 	real_matrix4x3 camera_effect_matrix = *global_identity4x3;
 	s_observer* observer = observer_get_from_user(user_index);
@@ -166,10 +231,13 @@ void observer_update_internal(int32 user_index)
 		normalize3d_with_default(&up, global_forward3d);
 		if (!valid_real_vector3d_axes2(&forward, &up))
 		{
+			error(2, "camera effect matrix was bad, cannot recover");
 			forward = *global_forward3d;
 			up = *global_up3d;
 		}
 	}
+
+	assert_valid_real_vector3d_axes2(&forward, &up);
 
 	if (!TEST_BIT(observer->pending_command.flags, 4))
 	{
@@ -189,31 +257,4 @@ void observer_update_internal(int32 user_index)
 	observer->result.forward = forward;
 	observer->result.up = up;
 	return;
-}
-
-float observer_suggested_field_of_view()
-{
-	return *Memory::GetAddress<float*>(0x413780, 0x3B5300);
-}
-
-void observer_set_suggested_field_of_view(float fov)
-{
-	// Don't change the fov if it's 0 or greater than 110
-	if (fov <= 0 || fov > 110) return;
-
-	float final_fov_rad;
-	if (currentVariantSettings.forced_fov == 0)
-	{
-		final_fov_rad = DEGREES_TO_RADIANS(fov);
-	}
-	else
-	{
-		final_fov_rad = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
-	}
-	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = final_fov_rad;
-}
-
-s_observer_result* __cdecl observer_get_camera(int32 user_index)
-{
-	return INVOKE(0x81EBA, 0x0, observer_get_camera, user_index);
 }

@@ -63,7 +63,8 @@ void c_particle::adjust_initial_position(
 			placement.y = m_position.y;
 			placement.z = m_position.z + 1.0f;
 
-			if (collision_test_vector(0x800005u, &placement, &direction, NONE, NONE, &collision_res))
+			const e_collision_test_flags flags = (e_collision_test_flags)(FLAG(_collision_test_structure_bit) | FLAG(_collision_test_instanced_geometry_bit) | FLAG(_collision_test_bit_23));
+			if (collision_test_vector(flags, &placement, &direction, NONE, NONE, &collision_res))
 			{
 				// fog plane??
 				point_from_line3d(&collision_res.point, &collision_res.fog_plane.n, 0.005f, &m_position);

@@ -210,6 +210,22 @@ datum __cdecl player_index_from_user_index(int32 user_index)
 	return INVOKE(0x5141D, 0x5992B, player_index_from_user_index, user_index);
 }
 
+int32 players_first_active_user(void)
+{
+	int32 player_num = 0;
+	const datum* player_user_mapping = get_players_globals()->player_user_mapping;
+	
+	for (; player_user_mapping[player_num] == NONE; ++player_num)
+	{
+		if (player_num >= k_number_of_users)
+		{
+			player_num = NONE;
+			break;
+		}
+	}
+	return player_num;
+}
+
 e_controller_index players_get_controller_index_from_user_index(int32 user_index)
 {
 	e_controller_index result = k_no_controller;

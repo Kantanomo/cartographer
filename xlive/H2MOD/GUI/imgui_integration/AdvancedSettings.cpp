@@ -723,7 +723,7 @@ namespace ImGuiHandler {
 						// TODO Remove this and replace with proper menu when selecting a map (WIP)
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_anger));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAnger", &get_ice_cream_activation()[_skull_type_anger]);
+						ImGui::Checkbox("##SkullAnger", &g_cheats_skull_enabled[_skull_type_anger]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_anger_tooltip));
 
@@ -731,7 +731,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_assassins));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAssassins", &get_ice_cream_activation()[_skull_type_assassians]);
+						ImGui::Checkbox("##SkullAssassins", &g_cheats_skull_enabled[_skull_type_assassians]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_assassins_tooltip));
 
@@ -739,7 +739,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_black_eye));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlackEye", &get_ice_cream_activation()[_skull_type_black_eye]);
+						ImGui::Checkbox("##SkullBlackEye", &g_cheats_skull_enabled[_skull_type_black_eye]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_black_eye_tooltip));
 
@@ -747,7 +747,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_blind));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlind", &get_ice_cream_activation()[_skull_type_blind]);
+						ImGui::Checkbox("##SkullBlind", &g_cheats_skull_enabled[_skull_type_blind]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_blind_tooltip));
 
@@ -755,7 +755,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_catch));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullCatch", &get_ice_cream_activation()[_skull_type_catch]);
+						ImGui::Checkbox("##SkullCatch", &g_cheats_skull_enabled[_skull_type_catch]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_catch_tooltip));
 
@@ -763,7 +763,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_envy));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullEnvy", &get_ice_cream_activation()[_skull_type_envy]);
+						ImGui::Checkbox("##SkullEnvy", &g_cheats_skull_enabled[_skull_type_envy]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_envy_tooltip));
 
@@ -771,7 +771,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_famine));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullFamine", &get_ice_cream_activation()[_skull_type_famine]);
+						ImGui::Checkbox("##SkullFamine", &g_cheats_skull_enabled[_skull_type_famine]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_famine_tooltip));
 
@@ -779,7 +779,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_ghost));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGhost", &get_ice_cream_activation()[_skull_type_ghost]);
+						ImGui::Checkbox("##SkullGhost", &g_cheats_skull_enabled[_skull_type_ghost]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_ghost_tooltip));
 
@@ -787,7 +787,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_grunt));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGBP", &get_ice_cream_activation()[_skull_type_grunt_birthday_party]);
+						ImGui::Checkbox("##SkullGBP", &g_cheats_skull_enabled[_skull_type_grunt_birthday_party]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_grunt_tooltip));
 
@@ -795,7 +795,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_iron));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIron", &get_ice_cream_activation()[_skull_type_iron]);
+						ImGui::Checkbox("##SkullIron", &g_cheats_skull_enabled[_skull_type_iron]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_iron_tooltip));
 
@@ -803,7 +803,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_iwbyd));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIWHBYD", &get_ice_cream_activation()[_skull_type_iwhbyd]);
+						ImGui::Checkbox("##SkullIWHBYD", &g_cheats_skull_enabled[_skull_type_iwhbyd]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_iwbyd_tooltip));
 
@@ -811,7 +811,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_mythic));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullMythic", &get_ice_cream_activation()[_skull_type_mythic]);
+						ImGui::Checkbox("##SkullMythic", &g_cheats_skull_enabled[_skull_type_mythic]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_mythic_tooltip));
 
@@ -819,7 +819,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_sputnik));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullSputnik", &get_ice_cream_activation()[_skull_type_sputnik]);
+						ImGui::Checkbox("##SkullSputnik", &g_cheats_skull_enabled[_skull_type_sputnik]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_sputnik_tooltip));
 
@@ -827,7 +827,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_thunderstorm));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullThunderstorm", &get_ice_cream_activation()[_skull_type_thunderstorm]);
+						ImGui::Checkbox("##SkullThunderstorm", &g_cheats_skull_enabled[_skull_type_thunderstorm]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_thunderstorm_tooltip));
 
@@ -835,7 +835,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_skull_whuppopotamus));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullWhuppopatamus", &get_ice_cream_activation()[_skull_type_whuppopotamus]);
+						ImGui::Checkbox("##SkullWhuppopatamus", &g_cheats_skull_enabled[_skull_type_whuppopotamus]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_skull_whuppopotamus_tooltip));
 

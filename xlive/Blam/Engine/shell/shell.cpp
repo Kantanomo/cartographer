@@ -18,7 +18,21 @@
 
 #include "H2MOD/Modules/Shell/Config.h"
 
-#define k_max_monitor_count 9
+/* constants */
+
+enum
+{
+	k_max_monitor_count = 9
+};
+
+s_shell_build_version k_shell_build_versions[] =
+{
+	{11081, "11081.07.04.30.0934.main"},
+	{11122, "11122.07.08.24.1808.main"},
+
+};
+
+/* public code */
 
 void shell_apply_patches(void)
 {
@@ -189,4 +203,20 @@ void __cdecl timing_initialize(int32 a1)
 {
 	INVOKE(0x37E39, 0x0, timing_initialize, a1);
 	return;
+}
+
+bool shell_build_string_is_compatible(const char* build_string)
+{
+	bool result = false;
+
+	for (size_t i = 0; i < NUMBEROF(k_shell_build_versions); ++i)
+	{
+		if (!csstricmp(build_string, k_shell_build_versions[i].string))
+		{
+			result = true;
+			break;
+		}
+	}
+
+	return result;
 }

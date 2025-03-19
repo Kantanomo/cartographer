@@ -132,7 +132,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_USRDLL;xliveless_EXPORTS;ERRORS_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_USRDLL;xliveless_EXPORTS;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -215,7 +215,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_USRDLL;LLVM;xliveless_EXPORTS;ERRORS_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_USRDLL;xliveless_EXPORTS;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -292,7 +292,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -319,6 +319,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SDLCheck>true</SDLCheck>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -360,7 +361,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;LLVM;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -671,6 +672,7 @@
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\main\console.cpp" />
     <ClCompile Include="Blam\Engine\main\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
     <ClCompile Include="Blam\Engine\main\levels.cpp" />
@@ -984,6 +986,7 @@
     <ClInclude Include="Blam\Engine\items\projectile_definition.h" />
     <ClInclude Include="Blam\Engine\items\vehicle_collection_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
+    <ClInclude Include="Blam\Engine\main\console.h" />
     <ClInclude Include="Blam\Engine\main\game_preferences.h" />
     <ClInclude Include="Blam\Engine\main\interpolator.h" />
     <ClInclude Include="Blam\Engine\main\levels.h" />
@@ -1118,6 +1121,7 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_global_events.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_type_collection.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_world.cpp" />
+    <ClCompile Include="Blam\Engine\sound\game_sound.cpp" />
     <ClCompile Include="Blam\Engine\sound\sound_cache_file_definitions.cpp" />
     <ClCompile Include="Blam\Engine\sound\sound_manager.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
@@ -1222,7 +1226,6 @@
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="util\filesys.cpp" />
-    <ClCompile Include="Util\hash.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
@@ -2261,6 +2264,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_view.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
+    <ClInclude Include="Blam\Engine\sound\game_sound.h" />
     <ClInclude Include="Blam\Engine\sound\sound_cache_file_definitions.h" />
     <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
     <ClInclude Include="Blam\Engine\sound\sound_clusters.h" />
@@ -2397,7 +2401,6 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="util\filesys.h" />
-    <ClInclude Include="Util\hash.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
     <ClInclude Include="Util\log.h" />
     <ClInclude Include="xlivedefs.h" />

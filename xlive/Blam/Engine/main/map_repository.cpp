@@ -18,37 +18,6 @@
 
 const wchar_t* custom_map_cache_filename_client = L".h2mdat";
 
-// TODO: determine whether or not the pre-release version of vista's map files are supported (11028.07.03.23.1927.main)
-const static char* offically_supported_builds[] =
-{
-	"11081.07.04.30.0934.main",
-	"11122.07.08.24.1808.main",
-};
-
-bool __cdecl scenario_is_supported_build(const char* build)
-{
-	bool result = false;
-
-	for (int32 i = 0; i < NUMBEROF(offically_supported_builds); i++)
-	{
-		if (strcmp(build, offically_supported_builds[i]) == 0)
-		{
-			result = true;
-			break;
-		}
-	}
-
-	if (!result)
-	{
-		LOG_TRACE_FUNC("Build '{}' is not offically supported, consider repacking and updating map with supported tools!", build);
-	}
-
-	// allow map to be loaded regardless of the cache version
-	result = true;
-
-	return result;
-}
-
 static s_custom_map_entry* get_custom_map_entry_list_from_header(s_custom_map_file_cache_header* header)
 {
 	return (s_custom_map_entry*)((uint8*)header + sizeof(s_custom_map_file_cache_header));
@@ -1006,8 +975,6 @@ void c_custom_map_manager::ApplyCustomMapExtensionLimitPatches()
 	PatchCall(Memory::GetAddress(0x4D3BA, 0x417FE), validate_and_read_custom_map_data);
 	PatchCall(Memory::GetAddress(0x4CF26, 0x41D4E), validate_and_read_custom_map_data);
 	PatchCall(Memory::GetAddress(0x8928, 0x1B6482), validate_and_read_custom_map_data);
-
-	WriteJmpTo(Memory::GetAddress(0x1467, 0x12E2), scenario_is_supported_build);
 }
 
 // '50 map limit removal' region end

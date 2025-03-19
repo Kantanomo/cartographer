@@ -16,9 +16,6 @@
 #include "H2MOD/Utils/Utils.h"
 
 #include "Util/filesys.h"
-#include "Util/hash.h"
-
-#include <io.h>
 
 const wchar_t* k_client_process_name = L"Halo2Client";
 const wchar_t* k_server_process_name = L"H2Server";
@@ -60,130 +57,6 @@ void PostH2Config() {
 		_Shell::OpenMessageBox(NULL, MB_ICONWARNING, "BASE PORT BIND WARNING!", "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
 	}
 	addDebugText("Base port: %d.", H2Config_base_port);
-}
-
-wchar_t xinput_path[_MAX_PATH];
-
-bool configureXinput() {
-	auto report_error = [](const std::string &message) {
-		MessageBoxA(NULL, message.c_str(), "Xinput config error!", MB_OK);
-	};
-
-	if (!Memory::IsDedicatedServer()) {
-		if (_Shell::GetInstanceId() > 1) {
-			swprintf(xinput_path, ARRAYSIZE(xinput_path), L"xinput/p%02d/xinput9_1_0.dll", _Shell::GetInstanceId());
-			LOG_TRACE_FUNCW(L"Changing xinput path to '{0}' : '{1}'", xinput_path, xinput_path);
-
-			WritePointer(Memory::GetAddress() + 0x8AD28, xinput_path);
-
-			char xinputName[_MAX_PATH];
-			char xinputdir[_MAX_PATH];
-			csprintf(xinputdir, NUMBEROF(xinputdir), "xinput/p%02d", _Shell::GetInstanceId());
-			csprintf(xinputName, NUMBEROF(xinputdir), "%s/xinput9_1_0.dll", xinputdir);
-
-			/* Creates a directory and displays error if it fails */
-			auto create_dir = [=](const std::string &path) -> bool {
-				if (LOG_CHECK(!CreateDirectoryA(path.c_str(), NULL) && GetLastError() != ERROR_ALREADY_EXISTS))
-				{
-					report_error("Failed to create '" + path + "' directory, check logs!");
-					return false;
-				}
-				return true;
-			};
-
-			if (!create_dir("xinput") || !create_dir(xinputdir))
-			{
-				return false;
-			}
-
-			LOG_TRACE_FUNC("xinput path: {}", xinputName);
-			if (_access_s(xinputName, 02))
-			{
-				if (errno == EACCES)
-				{
-					report_error("Can't access the xinput dll for writing");
-					return false;
-				}
-
-				if (_access_s("xinput9_1_0.dll", 04) != 0) {
-					char xinputError[] = "ERROR! An xinput9_1_0.dll does not exist in the local game directory or is inaccessible!\nFor \'Split-screen\' play, any supported .dll is required.";
-					addDebugText(xinputError);
-					_Shell::OpenMessageBox(NULL, MB_ICONERROR, "DLL Missing Error", xinputError);
-					exit(EXIT_FAILURE);
-				}
-				int xinput_index = -1;
-				const char *xinput_md5_durazno_0_6_0_0 = "6140ae76b26a633ce2255f6fc88fbe34";
-				const long xinput_offset_durazno_0_6_0_0 = 0x196de;
-				const bool xinput_unicode_durazno_0_6_0_0 = true;
-				const char *xinput_md5_x360ce_3_3_1_444 = "8f24e36d5f0a71c8a412cec6323cd781";
-				const long xinput_offset_x360ce_3_3_1_444 = 0x1ea54;
-				const bool xinput_unicode_x360ce_3_3_1_444 = true;
-				const char *xinput_md5_x360ce_3_4_1_1357 = "5236623449893c0e1e98fc95f067fcff";
-				const long xinput_offset_x360ce_3_4_1_1357 = 0x16110;
-				const bool xinput_unicode_x360ce_3_4_1_1357 = false;
-				const int xinput_array_length = 3;
-				static const char* xinput_md5[xinput_array_length] = { xinput_md5_durazno_0_6_0_0, xinput_md5_x360ce_3_3_1_444, xinput_md5_x360ce_3_4_1_1357 };
-				static const long xinput_offset[xinput_array_length] = { xinput_offset_durazno_0_6_0_0, xinput_offset_x360ce_3_3_1_444, xinput_offset_x360ce_3_4_1_1357 };
-				static const bool xinput_unicode[xinput_array_length] = { xinput_unicode_durazno_0_6_0_0, xinput_unicode_x360ce_3_3_1_444, xinput_unicode_x360ce_3_4_1_1357 };
-				std::string available_xinput_md5;
-				if (!hashes::calc_file_md5(L"xinput9_1_0.dll", available_xinput_md5))
-				{
-					report_error("Failed to hash original xinput9_1_0.dll, file might be missing?");
-					return false;
-				}
-				for (int i = 0; i < xinput_array_length; i++) {
-					if (strcmp(xinput_md5[i], available_xinput_md5.c_str()) == 0) {
-						xinput_index = i;
-						break;
-					}
-				}
-				if (xinput_index < 0) {
-					char xinputError[] = "ERROR! For \'Split-screen\' play, a supported xinput9_1_0.dll is required to be installed in the local game directory!\nOr you may install a custom one manually in the xinput/p??/ folders.";
-					addDebugText(xinputError);
-					_Shell::OpenMessageBox(NULL, MB_ICONERROR, "Incorrect DLL Error", xinputError);
-					exit(EXIT_FAILURE);
-				}
-
-				if (!LOG_CHECK(CopyFileA("xinput9_1_0.dll", xinputName, FALSE)))
-				{
-					report_error("Failed to copy Xinput DLL for patching!");
-					return false;
-				}
-
-				FILE* xinput_patched = fopen(xinputName, "r+b");
-				if (!xinput_patched) {
-					_Shell::FileErrorDialog(errno);
-					report_error("Can't open xinput file for patching.");
-					exit(EXIT_FAILURE);
-				}
-
-				int len_to_write = 2;
-				uint8 assmXinputDuraznoNameEdit[] = 
-				{ 
-					(uint8)(0x30 + (_Shell::GetInstanceId() / 10)),
-					(uint8)(0x30 + (_Shell::GetInstanceId() % 10)),
-					(uint8)(0x30 + (_Shell::GetInstanceId() % 10))
-				};
-				if (xinput_unicode[xinput_index]) {
-					assmXinputDuraznoNameEdit[1] = 0x00;
-					len_to_write = 3;
-				}
-				if (fseek(xinput_patched, xinput_offset[xinput_index], SEEK_SET) == 0 && fwrite(assmXinputDuraznoNameEdit, sizeof(BYTE), len_to_write, xinput_patched) == len_to_write) {
-					addDebugText("Successfully copied and patched original xinput9_1_0.dll");
-				}
-				else {
-					fclose(xinput_patched);
-					remove(xinputName);
-					addDebugText("ERROR! Failed to write hex edit to file: %s", xinputName);
-					_Shell::OpenMessageBox(NULL, MB_OK, "DLL Edit Error", "ERROR! Failed to write hex edit to file:\n %s", xinputName);
-					exit(EXIT_FAILURE);
-				}
-				fclose(xinput_patched);
-			}
-		}
-	}
-	addDebugText("Finished Processing Instance Number.");
-	return true;
 }
 
 void InitLocalAppData() {
@@ -286,7 +159,7 @@ void InitH2Startup() {
 	InitializeCriticalSection(&log_section);
 
 	DETOUR_BEGIN();
-	cseries_debug_initialize();
+	cseries_windows_debug_initialize();
 	Memory::Initialize();
 
 	shell_windows_initialize();
@@ -363,9 +236,6 @@ void InitH2Startup() {
 	//checksum_log = h2log::create("Checksum", prepareLogFileName(L"checksum"), true, 0);
 	LeaveCriticalSection(&log_section);
 	InitH2Accounts();
-
-	if (!configureXinput())
-		exit(EXIT_FAILURE);
 
 	H2MOD::Initialize();
 

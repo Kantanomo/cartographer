@@ -47,6 +47,12 @@ struct cluster_partition
 
 /* prototypes */
 
+cluster_partition* collideable_object_cluster_partition_get(void);
+
+cluster_partition* noncollideable_object_cluster_partition_get(void);
+
+void __cdecl cluster_partition_make_valid(cluster_partition* partition);
+
 void __cdecl cluster_partition_reconnect(cluster_partition* partition,
 	datum object_datum,
 	int32* first_cluster_reference,
@@ -58,5 +64,3 @@ void __cdecl cluster_partition_reconnect(cluster_partition* partition,
 	const void* payload,
 	bool* cluster_overflow);
 
-cluster_partition* collideable_object_cluster_partition_get(void);
-cluster_partition* noncollideable_object_cluster_partition_get(void);

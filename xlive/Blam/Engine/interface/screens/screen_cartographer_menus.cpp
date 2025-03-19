@@ -8,7 +8,7 @@
 #include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Updater/Updater.h"
-
+#include "H2MOD/Utils/Utils.h"
 
 /* macro defines */
 
@@ -302,8 +302,10 @@ void c_cartographer_guide_menu::initialize(s_screen_parameters* screen_parameter
 	if (subheader_text_widget)
 	{
 		extern int H2Config_hotkeyIdGuide;
-		extern std::string GetVKeyCodeString(int vkey);
-		swprintf(text_buffer, ARRAYSIZE(text_buffer), subheader_text, GetVKeyCodeString(H2Config_hotkeyIdGuide).c_str());
+		
+		c_static_string<64> vkstring;
+		GetVKeyCodeString(H2Config_hotkeyIdGuide, &vkstring);
+		swprintf(text_buffer, ARRAYSIZE(text_buffer), subheader_text, vkstring.get_string());
 		subheader_text = text_buffer;
 
 		subheader_text_widget->set_text(subheader_text);

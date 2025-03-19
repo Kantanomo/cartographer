@@ -5,6 +5,7 @@
 #include "game/game_globals.h"
 #include "main/main_game.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
 #include "sound/sound_cache_file_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "tag_files/tag_loader/tag_injection_manager.h"
@@ -192,13 +193,13 @@ bool scenario_tags_load_process_shared_tags()
 	if(tag_header->tag_count >= FIRST_SHARED_TAG_INSTANCE_INDEX)
 	{
 		// Update cache tag_header's instances referencing shared tags
-		datum current_shared_datum = FIRST_SHARED_TAG_INSTANCE_INDEX;
-		for (; current_shared_datum < tag_header->tag_count; current_shared_datum++)
+		int32 absolute_index = FIRST_SHARED_TAG_INSTANCE_INDEX;
+		for (; absolute_index < tag_header->tag_count; absolute_index++)
 		{
-			if(tag_header->tag_instances[current_shared_datum].tag_index != NONE)
+			if(tag_header->tag_instances[absolute_index].tag_index != NONE)
 			{
-				tag_header->tag_instances[current_shared_datum].data_offset = unmasked_tag_header->tag_instances[current_shared_datum].data_offset;
-				tag_header->tag_instances[current_shared_datum].size = unmasked_tag_header->tag_instances[current_shared_datum].size;
+				tag_header->tag_instances[absolute_index].data_offset = unmasked_tag_header->tag_instances[absolute_index].data_offset;
+				tag_header->tag_instances[absolute_index].size = unmasked_tag_header->tag_instances[absolute_index].size;
 			}
 		}
 	}
@@ -246,12 +247,25 @@ bool scenario_tags_load_debug(void)
 bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 {
 	s_cache_header* cache_header = cache_files_get_header();
-
 	s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
 
+	const bool custom_map = cache_file_memory_globals->custom_map;
 	const uint32 aligned_tag_size_read = cache_header->tag_size + cache_header->tag_offset_mask;
 
-	if(!cache_header_verify(cache_header)|| csstrnlen(cache_header->version_string, NUMBEROF(cache_header->version_string)) > 32)
+	bool is_compatible = false;
+	if (cache_header_verify(cache_header) && csstrnlen(cache_header->version_string, NUMBEROF(cache_header->version_string)) < 32)
+	{
+		if (shell_build_string_is_compatible(cache_header->version_string))
+		{
+			is_compatible = true;
+		}
+		else if (!custom_map)
+		{
+			error(3, "the cache file '%s' belongs to an incompatible build (%s)", cache_file_memory_globals->header.name, cache_file_memory_globals->header.version_string);
+		}
+	}
+
+	if (!is_compatible)
 	{
 		scenario_tags_load_internal_panic();
 		return false;
@@ -263,6 +277,8 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 
 	if(!cache_file_memory_globals->tag_cache_base_address)
 	{
+		error(3, "failed to allocate the physical memory for the tags");
+		error(3, "cache file header is invalid");
 		scenario_tags_load_internal_panic();
 		return false;
 	}
@@ -355,23 +371,43 @@ datum tag_loaded(uint32 group_tag, const char* name)
 
 	if (g_cache_file_memory_globals->tags_loaded)
 	{
-		if (g_cache_file_memory_globals->tags_header->tag_count > 0)
+		const cache_file_tag_instance* global_tag_instances = global_tag_instances_get();
+
+		ASSERT(global_tag_instances);
+
+		for (int32 i = 0; i < g_cache_file_memory_globals->tags_header->tag_count; ++i)
 		{
-			cache_file_tag_instance* global_tag_instances = global_tag_instances_get();
-
-			for (int32 i = 0; i < g_cache_file_memory_globals->tags_header->tag_count; ++i)
+			const cache_file_tag_instance* tag_instance = &global_tag_instances[i];
+			if (group_tag == tag_instance->group_tag.group)
 			{
-				cache_file_tag_instance* tag_instance = &global_tag_instances[i];
-				if (group_tag == tag_instance->group_tag.group)
+				const char* tag_name = tag_get_name(tag_instance->tag_index);
+				if (!csstricmp(name, tag_name))
 				{
-					const char* tag_name = tag_get_name(tag_instance->tag_index);
-					if (!_stricmp(name, tag_name))
-					{
-						result = tag_instance->tag_index;
-						break;
-					}
+					result = tag_instance->tag_index;
+					break;
 				}
+			}
+		}
+	}
+	
+	// CARTO ADDITION:
+	// Parse the injected tag instances when checking if a tag is loaded
+	if (result == NONE)
+	{
+		const uint16 last_injected_index = k_first_injected_datum + g_tag_injection_manager->get_table()->get_entry_count();
+		const cache_file_tag_instance* global_tag_instances = global_tag_instances_get();
 
+		for (uint16 i = k_first_injected_datum; i < last_injected_index; ++i)
+		{
+			const cache_file_tag_instance* tag_instance = &global_tag_instances[i];
+			if (group_tag == tag_instance->group_tag.group)
+			{
+				const char* tag_name = tag_get_name(tag_instance->tag_index);
+				if (!csstricmp(name, tag_name))
+				{
+					result = tag_instance->tag_index;
+					break;
+				}
 			}
 		}
 	}
@@ -384,7 +420,9 @@ const char* tag_get_name(datum tag_index)
 
 	s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
 	ASSERT(g_cache_file_memory_globals->tags_loaded);
-	ASSERT(IN_RANGE(tag_name_index, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1));
+	
+	// We added a second check if the first one fails, since we're going to be passing it tag indexes in the injected tag area
+	ASSERT(IN_RANGE(tag_name_index, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1) || IN_RANGE(tag_name_index - k_first_injected_datum, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1));
 
 	int32 tag_name_offset = g_cache_file_debug_globals.debug_tag_name_offsets[tag_name_index];
 

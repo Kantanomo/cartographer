@@ -1,7 +1,7 @@
 #pragma once
 
-std::string IOCTLSocket_cmd_string(unsigned long cmd);
-std::string sockOpt_string(int optName);
+void IOCTLSocket_cmd_string(unsigned long cmd, char* string);
+void sockOpt_string(int optName, char* string);
 
 bool Ipv4AddressIsReservedOrLocalhost(const IN_ADDR ipv4Addr);
 

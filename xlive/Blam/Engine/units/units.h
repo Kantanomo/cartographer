@@ -144,7 +144,9 @@ struct _unit_datum
 	int8 tick_count_20E;
 	bool unk_bool_20F;
 	int16 parent_seat_index;
-	int8 gap_212[10];
+	int8 weapon_index;
+	int8 weapon_type_index;
+	int8 gap_214[8];
 	real32 mouth_aperture;
 	int32 last_entrance_attempt;
 	uint16 field_224;

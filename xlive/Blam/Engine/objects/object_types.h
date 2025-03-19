@@ -92,6 +92,8 @@ object_type_definition* object_type_definition_get(e_object_type object_type);
 
 object_type_definition* get_game_object_type_definition(datum object_datum);
 
+void __cdecl object_types_initialize_for_new_map(void);
+
 void __cdecl object_type_adjust_placement(object_placement_data* placement_data);
 
 bool object_type_new(datum object_index, object_placement_data* placement_data, bool* a3);

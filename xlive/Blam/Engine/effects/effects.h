@@ -30,6 +30,16 @@ enum e_effect_location_flags : uint16
     _effect_location_flags_bit_15 = FLAG(15),
 };
 
+enum e_match_all_markers : int32
+{
+    _match_all_markers_true = 1
+};
+
+enum e_effect_deterministic : int32
+{
+    _effect_deterministic_true = 1
+};
+
 struct s_effect_struct
 {
     int32 field_0;
@@ -99,5 +109,13 @@ real_vector3d* effect_get_velocity(datum effect_index);
 void __cdecl effect_update(datum effect_index, real32 dt);
 void __cdecl effect_update_time(datum effect_index, real32 dt);
 effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum* effect_datum, int32* out_index, int16 a3);
+
+int32 __cdecl effect_new_from_point_vector(
+    datum tag_index,
+    const real_point3d* position,
+    const real_vector3d* forward, 
+    const real_plane3d* plane,
+    e_match_all_markers match_all_markers,
+    e_effect_deterministic effect_deterministic);
 
 void effects_apply_patches();

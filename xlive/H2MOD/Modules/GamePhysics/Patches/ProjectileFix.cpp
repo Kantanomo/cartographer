@@ -6,8 +6,6 @@
 
 #include "items/projectile_definition.h"
 
-FLOATING_POINT_ENV_ACCESS();
-
 #define PROJECTILE_DEFAULT_OBJECT_DATA_SIZE 428
 
 // h3 gets the projectile collision data from somewhere else

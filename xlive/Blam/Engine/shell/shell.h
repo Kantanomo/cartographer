@@ -43,6 +43,14 @@ enum e_shell_command_line_flags : int32
 	k_number_of_shell_command_line_flags
 };
 
+/* structures*/
+
+struct s_shell_build_version
+{
+	int32 version;
+	const char* string;
+};
+
 /* prototypes */
 
 void shell_apply_patches(void);
@@ -62,3 +70,5 @@ void __cdecl shell_dispose(void);
 void __cdecl shell_update(void);
 
 void __cdecl timing_initialize(int32 a1);
+
+bool shell_build_string_is_compatible(const char* build_string);

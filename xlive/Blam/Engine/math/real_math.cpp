@@ -184,7 +184,7 @@ real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b)
 	return magnitude;
 }
 
-bool valid_real_vector3d_axes2(real_vector3d* forward, real_vector3d* up)
+bool valid_real_vector3d_axes2(const real_vector3d* forward, const real_vector3d* up)
 {
 	bool result = false;
 	if (valid_real_normal3d(forward) && valid_real_normal3d(up))

@@ -6,9 +6,25 @@
 #include "game/game.h"
 #include "saved_games/game_variant.h"
 
+/* constants */
+
+s_variant_description_map k_launch_multiplayer_variants[k_variant_count] =
+{
+	{ "slayer", _game_variant_description_slayer },
+	{ "oddball", _game_variant_description_oddball },
+	{ "juggernaut", _game_variant_description_juggernaut },
+	{ "king", _game_variant_description_king },
+	{ "ctf", _game_variant_description_ctf },
+	{ "invasion", _game_variant_description_invasion },
+	{ "territories", _game_variant_description_territories }
+};
+
+/* globals */
 
 s_game_options g_main_game_launch_options = {};
-int g_main_game_launch_user_count = 1;
+int32 g_main_game_launch_user_count = 1;
+
+/* prototypes */
 
 // Setup default values for the options structure depending on the game mode set
 void main_game_launch_setup_game_mode_details(void);
@@ -18,6 +34,8 @@ void main_game_launch_set_campaign_details(void);
 void main_game_launch_set_multiplayer_details(void);
 // Set default details for the mainmenu
 void main_game_launch_set_ui_shell_details(void);
+
+/* public code */
 
 void main_game_initialize(void)
 {
@@ -80,20 +98,11 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 }
 
 void main_game_launch_set_multiplayer_variant(const char* variant_name)
-{
-	s_variant_description_map variants[k_variant_count];
-	variants[_game_variant_description_slayer] = { "slayer", _game_variant_description_slayer };
-	variants[_game_variant_description_oddball] = { "oddball", _game_variant_description_oddball };
-	variants[_game_variant_description_juggernaut] = { "juggernaut", _game_variant_description_juggernaut };
-	variants[_game_variant_description_king] = { "king", _game_variant_description_king };
-	variants[_game_variant_description_ctf] = { "ctf", _game_variant_description_ctf };
-	variants[_game_variant_description_invasion] = { "invasion", _game_variant_description_invasion };
-	variants[_game_variant_description_territories] = { "territories", _game_variant_description_territories };
-	
-	size_t i;
-	for (i = 0; i < k_variant_count; ++i)
+{	
+	size_t i = 0;
+	for (; i < k_variant_count; ++i)
 	{
-		if (!csstricmp(variant_name, variants[i].name))
+		if (!csstricmp(variant_name, k_launch_multiplayer_variants[i].name))
 		{
 			break;
 		}
@@ -106,7 +115,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 	}
 	else
 	{
-		game_variant_build_default(&g_main_game_launch_options.game_variant, variants[i].index);
+		game_variant_build_default(&g_main_game_launch_options.game_variant, k_launch_multiplayer_variants[i].index);
 	}
 
 	g_main_game_launch_options.game_variant.round_time_limit = 0;
@@ -148,7 +157,10 @@ void main_game_set_global_scenario_index(datum scenario_index)
 {
 	datum* global_scenario_index = Memory::GetAddress<datum*>(0x4119A0, 0x3B528C);
 	*global_scenario_index = scenario_index;
+	return;
 }
+
+/* private code */
 
 void main_game_launch_setup_game_mode_details(void)
 {

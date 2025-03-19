@@ -8,12 +8,20 @@
 // https://www.cec.uchile.cl/cinetica/pcordero/MC_libros/NumericalRecipesinC.pdf
 // Page 284 to 285
 
-#define RANDOM_A 1664525
-#define RANDOM_C 1013904223
-#define RANDOM_NEW_SEED(prev_seed) ((RANDOM_A * (prev_seed) + RANDOM_C))
+/* constants */
 
-#define RANDOM_FLONE 1.0f
-#define RANDOM_MASK 0xffff // 0xffff
+enum
+{
+	RANDOM_A = 1664525,
+	RANDOM_C = 1013904223,
+	RANDOM_MASK = 0xffff // 0xffff
+};
+
+#define RANDOM_FLONE 1.f
+
+/* macros */
+
+#define RANDOM_NEW_SEED(prev_seed) ((RANDOM_A * (prev_seed) + RANDOM_C))
 
 // DIV_BY_MAX_MASK Compiles to 0.000015259022
 #define DIV_BY_MAX_MASK_REAL (RANDOM_FLONE / (real32)RANDOM_MASK)
@@ -30,6 +38,12 @@
 // [65535 = (2^16) - 1]
 #define REAL_RANDOM(seed) (DIV_BY_MAX_MASK_REAL * SEED_HIWORD(seed))
 #define REAL_RANDOM_RANGE(seed, lower_bound, delta) ((lower_bound) + (delta) * REAL_RANDOM(seed))
+
+/* globals */
+
+int32 g_random_seed_allow = 0;
+
+/* public code */
 
 s_random_math* random_math_get_globals()
 {
@@ -84,4 +98,20 @@ real_vector3d* _random_direction3d(uint32* seed, const char* type, char* file, i
 	int32 index = _random_range(seed, 0, k_random_direction_table_size);
 	*direction = k_random_direction_table[index];
 	return direction;
+}
+
+void random_seed_allow_use(void)
+{
+	++g_random_seed_allow;
+	return;
+}
+
+void random_seed_disallow_use(void)
+{
+	if (g_random_seed_allow <= 0)
+	{
+		DISPLAY_ASSERT("unmatched call to random_seed_disallow() somewhere");
+	}
+	--g_random_seed_allow;
+	return;
 }

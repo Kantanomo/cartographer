@@ -26,3 +26,7 @@ int16 _random_integer(uint32* seed);
 int16 _random_range(uint32* seed, int16 lower_bound, int16 upper_bound);
 
 real_vector3d* _random_direction3d(uint32* seed, const char* type, char* file, int32 line, real_vector3d* direction);
+
+void random_seed_allow_use(void);
+
+void random_seed_disallow_use(void);

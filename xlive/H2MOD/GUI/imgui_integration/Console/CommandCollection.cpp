@@ -4,8 +4,9 @@
 #include "CommandsUtil.h"
 #include "ComVar.h"
 
-#include "main/main.h"
+#include "game/cheats.h"
 #include "game/game.h"
+#include "main/main.h"
 #include "main/main_game.h"
 #include "main/main_game_time.h"
 #include "main/main_render.h"
@@ -13,7 +14,6 @@
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/NetworkMessageTypeCollection.h"
 #include "objects/objects.h"
-#include "simulation/game_interface/simulation_game_action.h"
 #include "text/unicode.h"
 
 #include "H2MOD.h"
@@ -25,7 +25,6 @@
 #include "tag_files/tag_loader/tag_injection.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 
-#include <fstream>
 
 std::mutex commandInsertMtx;
 
@@ -87,8 +86,7 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand("delete_object", "deletes an object, 1 parameter(s): <int>: object datum index", 1, 1, CommandCollection::DestroyObjectCmd));
 	InsertCommand(new ConsoleCommand("warp_fix", "(EXPERIMENTAL) increases client position update control threshold", 1, 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden));
 	InsertCommand(new ConsoleCommand("log_xnet_connections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden));
-	InsertCommand(new ConsoleCommand("spawn", "spawn an object from the list, 4 - 10 parameter(s): "
-		"<string>: object name <int>: count <bool>: same team, near player <float3>: (only if near player false) position xyz, rotation (optional) ijk", 4, 10, CommandCollection::SpawnCmd));
+	InsertCommand(new ConsoleCommand("drop", "drops the named tag e.g. objects\\vehicles\\banshee\\banshee.vehicle", 1, 1, CommandCollection::drop));
 	InsertCommand(new ConsoleCommand("spawn_reload_command_list", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd));
 	InsertCommand(new ConsoleCommand("tag_inject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden));
 	InsertCommand(new ConsoleCommand("crash", "crashes the game", 0, 0, CommandCollection::Crash));
@@ -530,27 +528,36 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 
 	for (int32 peer_index = 0; peer_index < session->get_peer_count(); peer_index++)
 	{
-		auto peer_observer_channel = &observer->m_observer_channels[session->m_session_peers[peer_index].observer_channel_index];
+		const s_observer_channel* peer_observer_channel = &observer->m_observer_channels[session->m_session_peers[peer_index].observer_channel_index];
 
 		char name[XUSER_NAME_SIZE * 2];
 		wchar_string_to_utf8_string(session->m_session_membership.membership_peers[peer_index].name, name, NUMBEROF(name));
 
-		std::string outStr = "# Peer index=" + std::to_string(peer_index);
-		outStr += ", Peer Name=" + std::string(name);
-		outStr += ", Connection Status=" + std::to_string(peer_observer_channel->state);
-		outStr += ", Peer map state: " + std::to_string(session->m_session_membership.membership_peers[peer_index].map_status);
-		datum player_index = session->m_session_membership.membership_peers[peer_index].local_players_indexes[0];
+		c_static_string<512> string;
+		string.set("# Peer index=");
+		string.append(std::to_string(peer_index).c_str());
+		string.append(", Peer Name=");
+		string.append(name);
+		string.append(", Connection Status=");
+		string.append(std::to_string(peer_observer_channel->state).c_str());
+		string.append(", Peer map state: ");
+		string.append(std::to_string(session->m_session_membership.membership_peers[peer_index].map_status).c_str());
+		
+		const datum player_index = session->m_session_membership.membership_peers[peer_index].local_players_indexes[0];
 		if (player_index != NONE)
 		{
 			wchar_string_to_utf8_string(session->get_player_membership(player_index)->properties[0].player_name, name, NUMBEROF(name));
 
-			outStr += ", Player index=" + std::to_string(player_index);
-			outStr += ", Player name=" + std::string(name);
+			string.append(", Player index=");
+			string.append(std::to_string(player_index).c_str());
+			string.append(", Player name=");
+			string.append(name);
 
 			wchar_string_to_utf8_string(s_player::get_name(player_index), name, NUMBEROF(name));
-			outStr += ", Name from game player state=" + std::string(name);
+			string.append(", Name from game player state=");
+			string.append(name);
 		}
-		outputCb(StringFlag_None, outStr.c_str());
+		outputCb(StringFlag_None, string.get_string());
 	}
 
 	return 0;
@@ -654,107 +661,9 @@ int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>&
 	return 0;
 }
 
-int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+int CommandCollection::drop(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	TextOutputCb* outputCb = ctx.outputCb;
-
-	int tokenArgPos = 1;
-
-	// spawn object_name count same_team near_player x y z i j k
-
-	datum objectDatum = NONE;
-	int count;
-	real_point3d position;
-	real_vector3d rotation;
-	bool sameTeam, nearPlayerSpawn;
-	int parameterCount = tokens.size() - 1; // only parameters
-
-	datum localPlayerIdx = player_index_from_user_index(0);
-
-	std::string objectName = tokens[tokenArgPos++];
-
-	if (game_is_ui_shell()) {
-		outputCb(StringFlag_None, "# can only be used ingame");
-		return 0;
-	}
-	else if (!NetworkSession::LocalPeerIsSessionHost()) {
-		outputCb(StringFlag_None, "# can only be used by the session host");
-		return 0;
-	}
-	else if (!ComVar(&count).SetFromStr(tokens[tokenArgPos++])
-		|| !ComVar(&sameTeam).SetFromStr(tokens[tokenArgPos++])
-		|| !ComVar(&nearPlayerSpawn).SetFromStr(tokens[tokenArgPos++])
-		)
-	{
-		outputCb(StringFlag_None, "# one or more invalid spawn arguments");
-		return 0;
-	}
-
-	if (nearPlayerSpawn)
-	{
-		real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->object.position;
-		position.x = localPlayerPos->x + 0.5f;
-		position.y = localPlayerPos->y + 0.5f;
-		position.z = localPlayerPos->z + 0.5f;
-	}
-	else
-	{
-		if (parameterCount < 7
-			|| !ComVar(&position.x).SetFromStr(tokens[tokenArgPos++])
-			|| !ComVar(&position.y).SetFromStr(tokens[tokenArgPos++])
-			|| !ComVar(&position.z).SetFromStr(tokens[tokenArgPos++]))
-		{
-			outputCb(StringFlag_None, "# insufficient/invalid xyz position spawn arguments");
-			return 0;
-		}
-	}
-
-	// check if rotation parameters were passed
-	// even if invalid, error handled after
-	bool withRotation = (parameterCount >= 5 && nearPlayerSpawn)
-		|| (parameterCount >= 8 && !nearPlayerSpawn);
-
-	if (withRotation)
-	{
-		if ((parameterCount < 7 && nearPlayerSpawn)
-			|| (parameterCount < 10 && !nearPlayerSpawn)
-			|| !ComVar(&rotation.i).SetFromStr(tokens[tokenArgPos++])
-			|| !ComVar(&rotation.j).SetFromStr(tokens[tokenArgPos++])
-			|| !ComVar(&rotation.k).SetFromStr(tokens[tokenArgPos++]))
-		{
-			outputCb(StringFlag_None, "# insufficient/invalid ijk rotation spawn arguments");
-			return 0;
-		}
-	}
-
-	//lookup a commands.txt file that contain string->object_datums
-	if (readObjectIds)
-		ReadObjectDatumIdx();
-
-	if (objectIds.find(objectName) == objectIds.end()) {
-		objectDatum = strtoul(objectName.c_str(), NULL, 0);
-	}
-	else {
-		objectDatum = objectIds[objectName];
-	}
-
-	real_vector3d* pRotation = nullptr;
-	real_point3d* pPosition = nullptr;
-
-	if (!nearPlayerSpawn)
-	{
-		pPosition = &position;
-	}
-
-	if (withRotation)
-	{
-		pRotation = &rotation;
-	}
-
-	ObjectSpawn(objectDatum, count, pPosition, pRotation, 1.0f, sameTeam);
-
-	// outputCbFmt(StringFlag_None, "# spawned: %s, near player: %s with rotation: %i", objectName.c_str(), nearPlayerSpawn.AsString().c_str(), withRotation);
-
+	cheat_drop_tag_name(tokens[1].c_str());
 	return 0;
 }
 
@@ -801,72 +710,6 @@ int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleComm
 //////////////////////////////////////////////////////////////////////////
 //	commands end
 //////////////////////////////////////////////////////////////////////////
-
-void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, float randomMultiplier, bool sameTeam)
-{
-	typedef void(__cdecl* set_orientation_t)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);
-	auto p_vector3d_from_euler_angles3d = Memory::GetAddress<set_orientation_t>(0x3347B);
-
-	for (int i = 0; i < count; i++)
-	{
-		try
-		{
-			object_placement_data new_object_placement;
-			datum localPlayerIdx = player_index_from_user_index(0);
-			real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->object.position;
-
-			if (object_idx != NONE)
-			{
-				object_placement_data_new(&new_object_placement, object_idx, -1, 0);
-
-				if (position)
-				{
-					new_object_placement.position = *position;
-				}
-				else if (localPlayerPos)
-				{
-					new_object_placement.position.x = localPlayerPos->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					new_object_placement.position.y = localPlayerPos->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					new_object_placement.position.z = (localPlayerPos->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-				}
-
-				if (rotation)
-				{
-					p_vector3d_from_euler_angles3d(&new_object_placement.forward, &new_object_placement.up, rotation);
-				}
-
-				if (!sameTeam)
-					new_object_placement.team_index = NONE;
-
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_idx, new_object_placement.position.x, new_object_placement.position.y, new_object_placement.position.z);
-				datum new_object_index = object_new(&new_object_placement);
-				simulation_action_object_create(new_object_index);
-			}
-		}
-		catch (...) {
-			LOG_TRACE_GAME("{} - error running spawn command", __FUNCTION__);
-		}
-	}
-}
-
-void CommandCollection::ReadObjectDatumIdx() {
-	std::ifstream infile("commands.txt");
-	if (infile.good()) {
-		std::string line;
-		while (std::getline(infile, line)) {
-			std::vector<std::string> command;
-			if (tokenize(line.c_str(), line.length(), ",", command))
-			{
-				if (command.size() != 2) {
-					LOG_TRACE_GAME("Found line not comma separated right, {}", line);
-				}
-				else {
-					objectIds[command[0]] = strtoul(command[1].c_str(), NULL, 0);
-				}
-			}
-		}
-	}
-}
 
 void CommandCollection::DeleteObject(datum objectDatumIdx)
 {

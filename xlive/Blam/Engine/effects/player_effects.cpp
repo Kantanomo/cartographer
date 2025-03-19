@@ -6,18 +6,17 @@
 #include "main/interpolator.h"
 #include "math/random_math.h"
 
-void get_shake_matrix(real_matrix4x3* shake_matrix, real32 translation_magnitude, real32 rotation_magnitude);
-real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 elapsed_time, real32 duration);
+/* prototypes */
 
-s_player_effect_globals* player_effect_globals_get(void)
-{
-    return *Memory::GetAddress<s_player_effect_globals**>(0x4CE860, 0x4F504C);
-}
+static s_player_effect_globals* player_effect_globals_get(void);
 
-s_player_effect_user_globals* player_effects_get_user_globals(int32 user_index)
-{
-    return &player_effect_globals_get()->user_effects[user_index];
-}
+static s_player_effect_user_globals* player_effects_get_user_globals(int32 user_index);
+
+static void get_shake_matrix(real_matrix4x3* shake_matrix, real32 translation_magnitude, real32 rotation_magnitude);
+
+static real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 elapsed_time, real32 duration);
+
+/* public code */
 
 void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* matrix)
 {
@@ -157,8 +156,31 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
     return;
 }
 
+void __cdecl render_screen_flash(int32 player_index, s_screen_flash* screen_flash)
+{
+    INVOKE(0xA408F, 0x0, render_screen_flash, player_index, screen_flash);
+    return;
+}
 
-void get_shake_matrix(real_matrix4x3* shake_matrix, real32 translation_magnitude, real32 rotation_magnitude)
+void __cdecl scripted_player_effect_screen_fade_in(real32 r, real32 g, real32 b, int16 ticks)
+{
+    INVOKE(0xA402C, 0x9628C, scripted_player_effect_screen_fade_in, r, g, b, ticks);
+    return;
+}
+
+/* private code */
+
+static s_player_effect_globals* player_effect_globals_get(void)
+{
+    return *Memory::GetAddress<s_player_effect_globals**>(0x4CE860, 0x4F504C);
+}
+
+static s_player_effect_user_globals* player_effects_get_user_globals(int32 user_index)
+{
+    return &player_effect_globals_get()->user_effects[user_index];
+}
+
+static void get_shake_matrix(real_matrix4x3* shake_matrix, real32 translation_magnitude, real32 rotation_magnitude)
 {
     real_vector3d vector;
 
@@ -177,14 +199,8 @@ void get_shake_matrix(real_matrix4x3* shake_matrix, real32 translation_magnitude
     return;
 }
 
-real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 elapsed_time, real32 duration)
+static real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 elapsed_time, real32 duration)
 {
     real32 function_value = 1.0f - (elapsed_time / duration);
     return transition_function_evaluate(function_type, function_value) * scale;
-}
-
-void __cdecl render_screen_flash(int32 player_index, s_screen_flash* screen_flash)
-{
-    INVOKE(0xA408F, 0x0, render_screen_flash, player_index, screen_flash);
-    return;
 }

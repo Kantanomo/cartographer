@@ -117,6 +117,16 @@ __declspec(naked) void effect_datum_get_node_matrix_relative_or_origin_to_cdecl(
 	}
 }
 
+int32 __cdecl effect_new_from_point_vector(
+	datum tag_index,
+	const real_point3d* position,
+	const real_vector3d* forward,
+	const real_plane3d* plane,
+	e_match_all_markers match_all_markers,
+	e_effect_deterministic effect_deterministic)
+{
+	return INVOKE(0xAB2E8, 0x0, effect_new_from_point_vector, tag_index, position, forward, plane, match_all_markers, effect_deterministic);
+}
 
 void effects_apply_patches()
 {
