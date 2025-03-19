@@ -1390,17 +1390,11 @@ static int32 object_get_override_index(datum object_index)
 			ASSERT(override->valid);
 			ASSERT(override->object_index != NONE);
 
-			object_header_datum* object_header = (object_header_datum*)datum_try_and_get(object_header_data_get(), g_object_override_data[0].object_index);
-			if (object_header)
+			// This specific call to object_get_and_verify_type was inlined by default for some reason?
+			object_datum* override_object = (object_datum*)object_get_and_verify_type(g_object_override_data[0].object_index, NONE);
+			if (override_object)
 			{
-				if (TEST_BIT(0, object_header->type))
-				{
-					object_datum* override_object = (object_datum*)object_header->datum;
-					if (override_object)
-					{
-						override_object->object.flags.set(_object_has_override_bit, false);
-					}
-				}
+				override_object->object.flags.set(_object_has_override_bit, false);
 			}
 
 			memmove_guarded(
