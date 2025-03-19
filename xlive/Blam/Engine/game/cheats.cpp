@@ -4,14 +4,17 @@
 #include "cache/cache_files.h"
 #include "camera/observer.h"
 #include "effects/effects.h"
+#include "effects/player_effects.h"
 #include "game/game.h"
 #include "game/game_globals.h"
+#include "interface/hud_messaging.h"
 #include "math/random_math.h"
 #include "main/console.h"
 #include "objects/object_definition.h"
 #include "objects/objects.h"
 #include "physics/collisions.h"
 #include "simulation/game_interface/simulation_game_action.h"
+#include "sound/game_sound.h"
 #include "tag_files/global_string_ids.h"
 #include "units/units.h"
 
@@ -93,39 +96,19 @@ bool __cdecl ice_cream_flavor_available(const e_skull_type skull)
 
 void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 {
-	typedef void(__cdecl* hud_clear_messages_t)();
-	auto p_hud_clear_messages = Memory::GetAddress<hud_clear_messages_t>(0x22CE83, 0x206863);
-	typedef int(__cdecl* display_generic_hud_string_t)(int controller_index, string_id string_id);
-	auto p_display_generic_hud_string = Memory::GetAddress<display_generic_hud_string_t>(0x22DEA4, 0x206BB7);
-	typedef int(__cdecl* scripted_player_effect_screen_fade_in_t)(float r, float g, float b, __int16 ticks);
-	auto p_scripted_player_effect_screen_fade_in = Memory::GetAddress<scripted_player_effect_screen_fade_in_t>(0xA402C, 0x9628C);
-	typedef int(__cdecl* unspatialized_impulse_sound_new_t)(datum sound_datum, float scale);
-	auto p_unspatialized_impulse_sound_new = Memory::GetAddress<unspatialized_impulse_sound_new_t>(0x8836C, 0x7F173);
-
-	s_game_globals* g_globals_tag = scenario_get_game_globals();
-	const s_game_globals_player_information* player_information = g_globals_tag->player_information[0];
-
 	if (skull < k_skull_count && !g_cheats_skull_enabled[skull])
 	{
 		g_cheats_skull_enabled[skull] = true;
-		p_hud_clear_messages();
+		hud_messaging_clear();
 		
 		const int32 user_index = players_first_active_user();
 
-		p_display_generic_hud_string(user_index, k_skull_string_ids[skull]);
-		p_scripted_player_effect_screen_fade_in(1.0, 1.0, 1.0, 20);
-
-		// The below should never return true, if that's the case we've got bigger issues
-		if (g_globals_tag->player_information.count == 0)
-		{
-			LOG_CRITICAL_GAME("g_globals_tag->player_information.size == 0, something is wrong with the globals tag on this map");
-			return; 
-		}
-
-		datum sound_datum = player_information->ice_cream.index;
+		hud_messaging_post(user_index, k_skull_string_ids[skull]);
+		scripted_player_effect_screen_fade_in(1.0, 1.0, 1.0, 20);
+		const datum sound_datum = scenario_get_game_globals()->player_information[0]->ice_cream.index;
 		if (sound_datum != NONE)
 		{
-			p_unspatialized_impulse_sound_new(sound_datum, 1.0);
+			unspatialized_impulse_sound_new(sound_datum, 1.f);
 		}
 	}
 }
@@ -155,7 +138,7 @@ void cheat_drop_tag_name(const char* name)
 bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 {
 	const datum tag_index = tag_loaded(group.group, name);
-	if (tag_index == -1)
+	if (tag_index == NONE)
 	{
 		if (!ignore_error)
 		{
@@ -164,7 +147,7 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 		return false;
 	}
 
-	int32 active_user = players_first_active_user();
+	const int32 active_user = players_first_active_user();
 	if (active_user == NONE)
 	{
 		return false;

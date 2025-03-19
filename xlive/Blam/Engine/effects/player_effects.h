@@ -148,3 +148,5 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 
 // Render screen flash
 void __cdecl render_screen_flash(int32 player_index, s_screen_flash* screen_flash);
+
+void __cdecl scripted_player_effect_screen_fade_in(real32 r, real32 g, real32 b, int16 ticks);

@@ -43,7 +43,10 @@ bool map_initialized(void)
 
 s_game_options* game_options_get(void)
 {
-	return &get_main_game_globals()->options;
+	s_main_game_globals* game_globals = get_main_game_globals();
+	// TODO: fix code in H2MOD that causes this assert
+	//ASSERT(game_globals && (game_globals->initializing || game_globals->map_active));
+	return &game_globals->options;
 }
 
 s_game_variant* current_game_variant(void)
@@ -143,6 +146,8 @@ s_game_cluster_bit_vectors* game_get_cluster_activation(void)
 
 void __cdecl game_options_setup_default_players(int32 player_count, s_game_options* game_options)
 {
+	ASSERT(player_count > 0 && player_count <= k_number_of_controllers);
+
 	INVOKE(0x49650, 0x428ED, game_options_setup_default_players, player_count, game_options);
 	return;
 }
@@ -315,6 +320,15 @@ void game_info_initialize_for_new_map(s_game_options* options)
 void __cdecl game_initialize_for_new_map(s_game_options* options)
 {
 	s_main_game_globals* game_globals = get_main_game_globals();
+
+	ASSERT(options);
+	// TODO: implement 
+	//ASSERT(main_game_loaded_map());
+	//ASSERT(wcscmp(options->scenario_path, main_game_loaded_map_name()) == 0);
+	ASSERT(!game_globals->initializing);
+	ASSERT(!game_globals->map_active);
+	ASSERT(!game_globals->game_in_progress);
+	ASSERT(game_globals->active_structure_bsp_index == NONE);
 
 	halo_interpolator_clear_buffers();
 	real_math_reset_precision();

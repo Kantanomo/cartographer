@@ -160,6 +160,8 @@ void main_game_set_global_scenario_index(datum scenario_index)
 	return;
 }
 
+/* private code */
+
 void main_game_launch_setup_game_mode_details(void)
 {
 	switch (g_main_game_launch_options.game_mode)

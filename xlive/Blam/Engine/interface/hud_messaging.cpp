@@ -52,8 +52,20 @@ void hud_messaging_apply_hooks(void)
 	return;
 }
 
-void hud_messaging_update(int32 user_index)
+void __cdecl hud_messaging_update(int32 user_index)
 {
 	INVOKE(0x22D1BD, 0x0, hud_messaging_update, user_index);
+	return;
+}
+
+void __cdecl hud_messaging_clear(void)
+{
+	INVOKE(0x22CE83, 0x206863, hud_messaging_clear);
+	return;
+}
+
+void __cdecl hud_messaging_post(int32 user_index, string_id string_id)
+{
+	INVOKE(0x22DEA4, 0x206BB7, hud_messaging_post, user_index, string_id);
 	return;
 }

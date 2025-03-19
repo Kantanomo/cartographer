@@ -450,6 +450,9 @@
     <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_button_settings.cpp" />
     <ClCompile Include="Blam\Engine\main\console.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_controller_settings_menu.cpp" />
+    <ClCompile Include="Blam\Engine\text\text_group.cpp" />
+    <ClCompile Include="Blam\Engine\sound\game_sound.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1901,6 +1904,8 @@
     <ClInclude Include="Blam\Engine\networking\network_utilities.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_button_settings.h" />
     <ClInclude Include="Blam\Engine\main\console.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_controller_settings_menu.h" />
+    <ClInclude Include="Blam\Engine\sound\game_sound.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -153,13 +153,13 @@ public:
 	}
 };
 
-template<size_t k_maximum_bit_count>
+template<size_t k_maximum_count>
 class c_static_flags_no_init
 {
 public:
 	void clear(void)
 	{
-		csmemset(m_flags, 0, BIT_VECTOR_SIZE_IN_BYTES(k_maximum_bit_count));
+		csmemset(m_flags, 0, BIT_VECTOR_SIZE_IN_BYTES(k_maximum_count));
 		return;
 	}
 
@@ -187,6 +187,9 @@ public:
 
 	void set(int32 index, bool enable)
 	{
+		ASSERT(VALID_INDEX(index, k_maximum_count));
+		ASSERT(m_flags);
+
 		BIT_VECTOR_SET_FLAG(m_flags, index, enable);
 		return;
 	}
@@ -199,6 +202,9 @@ public:
 
 	bool test(int32 index)
 	{
+		ASSERT(VALID_INDEX(index, k_maximum_count));
+		ASSERT(m_flags);
+
 		return BIT_VECTOR_TEST_FLAG(m_flags, index);
 	}
 
@@ -207,7 +213,7 @@ protected:
 	We do : "+ (k_maximum_bit_count % LONG_BITS > 0)" so we can make sure we have enough space
 	when m_flags is not perfectly divisible by LONG_BITS. It adds an extra element if the condition is true
 	*/
-	uint32 m_flags[k_maximum_bit_count / LONG_BITS + (k_maximum_bit_count % LONG_BITS > 0)];
+	uint32 m_flags[k_maximum_count / LONG_BITS + (k_maximum_count % LONG_BITS > 0)];
 };
 
 template<size_t k_maximum_bit_count>
