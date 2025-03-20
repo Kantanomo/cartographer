@@ -6,11 +6,13 @@
 #include "cutscene/cinematics.h"
 #include "effects/player_effects.h"
 #include "game/game_time.h"
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "interface/first_person_weapons.h"
 #include "physics/collisions.h"
 #include "render/render_visibility_collection.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
+
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 /* constants */
 
@@ -148,7 +150,7 @@ s_observer_result* __cdecl observer_try_and_get_camera(int32 user_index)
 
 static void observer_apply_interpolation_patches(void)
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		PatchCall(Memory::GetAddress(0x39D5D, 0xC0EC), observer_update);
 		PatchCall(Memory::GetAddress(0x97C93, 0xB6D47), observer_update);

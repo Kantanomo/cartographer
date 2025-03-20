@@ -122,7 +122,7 @@ CRITICAL_SECTION log_section;
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
 void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path, bool useAppDataLocalPath) {
-	const wchar_t* process_name = Memory::IsDedicatedServer() ? k_server_process_name : k_client_process_name;
+	const wchar_t* process_name = shell_is_dedicated_server() ? k_server_process_name : k_client_process_name;
 	
 	path->set(useAppDataLocalPath ? g_h2_appdata_local_path : L"");
 
@@ -191,7 +191,7 @@ void InitH2Startup() {
 	// after localAppData filepath initialized, we can initialize OnScreenDebugLog
 	InitOnScreenDebugText();
 
-	addDebugText(Memory::IsDedicatedServer() ? "Process is Dedi-Server" : "Process is Client");
+	addDebugText(shell_is_dedicated_server() ? "Process is Dedi-Server" : "Process is Client");
 
 	// DO NOT FUCKING TOUCH THIS
 	if (ArgList != NULL)
@@ -246,7 +246,7 @@ void InitH2Startup() {
 void H2DedicatedServerStartup() {
 	// initialize default data to run under LAN
 	// if the server runs in LIVE mode, check XLiveSignIn/XLiveSignOut in AccountLogin.cpp
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 	{
 		addDebugText("Signing in dedicated server locally.");
 

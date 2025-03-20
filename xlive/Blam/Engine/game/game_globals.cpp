@@ -3,10 +3,11 @@
 
 #include "units/unit_definitions.h"
 
+#include "cache/cache_files.h"
 #include "models/models.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
 #include "tag_files/global_string_ids.h"
-#include "cache/cache_files.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -106,7 +107,7 @@ static void game_globals_remove_singleplayer_representation(void)
 
 static void game_globals_add_new_player_representations(void)
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		scenario* scenario_definition = global_scenario_get();
 

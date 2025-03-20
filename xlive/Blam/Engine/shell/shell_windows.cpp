@@ -91,7 +91,7 @@ int32* fatal_error_id_get(void)
 void shell_windows_apply_patches(void)
 {
 	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		WriteJmpTo(Memory::GetAddress(0x7E43), H2WinMain);
 	}

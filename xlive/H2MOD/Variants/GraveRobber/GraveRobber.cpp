@@ -8,6 +8,7 @@
 #include "game/game_statborg.h"
 #include "items/weapons.h"
 #include "simulation/game_interface/simulation_game_action.h"
+#include "shell/shell.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 
 bool firstPlayerSpawn;
@@ -29,7 +30,7 @@ void GraveRobber::TriggerSound(e_graverobber_sounds sound, int sleep)
 {
 	const int language_id = *Memory::GetAddress<int*>(0x412818);
 
-	if (Memory::IsDedicatedServer()) return;
+	if (shell_is_dedicated_server()) return;
 
 	if (headhunterSoundTable[language_id][sound] != nullptr)
 	{
@@ -99,7 +100,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 	
 	HaloScript::ObjectDestroy(skull_datum);
 
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		for (int i = 0; i < k_number_of_users; i++)
 		{
@@ -120,7 +121,7 @@ void GraveRobber::InitializeClient()
 
 void GraveRobber::Initialize()
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		GraveRobber::InitializeClient();
 	}
@@ -172,7 +173,7 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 		// postspawn handler
 	case ExecTime::_postEventExec:
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 			GraveRobber::SpawnPlayerClientSetup();
 		break;
 	default:

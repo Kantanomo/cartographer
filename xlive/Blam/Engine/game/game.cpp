@@ -229,7 +229,7 @@ void __cdecl game_initialize(void)
 	}
 
 	// Interpolation allocation
-	if (shell_tool_type() != _shell_tool_type_editing_tools && !Memory::IsDedicatedServer())
+	if (shell_tool_type() != _shell_tool_type_editing_tools && !shell_is_dedicated_server())
 	{
 		halo_interpolator_initialize();
 		halo_interpolator_set_interpolation_enabled(true);
@@ -368,7 +368,7 @@ void game_apply_pre_winmain_patches(void)
 	WriteValue<int8>(Memory::GetAddress(0x49CDC, 0x42F5A) + 2, k_game_maximum_ragdolls_new);
 	
 	// Get original game_frame function
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC, 0x41F7D);
 

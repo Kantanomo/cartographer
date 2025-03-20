@@ -3,6 +3,7 @@
 
 #include "input/controllers.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "shell/shell.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/GUI/XLiveRendering.h"
@@ -117,7 +118,7 @@ void setWindowed(int originX, int originY, int width, int height) {
 }
 //TODO: REFACTOR Content
 void hotkeyFuncAlignWindow() {
-	if (Memory::IsDedicatedServer()) {
+	if (shell_is_dedicated_server()) {
 		return;
 	}
 
@@ -151,7 +152,7 @@ void hotkeyFuncAlignWindow() {
 }
 //TODO: REFACTOR Content
 void hotkeyFuncWindowMode() {
-	if (Memory::IsDedicatedServer()) {
+	if (shell_is_dedicated_server()) {
 		return;
 	}
 

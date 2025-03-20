@@ -36,7 +36,7 @@ s_shell_build_version k_shell_build_versions[] =
 
 void shell_apply_patches(void)
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		WriteJmpTo(Memory::GetAddress(0x4544), shell_command_line_flag_get);
 	}
@@ -47,6 +47,13 @@ void shell_apply_patches(void)
 e_shell_tool_type shell_tool_type(void)
 {
 	return _shell_tool_type_game;
+}
+
+bool shell_is_dedicated_server(void)
+{
+	// This function originally returned a compiler argument for the server
+	// We can't do that since we build a universal dll so just return the Memory global
+	return Memory::g_memory_is_dedicated_server;
 }
 
 static int32* shell_startup_flags_get()

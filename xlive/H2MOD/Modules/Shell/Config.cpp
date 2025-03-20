@@ -7,6 +7,8 @@
 #include "render/render_lod_new.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "rasterizer/dx9/rasterizer_dx9_9on12.h"
+#include "shell/shell.h"
+#include "shell/shell_windows.h"
 
 #include "H2MOD/GUI/imgui_integration/Console/ComVar.h"
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
@@ -24,7 +26,7 @@
 
 bool g_force_cartographer_update = false;
 
-const wchar_t* H2ConfigFilenames[] = { L"%wshalo2config%d.ini", L"%wsh2serverconfig%d.ini" };
+const wchar_t* k_h2config_filenames[] = { L"%wshalo2config%d.ini", L"%wsh2serverconfig%d.ini" };
 
 unsigned long H2Config_master_ip = inet_addr("149.56.81.89");
 unsigned short H2Config_master_port_login = 27020;
@@ -206,7 +208,7 @@ bool H2Config_isConfigFileAppDataLocal = false;
 void SaveH2Config() {
 	addDebugText("Saving H2Configuration File...");
 
-	if (!Memory::IsDedicatedServer()) {
+	if (!shell_is_dedicated_server()) {
 		extern int current_language_main;
 		extern int current_language_sub;
 		H2Config_language.code_main = current_language_main;
@@ -218,10 +220,10 @@ void SaveH2Config() {
 		wcsncpy(fileConfigPath, g_h2_config_path_override, ARRAYSIZE(fileConfigPath));
 	}
 	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], g_h2_process_file_path, _Shell::GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), k_h2config_filenames[shell_is_dedicated_server()], g_h2_process_file_path, _Shell::GetInstanceId());
 	}
 	else {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], g_h2_appdata_local_path, _Shell::GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), k_h2config_filenames[shell_is_dedicated_server()], g_h2_appdata_local_path, _Shell::GetInstanceId());
 	}
 
 	addDebugText(L"Saving config: \"%ws\"", fileConfigPath);
@@ -257,7 +259,7 @@ void SaveH2Config() {
 			"\n\n"
 		);
 
-		if (!Memory::IsDedicatedServer()) {
+		if (!shell_is_dedicated_server()) {
 			fprintf(fileConfig,
 				"# language_code Options (Client):"
 				"\n# <main>x<variant> - Sets the main/custom language for the game."
@@ -356,7 +358,7 @@ void SaveH2Config() {
 			"\n\n"
 		);
 
-		if (Memory::IsDedicatedServer()) {
+		if (shell_is_dedicated_server()) {
 			fprintf(fileConfig,
 				"# server_name Options (Server):"
 				"\n# Sets the name of the server up to 15 characters long."
@@ -416,7 +418,7 @@ void SaveH2Config() {
 	  
 		}
 
-		if (!Memory::IsDedicatedServer()) {
+		if (!shell_is_dedicated_server()) {
 			fprintf(fileConfig,
 				"# hotkey_... Options (Client):"
 				"\n# The number used is the keyboard Virtual-Key (VK) Code in base-10 integer form."
@@ -439,12 +441,12 @@ void SaveH2Config() {
 
 		CONFIG_SET(&ini, "upnp", &H2Config_upnp_enable);
 
-		if (!Memory::IsDedicatedServer()) {
+		if (!shell_is_dedicated_server()) {
 			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
 			CONFIG_SET(&ini, "language_code", lang_str.c_str());
 		}
 
-		if (!Memory::IsDedicatedServer()) {
+		if (!shell_is_dedicated_server()) {
 			CONFIG_SET(&ini, "language_label_capture", &H2Config_custom_labels_capture_missing);
 
 			CONFIG_SET(&ini, "skip_intro", &H2Config_skip_intro);
@@ -481,7 +483,7 @@ void SaveH2Config() {
 
 		CONFIG_SET(&ini, "enable_xdelay", &H2Config_xDelay);
 
-		if (Memory::IsDedicatedServer()) {
+		if (shell_is_dedicated_server()) {
 			CONFIG_SET(&ini, "server_name", H2Config_dedi_server_name);
 
 			CONFIG_SET(&ini, "server_playlist", H2Config_dedi_server_playlist);
@@ -512,7 +514,7 @@ void SaveH2Config() {
 				"\n");
 		}
 
-		if (!Memory::IsDedicatedServer()) {
+		if (!shell_is_dedicated_server()) {
 
 			c_static_string<64> vkstring;
 			vkstring.set("#");
@@ -581,7 +583,7 @@ void ReadH2Config() {
 			if (H2Config_isConfigFileAppDataLocal) {
 				checkFilePath = local;
 			}
-			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], checkFilePath, readInstanceIdFile);
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), k_h2config_filenames[shell_is_dedicated_server()], checkFilePath, readInstanceIdFile);
 			addDebugText(L"Reading config: \"%ws\"", fileConfigPath);
 			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
@@ -604,7 +606,7 @@ void ReadH2Config() {
 	else {
 		ownsConfigFile = (readInstanceIdFile == _Shell::GetInstanceId());
 
-		if (!Memory::IsDedicatedServer()) {
+		if (!shell_is_dedicated_server()) {
 			extern int current_language_main;
 			extern int current_language_sub;
 			H2Config_language.code_main = current_language_main;
@@ -661,7 +663,7 @@ void ReadH2Config() {
 			}
 
 			// client only
-			if (!Memory::IsDedicatedServer())
+			if (!shell_is_dedicated_server())
 			{
 				const char* language_code;
 				CONFIG_GET(&ini, "language_code", "-1x0", &language_code);
@@ -774,7 +776,7 @@ void ReadH2Config() {
 			}
 
 			// dedicated server only
-			if (Memory::IsDedicatedServer())
+			if (shell_is_dedicated_server())
 			{
 				const char* server_name = NULL; 
 				CONFIG_GET(&ini, "server_name", "", &server_name);

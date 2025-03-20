@@ -16,7 +16,7 @@ struct ProcessInfo
 };
 
 DWORD Memory::baseAddress;
-bool Memory::dedicatedServer;
+bool Memory::g_memory_is_dedicated_server;
 
 ProcessInfo game_info;
 

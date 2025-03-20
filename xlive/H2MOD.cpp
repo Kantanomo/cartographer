@@ -71,6 +71,7 @@
 #include "saved_games/cartographer_player_profile.h"
 #include "saved_games/game_state_procs.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_players.h"
 #include "simulation/game_interface/simulation_game_objects.h"
@@ -288,7 +289,7 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		PlaySound(soundName, NULL, SND_FILENAME | SND_NODEFAULT);
 	};
 
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 		std::thread(playSound).detach();
 }
 
@@ -303,7 +304,7 @@ static const real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds 
 
 void H2MOD::player_position_increase_client_position_margin_of_error(bool enable)
 {
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 		return;
 
 	const real32 k_default_biped_distance_error_margin = 2.5f;
@@ -327,9 +328,7 @@ void H2MOD::Initialize()
 	// Apply patches
 	game_apply_pre_winmain_patches();
 
-	main_loop_apply_patches();
-
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		// TODO: remove this garbage
 		custom_language_initialize();
@@ -468,7 +467,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 	if (game_mode_ui_shell)
 	{
 		addDebugText("Engine type: Main-Menu");
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 		{
 			MapSlots::OnMapLoad();
 			UIRankPatch();
@@ -480,7 +479,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 	{
 		LOG_INFO_GAME(L"[h2mod] engine type: {}", (int)options->game_mode);
 
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 		{
 			hud_patches_on_map_load();
 			screens_apply_patches_on_mp_map_load();
@@ -676,7 +675,7 @@ static void h2mod_apply_hooks(void)
 	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
 
 	// below hooks applied to specific executables
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		/* These hooks are only built for the client, don't enable them on the server! */
 
@@ -765,7 +764,7 @@ static void h2mod_apply_tweaks(void)
 
 	H2MOD::RefreshTogglexDelay();
 
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 	{
 	}
 	else {//is client

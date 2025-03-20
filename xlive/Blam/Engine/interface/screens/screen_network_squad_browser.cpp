@@ -2,6 +2,7 @@
 #include "screen_network_squad_browser.h"
 
 #include "interface/user_interface_controller.h"
+#include "shell/shell.h"
 
 /* typedefs */
 
@@ -73,7 +74,7 @@ void* c_screen_network_squad_browser::load(s_screen_parameters* parameters)
 
 void c_screen_network_squad_browser::apply_patches()
 {
-	if (Memory::IsDedicatedServer()) return;
+	if (shell_is_dedicated_server()) return;
 
 	PatchCall(Memory::GetAddressRelative(0x619650), jmp_build_player_list);
 

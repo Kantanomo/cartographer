@@ -14,6 +14,7 @@
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/NetworkMessageTypeCollection.h"
 #include "objects/objects.h"
+#include "shell/shell.h"
 #include "text/unicode.h"
 
 #include "H2MOD.h"
@@ -231,7 +232,7 @@ int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens,
 	int32 network_debug_display_type;
 	std::string exception;
 
-	if (Memory::IsDedicatedServer()) {
+	if (shell_is_dedicated_server()) {
 		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}
@@ -268,7 +269,7 @@ int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens,
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
-	if (Memory::IsDedicatedServer()) {
+	if (shell_is_dedicated_server()) {
 		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}
@@ -330,7 +331,7 @@ int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& to
 		outputCb(StringFlag_None, "# not in a network session");
 		return 0;
 	}
-	else if (Memory::IsDedicatedServer()) {
+	else if (shell_is_dedicated_server()) {
 		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}
@@ -372,7 +373,7 @@ int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, Conso
 			outputCb(StringFlag_None, "	%s", exception.c_str());
 			break;
 		}
-		else if (Memory::IsDedicatedServer()) {
+		else if (shell_is_dedicated_server()) {
 			outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 			break;
 		}
@@ -609,7 +610,7 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 	TextOutputCb* outputCb = ctx.outputCb;
 	bool warpFixVar;
 
-	if (Memory::IsDedicatedServer()) {
+	if (shell_is_dedicated_server()) {
 		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}

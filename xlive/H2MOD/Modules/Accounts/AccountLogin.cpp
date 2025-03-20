@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "AccountLogin.h"
+
+#include "shell/shell.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -45,7 +46,7 @@ void UpdateMasterStatus(int new_state, const char* state_str, ...)
 	va_list v;
 	va_start(v, state_str);
 	masterState = new_state;
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		if (masterStateStr)
 			delete[] masterStateStr;
@@ -97,7 +98,7 @@ int ConfigureUserDetails(const char* username, const char* login_token, unsigned
 	UpdateMasterLoginStatus(developer);
 
 	if (online_signin) {
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 			ForwardPorts();
 	}
 

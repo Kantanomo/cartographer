@@ -2,6 +2,7 @@
 #include "RunLoop.h"
 
 #include "main/main_game_time.h"
+#include "shell/shell.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -22,7 +23,7 @@ H2Config_Experimental_Rendering_Mode g_experimental_rendering_mode = _rendering_
 
 void CartographerMainLoop() {
 	static bool halo2WindowExists = false;
-	if (!Memory::IsDedicatedServer() && !halo2WindowExists && H2hWnd != NULL) {
+	if (!shell_is_dedicated_server() && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
 		DWORD Display_Mode = 1;
 		HKEY hKeyVideoSettings = NULL;
@@ -42,7 +43,7 @@ void CartographerMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
-	if(Memory::IsDedicatedServer())
+	if(shell_is_dedicated_server())
 	{
 		//StatsHandler::playerRanksUpdateTick();
 	}
@@ -89,7 +90,7 @@ void __cdecl main_loop_body() {
 	CartographerMainLoop();
 
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		mapManager->MapDownloadUpdateTick();
 		gXnIpMgr.GetLocalUserXn()->m_pckStats.PckDataSampleUpdate();	// update local user network stats
@@ -105,7 +106,7 @@ void main_loop_apply_patches() {
 	p_main_loop_body = Memory::GetAddress<main_loop_body_t>(0x399CC, 0xBFDE);
 	PatchCall(Memory::GetAddress(0x39E64, 0xC684), main_loop_body);
 
-	if (Memory::IsDedicatedServer()) {
+	if (shell_is_dedicated_server()) {
 		main_game_time_apply_patches();
 		addDebugText("Hooking loop & shutdown Function");
 	}

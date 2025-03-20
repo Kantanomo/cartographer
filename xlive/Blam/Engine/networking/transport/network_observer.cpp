@@ -3,6 +3,8 @@
 #include "network_observer.h"
 #include "network_channel.h"
 
+#include "shell/shell.h"
+
 s_network_observer_configuration* g_network_observer_configuration;
 
 #if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
@@ -360,7 +362,7 @@ void c_network_observer::apply_patches()
 	// disable forced host migration in P2P games
 	// this is using the XNet QoS probes to select a preferred host with a possible better connection
 	// which is not really available anymore with cartographer, since the QoS probes are not that accurate anymore
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		PatchCall(Memory::GetAddress(0x1D97DD, 0x1BEE59), is_network_observer_mode_managed);
 	}

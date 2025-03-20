@@ -19,6 +19,7 @@
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_utilities.h"
 #include "Networking/online/online_account_xbox.h"
+#include "shell/shell.h"
 #include "tag_files/global_string_ids.h"
 #include "text/unicode.h"
 
@@ -992,7 +993,7 @@ void user_interface_backout_to_mainmenu_patches()
 
 void c_screen_4way_signin::apply_instance_patches()
 {
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 		return;
 
 	user_interface_recover_from_disconnection_patches();

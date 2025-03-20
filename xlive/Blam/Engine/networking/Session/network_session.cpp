@@ -2,9 +2,9 @@
 #include "network_session.h"
 
 #include "game/game.h"
-#include "networking/logic/life_cycle_manager.h"
-
 #include "interface/user_interface_controller.h"
+#include "networking/logic/life_cycle_manager.h"
+#include "shell/shell.h"
 
 /* public code */
 
@@ -173,7 +173,7 @@ bool NetworkSession::IsVariantTeamPlay()
 
 void NetworkSession::LeaveSession()
 {
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 		return;
 
 	if (game_is_ui_shell())

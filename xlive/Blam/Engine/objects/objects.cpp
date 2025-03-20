@@ -21,6 +21,7 @@
 #include "physics/havok.h"
 #include "physics/havok_memory.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
 #include "simulation/simulation.h"
 #include "structures/cluster_partitions.h"
 #include "tag_files/tag_files.h"
@@ -262,7 +263,7 @@ void __cdecl object_reconnect_to_physics(datum object_index)
 
 datum object_new_internal(datum object_index, object_placement_data* data)
 {
-	bool process_is_game_client = !Memory::IsDedicatedServer();
+	bool process_is_game_client = !shell_is_dedicated_server();
 
 	const object_definition* object_def = (object_definition*)tag_get_fast(data->tag_index);
 	const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object.object_type);
@@ -795,7 +796,7 @@ void __cdecl objects_post_update(void)
 			&& object_header->flags.test(_object_header_awake_bit)
 			&& !object_header->flags.test(_object_header_being_deleted_bit))
 		{
-			if (object->object.flags.test(_object_hidden_bit) && !Memory::IsDedicatedServer())
+			if (object->object.flags.test(_object_hidden_bit) && !shell_is_dedicated_server())
 			{
 				// reset the interpolator for this object, if hidden
 				// ### FIXME maybe hook object_hide and reset it there?
@@ -878,7 +879,7 @@ static void objects_apply_interpolation_patches(void)
 {
 	object_new_replace_calls();
 
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		object_move_replace_calls();
 		object_get_markers_by_string_id_replace_calls();

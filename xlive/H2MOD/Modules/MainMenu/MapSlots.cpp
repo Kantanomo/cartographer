@@ -6,6 +6,7 @@
 #include "game/game_globals.h"
 #include "main/level_definitions.h"
 #include "scenario/scenario_definitions.h"
+#include "shell/shell.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 
@@ -197,7 +198,7 @@ namespace MapSlots
 	{
 		CacheMapData();
 
-		if (Memory::IsDedicatedServer())
+		if (shell_is_dedicated_server())
 		{
 			map_slots_apply_dedi_hooks();
 		}

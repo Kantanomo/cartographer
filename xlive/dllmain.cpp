@@ -2,6 +2,7 @@
 
 #include "cartographer/discord/discord_interface.h"
 #include "interface/new_hud_draw.h"
+#include "shell/shell.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
@@ -60,7 +61,7 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 void discord_initialize(void)
 {
 	HMODULE module = LoadLibraryW(k_discord_dll_filename);
-	if (module && !Memory::IsDedicatedServer()
+	if (module && !shell_is_dedicated_server()
 		&& H2Config_discord_enable
 #ifdef TEST_DISCORD_INSTANCE
 		&& _Shell::GetInstanceId() == 1
@@ -75,7 +76,7 @@ void discord_initialize(void)
 
 void discord_dispose(void)
 {
-	if (!Memory::IsDedicatedServer()
+	if (!shell_is_dedicated_server()
 		&& H2Config_discord_enable
 #ifdef TEST_DISCORD_INSTANCE
 		&& _Shell::GetInstanceId() == 1

@@ -4,6 +4,7 @@
 #include "simulation.h"
 
 #include "cartographer/discord/discord_interface.h"
+#include "shell/shell.h"
 
 /* prototypes */
 
@@ -32,7 +33,7 @@ void __cdecl simulation_player_joined_game(datum player_index)
 	if (g_simulation_globals->engine_initialized && !g_simulation_globals->field_B)
 	{
 		g_simulation_globals->world->create_player(player_index);
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 		{
 			// Update discord player counts
 			discord_interface_set_player_counts();
@@ -49,7 +50,7 @@ void __cdecl simulation_player_left_game(datum player_index)
 	if (g_simulation_globals->engine_initialized && !g_simulation_globals->field_B)
 	{
 		g_simulation_globals->world->delete_player(player_index);
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 		{
 			// Update discord player counts
 			discord_interface_set_player_counts();

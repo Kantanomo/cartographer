@@ -1,6 +1,8 @@
 #include "stdafx.h"
-
 #include "H2MODShell.h"
+
+#include "shell/shell.h"
+
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 int instanceNumber = 0;
@@ -16,7 +18,7 @@ static void InitializeInstanceId() {
 	do {
 		instanceNumber++;
 		wchar_t mutexName[64];
-		swprintf(mutexName, ARRAYSIZE(mutexName), (Memory::IsDedicatedServer() ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
+		swprintf(mutexName, ARRAYSIZE(mutexName), (shell_is_dedicated_server() ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
 		mutex = CreateMutexW(0, TRUE, mutexName);
 		lastErr = GetLastError();
 		if (lastErr == ERROR_ALREADY_EXISTS) {
