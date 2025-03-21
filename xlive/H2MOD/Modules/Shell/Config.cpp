@@ -70,7 +70,6 @@ bool H2Config_vip_lock = false;
 bool H2Config_even_shuffle_teams = false;
 bool H2Config_koth_random = true;
 bool H2Config_intel_sky_hack = false;
-H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = _rendering_mode_none;
 
 // ### TODO FIXME remove CSimpleIniA garbage
 // for now improve the code by simplifying it
@@ -220,10 +219,10 @@ void SaveH2Config() {
 		wcsncpy(fileConfigPath, g_h2_config_path_override, ARRAYSIZE(fileConfigPath));
 	}
 	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), k_h2config_filenames[shell_is_dedicated_server()], g_h2_process_file_path, _Shell::GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), k_h2config_filenames[shell_is_dedicated_server()], g_h2_process_file_path, g_instance_number);
 	}
 	else {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), k_h2config_filenames[shell_is_dedicated_server()], g_h2_appdata_local_path, _Shell::GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), k_h2config_filenames[shell_is_dedicated_server()], g_h2_appdata_local_path, g_instance_number);
 	}
 
 	addDebugText(L"Saving config: \"%ws\"", fileConfigPath);
@@ -561,7 +560,7 @@ void SaveH2Config() {
 void ReadH2Config() {
 	addDebugText("Reading H2Configuration file...");
 
-	int readInstanceIdFile = _Shell::GetInstanceId();
+	int readInstanceIdFile = g_instance_number;
 	wchar_t local[MAX_PATH];
 	wcscpy_s(local, ARRAYSIZE(local), g_h2_appdata_local_path);
 	H2Config_isConfigFileAppDataLocal = false;
@@ -604,7 +603,7 @@ void ReadH2Config() {
 		H2Config_isConfigFileAppDataLocal = true;
 	}
 	else {
-		ownsConfigFile = (readInstanceIdFile == _Shell::GetInstanceId());
+		ownsConfigFile = (readInstanceIdFile == g_instance_number);
 
 		if (!shell_is_dedicated_server()) {
 			extern int current_language_main;
@@ -688,20 +687,6 @@ void ReadH2Config() {
 				CONFIG_GET(&ini, "fps_limit", "120", &H2Config_fps_limit);
 
 				CONFIG_GET(&ini, "static_lod_state", "0", &H2Config_static_lod_state);
-
-				switch(1)
-				{
-					case 0:
-						H2Config_experimental_fps = _rendering_mode_none;
-						break;
-					case 1:
-						H2Config_experimental_fps = _rendering_mode_original_game_frame_limit;
-						break;
-					default:
-						//Incase any of the old rendering modes were used for a higher fps, set it back to 60.
-						H2Config_fps_limit = 60;
-						break;
-				}
 				
 				CONFIG_GET(&ini, "shader_lod_max", "false", &H2Config_shader_lod_max);
 				CONFIG_GET(&ini, "light_suppressor", "false", &H2Config_light_suppressor);
@@ -871,7 +856,7 @@ void ReadH2Config() {
 
 #pragma region Config Init/Deinit
 void InitH2Config() {
-	H2Config_disable_ingame_keyboard = _Shell::GetInstanceId() > 1 ? true : false;
+	H2Config_disable_ingame_keyboard = g_instance_number > 1 ? true : false;
 	ReadH2Config();
 }
 void DeinitH2Config() {

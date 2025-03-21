@@ -2,16 +2,23 @@
 
 /* constants */
 
-// 1 hour offset
-#define k_process_system_time_startup_offset_sec (1 * 60 * 60)
+enum
+{
+	k_process_system_time_startup_offset_sec = (1 * 60 * 60),	// 1 hour offset
+	k_shell_time_sec_denominator = 1,
+	k_shell_time_msec_denominator = 1000,
+	k_shell_time_usec_denominator = 1000000
+};
 
-#define k_shell_time_sec_denominator 1
-#define k_shell_time_msec_denominator 1000
-#define k_shell_time_usec_denominator 1000000
+/* globals */
+
+extern uint32 g_instance_number;
 
 /* prototypes */
 
 HWND* shell_windows_get_hwnd(void);
+
+bool shell_platform_initialize(void);
 
 bool* should_initilize_xlive_get(void);
 

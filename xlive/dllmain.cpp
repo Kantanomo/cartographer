@@ -64,7 +64,7 @@ void discord_initialize(void)
 	if (module && !shell_is_dedicated_server()
 		&& H2Config_discord_enable
 #ifdef TEST_DISCORD_INSTANCE
-		&& _Shell::GetInstanceId() == 1
+		&& g_instance_number == 1
 #endif
 		)
 	{
@@ -79,7 +79,7 @@ void discord_dispose(void)
 	if (!shell_is_dedicated_server()
 		&& H2Config_discord_enable
 #ifdef TEST_DISCORD_INSTANCE
-		&& _Shell::GetInstanceId() == 1
+		&& g_instance_number == 1
 #endif
 		)
 	{
@@ -122,6 +122,10 @@ void exit_instance(void)
 	discord_dispose();
 	tag_injection_deinitialize();
 	new_hud_draw_deinitialize();
+
+	extern void DeinitCustomLanguage();
+	DeinitCustomLanguage();
+	DeinitH2Config();
 
 #ifndef NO_TRACE
 	EnterCriticalSection(&log_section);

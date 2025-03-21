@@ -1,39 +1,6 @@
 #include "stdafx.h"
 #include "H2MODShell.h"
 
-#include "shell/shell.h"
-
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-
-int instanceNumber = 0;
-
-int _Shell::GetInstanceId() {
-	return instanceNumber;
-}
-
-static void InitializeInstanceId() {
-	addDebugText("Determining Process Instance Number.");
-	HANDLE mutex;
-	DWORD lastErr;
-	do {
-		instanceNumber++;
-		wchar_t mutexName[64];
-		swprintf(mutexName, ARRAYSIZE(mutexName), (shell_is_dedicated_server() ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
-		mutex = CreateMutexW(0, TRUE, mutexName);
-		lastErr = GetLastError();
-		if (lastErr == ERROR_ALREADY_EXISTS) {
-			CloseHandle(mutex);
-		}
-	} while (lastErr == ERROR_ALREADY_EXISTS);
-	addDebugText("You are Instance #%d.", instanceNumber);
-}
-
-void _Shell::Initialize()
-{
-	// initialize game instance Id
-	InitializeInstanceId();
-}
-
 void _Shell::OpenMessageBox(HWND hWnd, UINT uType, const char* caption,  const char* format, ...)
 {
 	va_list valist;

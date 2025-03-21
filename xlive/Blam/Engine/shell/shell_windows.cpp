@@ -8,7 +8,16 @@
 #include "main/main.h"
 #include "math/math.h"
 
+#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+
+/* constants */
+
+enum
+{
+	k_max_monitor_count = 9
+};
 
 /* globals */
 
@@ -16,6 +25,8 @@ static LARGE_INTEGER g_startup_counter;
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 
 static bool g_custom_mouse_cursor_enabled = false;
+
+uint32 g_instance_number = 0;
 
 /* prototypes */
 
@@ -42,6 +53,17 @@ static void shell_system_set_timer_resolution_max(bool enable);
 static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator);
 
 static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_time, int framerate);
+
+// Adjust name of window to display the instance number when we have more than 1 window open
+static void shell_windows_adjust_name(void);
+
+static void shell_windows_fix_adjustment(void);
+
+static void shell_windows_calculate_instance_num(void);
+
+static void shell_windows_tokenize_command_line_buffer(const wchar_t* argument_buffer, wchar_t** args, int32 max_arg_count, int32* arg_count);
+
+static void shell_windows_initialize_arguments(void);
 
 static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut);
 
@@ -70,6 +92,22 @@ static BOOL WINAPI CryptUnprotectDataHook(
 HWND* shell_windows_get_hwnd(void)
 {
 	return Memory::GetAddress<HWND*>(0x46D9C4);
+}
+
+bool shell_platform_initialize(void)
+{
+	shell_windows_calculate_instance_num();
+
+	shell_windows_initialize_arguments();
+	shell_command_line_flag_set(_shell_command_line_flag_nointro, H2Config_skip_intro);
+	shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);			// ### TODO FIXME: voice-chat is disabled for now
+	
+	shell_windows_adjust_name();
+	shell_windows_fix_adjustment();
+
+	InitH2Config();
+	PostH2Config();
+	return true;
 }
 
 // mess around with xlive (not calling XLiveInitialize etc)
@@ -457,11 +495,184 @@ static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_IN
 	}
 }
 
+static void shell_windows_adjust_name(void)
+{
+	const HWND hwnd = *shell_windows_get_hwnd();
+	if (g_instance_number > 1)
+	{
+		wchar_t titleMod[256];
+		wchar_t titleOriginal[256];
+		GetWindowText(hwnd, titleOriginal, 256);
+		wsprintf(titleMod, L"%ls (P%d)", titleOriginal, g_instance_number);
+		SetWindowText(hwnd, titleMod);
+	}
+	return;
+}
+
+// TODO: remove, this should go in the winproc function
+static void shell_windows_fix_adjustment(void)
+{
+	if (!shell_is_dedicated_server())
+	{
+		const HWND hwnd = *shell_windows_get_hwnd();
+		BYTE display_mode = 1;
+		HKEY hkey_video_settings = NULL;
+		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hkey_video_settings) == ERROR_SUCCESS)
+		{
+			DWORD cb_data;
+			DWORD type = 4;
+			if (RegQueryValueExA(hkey_video_settings, "DisplayMode", NULL, &type, &display_mode, &cb_data))
+			{
+				error(2, "error getting the DisplayMode registry key");
+			}
+			RegCloseKey(hkey_video_settings);
+		}
+
+		if (display_mode)
+		{
+			SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+		}
+	}
+	return;
+}
+
+static void shell_windows_calculate_instance_num(void)
+{
+	DWORD lastErr;
+	do
+	{
+		++g_instance_number;
+		wchar_t mutexName[64];
+		swprintf(mutexName, ARRAYSIZE(mutexName), (shell_is_dedicated_server() ? L"Halo2Server%d" : L"Halo2Player%d"), g_instance_number);
+		HANDLE mutex = CreateMutexW(0, TRUE, mutexName);
+		lastErr = GetLastError();
+		if (lastErr == ERROR_ALREADY_EXISTS)
+		{
+			CloseHandle(mutex);
+		}
+	}
+	while (lastErr == ERROR_ALREADY_EXISTS);
+	return;
+}
+
+static void shell_windows_tokenize_command_line_buffer(const wchar_t* argument_buffer, wchar_t** args, int32 max_arg_count, int32* arg_count)
+{
+	void* p_shell_windows_tokenize_command_line_buffer = Memory::GetAddress<void*>(0x1014, 0x1000);
+	__asm
+	{
+		push arg_count
+		push max_arg_count
+		push args
+		mov eax, argument_buffer
+		call p_shell_windows_tokenize_command_line_buffer
+		add esp, 12
+	}
+	return;
+}
+
+static void shell_windows_initialize_arguments(void)
+{
+	for (int32 i = 0; i < k_number_of_shell_command_line_flags; i++)
+	{
+		shell_command_line_flag_set((e_shell_command_line_flags)i, 0);
+	}
+
+	const LPWSTR command_line = GetCommandLineW();
+	if (command_line)
+	{
+		// Copy the buffer
+		wchar_t argument_buffer[INT16_MAX + 1];
+		ustrncpy(argument_buffer, command_line, NUMBEROF(argument_buffer));
+
+		// Initialize our list of args
+		wchar_t* args[1024];
+		csmemset(args, 0, sizeof(args));
+
+		// Tokenize the argument buffer into our list of args
+		int32 arg_count;
+		shell_windows_tokenize_command_line_buffer(argument_buffer, args, NUMBEROF(args), &arg_count);
+
+		for (int32 i = 0; i < arg_count; i++)
+		{
+			const wchar_t* current_argument = args[i];
+
+			if (_wcsicmp(current_argument, L"-windowed") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_windowed, 1);
+			}
+			else if (_wcsicmp(current_argument, L"-nosound") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_nosound, 1);
+				WriteValue(Memory::GetAddress(0x479EDC), 1);
+			}
+			else if (_wcsicmp(current_argument, L"-novsync") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_novsync, 1);
+			}
+			else if (_wcsicmp(current_argument, L"-nointro") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_nointro, 1);
+			}
+			else if (_wcsnicmp(current_argument, L"-monitor:", 9) == 0)
+			{
+				int monitor_id = _wtol(&current_argument[9]);
+				shell_command_line_flag_set(_shell_command_line_flag_monitor_count, PIN(monitor_id, 0, k_max_monitor_count));
+			}
+			else if (_wcsicmp(current_argument, L"-highquality") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_high_quality, 1);
+			}
+			else if (_wcsicmp(current_argument, L"-disabledepthbias") == 0)
+			{
+				// Check github issue #118
+				/* g_depth_bias always NULL rather than taking any value from
+				shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
+				NopFill(Memory::GetAddress(0x269FD5), 8);
+			}
+			else if (_wcsicmp(current_argument, L"-h2config=") == 0)
+			{
+				if (wcslen(current_argument) < 255)
+				{
+					int pfcbuflen = wcslen(current_argument + 10) + 1;
+					g_h2_config_path_override = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
+					swprintf(g_h2_config_path_override, pfcbuflen, current_argument + 10);
+				}
+			}
+			// This is for manually setting the instance number on dedis
+			else if (wcsstr(current_argument, L"instance:") != NULL)
+			{
+				// Get instance number from the argument
+				const wchar_t* instance_number = current_argument + NUMBEROF(L"instance:") - 1;
+
+				// Convert to unsigned int
+				wchar_t* end;
+				const uint32 instance_num = wcstoul(instance_number, &end, 10);
+
+				// If the end of the string isn't the same as the start then we've converted properly
+				// and can safely set the instance number
+				if (end != instance_number)
+				{
+					g_instance_number = instance_num;
+				}
+			}
+#ifdef _DEBUG
+			else if (_wcsnicmp(current_argument, L"-dev_flag:", 10) == 0)
+			{
+				int flag_id = _wtol(&current_argument[10]);
+				shell_command_line_flag_set((e_shell_command_line_flags)PIN(0, flag_id, k_number_of_shell_command_line_flags - 1), 1);
+			}
+#endif
+		}
+	}
+	return;
+}
+
 static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
 {
 	pDataOut->cbData = pDataIn->cbData;
 	pDataOut->pbData = static_cast<BYTE*>(LocalAlloc(LMEM_FIXED, pDataIn->cbData));
 	CopyMemory(pDataOut->pbData, pDataIn->pbData, pDataIn->cbData);
+	return;
 }
 
 static BOOL WINAPI CryptProtectDataHook(

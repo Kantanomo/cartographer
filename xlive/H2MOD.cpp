@@ -14,7 +14,6 @@
 #include "effects/effects.h"
 #include "effects/particle_update.h"
 #include "physics/character_physics_mode_melee.h"
-#include "tag_files/files_windows.h"
 #include "game/aim_assist.h"
 #include "game/cheats.h"
 #include "game/game.h"
@@ -39,10 +38,11 @@
 #include "interface/screens/screens_patches.h"
 #include "items/weapon_definitions.h"
 #include "kablam/kablam.h"
-#include "main/main.h"
 #include "main/levels.h"
 #include "main/loading.h"
+#include "main/main.h"
 #include "main/main_game.h"
+#include "main/main_game_time.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
 #include "networking/network_utilities.h"
@@ -76,6 +76,7 @@
 #include "simulation/simulation_players.h"
 #include "simulation/game_interface/simulation_game_objects.h"
 #include "simulation/game_interface/simulation_game_units.h"
+#include "tag_files/files_windows.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/font_cache.h"
 #include "units/units.h"
@@ -96,7 +97,6 @@
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
-#include "H2MOD/Modules/MainLoopPatches/RunLoop/RunLoop.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
@@ -643,6 +643,8 @@ static void h2mod_apply_hooks(void)
 	}
 
 	cheats_apply_patches();
+	main_apply_patches();
+	main_game_time_apply_patches();
 	game_statborg_apply_patches();
 	simulation_game_objects_apply_patches();
 	simulation_game_units_apply_patches();

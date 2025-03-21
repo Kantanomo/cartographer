@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "main.h"
 
+#include "shell/shell.h"
 #include "simulation/simulation.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/MapManager/MapManager.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
 
 /* typedefs */
 typedef void(__cdecl* t_main_game_reset_map)();
@@ -69,4 +72,19 @@ static void __cdecl main_game_reset_map_blue_screen_detection()
 	{
 		EventHandler::BlueScreenEventExecute(EventExecutionType::execute_after);
 	}
+}
+
+void __cdecl main_loop_body(void)
+{
+	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
+	if (!shell_is_dedicated_server())
+	{
+		mapManager->MapDownloadUpdateTick();
+		gXnIpMgr.GetLocalUserXn()->m_pckStats.PckDataSampleUpdate();	// update local user network stats
+	}
+	
+	INVOKE(0x399CC, 0xBFDE, main_loop_body);
+
+	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
+	return;
 }

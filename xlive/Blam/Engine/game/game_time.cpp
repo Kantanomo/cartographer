@@ -5,11 +5,8 @@
 
 #include "cutscene/cinematics.h"
 #include "math/math.h"
+#include "main/main_game_time.h"
 #include "shell/shell_windows.h"
-
-#include "H2MOD/Modules/Shell/Config.h"
-
-extern H2Config_Experimental_Rendering_Mode g_experimental_rendering_mode;
 
 time_globals* time_globals::get()
 {
@@ -83,6 +80,7 @@ void game_time_set_paused(bool pause)
 	ASSERT(game_time_globals->initialized);
 
 	game_time_globals->paused = pause;
+	return;
 }
 
 // We disable some broken code added by hired gun, that is also disabled while running a cinematic 
@@ -90,36 +88,32 @@ void game_time_set_paused(bool pause)
 // As well as the game speeding up while minimized
 bool __cdecl cinematic_is_running_hook()
 {
-	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = g_experimental_rendering_mode;
-
-	switch (experimental_rendering_mode)
+	bool result;
+	if (!g_main_game_time_frame_limiter_enabled)
 	{
-		// these two options disable the hacks that hired gun added to the main loop
-	case _rendering_mode_original_game_frame_limit:
-		return true;
-
-	case _rendering_mode_none:
-	default:
-		return cinematic_is_running() || xbox_tickrate_is_enabled() || game_is_minimized();
+		result = true; // these two options disable the hacks that hired gun added to the main loop
 	}
-
-	return false;
+	else
+	{
+		result = cinematic_is_running() || xbox_tickrate_is_enabled() || game_is_minimized();;
+	}
+	
+	return result;
 }
 
 bool __cdecl should_limit_framerate_hook()
 {
-	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = g_experimental_rendering_mode;
-
-	switch (experimental_rendering_mode)
+	bool result;
+	if (!g_main_game_time_frame_limiter_enabled)
 	{
-	case _rendering_mode_original_game_frame_limit:
-		return false; // e_render_original_game_frame_limit handles frame limit in main_game_time.cpp
-	case _rendering_mode_none:
-	default:
-		return (game_is_minimized() || xbox_tickrate_is_enabled());
+		result = false; // e_render_original_game_frame_limit handles frame limit in main_game_time.cpp
+	}
+	else
+	{
+		result = (game_is_minimized() || xbox_tickrate_is_enabled());
 	}
 
-	return false;
+	return result;
 }
 
 void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_game_dt)

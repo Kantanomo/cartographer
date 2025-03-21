@@ -356,11 +356,3 @@ bool ReadH2Accounts() {
 }
 #pragma endregion
 
-#pragma region Config Init/Deinit
-void InitH2Accounts() {
-
-}
-void DeinitH2Accounts() {
-
-}
-#pragma endregion

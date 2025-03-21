@@ -26,12 +26,6 @@ enum e_override_texture_resolution : int
 	tex_ultra
 };
 
-enum H2Config_Experimental_Rendering_Mode : byte
-{
-	_rendering_mode_none,
-	_rendering_mode_original_game_frame_limit
-};
-
 #define k_cartographer_url_http "http://cartographer.online"
 #define k_cartographer_url_https "https://cartographer.online"
 extern const char* k_cartographer_map_repo_url;
@@ -73,7 +67,6 @@ extern char H2Config_stats_authkey[32 + 1];
 extern bool H2Config_vip_lock;
 extern bool H2Config_even_shuffle_teams;
 extern bool H2Config_koth_random;
-extern H2Config_Experimental_Rendering_Mode H2Config_experimental_fps;
 
 extern int H2Config_hotkeyIdHelp;
 extern int H2Config_hotkeyIdAlignWindow;

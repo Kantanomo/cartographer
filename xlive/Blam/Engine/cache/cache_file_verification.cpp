@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "cache_file_verification.h"
 
-HANDLE __cdecl cache_file_verification_initialize(void)
+/* public code */
+
+void __cdecl cache_file_verification_initialize(void)
 {
-	return INVOKE(0x000388d3, 0x0, cache_file_verification_initialize);
+	return INVOKE(0x388D3, 0x300A3, cache_file_verification_initialize);
 }

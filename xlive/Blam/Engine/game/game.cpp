@@ -10,6 +10,7 @@
 #include "math/random_math.h"
 #include "main/interpolator.h"
 #include "main/main.h"
+#include "main/main_game_time.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "saved_games/game_state.h"
 #include "shell/shell.h"
@@ -21,6 +22,10 @@
 /* typedefs */
 
 typedef void(__cdecl* game_frame_t)(real32);
+
+/* prototypes */
+
+static void set_main_game_globals(s_main_game_globals* main);
 
 /* globals */
 
@@ -104,9 +109,10 @@ bool game_is_playback(void)
 	//return _game_playback_none;
 }
 
-void __cdecl game_shell_set_in_progress()
+void __cdecl game_shell_set_in_progress(void)
 {
 	INVOKE(0x242E5B, 0x22054B, game_shell_set_in_progress);
+    return;
 }
 
 bool game_is_predicted(void)
@@ -239,6 +245,21 @@ void __cdecl game_initialize(void)
 		halo_interpolator_set_interpolation_enabled(false);
 	}
 	return;
+}
+
+void __cdecl game_dispose(void)
+{
+    set_main_game_globals(NULL);
+    s_game_systems* g_game_systems = get_game_systems();
+    for (int32 system_index = 69; system_index >= 0; --system_index)
+    {
+        ASSERT(g_game_systems[system_index].dispose_proc);
+        g_game_systems[system_index].dispose_proc();
+    }
+    
+    // reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_hook())
+    timeEndPeriod(SYSTEM_TIMER_RESOLUTION_MS);
+    return;
 }
 
 bool __cdecl main_events_pending(void)
@@ -382,4 +403,12 @@ void game_apply_pre_winmain_patches(void)
 		DETOUR_ATTACH(p_main_loop_process_global_state_changes, Memory::GetAddress<t_main_loop_process_global_state_changes>(0x39783), main_loop_process_global_state_changes_hook);
 	}
 	return;
+}
+
+/* private code */
+
+static void set_main_game_globals(s_main_game_globals* main)
+{
+    *Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520) = main;
+    return;
 }

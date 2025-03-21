@@ -62,6 +62,12 @@ if (!(STATEMENT))					\
 
 /* public code */
 
+void cseries_initialize(void)
+{
+	// TODO: implement debug logic
+	return;
+}
+
 void display_assert(char const* condition, char const* file, int32 line, bool assertion_failed)
 {
 	return;

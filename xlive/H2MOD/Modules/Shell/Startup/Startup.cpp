@@ -11,7 +11,6 @@
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
 
@@ -127,7 +126,7 @@ void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PA
 	path->set(useAppDataLocalPath ? g_h2_appdata_local_path : L"");
 
 	wchar_t instance_string[3] = {};
-	swprintf(instance_string, NUMBEROF(instance_string), L"%d", _Shell::GetInstanceId());
+	swprintf(instance_string, NUMBEROF(instance_string), L"%d", g_instance_number);
 	
 	c_static_wchar_string<MAX_PATH> folders;
 	folders.append(L"logs\\");
@@ -165,8 +164,7 @@ void InitH2Startup() {
 	shell_windows_initialize();
 	shell_apply_patches();
 	shell_windows_apply_patches();
-	// ### TODO remove entirely
-	_Shell::Initialize();
+
 	DETOUR_COMMIT();
 
 	int ArgCnt;
@@ -193,27 +191,6 @@ void InitH2Startup() {
 
 	addDebugText(shell_is_dedicated_server() ? "Process is Dedi-Server" : "Process is Client");
 
-	// DO NOT FUCKING TOUCH THIS
-	if (ArgList != NULL)
-	{
-		for (int i = 0; i < ArgCnt; i++)
-		{
-			if (wcsstr(ArgList[i], L"-h2config=") != NULL)
-			{
-				if (wcslen(ArgList[i]) < 255)
-				{
-					int pfcbuflen = wcslen(ArgList[i] + 10) + 1;
-					g_h2_config_path_override = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
-					swprintf(g_h2_config_path_override, pfcbuflen, ArgList[i] + 10);
-				}
-			}
-		}
-	}
-	// END OF THE COMMENT ABOVE
-
-	InitH2Config();
-	PostH2Config();
-
 	EnterCriticalSection(&log_section);
 
 	// prepare default log files if enabled, after we read the H2Config
@@ -235,7 +212,6 @@ void InitH2Startup() {
 
 	//checksum_log = h2log::create("Checksum", prepareLogFileName(L"checksum"), true, 0);
 	LeaveCriticalSection(&log_section);
-	InitH2Accounts();
 
 	H2MOD::Initialize();
 
@@ -260,14 +236,3 @@ void H2DedicatedServerStartup() {
 	}
 }
 
-void DeinitH2Startup() {
-	extern void DeinitRunLoop();
-	DeinitRunLoop();
-	extern void DeinitCustomLanguage();
-	DeinitCustomLanguage();
-	DeinitH2Accounts();
-	DeinitH2Config();
-
-	free(g_h2_config_path_override);
-	return;
-}

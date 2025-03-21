@@ -105,8 +105,6 @@ static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_
 
 extern std::random_device rd;
 
-#define COMPILE_WITH_VOICE 0
-
 #pragma region Warnings as errors
 #pragma warning(error: 4700)
 #pragma endregion

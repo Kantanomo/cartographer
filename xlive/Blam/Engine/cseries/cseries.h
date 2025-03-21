@@ -65,6 +65,8 @@ static_assert(sizeof(datum) == 4);
 
 extern char g_temporary[256];
 
+extern bool g_catch_exceptions;
+
 /* macros */
 
 // Invokes a function
@@ -193,7 +195,9 @@ ASSERT_EXCEPTION(STATEMENT, true);	\
 
 #endif // _DEBUG
 
-extern bool g_catch_exceptions;
+/* prototypes */
+
+void cseries_initialize(void);
 
 // TODO implement
 void display_assert(char const* condition, char const* file, int32 line, bool assertion_failed);
