@@ -1556,6 +1556,7 @@
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_action.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine_headhunter.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine_king.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine_slayer.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_entities.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_events.cpp" />

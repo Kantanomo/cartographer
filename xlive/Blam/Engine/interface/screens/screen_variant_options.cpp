@@ -20,6 +20,7 @@ int32 c_variant_options_list::link_item_widgets()
 	else
 		g_previous_variant_setting_category = this->m_variant_setting_category_type;
 
+	// todo: figure out a way to do this without manually checking the category type, currently is not very expandable to new game variants
 	if (this->m_variant_setting_category_type != _variant_setting_category_type_game_head_hunter)
 	{
 		s_variant_setting_edit_reference* variant_reference = multiplayer_variant_settings_interface_get_category_reference(this->m_variant_setting_category_type);
@@ -66,14 +67,26 @@ int32 c_variant_options_list::link_item_widgets()
 	}
 	else
 	{
+		s_variant_setting_edit_reference* variant_reference = multiplayer_variant_settings_interface_get_category_reference(this->m_variant_setting_category_type);
+
 		this->m_list_data = ui_list_data_new(k_variant_options_list_name, k_multiplayer_variant_headhunter_parameter_count, sizeof(s_variant_options_list_item));
 		data_make_valid(this->m_list_data);
 		if(this->m_list_data->datum_max_elements > 0)
 		{
-			for(int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
+			for (int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
 			{
 				s_variant_options_list_item* list_item = (s_variant_options_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
 				list_item->parameter_type = g_multiplayer_variant_interface_headhunter_parameter_types[i];
+
+				for (int32 k = 0; k < variant_reference->options.count; ++k)
+				{
+					s_text_value_pair_definition* sily_definition = (s_text_value_pair_definition*)tag_get_fast(variant_reference->options[k]->index);
+					if(sily_definition->parameter == g_multiplayer_variant_interface_headhunter_parameter_types[i])
+					{
+						list_item->sily_definition = sily_definition;
+						break;
+					}
+				}
 			}
 		}
 		this->linker_type2.link(&this->m_slot);
@@ -102,41 +115,38 @@ void c_variant_options_list::update_list_items(c_list_item_widget* item, int32 s
 		c_text_widget* title_text = item->try_find_text_widget(0);
 		c_text_widget* value_text = item->try_find_text_widget(1);
 
-		if (this->m_variant_setting_category_type != _variant_setting_category_type_game_head_hunter)
+		if (list_item && list_item->sily_definition && list_item->sily_definition->string_list.index != NONE)
 		{
-			if (list_item && list_item->sily_definition && list_item->sily_definition->string_list.index != NONE)
+			wchar_t temp_string[512];
+			if (title_text)
 			{
-				wchar_t temp_string[512];
-				if (title_text)
-				{
-					temp_string[0] = '\0';
-					text_group_get_unicode_string(list_item->sily_definition->string_list.index, list_item->sily_definition->title_text, temp_string);
-					title_text->set_text(temp_string);
-				}
-				if (value_text)
-				{
-					s_game_variant* variant;
+				temp_string[0] = '\0';
+				text_group_get_unicode_string(list_item->sily_definition->string_list.index, list_item->sily_definition->title_text, temp_string);
+				title_text->set_text(temp_string);
+			}
+			if (value_text)
+			{
+				s_game_variant* variant;
 
-					if (!this->m_is_quick_options)
-						variant = user_interface_get_variant();
+				if (!this->m_is_quick_options)
+					variant = user_interface_get_variant();
+				else
+				{
+					c_network_session* network_session;
+					if (network_life_cycle_in_squad_session(&network_session))
+						variant = &network_session->m_session_parameters.game_variant;
 					else
+						variant = nullptr;
+				}
+				if (variant)
+				{
+					int32 variant_setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, list_item->sily_definition->parameter);
+					s_text_value_pair_reference_new* variant_setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(list_item->sily_definition, variant_setting_value);
+					temp_string[0] = '\0';
+					if (variant_setting_label)
 					{
-						c_network_session* network_session;
-						if (network_life_cycle_in_squad_session(&network_session))
-							variant = &network_session->m_session_parameters.game_variant;
-						else
-							variant = nullptr;
-					}
-					if (variant)
-					{
-						int32 variant_setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, list_item->sily_definition->parameter);
-						s_text_value_pair_reference_new* variant_setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(list_item->sily_definition, variant_setting_value);
-						temp_string[0] = '\0';
-						if (variant_setting_label)
-						{
-							text_group_get_unicode_string(list_item->sily_definition->string_list.index, variant_setting_label->label_string, temp_string);
-							value_text->set_text(temp_string);
-						}
+						text_group_get_unicode_string(list_item->sily_definition->string_list.index, variant_setting_label->label_string, temp_string);
+						value_text->set_text(temp_string);
 					}
 				}
 			}

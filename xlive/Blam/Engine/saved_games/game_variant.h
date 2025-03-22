@@ -393,11 +393,15 @@ enum e_headhunter_max_heads_carried : uint8
 
 enum e_headhunter_engine_flags : uint32
 {
+	_headhunter_engine_uncontested_hill_to_score_bit = 0,
+	_headhunter_engine_team_multiplier_bit = 1,
+	_headhunter_engine_extra_damage_on_hill_bit = 2,
+	_headhunter_engine_damage_resistance_on_hill_bit = 3,
+	_headhunter_engine_invis_on_hill_bit = 4,
 	_headhunter_engine_flag_moving_bin,
 	_headhunter_engine_flag_point_multiplier,
 	_headhunter_engine_flag_suicide_point_loss,
 	_headhunter_engine_flag_death_point_loss,
-	_headhunter_engine_flag_uncontested_bin,
 
 	k_headhunter_engine_flags_count
 };
@@ -451,6 +455,7 @@ struct s_juggernaut_variant_settings
 struct s_head_hunter_settings
 {
 	c_flags_no_init<e_headhunter_engine_flags, uint32, k_headhunter_engine_flags_count> flags;
+	uint16 hill_move_time;
 	e_ctf_engine_player_speed speed_with_heads;
 	e_headhunter_max_heads_carried max_heads_carried;
 };

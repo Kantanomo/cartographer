@@ -8,9 +8,9 @@
 
 static void multiplayer_variant_settings_interface_parse_headhunter_moving_bin(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
 {
-	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_flags_32;
-	*out_offset = offsetof(s_game_variant, game_engine_variant.head_hunter.flags);
-	*(uint32*)out_variable = _headhunter_engine_flag_moving_bin;
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_int16;
+	*out_offset = offsetof(s_game_variant, game_engine_variant.head_hunter.hill_move_time);
+	*(uint32*)out_variable = 1.f;
 }
 
 static void multiplayer_variant_settings_interface_parse_headhunter_point_multiplier(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
@@ -38,7 +38,7 @@ static void multiplayer_variant_settings_interface_parse_headhunter_uncontested_
 {
 	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_flags_32;
 	*out_offset = offsetof(s_game_variant, game_engine_variant.head_hunter.flags);
-	*(uint32*)out_variable = _headhunter_engine_flag_uncontested_bin;
+	*(uint32*)out_variable = _king_engine_uncontested_hill_to_score_bit;
 }
 
 static void multiplayer_variant_settings_interface_parse_headhunter_speed_with_heads(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
@@ -137,7 +137,16 @@ void multiplayer_variant_settings_interface_apply_patches()
 
 s_variant_setting_edit_reference* __cdecl multiplayer_variant_settings_interface_get_category_reference(e_variant_setting_category_type category_type)
 {
-	return INVOKE(0x23ACDC, 0, multiplayer_variant_settings_interface_get_category_reference, category_type);
+	switch(category_type)
+	{
+		// return the setting reference for king on headhunter game modes
+		case _variant_setting_category_type_game_head_hunter:
+			return INVOKE(0x23ACDC, 0, multiplayer_variant_settings_interface_get_category_reference, _variant_setting_category_type_game_king);
+
+		default:
+			return INVOKE(0x23ACDC, 0, multiplayer_variant_settings_interface_get_category_reference, category_type);
+	}
+
 }
 
 s_text_value_pair_definition* multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(e_variant_setting_parameter_type parameter_type)
@@ -145,7 +154,7 @@ s_text_value_pair_definition* multiplayer_variant_settings_interface_get_text_va
 	return INVOKE(0x23ABCC, 0, multiplayer_variant_settings_interface_get_text_value_pair_for_parameter, parameter_type);
 }
 
-int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value(s_game_variant* variant,	e_variant_setting_parameter_type type)
+int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value(s_game_variant* variant, e_variant_setting_parameter_type type)
 {
 	return INVOKE(0x23AA54, 0, multiplayer_variant_settings_interface_get_variant_parameter_value, variant, type);
 }
@@ -246,7 +255,11 @@ bool multiplayer_variant_settings_interface_parameter_is_custom(s_game_variant* 
 		{
 			for (const auto headhunter_parameter_type : g_multiplayer_variant_interface_headhunter_parameter_types)
 				if (headhunter_parameter_type == type)
-					return true;
+				{
+					// todo: construct a way to do this that doesn't require manually checking for these two types
+					if(headhunter_parameter_type != _variant_setting_parameter_type_king_moving_hill && headhunter_parameter_type != _variant_setting_parameter_type_king_uncontested_hill)
+						return true;
+				}
 		}
 	}
 	return false;
