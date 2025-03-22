@@ -94,7 +94,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 cross_product3d(global_up3d, &user_effect->jitter, &v1);
 
                 real32 rotation = user_effect->camera_impulse.temporary_rotation * transition_result;
-                matrix4x3_rotation_from_axis_and_angle(&effect_matrix, &v1, sin(rotation), cos(rotation));
+                matrix4x3_rotation_from_axis_and_angle(&effect_matrix, &v1, sine(rotation), cosine(rotation));
 
                 real32 translation = user_effect->camera_impulse.temporary_translation * transition_result;
                 effect_matrix.position.x = user_effect->jitter.i * translation;
@@ -165,7 +165,7 @@ void get_shake_matrix(real_matrix4x3* shake_matrix, real32 translation_magnitude
     if (rotation_magnitude != 0.0f)
     {
         _random_direction3d(get_local_random_seed_address(), NULL, __FILE__, __LINE__, &vector);
-        matrix4x3_rotation_from_axis_and_angle(shake_matrix, &vector, sin(rotation_magnitude), cos(rotation_magnitude));
+        matrix4x3_rotation_from_axis_and_angle(shake_matrix, &vector, sine(rotation_magnitude), cosine(rotation_magnitude));
     }
     if (translation_magnitude != 0.0f)
     {

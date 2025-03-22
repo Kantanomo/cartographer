@@ -267,7 +267,7 @@ void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angle
 
 	const real32 horizontal_projection = cos(angles->pitch);
 
-	forward->i = cos(angles->yaw) * horizontal_projection;
-	forward->j = sin(angles->yaw) * horizontal_projection;
-	forward->k = sin(angles->pitch);
+	forward->i = cosine(angles->yaw) * horizontal_projection;
+	forward->j = sine(angles->yaw) * horizontal_projection;
+	forward->k = sine(angles->pitch);
 }

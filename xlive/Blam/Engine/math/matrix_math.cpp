@@ -251,8 +251,8 @@ real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const re
 
 real_matrix4x3* matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i, real32 j, real32 k)
 {
-	const real_vector3d cosine_vector { cos(i), cos(j), cos(k) };
-	const real_vector3d sine_vector{ sin(i), sin(j), sin(k) };
+	const real_vector3d cosine_vector { cosine(i), cosine(j), cosine(k) };
+	const real_vector3d sine_vector{ sine(i), sine(j), sine(k) };
 
 	const real32 j_cos_k = sine_vector.j * cosine_vector.k;
 	const real32 sin_jk = sine_vector.j * sine_vector.k;
