@@ -37,7 +37,7 @@ public:
 ASSERT_STRUCT_SIZE(c_king_engine_globals, 0x1DC)
 
 
-class c_king_engine : c_game_engine
+class c_king_engine : public c_game_engine
 {
 public:
 	virtual e_game_engine_type get_type() override;
