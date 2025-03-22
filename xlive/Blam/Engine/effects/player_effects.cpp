@@ -193,8 +193,8 @@ static void get_shake_matrix(real_matrix4x3* shake_matrix, real32 translation_ma
     {
         _random_direction3d(get_local_random_seed_address(), NULL, __FILE__, __LINE__, &vector);
         shake_matrix->position.x = vector.i * translation_magnitude;
-        shake_matrix->position.x = vector.j * translation_magnitude;
-        shake_matrix->position.x = vector.k * translation_magnitude;
+        shake_matrix->position.y = vector.j * translation_magnitude;
+        shake_matrix->position.z = vector.k * translation_magnitude;
     }
     return;
 }
