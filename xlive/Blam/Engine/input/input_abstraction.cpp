@@ -643,7 +643,7 @@ static void input_abstraction_update_dead_zones(const point2d* thumb, real_euler
 	real_point2d thumbstick_points = { (real32)thumb->x, (real32)thumb->y };
 	real_angle angle = arctangent(thumbstick_points.y, thumbstick_points.x);
 
-	real32 magnitude = MAX(fabs(sin(angle)), fabs(cos(angle)));
+	real32 magnitude = MAX(abs(sine(angle)), abs(cosine(angle)));
 	real32 inverse_magnitude = 1.0f / magnitude;
 
 	out_stick_euler_angles->yaw = (real32)(thumbstick_points.x * inverse_magnitude) * normalize_scale;
