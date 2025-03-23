@@ -3,7 +3,7 @@
 
 #define STRINGIFY_AND_RET_CASE(_case) \
 case _case:											\
-	csstrncpy(string, #_case, NUMBEROF(#_case));	\
+	string = #_case;	\
 	break
 
 void IOCTLSocket_cmd_string(unsigned long cmd, char* string)
@@ -13,7 +13,7 @@ void IOCTLSocket_cmd_string(unsigned long cmd, char* string)
 		STRINGIFY_AND_RET_CASE(FIONBIO);
 		STRINGIFY_AND_RET_CASE(FIONREAD);
 	default:
-		csnprintf(string, 32, 32, "UNKNOWN: %x", cmd);
+		string = "UNKNOWN";
 	}
 	return;
 }
@@ -45,7 +45,7 @@ void sockOpt_string(int optName, char* string)
 		STRINGIFY_AND_RET_CASE(SO_TYPE);
 
 	default:
-		csnprintf(string, 32, 32, "UNKNOWN: %x", optName);
+		string = "UNKNOWN";
 	}
 	return;
 }
