@@ -108,13 +108,18 @@ bool shell_platform_initialize(void)
 	shell_windows_calculate_instance_num();
 
 	shell_windows_initialize_arguments();
-	shell_command_line_flag_set(_shell_command_line_flag_nointro, H2Config_skip_intro);
-	shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);			// ### TODO FIXME: voice-chat is disabled for now
 	
 	shell_windows_adjust_name();
 
 	InitH2Config();
 	PostH2Config();
+
+	// If the intro is already disabled via command line flag don't try and set it via the config option
+	if (shell_command_line_flag_get(_shell_command_line_flag_nointro) == false)
+	{
+		shell_command_line_flag_set(_shell_command_line_flag_nointro, H2Config_skip_intro);
+	}
+	shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);			// ### TODO FIXME: voice-chat is disabled for now
 	return true;
 }
 
