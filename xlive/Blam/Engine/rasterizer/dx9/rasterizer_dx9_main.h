@@ -136,3 +136,5 @@ bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* 
 bool __cdecl rasterizer_dx9_render_scene_end(void);
 
 void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, pixel32 color, real32 z, bool stencil);
+
+void __cdecl rasterizer_dx9_window_change_display_settings(DWORD flags);

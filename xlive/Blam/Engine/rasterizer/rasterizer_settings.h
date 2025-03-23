@@ -76,4 +76,8 @@ void __cdecl rasterizer_settings_create_registry_keys(bool is_game);
 
 void __cdecl rasterizer_settings_set_display_mode(const e_rasterizer_window_mode* display_mode);
 
+int32 rasterizer_settings_get_refresh_rate(void);
+
 void __cdecl rasterizer_settings_apply_settings(int32 setting);
+
+DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode window_mode, DWORD* style);

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "rasterizer_globals.h"
 
+#include "shell/shell.h"
+
 /* public code */
 
 s_rasterizer_globals* rasterizer_globals_get(void)

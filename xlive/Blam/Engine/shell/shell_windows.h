@@ -14,6 +14,14 @@ enum
 
 extern uint32 g_instance_number;
 
+extern int32 g_cmd_show;
+
+extern WNDPROC g_wndproc_procedure;
+
+extern wchar_t g_window_classname[64];
+
+extern wchar_t g_window_name[64];
+
 /* prototypes */
 
 HWND* shell_windows_get_hwnd(void);
@@ -49,3 +57,5 @@ unsigned long long shell_time_now(unsigned long long denominator);
 void shell_windows_throttle_framerate(int desired_framerate);
 
 bool __cdecl gfwl_gamestore_initialize(void);
+
+uint32 shell_windows_get_monitor_index(void);

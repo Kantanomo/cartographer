@@ -134,8 +134,6 @@ static void toggle_xbox_tickrate(s_game_options* options, bool toggle);
 
 static void toggle_ai_multiplayer(bool toggle);
 
-static bool __cdecl shell_is_remote_desktop(void);
-
 static bool __cdecl OnPlayerSpawn(datum playerDatumIdx);
 
 static void __cdecl OnPlayerDeath(datum player_index);
@@ -384,12 +382,6 @@ static void toggle_ai_multiplayer(bool toggle)
 {
 	WriteValue<BYTE>(Memory::GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
 	return;
-}
-
-static bool __cdecl shell_is_remote_desktop(void)
-{
-	LOG_TRACE_FUNC("check disabled");
-	return false;
 }
 
 static void __cdecl OnPlayerDeath(datum player_index)
@@ -789,8 +781,6 @@ static void h2mod_apply_tweaks(void)
 
 		// patch to show game details menu in NETWORK serverlist too
 		//NopFill(Memory::GetAddress(0x219D6D), 2);
-
-		WriteJmpTo(Memory::GetAddress(0x39EA2), shell_is_remote_desktop);
 
 		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
 		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);

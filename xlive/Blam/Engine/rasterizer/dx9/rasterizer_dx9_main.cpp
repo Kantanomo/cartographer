@@ -46,7 +46,14 @@
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/Shell/Config.h"
+
 #include <dwmapi.h>
+/*
+	The below was used before when creating the main window to call: WTSRegisterSessionNotification
+	Since we removed the call as a part of the RDP check we don't need to include and link to this lib
+*/
+// #include <wtsapi32.h>
+// #pragma comment(lib, "wtsapi32.lib")
 
 /* typedefs */
 
@@ -475,8 +482,8 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 
 	D3DPRESENT_PARAMETERS d3d_present_parameters = {};
 	d3d_present_parameters.hDeviceWindow = *shell_windows_get_hwnd();
-	rasterizer_globals->display_parameters.backbuffer_format = D3DFMT_A8R8G8B8;
-	d3d_present_parameters.BackBufferFormat = D3DFMT_A8R8G8B8;
+	//rasterizer_globals->display_parameters.backbuffer_format = D3DFMT_A8R8G8B8;
+	d3d_present_parameters.BackBufferFormat = rasterizer_globals->display_parameters.backbuffer_format;
 	d3d_present_parameters.Windowed = !is_fullscreen;
 	d3d_present_parameters.AutoDepthStencilFormat = rasterizer_globals->display_parameters.depthstencil_format;
 	d3d_present_parameters.BackBufferWidth = rectangle2d_width(&rasterizer_globals->screen_bounds);
@@ -605,7 +612,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 			}
 		}
 
-		if (g_rasterizer_dx9on12_enabled)
+		if (succeeded && g_rasterizer_dx9on12_enabled)
 		{
 			HRESULT d3d9on12_query_interface_hr = rasterizer_dx9_main_globals->global_d3d_device->QueryInterface(IID_PPV_ARGS(&g_d3d9on12_device));
 			if (FAILED(d3d9on12_query_interface_hr))
@@ -901,6 +908,12 @@ void __cdecl rasterizer_dx9_clear_render_target(uint32 flags, pixel32 color, rea
 	return;
 }
 
+void __cdecl rasterizer_dx9_window_change_display_settings(DWORD flags)
+{
+	INVOKE(0x25F431, 0x0, rasterizer_dx9_window_change_display_settings, flags);
+	return;
+}
+
 /* private code */
 
 static PALETTEENTRY* g_d3d_palettes_get(void)
@@ -1001,7 +1014,131 @@ static void __cdecl display_blackness_window(void)
 
 static HWND __cdecl rasterizer_dx9_create_main_window(void)
 {
-	return INVOKE(0x26101B, 0x0, rasterizer_dx9_create_main_window);
+	//return INVOKE(0x26101B, 0x0, rasterizer_dx9_create_main_window);
+	
+	HWND* g_hwnd = shell_windows_get_hwnd();
+
+	bool success = true;
+	if (!*g_hwnd)
+	{
+		s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+		const int16 width = rectangle2d_width(&rasterizer_globals->screen_bounds);
+		const int16 height = rectangle2d_height(&rasterizer_globals->screen_bounds);
+		HMODULE module = GetModuleHandleA(0);
+		HICON icon = LoadIconA(module, (LPCSTR)0x65);
+		if (!icon)
+		{
+			icon = LoadIconA(0, (LPCSTR)0x7F00);
+		}
+
+		WNDCLASSEXW wnd_class = {};
+		wnd_class.cbSize = sizeof(WNDCLASSEXW);
+		wnd_class.style = CS_VREDRAW | CS_HREDRAW | CS_CLASSDC;
+		wnd_class.lpfnWndProc = g_wndproc_procedure;
+		wnd_class.cbClsExtra = 0;
+		wnd_class.cbWndExtra = 0;
+		wnd_class.hInstance = *Memory::GetAddress<HINSTANCE*>(0x46D9C0);
+		wnd_class.hIcon = icon;
+		wnd_class.hCursor = LoadCursorA(0, (LPCSTR)0x7F00);
+		wnd_class.hbrBackground = 0;
+		wnd_class.lpszMenuName = 0;
+		wnd_class.lpszClassName = g_window_classname;
+		wnd_class.hIconSm = 0;
+		const ATOM window_class = RegisterClassExW(&wnd_class);
+		success = window_class != 0;
+		if (success)
+		{
+			rasterizer_globals->field_10ED = false;
+			
+			DEVMODEA* g_window_device_mode = Memory::GetAddress<DEVMODEA*>(0xA3F4F0);
+			csmemset(g_window_device_mode, 0, sizeof(DEVMODEA));
+			g_window_device_mode->dmSize = sizeof(DEVMODEA);
+			g_window_device_mode->dmDriverExtra = 0;
+			g_window_device_mode->dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
+
+
+			rasterizer_globals->display_settings_retrieved = EnumDisplaySettingsA(0, ENUM_CURRENT_SETTINGS, g_window_device_mode);
+			if (rasterizer_globals->display_parameters.window_mode == _rasterizer_window_mode_funky_fullscreen)
+			{
+				rasterizer_globals->field_10ED = true;
+				
+				DEVMODEA device_mode = {};
+				device_mode.dmSize = sizeof(DEVMODEA);
+				device_mode.dmBitsPerPel = 32;
+				device_mode.dmPelsWidth = width;
+				device_mode.dmPelsHeight = height;
+				device_mode.dmDisplayFrequency = rasterizer_settings_get_refresh_rate();
+				device_mode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
+
+				LONG change_result = ChangeDisplaySettingsA(&device_mode, 0);
+				if (change_result)
+				{
+					error(2, "ChangeDisplaySettings failed: 0x%8x", change_result);
+					rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
+				}
+			}
+			else
+			{
+				rasterizer_dx9_window_change_display_settings(0);
+			}
+
+			DWORD style = 0;
+			DWORD window_flags = rasterizer_settings_get_window_flags(rasterizer_globals->display_parameters.window_mode, &style);
+			const HWND window_handle = CreateWindowExW(style, g_window_classname, g_window_name, window_flags, 0, 0, width, height, GetDesktopWindow(), 0, wnd_class.hInstance, 0);
+			success = !window_handle ? false : success;
+			
+			*g_hwnd = window_handle;
+
+			if (success)
+			{
+				// Game wants to know what state the user session is in if we're a game
+				// It uses this for preventing us from opening the game while using RDP
+				if (shell_tool_type() == _shell_tool_type_game)
+				{
+					// Commented out because we removed the RDP check in cartographer...
+					//WTSRegisterSessionNotification(*g_hwnd, NOTIFY_FOR_THIS_SESSION);
+				}
+
+				RECT client_rect;
+				RECT window_rect;
+				GetClientRect(window_handle, &client_rect);
+				GetWindowRect(window_handle, &window_rect);
+
+				const LONG window_rect_width = window_rect.right - window_rect.left;
+				const LONG window_rect_height = window_rect.bottom - window_rect.top;
+				const LONG client_rect_width = client_rect.right - client_rect.left;
+				const LONG client_rect_height = client_rect.bottom - client_rect.top;
+
+				const BOOL pos_result = SetWindowPos(
+					window_handle,
+					HWND_NOTOPMOST,
+					0,
+					0,
+					window_rect_width + width - client_rect_width,
+					window_rect_height + height - client_rect_height,
+					SWP_NOREDRAW | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOCOPYBITS | SWP_NOSENDCHANGING);
+
+				success = pos_result;
+				if (success)
+				{
+					ShowWindow(window_handle, g_cmd_show);
+					SetForegroundWindow(*g_hwnd);
+					SetFocus(*g_hwnd);
+				}
+			}
+		}
+
+		if (!success)
+		{
+			LPSTR buffer = NULL;
+			FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM, 0, GetLastError(), 0x400, (LPSTR)&buffer, 0, NULL);
+			MessageBoxA(0, buffer, "ERROR - failed to create window", MB_ICONASTERISK);
+			LocalFree(buffer);
+			error(2, "### ERROR failed to create a window");
+		}
+	}
+
+	return (success ? *g_hwnd : 0);
 }
 
 static void rasterizer_dx9_prime_shader_initialize(void)

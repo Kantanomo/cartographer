@@ -21,6 +21,11 @@ void rasterizer_main_apply_patches(void)
 	return;
 }
 
+s_rasterizer_debug_options* rasterizer_debug_options_get(void)
+{
+	return Memory::GetAddress<s_rasterizer_debug_options*>(0x46816C);
+}
+
 void rasterizer_present_frame_wrapper(bitmap_data* bitmap)
 {
 	rasterizer_dx9_present(bitmap, false);

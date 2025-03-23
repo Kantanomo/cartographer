@@ -7,6 +7,7 @@
 #include "cseries/cseries_errors.h"
 #include "main/main.h"
 #include "math/math.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
@@ -27,6 +28,14 @@ static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 static bool g_custom_mouse_cursor_enabled = false;
 
 uint32 g_instance_number = 0;
+
+int32 g_cmd_show = 0;
+
+WNDPROC g_wndproc_procedure = NULL;
+
+wchar_t g_window_classname[64] = {};
+
+wchar_t g_window_name[64] = {};
 
 /* prototypes */
 
@@ -57,13 +66,13 @@ static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_IN
 // Adjust name of window to display the instance number when we have more than 1 window open
 static void shell_windows_adjust_name(void);
 
-static void shell_windows_fix_adjustment(void);
-
 static void shell_windows_calculate_instance_num(void);
 
 static void shell_windows_tokenize_command_line_buffer(const wchar_t* argument_buffer, wchar_t** args, int32 max_arg_count, int32* arg_count);
 
 static void shell_windows_initialize_arguments(void);
+
+static bool __cdecl shell_windows_is_remote_desktop(void);
 
 static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut);
 
@@ -103,7 +112,6 @@ bool shell_platform_initialize(void)
 	shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);			// ### TODO FIXME: voice-chat is disabled for now
 	
 	shell_windows_adjust_name();
-	shell_windows_fix_adjustment();
 
 	InitH2Config();
 	PostH2Config();
@@ -253,6 +261,22 @@ bool __cdecl gfwl_gamestore_initialize(void)
 	return INVOKE(0x202F3E, 0x0, gfwl_gamestore_initialize);
 }
 
+uint32 shell_windows_get_monitor_index(void)
+{
+	uint32 result = 0;
+	if (shell_command_line_flag_is_set(_shell_command_line_flag_monitor_count))
+	{
+		result = shell_command_line_flag_get(_shell_command_line_flag_monitor_count);
+
+		// Set monitor index to 0 if the monitor index set by the shell flag isn't a valid monitor
+		if (result >= rasterizer_dx9_main_globals_get()->global_d3d_interface->GetAdapterCount())
+		{
+			result = 0;
+		}
+	}
+	return result;
+}
+
 /* private code */
 
 DWORD WINAPI timeGetTime_hook()
@@ -267,13 +291,12 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	// set args
 	WriteValue(Memory::GetAddress(0x46D9BC), lpCmdLine); // command_line_args
 	WriteValue(Memory::GetAddress(0x46D9C0), hInstance); // g_instance
-	WriteValue(Memory::GetAddress(0x46D9CC), nShowCmd); // g_CmdShow
+	g_cmd_show = nShowCmd; // g_CmdShow
 
 	// window setup
-	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46D9D4), 0x40, L"halo"); // ClassName
-	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
-
-	WriteValue(Memory::GetAddress(0x46D9D0), H2WndProc); // g_WndProc_ptr
+	ustrncpy(g_window_classname, L"halo", NUMBEROF(g_window_classname));
+	ustrncpy(g_window_name, L"Halo 2 - Project Cartographer", NUMBEROF(g_window_name));
+	g_wndproc_procedure = H2WndProc;
 
 	bool pcc_result = pcc_get_properties();
 	if (!pcc_result)
@@ -509,33 +532,6 @@ static void shell_windows_adjust_name(void)
 	return;
 }
 
-// TODO: remove, this should go in the winproc function
-static void shell_windows_fix_adjustment(void)
-{
-	if (!shell_is_dedicated_server())
-	{
-		const HWND hwnd = *shell_windows_get_hwnd();
-		BYTE display_mode = 1;
-		HKEY hkey_video_settings = NULL;
-		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Halo 2\\Video Settings", 0, KEY_READ, &hkey_video_settings) == ERROR_SUCCESS)
-		{
-			DWORD cb_data;
-			DWORD type = 4;
-			if (RegQueryValueExA(hkey_video_settings, "DisplayMode", NULL, &type, &display_mode, &cb_data))
-			{
-				error(2, "error getting the DisplayMode registry key");
-			}
-			RegCloseKey(hkey_video_settings);
-		}
-
-		if (display_mode)
-		{
-			SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
-		}
-	}
-	return;
-}
-
 static void shell_windows_calculate_instance_num(void)
 {
 	DWORD lastErr;
@@ -665,6 +661,11 @@ static void shell_windows_initialize_arguments(void)
 		}
 	}
 	return;
+}
+
+static bool __cdecl shell_windows_is_remote_desktop(void)
+{
+	return INVOKE(0x39EA2, 0x0, shell_windows_is_remote_desktop);
 }
 
 static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
