@@ -29,21 +29,21 @@ uint32 c_simulation_slayer_engine_globals_definition::initial_update_mask()
 void c_simulation_slayer_engine_globals_definition::calculate_update_relevance(int a1, void* update_data,
 	int32* out_relevance)
 {
-	*out_relevance = INVOKE_TYPE(0x2017AD, 0, int32(__thiscall*)(c_simulation_slayer_engine_globals_definition*, int, void*, int32*), this, a1, update_data, out_relevance);
+	*out_relevance = INVOKE_TYPE(0x2017AD, 0x1EB515, int32(__thiscall*)(c_simulation_slayer_engine_globals_definition*, int, void*, int32*), this, a1, update_data, out_relevance);
 }
 
 bool c_simulation_slayer_engine_globals_definition::entity_update_encode(bool a1, uint32 update_mask,
 	uint32* update_mask_written, uint32 state_data_size, void* state_data, void* telemetry_data, c_bitstream* packet,
 	int32 required_leave_space_bits)
 {
-	return INVOKE_TYPE(0x201864, 0, bool(__thiscall*)(c_simulation_slayer_engine_globals_definition*, bool, uint32, uint32*, uint32, void*, void*, c_bitstream*, int32),
+	return INVOKE_TYPE(0x201864, 0x1EB5CC, bool(__thiscall*)(c_simulation_slayer_engine_globals_definition*, bool, uint32, uint32*, uint32, void*, void*, c_bitstream*, int32),
 		this, a1, update_mask, update_mask_written, state_data_size, state_data, telemetry_data, packet, required_leave_space_bits);
 }
 
 bool c_simulation_slayer_engine_globals_definition::entity_update_decode(bool a1, uint32* out_update_mask,
 	uint32 state_data_size, void* state_data, c_bitstream* packet)
 {
-	return INVOKE_TYPE(0x201885, 0, bool(__thiscall*)(c_simulation_slayer_engine_globals_definition*, bool, uint32*, uint32, void*, c_bitstream*),
+	return INVOKE_TYPE(0x201885, 0x1EB5ED, bool(__thiscall*)(c_simulation_slayer_engine_globals_definition*, bool, uint32*, uint32, void*, c_bitstream*),
 		this, a1, out_update_mask, state_data_size, state_data, packet);
 }
 
@@ -60,12 +60,6 @@ bool c_simulation_slayer_engine_globals_definition::entity_creation_lossy_compar
 void* c_simulation_slayer_engine_globals_definition::build_object_creation_data(datum object_index,
 	int32 creation_data_size, void* creation_data)
 {
-	return INVOKE_TYPE(0x2017C0, 0, void*(__thiscall*)(c_simulation_slayer_engine_globals_definition*, datum, int32, void*),
+	return INVOKE_TYPE(0x2017C0, 0x1EB528, void*(__thiscall*)(c_simulation_slayer_engine_globals_definition*, datum, int32, void*),
 		this, object_index, creation_data_size, creation_data);
-}
-
-void simulation_slayer_engine_globals_definition_apply_patches()
-{
-	// todo: do better
-	WritePointer(Memory::GetAddress(0x1DAF49 + 1), g_simulation_slayer_engine_definition_ptr);
 }

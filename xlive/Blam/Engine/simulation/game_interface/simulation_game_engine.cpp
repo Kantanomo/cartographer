@@ -33,7 +33,7 @@ int8 c_simulation_game_engine_definition::creation_minimum_required_bits(s_simul
 
 void c_simulation_game_engine_definition::write_creation_description_to_string(s_simulation_game_entity* entity, void* tel_data, int32 buffer_size, char* buffer)
 {
-	INVOKE_TYPE(0x1F7512, 0, void(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*, void*, int32, char*),
+	INVOKE_TYPE(0x1F7512, 0x1E1278, void(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*, void*, int32, char*),
 		this, entity, tel_data, buffer_size, buffer);
 }
 
@@ -51,7 +51,7 @@ bool c_simulation_game_engine_definition::entity_update_encode(bool a1, uint32 u
 	uint32 state_data_size, void* state_data, void* telemetry_data, c_bitstream* packet,
 	int32 required_leave_space_bits)
 {
-	return INVOKE_TYPE(0x1F76B7, 0, bool(__thiscall*)(c_simulation_game_engine_definition*, uint32, uint32*, void*, c_bitstream*, int32),
+	return INVOKE_TYPE(0x1F76B7, 0x1E141D, bool(__thiscall*)(c_simulation_game_engine_definition*, uint32, uint32*, void*, c_bitstream*, int32),
 		this, update_mask, update_mask_written, state_data, packet, required_leave_space_bits);
 
 
@@ -102,7 +102,7 @@ bool c_simulation_game_engine_definition::entity_update_encode(bool a1, uint32 u
 bool c_simulation_game_engine_definition::entity_update_decode(bool a1, uint32* out_update_mask, uint32 state_data_size,
 	void* state_data, c_bitstream* packet)
 {
-	return INVOKE_TYPE(0x1F789E, 0, bool(__thiscall*)(c_simulation_game_engine_definition*, uint32*, void*, c_bitstream*),
+	return INVOKE_TYPE(0x1F789E, 0x1E1504, bool(__thiscall*)(c_simulation_game_engine_definition*, uint32*, void*, c_bitstream*),
 		this, out_update_mask, state_data, packet);
 
 	//s_game_engine_state_data* game_state_data = (s_game_engine_state_data*)state_data;
@@ -182,39 +182,39 @@ uint32 c_simulation_game_engine_definition::build_creation_data(s_simulation_gam
 
 bool c_simulation_game_engine_definition::build_baseline_state_data(int32 creation_data_size, void* creation_data, int32 state_data_size, void* out_state_baseline_data)
 {
-	return INVOKE_TYPE(0x1F73CD, 0, bool(__thiscall*)(c_simulation_game_engine_definition*, int32, void*, int32, void*),
+	return INVOKE_TYPE(0x1F73CD, 0x1E1133, bool(__thiscall*)(c_simulation_game_engine_definition*, int32, void*, int32, void*),
 		this, creation_data_size, creation_data, state_data_size, out_state_baseline_data);
 }
 
 bool c_simulation_game_engine_definition::build_updated_state_data(s_simulation_game_entity* entity, uint32* update_mask, int32 state_data_size, void* state_data)
 {
-	return INVOKE_TYPE(0x1F7402, 0, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*, uint32*, int32, void*),
+	return INVOKE_TYPE(0x1F7402, 0x1E1168, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*, uint32*, int32, void*),
 		this, entity, update_mask, state_data_size, state_data);
 }
 
 uint32 c_simulation_game_engine_definition::rotate_entity_indices(s_simulation_game_entity* entity)
 {
-	return INVOKE_TYPE(0x1F7443, 0, uint32(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*), this, entity);
+	return INVOKE_TYPE(0x1F7443, 0x1E11A9, uint32(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*), this, entity);
 }
 
 bool c_simulation_game_engine_definition::create_game_entity(s_simulation_game_entity* entity, int32 creation_data_size, void* creation_data, uint32 mask, int32 state_data_size, void* state_data)
 {
-	return INVOKE_TYPE(0x1F755F, 0, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*, int32, void*, uint32, int32, void*),
+	return INVOKE_TYPE(0x1F755F, 0x1E12C5, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*, int32, void*, uint32, int32, void*),
 		this, entity, creation_data_size, creation_data, mask, state_data_size, state_data);
 }
 
 bool c_simulation_game_engine_definition::update_game_entity(s_simulation_game_entity* entity, uint32 update_flags, int32 state_data_size, void* state_data)
 {
-	return INVOKE_TYPE(0x1F7482, 0, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*, uint32, int32, void*),
+	return INVOKE_TYPE(0x1F7482, 0x1E11E8, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*, uint32, int32, void*),
 		this, entity, update_flags, state_data_size, state_data);
 }
 
 bool c_simulation_game_engine_definition::delete_game_entity(s_simulation_game_entity* entity)
 {
-	return INVOKE_TYPE(0x1F75BE, 0, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*), this, entity);
+	return INVOKE_TYPE(0x1F75BE, 0x1E1324, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*), this, entity);
 }
 
 bool c_simulation_game_engine_definition::promote_game_entity_to_authority(s_simulation_game_entity* entity)
 {
-	return INVOKE_TYPE(0x1F74C1, 0, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*), this, entity);
+	return INVOKE_TYPE(0x1F74C1, 0x1E1227, bool(__thiscall*)(c_simulation_game_engine_definition*, s_simulation_game_entity*), this, entity);
 }
