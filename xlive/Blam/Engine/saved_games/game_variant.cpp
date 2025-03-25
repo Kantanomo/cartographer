@@ -20,8 +20,8 @@ t_game_variant_validate p_game_variant_validate;
 
 void game_variant_apply_patches()
 {
-	DETOUR_ATTACH(p_game_variant_create_default_new, Memory::GetAddress<t_game_variant_create_default_new>(0x5B33D), game_variant_create_default_new);
-	DETOUR_ATTACH(p_game_variant_validate, Memory::GetAddress<t_game_variant_validate>(0x5B720), game_variant_cleanup);
+	DETOUR_ATTACH(p_game_variant_create_default_new, Memory::GetAddress<t_game_variant_create_default_new>(0x5B33D, 0x3CF9D), game_variant_create_default_new);
+	DETOUR_ATTACH(p_game_variant_validate, Memory::GetAddress<t_game_variant_validate>(0x5B720, 0x3D380), game_variant_cleanup);
 }
 
 s_game_variant* get_game_variant(void)

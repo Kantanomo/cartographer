@@ -22,8 +22,3 @@ public:
 	virtual bool entity_creation_lossy_compare(void* a1, void* a2, int32 a3) override;
 	virtual void* build_object_creation_data(datum object_index, int32 creation_data_size, void* creation_data) override;
 };
-
-static c_simulation_slayer_engine_globals_definition g_simulation_slayer_engine_definition;
-static c_simulation_slayer_engine_globals_definition* g_simulation_slayer_engine_definition_ptr = &g_simulation_slayer_engine_definition;
-
-void simulation_slayer_engine_globals_definition_apply_patches();
