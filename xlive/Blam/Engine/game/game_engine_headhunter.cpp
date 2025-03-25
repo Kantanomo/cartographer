@@ -71,7 +71,7 @@ bool c_headhunter_engine::function_34(datum player_index, void* unk)
 //	c_slayer_engine::update();
 //}
 
-uint32 c_headhunter_engine::get_game_engine_entity_type()
+e_simulation_entity_type c_headhunter_engine::get_game_engine_entity_type()
 {
 	return _simulation_entity_type_headhunter_engine_globals;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "game_engine_default.h"
+#include "simulation/game_interface/simulation_game_entities.h"
 
 
 class c_juggernaut_engine : c_game_engine
@@ -22,7 +23,7 @@ public:
 	virtual bool function_35(int32 unk_index) override;
 	virtual bool test_variant_engine_flag(datum player_index, e_game_engine_variant_flag_test_type type) override;
 	virtual void get_player_state_index(datum player_index, bool* always_returned_true) override;
-	virtual uint32 get_game_engine_entity_type() override;
+	virtual e_simulation_entity_type get_game_engine_entity_type() override;
 	virtual void function_41() override;
 	virtual void set_simulation_baseline_data(int32 unused, void* state_data) override;
 	virtual void build_simulation_update(uint32* unk, int32 unused, void* state_data) override;

@@ -1,6 +1,7 @@
 #pragma once
 #include "game_allegiance.h"
 #include "saved_games/game_variant.h"
+#include "simulation/game_interface/simulation_game_entities.h"
 
 enum e_simulation_game_engine_update : uint32
 {
@@ -57,7 +58,7 @@ public:
 	virtual void function_37(int32 unk_always_1);
 	virtual void get_player_state_index(datum player_index, bool* always_returned_true);
 	virtual bool should_garbage_collect(datum object_index);
-	virtual uint32 get_game_engine_entity_type();
+	virtual e_simulation_entity_type get_game_engine_entity_type();
 	virtual void function_41() = 0;
 	virtual void function_42(void* unk);
 	virtual void function_43(uint32 flags, void* unk, void* unk_2);
