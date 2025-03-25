@@ -1,5 +1,6 @@
 #pragma once
 #include "game_engine_default.h"
+#include "simulation/game_interface/simulation_game_entities.h"
 
 class c_slayer_engine : public c_game_engine
 {
@@ -14,7 +15,7 @@ public:
 	virtual void function_16(datum player_index) override;
 	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
 	virtual bool function_35(int32 unk_index) override;
-	virtual uint32 get_game_engine_entity_type() override;
+	virtual e_simulation_entity_type get_game_engine_entity_type() override;
 	virtual void function_41() override;
 	virtual void set_simulation_baseline_data(int32 unused, void* state_data) override;
 	virtual void build_simulation_update(uint32* unk, int32 unused, void* state_data) override;

@@ -122,7 +122,7 @@ bool c_game_engine::is_team_enemy(e_game_team a, e_game_team b)
 
 void c_game_engine::get_multiplayer_score_string(wchar_t* out_string)
 {
-	INVOKE_TYPE(0x111251, 0, void(__thiscall*)(c_game_engine*, wchar_t*), this, out_string);
+	INVOKE_TYPE(0x111251, 0x1001A9, void(__thiscall*)(c_game_engine*, wchar_t*), this, out_string);
 }
 
 void c_game_engine::function_30(int32 a1, int32 a2, int32 a3)
@@ -147,7 +147,7 @@ bool c_game_engine::function_34(datum player_index, void* unk)
 
 bool c_game_engine::test_variant_engine_flag(datum player_index, e_game_engine_variant_flag_test_type type)
 {
-	return INVOKE_TYPE(0x1112D1, 0, bool(__thiscall*)(c_game_engine*, datum, e_game_engine_variant_flag_test_type), this, player_index, type);
+	return INVOKE_TYPE(0x1112D1, 0x100229, bool(__thiscall*)(c_game_engine*, datum, e_game_engine_variant_flag_test_type), this, player_index, type);
 }
 
 void c_game_engine::function_37(int32 unk_always_1)
@@ -165,39 +165,39 @@ bool c_game_engine::should_garbage_collect(datum object_index)
 	return false;
 }
 
-uint32 c_game_engine::get_game_engine_entity_type()
+e_simulation_entity_type c_game_engine::get_game_engine_entity_type()
 {
-	return 0;
+	return _simulation_entity_type_slayer_engine_globals;
 }
 
 void c_game_engine::function_42(void* unk)
 {
-	INVOKE_TYPE(0x1112A7, 0, void(__thiscall*)(c_game_engine*, void*), this, unk);
+	INVOKE_TYPE(0x1112A7, 0x1001FF, void(__thiscall*)(c_game_engine*, void*), this, unk);
 }
 
 void c_game_engine::function_43(uint32 flags, void* unk, void* unk_2)
 {
-	INVOKE_TYPE(0x111750, 0, void(__thiscall*)(c_game_engine*, uint32, void*, void*), this, flags, unk, unk_2);
+	INVOKE_TYPE(0x111750, 0x1006A8, void(__thiscall*)(c_game_engine*, uint32, void*, void*), this, flags, unk, unk_2);
 }
 
 bool c_game_engine::function_44(uint32 flags, void* unk)
 {
-	return INVOKE_TYPE(0x111965, 0, bool(__thiscall*)(c_game_engine*, uint32, void*), this, flags, unk);
+	return INVOKE_TYPE(0x111965, 0x1008BD, bool(__thiscall*)(c_game_engine*, uint32, void*), this, flags, unk);
 }
 
 void c_game_engine::set_player_simulation_baseline_data(int32 unused, int32 unused_2, void* unk)
 {
-	INVOKE_TYPE(0x11127D, 0, void(__thiscall*)(c_game_engine*, int32, int32, void*), this, unused, unused_2, unk);
+	INVOKE_TYPE(0x11127D, 0x1001D5, void(__thiscall*)(c_game_engine*, int32, int32, void*), this, unused, unused_2, unk);
 }
 
 void c_game_engine::build_player_simulation_update(int16 abs_player_index, void* unk, int32 unused, void* unk_2)
 {
-	INVOKE_TYPE(0x11131C, 0, void(__thiscall*)(c_game_engine*, int16, void*, int32, void*), this, abs_player_index, unk, unused, unk_2);
+	INVOKE_TYPE(0x11131C, 0x100274, void(__thiscall*)(c_game_engine*, int16, void*, int32, void*), this, abs_player_index, unk, unused, unk_2);
 }
 
 bool c_game_engine::apply_player_simulation_update(int16 abs_player_index, int8 flags, int32 unused, void* unk)
 {
-	return INVOKE_TYPE(0x111541, 0, bool(__thiscall*)(c_game_engine*, int16, int8, int32, void*), this, abs_player_index, flags, unused, unk);
+	return INVOKE_TYPE(0x111541, 0x100499, bool(__thiscall*)(c_game_engine*, int16, int8, int32, void*), this, abs_player_index, flags, unused, unk);
 }
 
 uint32 c_game_engine::get_territory_name(wchar_t* a1, int32 a2, int32 a3, wchar_t* a4, wchar_t* a5)
