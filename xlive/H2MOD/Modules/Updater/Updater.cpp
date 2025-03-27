@@ -418,7 +418,7 @@ bool DownloadUpdatedFiles() {
 			else {
 				swprintf(existingfilepath, ARRAYSIZE(existingfilepath), L"%s%hs", dir_update, UpdateFileEntries[i]->local_name);
 			}
-			_wremove(existingfilepath);
+			uremove(existingfilepath);
 			
 			c_static_string<1024> download_url(k_cartographer_url_http);
 			download_url.append("/");

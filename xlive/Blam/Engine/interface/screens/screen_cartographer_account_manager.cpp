@@ -343,7 +343,7 @@ void c_cartographer_account_manager_edit_list::update_list_items(c_list_item_wid
 				break;
 			case _screen_type_account_add_button_remember_me_text:
 				button_label = get_cartographer_account_manager_label(m_cartographer_screen_type, k_screen_type_account_add_button_text_index + list_item_index);
-				usnzprintf(remember_me_text, NUMBEROF(remember_me_text), button_label, m_account_add.remember_me ? L'☑' : L'☐');
+				usnprintf(remember_me_text, NUMBEROF(remember_me_text), button_label, m_account_add.remember_me ? L'☑' : L'☐');
 				button_label = remember_me_text;
 				break;
 			case _screen_type_account_add_button_login_text:
@@ -483,7 +483,6 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 			extern int notify_xlive_ui;
 			notify_xlive_ui = 0;
 			H2Config_master_ip = inet_addr("127.0.0.1");
-			H2Config_master_port_relay = 2001;
 			XUserSignInSetStatusChanged(0);
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}

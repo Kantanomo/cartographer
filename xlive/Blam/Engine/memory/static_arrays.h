@@ -486,7 +486,7 @@ inline wchar_t* c_static_wchar_string<T>::clear(void)
 template<size_t T>
 inline wchar_t* c_static_wchar_string<T>::set(const wchar_t* src)
 {
-	return ustrnzcpy(this->get_buffer(), src, T);
+	return ustrncpy(this->get_buffer(), src, T);
 }
 
 template<size_t T>
@@ -504,7 +504,7 @@ inline size_t c_static_wchar_string<T>::max_length(void) const
 template<size_t T>
 wchar_t* c_static_wchar_string<T>::append(const wchar_t* src)
 {
-	wchar_t* result = ustrnzcat(this->get_buffer(), src, T);
+	wchar_t* result = ustrncat(this->get_buffer(), src, T);
 	result[T - 1] = 0;
 	return result;
 }

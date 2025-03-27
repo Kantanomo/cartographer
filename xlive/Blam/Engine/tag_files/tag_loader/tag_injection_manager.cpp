@@ -103,7 +103,7 @@ bool c_tag_injecting_manager::find_map(const wchar_t* map_name, c_static_wchar_s
 			const wchar_t format[] = L"[c_tag_injecting_manager::find_map] could not locate %s.map in any valid content location";
 			wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
 			
-			usnzprintf(output_wide, NUMBEROF(output_wide), format, map_name);
+			usnprintf(output_wide, NUMBEROF(output_wide), format, map_name);
 			LOG_ERROR_GAME(output_wide);
 			g_force_cartographer_update = true;
 			return false;
@@ -526,7 +526,7 @@ bool c_tag_injecting_manager::initialize_agent(tag_group group)
 		const wchar_t format[] = L"[c_tag_injecting_manager::initialize_agent] Plugin file could not be located %s";
 		wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
 
-		usnzprintf(output_wide, NUMBEROF(output_wide), format, plugin_path.get_string());
+		usnprintf(output_wide, NUMBEROF(output_wide), format, plugin_path.get_string());
 		LOG_ERROR_GAME(output_wide);
 		g_force_cartographer_update = true;
 		return false;
