@@ -231,20 +231,6 @@ void GetVKeyCodeString(int vkey, c_static_string<64>* string)
 	return;
 }
 
-int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath) {
-	const wchar_t* backslash_offset = wcsrchr(filepath, L'\\');
-	const wchar_t* forward_slash_offset = wcsrchr(filepath, L'/');
-	const wchar_t* most_right_slash_offset = 
-		backslash_offset == NULL ? forward_slash_offset : ((forward_slash_offset != NULL && backslash_offset < forward_slash_offset) ? forward_slash_offset : backslash_offset);
-
-	if (most_right_slash_offset != NULL) {
-		wcsncpy(rtnpath, filepath, (most_right_slash_offset - filepath) + 1);
-		return 0;
-	}
-
-	return -1;
-}
-
 char* custom_label_escape(char* label_literal) {
 	int label_literal_length = strlen(label_literal);
 	int length_shift = 0;

@@ -6,7 +6,6 @@ bool GetFileLine(FILE* fp, char** fileLine);
 char CmpVersions(const char* version_base, const char* version_alt);
 void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber));
 void GetVKeyCodeString(int vkey, c_static_string<64>* string);
-int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath);
 
 ///FREE MEMOERY in returned char*
 char* custom_label_escape(char* label_literal);

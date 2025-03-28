@@ -14,8 +14,6 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
 
-#include "Util/filesys.h"
-
 const wchar_t* k_client_process_name = L"Halo2Client";
 const wchar_t* k_server_process_name = L"H2Server";
 
@@ -42,6 +40,10 @@ h2log *console_log = nullptr;
 
 wchar_t g_h2_process_file_path[MAX_PATH];
 wchar_t g_h2_appdata_local_path[MAX_PATH];
+
+CRITICAL_SECTION log_section;
+
+static void startup_force_working_directory_to_process_directory(void);
 
 
 void PostH2Config() {
@@ -115,8 +117,6 @@ void InitLocalAppData() {
 	}
 }
 
-CRITICAL_SECTION log_section;
-
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
 void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path, bool useAppDataLocalPath) {
@@ -164,20 +164,7 @@ void InitH2Startup() {
 	shell_apply_patches();
 	shell_windows_apply_patches();
 
-	DETOUR_COMMIT();
-
-	int ArgCnt;
-	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
-	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], g_h2_process_file_path);
-	if (rtncodepath == -1) {
-		std::wstring path = GetExeDirectoryWide();
-		path.append(L"\\");
-		_swprintf(g_h2_process_file_path, path.c_str());
-	}
-
-	// fix the game not finding the files it needs if the current directory is not the install directory
-	SetCurrentDirectoryW(GetExeDirectoryWide().c_str());
-	//If H2ProcessFilePath is empty (Server Console Mode?) set to working directory
+	DETOUR_COMMIT();	
 	
 	InitLocalAppData();
 
@@ -235,3 +222,21 @@ void H2DedicatedServerStartup() {
 	}
 }
 
+
+static void startup_force_working_directory_to_process_directory(void)
+{
+	int ArgCnt;
+	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
+
+	c_static_wchar_string<MAX_PATH> path(ArgList[0]);
+	
+	// Remove the exe name by terminating the string at the last backslash character
+	const int32 backslash_index = path.last_index_of(L"\\");
+	path.get_buffer()[backslash_index] = L'\0';
+
+	ustrncpy(g_h2_process_file_path, path.get_string(), MAX_PATH);
+
+	// Force the current working directory to the one where halo2.exe is located
+	SetCurrentDirectoryW(g_h2_process_file_path);
+	return;
+}
