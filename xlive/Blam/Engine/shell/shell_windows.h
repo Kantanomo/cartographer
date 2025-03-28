@@ -22,6 +22,8 @@ extern wchar_t g_window_classname[64];
 
 extern wchar_t g_window_name[64];
 
+extern wchar_t g_shell_windows_instance_name[13];
+
 /* prototypes */
 
 HWND* shell_windows_get_hwnd(void);

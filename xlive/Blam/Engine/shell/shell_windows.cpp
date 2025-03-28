@@ -37,6 +37,8 @@ wchar_t g_window_classname[64] = {};
 
 wchar_t g_window_name[64] = {};
 
+wchar_t g_shell_windows_instance_name[13];
+
 /* prototypes */
 
 static DWORD WINAPI timeGetTime_hook();
@@ -581,6 +583,8 @@ static void shell_windows_initialize_arguments(void)
 	const LPWSTR command_line = GetCommandLineW();
 	if (command_line)
 	{
+		const bool is_dedicated_server = shell_is_dedicated_server();
+
 		// Copy the buffer
 		wchar_t argument_buffer[INT16_MAX + 1];
 		ustrncpy(argument_buffer, command_line, NUMBEROF(argument_buffer));
@@ -616,7 +620,7 @@ static void shell_windows_initialize_arguments(void)
 			}
 			else if (_wcsnicmp(current_argument, L"-monitor:", 9) == 0)
 			{
-				int monitor_id = _wtol(&current_argument[9]);
+				int monitor_id = utol(&current_argument[9]);
 				shell_command_line_flag_set(_shell_command_line_flag_monitor_count, PIN(monitor_id, 0, k_max_monitor_count));
 			}
 			else if (_wcsicmp(current_argument, L"-highquality") == 0)
@@ -630,36 +634,16 @@ static void shell_windows_initialize_arguments(void)
 				shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill(Memory::GetAddress(0x269FD5), 8);
 			}
-			else if (_wcsicmp(current_argument, L"-h2config=") == 0)
-			{
-				if (wcslen(current_argument) < 255)
-				{
-					int pfcbuflen = wcslen(current_argument + 10) + 1;
-					g_h2_config_path_override = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
-					swprintf(g_h2_config_path_override, pfcbuflen, current_argument + 10);
-				}
-			}
-			// This is for manually setting the instance number on dedis
-			else if (wcsstr(current_argument, L"instance:") != NULL)
+			else if (is_dedicated_server && wcsstr(current_argument, L"instance:") != NULL)
 			{
 				// Get instance number from the argument
-				const wchar_t* instance_number = current_argument + NUMBEROF(L"instance:") - 1;
-
-				// Convert to unsigned int
-				wchar_t* end;
-				const uint32 instance_num = wcstoul(instance_number, &end, 10);
-
-				// If the end of the string isn't the same as the start then we've converted properly
-				// and can safely set the instance number
-				if (end != instance_number)
-				{
-					g_instance_number = instance_num;
-				}
+				const wchar_t* instance_name = current_argument + NUMBEROF(L"instance:");
+				ustrncpy(g_shell_windows_instance_name, instance_name, NUMBEROF(g_shell_windows_instance_name));
 			}
 #ifdef _DEBUG
 			else if (_wcsnicmp(current_argument, L"-dev_flag:", 10) == 0)
 			{
-				int flag_id = _wtol(&current_argument[10]);
+				int flag_id = utol(&current_argument[10]);
 				shell_command_line_flag_set((e_shell_command_line_flags)PIN(0, flag_id, k_number_of_shell_command_line_flags - 1), 1);
 			}
 #endif

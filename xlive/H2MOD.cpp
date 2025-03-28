@@ -862,7 +862,6 @@ static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a
 		XUserSignOut(0);
 		UpdateMasterLoginStatus();
 		H2Config_master_ip = inet_addr("127.0.0.1");
-		H2Config_master_port_relay = 2001;
 	}
 	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
 	return result;

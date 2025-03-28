@@ -1,6 +1,5 @@
 #pragma once
 
-extern bool g_force_cartographer_update;
 
 void InitH2Config();
 void DeinitH2Config();
@@ -26,16 +25,19 @@ enum e_override_texture_resolution : int
 	tex_ultra
 };
 
+/* constants */
+
 #define k_cartographer_url_http "http://cartographer.online"
 #define k_cartographer_url_https "https://cartographer.online"
 extern const char* k_cartographer_map_repo_url;
 
-extern unsigned long H2Config_master_ip;
-extern unsigned short H2Config_master_port_login;
-extern unsigned short H2Config_master_port_relay;
+/* globals */
 
-extern bool H2Portable;
-extern bool H2Config_isConfigFileAppDataLocal;
+extern bool g_force_cartographer_update;
+extern bool g_h2_portable;
+
+extern unsigned long H2Config_master_ip;
+
 extern unsigned short H2Config_base_port;
 extern unsigned long H2Config_ip_lan;
 extern unsigned long H2Config_ip_broadcast_override;

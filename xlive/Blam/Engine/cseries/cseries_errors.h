@@ -5,7 +5,7 @@
 
 enum e_error_category : int32
 {
-	_error_category_generic = 0,		// unsure about name
+	_error_category_generic = 0,
 	_error_category_internal_full = 1,
 	_error_category_internal_subfolder = 2,
 	_error_category_animation = 3,

@@ -43,7 +43,6 @@ h2log *console_log = nullptr;
 wchar_t g_h2_process_file_path[MAX_PATH];
 wchar_t g_h2_appdata_local_path[MAX_PATH];
 
-wchar_t* g_h2_config_path_override = NULL;
 
 void PostH2Config() {
 

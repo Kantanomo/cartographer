@@ -231,7 +231,6 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		else if (sscanf(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
 			if (tempint1 >= 0) {
 				//addDebugText("H2 master relay port is: %d", tempint1);
-				H2Config_master_port_relay = tempint1;
 			}
 		}
 		else if (strstr(fileLine, k_login_token_string)) {

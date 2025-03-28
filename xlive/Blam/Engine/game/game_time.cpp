@@ -95,7 +95,7 @@ bool __cdecl cinematic_is_running_hook()
 	}
 	else
 	{
-		result = cinematic_is_running() || xbox_tickrate_is_enabled() || game_is_minimized();;
+		result = cinematic_is_running() || xbox_tickrate_is_enabled() || game_is_minimized();
 	}
 	
 	return result;
