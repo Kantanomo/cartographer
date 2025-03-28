@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "AccountLogin.h"
 
+#include "cartographer/config/endpoints.h"
 #include "shell/shell.h"
 
 #include "H2MOD/Modules/Shell/Config.h"

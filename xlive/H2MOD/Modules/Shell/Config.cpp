@@ -27,7 +27,6 @@ static const wchar_t* k_h2config_filenames[] = { L"halo2config", L"h2serverconfi
 #define k_h2config_version_number "1"
 #define k_h2config_version_section "H2ConfigurationVersion:" k_h2config_version_number
 #define k_h2config_version_debug_section "Debug:" k_h2config_version_number
-const char* k_cartographer_map_repo_url = "http://www.h2maps.net/Cartographer/CustomMaps";
 
 /* globals */
 

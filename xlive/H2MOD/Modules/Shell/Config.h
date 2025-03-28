@@ -25,12 +25,6 @@ enum e_override_texture_resolution : int
 	tex_ultra
 };
 
-/* constants */
-
-#define k_cartographer_url_http "http://cartographer.online"
-#define k_cartographer_url_https "https://cartographer.online"
-extern const char* k_cartographer_map_repo_url;
-
 /* globals */
 
 extern bool g_force_cartographer_update;

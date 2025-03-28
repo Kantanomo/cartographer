@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "AccountCreate.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
+#include "cartographer/config/endpoints.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
 
