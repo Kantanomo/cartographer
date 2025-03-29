@@ -22,10 +22,11 @@ void __cdecl datum_delete(s_data_array* data_array, datum datum_index)
 	return;
 }
 
+// not entirely sure what this actually does
 void data_make_valid(s_data_array* data_array)
 {
-	// not entirely sure what this actually does
 	INVOKE(0x66B33, 0x3281F, data_make_valid, data_array);
+	return;
 }
 
 

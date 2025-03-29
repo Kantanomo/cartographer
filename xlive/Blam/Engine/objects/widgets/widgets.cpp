@@ -5,7 +5,7 @@
 
 void __cdecl widgets_initialize_for_new_map(void)
 {
-	INVOKE(0x14FDB5, 0x0, widgets_initialize_for_new_map);
+	INVOKE(0x14FDB5, 0x14CB4D, widgets_initialize_for_new_map);
 	return;
 }
 

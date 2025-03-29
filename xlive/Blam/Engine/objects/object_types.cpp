@@ -22,7 +22,7 @@ object_type_definition* get_game_object_type_definition(datum object_datum)
 
 void __cdecl object_types_initialize_for_new_map(void)
 {
-	INVOKE(0x185A9C, 0x0, object_types_initialize_for_new_map);
+	INVOKE(0x185A9C, 0x16FB38, object_types_initialize_for_new_map);
 	return;
 }
 
