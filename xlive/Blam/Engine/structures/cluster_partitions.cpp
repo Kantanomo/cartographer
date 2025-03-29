@@ -15,7 +15,7 @@ cluster_partition* noncollideable_object_cluster_partition_get(void)
 
 void __cdecl cluster_partition_make_valid(cluster_partition* partition)
 {
-	INVOKE(0x37A07D, 0x0, cluster_partition_make_valid, partition);
+	INVOKE(0x37A07D, 0x324DED, cluster_partition_make_valid, partition);
 	return;
 }
 

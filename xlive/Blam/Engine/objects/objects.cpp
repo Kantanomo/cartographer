@@ -146,7 +146,7 @@ void __cdecl objects_initialize_for_new_map(void)
 	cluster_partition_make_valid(collideable_object_cluster_partition_get());
 	cluster_partition_make_valid(noncollideable_object_cluster_partition_get());
 	s_object_globals* object_globals = object_globals_get();
-	object_globals->objects_updating = 0;
+	object_globals->objects_updating = false;
 	object_globals->field_8 = NONE;
 	object_globals->active_garbage_object_count = 0;
 	object_globals->field_C = 0;
@@ -871,7 +871,7 @@ static s_memory_pool* get_object_table(void)
 
 static datum** game_state_object_name_list_get(void)
 {
-	return Memory::GetAddress<datum**>(0x4E2614);
+	return Memory::GetAddress<datum**>(0x4E2614, 0x50A8E4);
 }
 
 static void objects_apply_interpolation_patches(void)

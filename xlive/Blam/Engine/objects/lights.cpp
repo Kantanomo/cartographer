@@ -11,6 +11,6 @@ void __cdecl render_light_lens_flares(void)
 
 void __cdecl lights_initialize_for_new_map(void)
 {
-	INVOKE(0x14C74D, 0x0, lights_initialize_for_new_map);
+	INVOKE(0x14C74D, 0x1494E5, lights_initialize_for_new_map);
 	return;
 }
