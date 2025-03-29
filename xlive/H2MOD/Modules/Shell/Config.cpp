@@ -189,8 +189,8 @@ set_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* c
 #define CONFIG_SET_DEBUG_KEY(_simple_ini, _config_name, _value) \
 	set_config_entry(_simple_ini, k_h2config_version_debug_section, _config_name, _value)
 
-e_override_texture_resolution H2Config_Override_Shadows;
-e_override_texture_resolution H2Config_Override_Water;
+e_override_texture_resolution H2Config_Override_Shadows = e_override_texture_resolution::tex_default;
+e_override_texture_resolution H2Config_Override_Water = e_override_texture_resolution::tex_default;
 
 bool H2Config_upnp_enable = true;
 bool H2Config_no_events = false;
