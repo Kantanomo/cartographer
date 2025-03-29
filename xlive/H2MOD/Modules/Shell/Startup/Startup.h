@@ -4,6 +4,7 @@
 void PostH2Config();
 void InitH2Startup();
 void H2DedicatedServerStartup();
+void startup_initialize_log_directories(void);
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified

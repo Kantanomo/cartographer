@@ -116,6 +116,8 @@ bool shell_platform_initialize(void)
 	InitH2Config();
 	PostH2Config();
 
+	startup_initialize_log_directories();
+
 	// If the intro is already disabled via command line flag don't try and set it via the config option
 	if (shell_command_line_flag_get(_shell_command_line_flag_nointro) == false)
 	{

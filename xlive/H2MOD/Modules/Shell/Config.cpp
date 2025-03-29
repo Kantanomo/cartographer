@@ -864,7 +864,7 @@ static bool config_local_instance_exists(wchar_t* config_file_path, size_t count
 
 	// Check for read and write permissions
 	const errno_t error = _waccess_s(config_file_path, 6);
-	return error == 0 ? true : false;
+	return error == ERROR_SUCCESS ? true : false;
 }
 
 static void config_get_formatted_path(wchar_t* config_file_path, const wchar_t* main_path, size_t count)
@@ -890,6 +890,6 @@ static void config_get_path(wchar_t* config_file_path, size_t count)
 	// 2. In portable mode
 	// 3. Have an appropriately named local config in the directory
 	const wchar_t* main_config_path = (shell_is_dedicated_server() || g_h2_portable || config_local_instance_exists(config_file_path, count) ? g_h2_process_file_path : g_h2_appdata_local_path);
-	config_get_formatted_path(config_file_path, main_config_path, count);;
+	config_get_formatted_path(config_file_path, main_config_path, count);
 	return;
 }
