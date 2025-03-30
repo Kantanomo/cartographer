@@ -103,7 +103,7 @@ void InitLocalAppData()
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
-void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path, bool use_appdata_path)
+void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path)
 {
 	const wchar_t* process_name = shell_is_dedicated_server() ? k_server_process_name : k_client_process_name;
 	
@@ -127,14 +127,14 @@ void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PA
 	folders.append(L"\\instance");
 	folders.append(instance_string);
 
-	path->set(use_appdata_path ? g_h2_appdata_local_path : L"");
+	path->set(g_h2_portable ? L"" : g_h2_appdata_local_path);
 	path->append(folders.get_string());
 
 	// try making logs directory
 	if (!filesystem::create_directories(path->get_string()) && !filesystem::is_directory(filesystem::status(path->get_string())))
 	{
 		// try locally if we didn't already
-		if (use_appdata_path
+		if (!g_h2_portable
 			&& filesystem::create_directories(folders.get_string()) || filesystem::is_directory(filesystem::status(folders.get_string())))
 			path->set(folders.get_string());
 		else
