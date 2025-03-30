@@ -109,8 +109,7 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long* argp)
 {
 	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
-	char* string = NULL;
-	IOCTLSocket_cmd_string(cmd, string);
+	const char* string = IOCTLSocket_cmd_string(cmd);
 	LOG_TRACE_NETWORK("XSocketIOCTLSocket() - cmd: {} - {}", string, cmd);
 	int ret = ioctlsocket(xsocket->systemSocketHandle, cmd, argp);
 
@@ -137,9 +136,7 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char* optva
 {
 	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
-	char* string = NULL;
-	sockOpt_string(optname, string);
-
+	const char* string = sockOpt_string(optname);
 	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {:x}, level = {}, optname = {} - {},  optlen = {})",
 		xsocket->systemSocketHandle, level, string, optname, optlen);
 
@@ -890,8 +887,7 @@ int XVirtualSocket::SetBufferSize(int optname, INT bufSize)
 		return SOCKET_ERROR;
 	}
 
-	char* string = NULL;
-	sockOpt_string(optname, string);
+	const char* string = sockOpt_string(optname);
 	LOG_TRACE_NETWORK("{} - getsockopt() - {} - {}:{} - {}", __FUNCTION__, string, optname, bufOpt, bufSize);
 
 	// this may only affect Windows 7/Server 2008 R2 and below, as Windows 10 uses an 64K buffer already

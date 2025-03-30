@@ -342,6 +342,7 @@ void H2MOD::Initialize()
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		ImGuiHandler::WeaponOffsets::Initialize();
+		CommandCollection::InitializeCommands();
 		TEST_N_DEF(PC3);
 	}
 	else
@@ -349,9 +350,9 @@ void H2MOD::Initialize()
 		kablam_apply_patches();
 		playlist_loader::initialize();
 	}
+
 	cartographer_player_profile_initialize();
 	tag_injection_initialize();
-	CommandCollection::InitializeCommands();
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MapSlots::Initialize();

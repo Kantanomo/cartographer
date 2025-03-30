@@ -6,20 +6,24 @@ case _case:											\
 	string = #_case;	\
 	break
 
-void IOCTLSocket_cmd_string(unsigned long cmd, char* string)
+static const char k_sock_unknown_string[] = "UNKNOWN";
+
+const char* IOCTLSocket_cmd_string(unsigned long cmd)
 {
+	const char* string;
 	switch (cmd)
 	{
 		STRINGIFY_AND_RET_CASE(FIONBIO);
 		STRINGIFY_AND_RET_CASE(FIONREAD);
 	default:
-		string = "UNKNOWN";
+		string = k_sock_unknown_string;
 	}
-	return;
+	return string;
 }
 
-void sockOpt_string(int optName, char* string)
+const char* sockOpt_string(int optName)
 {
+	const char* string;
 	switch (optName)
 	{
 		STRINGIFY_AND_RET_CASE(SO_DEBUG);
@@ -45,9 +49,9 @@ void sockOpt_string(int optName, char* string)
 		STRINGIFY_AND_RET_CASE(SO_TYPE);
 
 	default:
-		string = "UNKNOWN";
+		string = k_sock_unknown_string;
 	}
-	return;
+	return string;
 }
 
 bool Ipv4AddressIsReservedOrLocalhost(const IN_ADDR ipv4Addr)
