@@ -16,9 +16,9 @@
 
 /* constants */
 
-const wchar_t* k_client_process_name = L"Halo2Client";
-const wchar_t* k_server_process_name = L"H2Server";
-const wchar_t k_microsoft_folder[] = L"\\Microsoft";
+static const wchar_t k_client_process_name[] = L"Halo2Client";
+static const wchar_t k_server_process_name[] = L"H2Server";
+static const wchar_t k_microsoft_folder[] = L"\\Microsoft";
 
 
 namespace filesystem = std::filesystem;
@@ -103,27 +103,38 @@ void InitLocalAppData()
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
-void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path, bool useAppDataLocalPath) {
+void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path, bool use_appdata_path)
+{
 	const wchar_t* process_name = shell_is_dedicated_server() ? k_server_process_name : k_client_process_name;
 	
-	path->set(useAppDataLocalPath ? g_h2_appdata_local_path : L"");
+	// We set the instance string based on whether or not 
+	const wchar_t* instance_string;
+	wchar_t instance_number_string[4];
+	if (config_use_instance_name())
+	{
+		instance_string =  g_shell_windows_instance_name;
+	}
+	else
+	{
+		usnprintf(instance_number_string, NUMBEROF(instance_number_string), L"%d", g_instance_number);
+		instance_string = instance_number_string;
+	}
 
-	wchar_t instance_string[3] = {};
-	swprintf(instance_string, NUMBEROF(instance_string), L"%d", g_instance_number);
-	
+
 	c_static_wchar_string<MAX_PATH> folders;
 	folders.append(L"logs\\");
 	folders.append(process_name);
 	folders.append(L"\\instance");
 	folders.append(instance_string);
 
+	path->set(use_appdata_path ? g_h2_appdata_local_path : L"");
 	path->append(folders.get_string());
 
 	// try making logs directory
 	if (!filesystem::create_directories(path->get_string()) && !filesystem::is_directory(filesystem::status(path->get_string())))
 	{
 		// try locally if we didn't already
-		if (useAppDataLocalPath
+		if (use_appdata_path
 			&& filesystem::create_directories(folders.get_string()) || filesystem::is_directory(filesystem::status(folders.get_string())))
 			path->set(folders.get_string());
 		else

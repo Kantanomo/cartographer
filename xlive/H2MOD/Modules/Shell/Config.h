@@ -5,6 +5,7 @@ void InitH2Config();
 void DeinitH2Config();
 void SaveH2Config();
 void ReadH2Config();
+bool config_use_instance_name(void);
 
 #ifndef _CARTOGRAPHER_DLL_CONF
 // temporary config files 

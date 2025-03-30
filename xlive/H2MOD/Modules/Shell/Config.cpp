@@ -73,8 +73,6 @@ bool H2Config_koth_random = true;
 // ### TODO FIXME remove CSimpleIniA garbage
 // for now improve the code by simplifying it
 
-static bool config_use_instance_name(void);
-
 static bool config_local_instance_exists(wchar_t* config_file_path, size_t count);
 
 static void config_get_formatted_path(wchar_t* config_file_path, const wchar_t* main_path, size_t count);
@@ -851,7 +849,7 @@ void DeinitH2Config()
 }
 #pragma endregion
 
-static bool config_use_instance_name(void)
+bool config_use_instance_name(void)
 {
 	// If is dedicated server and the instance name is set then use the instance name for the config
 	return shell_is_dedicated_server() && ustrnlen(g_shell_windows_instance_name, NUMBEROF(g_shell_windows_instance_name)) > 0;
