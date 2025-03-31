@@ -1,15 +1,14 @@
 #include "stdafx.h"
-
 #include "CustomLanguage.h"
 
 #include "main/game_preferences.h"
 #include "game/game.h"
+#include "shell/shell.h"
 #include "text/unicode.h"
 #include "text/font_group.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Utils/Utils.h"
 
 
@@ -609,7 +608,7 @@ static void overrideCoreH2Labels() {
 } 
 
 void custom_language_initialize() {
-	if (!Memory::IsDedicatedServer()) {
+	if (!shell_is_dedicated_server()) {
 		setGameLanguage();
 
 		initialise_core_languages();
@@ -629,7 +628,7 @@ void custom_language_initialize() {
 }
 
 void DeinitCustomLanguage() {
-	if (!Memory::IsDedicatedServer()) {
+	if (!shell_is_dedicated_server()) {
 		write_custom_labels();
 	}
 }

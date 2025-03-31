@@ -6,9 +6,10 @@
 #include "game/game.h"
 #include "networking/Session/network_session.h"
 #include "text/unicode.h"
+#include "shell/shell.h"
+#include "shell/shell_windows.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "XLive/xbox/xbox.h"
 
 enum e_context_id : uint32
@@ -100,7 +101,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 	LOG_TRACE_XLIVE("XUserSetContext  (userIndex = {0}, contextId = {1}, contextValue = {2})",
 		dwUserIndex, dwContextId, dwContextValue);
 
-	if (Memory::IsDedicatedServer() || !H2Config_discord_enable || _Shell::GetInstanceId() > 1)
+	if (shell_is_dedicated_server() || !H2Config_discord_enable || g_instance_number > 1)
 	{
 		return ERROR_SUCCESS;
 	}

@@ -5,6 +5,7 @@
 enum e_shell_tool_type
 {
 	_shell_tool_type_editing_tools = 0,
+	_shell_tool_type_sapien = 1,
 	_shell_tool_type_game = 2
 };
 
@@ -51,11 +52,16 @@ struct s_shell_build_version
 	const char* string;
 };
 
+/* globals */
+
+
 /* prototypes */
 
 void shell_apply_patches(void);
 
 e_shell_tool_type shell_tool_type(void);
+
+bool shell_is_dedicated_server(void);
 
 bool shell_command_line_flag_is_set(e_shell_command_line_flags flag);
 int32 __cdecl shell_command_line_flag_get(e_shell_command_line_flags flag);

@@ -14,6 +14,7 @@
 #include "physics/physics_model_definitions.h"
 #include "render/weather_definitions.h"
 #include "scenario/scenario_definitions.h"
+#include "shell/shell.h"
 #include "units/biped_definitions.h"
 #include "units/vehicle_definitions.h"
 
@@ -102,7 +103,7 @@ bool c_tag_injecting_manager::find_map(const wchar_t* map_name, c_static_wchar_s
 			const wchar_t format[] = L"[c_tag_injecting_manager::find_map] could not locate %s.map in any valid content location";
 			wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
 			
-			usnzprintf(output_wide, NUMBEROF(output_wide), format, map_name);
+			usnprintf(output_wide, NUMBEROF(output_wide), format, map_name);
 			LOG_ERROR_GAME(output_wide);
 			g_force_cartographer_update = true;
 			return false;
@@ -202,7 +203,7 @@ tag_group c_tag_injecting_manager::get_tag_group_by_datum(datum cache_datum) con
 void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) const
 {
 	// resource caches are disabled on H2Server
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 		return;
 
 	// There is probably a struct here but can't identify anything
@@ -334,7 +335,7 @@ void c_tag_injecting_manager::apply_definition_fixup(e_tag_group group, datum in
 
 void c_tag_injecting_manager::initialize_shader_template(datum injected_datum)
 {
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 		return;
 
 	typedef bool(__cdecl t_init_shader_template)(int a1);
@@ -525,7 +526,7 @@ bool c_tag_injecting_manager::initialize_agent(tag_group group)
 		const wchar_t format[] = L"[c_tag_injecting_manager::initialize_agent] Plugin file could not be located %s";
 		wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
 
-		usnzprintf(output_wide, NUMBEROF(output_wide), format, plugin_path.get_string());
+		usnprintf(output_wide, NUMBEROF(output_wide), format, plugin_path.get_string());
 		LOG_ERROR_GAME(output_wide);
 		g_force_cartographer_update = true;
 		return false;

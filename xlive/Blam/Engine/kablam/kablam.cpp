@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "kablam.h"
 
-
+#include "shell/shell.h"
 #include "shell/shell_windows.h"
 
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
@@ -328,7 +328,7 @@ static bool __cdecl kablam_command_play(wchar_t* playlist_file_path, int32 a2)
 
 static void server_console_apply_hooks(void)
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 		return;
 
 	p_kablam_command_handler = (dedi_command_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)kablam_command_handler_hook, 7);
@@ -342,7 +342,7 @@ static void server_console_apply_hooks(void)
 
 static int server_console_log_to_dedicated_server_console_wide(const wchar_t* fmt, ...) 
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 		return 0;
 
 	int result;
@@ -357,7 +357,7 @@ static int server_console_log_to_dedicated_server_console_wide(const wchar_t* fm
 
 static int server_console_log_to_dedicated_server_console(const char* fmt, ...)
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 		return 0;
 
 	int result;

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Updater.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
+#include "cartographer/config/endpoints.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Utils/Utils.h"
@@ -418,7 +418,7 @@ bool DownloadUpdatedFiles() {
 			else {
 				swprintf(existingfilepath, ARRAYSIZE(existingfilepath), L"%s%hs", dir_update, UpdateFileEntries[i]->local_name);
 			}
-			_wremove(existingfilepath);
+			uremove(existingfilepath);
 			
 			c_static_string<1024> download_url(k_cartographer_url_http);
 			download_url.append("/");

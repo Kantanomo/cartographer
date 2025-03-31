@@ -26,7 +26,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\Startup.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Utils\Utils.cpp" />
@@ -453,6 +452,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_controller_settings_menu.cpp" />
     <ClCompile Include="Blam\Engine\text\text_group.cpp" />
     <ClCompile Include="Blam\Engine\sound\game_sound.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\config\endpoints.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -566,7 +566,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\Startup.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Utils\Utils.h" />
@@ -1906,6 +1905,7 @@
     <ClInclude Include="Blam\Engine\main\console.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_controller_settings_menu.h" />
     <ClInclude Include="Blam\Engine\sound\game_sound.h" />
+    <ClInclude Include="Blam\Engine\cartographer\config\endpoints.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

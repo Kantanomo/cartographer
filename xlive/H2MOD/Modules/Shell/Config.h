@@ -1,11 +1,11 @@
 #pragma once
 
-extern bool g_force_cartographer_update;
 
 void InitH2Config();
 void DeinitH2Config();
 void SaveH2Config();
 void ReadH2Config();
+bool config_use_instance_name(void);
 
 #ifndef _CARTOGRAPHER_DLL_CONF
 // temporary config files 
@@ -26,22 +26,13 @@ enum e_override_texture_resolution : int
 	tex_ultra
 };
 
-enum H2Config_Experimental_Rendering_Mode : byte
-{
-	_rendering_mode_none,
-	_rendering_mode_original_game_frame_limit
-};
+/* globals */
 
-#define k_cartographer_url_http "http://cartographer.online"
-#define k_cartographer_url_https "https://cartographer.online"
-extern const char* k_cartographer_map_repo_url;
+extern bool g_force_cartographer_update;
+extern bool g_h2_portable;
 
 extern unsigned long H2Config_master_ip;
-extern unsigned short H2Config_master_port_login;
-extern unsigned short H2Config_master_port_relay;
 
-extern bool H2Portable;
-extern bool H2Config_isConfigFileAppDataLocal;
 extern unsigned short H2Config_base_port;
 extern unsigned long H2Config_ip_lan;
 extern unsigned long H2Config_ip_broadcast_override;
@@ -73,7 +64,6 @@ extern char H2Config_stats_authkey[32 + 1];
 extern bool H2Config_vip_lock;
 extern bool H2Config_even_shuffle_teams;
 extern bool H2Config_koth_random;
-extern H2Config_Experimental_Rendering_Mode H2Config_experimental_fps;
 
 extern int H2Config_hotkeyIdHelp;
 extern int H2Config_hotkeyIdAlignWindow;

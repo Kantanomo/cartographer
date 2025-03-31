@@ -2,14 +2,14 @@
 
 #include "MapManager.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-
+#include "cartographer/config/endpoints.h"
 #include "main/map_repository.h"
 #include "main/game_preferences.h"
 #include "networking/NetworkMessageTypeCollection.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "shell/shell.h"
 #include "text/unicode.h"
 
 std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());
@@ -235,7 +235,7 @@ int32 __cdecl map_download_get_progress_percentage()
 void map_download_get_download_source_text(int32 a1, wchar_t* out_text)
 {
 	if (out_text != NULL)
-		wcsncpy_s(out_text, 512, k_map_download_source_text[0], _TRUNCATE);
+		wcsncpy_s(out_text, 512, k_map_download_source_text[_language_english], _TRUNCATE);
 }
 
 /*
@@ -257,7 +257,7 @@ void __declspec(naked) load_map_data_for_display_nak() {
 */
 void MapManager::ApplyPatches() {
 
-	if (!Memory::IsDedicatedServer()) {
+	if (!shell_is_dedicated_server()) {
 
 		BYTE jmp[] = { 0xEB };
 

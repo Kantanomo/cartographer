@@ -3,6 +3,7 @@
 
 #include "cseries_windows_minidump.h"
 
+#include "shell/shell.h"
 #include "shell/windows/crash_report_window/crash_report_window.h"
 
 
@@ -15,7 +16,7 @@ LONG WINAPI debug_unhandled_exception_cb(_In_ struct _EXCEPTION_POINTERS* except
 	write_crash_dump_files(exception_info, &reports_path, &zip_file_path);
 
 	// don't attempt to display a GUI error box if running on a server.
-	if (!Memory::IsDedicatedServer()) 
+	if (!shell_is_dedicated_server()) 
 	{
 		crash_window_create(reports_path.get_string(), zip_file_path.get_string());
 	}

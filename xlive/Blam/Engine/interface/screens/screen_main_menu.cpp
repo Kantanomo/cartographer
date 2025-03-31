@@ -529,7 +529,7 @@ bool __cdecl screen_show_screen_4way_signin_xbox_live_callback()
 
 void c_main_menu_list::apply_instance_patches()
 {
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 		return;
 
 	PatchCall(Memory::GetAddress(0xB724), jmp_c_main_menu_list); //replace our c_main_menu_list inside c_screen_main_menu ctor

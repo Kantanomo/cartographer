@@ -21,9 +21,9 @@ public:
 
 	static DWORD GetAddress(DWORD client, DWORD server)
 	{
-		ASSERT( Memory::IsDedicatedServer() || client != 0);
-		ASSERT(!Memory::IsDedicatedServer() || server != 0);
-		return GetBaseAddress() + (IsDedicatedServer() ? server : client);
+		ASSERT(g_memory_is_dedicated_server || client != 0);
+		ASSERT(!g_memory_is_dedicated_server || server != 0);
+		return GetBaseAddress() + (g_memory_is_dedicated_server ? server : client);
 	}
 	
 	template <typename T = void*>
@@ -52,14 +52,13 @@ public:
 	static void SetBaseAddress(DWORD base, bool isDedicatedServer)
 	{
 		baseAddress = base;
-		dedicatedServer = isDedicatedServer;
+		g_memory_is_dedicated_server = isDedicatedServer;
 	}
 
 	// gets base address
 	static DWORD GetBaseAddress() { return baseAddress; }
-	static bool IsDedicatedServer() { return dedicatedServer; }
 
 	static DWORD baseAddress;
-	static bool dedicatedServer;
+	static bool g_memory_is_dedicated_server;
 };
 

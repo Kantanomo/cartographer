@@ -2,11 +2,12 @@
 #include "TagFixes.h"
 
 #include "cache/cache_files.h"
+#include "objects/light_definitions.h"
 #include "shaders/shader_definitions.h"
+#include "shell/shell.h"
 #include "units/biped_definitions.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "objects/light_definitions.h"
 
 // ### TODO Cleanup
 extern bool g_xbox_tickrate_enabled;
@@ -119,7 +120,7 @@ namespace TagFixes
 
 	void OnMapLoad()
 	{
-		if (!Memory::IsDedicatedServer()) 
+		if (!shell_is_dedicated_server()) 
 		{
 			fix_shaders_nvidia();
 			font_table_fix();

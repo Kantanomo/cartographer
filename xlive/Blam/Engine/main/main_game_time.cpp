@@ -51,7 +51,7 @@ void main_game_time_apply_patches(void)
 
 	DETOUR_ATTACH(p_main_time_reset, Memory::GetAddress<t_main_time_reset>(0x286C5, 0x24867), main_time_reset);
 
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		PatchCall(Memory::GetAddress(0x39C0D), main_time_update);
 	}

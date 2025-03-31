@@ -11,14 +11,16 @@
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
 
-#include "Util/filesys.h"
+/* constants */
 
-const wchar_t* k_client_process_name = L"Halo2Client";
-const wchar_t* k_server_process_name = L"H2Server";
+static const wchar_t k_client_process_name[] = L"Halo2Client";
+static const wchar_t k_server_process_name[] = L"H2Server";
+static const wchar_t k_microsoft_folder[] = L"\\Microsoft";
+static const wchar_t k_appdata_default_path[] = L"\\Halo 2\\";
+static const wchar_t k_appdata_dev_preview_path[] = L"DevPreview\\";
 
 namespace filesystem = std::filesystem;
 
@@ -44,7 +46,9 @@ h2log *console_log = nullptr;
 wchar_t g_h2_process_file_path[MAX_PATH];
 wchar_t g_h2_appdata_local_path[MAX_PATH];
 
-wchar_t* g_h2_config_path_override = NULL;
+CRITICAL_SECTION log_section;
+
+static void startup_force_working_directory_to_process_directory(void);
 
 void PostH2Config() {
 
@@ -59,89 +63,75 @@ void PostH2Config() {
 	addDebugText("Base port: %d.", H2Config_base_port);
 }
 
-void InitLocalAppData() {
+void InitLocalAppData()
+{
 	addDebugText("Find AppData Local.");
 
-	wchar_t* userprofile = _wgetenv(L"USERPROFILE");
+	const wchar_t* localappdata_env = _wgetenv(L"localappdata");
 
-	wchar_t local2[MAX_PATH];
+	wchar_t appdata_path[MAX_PATH];
+	ustrncpy(appdata_path, localappdata_env, NUMBEROF(appdata_path));
+	ustrncat(appdata_path, k_microsoft_folder, NUMBEROF(k_microsoft_folder));
+	ustrncat(appdata_path, k_appdata_default_path, NUMBEROF(k_appdata_default_path));
 
-	swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\", userprofile);
-	struct _stat64i32 sb;
-	if (_wstat(local2, &sb) == 0 && sb.st_mode & S_IFDIR) {
-		swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\Microsoft\\", userprofile);
-		CreateDirectoryW(local2, NULL);
-		int fperrno1 = GetLastError();
-		if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
-#if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
-			swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
-#else
-			swprintf(local2, ARRAYSIZE(local2), L"%ws\\AppData\\Local\\Microsoft\\Halo 2\\", userprofile);
-#endif
-			CreateDirectoryW(local2, NULL);
-			int fperrno1 = GetLastError();
-			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
-				int appdatabuflen = wcslen(local2) + 1;
-				wcscpy_s(g_h2_appdata_local_path, appdatabuflen, local2);
-			}
-		}
-	}
-	else if (swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\", userprofile), _wstat(local2, &sb) == 0 && sb.st_mode & S_IFDIR)
+	// Make sure main folder exists and create if not
+	const errno_t error = _waccess_s(appdata_path, 6);
+	if (error != ERROR_SUCCESS)
 	{
-		swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\", userprofile);
-		CreateDirectoryW(local2, NULL);
-		int fperrno1 = GetLastError();
-		if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
-#if USE_DEV_PREVIEW_CONFIG_FILE_PATHS
-			swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\DevPreview\\", userprofile);
-#else
-			swprintf(local2, ARRAYSIZE(local2), L"%ws\\Local Settings\\Application Data\\Microsoft\\Halo 2\\", userprofile);
-#endif
-			CreateDirectoryW(local2, NULL);
-			int fperrno1 = GetLastError();
-			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
-				int appdatabuflen = wcslen(local2) + 1;
-				wcscpy_s(g_h2_appdata_local_path, appdatabuflen, local2);
-			}
+		CreateDirectoryW(appdata_path, NULL);
+	}
+	
+	// Run folder checks if we're using dev preview paths 
+	if (USE_DEV_PREVIEW_CONFIG_FILE_PATHS)
+	{
+		ustrncat(appdata_path, k_appdata_dev_preview_path, NUMBEROF(k_appdata_dev_preview_path));
+		
+		// Make sure dev preview folder exists and create if not
+		const errno_t error = _waccess_s(appdata_path, 6);
+		if (error != ERROR_SUCCESS)
+		{
+			CreateDirectoryW(appdata_path, NULL);
 		}
 	}
 
-	if (g_h2_appdata_local_path == nullptr) {
-		int appdatabuflen = wcslen(g_h2_process_file_path) + 1;
-		wcscpy_s(g_h2_appdata_local_path, appdatabuflen, g_h2_process_file_path);
-		addDebugText("ERROR: Could not find AppData Local. Using Process File Path:");
-		addDebugText(g_h2_appdata_local_path);
-	}
-	else {
-		addDebugText("Found AppData Local: %s", g_h2_appdata_local_path);
-	}
+	ustrncpy(g_h2_appdata_local_path, appdata_path, MAX_PATH);
+	return;
 }
-
-CRITICAL_SECTION log_section;
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
-void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path, bool useAppDataLocalPath) {
-	const wchar_t* process_name = Memory::IsDedicatedServer() ? k_server_process_name : k_client_process_name;
+void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path)
+{
+	const wchar_t* process_name = shell_is_dedicated_server() ? k_server_process_name : k_client_process_name;
 	
-	path->set(useAppDataLocalPath ? g_h2_appdata_local_path : L"");
+	// We set the instance string based on whether or not 
+	const wchar_t* instance_string;
+	wchar_t instance_number_string[4];
+	if (config_use_instance_name())
+	{
+		instance_string =  g_shell_windows_instance_name;
+	}
+	else
+	{
+		usnprintf(instance_number_string, NUMBEROF(instance_number_string), L"%d", g_instance_number);
+		instance_string = instance_number_string;
+	}
 
-	wchar_t instance_string[3] = {};
-	swprintf(instance_string, NUMBEROF(instance_string), L"%d", _Shell::GetInstanceId());
-	
+
 	c_static_wchar_string<MAX_PATH> folders;
 	folders.append(L"logs\\");
 	folders.append(process_name);
 	folders.append(L"\\instance");
 	folders.append(instance_string);
 
+	path->set(g_h2_portable ? L"" : g_h2_appdata_local_path);
 	path->append(folders.get_string());
 
 	// try making logs directory
 	if (!filesystem::create_directories(path->get_string()) && !filesystem::is_directory(filesystem::status(path->get_string())))
 	{
 		// try locally if we didn't already
-		if (useAppDataLocalPath
+		if (!g_h2_portable
 			&& filesystem::create_directories(folders.get_string()) || filesystem::is_directory(filesystem::status(folders.get_string())))
 			path->set(folders.get_string());
 		else
@@ -165,22 +155,8 @@ void InitH2Startup() {
 	shell_windows_initialize();
 	shell_apply_patches();
 	shell_windows_apply_patches();
-	// ### TODO remove entirely
-	_Shell::Initialize();
-	DETOUR_COMMIT();
 
-	int ArgCnt;
-	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
-	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], g_h2_process_file_path);
-	if (rtncodepath == -1) {
-		std::wstring path = GetExeDirectoryWide();
-		path.append(L"\\");
-		_swprintf(g_h2_process_file_path, path.c_str());
-	}
-
-	// fix the game not finding the files it needs if the current directory is not the install directory
-	SetCurrentDirectoryW(GetExeDirectoryWide().c_str());
-	//If H2ProcessFilePath is empty (Server Console Mode?) set to working directory
+	DETOUR_COMMIT();	
 	
 	InitLocalAppData();
 
@@ -188,31 +164,34 @@ void InitH2Startup() {
 	curl_global_init(CURL_GLOBAL_ALL);
 	atexit([] { curl_global_cleanup(); });
 
-	// after localAppData filepath initialized, we can initialize OnScreenDebugLog
-	InitOnScreenDebugText();
+	addDebugText(shell_is_dedicated_server() ? "Process is Dedi-Server" : "Process is Client");
 
-	addDebugText(Memory::IsDedicatedServer() ? "Process is Dedi-Server" : "Process is Client");
+	H2MOD::Initialize();
 
-	// DO NOT FUCKING TOUCH THIS
-	if (ArgList != NULL)
+	addDebugText("ProcessStartup finished.");
+}
+
+///After the game window appears
+void H2DedicatedServerStartup() {
+	// initialize default data to run under LAN
+	// if the server runs in LIVE mode, check XLiveSignIn/XLiveSignOut in AccountLogin.cpp
+	if (shell_is_dedicated_server())
 	{
-		for (int i = 0; i < ArgCnt; i++)
-		{
-			if (wcsstr(ArgList[i], L"-h2config=") != NULL)
-			{
-				if (wcslen(ArgList[i]) < 255)
-				{
-					int pfcbuflen = wcslen(ArgList[i] + 10) + 1;
-					g_h2_config_path_override = (wchar_t*)malloc(sizeof(wchar_t) * pfcbuflen);
-					swprintf(g_h2_config_path_override, pfcbuflen, ArgList[i] + 10);
-				}
-			}
-		}
-	}
-	// END OF THE COMMENT ABOVE
+		addDebugText("Signing in dedicated server locally.");
 
-	InitH2Config();
-	PostH2Config();
+		AccountEdit_remember = false;
+
+		BYTE abEnet[6];
+		BYTE abOnline[20];
+		XNetRandom(abEnet, sizeof(abEnet));
+		XNetRandom(abOnline, sizeof(abOnline));
+		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, sizeof(abEnet)).c_str(), ByteToHexStr(abOnline, sizeof(abOnline)).c_str(), false);
+	}
+}
+
+void startup_initialize_log_directories(void)
+{
+	InitOnScreenDebugText();
 
 	EnterCriticalSection(&log_section);
 
@@ -228,46 +207,29 @@ void InitH2Startup() {
 	prepareLogFileName(L"h2mod", &path);
 	h2mod_log = h2log::create("H2MOD", path.get_string(), H2Config_debug_log, H2Config_debug_log_level);
 	LOG_DEBUG_GAME(DLL_VERSION_STR);
-	
+
 	prepareLogFileName(L"h2network", &path);
 	network_log = h2log::create("Network", path.get_string(), H2Config_debug_log, H2Config_debug_log_level);
 	LOG_DEBUG_NETWORK(DLL_VERSION_STR);
 
-	//checksum_log = h2log::create("Checksum", prepareLogFileName(L"checksum"), true, 0);
 	LeaveCriticalSection(&log_section);
-	InitH2Accounts();
-
-	H2MOD::Initialize();
-
-	addDebugText("ProcessStartup finished.");
+	return;
 }
 
-///After the game window appears
-void H2DedicatedServerStartup() {
-	// initialize default data to run under LAN
-	// if the server runs in LIVE mode, check XLiveSignIn/XLiveSignOut in AccountLogin.cpp
-	if (Memory::IsDedicatedServer())
-	{
-		addDebugText("Signing in dedicated server locally.");
+static void startup_force_working_directory_to_process_directory(void)
+{
+	int ArgCnt;
+	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
 
-		AccountEdit_remember = false;
+	c_static_wchar_string<MAX_PATH> path(ArgList[0]);
+	
+	// Remove the exe name by terminating the string at the last backslash character
+	const int32 backslash_index = path.last_index_of(L"\\");
+	path.get_buffer()[backslash_index] = L'\0';
 
-		BYTE abEnet[6];
-		BYTE abOnline[20];
-		XNetRandom(abEnet, sizeof(abEnet));
-		XNetRandom(abOnline, sizeof(abOnline));
-		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, sizeof(abEnet)).c_str(), ByteToHexStr(abOnline, sizeof(abOnline)).c_str(), false);
-	}
-}
+	ustrncpy(g_h2_process_file_path, path.get_string(), MAX_PATH);
 
-void DeinitH2Startup() {
-	extern void DeinitRunLoop();
-	DeinitRunLoop();
-	extern void DeinitCustomLanguage();
-	DeinitCustomLanguage();
-	DeinitH2Accounts();
-	DeinitH2Config();
-
-	free(g_h2_config_path_override);
+	// Force the current working directory to the one where halo2.exe is located
+	SetCurrentDirectoryW(g_h2_process_file_path);
 	return;
 }

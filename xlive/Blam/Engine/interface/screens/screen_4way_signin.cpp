@@ -19,6 +19,7 @@
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_utilities.h"
 #include "Networking/online/online_account_xbox.h"
+#include "shell/shell.h"
 #include "tag_files/global_string_ids.h"
 #include "text/unicode.h"
 
@@ -838,7 +839,7 @@ void add_button_key_split_input(c_text_widget* button_key_text)
 	ustrncpy(old, button_key_text->get_interface()->get_raw_string(), NUMBEROF(old));
 
 	const wchar_t* split_text = !input_windows_has_split_device_active() ? L"%c ADD SPLIT " : L"%c REMOVE SPLIT ";
-	usnzprintf(temp, NUMBEROF(temp), split_text, _private_use_character_x_button);
+	usnprintf(temp, NUMBEROF(temp), split_text, _private_use_character_x_button);
 
 	button_key_text->set_text(temp);
 	button_key_text->append_text(old);
@@ -992,7 +993,7 @@ void user_interface_backout_to_mainmenu_patches()
 
 void c_screen_4way_signin::apply_instance_patches()
 {
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 		return;
 
 	user_interface_recover_from_disconnection_patches();

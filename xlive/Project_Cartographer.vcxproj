@@ -581,6 +581,7 @@
     <ClCompile Include="Blam\Engine\camera\first_person_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\following_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\observer.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\config\endpoints.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\twizzler\twizzler.cpp" />
     <ClCompile Include="Blam\Engine\creatures\creature_definitions.cpp" />
@@ -843,6 +844,7 @@
     <ClInclude Include="Blam\Engine\camera\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\camera\following_camera.h" />
     <ClInclude Include="Blam\Engine\camera\observer.h" />
+    <ClInclude Include="Blam\Engine\cartographer\config\endpoints.h" />
     <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
     <ClInclude Include="Blam\Engine\creatures\creature_definitions.h" />
@@ -1213,7 +1215,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\Startup.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Utils\Utils.cpp" />
@@ -1221,7 +1222,6 @@
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp" />
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
-    <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
@@ -2387,7 +2387,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\Startup.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Utils\Utils.h" />
@@ -2396,7 +2395,6 @@
     <ClInclude Include="H2MOD\Variants\Infection\Infection.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resources\resource.h" />
-    <ClInclude Include="util\filesys.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
     <ClInclude Include="Util\log.h" />
     <ClInclude Include="xlivedefs.h" />

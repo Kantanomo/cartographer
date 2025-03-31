@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "tag_injection.h"
 
+#include "shell/shell.h"
+
 /* globals */
 
 c_tag_injecting_manager* g_tag_injection_manager = NULL;
@@ -17,7 +19,7 @@ cache_file_tag_instance* g_tag_table = NULL;
 
 bool tag_injection_check_map_exists(const wchar_t* map_name)
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		return g_tag_injection_manager->find_map(map_name, nullptr);
 	}
@@ -30,7 +32,7 @@ bool tag_injection_check_map_exists(const wchar_t* map_name)
 
 void tag_injection_set_active_map(const wchar_t* map_name)
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		g_tag_injection_manager->set_active_map(map_name);
 	}
@@ -38,7 +40,7 @@ void tag_injection_set_active_map(const wchar_t* map_name)
 
 bool tag_injection_active_map_verified()
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		return g_tag_injection_manager->get_active_map_verified();
 	}

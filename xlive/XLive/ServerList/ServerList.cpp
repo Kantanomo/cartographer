@@ -4,6 +4,7 @@
 #include "XLive/Cryptography/Rc4.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 
+#include "cartographer/config/endpoints.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"

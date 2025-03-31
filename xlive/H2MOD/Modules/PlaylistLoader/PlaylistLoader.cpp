@@ -21,7 +21,14 @@ namespace playlist_loader
 		hill_set,
 		forced_fov
 	};
-	std::map<std::wstring, e_custom_setting> custom_settings
+
+	struct s_custom_setting_data
+	{
+		const wchar_t* name;
+		e_custom_setting setting;
+	};
+
+	const s_custom_setting_data k_custom_settings[]
 	{
 		{L"None", e_custom_setting::none},
 		{L"Gravity", e_custom_setting::gravity},
@@ -34,11 +41,12 @@ namespace playlist_loader
 		{L"Spawn Protection", e_custom_setting::spawn_protection},
 		{L"Forced FOV", e_custom_setting::forced_fov}
 	};
+
 	e_custom_setting get_custom_setting_index(wchar_t* Name)
 	{
-		for (const auto& custom_setting : custom_settings)
-			if (_wcsicmp(custom_setting.first.c_str(), Name) == 0)
-				return custom_setting.second;
+		for (const auto& custom_setting : k_custom_settings)
+			if (_wcsicmp(custom_setting.name, Name) == 0)
+				return custom_setting.setting;
 		return none;
 	}
 	typedef void(__thiscall* playlist_loader_invalid_entry)(playlist_entry* thisx, int a2, int a3, wchar_t* a5, wchar_t* a6, const wchar_t* a7);

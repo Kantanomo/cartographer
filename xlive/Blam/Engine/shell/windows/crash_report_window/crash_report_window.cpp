@@ -108,9 +108,9 @@ void crash_window_message_create(const wchar_t* reports_path, const wchar_t* arc
 
 	if (g_crash_message != NULL)
 	{
-		ustrnzcat(g_crash_message, k_crash_text_1, NUMBEROF(k_crash_text_1));
-		ustrnzcat(g_crash_message, archive_path, archive_path_length);
-		ustrnzcat(g_crash_message, double_return, double_return_length);
+		ustrncat(g_crash_message, k_crash_text_1, NUMBEROF(k_crash_text_1));
+		ustrncat(g_crash_message, archive_path, archive_path_length);
+		ustrncat(g_crash_message, double_return, double_return_length);
 		crash_window_set_text(reports_path, g_crash_message);
 	}
 
@@ -204,7 +204,7 @@ void crash_window_set_text(const wchar_t* reports_path, wchar_t* crash_message)
 		{
 			wchar_t* wide_string = (wchar_t*)calloc(g_report_text_file_string_lengths[report_file_index] + 1, sizeof(wchar_t));
 			utf8_string_to_wchar_string(g_report_text_file_utf8_strings[report_file_index], wide_string, g_report_text_file_string_lengths[report_file_index] + 1);
-			ustrnzcat(crash_message, wide_string, g_report_text_file_string_lengths[report_file_index]);
+			ustrncat(crash_message, wide_string, g_report_text_file_string_lengths[report_file_index]);
 
 			// Cleanup
 			free(wide_string);
@@ -375,6 +375,6 @@ LRESULT CALLBACK crash_window_wnd_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
 
 void crash_report_text_add_windows_newline(wchar_t* crash_message)
 {
-	crash_message = ustrnzcat(crash_message, L"\r\n", 2);
+	crash_message = ustrncat(crash_message, L"\r\n", 2);
 	return;
 }

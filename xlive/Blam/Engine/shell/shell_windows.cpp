@@ -7,8 +7,18 @@
 #include "cseries/cseries_errors.h"
 #include "main/main.h"
 #include "math/math.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
+#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+
+/* constants */
+
+enum
+{
+	k_max_monitor_count = 9
+};
 
 /* globals */
 
@@ -16,6 +26,18 @@ static LARGE_INTEGER g_startup_counter;
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 
 static bool g_custom_mouse_cursor_enabled = false;
+
+uint32 g_instance_number = 0;
+
+int32 g_cmd_show = 0;
+
+WNDPROC g_wndproc_procedure = NULL;
+
+wchar_t g_window_classname[64] = {};
+
+wchar_t g_window_name[64] = {};
+
+wchar_t g_shell_windows_instance_name[13];
 
 /* prototypes */
 
@@ -42,6 +64,17 @@ static void shell_system_set_timer_resolution_max(bool enable);
 static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator);
 
 static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_time, int framerate);
+
+// Adjust name of window to display the instance number when we have more than 1 window open
+static void shell_windows_adjust_name(void);
+
+static void shell_windows_calculate_instance_num(void);
+
+static void shell_windows_tokenize_command_line_buffer(const wchar_t* argument_buffer, wchar_t** args, int32 max_arg_count, int32* arg_count);
+
+static void shell_windows_initialize_arguments(void);
+
+static bool __cdecl shell_windows_is_remote_desktop(void);
 
 static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut);
 
@@ -72,6 +105,28 @@ HWND* shell_windows_get_hwnd(void)
 	return Memory::GetAddress<HWND*>(0x46D9C4);
 }
 
+bool shell_platform_initialize(void)
+{
+	shell_windows_calculate_instance_num();
+
+	shell_windows_initialize_arguments();
+	
+	shell_windows_adjust_name();
+
+	InitH2Config();
+	PostH2Config();
+
+	startup_initialize_log_directories();
+
+	// If the intro is already disabled via command line flag don't try and set it via the config option
+	if (shell_command_line_flag_get(_shell_command_line_flag_nointro) == false)
+	{
+		shell_command_line_flag_set(_shell_command_line_flag_nointro, H2Config_skip_intro);
+	}
+	shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);			// ### TODO FIXME: voice-chat is disabled for now
+	return true;
+}
+
 // mess around with xlive (not calling XLiveInitialize etc)
 bool* should_initilize_xlive_get(void)
 {
@@ -91,7 +146,7 @@ int32* fatal_error_id_get(void)
 void shell_windows_apply_patches(void)
 {
 	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		WriteJmpTo(Memory::GetAddress(0x7E43), H2WinMain);
 	}
@@ -215,6 +270,22 @@ bool __cdecl gfwl_gamestore_initialize(void)
 	return INVOKE(0x202F3E, 0x0, gfwl_gamestore_initialize);
 }
 
+uint32 shell_windows_get_monitor_index(void)
+{
+	uint32 result = 0;
+	if (shell_command_line_flag_is_set(_shell_command_line_flag_monitor_count))
+	{
+		result = shell_command_line_flag_get(_shell_command_line_flag_monitor_count);
+
+		// Set monitor index to 0 if the monitor index set by the shell flag isn't a valid monitor
+		if (result >= rasterizer_dx9_main_globals_get()->global_d3d_interface->GetAdapterCount())
+		{
+			result = 0;
+		}
+	}
+	return result;
+}
+
 /* private code */
 
 DWORD WINAPI timeGetTime_hook()
@@ -229,13 +300,12 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	// set args
 	WriteValue(Memory::GetAddress(0x46D9BC), lpCmdLine); // command_line_args
 	WriteValue(Memory::GetAddress(0x46D9C0), hInstance); // g_instance
-	WriteValue(Memory::GetAddress(0x46D9CC), nShowCmd); // g_CmdShow
+	g_cmd_show = nShowCmd; // g_CmdShow
 
 	// window setup
-	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46D9D4), 0x40, L"halo"); // ClassName
-	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
-
-	WriteValue(Memory::GetAddress(0x46D9D0), H2WndProc); // g_WndProc_ptr
+	ustrncpy(g_window_classname, L"halo", NUMBEROF(g_window_classname));
+	ustrncpy(g_window_name, L"Halo 2 - Project Cartographer", NUMBEROF(g_window_name));
+	g_wndproc_procedure = H2WndProc;
 
 	bool pcc_result = pcc_get_properties();
 	if (!pcc_result)
@@ -457,11 +527,144 @@ static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_IN
 	}
 }
 
+static void shell_windows_adjust_name(void)
+{
+	const HWND hwnd = *shell_windows_get_hwnd();
+	if (g_instance_number > 1)
+	{
+		wchar_t titleMod[256];
+		wchar_t titleOriginal[256];
+		GetWindowText(hwnd, titleOriginal, 256);
+		wsprintf(titleMod, L"%ls (P%d)", titleOriginal, g_instance_number);
+		SetWindowText(hwnd, titleMod);
+	}
+	return;
+}
+
+static void shell_windows_calculate_instance_num(void)
+{
+	DWORD lastErr;
+	do
+	{
+		++g_instance_number;
+		wchar_t mutexName[64];
+		swprintf(mutexName, ARRAYSIZE(mutexName), (shell_is_dedicated_server() ? L"Halo2Server%d" : L"Halo2Player%d"), g_instance_number);
+		HANDLE mutex = CreateMutexW(0, TRUE, mutexName);
+		lastErr = GetLastError();
+		if (lastErr == ERROR_ALREADY_EXISTS)
+		{
+			CloseHandle(mutex);
+		}
+	}
+	while (lastErr == ERROR_ALREADY_EXISTS);
+	return;
+}
+
+static void shell_windows_tokenize_command_line_buffer(const wchar_t* argument_buffer, wchar_t** args, int32 max_arg_count, int32* arg_count)
+{
+	void* p_shell_windows_tokenize_command_line_buffer = Memory::GetAddress<void*>(0x1014, 0x1000);
+	__asm
+	{
+		push arg_count
+		push max_arg_count
+		push args
+		mov eax, argument_buffer
+		call p_shell_windows_tokenize_command_line_buffer
+		add esp, 12
+	}
+	return;
+}
+
+static void shell_windows_initialize_arguments(void)
+{
+	for (int32 i = 0; i < k_number_of_shell_command_line_flags; i++)
+	{
+		shell_command_line_flag_set((e_shell_command_line_flags)i, 0);
+	}
+
+	const LPWSTR command_line = GetCommandLineW();
+	if (command_line)
+	{
+		const bool is_dedicated_server = shell_is_dedicated_server();
+
+		// Copy the buffer
+		wchar_t argument_buffer[INT16_MAX + 1];
+		ustrncpy(argument_buffer, command_line, NUMBEROF(argument_buffer));
+
+		// Initialize our list of args
+		wchar_t* args[1024];
+		csmemset(args, 0, sizeof(args));
+
+		// Tokenize the argument buffer into our list of args
+		int32 arg_count;
+		shell_windows_tokenize_command_line_buffer(argument_buffer, args, NUMBEROF(args), &arg_count);
+
+		for (int32 i = 0; i < arg_count; i++)
+		{
+			const wchar_t* current_argument = args[i];
+
+			if (_wcsicmp(current_argument, L"-windowed") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_windowed, 1);
+			}
+			else if (_wcsicmp(current_argument, L"-nosound") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_nosound, 1);
+				WriteValue(Memory::GetAddress(0x479EDC), 1);
+			}
+			else if (_wcsicmp(current_argument, L"-novsync") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_novsync, 1);
+			}
+			else if (_wcsicmp(current_argument, L"-nointro") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_nointro, 1);
+			}
+			else if (_wcsnicmp(current_argument, L"-monitor:", 9) == 0)
+			{
+				int monitor_id = utol(&current_argument[9]);
+				shell_command_line_flag_set(_shell_command_line_flag_monitor_count, PIN(monitor_id, 0, k_max_monitor_count));
+			}
+			else if (_wcsicmp(current_argument, L"-highquality") == 0)
+			{
+				shell_command_line_flag_set(_shell_command_line_flag_high_quality, 1);
+			}
+			else if (_wcsicmp(current_argument, L"-disabledepthbias") == 0)
+			{
+				// Check github issue #118
+				/* g_depth_bias always NULL rather than taking any value from
+				shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
+				NopFill(Memory::GetAddress(0x269FD5), 8);
+			}
+			else if (is_dedicated_server && wcsstr(current_argument, L"instance:") != NULL)
+			{
+				// Get instance number from the argument
+				const wchar_t* instance_name = current_argument + NUMBEROF(L"instance:");
+				ustrncpy(g_shell_windows_instance_name, instance_name, NUMBEROF(g_shell_windows_instance_name));
+			}
+#ifdef _DEBUG
+			else if (_wcsnicmp(current_argument, L"-dev_flag:", 10) == 0)
+			{
+				int flag_id = utol(&current_argument[10]);
+				shell_command_line_flag_set((e_shell_command_line_flags)PIN(0, flag_id, k_number_of_shell_command_line_flags - 1), 1);
+			}
+#endif
+		}
+	}
+	return;
+}
+
+static bool __cdecl shell_windows_is_remote_desktop(void)
+{
+	return INVOKE(0x39EA2, 0x0, shell_windows_is_remote_desktop);
+}
+
 static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
 {
 	pDataOut->cbData = pDataIn->cbData;
 	pDataOut->pbData = static_cast<BYTE*>(LocalAlloc(LMEM_FIXED, pDataIn->cbData));
 	CopyMemory(pDataOut->pbData, pDataIn->pbData, pDataIn->cbData);
+	return;
 }
 
 static BOOL WINAPI CryptProtectDataHook(

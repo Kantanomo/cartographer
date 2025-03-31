@@ -952,7 +952,7 @@ void c_custom_map_manager::ApplyCustomMapExtensionLimitPatches()
 	PatchCall(Memory::GetAddressRelative(0x439E56, 0x40BAB8), jmp_start_custom_map_sync);
 
 	// custom map data menu list hook/patches
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		PatchCall(Memory::GetAddressRelative(0x64F708), jmp_c_custom_game_custom_map_list_constructor_hook);
 

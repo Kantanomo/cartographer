@@ -8,6 +8,7 @@
 #include "units/units.h"
 #include "saved_games/game_variant.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_queue_global_events.h"
 
@@ -334,7 +335,7 @@ void __cdecl player_configuration_validate_character_type(s_player_properties* c
 			character != _character_type_flood && H2Config_spooky_boy && get_current_special_event() == _special_event_halloween)
 		{
 			configuration_data->profile_traits.profile.player_character_type = _character_type_skeleton;
-			if (!Memory::IsDedicatedServer())
+			if (!shell_is_dedicated_server())
 			{
 				for (uint32 i = 0; i < k_number_of_users; i++)
 				{

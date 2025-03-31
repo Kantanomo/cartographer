@@ -93,7 +93,7 @@ void SaveH2Accounts() {
 		addDebugText("Mutex is ours!");
 
 		wchar_t fileConfigPath[1024];
-		if (H2Portable) {
+		if (g_h2_portable) {
 			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, g_h2_process_file_path);
 		}
 		else {
@@ -289,7 +289,7 @@ bool ReadH2Accounts() {
 
 	wchar_t fileConfigPath[1024];
 
-	if (H2Portable) {
+	if (g_h2_portable) {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2AccountsFilename, g_h2_process_file_path);
 	}
 	else {
@@ -356,11 +356,3 @@ bool ReadH2Accounts() {
 }
 #pragma endregion
 
-#pragma region Config Init/Deinit
-void InitH2Accounts() {
-
-}
-void DeinitH2Accounts() {
-
-}
-#pragma endregion

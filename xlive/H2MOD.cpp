@@ -14,7 +14,6 @@
 #include "effects/effects.h"
 #include "effects/particle_update.h"
 #include "physics/character_physics_mode_melee.h"
-#include "tag_files/files_windows.h"
 #include "game/aim_assist.h"
 #include "game/cheats.h"
 #include "game/game.h"
@@ -39,10 +38,11 @@
 #include "interface/screens/screens_patches.h"
 #include "items/weapon_definitions.h"
 #include "kablam/kablam.h"
-#include "main/main.h"
 #include "main/levels.h"
 #include "main/loading.h"
+#include "main/main.h"
 #include "main/main_game.h"
+#include "main/main_game_time.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
 #include "networking/network_utilities.h"
@@ -71,10 +71,12 @@
 #include "saved_games/cartographer_player_profile.h"
 #include "saved_games/game_state_procs.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_players.h"
 #include "simulation/game_interface/simulation_game_objects.h"
 #include "simulation/game_interface/simulation_game_units.h"
+#include "tag_files/files_windows.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/font_cache.h"
 #include "units/units.h"
@@ -95,7 +97,6 @@
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
-#include "H2MOD/Modules/MainLoopPatches/RunLoop/RunLoop.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
@@ -132,8 +133,6 @@ bool g_xbox_tickrate_enabled = false;
 static void toggle_xbox_tickrate(s_game_options* options, bool toggle);
 
 static void toggle_ai_multiplayer(bool toggle);
-
-static bool __cdecl shell_is_remote_desktop(void);
 
 static bool __cdecl OnPlayerSpawn(datum playerDatumIdx);
 
@@ -288,7 +287,7 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		PlaySound(soundName, NULL, SND_FILENAME | SND_NODEFAULT);
 	};
 
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 		std::thread(playSound).detach();
 }
 
@@ -303,7 +302,7 @@ static const real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds 
 
 void H2MOD::player_position_increase_client_position_margin_of_error(bool enable)
 {
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 		return;
 
 	const real32 k_default_biped_distance_error_margin = 2.5f;
@@ -327,9 +326,7 @@ void H2MOD::Initialize()
 	// Apply patches
 	game_apply_pre_winmain_patches();
 
-	main_loop_apply_patches();
-
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		// TODO: remove this garbage
 		custom_language_initialize();
@@ -345,6 +342,7 @@ void H2MOD::Initialize()
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		ImGuiHandler::WeaponOffsets::Initialize();
+		CommandCollection::InitializeCommands();
 		TEST_N_DEF(PC3);
 	}
 	else
@@ -352,9 +350,9 @@ void H2MOD::Initialize()
 		kablam_apply_patches();
 		playlist_loader::initialize();
 	}
+
 	cartographer_player_profile_initialize();
 	tag_injection_initialize();
-	CommandCollection::InitializeCommands();
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MapSlots::Initialize();
@@ -385,12 +383,6 @@ static void toggle_ai_multiplayer(bool toggle)
 {
 	WriteValue<BYTE>(Memory::GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
 	return;
-}
-
-static bool __cdecl shell_is_remote_desktop(void)
-{
-	LOG_TRACE_FUNC("check disabled");
-	return false;
 }
 
 static void __cdecl OnPlayerDeath(datum player_index)
@@ -468,7 +460,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 	if (game_mode_ui_shell)
 	{
 		addDebugText("Engine type: Main-Menu");
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 		{
 			MapSlots::OnMapLoad();
 			UIRankPatch();
@@ -480,7 +472,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 	{
 		LOG_INFO_GAME(L"[h2mod] engine type: {}", (int)options->game_mode);
 
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 		{
 			hud_patches_on_map_load();
 			screens_apply_patches_on_mp_map_load();
@@ -644,6 +636,8 @@ static void h2mod_apply_hooks(void)
 	}
 
 	cheats_apply_patches();
+	main_apply_patches();
+	main_game_time_apply_patches();
 	game_statborg_apply_patches();
 	simulation_game_objects_apply_patches();
 	simulation_game_units_apply_patches();
@@ -676,7 +670,7 @@ static void h2mod_apply_hooks(void)
 	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
 
 	// below hooks applied to specific executables
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		/* These hooks are only built for the client, don't enable them on the server! */
 
@@ -765,7 +759,7 @@ static void h2mod_apply_tweaks(void)
 
 	H2MOD::RefreshTogglexDelay();
 
-	if (Memory::IsDedicatedServer())
+	if (shell_is_dedicated_server())
 	{
 	}
 	else {//is client
@@ -788,8 +782,6 @@ static void h2mod_apply_tweaks(void)
 
 		// patch to show game details menu in NETWORK serverlist too
 		//NopFill(Memory::GetAddress(0x219D6D), 2);
-
-		WriteJmpTo(Memory::GetAddress(0x39EA2), shell_is_remote_desktop);
 
 		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
 		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
@@ -871,7 +863,6 @@ static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a
 		XUserSignOut(0);
 		UpdateMasterLoginStatus();
 		H2Config_master_ip = inet_addr("127.0.0.1");
-		H2Config_master_port_relay = 2001;
 	}
 	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
 	return result;

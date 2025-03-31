@@ -21,6 +21,7 @@
 #include "physics/havok.h"
 #include "physics/havok_memory.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
 #include "simulation/simulation.h"
 #include "structures/cluster_partitions.h"
 #include "tag_files/tag_files.h"
@@ -262,7 +263,7 @@ void __cdecl object_reconnect_to_physics(datum object_index)
 
 datum object_new_internal(datum object_index, object_placement_data* data)
 {
-	bool process_is_game_client = !Memory::IsDedicatedServer();
+	bool process_is_game_client = !shell_is_dedicated_server();
 
 	const object_definition* object_def = (object_definition*)tag_get_fast(data->tag_index);
 	const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object.object_type);
@@ -371,7 +372,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 		{
 			const char* model_name = tag_get_name(object_model_index);
 			const char* object_name = tag_get_name(data->tag_index);
-			error(8, 2, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
+			error(_error_category_objects, 2, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
 		}
 
 
@@ -383,7 +384,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 		{
 			const char* model_name = tag_get_name(object_model_index);
 			const char* object_name = tag_get_name(data->tag_index);
-			error(8, 2, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
+			error(_error_category_objects, 2, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
 		}
 
 		if (model_definition->new_damage_info.count > 0 && model_definition->new_damage_info.data != NONE)
@@ -415,7 +416,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 				const char* model_name = tag_name_strip_path(model_path);
 				const char* graph_path = tag_get_name(model_definition->animation_graph.index);
 				const char* graph_name = tag_name_strip_path(graph_path);
-				error(3, 2, "graph '%s' is not compatible with model '%s'", graph_name, model_name);
+				error(_error_category_animation, 2, "graph '%s' is not compatible with model '%s'", graph_name, model_name);
 			}
 		}
 	}
@@ -559,7 +560,7 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 		const char* message = out_of_objects ? "OUT OF OBJECTS" : "OBJECT CREATION FAILED";
 		const char* object_path = tag_get_name(data->tag_index);
 		const char* object_name = tag_name_strip_path(object_path);
-		error(8, 3, "%s: cannot create %s", message, object_name);
+		error(_error_category_objects, 3, "%s: cannot create %s", message, object_name);
 
 		// TODO: error globals here 
 	}
@@ -795,7 +796,7 @@ void __cdecl objects_post_update(void)
 			&& object_header->flags.test(_object_header_awake_bit)
 			&& !object_header->flags.test(_object_header_being_deleted_bit))
 		{
-			if (object->object.flags.test(_object_hidden_bit) && !Memory::IsDedicatedServer())
+			if (object->object.flags.test(_object_hidden_bit) && !shell_is_dedicated_server())
 			{
 				// reset the interpolator for this object, if hidden
 				// ### FIXME maybe hook object_hide and reset it there?
@@ -878,7 +879,7 @@ static void objects_apply_interpolation_patches(void)
 {
 	object_new_replace_calls();
 
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		object_move_replace_calls();
 		object_get_markers_by_string_id_replace_calls();
@@ -1149,7 +1150,7 @@ static void object_reconnect_to_map(s_location* location, datum object_index)
 	if (cluster_overflow)
 	{
 		const char* name = tag_get_name(object->definition_index);
-		error(8, 2, "### WARNING object %s touched too many clusters", name);
+		error(_error_category_objects, 2, "### WARNING object %s touched too many clusters", name);
 	}
 
 	object_connect_lights_recursive(object_index, false, true, false, false);

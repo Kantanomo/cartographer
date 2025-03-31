@@ -1,7 +1,5 @@
 #pragma once
 
-void InitH2Accounts();
-void DeinitH2Accounts();
 void SaveH2Accounts();
 bool ReadH2Accounts();
 

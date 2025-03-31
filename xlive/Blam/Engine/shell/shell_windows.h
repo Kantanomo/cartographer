@@ -2,16 +2,33 @@
 
 /* constants */
 
-// 1 hour offset
-#define k_process_system_time_startup_offset_sec (1 * 60 * 60)
+enum
+{
+	k_process_system_time_startup_offset_sec = (1 * 60 * 60),	// 1 hour offset
+	k_shell_time_sec_denominator = 1,
+	k_shell_time_msec_denominator = 1000,
+	k_shell_time_usec_denominator = 1000000
+};
 
-#define k_shell_time_sec_denominator 1
-#define k_shell_time_msec_denominator 1000
-#define k_shell_time_usec_denominator 1000000
+/* globals */
+
+extern uint32 g_instance_number;
+
+extern int32 g_cmd_show;
+
+extern WNDPROC g_wndproc_procedure;
+
+extern wchar_t g_window_classname[64];
+
+extern wchar_t g_window_name[64];
+
+extern wchar_t g_shell_windows_instance_name[13];
 
 /* prototypes */
 
 HWND* shell_windows_get_hwnd(void);
+
+bool shell_platform_initialize(void);
 
 bool* should_initilize_xlive_get(void);
 
@@ -42,3 +59,5 @@ unsigned long long shell_time_now(unsigned long long denominator);
 void shell_windows_throttle_framerate(int desired_framerate);
 
 bool __cdecl gfwl_gamestore_initialize(void);
+
+uint32 shell_windows_get_monitor_index(void);

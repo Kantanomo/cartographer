@@ -252,7 +252,7 @@ static unsigned __stdcall discord_thread_proc(void* pArguments)
 {
 	// Set discord instance based on instance ID
 #ifdef TEST_DISCORD_INSTANCE
-	int32 instance_id = _Shell::GetInstanceId();
+	int32 instance_id = g_instance_number;
 	wchar_t instance[2]{};
 	swprintf(instance, 2, L"%d", instance_id - 1);
 	SetEnvironmentVariableW(L"DISCORD_INSTANCE_ID", instance);

@@ -3,27 +3,26 @@
 
 #include "cache/cache_file_verification.h"
 #include "cseries/async.h"
+#include "cseries/cseries.h"
+#include "cseries/debug_memory.h"
 #include "cseries/runtime_state.h"
 #include "input/input_windows.h"
 #include "main/game_preferences.h"
 #include "main/licensing.h"
 #include "math/real_math.h"
+#include "networking/network_configuration.h"
 #include "networking/Transport/network_observer.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "saved_games/game_state.h"
+#ifdef _WINDOWS
 #include "shell/shell_windows.h"
+#endif
 #include "sound/sound_manager.h"
 #include "tag_files/tag_files.h"
 #include "text/font_group.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 
 /* constants */
-
-enum
-{
-	k_max_monitor_count = 9
-};
 
 s_shell_build_version k_shell_build_versions[] =
 {
@@ -32,13 +31,23 @@ s_shell_build_version k_shell_build_versions[] =
 
 };
 
+/* globals */
+
+
+/* prototypes */
+
+
 /* public code */
 
 void shell_apply_patches(void)
 {
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		WriteJmpTo(Memory::GetAddress(0x4544), shell_command_line_flag_get);
+	}
+	else
+	{
+		PatchCall(Memory::GetAddress(0x0, 0xC9BE), shell_initialize);
 	}
 
 	return;
@@ -47,6 +56,13 @@ void shell_apply_patches(void)
 e_shell_tool_type shell_tool_type(void)
 {
 	return _shell_tool_type_game;
+}
+
+bool shell_is_dedicated_server(void)
+{
+	// This function originally returned a compiler argument for the server
+	// We can't do that since we build a universal dll so just return the Memory global
+	return Memory::g_memory_is_dedicated_server;
 }
 
 static int32* shell_startup_flags_get()
@@ -80,107 +96,79 @@ const char* shell_get_version(void)
 
 bool shell_initialize(void)
 {
-	for (int32 i = 0; i < k_number_of_shell_command_line_flags; i++)
+	bool result = false;
+
+	if (!shell_is_dedicated_server())
 	{
-		shell_command_line_flag_set((e_shell_command_line_flags)i, 0);
+		// Don't check the result of this because we're not using GFWL
+		gfwl_gamestore_initialize();
 	}
-
-	shell_command_line_flag_set(_shell_command_line_flag_nointro, H2Config_skip_intro);
-
-	// ### TODO FIXME: voice-chat is disabled for now
-	shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);
-
-	// Don't check the result of this because we're not using GFWL
-	gfwl_gamestore_initialize();
 
 	cache_file_verification_initialize();
+	cseries_initialize();
 	runtime_state_initialize();
 
-	int arg_count;
-	wchar_t** cmd_line_args = LOG_CHECK(CommandLineToArgvW(GetCommandLineW(), &arg_count));
-	if (cmd_line_args && arg_count > 1) {
-		for (int i = 1; i < arg_count; i++) {
-			wchar_t* cmd_line_arg = cmd_line_args[i];
+	SYSTEM_DEBUG_MEMORY(cseries_initialize());
 
-			if (_wcsicmp(cmd_line_arg, L"-windowed") == 0) {
-				shell_command_line_flag_set(_shell_command_line_flag_windowed, 1);
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-nosound") == 0) {
-				shell_command_line_flag_set(_shell_command_line_flag_nosound, 1);
-				WriteValue(Memory::GetAddress(0x479EDC), 1);
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-novsync") == 0) {
-				shell_command_line_flag_set(_shell_command_line_flag_novsync, 1);
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-nointro") == 0) {
-				shell_command_line_flag_set(_shell_command_line_flag_nointro, 1);
-			}
-			else if (_wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
-				int monitor_id = _wtol(&cmd_line_arg[9]);
-				shell_command_line_flag_set(_shell_command_line_flag_monitor_count, PIN(monitor_id, 0, k_max_monitor_count));
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-highquality") == 0) {
-				shell_command_line_flag_set(_shell_command_line_flag_high_quality, 1);
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-disabledepthbias") == 0)
-			{
-				// Check github issue #118
-				/* g_depth_bias always NULL rather than taking any value from
-				shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
-				NopFill(Memory::GetAddress(0x269FD5), 8);
-			}
-#if COMPILE_WITH_VOICE
-			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
-			{
-				shell_shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, false);
-				H2Config_voice_chat = true;
-			}
+#ifdef _WINDOWS
+	if (shell_platform_initialize())
 #endif
-#ifdef _DEBUG
-			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
-				int flag_id = _wtol(&cmd_line_arg[10]);
-				shell_command_line_flag_set((e_shell_command_line_flags)PIN(0, flag_id, k_number_of_shell_command_line_flags - 1), 1);
-			}
-#endif
-		}
-	}
-	LocalFree(cmd_line_args);
-
-	if (shell_command_line_flag_is_set(_shell_command_line_flag_unk26))
-		timing_initialize(1000 * shell_command_line_flag_get(_shell_command_line_flag_unk26));
-
-	real_math_initialize();
-	async_initialize();
-	global_preferences_initialize();
-
-	c_network_observer::reset_network_observer_bandwidth_preferences();
-
-	font_initialize();
-	
-	bool result = tag_files_open();
-	if (result)
 	{
-		game_state_initialize();
-		result = rasterizer_initialize();
-		if (result)
+		SYSTEM_DEBUG_MEMORY(shell_platform_initialize());
+
+		if (shell_command_line_flag_is_set(_shell_command_line_flag_unk26))
 		{
-			sub_285FD();
+			timing_initialize(1000 * shell_command_line_flag_get(_shell_command_line_flag_unk26));
+		}
 
-			input_initialize();
-			sound_initialize();
+		real_math_initialize();
+		SYSTEM_DEBUG_MEMORY(real_math_initialize());
 
-			FakePBuffer** var_c00479e78 = Memory::GetAddress<FakePBuffer**>(0x479E78);
-			XLivePBufferAllocate(2, var_c00479e78);
-			XLivePBufferSetByte(*var_c00479e78, 0, 0);
-			XLivePBufferSetByte(*var_c00479e78, 1, 0);
+		async_initialize();
+		SYSTEM_DEBUG_MEMORY(async_initialize());
 
-			//SLDLInitialize
+		global_preferences_initialize();
+		SYSTEM_DEBUG_MEMORY(global_preferences_initialize());
 
-			//SLDLOpen
-			//SLDLConsumeRight
-			//SLDLClose
-			// This call would disable the multiplayer buttons in the mainmenu. Likely setup this way from SLDL.
-			//XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 1);
+		if (!shell_is_dedicated_server())
+		{
+			c_network_observer::reset_network_observer_bandwidth_preferences();
+			font_initialize();
+			SYSTEM_DEBUG_MEMORY(font_initialize());
+		}
+	
+		result = tag_files_open();
+		SYSTEM_DEBUG_MEMORY(tag_files_open());
+		
+		// Don't initialize the things below if we haven't loaded tags or are a dedi
+		if (result && !shell_is_dedicated_server())
+		{
+			game_state_initialize();
+			SYSTEM_DEBUG_MEMORY(game_state_initialize());
+		
+			network_configuration_initialize();
+			SYSTEM_DEBUG_MEMORY(network_configuration_initialize());
+
+
+			result = rasterizer_initialize();
+			if (result)
+			{
+				SYSTEM_DEBUG_MEMORY(rasterizer_initialize());
+				sub_285FD();
+
+				FakePBuffer** var_c00479e78 = Memory::GetAddress<FakePBuffer**>(0x479E78);
+				XLivePBufferAllocate(2, var_c00479e78);
+
+				for (DWORD i = 0; i < 2; ++i)
+				{
+					XLivePBufferSetByte(*var_c00479e78, i, 0);
+				}
+
+				input_initialize();
+				SYSTEM_DEBUG_MEMORY(input_initialize());
+				sound_initialize();
+				SYSTEM_DEBUG_MEMORY(sound_initialize());
+			}
 		}
 	}
 
@@ -220,3 +208,5 @@ bool shell_build_string_is_compatible(const char* build_string)
 
 	return result;
 }
+
+/* private code */

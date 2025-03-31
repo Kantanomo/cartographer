@@ -7,6 +7,7 @@
 #include "interface/user_interface_controller.h"
 #include "items/item_collection_definition.h"
 #include "scenario/scenario.h"
+#include "shell/shell.h"
 #include "units/units.h"
 
 #include "H2MOD.h"
@@ -308,7 +309,7 @@ void Infection::Initialize()
 	LOG_TRACE_GAME("{} - infection initialization!");
 	removeUnwantedItems();
 
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 		Infection::InitClient();
 
 	if (NetworkSession::LocalPeerIsSessionHost()) {
@@ -394,7 +395,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 		// to note after the original function executes, the controlled unit by this player is set to NONE
 		if (game_engine_in_round())
 		{
-			if (!Memory::IsDedicatedServer())
+			if (!shell_is_dedicated_server())
 			{
 				if (s_player::get_team(player_index) != k_zombie_team)
 				{
@@ -454,7 +455,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 	case ExecTime::_preEventExec:
 		// to note after the original function executes, the controlled unit by this player is set to NONE
 
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 		{
 			s_player* player = s_player::get(playerIdx);
 			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}", absPlayerIdx, player->identifier);
@@ -481,7 +482,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 	case ExecTime::_postEventExec:
 
 		// client only
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 		{
 			s_player* player = s_player::get(playerIdx);
 

@@ -6,6 +6,7 @@
 #include "interface/user_interface_text.h"
 #include "math/math.h"
 #include "shell/shell.h"
+#include "shell/shell_windows.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 /* typedefs */
@@ -94,6 +95,9 @@ void rasterizer_settings_apply_hooks(void)
 
 	PatchCall(Memory::GetAddress(0x25E207), rasterizer_settings_apply_settings);
 	WriteJmpTo(Memory::GetAddress(0x2640AE), rasterizer_settings_apply_settings);
+
+	// Replace window flags function so we can use the maximize box
+	PatchCall(Memory::GetAddress(0x264553), rasterizer_settings_get_window_flags);
 	return;
 }
 
@@ -172,7 +176,75 @@ void __cdecl rasterizer_settings_set_antialiasing(uint32* out_quality)
 
 void __cdecl rasterizer_settings_update_window_position(void)
 {
-	INVOKE(0x2640B3, 0x0, rasterizer_settings_update_window_position);
+	//INVOKE(0x2640B3, 0x0, rasterizer_settings_update_window_position);
+
+	IDirect3D9Ex* global_d3d_interface = rasterizer_dx9_main_globals_get()->global_d3d_interface;
+
+	const HWND g_hwnd = *shell_windows_get_hwnd();
+	if (g_hwnd && global_d3d_interface)
+	{
+		const s_rasterizer_settings* rasterizer_settings = rasterizer_settings_get();
+		
+		RECT rect;
+		UINT set_window_pos_flags = SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING;
+		if (rasterizer_settings->display_mode != _rasterizer_window_mode_real_fullscreen)
+		{
+			if (shell_tool_type() == _shell_tool_type_game)
+			{
+				rect.top = 0;
+				rect.left = 0;
+				rect.bottom = rasterizer_settings->screen_height;
+				rect.right = rasterizer_settings->screen_width;
+				LONG wl_0 = GetWindowLongA(g_hwnd, GWL_EXSTYLE);
+				LONG wl_1 = GetWindowLongA(g_hwnd, GWL_STYLE);
+				AdjustWindowRectEx(&rect, wl_1, false, wl_0);
+				set_window_pos_flags = SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING;
+			}
+			else
+			{
+				rect = {};
+			}
+		}
+		else
+		{
+			const HMONITOR monitor_handle = global_d3d_interface->GetAdapterMonitor(shell_windows_get_monitor_index());
+
+			tagMONITORINFO mi;
+			mi.cbSize = sizeof(tagMONITORINFO);
+			if (monitor_handle && GetMonitorInfoA(monitor_handle, &mi))
+			{
+				rect.right = mi.rcMonitor.right;
+				rect.left = mi.rcMonitor.left;
+				rect.top = mi.rcMonitor.top;
+				rect.bottom = mi.rcMonitor.bottom;
+			}
+			else
+			{
+				rect.right = rasterizer_settings->screen_width;
+				rect.top = 0;
+				rect.left = 0;
+				rect.bottom = rasterizer_settings->screen_height;
+			}
+			LONG wl = GetWindowLongA(g_hwnd, GWL_STYLE);
+			SetWindowLongA(g_hwnd, GWL_STYLE, wl & 0xFF3FFFFF);
+			
+			wl = GetWindowLongA(g_hwnd, GWL_EXSTYLE);
+			SetWindowLongA(g_hwnd, GWL_EXSTYLE, wl & 0xFFFFFEFF);
+			
+			LONG wl_0 = GetWindowLongA(g_hwnd, GWL_EXSTYLE);
+			LONG wl_1 = GetWindowLongA(g_hwnd, GWL_STYLE);
+			AdjustWindowRectEx(&rect, wl_1, 0, wl_0);
+			set_window_pos_flags = SWP_NOMOVE | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING;
+		}
+		SetWindowPos(
+			g_hwnd,
+			HWND_NOTOPMOST,
+			rect.left,
+			rect.top,
+			rect.right - rect.left,
+			rect.bottom - rect.top,
+			set_window_pos_flags);
+	}
 	return;
 }
 
@@ -220,6 +292,11 @@ void __cdecl rasterizer_settings_set_display_mode(const e_rasterizer_window_mode
 	return;
 }
 
+int32 rasterizer_settings_get_refresh_rate(void)
+{
+	return rasterizer_settings_get()->refresh_rate;
+}
+
 void __cdecl rasterizer_settings_apply_settings(int32 setting)
 {
 	INVOKE(0x190B26, 0x0, rasterizer_settings_apply_settings, setting);
@@ -231,6 +308,34 @@ void __cdecl rasterizer_settings_apply_settings(int32 setting)
 	}
 	return;
 }
+
+DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode window_mode, DWORD* style)
+{
+	if (style)
+	{
+		*style = 0;
+	}
+
+	DWORD result = 0;
+	if (window_mode == _rasterizer_window_mode_windowed)
+	{
+		result = 
+			shell_tool_type() == _shell_tool_type_sapien ?
+			WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_DLGFRAME | WS_BORDER :
+			WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_DLGFRAME | WS_BORDER;	// In original h2v WS_MAXIMIZEBOX and WS_SIZEBOX were not included in the window flags
+	}
+	else if (window_mode == _rasterizer_window_mode_funky_fullscreen)
+	{
+		if (style)
+		{
+			*style = WS_EX_TOPMOST;
+		}
+		result = WS_POPUP;
+	}
+
+	return result;
+}
+
 
 /* private code */
 

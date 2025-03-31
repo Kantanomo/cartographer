@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "network_utilities.h"
 
+#include "shell/shell.h"
+
 /* constants */
 
 
@@ -28,7 +30,7 @@ void network_utilities_apply_patches()
 {
 	DETOUR_ATTACH(p_network_utlilities_get_game_version, Memory::GetAddress<t_network_utilities_get_game_version>(0x1B4BF5, 0x1B0043), network_utilities_get_game_version);
 
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)check_joining_session_version_hook, 5);
 		DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)check_executable_type_hook, 8);

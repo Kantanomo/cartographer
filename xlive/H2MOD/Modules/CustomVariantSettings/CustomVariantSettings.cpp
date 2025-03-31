@@ -8,6 +8,7 @@
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/NetworkMessageTypeCollection.h"
 #include "physics/physics_constants.h"
+#include "shell/shell.h"
 #include "units/units.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -51,7 +52,7 @@ namespace CustomVariantSettings
 	{
 		c_network_session* session = NULL;
 		network_life_cycle_in_squad_session(&session);
-		if (session->is_host() && Memory::IsDedicatedServer())
+		if (session->is_host() && shell_is_dedicated_server())
 		{
 			//TODO: Find and map out struct with current variant information.
 			auto VariantName = std::wstring(Memory::GetAddress<wchar_t*>(0, 0x534A18));
@@ -131,7 +132,7 @@ namespace CustomVariantSettings
 		}
 
 		//Client Only
-		if (!Memory::IsDedicatedServer()) {
+		if (!shell_is_dedicated_server()) {
 			if (newVariantSettings->explosionPhysics)
 				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1E);
 			else
@@ -144,7 +145,7 @@ namespace CustomVariantSettings
 		}
 
 		//Server Only
-		if (Memory::IsDedicatedServer())
+		if (shell_is_dedicated_server())
 		{
 
 		}

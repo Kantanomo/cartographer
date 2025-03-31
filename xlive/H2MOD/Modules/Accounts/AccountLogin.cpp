@@ -1,6 +1,8 @@
 #include "stdafx.h"
-
 #include "AccountLogin.h"
+
+#include "cartographer/config/endpoints.h"
+#include "shell/shell.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -45,7 +47,7 @@ void UpdateMasterStatus(int new_state, const char* state_str, ...)
 	va_list v;
 	va_start(v, state_str);
 	masterState = new_state;
-	if (!Memory::IsDedicatedServer())
+	if (!shell_is_dedicated_server())
 	{
 		if (masterStateStr)
 			delete[] masterStateStr;
@@ -97,7 +99,7 @@ int ConfigureUserDetails(const char* username, const char* login_token, unsigned
 	UpdateMasterLoginStatus(developer);
 
 	if (online_signin) {
-		if (!Memory::IsDedicatedServer())
+		if (!shell_is_dedicated_server())
 			ForwardPorts();
 	}
 
@@ -230,7 +232,6 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		else if (sscanf(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
 			if (tempint1 >= 0) {
 				//addDebugText("H2 master relay port is: %d", tempint1);
-				H2Config_master_port_relay = tempint1;
 			}
 		}
 		else if (strstr(fileLine, k_login_token_string)) {

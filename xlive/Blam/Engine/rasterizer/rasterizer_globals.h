@@ -113,7 +113,7 @@ struct s_rasterizer_globals
 	bitmap_data* bitmap_data_array[1024];
 	uint32 next_bitmap_index;
 	uint32 bitmap_data_count;
-	bool field_10EC;
+	bool display_settings_retrieved;
 	bool field_10ED;
 	int8 pad_5[2];
 };
