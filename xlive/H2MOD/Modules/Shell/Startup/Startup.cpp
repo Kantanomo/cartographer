@@ -19,7 +19,8 @@
 static const wchar_t k_client_process_name[] = L"Halo2Client";
 static const wchar_t k_server_process_name[] = L"H2Server";
 static const wchar_t k_microsoft_folder[] = L"\\Microsoft";
-
+static const wchar_t k_appdata_default_path[] = L"\\Halo 2\\";
+static const wchar_t k_appdata_dev_preview_path[] = L"DevPreview\\";
 
 namespace filesystem = std::filesystem;
 
@@ -71,24 +72,7 @@ void InitLocalAppData()
 	wchar_t appdata_path[MAX_PATH];
 	ustrncpy(appdata_path, localappdata_env, NUMBEROF(appdata_path));
 	ustrncat(appdata_path, k_microsoft_folder, NUMBEROF(k_microsoft_folder));
-
-	// Dev preview config uses a different path compared to 
-	const wchar_t* format = USE_DEV_PREVIEW_CONFIG_FILE_PATHS ? L"%ws\\Halo 2\\DevPreview\\" : L"%ws\\Halo 2\\";
-	swprintf(appdata_path, ARRAYSIZE(appdata_path), format, appdata_path);
-
-	// Make sure directories exist beforehand...
-	if (USE_DEV_PREVIEW_CONFIG_FILE_PATHS)
-	{
-		// We check the initial Halo 2 path first if we're using dev preview settings
-		wchar_t initial_appdata_path[MAX_PATH];
-		swprintf(initial_appdata_path, ARRAYSIZE(initial_appdata_path), L"%ws\\Halo 2\\", localappdata_env);
-
-		const errno_t error = _waccess_s(initial_appdata_path, 6);
-		if (error != ERROR_SUCCESS)
-		{
-			CreateDirectoryW(initial_appdata_path, NULL);
-		}
-	}
+	ustrncat(appdata_path, k_appdata_default_path, NUMBEROF(k_appdata_default_path));
 
 	// Make sure main folder exists and create if not
 	const errno_t error = _waccess_s(appdata_path, 6);
@@ -97,7 +81,20 @@ void InitLocalAppData()
 		CreateDirectoryW(appdata_path, NULL);
 	}
 	
-	wcscpy_s(g_h2_appdata_local_path, ustrlen(appdata_path) + 1, appdata_path);
+	// Run folder checks if we're using dev preview paths 
+	if (USE_DEV_PREVIEW_CONFIG_FILE_PATHS)
+	{
+		ustrncat(appdata_path, k_appdata_dev_preview_path, NUMBEROF(k_appdata_dev_preview_path));
+		
+		// Make sure dev preview folder exists and create if not
+		const errno_t error = _waccess_s(appdata_path, 6);
+		if (error != ERROR_SUCCESS)
+		{
+			CreateDirectoryW(appdata_path, NULL);
+		}
+	}
+
+	ustrncpy(g_h2_appdata_local_path, appdata_path, MAX_PATH);
 	return;
 }
 
