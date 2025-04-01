@@ -5364,7 +5364,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
         {
             char completion_candidate_display[1024];
             completion_candidate_display[0] = '\x0';
-            for (unsigned int i = 0; i < completion->Count; i++)
+            for (int i = 0; i < completion->Count; i++)
             {
                 ImGuiTextInputCompletionCandidate* completionData = &completion->CompletionCandidate[i];
                 strncpy(completion_candidate_display, completionData->CompletionText, sizeof(completion_candidate_display));

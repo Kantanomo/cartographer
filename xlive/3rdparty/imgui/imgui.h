@@ -2778,9 +2778,9 @@ struct ImGuiTextInputCompletion
 {
     int                                 SelectedCandidateIndex;
     int                                 ClickedCandidateIndex;
-    unsigned int                        Count;
+    int                                 Count;
     ImGuiTextInputCompletionCandidate* CompletionCandidate;
-    ImGuiTextInputCompletion(unsigned int _candidatesCount)
+    ImGuiTextInputCompletion(int _candidatesCount)
     {
         this->SelectedCandidateIndex = -1;
         this->ClickedCandidateIndex = -1;

@@ -1454,9 +1454,9 @@ CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::LoadData(
 	}
 
 	// parse it
-	const static SI_CHAR empty = 0;
+	const static SI_CHAR x_empty = 0;
 	SI_CHAR * pWork = pData;
-	const SI_CHAR * pSection = &empty;
+	const SI_CHAR * pSection = &x_empty;
 	const SI_CHAR * pItem = NULL;
 	const SI_CHAR * pVal = NULL;
 	const SI_CHAR * pComment = NULL;
