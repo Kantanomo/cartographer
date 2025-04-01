@@ -84,14 +84,14 @@ void memmove_guarded(void* write_start, const void* src, size_t size, void* boun
 {
 	if (size > 0)
 	{
+#ifdef ASSERTS_ENABLED
 		const void* write_end = (int8*)write_start + size - 1;
 		const void* bounds_upper = (int8*)bounds_lower + bounds_size - 1;
-		
 		CSERIES_ASSERT(bounds_upper >= bounds_lower);
 		CSERIES_ASSERT(bounds_size > 0);
 		CSERIES_ASSERT((write_start >= bounds_lower) && (write_start <= bounds_upper));
 		CSERIES_ASSERT((write_end >= bounds_lower) && (write_end <= bounds_upper));
-
+#endif
 		memmove(write_start, src, size);
 	}
 	return;

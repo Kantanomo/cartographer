@@ -77,8 +77,7 @@ bool GetFileLine(FILE* fp, char** fileLine) {
 	bool moreToGo = true;
 	int c, fileLineLen = 256, fileLineCursor = 0;
 	*fileLine = (char*)malloc(fileLineLen);
-	while (true) {
-		c = fgetc(fp);
+	while ((c = fgetc(fp))) {
 		if (c == EOF) {
 			moreToGo = false;
 			break;
@@ -310,9 +309,8 @@ bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32) {
 		return false;
 	}
 
-	while (true)
+	while ((bResult = ReadFile(hFile, rgbFile, BUFSIZE, &cbRead, NULL)))
 	{
-		bResult = ReadFile(hFile, rgbFile, BUFSIZE, &cbRead, NULL);
 		if (cbRead == 0) {
 			break;
 		}
@@ -404,7 +402,8 @@ int MasterHttpResponse(const char* url, const char* http_request, char** rtn_res
 
 	/* get a curl handle */
 	curl = curl_interface_init_no_verify();
-	if (curl) {
+	if (curl)
+	{
 		/* First set the URL that is about to receive our POST. This URL can
 		just as well be a https:// URL if that is what should receive the
 		data. */
@@ -437,7 +436,8 @@ int MasterHttpResponse(const char* url, const char* http_request, char** rtn_res
 		/* always cleanup */
 		curl_easy_cleanup(curl);
 	}
-	else {
+	else
+	{
 		result = ERROR_CODE_CURL_HANDLE;//curl handle fail
 	}
 

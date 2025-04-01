@@ -7,8 +7,6 @@ bool g_debugger_flag_2 = false;
 
 bool is_debugger_present(void)
 {
-	bool result = false;
-
 	bool present = g_debugger_flag_0 || IsDebuggerPresent();
 	return !g_debugger_flag_1 && !g_debugger_flag_2 && present;
 }

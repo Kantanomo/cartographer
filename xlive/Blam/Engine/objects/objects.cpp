@@ -826,9 +826,9 @@ void* object_get_and_verify_type(datum object_index, int32 object_type_mask)
 {
 	const object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
 	const object_datum* object = (object_datum*)object_header->datum;
-	const e_object_type type = object->object.object_identifier.get_type();
-
+	
 #ifdef ASSERTS_ENABLED
+	const e_object_type type = object->object.object_identifier.get_type();
 	if (!TEST_BIT(object_type_mask, type))
 	{
 		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "got an object type we didn't expect (expected one of 0x%08x but got #%d).", object_type_mask, type);

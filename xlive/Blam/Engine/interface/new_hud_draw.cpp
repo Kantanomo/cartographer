@@ -154,7 +154,7 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 	bounds->x1 = bitmap_sprite->bounds.x1;
 }
 
-real32 __cdecl draw_hud_widget_get_value(uint32 unused, string_id input_name)
+real32 __cdecl draw_hud_widget_get_value(int32 unused, string_id input_name)
 {
 	return INVOKE(0x22211A, 0, draw_hud_widget_get_value, unused, input_name);
 }

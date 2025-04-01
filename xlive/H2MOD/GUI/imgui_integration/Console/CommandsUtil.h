@@ -136,13 +136,12 @@ public:
 
 	void StringBufferResize(int newLineCount, size_t newLineBufSize)
 	{
-		size_t oldBufferSize = GetBufferSize();
-
 		m_line_count = newLineCount;
 		m_line_buf_size = newLineBufSize;
 
 		size_t newBufferSize = GetBufferSize();
-		ASSERT(newBufferSize > oldBufferSize);
+		ASSERT(newBufferSize > GetBufferSize());
+
 		char* new_buffer = (char*)malloc(newBufferSize);
 		if (m_buf != NULL)
 		{

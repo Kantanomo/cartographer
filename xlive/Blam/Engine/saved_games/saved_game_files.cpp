@@ -187,9 +187,12 @@ void saved_game_main_menu_globals_initialize(void)
 void saved_game_files_memory_initialize(int32 unk)
 {
 	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
-	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
 
+#ifdef ASSERTS_ENABLED
+	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
 	ASSERT(saved_game_main_menu_globals);
+#endif
+
 	ASSERT(saved_game_files_globals->memory_initialized_for_game);
 	
 	if (unk == 1)

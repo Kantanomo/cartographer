@@ -156,9 +156,9 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 	unsigned long long templlu1 = 0;
 
 	char* index_current = response_content;
-	char* index_next = 0;
-	while (true) {
-		index_next = strstr(index_current, "<br>");
+	char* index_next = NULL;
+	while ((index_next = strstr(index_current, "<br>")))
+	{
 		char* fileLine = (char*)malloc((index_next - index_current + 1) * sizeof(char));
 		csmemcpy(fileLine, index_current, index_next - index_current);
 		fileLine[index_next - index_current] = 0;

@@ -22,33 +22,38 @@ const char k_cartographer_create_url[] = k_cartographer_url_https"/create1";
 static int InterpretMasterCreate(char* response_content) {
 	int result = 0;//will stay as 0 when master only returns "return_code=xxx<br>"
 
-	int tempint1 = -1;
-	char tempstr1[512] = { "" };
-
+	char* index_next = NULL;
 	char* index_current = response_content;
-	char* index_next = 0;
-	while (true) {
-		index_next = strstr(index_current, "<br>");
+	while ((index_next = strstr(index_current, "<br>")))
+	{
 		char* fileLine = (char*)malloc((index_next - index_current + 1) * sizeof(char));
 		memcpy(fileLine, index_current, index_next - index_current);
 		fileLine[index_next - index_current] = 0;
 
-
-		if (sscanf(fileLine, "return_code=%d", &tempint1) == 1) {
+		int tempint1;
+		if (sscanf(fileLine, "return_code=%d", &tempint1) == 1) 
+		{
 			addDebugText("Return code is: %d", tempint1);
 			result = tempint1;
 		}
-		else if (strstr(fileLine, k_user_name_string)) {
+		else if (strstr(fileLine, k_user_name_string))
+		{
 			char* tempName = fileLine + NUMBEROF(k_user_name_string) - 1;
-			while (isspace(*tempName)) {
+			while (isspace(*tempName))
+			{
 				tempName++;
 			}
+
+			char tempstr1[512] = { "" };
 			snprintf(tempstr1, 32, tempName);
-			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
-				if (isspace(tempstr1[j])) {
+			for (int j = strlen(tempstr1) - 1; j > 0; j--)
+			{
+				if (isspace(tempstr1[j]))
+				{
 					tempstr1[j] = 0;
 				}
-				else {
+				else
+				{
 					break;
 				}
 			}
@@ -56,11 +61,6 @@ static int InterpretMasterCreate(char* response_content) {
 
 		free(fileLine);
 		index_current = index_next + 4;
-	}
-
-
-	if (result > 0) {
-		
 	}
 
 	return result;
@@ -88,14 +88,15 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password, e_carto
 	TEST_N_DEF(LC4);
 #endif
 	
-	if (rtn_code == 0) {
+	if (rtn_code == 0)
+	{
 		rtn_code = InterpretMasterCreate(rtn_result);
-		if (rtn_code > 0) {
-			result = true;
-		}
+		result = rtn_code > 0 ? true : result;
 		free(rtn_result);
 	}
-	if (rtn_code <= 0) {
+	
+	if (rtn_code <= 0)
+	{
 		addDebugText("ERROR Account Create: %d", rtn_code);
 		// ### TODO FIXME move this handling trash out of here
 		if (rtn_code == 0 
