@@ -78,10 +78,6 @@ int WINAPI XLiveUninitialize()
 // #5005: XLiveOnCreateDevice
 int WINAPI XLiveOnCreateDevice(IUnknown* pD3D, VOID* vD3DPP)
 {	
-	//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice+17);
-	//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
-	//*(DWORD_PTR*)(pDevice + 17) = (DWORD_PTR)hkPresent;
-
 	//LOG_TRACE_XLIVE("XLiveOnCreateDevice  (pD3D = %X, pD3DPP = %X)", pD3D, vD3DPP);
 	return 0;
 }

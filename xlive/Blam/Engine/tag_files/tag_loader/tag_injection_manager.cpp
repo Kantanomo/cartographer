@@ -242,7 +242,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 
 	switch (tag_info->group_tag.group)
 	{
-		case 'mode':
+		case _tag_group_render_model:
 		{
 			render_model_definition* model_definition = (render_model_definition*)tag_data;
 			if (model_definition->sections.count > 0)
@@ -261,7 +261,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 			break;
 		}
 
-		case 'bitm':
+		case _tag_group_bitmap:
 		{
 			int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
 			bitmap_group* bitmap_definition = (bitmap_group*)tag_data;
@@ -279,7 +279,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
 			break;
 		}
-		case 'weat':
+		case _tag_group_weather_system:
 		{
 			auto weather_tag = reinterpret_cast<c_weather_system*>(tag_data);
 			for (auto i = 0; i < weather_tag->m_particle_system.count; i++)

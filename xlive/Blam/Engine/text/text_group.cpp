@@ -38,17 +38,17 @@ void c_language_pack::string_list_get_normal_string(string_id id, wchar_t* out_s
 	INVOKE_TYPE(0x3E332, 0x0, void(__thiscall*)(c_language_pack*, string_id, wchar_t*, int32, int32), this, id, out_string, strings_start_index, strings_count);
 }
 
-void c_language_pack::get_string_ids(string_id* array, int32 array_size, int32 starting_index, int32 max_count)
+void c_language_pack::get_string_ids(string_id* out_ids, int32 out_count, int32 starting_index, int32 max_count)
 {
-	csmemset(array, _string_id_invalid, array_size);
+	csmemset(out_ids, _string_id_invalid, sizeof(*out_ids) * out_count);
 	if (data_loaded)
 	{
 		for (int32 itr = starting_index; itr < max_count + starting_index; itr++)
 		{
 			int32 index = itr - starting_index;
-			if (index < array_size)//prevent buffer overrun
+			if (index < out_count)//prevent buffer overrun
 			{
-				array[index] = this->m_string_references[itr].string_id;
+				out_ids[index] = this->m_string_references[itr].string_id;
 			}
 		}
 	}
@@ -59,20 +59,18 @@ void __cdecl string_list_get_normal_string(datum unic_datum, string_id id, wchar
 	INVOKE(0x3E3AC, 0x0, string_list_get_normal_string, unic_datum, id, out_string);
 }
 
-void __cdecl string_list_get_string_id_list(datum unic_datum, string_id* array, int32 array_size)
+void __cdecl string_list_get_string_id_list(datum unic_datum, string_id* out_ids, int32 out_count)
 {
-	ASSERT(array);
-	ASSERT(array_size > 0);
+	ASSERT(out_ids);
+	ASSERT(out_count > 0);
 
 	if (unic_datum != NONE)
 	{
 		e_language current_language = get_current_language();
 		int8* unic_tag = (int8*)tag_get_fast(unic_datum);
-		unic_tag += 0x10;
-		s_unicode_string_list_reference list_reference = ((s_unicode_string_list_reference*)unic_tag)[current_language];
-
+		s_unicode_string_list_reference* list_reference = &((s_unicode_string_list_reference*)(unic_tag + 0x10))[current_language];
 
 		s_game_globals* game_globals = scenario_get_game_globals();
-		game_globals->language_pack[current_language].get_string_ids(array, array_size, list_reference.strings_index, list_reference.strings_count);
+		game_globals->language_pack[current_language].get_string_ids(out_ids, out_count, list_reference->strings_index, list_reference->strings_count);
 	}
 }

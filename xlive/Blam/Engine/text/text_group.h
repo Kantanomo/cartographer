@@ -8,7 +8,7 @@
 struct s_string_reference
 {
 	string_id string_id;
-	int32 buffer_offset;
+	uint32 buffer_offset;
 };
 
 // TODO add member functions
@@ -24,7 +24,7 @@ public:
 
 private:
 	s_string_reference* m_string_references;
-	char** m_strings_buffer;					// this is utf8 string data
+	char* m_strings_buffer;					// this is utf8 string data
 	int32 m_strings_count;
 	int32 m_string_data_size;
 	int32 m_string_reference_cache_offset;
@@ -36,4 +36,4 @@ ASSERT_STRUCT_SIZE(c_language_pack, 28);
 /* public code */
 
 void __cdecl string_list_get_normal_string(datum unic_datum, string_id id, wchar_t* out_string);
-void __cdecl string_list_get_string_id_list(datum unic_datum, string_id* array, int32 array_size);
+void __cdecl string_list_get_string_id_list(datum unic_datum, string_id* out_ids, int32 out_count);
