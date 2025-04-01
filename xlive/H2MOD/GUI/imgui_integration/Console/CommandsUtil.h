@@ -60,7 +60,7 @@ static bool InputTextContainsCommandSubstring(const char* command, const char* i
 }
 
 template<typename T>
-static inline bool tokenize(const char* str, size_t str_length, const char* delimiters, std::vector<T>& out, int tokenize_count = 0)
+static inline bool tokenize(const char* str, size_t str_length, const char* delimiters, std::vector<T>& out, size_t tokenize_count = 0)
 {
 	out.clear();
 	size_t beg, pos = 0;

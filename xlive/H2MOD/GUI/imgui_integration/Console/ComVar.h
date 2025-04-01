@@ -1,7 +1,5 @@
 #pragma once
 
-#include "H2MOD/Utils/Utils.h"
-
 extern std::string empty;
 
 /// Command Variable
@@ -45,7 +43,7 @@ public:
 	template<>
 	static signed char ToIntegral<signed char>(const std::string& str, int _Base)
 	{
-		return ToIntegral<int>(str, _Base);
+		return (signed char)ToIntegral<int>(str, _Base);
 	}
 
 	// cool, signed char is apparently considered different from char
@@ -65,7 +63,7 @@ public:
 	template<>
 	static unsigned short ToIntegral<unsigned short>(const std::string& str, int _Base)
 	{
-		return ToIntegral<unsigned int>(str, _Base);
+		return (unsigned short)ToIntegral<unsigned int>(str, _Base);
 	}
 
 	template<>
@@ -90,12 +88,10 @@ public:
 	static bool ToBoolean(const std::string& str)
 	{
 		bool result = false;
-		if (str_tolower(str) != "true"
-			&& str_tolower(str) != "false"
-			)
+		if (_strcmpi(str.c_str(), "true") != 0 && _strcmpi(str.c_str(), "false") != 0)
 			throw std::runtime_error("error: invalid boolean format (must be true/false)");
 		else
-			result = str_tolower(str) == "true" ? true : false;
+			result = _strcmpi(str.c_str(), "true") == 0 ? true : false;
 
 		return result;
 	}
@@ -244,7 +240,7 @@ public:
 			//std::string subip_address("");
 			//size_t cur_offset = 0;
 
-			unsigned long new_address = 0;
+			//unsigned long new_address = 0;
 
 			if (str.length() < std::string("0.0.0.0").length()
 				|| str.length() > std::string("255.255.255.255").length()

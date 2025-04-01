@@ -732,7 +732,7 @@ int CommandCollection::game_difficulty(const std::vector<std::string>& tokens, C
 	std::string exception;
 	ComVar(&difficulty).SetFromStr(tokens[1], 0, exception);
 
-	main_game_launch_set_difficulty(difficulty);
+	main_game_launch_set_difficulty((int16)difficulty);
 	return 0;
 }
 

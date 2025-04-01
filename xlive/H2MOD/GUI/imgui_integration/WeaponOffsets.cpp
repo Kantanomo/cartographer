@@ -88,7 +88,6 @@ namespace ImGuiHandler {
 			bool open = *p_open;
 			
 			ImGuiIO& io = ImGui::GetIO();
-			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGuiWindowFlags window_flags = 0
 				| ImGuiWindowFlags_NoCollapse
 				| ImGuiWindowFlags_AlwaysVerticalScrollbar
