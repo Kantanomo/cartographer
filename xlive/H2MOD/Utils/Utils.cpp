@@ -77,7 +77,8 @@ bool GetFileLine(FILE* fp, char** fileLine) {
 	bool moreToGo = true;
 	int c, fileLineLen = 256, fileLineCursor = 0;
 	*fileLine = (char*)malloc(fileLineLen);
-	while (c = fgetc(fp)) {
+	while (true) {
+		c = fgetc(fp);
 		if (c == EOF) {
 			moreToGo = false;
 			break;
@@ -89,7 +90,7 @@ bool GetFileLine(FILE* fp, char** fileLine) {
 			break;
 		}
 		else {
-			(*fileLine)[fileLineCursor++] = c;
+			(*fileLine)[fileLineCursor++] = (char)c;
 		}
 		if (fileLineCursor >= fileLineLen - 2) {
 			fileLineLen += 256;
@@ -309,8 +310,9 @@ bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32) {
 		return false;
 	}
 
-	while (bResult = ReadFile(hFile, rgbFile, BUFSIZE, &cbRead, NULL))
+	while (true)
 	{
+		bResult = ReadFile(hFile, rgbFile, BUFSIZE, &cbRead, NULL);
 		if (cbRead == 0) {
 			break;
 		}
@@ -479,7 +481,6 @@ bool HexStrToBytes(const char* hexStr, size_t hexStrLen, uint8_t* outByteBuf, si
 		return false;
 	}
 
-	const uint8_t* byteBufEnd = outByteBuf + outBufLen;
 	hexStrLen = hexStrLen != 0u ? hexStrLen : strlen(hexStr);
 
 	// handle prefixes

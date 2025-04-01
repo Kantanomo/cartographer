@@ -21,14 +21,5 @@ char* encode_rfc3986(const char* label_literal, size_t label_literal_length = 0u
 int MasterHttpResponse(const char* url, const char* http_request, char** rtn_response);
 
 void CreateDirTree(const wchar_t* path);
-
-inline std::string str_tolower(std::string s)
-{
-	std::transform(s.begin(), s.end(), s.begin(),
-		[](unsigned char c) { return std::tolower(c); }
-	);
-	return s;
-}
-
 DWORD crc32buf(const char* buf, size_t len);
 bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD& rtncrc32);

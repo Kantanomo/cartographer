@@ -200,12 +200,12 @@ int H2Config_forced_event = 0;
 bool H2Config_force_off_d3d9ex = false;
 bool H2Config_force_off_sm3 = false;
 
-int H2Config_hotkeyIdHelp = VK_F2;
-int H2Config_hotkeyIdAlignWindow = VK_F7;
-int H2Config_hotkeyIdWindowMode = VK_F8;
-int H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
-int H2Config_hotkeyIdGuide = VK_HOME;
-int H2Config_hotkeyIdConsole = VK_F10;
+WPARAM H2Config_hotkeyIdHelp = VK_F2;
+WPARAM H2Config_hotkeyIdAlignWindow = VK_F7;
+WPARAM H2Config_hotkeyIdWindowMode = VK_F8;
+WPARAM H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
+WPARAM H2Config_hotkeyIdGuide = VK_HOME;
+WPARAM H2Config_hotkeyIdConsole = VK_F10;
 bool ownsConfigFile = false;
 
 void SaveH2Config()
@@ -568,7 +568,7 @@ void ReadH2Config()
 
 	const bool is_dedicated_server = shell_is_dedicated_server();
 
-	int readInstanceIdFile = g_instance_number;
+	//int readInstanceIdFile = g_instance_number;
 
 
 	wchar_t config_file_path[MAX_PATH];
@@ -585,7 +585,8 @@ void ReadH2Config()
 	}
 	else
 	{
-		ownsConfigFile = (readInstanceIdFile == g_instance_number);
+		// TODO: how to handle this?
+		//ownsConfigFile = (readInstanceIdFile == g_instance_number);
 
 		if (!is_dedicated_server)
 		{

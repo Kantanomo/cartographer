@@ -60,7 +60,7 @@ public:
 		return nullptr;
 	}
 
-	std::shared_ptr<MapDownloadQuery> GetDownloadQueryById(int id)
+	std::shared_ptr<MapDownloadQuery> GetDownloadQueryById(unsigned int id)
 	{
 		for (auto& query : m_mapDownloadQueryList)
 		{

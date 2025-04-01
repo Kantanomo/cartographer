@@ -65,12 +65,12 @@ extern bool H2Config_vip_lock;
 extern bool H2Config_even_shuffle_teams;
 extern bool H2Config_koth_random;
 
-extern int H2Config_hotkeyIdHelp;
-extern int H2Config_hotkeyIdAlignWindow;
-extern int H2Config_hotkeyIdWindowMode;
-extern int H2Config_hotkeyIdToggleHideIngameChat;
-extern int H2Config_hotkeyIdGuide;
-extern int H2Config_hotkeyIdConsole;
+extern WPARAM H2Config_hotkeyIdHelp;
+extern WPARAM H2Config_hotkeyIdAlignWindow;
+extern WPARAM H2Config_hotkeyIdWindowMode;
+extern WPARAM H2Config_hotkeyIdToggleHideIngameChat;
+extern WPARAM H2Config_hotkeyIdGuide;
+extern WPARAM H2Config_hotkeyIdConsole;
 extern int H2Config_minimum_player_start;
 
 extern e_override_texture_resolution H2Config_Override_Shadows;

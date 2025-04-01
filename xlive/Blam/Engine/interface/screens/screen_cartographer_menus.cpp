@@ -301,7 +301,7 @@ void c_cartographer_guide_menu::initialize(s_screen_parameters* screen_parameter
 	c_text_widget* subheader_text_widget = get_screen_subheader_text();
 	if (subheader_text_widget)
 	{
-		extern int H2Config_hotkeyIdGuide;
+		extern WPARAM H2Config_hotkeyIdGuide;
 		
 		c_static_string<64> vkstring;
 		GetVKeyCodeString(H2Config_hotkeyIdGuide, &vkstring);

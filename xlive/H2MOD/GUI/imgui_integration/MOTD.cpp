@@ -165,7 +165,6 @@ namespace ImGuiHandler
 				| ImGuiWindowFlags_NoBackground
 				;
 
-			ImGuiIO& io = ImGui::GetIO();
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 			ImGui::SetNextWindowPos(viewport->WorkPos);

@@ -154,12 +154,11 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 	char tempstr1[128 + 1] = {};
 	int tempint1 = -1;
 	unsigned long long templlu1 = 0;
-	unsigned int tempuint1 = 0;
-	unsigned long tempulong = 0;
 
 	char* index_current = response_content;
 	char* index_next = 0;
-	while (index_next = strstr(index_current, "<br>")) {
+	while (true) {
+		index_next = strstr(index_current, "<br>");
 		char* fileLine = (char*)malloc((index_next - index_current + 1) * sizeof(char));
 		csmemcpy(fileLine, index_current, index_next - index_current);
 		fileLine[index_next - index_current] = 0;
@@ -396,7 +395,6 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	}
 	addDebugText(os_string);
 
-	char http_request_body[] = "request_type=%08x&request_version=%s&user_identifier=%s&user_pass=%s&user_token=%s&op_sys=%s";
 
 	char* escaped_user_login_token = encode_rfc3986(ltoken == 0 ? "" : ltoken);
 	char* escaped_user_identifier = encode_rfc3986(identifier == 0 ? "" : identifier);
@@ -405,7 +403,9 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 #if !defined(LC3)
 	int http_request_body_build_len = (89 + 8 + strlen(DLL_VERSION_STR) + strlen(escaped_user_identifier) + strlen(escaped_user_password) + strlen(escaped_user_login_token) + strlen(os_string));
 	char* http_request_body_build = (char*)malloc(sizeof(char) * http_request_body_build_len + 1);
-	char* http_request_body_build2 = http_request_body_build + snprintf(http_request_body_build, http_request_body_build_len, http_request_body, ltoken == 0 ? 1 : 2, DLL_VERSION_STR, escaped_user_identifier, escaped_user_password, escaped_user_login_token, os_string);
+
+	char http_request_body[] = "request_type=%08x&request_version=%s&user_identifier=%s&user_pass=%s&user_token=%s&op_sys=%s";
+	snprintf(http_request_body_build, http_request_body_build_len, http_request_body, ltoken == 0 ? 1 : 2, DLL_VERSION_STR, escaped_user_identifier, escaped_user_password, escaped_user_login_token, os_string);
 #else
 	TEST_N_DEF(LC3);
 #endif

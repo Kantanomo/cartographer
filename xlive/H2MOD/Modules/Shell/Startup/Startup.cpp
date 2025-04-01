@@ -54,9 +54,10 @@ void PostH2Config() {
 
 	wchar_t mutexName2[256];
 	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", H2Config_base_port);
-	HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
+	/*HANDLE mutex2 =*/ CreateMutex(0, TRUE, mutexName2);
 	DWORD lastErr2 = GetLastError();
-	if (lastErr2 == ERROR_ALREADY_EXISTS) {
+	if (lastErr2 == ERROR_ALREADY_EXISTS)
+	{
 		addDebugText("Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
 		_Shell::OpenMessageBox(NULL, MB_ICONWARNING, "BASE PORT BIND WARNING!", "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
 	}
@@ -87,8 +88,8 @@ void InitLocalAppData()
 		ustrncat(appdata_path, k_appdata_dev_preview_path, NUMBEROF(k_appdata_dev_preview_path));
 		
 		// Make sure dev preview folder exists and create if not
-		const errno_t error = _waccess_s(appdata_path, 6);
-		if (error != ERROR_SUCCESS)
+		const errno_t dev_path_error = _waccess_s(appdata_path, 6);
+		if (dev_path_error != ERROR_SUCCESS)
 		{
 			CreateDirectoryW(appdata_path, NULL);
 		}

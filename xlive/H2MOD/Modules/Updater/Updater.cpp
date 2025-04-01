@@ -167,13 +167,8 @@ static int interpretUpdateEntry(char* fileLine, char* version, int lineNumber) {
 		bool unrecognised = false;
 		bool duplicated = false;
 		bool incorrect = false;
-		bool dontSave = false;
 		int fileLineLen = strlen(fileLine);
-		int tempint1 = -1;
 		DWORD tempDWORD = 0;
-		unsigned short tempushort1 = -1;
-		int tempint2 = -1;
-		float tempfloat1 = NULL;
 		char tempstr1[260] = "";
 		char tempstr2[260] = "";
 		if (fileLine[0] == '#' || fileLine[0] == ';' || fileLineLen < 5) {
@@ -283,7 +278,7 @@ static void FetchUpdateDetails() {
 
 		addDebugText("Interpreted the details.");
 
-		int entry_count = UpdateFileEntries.size();
+		entry_count = (int)UpdateFileEntries.size();
 		for (int i = entry_count - 1; i >= 0; i--) {
 			if (!UpdateFileEntries[i]->need_to_update)
 				continue;

@@ -27,7 +27,8 @@ static int InterpretMasterCreate(char* response_content) {
 
 	char* index_current = response_content;
 	char* index_next = 0;
-	while (index_next = strstr(index_current, "<br>")) {
+	while (true) {
+		index_next = strstr(index_current, "<br>");
 		char* fileLine = (char*)malloc((index_next - index_current + 1) * sizeof(char));
 		memcpy(fileLine, index_current, index_next - index_current);
 		fileLine[index_next - index_current] = 0;

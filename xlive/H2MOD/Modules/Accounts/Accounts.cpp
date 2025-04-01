@@ -1,7 +1,5 @@
 #include "stdafx.h"
-
 #include "Accounts.h"
-#include "simpleini/SimpleIni.h"
 
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -9,6 +7,8 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include "H2MOD/Utils/Utils.h"
+
+#include "simpleini/SimpleIni.h"
 
 #pragma region Config IO
 const wchar_t H2AccountsFilename[] = L"%wshalo2accounts.ini";
@@ -230,14 +230,7 @@ static bool accSet;
 static bool tokSet;
 static int interpretConfigSetting(char* fileLine, char* version, int lineNumber) {
 	bool unrecognised = false;
-	bool duplicated = false;
-	bool incorrect = false;
-	bool dontSave = false;
 	int fileLineLen = strlen(fileLine);
-	int tempint1 = -1;
-	unsigned short tempushort1 = -1;
-	int tempint2 = -1;
-	float tempfloat1 = NULL;
 	char tempstr1[33] = { "" };
 	if (fileLine[0] == '#' || fileLine[0] == ';' || fileLineLen <= 2) {
 		unrecognised = true;

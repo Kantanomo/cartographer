@@ -22,8 +22,8 @@ void add_special_event_markers(void)
 		
 		render_model_marker* new_marker = (render_model_marker*)tag_injection_extend_block(&new_marker_group->markers, new_marker_group->markers.type_size(), 1);
 		new_marker->node_index = 19;
-		new_marker->permutation_index = NONE;
-		new_marker->region_index = NONE;
+		new_marker->permutation_index = (uint8)NONE;
+		new_marker->region_index = (uint8)NONE;
 		new_marker->position.x = 0.006f;
 		new_marker->position.y = 0.06f;
 		new_marker->position.z = 0.0f;

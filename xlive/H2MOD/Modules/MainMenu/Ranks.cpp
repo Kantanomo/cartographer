@@ -31,7 +31,6 @@ void UIRankPatch()
 	const BYTE bitmOffset = 0x18;		//Definition : Bitm (bitmap loaded based on datum index)
 
 	//Tag : ui\global_bitmaps\rank_icons.bitm
-	const DWORD RankIcon = 0xE50802E6;			//Bitmap Datum Index
 	const DWORD RankIconOff = 0x0047E9A8;		//Property : Bitmap
 
 	//Tag : ui\global_bitmaps\rank_icons_sm.bitm
