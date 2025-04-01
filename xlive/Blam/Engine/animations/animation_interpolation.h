@@ -9,19 +9,21 @@ enum e_interpolation_type : byte
 	_interpolation_type_four = 4
 };
 
-enum e_interpolator_control_flags : byte
+enum e_interpolator_control_flags : uint8
 {
 	_interpolator_control_flag_none = 0,
-	_interpolator_control_flag_0 = FLAG(0),
-	_interpolator_control_finished = FLAG(1)
+
+	_interpolator_control_bit0 = 0,
+	_interpolator_control_finished_bit = 1,
+
 };
 
 class c_interpolator_control
 {
-	int8 ticks_remaining;
-	uint8 duration_ticks;
-	e_interpolation_type interpolation_type;
-	e_interpolator_control_flags flags;
+	int8 m_ticks_remaining;
+	uint8 m_duration_ticks;
+	e_interpolation_type m_interpolation_type;
+	e_interpolator_control_flags m_flags;
 
 public:
 	c_interpolator_control(void);

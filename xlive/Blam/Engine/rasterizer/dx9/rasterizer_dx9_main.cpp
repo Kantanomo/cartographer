@@ -549,11 +549,11 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 			{
 				display_blackness_window();
 			}
-			HRESULT hr = rasterizer_dx9_main_globals->global_d3d_device->Reset(&d3d_present_parameters);
-			succeeded &= SUCCEEDED(hr);
+			const HRESULT reset_hr = rasterizer_dx9_main_globals->global_d3d_device->Reset(&d3d_present_parameters);
+			succeeded &= SUCCEEDED(reset_hr);
 			if (!succeeded)
 			{
-				rasterizer_dx9_errors_log(hr, "global_d3d_device->Reset(&d3d_present_parameters)");
+				rasterizer_dx9_errors_log(reset_hr, "global_d3d_device->Reset(&d3d_present_parameters)");
 			}
 
 			if (!d3d_present_parameters.SwapEffect)
@@ -713,7 +713,6 @@ bool __cdecl rasterizer_dx9_initialize(void)
 	bool result = true;
 
 	s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-	s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals = rasterizer_dx9_main_globals_get();
 
 	if (!rasterizer_globals->rasterizer_initialized && shell_tool_type() != _shell_tool_type_editing_tools)
 	{

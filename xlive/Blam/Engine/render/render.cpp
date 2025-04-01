@@ -630,17 +630,14 @@ render_postprocess:
 
 			if (get_render_fog_enabled())
 			{
-				const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-				const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-
 				// If we're not using shader model 3 draw the depth on the backbuffer in a seperate pass
 				// In shader model 3 these are already drawn during the lightmap_indirect stage
 				if (!rasterizer_globals->d3d9_sm3_supported)
 				{
 					rasterizer_dx9_perf_event_begin("render depth to backbuffer", NULL);
 
-					const real32 depth_range = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
-					const real_vector4d constants{ 0.f, 1.f, depth_range, 1.f };
+					const real32 new_depth_range = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
+					const real_vector4d ps_constants{ 0.f, 1.f, new_depth_range, 1.f };
 					rasterizer_dx9_set_target(_rasterizer_target_backbuffer, 0, true);
 					global_d3d_device->Clear(
 						0,
@@ -650,9 +647,9 @@ render_postprocess:
 						1.f,
 						0);
 
-					if (rasterizer_get_main_pixel_shader_cache()->test_cache(16, &constants, 1))
+					if (rasterizer_get_main_pixel_shader_cache()->test_cache(16, &ps_constants, 1))
 					{
-						global_d3d_device->SetPixelShaderConstantF(16, (real32*)&constants, 1);
+						global_d3d_device->SetPixelShaderConstantF(16, (real32*)&ps_constants, 1);
 					}
 
 					*global_rasterizer_pixel_shader_index_get() = 1;
@@ -1001,8 +998,8 @@ bool render_scene_is_splitscreen(void)
 	return
 		global_window_parameters->camera.viewport_bounds.left != 0 ||
 		global_window_parameters->camera.viewport_bounds.top != 0 ||
-		global_window_parameters->camera.viewport_bounds.right != rasterizer_get_width() ||
-		global_window_parameters->camera.viewport_bounds.bottom != rasterizer_get_height() ||
+		global_window_parameters->camera.viewport_bounds.right != (int16)rasterizer_get_width() ||
+		global_window_parameters->camera.viewport_bounds.bottom != (int16)rasterizer_get_height() ||
 		get_player_window_count() > 1;
 }
 

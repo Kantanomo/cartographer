@@ -12,7 +12,7 @@
 #include "interface/user_interface_globals.h"
 #include "main/levels.h"
 #include "main/level_definitions.h"
-#include "networking/logic/life_cycle_manager.h"
+#include "networking/Session/network_session.h"
 #include "saved_games/game_variant.h"
 #include "tag_files/global_string_ids.h"
 #include "tag_files/tag_loader/tag_injection.h"
@@ -224,7 +224,7 @@ c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 	linker_type2.link(&this->m_slot);
 }
 
-uint16 c_squad_settings_list::get_last_item_type()
+int16 c_squad_settings_list::get_last_item_type()
 {
 	datum item_idx = this->get_old_data_index();
 	s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item_idx);
@@ -348,7 +348,7 @@ void c_squad_settings_list::handle_item_change_level(s_event_record** pevent)
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = 0;
-	params.user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -362,7 +362,7 @@ void c_squad_settings_list::handle_item_change_difficulty(s_event_record** peven
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = 0;
-	params.user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -673,7 +673,7 @@ void* c_screen_squad_settings::load(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_squad_settings(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags);
+			parameters->m_user_flags);
 
 		screen->m_allocated = true;
 		user_interface_register_screen_to_channel(screen, parameters);

@@ -1,9 +1,9 @@
 #pragma once
 
-enum e_global_string_id : uint32
+enum e_global_string_id : int32
 {
 	_string_id_empty_string = 0,
-	_string_id_invalid = 0xffffffff,
+	_string_id_invalid = NONE,
 
 	_string_id_default = 0x7000001,
 	_string_id_reload_1 = 0x8000002,

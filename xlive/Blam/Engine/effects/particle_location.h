@@ -7,7 +7,7 @@ struct c_particle_location
 	uint16 datum_salt;
 	bool parent_effect_has_bit_15_set;
 	int8 gap_3;
-	datum particle_emitter_index;
+	datum m_particle_emitter_index;
 	int8 gap_8[4];
 	datum next_particle_location;
 	real_point3d position;

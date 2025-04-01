@@ -9,6 +9,6 @@
 * Length 1 Byte (upper 8 bits)
 **********************************************************************/
 
-typedef uint32 string_id;
+typedef int32 string_id;
 
 void __cdecl user_interface_global_string_get(string_id id, wchar_t* dest);

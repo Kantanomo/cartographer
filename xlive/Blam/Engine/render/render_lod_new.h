@@ -25,7 +25,7 @@ ASSERT_STRUCT_SIZE(s_render_cache_storage, 100);
 
 struct s_render_object_info
 {
-	c_static_array<uint32, 5> rasterizer_pool_offsets;
+	c_static_array<int32, 5> rasterizer_pool_offsets;
 	c_static_array<int32, 5> field_18;
 	c_static_array<uint8, 5> field_2C;
 	c_static_array<datum, 5> object_index;

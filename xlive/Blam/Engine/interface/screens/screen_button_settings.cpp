@@ -179,7 +179,7 @@ enum e_button_settings_multilingual_unicode_string_list
 
 /* constants */
 
-const wchar_t* g_jumpy_text_button_swap_left_string[k_language_count]
+static const wchar_t *const k_jumpy_text_button_swap_left_string[k_language_count]
 {
 	L"Swap Left Weapon",
 	L"左武器の交換",
@@ -259,7 +259,7 @@ void c_button_settings_edit_list::update_list_items(c_list_item_widget* item, in
 			item_text->set_text_from_string_id(strings_array[_string_id_l_jumpy]);
 			break;
 		default:
-			item_text->set_text_from_string_id(strings_array[_string_id_invalid]);
+			item_text->set_text_from_string_id(_string_id_invalid);
 			break;
 		}
 	}
@@ -329,10 +329,8 @@ void c_screen_button_settings_menu::update()
 		const int32 unk_setting = 0;
 		if (unk_setting != this->field_D3C)
 		{
-			if (unk_setting == 2)
-				this->field_9FB = 5; // wgit pane offset pointer ?
-			else
-				this->field_9FB = 0;
+			// wgit pane offset pointer ?
+			this->field_9FB = unk_setting == 2 ? 5 : 0;
 
 			datum old_data_idx = this->m_button_settings_list.get_old_data_index();
 			c_screen_widget::switch_panes(&old_data_idx);
@@ -408,7 +406,7 @@ void c_screen_button_settings_menu::post_initialize_button_keys()
 
 		if (swap_left_text)
 		{
-			swap_left_text->set_text(g_jumpy_text_button_swap_left_string[get_current_language()]);
+			swap_left_text->set_text(k_jumpy_text_button_swap_left_string[get_current_language()]);
 		}
 
 	}
@@ -435,7 +433,7 @@ void* c_screen_button_settings_menu::load(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_button_settings_menu(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_pp_button_settings);
 
 		screen->m_allocated = true;
@@ -461,7 +459,7 @@ void* c_screen_button_settings_menu::load_qtr(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_button_settings_menu(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_pp_buttons_qtr); //qtr screen is button_settings_ingame.wgit
 
 		screen->m_allocated = true;

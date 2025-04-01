@@ -57,7 +57,7 @@ public:
 	datum datum_44;
 	c_particle_system* parent_system;
 	int32 first_particle_index;
-	pixel32 color;
+	pixel32 m_color;
 
 	c_particle_system_definition* get_definition() const;
 

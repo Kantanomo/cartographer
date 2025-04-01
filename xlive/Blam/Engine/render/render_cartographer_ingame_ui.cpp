@@ -315,8 +315,6 @@ void render_netdebug_text(void)
 
 			if (!session->is_host())
 			{
-				s_membership_peer* membership_peer = session->get_peer_membership(session->get_local_peer_index());
-
 				observer_channel_index = session->m_session_peers[session->get_session_host_peer_index()].observer_channel_index;
 				if (observer_channel_index != NONE)
 				{
@@ -328,6 +326,7 @@ void render_netdebug_text(void)
 					netdebug_data->client_packet_loss_percentage = (int16)(observer_channel->field_440.average_values_in_window() * 100.f);
 
 					// NOT UPDATED IN REAL-TIME
+					//s_membership_peer* membership_peer = session->get_peer_membership(session->get_local_peer_index());
 					//for (int32 i = 0; i < k_number_of_users; i++)
 					//{
 					//	if (membership_peer->local_players_indexes[i] != NONE)

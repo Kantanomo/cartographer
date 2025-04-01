@@ -8,7 +8,7 @@ struct c_particle_emitter
 {
 	uint16 datum_salt;
 	int16 m_particle_count;
-	datum particle_index;
+	datum m_particle_index;
 	datum m_next_emitter_index;
 	real32 particles_to_emit;
 	real_matrix3x3 m_matrix;

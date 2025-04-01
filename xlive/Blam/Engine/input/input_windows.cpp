@@ -151,8 +151,10 @@ uint8 __cdecl input_get_connected_gamepads_count()
 		controller != k_no_controller;
 		controller = next_controller(controller))
 	{
-		if (input_has_gamepad_plugged(controller))
-			count++;
+		if (input_has_gamepad_plugged((uint16)controller))
+		{
+			++count;
+		}
 	}
 	return count;
 }

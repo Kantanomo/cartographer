@@ -109,8 +109,6 @@ static void game_globals_add_new_player_representations(void)
 {
 	if (!shell_is_dedicated_server())
 	{
-		scenario* scenario_definition = global_scenario_get();
-
 		s_game_globals_custom_representation_result representations[k_cartographer_custom_representation_count]{};
 		for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
 		{

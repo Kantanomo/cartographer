@@ -174,8 +174,8 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 	case _tag_group_equipment:
 	case _tag_group_garbage:
 	case _tag_group_creature:
-	default:
 		base_group.group = _tag_group_object;
+		break;
 	}
 
 	random_seed_allow_use();

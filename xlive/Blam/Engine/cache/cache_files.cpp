@@ -132,7 +132,7 @@ uint32 __cdecl cache_file_align_read_size_to_cache_page(uint32 size)
 	return INVOKE(0x647DA, 0x4C831, cache_file_align_read_size_to_cache_page, size);
 }
 
-bool __cdecl cache_file_blocking_read(uint32 a1, uint32 cache_offset, uint32 read_size, void* out_buffer)
+bool __cdecl cache_file_blocking_read(intptr_t a1, uint32 cache_offset, uint32 read_size, void* out_buffer)
 {
 	return INVOKE(0x64D01, 0x4CD58, cache_file_blocking_read, a1, cache_offset, read_size, out_buffer);
 }
@@ -364,7 +364,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 	return true;
 }
 
-datum tag_loaded(uint32 group_tag, const char* name)
+datum tag_loaded(int32 group_tag, const char* name)
 {
 	const s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
 	datum result = NONE;

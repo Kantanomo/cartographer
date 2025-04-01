@@ -47,11 +47,12 @@ bool g_vkbd_create_open_profile_config = true;
 // header & subheader
 static void get_keyboard_labels(e_vkbd_context_type context, const wchar_t** out_header_text, const wchar_t** out_subheader_text)
 {
-	ASSERT(context >= k_virtual_keyboard_custom_context_start);
+	ASSERT(context >= k_virtual_keyboard_custom_context_start && k_virtual_keyboard_custom_context_start < k_virtual_keyboard_custom_context_end);
 
 	// ### TODO FIXME localization
 	*out_header_text = k_keyboard_custom_label_globals[_language_english][context - k_virtual_keyboard_custom_context_start].header_text;
 	*out_subheader_text = k_keyboard_custom_label_globals[_language_english][context - k_virtual_keyboard_custom_context_start].subheader_text;
+	return;
 }
 
 c_virtual_keyboard_button::c_virtual_keyboard_button():
@@ -184,7 +185,7 @@ void* c_screen_virtual_keyboard::load(s_screen_parameters* parameters)
 	c_screen_virtual_keyboard* virtual_keyboard_menu = nullptr;
 	BYTE* ui_buffer = ui_pool_allocate_space(sizeof(c_screen_virtual_keyboard), 0);
 	if (ui_buffer) {
-		virtual_keyboard_menu = new (ui_buffer) c_screen_virtual_keyboard(parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
+		virtual_keyboard_menu = new (ui_buffer) c_screen_virtual_keyboard(parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags);
 		virtual_keyboard_menu->m_allocated = true;
 	}
 

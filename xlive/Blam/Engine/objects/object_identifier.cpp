@@ -22,7 +22,7 @@ void c_object_identifier::clear_for_deletion()
 void c_object_identifier::create_dynamic(e_object_type type)
 {
 	s_object_globals* object_globals = object_globals_get();
-	this->m_object_type = type;
+	this->m_object_type = (int8)type;
 	this->m_source = _object_source_dynamic;
 	this->m_origin_bsp_index = NONE;
 	this->m_unique_id = ++object_globals->unique_id;

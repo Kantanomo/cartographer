@@ -6,6 +6,8 @@
 #include "networking/transport/network_observer.h"
 #include "saved_games/game_variant.h"
 
+extern const char* const k_network_protocols_text[];
+
 /* enums */
 
 enum e_network_session_map_status : int32
@@ -559,7 +561,7 @@ public:
 	{
 		if (is_host())
 		{
-			get_player_membership(player_index)->properties[0].team_index = team_index;
+			get_player_membership(player_index)->properties[0].team_index = (int8)team_index;
 			request_membership_update();
 		}
 	}
@@ -610,14 +612,7 @@ public:
 
 	const char* describe_network_protocol_type() const
 	{
-		static const char* const k_network_protocols_text[] =
-		{
-			"<disconnected>",
-			"System-Link",
-			"LIVE",
-		};
-
-		return IN_RANGE(this->m_session_class, _network_session_class_offline, k_network_session_class_count - 1) ? k_network_protocols_text[this->m_session_class] : "<unknown>";
+		return VALID_INDEX(this->m_session_class, k_network_session_class_count) ? k_network_protocols_text[this->m_session_class] : "<unknown>";
 	}
 };
 ASSERT_STRUCT_SIZE(c_network_session, 31624);

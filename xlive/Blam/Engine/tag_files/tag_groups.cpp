@@ -48,7 +48,7 @@ tag_group tag_group_get_name(tag_group group)
 	return reversed_group;
 }
 
-uint32 tag_group_get_as_index(tag_group group)
+int32 tag_group_get_as_index(tag_group group)
 {
 	// this is unholy
 	switch (group.group)

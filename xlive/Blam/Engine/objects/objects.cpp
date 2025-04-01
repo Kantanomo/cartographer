@@ -261,12 +261,12 @@ void __cdecl object_reconnect_to_physics(datum object_index)
 	return;
 }
 
+// TODO: recombine object_new and object_new_internal and add position/vector assertions
 datum object_new_internal(datum object_index, object_placement_data* data)
 {
 	bool process_is_game_client = !shell_is_dedicated_server();
 
 	const object_definition* object_def = (object_definition*)tag_get_fast(data->tag_index);
-	const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object.object_type);
 	const s_model_definition* model_definition = NULL;
 
 	const datum object_model_index = object_def->object.model.index;
@@ -620,7 +620,7 @@ void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool
 {
 	real_point3d point;
 	real_point3d interpolated_object_position;
-	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, NONE);
+	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
 	if (interpolated && halo_interpolator_interpolate_object_position(object_index, &interpolated_object_position))
 	{
 		point = interpolated_object_position;
@@ -822,7 +822,7 @@ bool __cdecl object_force_inside_bsp(datum object_index, const real_point3d* kno
 	return INVOKE(0x137BCC, 0x0, object_force_inside_bsp, object_index, known_good_point, ignore_object_index);
 }
 
-void* object_get_and_verify_type(datum object_index, uint32 object_type_mask)
+void* object_get_and_verify_type(datum object_index, int32 object_type_mask)
 {
 	const object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
 	const object_datum* object = (object_datum*)object_header->datum;
@@ -937,14 +937,7 @@ static datum object_allocate_header(datum tag_definition_index)
 	{
 		const object_definition* object_def = (object_definition*)tag_get_fast(tag_definition_index);
 		const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)object_def->object.object_type);
-		const s_model_definition* model_definition = NULL;
 		object_index = object_header_new(object_type_definition->datum_size);
-
-		if (object_index != NONE)
-		{
-			object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
-			object_datum* object = object_get_fast_unsafe(object_index);
-		}
 	}
 
 	return object_index;
@@ -1276,6 +1269,7 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 	{
 		index = object_get_parent_recursive(index);
 	}
+
 	if (index != NONE)
 	{
 		object_datum* object = object_get_fast_unsafe(index);
@@ -1296,7 +1290,7 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 
 			void* collision_regions = (real_matrix4x3*)object_header_block_get(object_index, &object->object.collision_regions_block);
 
-			int32 marker_index = render_model_get_markers_by_name(model_def->render_model.index,
+			marker_index = render_model_get_markers_by_name(model_def->render_model.index,
 				marker,
 				collision_regions,
 				NONE,
@@ -1365,7 +1359,7 @@ static int32 object_find_override_index(datum object_index)
 
 static int32 object_get_override_index(datum object_index)
 {
-	object_datum* object = (object_datum*)object_get_and_verify_type(object_index, NONE);
+	object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
 	int32 override_index = object_find_override_index(object_index);
 	if (override_index == NONE)
 	{
@@ -1392,7 +1386,7 @@ static int32 object_get_override_index(datum object_index)
 			ASSERT(override->object_index != NONE);
 
 			// This specific call to object_get_and_verify_type was inlined by default for some reason?
-			object_datum* override_object = (object_datum*)object_get_and_verify_type(g_object_override_data[0].object_index, NONE);
+			object_datum* override_object = (object_datum*)object_get_and_verify_type(g_object_override_data[0].object_index, _object_mask_all);
 			if (override_object)
 			{
 				override_object->object.flags.set(_object_has_override_bit, false);

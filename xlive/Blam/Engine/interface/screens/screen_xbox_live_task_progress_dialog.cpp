@@ -162,9 +162,9 @@ void c_screen_xbox_live_task_progress_dialog::add_task_ex(datum task_datum, e_co
 	s_screen_parameters params;
 
 	if (controller_index >= k_number_of_controllers)
-		params.user_flags = NONE;
+		params.m_user_flags = NONE;
 	else
-		params.user_flags = FLAG(controller_index);
+		params.m_user_flags = FLAG(controller_index);
 
 	params.m_context = nullptr;
 	params.m_screen_state.field_0 = NONE;
@@ -191,7 +191,7 @@ void* c_screen_xbox_live_task_progress_dialog::load(s_screen_parameters* paramet
 	c_screen_xbox_live_task_progress_dialog* screen = nullptr;
 	uint8* pool = ui_pool_allocate_space(sizeof(c_screen_xbox_live_task_progress_dialog), 0);
 	if (pool) {
-		screen = new (pool) c_screen_xbox_live_task_progress_dialog(parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
+		screen = new (pool) c_screen_xbox_live_task_progress_dialog(parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags);
 		screen->m_allocated = true;
 	}
 	user_interface_register_screen_to_channel(screen, parameters);

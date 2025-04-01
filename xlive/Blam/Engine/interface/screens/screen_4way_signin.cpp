@@ -194,7 +194,7 @@ c_screen_4way_signin::c_screen_4way_signin(e_user_interface_channel_type channel
 
 void c_screen_4way_signin::update(void)
 {
-	const uint32 all_users_mask = NONE;
+	const uint32 all_users_mask = (uint32)NONE;
 	const bool has_live_privileges = true;
 
 	this->set_controller_mask_recursive(all_users_mask);
@@ -293,8 +293,8 @@ void c_screen_4way_signin::update(void)
 			controller_signin_bitmap->set_visible(should_show_bitmap);
 			if (should_show_bitmap)
 			{
-				// we dont really have a way to determine controller_types between akebono and duke , using either is fine.
-				int16 bitmap_update_idx = gamepad_connected ? _controller_signin_bitmap_akebono : _controller_signin_bitmap_missing;
+				// We dont really have a way to determine controller_types between akebono and duke, using either is fine.
+				const int16 bitmap_update_idx = (int16)(gamepad_connected ? _controller_signin_bitmap_akebono : _controller_signin_bitmap_missing);
 				controller_signin_bitmap->verify_and_update_bitmap_index(bitmap_update_idx);
 
 
@@ -427,7 +427,7 @@ bool __cdecl user_interface_decline_invite_callback(e_controller_index controlle
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = 0;
-	params.user_flags = FLAG(controller_index);
+	params.m_user_flags = FLAG(controller_index);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;
@@ -448,7 +448,7 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 		params.m_flags = 0;
 		params.m_window_index = _window_4;
 		params.m_context = 0;
-		params.user_flags = FLAG(event->controller);
+		params.m_user_flags = FLAG(event->controller);
 		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 		params.m_screen_state.field_0 = NONE;
 		params.m_screen_state.m_last_focused_item_order = NONE;
@@ -649,7 +649,7 @@ void* c_screen_4way_signin::load(s_screen_parameters * parameters)
 		screen = new (pool) c_screen_4way_signin(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags);
+			parameters->m_user_flags);
 
 		screen->m_allocated = true;
 	}
@@ -888,7 +888,7 @@ void user_interface_recover_4way_screen(e_session_protocol protocol)
 	params.m_flags = 7; //retreating or recovering?
 	params.m_window_index = _window_4;
 	params.m_context = 0;
-	params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
+	params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask();
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;
@@ -972,7 +972,7 @@ void screen_network_squad_browser_backout_to_4way_screen(uint8 context)
 	params.m_flags = 7; //retreating or recovering?
 	params.m_window_index = _window_4;
 	params.m_context = 0;
-	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); // orignally h2x uses the flags
+	params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask(); // orignally h2x uses the flags
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;

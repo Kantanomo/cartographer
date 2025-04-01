@@ -74,7 +74,7 @@ void* c_screen_press_start_introduction::load(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_press_start_introduction(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags);
+			parameters->m_user_flags);
 
 		screen->m_allocated = true;
 		user_interface_register_screen_to_channel(screen, parameters);

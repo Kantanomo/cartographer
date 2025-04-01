@@ -139,7 +139,7 @@ void halo_interpolator_update_end(void)
 	return;
 }
 
-object_datum* halo_interpolator_object_can_interpolate(datum object_index, uint32* out_abs_object_index)
+object_datum* halo_interpolator_object_can_interpolate(datum object_index, int32* out_abs_object_index)
 {
 	*out_abs_object_index = NONE;
 	uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
@@ -166,7 +166,7 @@ object_datum* halo_interpolator_object_can_interpolate(datum object_index, uint3
 	}
 	else
 	{
-		result =(object_datum*)object_try_and_get_and_verify_type(object_index, _object_mask_all);
+		result = (object_datum*)object_try_and_get_and_verify_type(object_index, _object_mask_all);
 	}
 	return result;
 }
@@ -174,7 +174,7 @@ object_datum* halo_interpolator_object_can_interpolate(datum object_index, uint3
 bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point3d* center_of_mass)
 {
 	bool mass_interpolated = false;
-	uint32 object_index;
+	int32 object_index;
 
 	if (!halo_interpolator_object_can_interpolate(object_datum, &object_index)) { return 0; }
 
@@ -197,7 +197,7 @@ bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point
 bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real_matrix4x3** node_matrices, int32* out_node_count)
 {
 	bool result = false;
-	uint32 out_abs_object_index;
+	int32 out_abs_object_index;
 	if (halo_interpolator_object_can_interpolate(object_index, &out_abs_object_index))
 	{
 		result = true;
@@ -283,7 +283,6 @@ void halo_interpolator_object_populate_interpolation_data(
 	const real_vector3d* up,
 	const real_point3d* center_of_mass)
 {
-	object_datum* object = object_get_fast_unsafe(object_index);
 	object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
 	uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
 	if (g_frame_data_storage && g_update_in_progress)
@@ -433,7 +432,7 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
 bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 node_index, real_matrix4x3* out_matrix)
 {
 	bool result = false;
-	uint32 object_absolute_index;
+	int32 object_absolute_index;
 	if (halo_interpolator_object_can_interpolate(object_index, &object_absolute_index))
 	{
 		real32 distance = distance_squared3d(
@@ -458,7 +457,7 @@ bool halo_interpolator_interpolate_object_position(datum object_index, real_poin
 {
 	bool interpolate_object = false;
 	
-	uint32 abs_object_index;
+	int32 abs_object_index;
 	if (halo_interpolator_object_can_interpolate(object_index, &abs_object_index))
 	{
 		real32 distance = distance_squared3d(
@@ -483,7 +482,7 @@ bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_
 	bool interpolate_object = false;
 
 	// ### TODO add biped check?
-	uint32 abs_object_index;
+	int32 abs_object_index;
 	if (halo_interpolator_object_can_interpolate(object_index, &abs_object_index))
 	{
 		real32 distance =

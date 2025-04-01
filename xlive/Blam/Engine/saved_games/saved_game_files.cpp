@@ -114,7 +114,6 @@ void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name
 		if (absolute_index <= last_index || absolute_index == last_index)
 		{
 			s_saved_game_main_menu_globals_default_save_file* default_save = saved_game_main_menu_globals->default_save_files[absolute_index];
-			s_saved_game_player_profile* default_profile = (s_saved_game_player_profile*)default_save->buffer;
 			if ((enumerated_index & 0xF) != 0)
 			{
 				if ((enumerated_index & 0xF) <= 9)

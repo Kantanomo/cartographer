@@ -458,8 +458,8 @@ void fix_server_party_leader_texts(e_pregame_pane_type pane_type)
 	}
 	// fixes code breaking _pregame_lobby_pane_1_text_party_leader
 	// fixes code breaking _pregame_lobby_pane_1_text_server_party_leader
-	WriteValue<uint8>(Memory::GetAddress(0x2452DD) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(party_leader_text_id));
-	WriteValue<uint8>(Memory::GetAddress(0x245275) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(server_party_leader_text_id));
+	WriteValue<uint8>(Memory::GetAddress(0x2452DD) + 1, (uint8)TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(party_leader_text_id));
+	WriteValue<uint8>(Memory::GetAddress(0x245275) + 1, (uint8)TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(server_party_leader_text_id));
 }
 
 void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
@@ -685,9 +685,9 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 	}
 
 	//	fix text bounds
-	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_text_count_orignal; block_idx++)
+	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_text_count_orignal; ++block_idx)
 	{
-		const uint8 custom_game_block_idx = c_screen_pregame_lobby_text_pane_1_mapping((e_pregame_lobby_text_blocks)block_idx);
+		const uint8 custom_game_block_idx = (uint8)c_screen_pregame_lobby_text_pane_1_mapping((e_pregame_lobby_text_blocks)block_idx);
 		cooperative_pane->text_blocks[block_idx]->text_bounds = custom_games_pane->text_blocks[custom_game_block_idx]->text_bounds;
 	}
 

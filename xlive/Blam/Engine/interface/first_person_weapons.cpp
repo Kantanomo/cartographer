@@ -159,7 +159,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 					real_orientation* orientation = &fp_orientations->weapon_orientations[animation_graph_node_index];
 					orientation->rotation = node->default_rotation;
 					orientation->translation = node->default_translation;
-					orientation->scale = 1.0f;
+					orientation->scale = 1.f;
 				}
 			}
 		}
@@ -179,7 +179,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 					real_orientation* orientation = &fp_orientations->weapon_orientations[animation_graph_node_index];
 					orientation->rotation = node->default_rotation;
 					orientation->translation = node->default_translation;
-					orientation->scale = 1.0f;
+					orientation->scale = 1.f;
 				}
 			}
 		}
@@ -187,7 +187,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 		if (weapon_data->animation_manager.valid())
 		{
 			bool weapon_aim_enabled = true;
-			weapon_data->animation_manager.get_node_orientations(0.0f, 1.0f, NULL, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, NULL, 0);
+			weapon_data->animation_manager.get_node_orientations(0.f, 1.f, NULL, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, NULL, 0);
 			object_apply_function_overlay_node_orientations(weapon_index,
 				weapon_model,
 				&weapon_data->animation_manager,
@@ -211,13 +211,13 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 				{
 					if (weapon_data->move_animation_channel.valid())
 					{
-						weapon_data->move_animation_channel.apply_weighted_node_orientations(0.0f, ratio, 0.0f, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, NULL, 0);
+						weapon_data->move_animation_channel.apply_weighted_node_orientations(0.f, ratio, 0.f, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, NULL, 0);
 					}
 					if (weapon_data->jitter_animation_channel.valid())
 					{
-						weapon_data->jitter_animation_channel.apply_weighted_node_orientations(0.0f,
+						weapon_data->jitter_animation_channel.apply_weighted_node_orientations(0.f,
 							(weapon->weapon.field_188 + 0.5f) * ratio,
-							0.0f,
+							0.f,
 							weapon_data->node_orientations_count,
 							fp_orientations->weapon_orientations,
 							NULL,
@@ -251,16 +251,16 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 						}
 						else
 						{
-							real32 yaw = fp_data->pos.yaw;
-							if (yaw <= 0.0f)
+							real32 pos_yaw = fp_data->pos.yaw;
+							if (pos_yaw <= 0.f)
 							{
-								if (yaw < 0.0f)
+								if (pos_yaw < 0.f)
 								{
-									weapon_channel.set_frame_position(1.0f);
+									weapon_channel.set_frame_position(1.f);
 									weapon_channel.apply_weighted_node_orientations(
-										0.0f,
-										-0.0f - (ratio * yaw),
-										0.0f,
+										0.f,
+										-(ratio * pos_yaw),
+										0.f,
 										weapon_data->node_orientations_count,
 										fp_orientations->weapon_orientations,
 										NULL,
@@ -269,27 +269,27 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 							}
 							else
 							{
-								weapon_channel.set_frame_position(0.0f);
+								weapon_channel.set_frame_position(0.f);
 								weapon_channel.apply_weighted_node_orientations(
-									0.0f,
-									ratio * yaw,
-									0.0f,
+									0.f,
+									ratio * pos_yaw,
+									0.f,
 									weapon_data->node_orientations_count,
 									fp_orientations->weapon_orientations,
 									NULL,
 									0);
 							}
 
-							real32 pitch = fp_data->pos.pitch;
-							if (pitch <= 0.0f)
+							real32 pos_pitch = fp_data->pos.pitch;
+							if (pos_pitch <= 0.f)
 							{
-								if (pitch < 0.0f)
+								if (pos_pitch < 0.f)
 								{
-									weapon_channel.set_frame_position(2.0f);
+									weapon_channel.set_frame_position(2.f);
 									weapon_channel.apply_weighted_node_orientations(
-										0.0f,
-										-0.0f - (ratio * pitch),
-										0.0f,
+										0.f,
+										-(ratio * pos_pitch),
+										0.f,
 										weapon_data->node_orientations_count,
 										fp_orientations->weapon_orientations,
 										NULL,
@@ -298,11 +298,11 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 							}
 							else
 							{
-								weapon_channel.set_frame_position(3.0f);
+								weapon_channel.set_frame_position(3.f);
 								weapon_channel.apply_weighted_node_orientations(
-									0.0f,
-									ratio * pitch,
-									0.0f,
+									0.f,
+									ratio * pos_pitch,
+									0.f,
 									weapon_data->node_orientations_count,
 									fp_orientations->weapon_orientations,
 									NULL,
@@ -311,16 +311,16 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 
 							if (!pitch_turn_valid)
 							{
-								real32 yaw = fp_data->turn.yaw;
-								if (yaw <= 0.0)
+								real32 turn_yaw = fp_data->turn.yaw;
+								if (turn_yaw <= 0.f)
 								{
-									if (yaw < 0.0)
+									if (turn_yaw < 0.f)
 									{
-										weapon_channel.set_frame_position(5.0f);
+										weapon_channel.set_frame_position(5.f);
 										weapon_channel.apply_weighted_node_orientations(
-											0.0f,
-											-0.0f - (ratio * yaw),
-											0.0f,
+											0.f,
+											-(ratio * turn_yaw),
+											0.f,
 											weapon_data->node_orientations_count,
 											fp_orientations->weapon_orientations,
 											NULL,
@@ -329,27 +329,27 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 								}
 								else
 								{
-									weapon_channel.set_frame_position(4.0f);
+									weapon_channel.set_frame_position(4.f);
 									weapon_channel.apply_weighted_node_orientations(
-										0.0f,
-										ratio * yaw,
-										0.0f,
+										0.f,
+										ratio * turn_yaw,
+										0.f,
 										weapon_data->node_orientations_count,
 										fp_orientations->weapon_orientations,
 										NULL,
 										0);
 								}
 
-								real32 pitch = fp_data->turn.pitch;
-								if (pitch <= 0.0f)
+								real32 turn_pitch = fp_data->turn.pitch;
+								if (turn_pitch <= 0.f)
 								{
-									if (pitch < 0.0f)
+									if (turn_pitch < 0.f)
 									{
-										weapon_channel.set_frame_position(6.0f);
+										weapon_channel.set_frame_position(6.f);
 										weapon_channel.apply_weighted_node_orientations(
-											0.0f,
-											-0.0f - (ratio * pitch),
-											0.0f,
+											0.f,
+											-(ratio * turn_pitch),
+											0.f,
 											weapon_data->node_orientations_count,
 											fp_orientations->weapon_orientations,
 											NULL,
@@ -358,11 +358,11 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 								}
 								else
 								{
-									weapon_channel.set_frame_position(7.0f);
+									weapon_channel.set_frame_position(7.f);
 									weapon_channel.apply_weighted_node_orientations(
-										0.0f,
-										ratio * pitch,
-										0.0f,
+										0.f,
+										ratio * turn_pitch,
+										0.f,
 										weapon_data->node_orientations_count,
 										fp_orientations->weapon_orientations,
 										NULL,
@@ -370,13 +370,13 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 								}
 							}
 
-							if (weapon_data->field_E4 > 0.0f)
+							if (weapon_data->field_E4 > 0.f)
 							{
-								weapon_channel.set_frame_position(8.0f);
+								weapon_channel.set_frame_position(8.f);
 								weapon_channel.apply_weighted_node_orientations(
-									0.0f,
+									0.f,
 									weapon_data->field_E4 * ratio,
-									0.0f,
+									0.f,
 									weapon_data->node_orientations_count,
 									fp_orientations->weapon_orientations,
 									NULL,
@@ -412,7 +412,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 						weapon_magazine_definition* magazine = weapon_definition->weapon.magazines[0];
 						ammunition_result -= 44;
 
-						real32 v1 = ((ammunition_result * 0.2f) <= 1.0f ? ammunition_result * 0.2f : 1.0f);
+						real32 v1 = ((ammunition_result * 0.2f) <= 1.f ? ammunition_result * 0.2f : 1.f);
 
 						int32 rounds_total = weapon_get_rounds_total(weapon_index, 0, 0);
 						if (rounds_total > magazine->rounds_loaded_maximum)

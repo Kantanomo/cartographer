@@ -33,7 +33,7 @@ void c_particle_location::adjust_emitter_particle_intial_position(
 
 	particle_state.m_states[7] = this->field_1C;
 
-	for (datum particle_emitter_index = this->particle_emitter_index; particle_emitter_index != NONE; )
+	for (datum particle_emitter_index = this->m_particle_emitter_index; particle_emitter_index != NONE; )
 	{
 		c_particle_emitter_definition* emitter_definition = NULL;
 		c_particle_emitter* particle_emitter = (c_particle_emitter*)datum_get(get_particle_emitter_table(), particle_emitter_index);
@@ -47,4 +47,5 @@ void c_particle_location::adjust_emitter_particle_intial_position(
 		particle_emitter->adjust_initial_particle_position(particle_system, emitter_definition, &particle_state, matrix, dt);
 		particle_emitter_index = particle_emitter->m_next_emitter_index;
 	}
+	return;
 }

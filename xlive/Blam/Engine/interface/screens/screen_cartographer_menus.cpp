@@ -274,7 +274,7 @@ void* c_cartographer_guide_menu::load(s_screen_parameters* parameters)
 
 	if (ui_buffer) {
 		guide_menu = new (ui_buffer) c_cartographer_guide_menu(
-			parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
+			parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags);
 		guide_menu->m_allocated = true;
 	}
 
@@ -378,7 +378,7 @@ void* c_cartographer_credits_menu::load(s_screen_parameters* parameters)
 
 	if (ui_buffer) {
 		credits_menu = new (ui_buffer) c_cartographer_credits_menu(
-			parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
+			parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags);
 		credits_menu->m_allocated = true;
 	}
 
@@ -609,7 +609,7 @@ void* c_cartographer_update_menu::load(s_screen_parameters* parameters)
 
 	if (ui_buffer) {
 		update_menu = new (ui_buffer) c_cartographer_update_menu(
-			parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
+			parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags);
 		update_menu->m_allocated = true;
 	}
 
@@ -719,7 +719,7 @@ void* c_cartographer_update_notice_menu::load(s_screen_parameters* parameters)
 
 	if (ui_buffer) {
 		update_notice_menu = new (ui_buffer) c_cartographer_update_notice_menu(
-			parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
+			parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags);
 		update_notice_menu->m_allocated = true;
 	}
 

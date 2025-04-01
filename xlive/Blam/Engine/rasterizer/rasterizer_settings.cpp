@@ -426,8 +426,7 @@ void create_new_display_setting_array(void)
 
 		for (size_t j = 0; j < count; j++)
 		{
-			if (screen.dmPelsWidth == g_display_options[j].width 
-				&& screen.dmPelsHeight == g_display_options[j].height)
+			if (screen.dmPelsWidth == g_display_options[j].width && screen.dmPelsHeight == g_display_options[j].height)
 			{
 				populate_setting = false;
 				break;
@@ -585,17 +584,17 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook(void)
 		{
 			D3DDISPLAYMODE* d3d_display_modes = new D3DDISPLAYMODE[d3d_adapter_mode_count];
 
-			int32 d3d_mode_index = 0;
+			size_t d3d_mode_index = 0;
 
 			for (UINT i = 0; i < d3d_adapter_mode_count; i++)
 			{
 				if (SUCCEEDED(d3d9->EnumAdapterModes(adapter_index, d3d_display_mode.Format, i, &d3d_display_modes[d3d_mode_index])))
 				{
-					d3d_mode_index++;
+					++d3d_mode_index;
 				}
 			}
 
-			int32 d3d_mode_count = d3d_mode_index;
+			size_t d3d_mode_count = d3d_mode_index;
 			qsort_s(d3d_display_modes, d3d_mode_count, sizeof(D3DDISPLAYMODE), d3d_display_mode_compare, NULL);
 
 			s_video_mode* video_modes = rasterizer_get_video_modes();
@@ -617,10 +616,10 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook(void)
 			// a tad too complex, might need some cleanup
 			// move to function that's using callbacks for each stage
 			bool compute_refresh_rate_count = true;
-			for (uint32 i = 0; i < video_mode_count; )
+			for (size_t i = 0; i < video_mode_count;)
 			{
 				int32 refresh_rate_index = 0;
-				for (int32 j = 0; j < d3d_mode_count; j++)
+				for (size_t j = 0; j < d3d_mode_count; j++)
 				{
 					if (d3d_display_modes[j].Width == video_modes[i].width
 						&& d3d_display_modes[j].Height == video_modes[i].height)

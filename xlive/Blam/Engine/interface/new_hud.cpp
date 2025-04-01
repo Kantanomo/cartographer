@@ -114,7 +114,7 @@ real_point2d* __cdecl ui_get_hud_element_position_hook(e_hud_anchor anchor, real
 
 	real32 scale_factor = *get_secondary_hud_scale();
 
-	int32 render_view_player_index = *Memory::GetAddress<int32*>(0x4E6800);
+	//int32 render_view_player_index = *Memory::GetAddress<int32*>(0x4E6800);
 
 	switch (anchor)
 	{
