@@ -7,9 +7,9 @@ IP_ADAPTER_ADDRESSES* CNic::GetNetworkAdapterWithGateway()
 {
 	return NULL;
 
+/*
 #define MAX_ITERATIONS 3
 
-	IP_ADAPTER_ADDRESSES* result = NULL;
 	DWORD dwRetVal = 0;
 	// Set the flags to pass to GetAdaptersAddresses.
 	ULONG flags = 0;
@@ -19,7 +19,6 @@ IP_ADAPTER_ADDRESSES* CNic::GetNetworkAdapterWithGateway()
 	// get the function to tell us how much memory we need
 	ULONG outBufLen = sizeof(IP_ADAPTER_ADDRESSES);
 	ULONG Iterations = 0;
-	PIP_ADAPTER_UNICAST_ADDRESS pUnicast = NULL;
 
 	do {
 		pAddresses = (IP_ADAPTER_ADDRESSES*)HeapAlloc(GetProcessHeap(), 0, (outBufLen));
@@ -66,6 +65,7 @@ IP_ADAPTER_ADDRESSES* CNic::GetNetworkAdapterWithGateway()
 	}
 
 #undef MAX_ITERATIONS
+*/
 }
 
 IN_ADDR CNic::GetBestInterfaceRouteAddressFromIp(const char* ipToTest)

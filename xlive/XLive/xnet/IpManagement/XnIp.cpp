@@ -824,8 +824,9 @@ void XnIp::SendXNetRequest(XVirtualSocket* xsocket, eXnip_ConnectRequestType req
 
 	m_requestContext = true;
 	int udp_send_result = xsocket->UdpSend((const char*)&reqPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
-	LOG_INFO_NETWORK("{} - request sent, socket handle: {}, connection index: {}, connection id: {:x}, n0nceKey: {}",
+	LOG_INFO_NETWORK("{} - request sent, result: {}, socket handle: {}, connection index: {}, connection id: {:x}, n0nceKey: {}",
 		__FUNCTION__,
+		udp_send_result,
 		xsocket->systemSocketHandle,
 		XnIp::GetConnectionIndex(GetConnectionId()),
 		GetConnectionId().s_addr,

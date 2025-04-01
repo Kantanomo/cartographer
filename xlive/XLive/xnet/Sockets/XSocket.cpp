@@ -36,12 +36,12 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 	LOG_TRACE_NETWORK("XSocketCreate() - af = {0}, type = {1}, protocol = {2}", af, type, protocol);
 
 	if (af != AF_INET)
-		return SOCKET_ERROR;
+		return (SOCKET)SOCKET_ERROR;
 
 	// TODO: add TCP support
 	if (protocol != IPPROTO_UDP
 		&& protocol != IPPROTO_VDP)
-		return SOCKET_ERROR;
+		return (SOCKET)SOCKET_ERROR;
 
 	bool isVoice = false;
 	if (protocol == IPPROTO_VDP)
@@ -600,8 +600,6 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 			gXnIpMgr.GetLocalUserXn()->m_pckStats.PckSendStatsUpdate(pckSent, dwNumberOfBytesSent);
 			if (lpNumberOfBytesSent)
 				*lpNumberOfBytesSent = dwNumberOfBytesSent;
-
-			return 0;
 		}
 
 		return 0;

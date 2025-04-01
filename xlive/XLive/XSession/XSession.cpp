@@ -390,7 +390,6 @@ DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 	if (!hSession)
 		return ERROR_INVALID_PARAMETER;
 
-	DWORD ret = 0;
 	//TODO XSessionDelete
 
 	auto xsession = sessionMap.find(hSession);
@@ -411,7 +410,10 @@ DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 		return ERROR_FUNCTION_FAILED;
 	}
 
-	/*if (pXOverlapped) {
+	/*
+	DWORD ret = 0;
+	if (pXOverlapped) 
+	{
 		//asynchronous
 
 		pXOverlapped->InternalLow = ERROR_SUCCESS;
@@ -422,11 +424,12 @@ DWORD WINAPI XSessionDelete(HANDLE hSession, PXOVERLAPPED pXOverlapped)
 
 		ret = ERROR_IO_PENDING;
 	}
-	else {
+	else
+	{
 		//synchronous
-	}*/
+	}
 
-	return ret;
+	return ret;*/
 }
 
 // #5333: XSessionArbitrationRegister

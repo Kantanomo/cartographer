@@ -77,7 +77,7 @@ struct XBroadcastPacket
 		pckHeader.signature = EXNIP_PACKET_SIGNATURE_XNET_BROADCAST;
 		strncpy(pckHeader.signatureString, XNIP_BROADCAST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
 		ZeroMemory(&data, sizeof(data));
-		data.titleId = -1;
+		data.titleId = (DWORD)-1;
 		data.name.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 	};
 

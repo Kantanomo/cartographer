@@ -72,7 +72,7 @@ void context_update_map_info_multiplayer(void)
 	discord_interface_set_map_name(scenario_name, map_name);
 }
 
-void context_update_map_info_campaign(uint32 map_id, const utf8* scenario_name)
+void context_update_map_info_campaign(int32 map_id, const utf8* scenario_name)
 {
 	// Get map name
 	const char* map_name = NULL;

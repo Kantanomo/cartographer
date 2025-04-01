@@ -215,7 +215,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		BadServer(xuid, "Missing Member: dwPort");
 		return result;
 	}
-	searchResult.serverAddress.wPortOnline = htons(doc["dwPort"].GetUint());
+	searchResult.serverAddress.wPortOnline = htons((u_short)doc["dwPort"].GetUint());
 
 	if (!doc.HasMember("abenet"))
 	{
@@ -317,7 +317,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		ZeroMemory(&userProperty, sizeof(XUSER_PROPERTY));
 
 		userProperty.dwPropertyId = propertyId;
-		userProperty.value.type = docProperty["type"].GetInt();
+		userProperty.value.type = (BYTE)docProperty["type"].GetInt();
 
 		propertiesWritten.push_back(propertyId);
 
@@ -908,11 +908,11 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 {
 	if (!UserSignedOnline(dwUserIndex))
 	{
-		return -1;
+		return (DWORD)-1;
 	}
 
 	if (!gXnIpMgr.GetLocalUserXn()->m_valid)
-		return -1;
+		return (DWORD)-1;
 
 	std::thread(&CServerList::AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 	return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
@@ -923,7 +923,7 @@ DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapp
 	LOG_TRACE_XLIVE("XLocatorServerUnAdvertise()");
 	if (!UserSignedOnline(dwUserIndex))
 	{
-		return -1;
+		return (DWORD)-1;
 	}
 
 	std::thread(&CServerList::RemoveServer, pOverlapped).detach();
@@ -944,7 +944,7 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 
 	if (!UserSignedOnline(dwUserIndex))
 	{
-		return -1;
+		return (DWORD)-1;
 	}
 
 	std::thread(&CServerList::GetServerCounts, pOverlapped).detach();

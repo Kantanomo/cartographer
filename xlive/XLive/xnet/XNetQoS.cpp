@@ -153,7 +153,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 
 			auto ping_result = std::minmax_element(ping_storage.begin(), ping_storage.end());
 			long long min_ping = *ping_result.first;
-			long long max_ping = *ping_result.second;
+			//long long max_ping = *ping_result.second;
 			long average = (long)(std::accumulate(ping_storage.begin(), ping_storage.end(), 0ll) / ping_storage.size());
 
 			ping_storage.clear();
@@ -165,7 +165,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 			xnqosinfo->cProbesRecv = 4;
 			xnqosinfo->cProbesXmit = 4;
 			xnqosinfo->pbData = recvBuf;
-			xnqosinfo->cbData = recvBufLen;
+			xnqosinfo->cbData = (WORD)recvBufLen;
 			xnqosinfo->dwUpBitsPerSec = dwBitsPerSec;
 			xnqosinfo->dwDnBitsPerSec = dwBitsPerSec;
 			xnqosinfo->bFlags |= (XNET_XNQOSINFO_TARGET_CONTACTED | XNET_XNQOSINFO_COMPLETE | XNET_XNQOSINFO_DATA_RECEIVED);
@@ -391,7 +391,6 @@ void CXNetQoS::Listener()
 				}
 			}
 
-			bool bConnectionInbound = false;
 
 			// Wait for AcceptEx events
 			// We use the async version of AcceptEx because we want to have the abillity to exit the thread

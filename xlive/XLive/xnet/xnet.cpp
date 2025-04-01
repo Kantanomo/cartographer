@@ -1,8 +1,6 @@
 #include "stdafx.h"
-
 #include "xnet.h"
 
-#include "XLive/xnet/IpManagement/XnIp.h"
 #include "XLive/xnet/Sockets/XSocket.h"
 
 // #58: XNetServerToInAddr
@@ -48,15 +46,15 @@ INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineI
 {
 	LOG_TRACE_NETWORK("XNetXnAddrToMachineId");
 
-
 	// ???
 	return -1;
 
-
+	/*
 	if (pqwMachineId)
 		*pqwMachineId = 0xDEADC0DE;
 
 	return 0;
+	*/
 }
 
 // #67: XNetDnsLookup

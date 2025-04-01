@@ -237,7 +237,8 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		return CServerList::Enumerate(hEnum, cbBuffer, pvBuffer, pOverlapped);
 	}
 
-	if( async == FALSE )
+	/* UNREACHABLE
+	if (async == FALSE)
 	{
 		if( *pcItemsReturned )
 		{
@@ -284,6 +285,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 			return ERROR_IO_PENDING;
 		}
 	}
+	*/
 }
 
 // #5303: XStringVerify
@@ -486,7 +488,7 @@ DWORD WINAPI XLivePBufferSetByte (FakePBuffer * pBuffer, DWORD offset, BYTE valu
 	if (!pBuffer || offset < 0 || offset+1 > pBuffer->dwSize)
 	{
 		LOG_TRACE_XLIVE("- Invalid parameter");
-		return -1;
+		return (DWORD)-1;
 	}
 
 	if( pBuffer->magic != 0xDEADC0DE )
@@ -510,7 +512,7 @@ DWORD WINAPI XLivePBufferGetByte(FakePBuffer* pBuffer, DWORD offset, BYTE* value
 	if (!pBuffer || !value || offset < 0 || offset + 1 > pBuffer->dwSize)
 	{
 		//LOG_TRACE_XLIVE("- Invalid parameter");
-		return -1;
+		return (DWORD)-1;
 	}
 
 
