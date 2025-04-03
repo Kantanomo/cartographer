@@ -19,7 +19,7 @@ public:
 	virtual void update() override;
 	virtual real32 get_player_speed_modifier(datum player_index) override;
 	virtual bool is_team_enemy(e_game_team a, e_game_team b) override;
-	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
+	virtual void player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index) override;
 	virtual bool function_35(int32 unk_index) override;
 	virtual bool test_variant_engine_flag(datum player_index, e_game_engine_variant_flag_test_type type) override;
 	virtual void get_player_state_index(datum player_index, bool* always_returned_true) override;

@@ -17,7 +17,7 @@ public:
 	virtual void handle_object_taken_event(datum weapon_index, datum biped_index) override;
 	virtual void handle_object_dropped_event(datum weapon_index, datum biped_index) override;
 	virtual void get_multiplayer_score_string(wchar_t* out_string) override;
-	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
+	virtual void player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index) override;
 	virtual void function_33(datum player_index, void* unk) override;
 	virtual bool function_35(int32 unk_index) override;
 	virtual bool test_variant_engine_flag(datum player_index, e_game_engine_variant_flag_test_type type) override;

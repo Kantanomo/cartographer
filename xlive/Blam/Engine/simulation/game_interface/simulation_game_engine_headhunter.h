@@ -1,21 +1,23 @@
 #pragma once
 #include "simulation_game_engine.h"
 #include "simulation_game_engine_king.h"
+#include "game/players.h"
 
 #define k_simulation_headhunter_entity_name "headhunter-engine-globals"
 
 enum e_headhunter_engine_state_flags
 {
-	_headhunter_engine_state_flag_unused = 7,
+	_headhunter_engine_state_flag_player_skull_count = 7,
 
 	k_headhunter_engine_state_data_flags_count = 1,
 	k_headhunter_engine_state_data_flags_total_count = k_headhunter_engine_state_data_flags_count + k_game_engine_state_data_flag_count,
 	k_headhunter_engine_state_data_initial_update_mask = MASK(k_headhunter_engine_state_data_flags_total_count),
-	k_headhunter_engine_state_data_flags_mask = FLAG(_headhunter_engine_state_flag_unused)
+	k_headhunter_engine_state_data_flags_mask = FLAG(_headhunter_engine_state_flag_player_skull_count)
 };
 
 struct s_headhunter_engine_state_data : s_king_engine_state_data
 {
+	int8 player_skull_count[k_maximum_players];
 };
 
 class c_simulation_headhunter_engine_globals_definition : public c_simulation_king_engine_globals_definition

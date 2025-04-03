@@ -86,6 +86,7 @@ bool game_is_distributed(void);
 bool game_is_server(void);
 bool game_is_playback(void);
 bool game_is_authoritative(void);
+bool game_is_finished();
 s_game_cluster_bit_vectors* game_get_cluster_activation(void);
 
 // Setup default player data in the game options structure

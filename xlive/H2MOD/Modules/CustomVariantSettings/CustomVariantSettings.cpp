@@ -233,9 +233,9 @@ namespace CustomVariantSettings
 
 	void ApplyHooks()
 	{
-		PatchCall(Memory::GetAddress(0x10FE1F, 0xDC3CF), get_next_hill_index);
-		PatchCall(Memory::GetAddress(0x10FE55, 0xDC405), get_next_hill_index);
-		p_get_next_hill_index = Memory::GetAddress<get_next_hill_index_t*>(0x10DF1E, 0xDA4CE);
+		//PatchCall(Memory::GetAddress(0x10FE1F, 0xDC3CF), get_next_hill_index);
+		//PatchCall(Memory::GetAddress(0x10FE55, 0xDC405), get_next_hill_index);
+		//p_get_next_hill_index = Memory::GetAddress<get_next_hill_index_t*>(0x10DF1E, 0xDA4CE);
 	}
 
 	void Initialize()

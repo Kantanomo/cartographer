@@ -1,133 +1,369 @@
 #include "stdafx.h"
 #include "game_engine_headhunter.h"
 
+#include "game.h"
 #include "game_engine.h"
+#include "game_engine_util.h"
 #include "game_time.h"
+#include "camera/camera.h"
+#include "interface/hud.h"
+#include "interface/new_hud.h"
+#include "interface/user_interface_text.h"
+#include "items/weapons.h"
+#include "math/random_math.h"
+#include "objects/objects.h"
+#include "objects/object_placement.h"
+#include "rasterizer/rasterizer_text.h"
+#include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "simulation/game_interface/simulation_game_engine_headhunter.h"
 #include "simulation/game_interface/simulation_game_entities.h"
 #include "simulation/game_interface/simulation_game_events.h"
+#include "tag_files/tag_loader/tag_injection.h"
+#include "text/draw_string.h"
+#include "text/font_cache.h"
+#include "units/bipeds.h"
 
 static c_headhunter_engine_globals* g_headhunter_engine_globals {};
+static datum g_ball_datum = NONE;
 
 e_game_engine_type c_headhunter_engine::get_type()
 {
 	return _game_engine_type_headhunter;
 }
 
-bool c_headhunter_engine::function_34(datum player_index, void* unk)
+bool c_headhunter_engine::setup()
 {
-	return false;
+	s_game_engine_globals* engine_globals = game_engine_globals_get();
+
+	g_headhunter_engine_globals = (c_headhunter_engine_globals*)engine_globals->game_engine_globals;
+
+	memset(g_headhunter_engine_globals->m_player_skull_count, 0, sizeof(g_headhunter_engine_globals->m_player_skull_count));
+
+	g_ball_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+
+	if (g_ball_datum == NONE)
+		return false;
+
+	//tag_injection_set_active_map(L"elongation");
+	//if(tag_injection_active_map_verified())
+	//{
+	//	datum small_fire = tag_injection_load(_tag_group_scenery, "effects\\scenery\\fires\\fire_basic_medium", true);
+	//	if(small_fire)
+	//	{
+	//		tag_injection_inject();
+	//		weapon_definition* ball_weapon = (weapon_definition*)tag_get_fast(g_ball_datum);
+	//		object_attachment_definition* new_attachment = (object_attachment_definition*)tag_injection_extend_block(&ball_weapon->object.attachments, sizeof(object_attachment_definition), 1);
+
+	//		new_attachment->type.index = small_fire;
+	//		new_attachment->type.group.group = _tag_group_scenery;
+	//	}
+	//}
+
+	return c_king_engine::setup();
 }
 
-//bool c_headhunter_engine::setup()
-//{
-//	s_game_engine_globals* game_engine_globals = game_engine_globals_get();
-//
-//	g_headhunter_engine_globals = (c_headhunter_engine_globals*)game_engine_globals->game_engine_globals;
-//
-//	memset(g_headhunter_engine_globals, 0, sizeof(c_headhunter_engine_globals));
-//
-//	g_headhunter_engine_globals->setup();
-//
-//	return c_slayer_engine::setup();
-//}
+void c_headhunter_engine::send_game_start_event(datum player_index)
+{
+	s_game_engine_event event {};
+	game_engine_event_new(_multiplayer_event_response_game_type_headhunter, _multiplayer_event_response_headhunter_game_start, &event);
+	event.player_index = player_index;
+	game_engine_send_event(&event);
+}
 
-//void c_headhunter_engine::update()
-//{
-//	if(--g_headhunter_engine_globals->m_ticks_till_hill_move <= 0)
-//	{
-//		g_headhunter_engine_globals->m_ticks_till_hill_move = time_globals::seconds_to_ticks_round(5);
-//
-//		uint32 next_hill_index = g_headhunter_engine_globals->get_next_hill_index();
-//
-//		if (next_hill_index != NONE)
-//		{
-//			while (true)
-//			{
-//				g_headhunter_engine_globals->setup_points(next_hill_index);
-//
-//				if (g_headhunter_engine_globals->m_even_count >= 4 & (g_headhunter_engine_globals->m_even_count & 1) == 0)
-//					break;
-//
-//				next_hill_index = g_headhunter_engine_globals->get_next_hill_index();
-//
-//				if(next_hill_index == NONE)
-//				{
-//					simulation_action_game_engine_globals_update(32);
-//					return;
-//				}
-//			}
-//			if(g_headhunter_engine_globals->m_hill_id != next_hill_index)
-//			{
-//				s_game_engine_event event{};
-//				game_engine_event_new(_multiplayer_event_response_game_type_headhunter, _multiplayer_event_response_headhunter_hill_move, &event);
-//
-//			}
-//		}
-//	}
-//
-//
-//	c_slayer_engine::update();
-//}
+void c_headhunter_engine::function_14(datum player_index)
+{
+	c_king_engine::function_14(player_index);
+}
+
+void c_headhunter_engine::swap_player_indices(uint32 old_index, uint32 new_index)
+{
+	g_headhunter_engine_globals->m_player_skull_count[new_index] = g_headhunter_engine_globals->m_player_skull_count[old_index];
+	g_headhunter_engine_globals->m_player_skull_count[old_index] = 0;
+
+	c_king_engine::swap_player_indices(old_index, new_index);
+}
+
+void c_headhunter_engine::render_game_engine_hud_elements(uint32 user_index)
+{
+	draw_skulls_carried_string(user_index);
+	c_king_engine::render_game_engine_hud_elements(user_index);
+}
+
+void c_headhunter_engine::function_16(datum player_index)
+{
+	c_king_engine::function_16(player_index);
+}
+
+void c_headhunter_engine::player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index)
+{
+	c_king_engine::player_killed(killing_player, killed_player, suicide, unk_index);
+
+	s_player* player = s_player::get(killed_player);
+
+	const object_datum* biped_unit = (object_datum*)object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
+
+	if (biped_unit != NULL)
+	{
+		LOG_TRACE_GAME(L"[{}] {} Died dropping {} skulls", __FUNCTIONW__, player->properties->player_name, g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(killed_player)] + 1);
+
+		object_placement_data placement_data;
+
+		object_placement_data_new(&placement_data, g_ball_datum, -1, 0);
+
+		placement_data.position = biped_unit->object.position;
+
+
+		for (int32 i = 0; i < g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(killed_player)] + 1; ++i)
+		{
+			uint32* r_seed = get_local_random_seed_address();
+
+			constexpr real32 scale = 1.f;
+
+			placement_data.translational_velocity.i = _real_random_range(r_seed, -scale, scale);
+			placement_data.translational_velocity.j = _real_random_range(r_seed, -scale, scale);
+			placement_data.translational_velocity.k = 2.f;
+
+			placement_data.angular_velocity.i = _real_random_range(r_seed, -scale, scale);
+			placement_data.angular_velocity.j = _real_random_range(r_seed, -scale, scale);
+			placement_data.angular_velocity.k = 4.f;
+
+			simulation_action_object_create(object_new(&placement_data));
+		}
+
+		g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(killed_player)] = 0;
+	}
+}
+
+bool c_headhunter_engine::player_can_interact_with_weapon(datum player_index, datum weapon_index)
+{
+	object_header_datum* weapon_header = (object_header_datum*)datum_get(object_header_data_get(), weapon_index);
+
+	weapon_datum* weapon = (weapon_datum*)weapon_header->datum;
+
+	if (weapon && weapon->definition_index == g_ball_datum)
+	{
+		if (game_is_authoritative() && !weapon_header->flags.test(_object_header_being_deleted_bit))
+		{
+			s_player* player = s_player::get(player_index);
+
+			const biped_datum* player_biped = (biped_datum*)object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
+
+			if (player_biped && !TEST_BIT(player_biped->object.object_damage_flags, _object_is_dead_bit))
+			{
+				constexpr real32 k_distance_from_skull_auto_pickup = 0.3f;
+
+				real32 distance = distance3d(&weapon->object.position, &player_biped->object.position);
+
+				if (distance < k_distance_from_skull_auto_pickup)
+				{
+					if(g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)] < variant_get_max_heads_carried())
+					{
+						object_delete(weapon_index);
+						++g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)];
+						LOG_TRACE_GAME(L"[{}] {} picked up a head", __FUNCTIONW__, player->properties->player_name);
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	return c_king_engine::player_can_interact_with_weapon(player_index, weapon_index);
+}
+
+void c_headhunter_engine::function_33(datum player_index, void* unk)
+{
+	c_king_engine::function_33(player_index, unk);
+}
+
+bool c_headhunter_engine::function_34(datum player_index, void* unk)
+{
+	// reworks behavior of spawn zones based on if the game engine has teams
+	// due to a default case behavior because the headhunter game engine isn't in a switch table
+	// the default behaviour for a game engine is to operate as if teams are enabled
+	// causing every player in a FFA match to spawn on top of each other in red team spawn zone
+	return game_engine_has_teams();
+}
+
+bool c_headhunter_engine::function_35(int32 unk_index)
+{
+	return c_king_engine::function_35(unk_index);
+}
+
+void c_headhunter_engine::update()
+{
+	if(!game_is_finished() && !game_is_predicted())
+	{
+		uint32 players_mask = 0;
+		player_iterator it;
+		while(it.get_next_active_player())
+		{
+			if (it.get_current_player_data()->field_19C)
+				players_mask |= 1 << it.get_current_player_index();
+		}
+
+		if(players_mask != g_headhunter_engine_globals->m_players_in_hill)
+		{
+			g_headhunter_engine_globals->alert_players_of_players_in_hill(g_headhunter_engine_globals->m_players_in_hill, players_mask);
+			g_headhunter_engine_globals->m_players_in_hill = players_mask;
+			simulation_action_game_engine_globals_update(64);
+		}
+
+		// todo: skull depositing check if hill is contested.
+
+		s_game_variant* variant = get_game_variant();
+
+		if(variant->game_engine_variant.king.hill_move_time)
+		{
+			--g_headhunter_engine_globals->m_ticks_till_hill_move;
+
+			if(g_headhunter_engine_globals->m_ticks_till_hill_move <= 0)
+			{
+				g_headhunter_engine_globals->m_ticks_till_hill_move = time_globals::seconds_to_ticks_real(variant->game_engine_variant.king.hill_move_time);
+
+				int32 next_hill_index = g_headhunter_engine_globals->get_next_hill_index();
+				if(next_hill_index != NONE)
+				{
+					while(true)
+					{
+						g_headhunter_engine_globals->setup_points(next_hill_index);
+						if (g_headhunter_engine_globals->m_even_count >= 4 && (g_headhunter_engine_globals->m_even_count & 1) == 0)
+							break;
+
+						next_hill_index = g_headhunter_engine_globals->get_next_hill_index();
+						if (next_hill_index == NONE)
+							break;
+					}
+
+					if(g_headhunter_engine_globals->m_hill_id != next_hill_index && next_hill_index != NONE)
+					{
+						s_game_engine_event event;
+
+						game_engine_event_new(
+							_multiplayer_event_response_game_type_king_of_the_hill,
+							_multiplayer_event_response_general_team_victory,
+							&event);
+
+						game_engine_send_event(&event);
+						g_headhunter_engine_globals->m_hill_id = next_hill_index;
+					}
+				}
+				simulation_action_game_engine_globals_update(32);
+			}
+		}
+	}
+	//c_king_engine::update();
+}
+
+void c_headhunter_engine::set_simulation_baseline_data(int32 unused, void* state_data)
+{
+	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
+
+	c_king_engine::set_simulation_baseline_data(unused, state_data);
+
+	memset(game_state_data->player_skull_count, 0, sizeof(game_state_data->player_skull_count));
+
+	c_headhunter_engine::function_42(state_data);
+}
+
+void c_headhunter_engine::build_simulation_update(uint32* update_mask, int32 unused, void* state_data)
+{
+	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
+
+	c_king_engine::build_simulation_update(update_mask , unused, state_data);
+
+	memcpy(game_state_data->player_skull_count, g_headhunter_engine_globals->m_player_skull_count, sizeof(game_state_data->player_skull_count));
+
+	uint32 out_mask = (uint32)(*update_mask | _headhunter_engine_state_flag_player_skull_count);
+
+	*update_mask = out_mask;
+}
+
+bool c_headhunter_engine::apply_simulation_update(uint32 update_mask, int32 unused, void* state_data)
+{
+	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
+
+	if(!c_king_engine::apply_simulation_update(update_mask, unused, state_data))
+	{
+		return false;
+	}
+
+	if(TEST_BIT(update_mask, _headhunter_engine_state_flag_player_skull_count))
+	{
+		memcpy(g_headhunter_engine_globals->m_player_skull_count, game_state_data->player_skull_count, sizeof(game_state_data->player_skull_count));
+		return true;
+	}
+
+	return false;
+}
 
 e_simulation_entity_type c_headhunter_engine::get_game_engine_entity_type()
 {
 	return _simulation_entity_type_headhunter_engine_globals;
 }
 
-//void c_headhunter_engine::set_simulation_baseline_data(int32 unused, void* state_data)
-//{
-//	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
-//
-//	game_state_data->initial_teams = 0;
-//	game_state_data->valid_teams = 0;
-//	game_state_data->ever_active_teams = 0;
-//	game_state_data->current_round = 0;
-//
-//	memset(game_state_data->team_designator, NONE, sizeof(game_state_data->team_designator));
-//
-//	game_state_data->bin_id = 1;
-//
-//	c_headhunter_engine::function_42(state_data);
-//}
-//
-//void c_headhunter_engine::build_simulation_update(uint32* update_mask, int32 unused, void* state_data)
-//{
-//	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
-//
-//	uint32 out_written_flags = 0;
-//	uint32 base_game_engine_state_flags = *update_mask & k_game_engine_state_data_flags_mask;
-//
-//	if(base_game_engine_state_flags)
-//		c_headhunter_engine::function_43(base_game_engine_state_flags, &out_written_flags, state_data);
-//
-//	//if (TEST_BIT(*update_mask, _headhunter_engine_state_flag_bin_id_exists) /*&& headhunter_globals->bin_id != state_data->bin_id*/)
-//	//{
-//		game_state_data->bin_id = 2;
-//		out_written_flags |= FLAG(_headhunter_engine_state_flag_bin_id_exists);
-//	//}
-//
-//	*update_mask = out_written_flags;
-//}
-//
-//bool c_headhunter_engine::apply_simulation_update(uint32 update_mask, int32 unused, void* state_data)
-//{
-//	bool result = true;
-//
-//	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
-//
-//	uint32 base_game_engine_state_flags = update_mask & k_game_engine_state_data_flags_mask;
-//
-//	if (base_game_engine_state_flags)
-//		result = c_headhunter_engine::function_44(update_mask, state_data);
-//
-//	if(TEST_BIT(update_mask, _headhunter_engine_state_flag_bin_id_exists))
-//	{
-//		LOG_INFO_GAME("[{}] recieved simulation update bin_id: {}", __FUNCTION__, game_state_data->bin_id);
-//		//headhunter_globals->bin_id = game_state_data->bin_id;
-//	}
-//
-//	return result;
-//}
+void c_headhunter_engine::draw_skulls_carried_string(uint32 user_index)
+{
+	datum player_index = player_index_from_user_index(user_index);
+	if(g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)] > 0)
+	{
+		wchar_t buffer[256];
+
+		swprintf(buffer, NUMBEROF(buffer), L"%c x %d", _private_use_character_oddball, g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)]);
+
+		if(g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)] == variant_get_max_heads_carried())
+		{
+			swprintf(buffer, NUMBEROF(buffer), L"%s (max)", buffer);
+		}
+
+		render_camera* camera = get_global_camera();
+
+		rectangle2d bounds{};
+
+		bounds.top = camera->window_bounds.bottom - camera->viewport_bounds.top + 10;
+		bounds.bottom = bounds.top + 80;
+		bounds.left = camera->window_bounds.left - camera->viewport_bounds.left;
+		bounds.right = camera->window_bounds.right - camera->viewport_bounds.left;
+
+		real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
+
+		bounds.top -= safe_area * 2.f;
+		bounds.bottom -= safe_area * 2.f;
+
+		real_argb_color text_color;
+		
+		text_color.alpha = 1.f;
+
+		*((real_rgb_color*)(&text_color.red)) = *get_local_user_hud_color(user_index);
+
+		draw_string_set_draw_mode(6, -1, 2, 0, &text_color, global_real_argb_black, false);
+
+		if (draw_string_set_string(buffer))
+			rasterizer_draw_unicode_string(&bounds, buffer);
+	}
+}
+
+uint8 c_headhunter_engine::variant_get_max_heads_carried()
+{
+	s_game_variant* variant = get_game_variant();
+
+	switch(variant->game_engine_variant.head_hunter.max_heads_carried)
+	{
+		case _headhunter_max_heads_carried_none:
+			return UINT8_MAX;
+		case _headhunter_max_heads_carried_one:
+			return 1;
+		case _headhunter_max_heads_carried_five:
+			return 5;
+		case _headhunter_max_heads_carried_ten:
+			return 10;
+		default:
+			{
+				DISPLAY_ASSERT("INVALID VARIANT SETTING FOR HEAD HUNTER HEADS CARRIED");
+				return 0;
+			}
+	}
+}
 

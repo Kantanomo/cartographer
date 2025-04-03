@@ -66,7 +66,7 @@ void c_territories_engine::update_object_color_change(datum object_index)
 	INVOKE_TYPE(0x10D807, 0xD9DB7, void(__thiscall*)(c_game_engine*, datum), this, object_index);
 }
 
-void c_territories_engine::function_31(datum player_index, datum player_index_2, bool a3, int32 a4)
+void c_territories_engine::player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index)
 {
 	return;
 }

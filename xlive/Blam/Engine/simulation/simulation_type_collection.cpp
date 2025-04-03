@@ -36,7 +36,7 @@ void c_simulation_type_collection::register_event_definition(e_simulation_event_
 
 void simulation_type_collection_apply_patches()
 {
-	DETOUR_ATTACH(p_simulation_game_register_types, Memory::GetAddress<t_simulation_game_register_types>(0x1DAF44), simulation_game_register_types);
+	DETOUR_ATTACH(p_simulation_game_register_types, Memory::GetAddress<t_simulation_game_register_types>(0x1DAF44, 0x1C0653), simulation_game_register_types);
 }
 
 /* private code */

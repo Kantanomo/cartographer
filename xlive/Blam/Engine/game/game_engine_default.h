@@ -49,7 +49,7 @@ public:
 	virtual bool is_team_enemy(e_game_team a, e_game_team b);
 	virtual void get_multiplayer_score_string(wchar_t* out_string);
 	virtual void function_30(int32 a1, int32 a2, int32 a3);
-	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) = 0;
+	virtual void player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index) = 0;
 	virtual int32 get_player_killed_event_id(datum player_index, datum player_index_2, bool a3);
 	virtual void function_33(datum player_index, void* unk);
 	virtual bool function_34(datum player_index, void* unk);

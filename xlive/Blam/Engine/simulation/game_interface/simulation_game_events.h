@@ -76,8 +76,8 @@ struct s_game_engine_event
 	int16 pad;
 	e_multiplayer_event_response_event event_type;
 	uint32 player_index;
-	int32 field_C;
-	int32 field_10;
+	int32 causing_player_index;
+	int32 causing_player_team;
 	int32 field_14;
 	int32 field_18;
 	int32 field_1C;
@@ -86,3 +86,5 @@ struct s_game_engine_event
 ASSERT_STRUCT_SIZE(s_game_engine_event, 36);
 
 void game_engine_event_new(e_multiplayer_event_response_game_type game_type, e_multiplayer_event_response_event event_type, s_game_engine_event* event);
+
+bool __cdecl game_engine_send_event(s_game_engine_event* event);

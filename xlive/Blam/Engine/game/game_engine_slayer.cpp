@@ -41,9 +41,9 @@ void c_slayer_engine::function_16(datum player_index)
 	return;
 }
 
-void c_slayer_engine::function_31(datum player_index, datum player_index_2, bool a3, int32 a4)
+void c_slayer_engine::player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index)
 {
-	INVOKE_TYPE(0x110C60, 0xDD210, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, player_index, player_index_2, a3, a4);
+	INVOKE_TYPE(0x110C60, 0xDD210, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, killing_player, killed_player, suicide, unk_index);
 }
 
 bool c_slayer_engine::function_35(int32 unk_index)

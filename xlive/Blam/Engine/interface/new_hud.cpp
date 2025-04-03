@@ -66,6 +66,11 @@ s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_use
 	return &Memory::GetAddress<s_new_hud_temporary_user_state*>(0x9766D0, 0)[local_user_index];
 }
 
+real_rgb_color* get_local_user_hud_color(uint32 local_user_index)
+{
+	return INVOKE(0x2237FB, 0, get_local_user_hud_color, local_user_index);
+}
+
 bool new_hud_dont_draw(void)
 {
 	s_screenshot_globals* globals = get_screenshot_globals();
