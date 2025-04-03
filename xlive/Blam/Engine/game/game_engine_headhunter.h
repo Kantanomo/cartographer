@@ -32,6 +32,7 @@ public:
 private:
 	static void draw_skulls_carried_string(uint32 user_index);
 	static uint8 variant_get_max_heads_carried();
+	static void update_scores();
 };
 
 static c_headhunter_engine g_headhunter_engine;
