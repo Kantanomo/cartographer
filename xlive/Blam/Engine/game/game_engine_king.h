@@ -15,7 +15,7 @@ public:
 	real32 m_min_z;
 	real32 m_max_z;
 	real32 m_total_perimeter;
-	uint32 m_team_score_accumulator[k_game_multiplayer_team_count];
+	uint32 m_team_control_accumulator[k_game_multiplayer_team_count];
 	int32 m_hill_id;
 	uint32 m_ticks_till_hill_move;
 	uint16 m_players_in_hill;

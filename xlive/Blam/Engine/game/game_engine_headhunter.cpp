@@ -206,12 +206,13 @@ void c_headhunter_engine::update()
 
 		if(players_mask != g_headhunter_engine_globals->m_players_in_hill)
 		{
-			g_headhunter_engine_globals->alert_players_of_players_in_hill(g_headhunter_engine_globals->m_players_in_hill, players_mask);
+			c_headhunter_engine_globals::alert_players_of_players_in_hill(g_headhunter_engine_globals->m_players_in_hill, players_mask);
 			g_headhunter_engine_globals->m_players_in_hill = players_mask;
 			simulation_action_game_engine_globals_update(64);
 		}
 
-		// todo: skull depositing check if hill is contested.
+
+		c_headhunter_engine::update_scores();
 
 		s_game_variant* variant = get_game_variant();
 
@@ -245,6 +246,7 @@ void c_headhunter_engine::update()
 							_multiplayer_event_response_game_type_king_of_the_hill,
 							_multiplayer_event_response_general_team_victory,
 							&event);
+
 
 						game_engine_send_event(&event);
 						g_headhunter_engine_globals->m_hill_id = next_hill_index;
@@ -307,42 +309,40 @@ e_simulation_entity_type c_headhunter_engine::get_game_engine_entity_type()
 void c_headhunter_engine::draw_skulls_carried_string(uint32 user_index)
 {
 	datum player_index = player_index_from_user_index(user_index);
-	if(g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)] > 0)
+
+	wchar_t buffer[256];
+
+	swprintf(buffer, NUMBEROF(buffer), L"%c x %d", _private_use_character_oddball, g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)]);
+
+	if (g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)] == variant_get_max_heads_carried())
 	{
-		wchar_t buffer[256];
-
-		swprintf(buffer, NUMBEROF(buffer), L"%c x %d", _private_use_character_oddball, g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)]);
-
-		if(g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)] == variant_get_max_heads_carried())
-		{
-			swprintf(buffer, NUMBEROF(buffer), L"%s (max)", buffer);
-		}
-
-		render_camera* camera = get_global_camera();
-
-		rectangle2d bounds{};
-
-		bounds.top = camera->window_bounds.bottom - camera->viewport_bounds.top + 10;
-		bounds.bottom = bounds.top + 80;
-		bounds.left = camera->window_bounds.left - camera->viewport_bounds.left;
-		bounds.right = camera->window_bounds.right - camera->viewport_bounds.left;
-
-		real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
-
-		bounds.top -= safe_area * 2.f;
-		bounds.bottom -= safe_area * 2.f;
-
-		real_argb_color text_color;
-		
-		text_color.alpha = 1.f;
-
-		*((real_rgb_color*)(&text_color.red)) = *get_local_user_hud_color(user_index);
-
-		draw_string_set_draw_mode(6, -1, 2, 0, &text_color, global_real_argb_black, false);
-
-		if (draw_string_set_string(buffer))
-			rasterizer_draw_unicode_string(&bounds, buffer);
+		swprintf(buffer, NUMBEROF(buffer), L"%s (max)", buffer);
 	}
+
+	render_camera* camera = get_global_camera();
+
+	rectangle2d bounds{};
+
+	bounds.top = camera->window_bounds.bottom - camera->viewport_bounds.top + 10;
+	bounds.bottom = bounds.top + 80;
+	bounds.left = camera->window_bounds.left - camera->viewport_bounds.left;
+	bounds.right = camera->window_bounds.right - camera->viewport_bounds.left;
+
+	real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
+
+	bounds.top -= safe_area * 2.f;
+	bounds.bottom -= safe_area * 2.f;
+
+	real_argb_color text_color;
+
+	text_color.alpha = 1.f;
+
+	*((real_rgb_color*)(&text_color.red)) = *get_local_user_hud_color(user_index);
+
+	draw_string_set_draw_mode(6, -1, 2, 0, &text_color, global_real_argb_black, false);
+
+	if (draw_string_set_string(buffer))
+		rasterizer_draw_unicode_string(&bounds, buffer);
 }
 
 uint8 c_headhunter_engine::variant_get_max_heads_carried()
@@ -365,5 +365,89 @@ uint8 c_headhunter_engine::variant_get_max_heads_carried()
 				return 0;
 			}
 	}
+}
+
+void c_headhunter_engine::update_scores()
+{
+	uint32 players_in_hill_mask = 0;
+	uint32 teams_in_hill_mask = 0;
+
+	player_iterator it;
+	while (it.get_next_active_player())
+	{
+		if (it.get_current_player_data()->field_19C)
+		{
+			players_in_hill_mask |= 1 << it.get_current_player_index();
+
+			if (it.get_current_player_data()->properties->team_index != NONE)
+				teams_in_hill_mask |= 1 << it.get_current_player_data()->properties->team_index;
+		}
+	}
+
+	s_game_variant* variant = get_game_variant();
+
+	if(variant->game_engine_variant.king.flags.test(_king_engine_uncontested_hill_to_score_bit))
+	{
+		if(game_engine_has_teams())
+		{
+			if (!teams_in_hill_mask || ((teams_in_hill_mask - 1) & teams_in_hill_mask) != 0)
+				return;
+		}
+		else if (!players_in_hill_mask || ((players_in_hill_mask - 1) & players_in_hill_mask) != 0)
+		{
+			return;
+		}
+	}
+
+	if(game_engine_in_round())
+	{
+		if (game_engine_has_teams())
+		{
+			for (int16 i = 0; i < k_game_multiplayer_team_count; ++i)
+			{
+				if ((teams_in_hill_mask & FLAG(i)) != 0)
+					++g_headhunter_engine_globals->m_team_control_accumulator[i];
+				else
+					g_headhunter_engine_globals->m_team_control_accumulator[i] = 0;
+			}
+
+			for(int16 i = 0; i < k_game_multiplayer_team_count; ++i)
+			{
+				if(TEST_BIT(teams_in_hill_mask, i))
+				{
+					if(!(g_headhunter_engine_globals->m_team_control_accumulator[i] % time_globals::get()->ticks_per_second))
+					{
+						// todo: finish team scoring nightmare
+					}
+				}
+			}
+		}
+		else
+		{
+			player_iterator it;
+			while(it.get_next_active_player())
+			{
+				s_player* player = it.get_current_player_data();
+				if(player->field_19C && !(player->field_19C % time_globals::get()->ticks_per_second))
+				{
+					c_game_statborg* statborg = game_engine_get_statborg();
+
+					int32 current_score = statborg->get_score(it.get_current_player_index());
+
+					// todo: have to rewrite the game results functions to add a new carry type for skulls pickedup
+					// game_results_add_carry_event();
+
+					game_engine_adjust_score(it.get_current_player_index(), g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()]);
+
+					g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()] = 0;
+
+					// todo: add c_slayer_engine::update_scores function that plays a sound when N kills to win
+				}
+			}
+
+		}
+	}
+
+
 }
 

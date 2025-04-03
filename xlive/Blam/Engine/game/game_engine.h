@@ -226,6 +226,8 @@ bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b);
 
 void __cdecl game_engine_render(void);
 
+void __cdecl game_engine_adjust_score(int32 player_index, int32 amount);
+
 bool game_engine_in_round();
 
 c_game_engine** get_game_mode_engines();

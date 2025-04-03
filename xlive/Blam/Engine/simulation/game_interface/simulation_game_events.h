@@ -87,4 +87,4 @@ ASSERT_STRUCT_SIZE(s_game_engine_event, 36);
 
 void game_engine_event_new(e_multiplayer_event_response_game_type game_type, e_multiplayer_event_response_event event_type, s_game_engine_event* event);
 
-bool __cdecl game_engine_send_event(s_game_engine_event* event);
+void __cdecl game_engine_send_event(s_game_engine_event* event);
