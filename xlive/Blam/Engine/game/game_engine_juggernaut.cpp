@@ -66,9 +66,9 @@ bool c_juggernaut_engine::is_team_enemy(e_game_team a, e_game_team b)
 	return INVOKE_TYPE(0xD3281, 0xCF841, bool(__thiscall*)(c_game_engine*, e_game_team, e_game_team), this, a, b);
 }
 
-void c_juggernaut_engine::function_31(datum player_index, datum player_index_2, bool a3, int32 a4)
+void c_juggernaut_engine::player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index)
 {
-	INVOKE_TYPE(0xD38D2, 0xCFE92, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, player_index, player_index_2, a3, a4);
+	INVOKE_TYPE(0xD38D2, 0xCFE92, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, killing_player, killed_player, suicide, unk_index);
 }
 
 bool c_juggernaut_engine::function_35(int32 unk_index)

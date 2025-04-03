@@ -61,9 +61,9 @@ void c_oddball_engine::get_multiplayer_score_string(wchar_t* out_string)
 	INVOKE_TYPE(0x10FFF0, 0xDC5A0, void(__thiscall*)(c_game_engine*, wchar_t*), this, out_string);
 }
 
-void c_oddball_engine::function_31(datum player_index, datum player_index_2, bool a3, int32 a4)
+void c_oddball_engine::player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index)
 {
-	INVOKE_TYPE(0x1107E1, 0xDCD91, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, player_index, player_index_2, a3, a4);
+	INVOKE_TYPE(0x1107E1, 0xDCD91, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, killing_player, killed_player, suicide, unk_index);
 }
 
 void c_oddball_engine::function_33(datum player_index, void* unk)

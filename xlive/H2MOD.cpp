@@ -658,6 +658,7 @@ static void h2mod_apply_hooks(void)
 	files_windows_apply_patches();
 
 	game_engine_apply_patches();
+	simulation_type_collection_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -759,7 +760,7 @@ static void h2mod_apply_hooks(void)
 		user_interface_networking_apply_patches();
 		multiplayer_variant_settings_interface_apply_patches();
 
-		simulation_type_collection_apply_patches();
+		
 	}
 	return;
 }

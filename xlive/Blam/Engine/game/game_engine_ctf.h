@@ -26,7 +26,7 @@ public:
 	virtual void handle_object_dropped_event(datum weapon_index, datum biped_index) override;
 	virtual int32 get_sudden_death_timer(int32 time_remaining_in_ticks, bool unk, bool unk_2) override;
 	virtual e_game_team get_primary_team_index() override;
-	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
+	virtual void player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index) override;
 	virtual int32 get_player_killed_event_id(datum player_index, datum player_index_2, bool a3) override;
 	virtual bool function_34(datum player_index, void* unk) override;
 	virtual bool function_35(int32 unk_index) override;

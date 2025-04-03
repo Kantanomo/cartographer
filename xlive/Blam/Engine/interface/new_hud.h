@@ -114,6 +114,8 @@ void new_hud_engine_globals_set_drawing_player_index(datum player_datum);
 s_hud_scripted_globals* get_hud_scripted_globals(void);
 s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_user_index);
 
+real_rgb_color* get_local_user_hud_color(uint32 local_user_index);
+
 // Checks if we shouldn't draw the hud
 bool new_hud_dont_draw(void);
 

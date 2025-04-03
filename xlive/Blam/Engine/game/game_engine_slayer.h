@@ -13,7 +13,7 @@ public:
 	virtual void function_13() override;
 	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual void function_16(datum player_index) override;
-	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
+	virtual void player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index) override;
 	virtual bool function_35(int32 unk_index) override;
 	virtual e_simulation_entity_type get_game_engine_entity_type() override;
 	virtual void function_41() override;

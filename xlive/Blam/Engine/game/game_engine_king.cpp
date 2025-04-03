@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "game_engine_king.h"
 
+#include "game_engine_util.h"
 #include "math/random_math.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
+#include "simulation/game_interface/simulation_game_events.h"
 
 void c_king_engine_globals::setup()
 {
@@ -16,7 +18,7 @@ void c_king_engine_globals::setup()
 
 		c_king_engine_globals::set_hill_count(0);
 
-		for(uint32 index = 0; index < global_scenario->netgame_flags.count; ++index)
+		for(int32 index = 0; index < global_scenario->netgame_flags.count; ++index)
 		{
 			scenario_netpoint* netpoint = global_scenario->netgame_flags[index];
 
@@ -26,7 +28,7 @@ void c_king_engine_globals::setup()
 
 				if(total_hill_count <= 0)
 				{
-					g_hill_indices[total_hill_count++] = type_index;
+					g_hill_indices[total_hill_count++] = (uint16)type_index;
 				}
 				else
 				{
@@ -35,7 +37,7 @@ void c_king_engine_globals::setup()
 					{
 						if(++temp_index >= total_hill_count)
 						{
-							g_hill_indices[total_hill_count++] = type_index;
+							g_hill_indices[total_hill_count++] = (uint16)type_index;
 							break;
 						}
 					}
@@ -57,9 +59,9 @@ void c_king_engine_globals::setup_colors()
 	this->m_color_4 = *global_real_rgb_white;
 }
 
-uint32 c_king_engine_globals::get_next_hill_index() const
+int32 c_king_engine_globals::get_next_hill_index() const
 {
-	return INVOKE_TYPE(0x10FE1F, 0xDC3CF, uint32(__cdecl*)(uint32), this->m_hill_id);
+	return INVOKE_TYPE(0x10DF1E, 0xDC3CF, int32(__cdecl*)(int32), this->m_hill_id);
 }
 
 void c_king_engine_globals::setup_points(uint32 hill_index)
@@ -80,6 +82,111 @@ void c_king_engine_globals::set_hill_count(uint32 count)
 uint16* c_king_engine_globals::get_hill_indices()
 {
 	return Memory::GetAddress<uint16*>(0x4dd0b0, 0x5008F0);
+}
+
+uint16 c_king_engine_globals::get_teams_mask_from_players_mask(uint16 players_mask)
+{
+	uint16 out_mask = 0;
+
+	for(uint32 i = 0; i < k_maximum_players; ++i)
+	{
+		if(TEST_BIT(players_mask, i))
+		{
+			s_player* player = s_player::get(i);
+			if(player->properties[0].team_index != -1)
+			{
+				out_mask |= 1 << player->properties[0].team_index;
+			}
+		}
+	}
+
+	return out_mask;
+}
+
+void c_king_engine_globals::alert_players_of_players_in_hill(uint16 old_players_in_hill, uint16 new_players_in_hill)
+{
+	uint16 old_players_team_mask = get_teams_mask_from_players_mask(old_players_in_hill);
+	uint16 new_players_team_mask = get_teams_mask_from_players_mask(new_players_in_hill);
+
+	if (old_players_team_mask == new_players_team_mask || !new_players_team_mask)
+		return;
+
+	if((new_players_team_mask & (new_players_team_mask - 1)) == 0)
+	{
+		player_iterator it;
+		int32 last_matching_player_index = NONE;
+
+		while(it.get_next_active_player())
+		{
+			s_player* player = it.get_current_player_data();
+			int8 team_index = player->properties[0].team_index;
+
+			if(player->field_19C && team_index != -1 && TEST_BIT(new_players_team_mask, team_index))
+			{
+				last_matching_player_index = it.get_current_player_index();
+				break;
+			}
+		}
+
+		s_game_engine_event event;
+
+		game_engine_event_new(_multiplayer_event_response_game_type_king_of_the_hill, 
+			game_engine_has_teams() ? 
+			_multiplayer_event_response_king_hill_controlled_team :
+			_multiplayer_event_response_king_hill_controlled,
+			&event);
+
+		if(last_matching_player_index != NONE)
+		{
+			event.causing_player_index = last_matching_player_index;
+			event.causing_player_team = (int32)s_player::get(last_matching_player_index)->properties[0].team_index;
+		}
+
+		game_engine_send_event(&event);
+		return;
+	}
+
+	if ((new_players_team_mask & (new_players_team_mask - 1)) != 0)
+	{
+		if(old_players_team_mask)
+		{
+			if(((old_players_team_mask - 1) & old_players_team_mask) == 0)
+			{
+				if(old_players_team_mask != new_players_team_mask)
+				{
+					player_iterator it;
+					int32 last_matching_player_index = NONE;
+
+					while (it.get_next_active_player())
+					{
+						s_player* player = it.get_current_player_data();
+						int8 team_index = player->properties[0].team_index;
+
+						if (player->field_19C && team_index != -1 && TEST_BIT(new_players_team_mask, team_index))
+						{
+							last_matching_player_index = it.get_current_player_index();
+							break;
+						}
+					}
+					s_game_engine_event event;
+
+					game_engine_event_new(_multiplayer_event_response_game_type_king_of_the_hill,
+						game_engine_has_teams() ?
+						_multiplayer_event_response_king_hill_controlled_team :
+						_multiplayer_event_response_king_hill_contested,
+						&event);
+
+					if (last_matching_player_index != NONE)
+					{
+						event.causing_player_index = last_matching_player_index;
+						event.causing_player_team = (int32)s_player::get(last_matching_player_index)->properties[0].team_index;
+					}
+
+					game_engine_send_event(&event);
+				}
+			}
+		}
+	}
 }
 
 
@@ -133,9 +240,9 @@ void c_king_engine::get_multiplayer_score_string(wchar_t* out_string)
 	INVOKE_TYPE(0x10E1FB, 0xDA7AB, void(__thiscall*)(c_game_engine*, wchar_t*), this, out_string);
 }
 
-void c_king_engine::function_31(datum player_index, datum player_index_2, bool a3, int32 a4)
+void c_king_engine::player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index)
 {
-	INVOKE_TYPE(0x10E291, 0xDA841, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, player_index, player_index_2, a3, a4);
+	INVOKE_TYPE(0x10E291, 0xDA841, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, killing_player, killed_player, suicide, unk_index);
 }
 
 void c_king_engine::function_33(datum player_index, void* unk)

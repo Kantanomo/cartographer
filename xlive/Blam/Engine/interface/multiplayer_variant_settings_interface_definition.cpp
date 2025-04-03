@@ -120,6 +120,7 @@ static int32 multiplayer_variant_settings_interface_get_variant_parameter_value_
 			return k_headhunter_max_heads_carried_count;
 		}
 	}
+	return NONE;
 }
 
 /* public code */

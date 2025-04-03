@@ -94,9 +94,9 @@ e_game_team c_ctf_engine::get_primary_team_index()
 	return INVOKE_TYPE(0xD3D74, 0xD1A89, e_game_team(__thiscall*)(c_game_engine*), this);
 }
 
-void c_ctf_engine::function_31(datum player_index, datum player_index_2, bool a3, int32 a4)
+void c_ctf_engine::player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index)
 {
-	INVOKE_TYPE(0xD3BFE, 0xD1913, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, player_index, player_index_2, a3, a4);
+	INVOKE_TYPE(0xD3BFE, 0xD1913, void(__thiscall*)(c_game_engine*, datum, datum, bool, int32), this, killing_player, killed_player, suicide, unk_index);
 }
 
 int32 c_ctf_engine::get_player_killed_event_id(datum player_index, datum player_index_2, bool a3)

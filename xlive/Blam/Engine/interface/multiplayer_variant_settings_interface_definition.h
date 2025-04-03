@@ -125,7 +125,7 @@ enum e_variant_setting_category_type : uint32
 	_variant_setting_category_type_team_assault,
 
 	k_variant_setting_category_type_count,
-	_variant_setting_category_type_none = -1
+	_variant_setting_category_type_none = (uint32)NONE
 };
 
 static e_variant_setting_category_type g_variant_setting_category_type_match[k_game_engine_playable_types]
@@ -309,7 +309,7 @@ enum e_variant_setting_parameter_type : uint32
 	_variant_setting_parameter_type_uns_force_even_teams,
 
 	k_variant_setting_parameter_type_count,
-	_variant_setting_parameter_type_invalid = -1
+	_variant_setting_parameter_type_invalid = (uint32)NONE
 };
 
 enum e_text_value_pair_reference_flags : uint32

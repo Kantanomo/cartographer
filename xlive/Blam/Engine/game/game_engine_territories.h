@@ -21,7 +21,7 @@ public:
 	virtual bool player_can_interact_with_weapon(datum player_index, datum weapon_index) override;
 	virtual void update() override;
 	virtual void update_object_color_change(datum object_index) override;
-	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
+	virtual void player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index) override;
 	virtual void function_33(datum player_index, void* unk) override;
 	virtual bool function_35(int32 unk_index) override;
 	virtual e_simulation_entity_type get_game_engine_entity_type() override;

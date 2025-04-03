@@ -27,12 +27,14 @@ public:
 
 	void setup();
 	void setup_colors();
-	uint32 get_next_hill_index() const;
+	int32 get_next_hill_index() const;
 	void setup_points(uint32 hill_index);
 
 	static uint32 get_hill_count();
 	static void set_hill_count(uint32 count);
 	static uint16* get_hill_indices();
+	static uint16 get_teams_mask_from_players_mask(uint16 players_mask);
+	static void alert_players_of_players_in_hill(uint16 old_players_in_hill, uint16 new_players_in_hill);
 
 };
 ASSERT_STRUCT_SIZE(c_king_engine_globals, 0x1DC)
@@ -51,7 +53,7 @@ public:
 	virtual void function_16(datum player_index) override;
 	virtual void update() override;
 	virtual void get_multiplayer_score_string(wchar_t* out_string) override;
-	virtual void function_31(datum player_index, datum player_index_2, bool a3, int32 a4) override;
+	virtual void player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index) override;
 	virtual void function_33(datum player_index, void* unk) override;
 	virtual bool function_35(int32 unk_index) override;
 	virtual bool test_variant_engine_flag(datum player_index, e_game_engine_variant_flag_test_type type) override;

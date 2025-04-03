@@ -397,6 +397,7 @@ struct s_multiplayer_runtime_globals_definition
 	tag_block<s_multiplayer_event_response_definition> unused_7_events;
 	tag_block<s_multiplayer_event_response_definition> juggernaut_events;
 	tag_block<s_multiplayer_event_response_definition> assault_events;
+	tag_block<s_multiplayer_event_response_definition> territories_events;
 	tag_block<s_multiplayer_event_response_definition> unused_10_events;
 	tag_block<s_multiplayer_event_response_definition> unused_11_events;
 	tag_block<s_multiplayer_event_response_definition> unused_12_events;
@@ -439,7 +440,7 @@ struct s_multiplayer_runtime_globals_definition
 	tag_reference scoreboard_dead_emblem_shader;
 	tag_reference scoreboard_dead_emblem_bitmap;
 };
-ASSERT_STRUCT_SIZE(s_multiplayer_runtime_globals_definition, 1376);
+ASSERT_STRUCT_SIZE(s_multiplayer_runtime_globals_definition, 1384);
 
 struct s_multiplayer_globals_definition
 {

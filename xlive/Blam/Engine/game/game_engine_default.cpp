@@ -83,6 +83,7 @@ real32 c_game_engine::get_player_speed_modifier(datum player_index)
 
 uint32 c_game_engine::function_21(datum object_index)
 {
+	LOG_INFO_GAME("[{}]", __FUNCTION__);
 	return NONE;
 }
 
@@ -127,7 +128,6 @@ void c_game_engine::get_multiplayer_score_string(wchar_t* out_string)
 
 void c_game_engine::function_30(int32 a1, int32 a2, int32 a3)
 {
-
 }
 
 int32 c_game_engine::get_player_killed_event_id(datum player_index, datum player_index_2, bool a3)
