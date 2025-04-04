@@ -234,6 +234,8 @@ char* csstrncpy(char* s1, const char* s2, size_t size);
 
 char* csstrncat(char* s1, char const* s2, size_t size);
 
+char* csstrnupr(char* s, size_t size);
+
 int32 csstricmp(const char* s1, const char* s2);
 
 int32 csstrncmp(const char* s1, const char* s2, size_t size);

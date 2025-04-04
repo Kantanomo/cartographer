@@ -590,12 +590,12 @@ void scenario_set_game_globals(s_game_globals* globals);
 s_ui_levels_definition* game_globals_get_ui_levels(void);
 s_game_globals_player_representation* game_globals_get_representation(e_character_type type);
 
-static s_game_globals_rasterizer_data* rasterizer_globals_get_data(void)
+inline s_game_globals_rasterizer_data* rasterizer_globals_get_data(void)
 {
 	return *Memory::GetAddress<s_game_globals_rasterizer_data**>(0xA3DA3C);
 }
 
-static tag_reference game_globals_get_interface_tag_reference(e_interface_tag interface_tag_index)
+inline tag_reference game_globals_get_interface_tag_reference(e_interface_tag interface_tag_index)
 {
 	return scenario_get_game_globals()->interface_tags[0]->interface_tag_references[interface_tag_index];
 }

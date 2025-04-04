@@ -37,7 +37,7 @@ INT   WINAPI XNetInAddrToServer(const IN_ADDR ina, IN_ADDR *pina)
 INT   WINAPI XNetInAddrToString(const IN_ADDR ina, char * pchBuf, INT cchBuf)
 {
 	LOG_TRACE_NETWORK("XNetInAddrToString");
-	strncpy(pchBuf, inet_ntoa(ina), cchBuf);
+	strncpy_s(pchBuf, cchBuf, inet_ntoa(ina), cchBuf);
 	return 0;
 }
 

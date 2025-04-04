@@ -89,11 +89,11 @@ custom_language* create_custom_language(int lang_base, int lang_variant, bool ot
 
 	int name_len = strlen(name) + 1;
 	custom_lang->lang_name = (char*)malloc(sizeof(char) * name_len);
-	strcpy(custom_lang->lang_name, name);
+	strcpy_s(custom_lang->lang_name, name_len, name);
 
 	int filename_len = strlen(font_table_filename) + 1;
 	custom_lang->font_table_filename = (char*)malloc(sizeof(char) * filename_len);
-	strcpy(custom_lang->font_table_filename, font_table_filename);
+	strcpy_s(custom_lang->font_table_filename, filename_len, font_table_filename);
 
 	custom_lang->label_map = new std::unordered_map<int, std::unordered_map<int, char*>>();
 
@@ -147,7 +147,7 @@ bool read_custom_labels() {
 
 	wchar_t labels_file_path[1024];
 	swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", L".\\");
-	FILE* labelsFile = _wfopen(labels_file_path, L"rb");
+	FILE* labelsFile = ufopen(labels_file_path, L"rb");
 	addDebugText(labels_file_path);
 
 	if (labelsFile == NULL) {
@@ -168,7 +168,7 @@ bool read_custom_labels() {
 				if (readingVersion || fileLine[0] == '[') {
 					if (readingVersion && fileLineLength >= 27 && strstr(&fileLine[1], "H2CustomLanguageVersion:")) {
 						int version = 0;
-						sscanf(&fileLine[25], "%d", &version);
+						sscanf_s(&fileLine[25], "%d", &version);
 						if (version != 1) {
 							keepReading = false;
 							addDebugText("Incorrect version number!");
@@ -218,7 +218,7 @@ bool read_custom_labels() {
 										break;
 									}
 									char* alloc_text = (char*)malloc(ele_len + 1);
-									strcpy(alloc_text, &fileLine[ele_start + 1]);
+									strcpy_s(alloc_text, ele_len + 1, &fileLine[ele_start + 1]);
 									if (ele_id == 3) {
 										name = alloc_text;
 									}
@@ -293,7 +293,7 @@ bool read_custom_labels() {
 					if (fileLineLength >= 22) {
 						int label_menu_id = 0;
 						int label_id = 0;
-						int scanResult = sscanf(fileLine, "%x : %x =", &label_menu_id, &label_id);
+						int scanResult = sscanf_s(fileLine, "%x : %x =", &label_menu_id, &label_id);
 						if (scanResult == 2) {
 							add_custom_label(curr_lang, label_menu_id, label_id, &fileLine[21]);
 						}
@@ -303,7 +303,7 @@ bool read_custom_labels() {
 			}
 		}
 
-		fclose(labelsFile);
+		ufclose(labelsFile);
 		custom_labels_updated = false;
 	}
 	H2Config_custom_labels_capture_missing = prev_capture;
@@ -351,7 +351,7 @@ void write_custom_labels() {
 
 		wchar_t labels_file_path[1024];
 		swprintf(labels_file_path, ARRAYSIZE(labels_file_path), L"%wsh2customlanguage.ini", L".\\");
-		FILE* labelsFile = _wfopen(labels_file_path, L"wb");
+		FILE* labelsFile = ufopen(labels_file_path, L"wb");
 		addDebugText(labels_file_path);
 
 		if (labelsFile == NULL) {
@@ -384,7 +384,7 @@ void write_custom_labels() {
 				fputs("\n", labelsFile);
 			}
 
-			fclose(labelsFile);
+			ufclose(labelsFile);
 		}
 		H2Config_custom_labels_capture_missing = prev_capture;
 	}

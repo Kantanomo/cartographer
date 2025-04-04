@@ -31,7 +31,7 @@ static int InterpretMasterCreate(char* response_content) {
 		fileLine[index_next - index_current] = 0;
 
 		int tempint1;
-		if (sscanf(fileLine, "return_code=%d", &tempint1) == 1) 
+		if (sscanf_s(fileLine, "return_code=%d", &tempint1) == 1) 
 		{
 			addDebugText("Return code is: %d", tempint1);
 			result = tempint1;

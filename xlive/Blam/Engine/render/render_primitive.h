@@ -41,7 +41,7 @@ void __cdecl create_visible_render_primitives(int32 hologram_flag);
 
 /* public code */
 
-static c_render_primitive_list* render_primitive_get_by_primitive_list_type(uint8 primitive_list_type)
+inline c_render_primitive_list* render_primitive_get_by_primitive_list_type(uint8 primitive_list_type)
 {
 	ASSERT(VALID_INDEX(primitive_list_type, NUMBEROF(g_render_primitives_by_primitive_list_type)));
 	return &Memory::GetAddress<c_render_primitive_list*>(0x4F4EC0)[primitive_list_type];

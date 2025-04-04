@@ -968,11 +968,14 @@ namespace ImGuiHandler {
 							ImGui::Columns(4, NULL, false);
 							for (auto i = 0; i < 25; i++)
 							{
-								if (ImGui::Checkbox(_itoa(i, integer_string, 10), &ras_layer_overrides[i]))
+								if (_itoa_s(i, integer_string, 10) == ERROR_SUCCESS)
 								{
-									rasterizer_globals->reset_screen = true;
+									if (ImGui::Checkbox(integer_string, &ras_layer_overrides[i]))
+									{
+										rasterizer_globals->reset_screen = true;
+									}
+									ImGui::NextColumn();
 								}
-								ImGui::NextColumn();
 							}
 							ImGui::Columns(1);
 						}
@@ -981,8 +984,12 @@ namespace ImGuiHandler {
 							ImGui::Columns(4, NULL, false);
 							for (auto i = 0; i < 24; i++)
 							{
-								ImGui::Checkbox(_itoa(i, integer_string, 10), &geo_render_overrides[i]);
-								ImGui::NextColumn();
+								if (_itoa_s(i, integer_string, 10) == ERROR_SUCCESS)
+								{
+									ImGui::Checkbox(integer_string, &geo_render_overrides[i]);
+									ImGui::NextColumn();
+								}
+
 							}
 							ImGui::Columns(1);
 						}

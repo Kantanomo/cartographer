@@ -77,7 +77,6 @@ static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_
 #include <d3d12.h>
 
 #include <dxgi1_4.h>
-#include <wrl/client.h>
 
 // Cartographer includes
 #include "cseries/cseries.h"

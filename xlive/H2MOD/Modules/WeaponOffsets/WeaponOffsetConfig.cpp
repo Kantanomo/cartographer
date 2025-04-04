@@ -36,14 +36,14 @@ void ReadWeaponOffsetConfig(s_weapon_custom_offset* weaponOffsets, int count)
 	c_static_wchar_string<MAX_PATH> path;
 	weapon_offset_get_path(&path);
 
-	FILE* file = _wfopen(path.get_string(), L"r");
+	FILE* file = ufopen(path.get_string(), L"r");
 	if (file != NULL)
 	{
 		for (int i = 0; i < count; i++)
 		{
 			fscanf_s(file, "%f,%f,%f\n", &weaponOffsets[i].modified_offset.x, &weaponOffsets[i].modified_offset.y, &weaponOffsets[i].modified_offset.z);
 		}
-		fclose(file);
+		ufclose(file);
 	}
 	return;
 }
@@ -53,7 +53,7 @@ void SaveWeaponOffsetConfig(const s_weapon_custom_offset* customOffsets, int cou
 	c_static_wchar_string<MAX_PATH> path;
 	weapon_offset_get_path(&path);
 
-	FILE* file = _wfopen(path.get_string(), L"w");
+	FILE* file = ufopen(path.get_string(), L"w");
 	if (file != NULL)
 	{
 		for (int i = 0; i < count; i++)
@@ -61,7 +61,7 @@ void SaveWeaponOffsetConfig(const s_weapon_custom_offset* customOffsets, int cou
 			const real_point3d *offset = defaultOffsets ? &k_weapon_custom_offset_constant_data[i].default_offset : &customOffsets[i].modified_offset;
 			fprintf_s(file, "%.3f,%.3f,%.3f\n", offset->x, offset->y, offset->z);
 		}
-		fclose(file);
+		ufclose(file);
 	}
 	return;
 }
@@ -72,7 +72,7 @@ void WriteDefaultFile(const s_weapon_custom_offset* weaponOffsets, int count)
 	c_static_wchar_string<MAX_PATH> path;
 	weapon_offset_get_path(&path);
 
-	FILE* file = _wfopen(path.get_string(), L"r");
+	FILE* file = ufopen(path.get_string(), L"r");
 	if (file == NULL)
 	{
 		SaveWeaponOffsetConfig(weaponOffsets, count, true);
@@ -88,7 +88,10 @@ void WriteDefaultFile(const s_weapon_custom_offset* weaponOffsets, int count)
 
 void weapon_offset_get_path(c_static_wchar_string<MAX_PATH>* path)
 {
-	path->set(_wgetenv(L"localappdata"));
+	wchar_t localappdata[MAX_PATH];
+	ugetenv(localappdata, NUMBEROF(localappdata), L"localappdata");
+
+	path->set(localappdata);
 	path->append(L"\\Microsoft\\Halo 2\\WeaponOffsets.cfg");
 	return;
 }

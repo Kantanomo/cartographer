@@ -5,19 +5,19 @@ typedef int StringHeaderFlags;
 
 #define MAX_CONSOLE_INPUT_BUFFER 256
 
-static bool InputTextContainsCommandSubstring(const char* command, const char* input_text, bool test_only_first_token)
+inline bool InputTextContainsCommandSubstring(const char* command, const char* input_text, bool test_only_first_token)
 {
 	char input_text_upper_temp[MAX_CONSOLE_INPUT_BUFFER];
 	char comand_text_upper[MAX_CONSOLE_INPUT_BUFFER];
 
-	strncpy(input_text_upper_temp, input_text, MAX_CONSOLE_INPUT_BUFFER - 1);
+	csstrncpy(input_text_upper_temp, input_text, MAX_CONSOLE_INPUT_BUFFER - 1);
 	input_text_upper_temp[MAX_CONSOLE_INPUT_BUFFER - 1] = '\0';
 
-	strncpy(comand_text_upper, command, MAX_CONSOLE_INPUT_BUFFER - 1);
+	csstrncpy(comand_text_upper, command, MAX_CONSOLE_INPUT_BUFFER - 1);
 	comand_text_upper[MAX_CONSOLE_INPUT_BUFFER - 1] = '\0';
 
-	_strupr(input_text_upper_temp);
-	_strupr(comand_text_upper);
+	csstrnupr(input_text_upper_temp, MAX_CONSOLE_INPUT_BUFFER);
+	csstrnupr(comand_text_upper, MAX_CONSOLE_INPUT_BUFFER);
 
 	char* next_token_to_test = NULL;
 	char* text_to_test = input_text_upper_temp;
@@ -60,7 +60,7 @@ static bool InputTextContainsCommandSubstring(const char* command, const char* i
 }
 
 template<typename T>
-static inline bool tokenize(const char* str, size_t str_length, const char* delimiters, std::vector<T>& out, size_t tokenize_count = 0)
+inline bool tokenize(const char* str, size_t str_length, const char* delimiters, std::vector<T>& out, size_t tokenize_count = 0)
 {
 	out.clear();
 	size_t beg, pos = 0;
@@ -188,13 +188,13 @@ public:
 	{
 		va_list valist;
 		va_start(valist, fmt);
-		int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
+		int buffer_size_needed = vsprintf(NULL, 0, fmt, valist) + 1;
 		if (buffer_size_needed)
 		{
 			if ((size_t)buffer_size_needed < m_line_buf_size)
 			{
 				char* buffer = (char*)_malloca(buffer_size_needed);
-				int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
+				int copied_characters = vsprintf(buffer, buffer_size_needed, fmt, valist);
 				AddString(flags, buffer, copied_characters);
 				_freea(buffer);
 			}
@@ -204,13 +204,13 @@ public:
 
 	void AddStringFmt(StringHeaderFlags flags, const char* fmt, va_list valist)
 	{
-		int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
+		int buffer_size_needed = vsprintf(NULL, 0, fmt, valist) + 1;
 		if (buffer_size_needed)
 		{
 			if ((size_t)buffer_size_needed < m_line_buf_size)
 			{
 				char* buffer = (char*)_malloca(buffer_size_needed);
-				int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
+				int copied_characters = vsprintf(buffer, buffer_size_needed, fmt, valist);
 				AddString(flags, buffer, copied_characters);
 				_freea(buffer);
 			}

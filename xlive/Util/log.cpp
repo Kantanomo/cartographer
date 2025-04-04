@@ -34,10 +34,10 @@ h2log* h2log::create(const std::string &name, const std::wstring &filename, bool
 	{
 		auto new_h2log = new h2log(name);
 		// try opening file to check permissions
-		FILE* fp = _wfopen(filename.c_str(), L"a+");
+		FILE* fp = ufopen(filename.c_str(), L"a+");
 		if (fp)
 		{
-			fclose(fp);
+			ufclose(fp);
 			new_h2log->output = spdlog::rotating_logger_mt(name, filename, 1048576 * 2, 3);
 			new_h2log->output->set_level(debugLogLevel ? (spdlog::level::level_enum)debugLogLevel : spdlog::level::trace);
 			new_h2log->output->set_pattern("%d/%m/%Y %H:%M:%S.%e [%n] [%l] : %v");

@@ -31,7 +31,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 			hints.ai_protocol = IPPROTO_TCP;
 
 			char port[8];
-			sprintf(port, "%d", ntohs(xn->wPortOnline) + k_xnet_qos_port_offset);
+			sprintf_s(port, "%d", ntohs(xn->wPortOnline) + k_xnet_qos_port_offset);
 			const char* addr = inet_ntoa(xn->inaOnline);
 
 			//	LOG_TRACE_NETWORK_N("[XNetQoSLookup] QoSLookup, addr={0}, port={1}", addr.c_str(), prt.c_str());

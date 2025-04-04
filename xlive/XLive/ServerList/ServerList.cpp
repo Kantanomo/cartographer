@@ -345,7 +345,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 
 			ZeroMemory(*stringBuffer, X_PROPERTY_UNICODE_BUFFER_SIZE);
 
-			wcscpy(*stringBuffer, str.c_str());
+			ustrncpy(*stringBuffer, str.c_str(), str.length() + 1);
 
 			userProperty.value.string.cbData = (wcsnlen(*stringBuffer, 64) + 1) * sizeof(WCHAR);
 			userProperty.value.string.pwszData = *stringBuffer;

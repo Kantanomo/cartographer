@@ -75,7 +75,7 @@ struct XBroadcastPacket
 	XBroadcastPacket()
 	{
 		pckHeader.signature = EXNIP_PACKET_SIGNATURE_XNET_BROADCAST;
-		strncpy(pckHeader.signatureString, XNIP_BROADCAST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
+		strncpy_s(pckHeader.signatureString, XNIP_BROADCAST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
 		ZeroMemory(&data, sizeof(data));
 		data.titleId = (DWORD)-1;
 		data.name.sin_addr.s_addr = htonl(INADDR_BROADCAST);
@@ -95,7 +95,7 @@ struct XNetRequestPacket
 	{
 		pckHeader.signature = EXNIP_PACKET_SIGNATURE_XNET_REQUEST;
 		memset(pckHeader.signatureString, 0, sizeof(pckHeader.signatureString));
-		strncpy(pckHeader.signatureString, XNIP_REQUEST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
+		strncpy_s(pckHeader.signatureString, XNIP_REQUEST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
 		ZeroMemory(&data, sizeof(data));
 	}
 

@@ -68,10 +68,9 @@ void InitLocalAppData()
 {
 	addDebugText("Find AppData Local.");
 
-	const wchar_t* localappdata_env = _wgetenv(L"localappdata");
-
 	wchar_t appdata_path[MAX_PATH];
-	ustrncpy(appdata_path, localappdata_env, NUMBEROF(appdata_path));
+	ugetenv(appdata_path, NUMBEROF(appdata_path), L"localappdata");
+
 	ustrncat(appdata_path, k_microsoft_folder, NUMBEROF(k_microsoft_folder));
 	ustrncat(appdata_path, k_appdata_default_path, NUMBEROF(k_appdata_default_path));
 

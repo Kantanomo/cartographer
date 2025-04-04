@@ -251,8 +251,8 @@ bool c_custom_map_manager::write_custom_map_data_cache_to_file(const utf8* path,
 CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__save_custom_map_data, c_custom_map_manager::save_custom_map_data);
 void __thiscall c_custom_map_manager::save_custom_map_data()
 {
-	WCHAR path_wide[MAX_PATH];
-	CHAR path_multibyte[MAX_PATH];
+	wchar_t path_wide[MAX_PATH];
+	char path_multibyte[MAX_PATH];
 	bool custom_map_data_path_available = false;
 
 	c_critical_section_scope lock(m_lock);
@@ -266,7 +266,7 @@ void __thiscall c_custom_map_manager::save_custom_map_data()
 	if (get_directory_path_from_id(e_directory_id::_custom_map_data_dir, L"\0", path_wide, true))
 	{
 		custom_map_data_path_available = true;
-		wcscat(path_wide, custom_map_cache_filename_client);
+		ustrncat(path_wide, custom_map_cache_filename_client, NUMBEROF(path_wide));
 	}
 
 	if (!custom_map_data_path_available
@@ -291,8 +291,8 @@ void __thiscall c_custom_map_manager::load_custom_map_data_cache()
 
 	c_critical_section_scope lock(m_lock);
 
-	WCHAR path_wide[MAX_PATH];
-	CHAR path_multibyte[MAX_PATH];
+	wchar_t path_wide[MAX_PATH];
+	char path_multibyte[MAX_PATH];
 	bool custom_map_data_path_available = false;
 
 	uint32 map_file_cache_buffer_size = sizeof(s_custom_map_file_cache_header) + sizeof(s_custom_map_entry) * k_maximum_number_of_custom_multiplayer_maps_new;
@@ -304,7 +304,7 @@ void __thiscall c_custom_map_manager::load_custom_map_data_cache()
 	if (get_directory_path_from_id(e_directory_id::_custom_map_data_dir, L"\0", path_wide, true))
 	{
 		custom_map_data_path_available = true;
-		wcscat(path_wide, custom_map_cache_filename_client);
+		ustrncat(path_wide, custom_map_cache_filename_client, NUMBEROF(path_wide));
 	}
 
 	if (!custom_map_data_path_available
@@ -354,7 +354,7 @@ uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids(s_custom_map_id*
 			if (i < out_ids_count)
 			{
 				csmemcpy(out_ids[i].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
-				wcsncpy(out_ids[i].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
+				ustrncpy(out_ids[i].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
 			}
 		}
 	}
@@ -382,7 +382,7 @@ uint32 __thiscall c_custom_map_manager::get_custom_map_list_ids_by_map_name(cons
 				if (matching_count_found < out_ids_count)
 				{
 					csmemcpy(out_ids[matching_count_found].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
-					wcsncpy(out_ids[matching_count_found].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
+					ustrncpy(out_ids[matching_count_found].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
 				}
 			}
 

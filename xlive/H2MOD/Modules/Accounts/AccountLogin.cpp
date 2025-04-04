@@ -163,10 +163,10 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		csmemcpy(fileLine, index_current, index_next - index_current);
 		fileLine[index_next - index_current] = 0;
 
-		if (sscanf(fileLine, "return_code=%d", &tempint1) == 1) {
+		if (sscanf_s(fileLine, "return_code=%d", &tempint1) == 1) {
 			addDebugText("Return code is: %d", tempint1);
 		}
-		else if (sscanf(fileLine, "login_code=%d", &tempint1) == 1) {
+		else if (sscanf_s(fileLine, "login_code=%d", &tempint1) == 1) {
 			addDebugText("Login code is: %d", tempint1);
 			result = tempint1;
 		}
@@ -228,7 +228,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				H2Config_master_ip = resolvedAddr;
 			}
 		}
-		else if (sscanf(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
+		else if (sscanf_s(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
 			if (tempint1 >= 0) {
 				//addDebugText("H2 master relay port is: %d", tempint1);
 			}
@@ -249,7 +249,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			}
 			if (strlen(tempstr1) == 32) {
 				//addDebugText("Login token is: %s", tempstr1);
-				strncpy(login_token, tempstr1, 32 + 1);
+				strncpy_s(login_token, tempstr1, 32 + 1);
 			}
 		}
 		else if (strstr(fileLine, k_login_username_string)) {
@@ -271,7 +271,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				strncpy_s(username, tempstr1, XUSER_MAX_NAME_LENGTH);
 			}
 		}
-		else if (sscanf(fileLine, "login_xuid=%llu", &templlu1) == 1) {
+		else if (sscanf_s(fileLine, "login_xuid=%llu", &templlu1) == 1) {
 			if (templlu1 > 0) {
 				//addDebugText("User XUID is: %llu", templlu1);
 				xuid = templlu1;
@@ -293,7 +293,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			}
 			if (strlen(tempstr1) == 12) {
 				//addDebugText("Login machineUID is: %s", tempstr1);
-				strncpy(machineUID, tempstr1, 12 + 1);
+				strncpy_s(machineUID, tempstr1, 12 + 1);
 			}
 		}
 		else if (strstr(fileLine, k_login_ab_online_string)) {
@@ -312,7 +312,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			}
 			if (strlen(tempstr1) == 40) {
 				//addDebugText("Login abOnline is: %s", tempstr1);
-				strncpy(abOnline, tempstr1, 40 + 1);
+				strncpy_s(abOnline, tempstr1, 40 + 1);
 			}
 		}
 
@@ -399,12 +399,12 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	char* escaped_user_login_token = encode_rfc3986(ltoken == 0 ? "" : ltoken);
 	char* escaped_user_identifier = encode_rfc3986(identifier == 0 ? "" : identifier);
 	char* escaped_user_password = encode_rfc3986(password == 0 ? "" : password);
+	char http_request_body[] = "request_type=%08x&request_version=%s&user_identifier=%s&user_pass=%s&user_token=%s&op_sys=%s";
 
 #if !defined(LC3)
 	int http_request_body_build_len = (89 + 8 + strlen(DLL_VERSION_STR) + strlen(escaped_user_identifier) + strlen(escaped_user_password) + strlen(escaped_user_login_token) + strlen(os_string));
 	char* http_request_body_build = (char*)malloc(sizeof(char) * http_request_body_build_len + 1);
 
-	char http_request_body[] = "request_type=%08x&request_version=%s&user_identifier=%s&user_pass=%s&user_token=%s&op_sys=%s";
 	snprintf(http_request_body_build, http_request_body_build_len, http_request_body, ltoken == 0 ? 1 : 2, DLL_VERSION_STR, escaped_user_identifier, escaped_user_password, escaped_user_login_token, os_string);
 #else
 	TEST_N_DEF(LC3);

@@ -67,9 +67,8 @@ static void setup_cpu_info_text(const wchar_t* reports_path, const MINIDUMP_EXCE
 	report_info_path_cpu->append(k_reports_path);
 	report_info_path_cpu->append(k_report_text_file_names[_report_file_type_cpu]);
 
-	FILE* file;
-	errno_t error = _wfopen_s(&file, report_info_path_cpu->get_string(), L"w+");
-	if (!error && file != NULL)
+	FILE* file = ufopen(report_info_path_cpu->get_string(), L"w+");
+	if (file != NULL)
 	{
 		fwprintf(file, L"CPU INFORMATION\n");
 		fwprintf(file, L"%ls", k_crash_message_header_break);

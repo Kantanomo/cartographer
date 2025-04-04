@@ -51,8 +51,17 @@ bool should_include_module_code_seg(const wchar_t* path)
 void dump_timestamp_get(c_static_wchar_string<64>* timestamp)
 {
 	time_t timer = time(NULL);
-	tm* tm_info = localtime(&timer);
-	wcsftime(timestamp->get_buffer(), timestamp->max_length(), L"%Y%m%d-%H%M%S_", tm_info);
+	tm tm_info;
+	const errno_t err = localtime_s(&tm_info, &timer);
+	if (err)
+	{
+		error(3, "Error occurred when getting timestamp: %d", err);
+	}
+	else
+	{
+		wcsftime(timestamp->get_buffer(), timestamp->max_length(), L"%Y%m%d-%H%M%S_", &tm_info);
+	}
+
 	return;
 }
 
