@@ -78,8 +78,8 @@ struct s_game_engine_event
 	uint32 player_index;
 	int32 causing_player_index;
 	int32 causing_player_team;
-	int32 field_14;
-	int32 field_18;
+	int32 effect_player_index;
+	int32 effect_player_team;
 	int32 field_1C;
 	int32 field_20;
 };
@@ -87,4 +87,10 @@ ASSERT_STRUCT_SIZE(s_game_engine_event, 36);
 
 void game_engine_event_new(e_multiplayer_event_response_game_type game_type, e_multiplayer_event_response_event event_type, s_game_engine_event* event);
 
+void __cdecl game_engine_event_evaluate(s_game_engine_event* event, int32 player_index);
+
 void __cdecl game_engine_send_event(s_game_engine_event* event);
+
+void __cdecl game_engine_event_play(s_game_engine_event* event);
+
+void simulation_game_events_apply_patches();

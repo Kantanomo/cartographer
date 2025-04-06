@@ -17,7 +17,7 @@ enum e_headhunter_engine_state_flags
 
 struct s_headhunter_engine_state_data : s_king_engine_state_data
 {
-	int8 player_skull_count[k_maximum_players];
+	uint8 player_skull_count[k_maximum_players];
 };
 
 class c_simulation_headhunter_engine_globals_definition : public c_simulation_king_engine_globals_definition
@@ -29,8 +29,8 @@ public:
 	virtual int32 update_flag_count() override;
 	virtual uint32 initial_update_mask() override;
 	//virtual void calculate_update_relevance(int a1, void* update_data, int32* out_relevance) override;
-	//virtual bool entity_update_encode(bool a1, uint32 update_mask, uint32* update_mask_written, uint32 state_data_size, void* state_data, void* telemetry_data, c_bitstream* packet, int32 required_leave_space_bits) override;
-	//virtual bool entity_update_decode(bool a1, uint32* out_update_mask, uint32 state_data_size, void* state_data, c_bitstream* packet) override;
+	virtual bool entity_update_encode(bool a1, uint32 update_mask, uint32* update_mask_written, uint32 state_data_size, void* state_data, void* telemetry_data, c_bitstream* packet, int32 required_leave_space_bits) override;
+	virtual bool entity_update_decode(bool a1, uint32* out_update_mask, uint32 state_data_size, void* state_data, c_bitstream* packet) override;
 	//virtual bool entity_state_lossy_compare(void* a1, void* a2, int32 a3) override;
 	//virtual bool entity_creation_lossy_compare(void* a1, void* a2, int32 a3) override;
 	//virtual void* build_object_creation_data(datum object_index, int32 creation_data_size, void* creation_data) override;

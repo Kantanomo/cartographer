@@ -37,7 +37,7 @@ public:
 	static void alert_players_of_players_in_hill(uint16 old_players_in_hill, uint16 new_players_in_hill);
 
 };
-ASSERT_STRUCT_SIZE(c_king_engine_globals, 0x1DC)
+ASSERT_STRUCT_SIZE(c_king_engine_globals, 476)
 
 
 class c_king_engine : public c_game_engine

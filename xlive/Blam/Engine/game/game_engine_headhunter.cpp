@@ -45,6 +45,27 @@ bool c_headhunter_engine::setup()
 	if (g_ball_datum == NONE)
 		return false;
 
+	s_multiplayer_globals_definition* m_globals = get_multiplayer_globals();
+
+	s_multiplayer_runtime_globals_definition* runtime = m_globals->runtime[0];
+
+	uint32 data_offset = 0;
+
+	s_multiplayer_event_response_definition* head_hunter_events = 
+		(s_multiplayer_event_response_definition*)tag_injection_reserve_cache_memory(
+			sizeof(s_multiplayer_event_response_definition) * runtime->king_events.count, 
+			&data_offset);
+
+	csmemcpy(head_hunter_events, runtime->king_events[0], sizeof(s_multiplayer_runtime_globals_definition) * runtime->king_events.count);
+
+	runtime->headhunter_events.count = runtime->king_events.count;
+	runtime->headhunter_events.data = data_offset;
+
+	for(int32 i = 0; i < runtime->headhunter_events.count; ++i)
+	{
+		head_hunter_events[i].type = _multiplayer_event_response_game_type_headhunter;
+	}
+
 	//tag_injection_set_active_map(L"elongation");
 	//if(tag_injection_active_map_verified())
 	//{
@@ -196,7 +217,7 @@ void c_headhunter_engine::update()
 {
 	if(!game_is_finished() && !game_is_predicted())
 	{
-		uint32 players_mask = 0;
+		uint16 players_mask = 0;
 		player_iterator it;
 		while(it.get_next_active_player())
 		{
@@ -244,7 +265,7 @@ void c_headhunter_engine::update()
 
 						game_engine_event_new(
 							_multiplayer_event_response_game_type_king_of_the_hill,
-							_multiplayer_event_response_general_team_victory,
+							_multiplayer_event_response_king_hill_move,
 							&event);
 
 
@@ -256,7 +277,6 @@ void c_headhunter_engine::update()
 			}
 		}
 	}
-	//c_king_engine::update();
 }
 
 void c_headhunter_engine::set_simulation_baseline_data(int32 unused, void* state_data)
@@ -278,7 +298,7 @@ void c_headhunter_engine::build_simulation_update(uint32* update_mask, int32 unu
 
 	memcpy(game_state_data->player_skull_count, g_headhunter_engine_globals->m_player_skull_count, sizeof(game_state_data->player_skull_count));
 
-	uint32 out_mask = (uint32)(*update_mask | _headhunter_engine_state_flag_player_skull_count);
+	uint32 out_mask = (uint32)(*update_mask | FLAG(_headhunter_engine_state_flag_player_skull_count));
 
 	*update_mask = out_mask;
 }
@@ -286,6 +306,8 @@ void c_headhunter_engine::build_simulation_update(uint32* update_mask, int32 unu
 bool c_headhunter_engine::apply_simulation_update(uint32 update_mask, int32 unused, void* state_data)
 {
 	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
+
+	LOG_INFO_GAME("[{}] {} {} {}", __FUNCTION__, game_state_data->hill_id, game_state_data->players_in_hill, game_state_data->player_skull_count[1]);
 
 	if(!c_king_engine::apply_simulation_update(update_mask, unused, state_data))
 	{
@@ -330,8 +352,8 @@ void c_headhunter_engine::draw_skulls_carried_string(uint32 user_index)
 
 	real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
 
-	bounds.top -= safe_area * 2.f;
-	bounds.bottom -= safe_area * 2.f;
+	bounds.top -= (int16)(safe_area * 2.f);
+	bounds.bottom -= (int16)(safe_area * 2.f);
 
 	real_argb_color text_color;
 
