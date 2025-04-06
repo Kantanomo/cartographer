@@ -57,3 +57,18 @@ void hud_messaging_update(int32 user_index)
 	INVOKE(0x22D1BD, 0x0, hud_messaging_update, user_index);
 	return;
 }
+
+void hud_messaging_add_message_plural(int32 user_index, wchar_t* display_string, wchar_t* plural_string, int32 a4)
+{
+	INVOKE(0x22DD6F, 0, hud_messaging_add_message_plural, user_index, display_string, plural_string, a4);
+}
+
+void hud_messaging_add_message(int32 user_index, wchar_t* display_string)
+{
+	INVOKE(0x22DE21, 0, hud_messaging_add_message, user_index, display_string);
+}
+
+void hud_messaging_display_primary_text(int32 user_index, wchar_t* primary_string, int32 display_ticks)
+{
+	INVOKE(0x22CD3C, 0, hud_messaging_display_primary_text, user_index, primary_string, display_ticks);
+}

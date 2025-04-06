@@ -6,7 +6,7 @@
 class c_headhunter_engine_globals : public c_king_engine_globals
 {
 public:
-	int8 m_player_skull_count[k_maximum_players];
+	uint8 m_player_skull_count[k_maximum_players];
 };
 
 class c_headhunter_engine : public c_king_engine

@@ -130,8 +130,12 @@ enum e_multiplayer_event_response_event : uint16
 
 	// headhunter
 	_multiplayer_event_response_headhunter_game_start = 0,
+	_multiplayer_event_response_headhunter_hill_controlled = 1,
+	_multiplayer_event_response_headhunter_hill_contested = 2,
 	_multiplayer_event_response_headhunter_hill_tick = 3,
 	_multiplayer_event_response_headhunter_hill_move = 4,
+	_multiplayer_event_response_headhunter_hill_controlled_team = 5,
+	_multiplayer_event_response_headhunter_hill_contested_team = 6,
 
 	// king
 	_multiplayer_event_response_king_game_start = 0,
@@ -392,7 +396,7 @@ struct s_multiplayer_runtime_globals_definition
 	tag_block<s_multiplayer_event_response_definition> slayer_events;
 	tag_block<s_multiplayer_event_response_definition> ctf_events;
 	tag_block<s_multiplayer_event_response_definition> oddball_events;
-	tag_block<s_multiplayer_event_response_definition> unused_5_events;
+	tag_block<s_multiplayer_event_response_definition> headhunter_events;
 	tag_block<s_multiplayer_event_response_definition> king_events;
 	tag_block<s_multiplayer_event_response_definition> unused_7_events;
 	tag_block<s_multiplayer_event_response_definition> juggernaut_events;
@@ -448,3 +452,5 @@ struct s_multiplayer_globals_definition
 	tag_block<s_multiplayer_runtime_globals_definition> runtime;
 };
 ASSERT_STRUCT_SIZE(s_multiplayer_globals_definition, 16);
+
+s_multiplayer_globals_definition* get_multiplayer_globals();

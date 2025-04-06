@@ -23,6 +23,7 @@ struct s_king_engine_state_data : s_game_engine_state_data
 
 class c_simulation_king_engine_globals_definition : public c_simulation_game_engine_definition
 {
+public:
 	virtual e_simulation_entity_type entity_type() override;
 	virtual const char* entity_type_name() override;
 	virtual uint32 state_data_size() override;
