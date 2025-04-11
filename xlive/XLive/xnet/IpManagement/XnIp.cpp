@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "XnIp.h"
 
 #include "H2MOD/Utils/Utils.h"
@@ -7,6 +6,8 @@
 #include "XLive/Cryptography/Rc4.h"
 #include "XLive/xnet/NIC.h"
 #include "XLive/xnet/net_utils.h"
+
+TEST_N_DEF(XL1);
 
 XnIpManager gXnIpMgr;
 
@@ -311,7 +312,12 @@ void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long l
 		LOG_TRACE_NETWORK("{} - lanaddr already specified: {}", __FUNCTION__, inet_ntoa(m_ipLocal.m_xnaddr.ina));
 	}
 
+#if defined XL2
+	TEST_N_DEF(XL2);
+#else
 	m_ipLocal.m_xnaddr.inaOnline.s_addr = xnaddr;
+#endif
+
 	// create rc4 state from machine id key to build the abEnet
 	XECRYPT_RC4_STATE rc4_engine_state;
 	XeCryptRc4Key(&rc4_engine_state, (BYTE*)machineUID, sizeof(XNADDR::abEnet) * 2);
@@ -462,6 +468,8 @@ int XnIpManager::RegisterNewXnIp(const XNADDR* pxna, const XNKID* pxnkid, IN_ADD
 			XnIp* newXnIp = &m_XnIPs[i];
 			ZeroMemory(newXnIp, sizeof(*newXnIp));
 			memcpy(&newXnIp->m_xnaddr, pxna, sizeof(*pxna));
+
+			TEST_N_DEF(XL3);
 
 			int randIdentifier = (rand() % 0xFF) + 1; // 0 to 254 + 1
 			randIdentifier <<= 8;

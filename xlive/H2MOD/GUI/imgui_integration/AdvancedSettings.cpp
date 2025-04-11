@@ -554,7 +554,7 @@ namespace ImGuiHandler {
 						ImGui::PushItemWidth(WidthPercentage(15));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_default, "C_Deadzone_A_X_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
-							current_cartographer_profile->deadzone_axial.x = k_default_right_thumbstick_deadzone_axial_percentage_x;
+							current_cartographer_profile->deadzone_axial.x = k_default_right_thumbstick_deadzone_axial_percentage.x;
 							input_abstraction_set_controller_right_thumb_deadzone(current_controller_index);
 						}
 						ImGui::PopItemWidth();
@@ -580,7 +580,7 @@ namespace ImGuiHandler {
 						ImGui::PushItemWidth(WidthPercentage(12));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_default, "C_Deadzone_A_Y_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
-							current_cartographer_profile->deadzone_axial.y = k_default_right_thumbstick_deadzone_axial_percentage_y;
+							current_cartographer_profile->deadzone_axial.y = k_default_right_thumbstick_deadzone_axial_percentage.y;
 							input_abstraction_set_controller_right_thumb_deadzone(current_controller_index);
 						}
 						ImGui::PopItemWidth();

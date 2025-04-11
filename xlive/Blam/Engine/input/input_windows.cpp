@@ -1,10 +1,12 @@
 #include "stdafx.h"
-#include "input_xinput.h"
 #include "input_windows.h"
-#include "input_abstraction.h"
+
 #include "controllers.h"
+#include "input_abstraction.h"
+#include "input_xinput.h"
 
 #include "interface/user_interface_controller.h"
+#include "render/render.h"							/* PC1 */
 #include "shell/shell_windows.h"
 
 extern input_device** g_xinput_devices;

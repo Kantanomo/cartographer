@@ -30,6 +30,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 			hints.ai_socktype = SOCK_STREAM;
 			hints.ai_protocol = IPPROTO_TCP;
 
+			TEST_N_DEF(XL8);
+
 			char port[8];
 			sprintf_s(port, "%d", ntohs(xn->wPortOnline) + k_xnet_qos_port_offset);
 			const char* addr = inet_ntoa(xn->inaOnline);

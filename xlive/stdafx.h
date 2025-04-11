@@ -4,6 +4,14 @@
 //
 #pragma once
 
+#pragma region Warnings as errors
+#pragma warning(error: 4700)
+#pragma endregion
+
+#pragma region global disabled warnings
+#pragma warning( disable : 4100)	// Disable unreferenced parameter warning
+#pragma endregion
+
 #define CARTOGRAPHER_HEAP_DEBUG 0
 
 #if CARTOGRAPHER_HEAP_DEBUG
@@ -108,13 +116,6 @@ static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_
 
 extern std::random_device rd;
 
-#pragma region Warnings as errors
-#pragma warning(error: 4700)
-#pragma endregion
-
-#pragma region global disabled warnings
-#pragma warning( disable : 4100)	// Disable unreferenced parameter warning
-#pragma endregion
 
 // use this macro to define _time and _clock namespaces
 #define STD_CHRONO_DEFINE_TIME_AND_CLOCK(_time_name, _clock_name) \

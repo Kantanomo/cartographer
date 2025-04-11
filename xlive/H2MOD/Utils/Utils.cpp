@@ -394,7 +394,9 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s
 }
 
 int MasterHttpResponse(const char* url, const char* http_request, char** rtn_response) {
+#ifdef LC1
 	TEST_N_DEF(LC1);
+#else
 	int result = ERROR_CODE_CURL_SOCKET_FAILED;//Socket failed to connect to server
 
 	CURL *curl;
@@ -442,6 +444,7 @@ int MasterHttpResponse(const char* url, const char* http_request, char** rtn_res
 	}
 
 	return result;
+#endif
 }
 
 void CreateDirTree(const wchar_t* path) {

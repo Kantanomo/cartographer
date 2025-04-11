@@ -1,21 +1,23 @@
 #pragma once
 #include "controllers.h"
 
-/* macro defines */
+/* constants */
 
-#define k_number_of_windows_input_virtual_codes 256
-#define k_number_of_windows_mouse_buttons 8
-#define k_number_of_buffered_keys 64
-#define k_number_of_memory_units 9
-#define k_maximum_delay_for_split_inputs 250
+enum
+{
+	k_number_of_windows_input_virtual_codes = 256,
+	k_number_of_windows_mouse_buttons = 8,
+	k_number_of_buffered_keys = 64,
+	k_number_of_memory_units = 9,
+	k_maximum_delay_for_split_inputs = 250,
+};
 
-
-// controller_index which the mouse/keyboard combo will use
-#define k_windows_device_controller_index _controller_index_0
+// Needs to be a define...
+#define k_windows_device_controller_index _controller_index_0		// controller_index which the mouse/keyboard combo will use
 
 /* forward declarations */
-class c_input_dx9_mouse_cursor; //TODO
 
+class c_input_dx9_mouse_cursor; //TODO
 
 /* classes */
 

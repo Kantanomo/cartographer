@@ -203,12 +203,16 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 	}
 	searchResult.serverAddress.ina.s_addr = doc["lanaddr"].GetUint();
 
+#ifdef XL7
+	TEST_N_DEF(XL7);
+#else
 	if (!doc.HasMember("xnaddr") || !doc["xnaddr"].IsUint())
 	{
 		BadServer(xuid, "Missing Member: xnaddr");
 		return result;
 	}
 	searchResult.serverAddress.inaOnline.s_addr = htonl(doc["xnaddr"].GetUint());
+#endif
 
 	if (!doc.HasMember("dwPort"))
 	{
@@ -828,8 +832,8 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), docAllocator);
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), docAllocator);
 		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), docAllocator);
+		TEST_N_DEF(XL6);
 		document.AddMember("lanaddr", Value().SetUint(localUser->m_xnaddr.ina.s_addr), docAllocator);
-
 		document.AddMember("xnkid", xnkid_val, docAllocator);
 		document.AddMember("xnkey", xnkey_val, docAllocator);
 		document.AddMember("cProperties", Value().SetInt(cProperties + 3), docAllocator);
