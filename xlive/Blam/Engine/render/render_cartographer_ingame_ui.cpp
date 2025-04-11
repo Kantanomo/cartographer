@@ -30,7 +30,9 @@
 //#define ACHIVEMENT_RENDER_DEBUG_ENABLED
 
 // define this to render git branch information (if GEN_GIT_VER_VERSION_STRING is defined)
+#if RELEASE_DLL == false
 #define CARTOGRAPHER_TEST_BUILD_DRAW_TEXT
+#endif
 
 /* constants */
 

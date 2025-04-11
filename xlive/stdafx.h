@@ -34,12 +34,6 @@
 #define XINPUT_USE_9_1_0
 #define DIRECTINPUT_VERSION 0x0800
 
-#include "version.h"
-
-static_assert(EXECUTABLE_TYPE >= 0 && EXECUTABLE_TYPE <= 7, "EXECUTABLE_TYPE VALUE BELOW 0 OR EXCEEDS 7");
-static_assert(EXECUTABLE_VERSION > 0 && EXECUTABLE_VERSION < 65535, "EXECUTABLE_VERSION VALUE EXCEEDS 65534");
-static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_VERSION VALUE EXCEEDS 65534");
-
 #define TEST_N_DEF(TEST)
 
 #define _USE_MATH_DEFINES
@@ -110,12 +104,15 @@ static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_
 #include <contrib/minizip/zip.h>
 #pragma warning( pop )
 
-#include "CartographerDllConf.h"
-
 #pragma comment(lib, "IPHLPAPI.lib")
 
-extern std::random_device rd;
+#include "CartographerDllConf.h"
 
+static_assert(EXECUTABLE_TYPE >= 0 && EXECUTABLE_TYPE <= 7, "EXECUTABLE_TYPE VALUE BELOW 0 OR EXCEEDS 7");
+static_assert(EXECUTABLE_VERSION > 0 && EXECUTABLE_VERSION < 65535, "EXECUTABLE_VERSION VALUE EXCEEDS 65534");
+static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_VERSION VALUE EXCEEDS 65534");
+
+extern std::random_device rd;
 
 // use this macro to define _time and _clock namespaces
 #define STD_CHRONO_DEFINE_TIME_AND_CLOCK(_time_name, _clock_name) \
