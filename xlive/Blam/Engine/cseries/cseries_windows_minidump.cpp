@@ -246,7 +246,7 @@ void write_crash_dump_files(_EXCEPTION_POINTERS* ExceptionInfo, c_static_wchar_s
 		error_val = GetLastError();
 		if (error_val != 0)
 		{
-			error(3, "MiniDumpWriteDump returned error: %d", error_val);
+			error(3, "MiniDumpWriteDump returned error: %lu", error_val);
 		}
 	}
 	else
