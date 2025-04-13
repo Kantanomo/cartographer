@@ -129,7 +129,7 @@ protected:
 	bool field_C74;
 	uint8 field_C75[3];
 	c_virtual_keyboard_button m_buttons[k_number_of_virtual_keyboard_button_types];
-	uint32 field_3B78;
+	int32 field_3B78;
 	bool field_3B7C;
 	bool field_3B7D;
 	bool field_3B7E;

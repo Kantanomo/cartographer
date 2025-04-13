@@ -1,5 +1,10 @@
 #pragma once
+
+// Disable sign/unsigned comparison mismatch in spdlog
+#pragma warning( push )
+#pragma warning( disable : 4389)
 #include "spdlog/logger.h"
+#pragma warning( pop )
 
 enum log_level : unsigned int {
 	trace,    //          Tell me *everything*

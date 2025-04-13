@@ -390,7 +390,7 @@ void input_abstraction_set_controller_right_thumb_deadzone(e_controller_index co
 
 void input_abstraction_set_controller_look_sensitivity(e_controller_index controller, real32 value)
 {
-	s_saved_game_cartographer_player_profile* cartographer_player_profile = cartographer_player_profile_get_by_user_index(controller);
+	//s_saved_game_cartographer_player_profile* cartographer_player_profile = cartographer_player_profile_get_by_user_index(controller);
 
 	if (value == 0.0f) return;
 
@@ -441,7 +441,7 @@ void __cdecl input_abstraction_update(void)
 		real_euler_angles2d left_stick = { 0.f, 0.f };
 		real_euler_angles2d right_stick = { 0.f, 0.f };
 
-		s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(controller);
+		s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state((uint16)controller);
 		s_game_input_state* game_input_state = &g_input_abstraction_globals->input_states[controller];
 		s_gamepad_input_preferences* preference = &g_input_abstraction_globals->preferences[controller];
 		s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
@@ -1203,5 +1203,5 @@ static void input_abstraction_mouse_set_default_mapping(s_gamepad_input_preferen
 static bool __cdecl input_abstraction_controller_plugged_hook(uint16 gamepad_index)
 {
 	//fixes a hardcode check to _controller_index_0 that prevents other controllers from working without _controller_index_0 being connected
-	return input_has_gamepad_plugged(g_updating_gamepad_index);
+	return input_has_gamepad_plugged((uint16)g_updating_gamepad_index);
 }

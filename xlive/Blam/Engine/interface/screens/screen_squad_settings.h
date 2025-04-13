@@ -4,9 +4,12 @@
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
 
-/* macro defines */
+/* constants */
 
-#define k_no_of_visible_items_for_squad_settings 7
+enum
+{
+	k_no_of_visible_items_for_squad_settings = 7
+};
 
 /* classes */
 
@@ -32,7 +35,7 @@ protected:
 
 public:
 	c_squad_settings_list(int16 user_flags);
-	uint16 get_last_item_type();
+	int16 get_last_item_type();
 	bool party_management_exists() const;
 	void party_management_delete_item();
 	

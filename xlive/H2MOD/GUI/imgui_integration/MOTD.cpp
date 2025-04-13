@@ -40,7 +40,7 @@ namespace ImGuiHandler
 			curl = curl_interface_init_no_verify();
 			if (curl)
 			{
-				fp = _wfopen(file_path, L"wb");
+				fp = ufopen(file_path, L"wb");
 				curl_easy_setopt(curl, CURLOPT_URL, k_motd_url);
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
 				curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
@@ -55,13 +55,12 @@ namespace ImGuiHandler
 					{
 						success = true;
 					}
-					fclose(fp);
 				}
 				else
 				{
-					fclose(fp);
 					// _wremove(file_path.c_str());
 				}
+				ufclose(fp);
 				curl_easy_cleanup(curl);
 			}
 
@@ -165,7 +164,6 @@ namespace ImGuiHandler
 				| ImGuiWindowFlags_NoBackground
 				;
 
-			ImGuiIO& io = ImGui::GetIO();
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 			ImGui::SetNextWindowPos(viewport->WorkPos);

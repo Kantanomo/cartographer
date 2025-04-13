@@ -8,7 +8,6 @@
 #include "cache/pc_texture_cache.h"
 #include "creatures/creature_definitions.h"
 #include "filesys/pc_file_system.h"
-#include "geometry/geometry_block.h"
 #include "models/render_model_definitions.h"
 #include "physics/collision_model_definitions.h"
 #include "physics/physics_model_definitions.h"
@@ -252,7 +251,6 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 				{
 					render_model_section* model_section = model_definition->sections[current_section_index];
 
-					geometry_block_resource* t_res = model_section->geometry_block_info.resources[0];
 					pc_geometry_cache_preload_geometry(&model_section->geometry_block_info, (e_pc_geometry_cache_preload_flags)(_pc_geometry_cache_preload_flag_2 | _pc_geometry_cache_preload_blocking));
 
 					++current_section_index;

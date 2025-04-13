@@ -65,7 +65,7 @@ int32 c_particle_system::get_particle_count() const
 	while (current_location_index != NONE)
 	{
 		c_particle_location* particle_location = (c_particle_location*)datum_get(get_particle_location_table(), current_location_index);
-		datum current_emitter_index = particle_location->particle_emitter_index;
+		datum current_emitter_index = particle_location->m_particle_emitter_index;
 		while (current_emitter_index != NONE)
 		{
 			c_particle_emitter* particle_emitter = (c_particle_emitter*)datum_get(get_particle_emitter_table(), current_emitter_index);
@@ -91,10 +91,10 @@ void __thiscall c_particle_system::update_position(
 	const real_matrix4x3* matrix,
 	bool a4)
 {
-
 	// the index is updated in the original code, so get it early
-	c_particle_system_definition* particle_system_def = this->get_definition();
-	datum location_index = particle_system_update->particle_system_location_index;
+	//c_particle_system_definition* particle_system_def = this->get_definition();
+	//datum location_index = particle_system_update->particle_system_location_index;
+	
 	p_update_position(this, particle_system_update, matrix, a4);
 }
 
@@ -190,12 +190,12 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 			particle_system_update.delta_time = dt;
 			particle_system_update.particle_system_location_index = current_particle_system->particle_system_location_index;
 
-			c_particle_definition_interface* particle_def_interface = current_particle_system->get_definition()->get_particle_system_interface();
+			c_particle_definition_interface* current_particle_def_interface = current_particle_system->get_definition()->get_particle_system_interface();
 
 			current_particle_system->update_colors(
-				particle_def_interface->vtbl->system_is_v_mirrored_or_one_shot(particle_def_interface),
-				particle_def_interface->vtbl->system_is_one_shot(particle_def_interface),
-				thisx->color,
+				current_particle_def_interface->vtbl->system_is_v_mirrored_or_one_shot(current_particle_def_interface),
+				current_particle_def_interface->vtbl->system_is_one_shot(current_particle_def_interface),
+				thisx->m_color,
 				global_white_pixel32
 			);
 

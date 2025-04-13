@@ -275,17 +275,17 @@ ASSERT_STRUCT_SIZE(light_definition, 228);
 
 /* public code */
 
-static light_definition* current_light_definition_get(void)
+inline light_definition* current_light_definition_get(void)
 {
 	return *Memory::GetAddress<light_definition**>(0xA3E234);
 }
 
-static e_light_type current_lght_type_get(void)
+inline e_light_type current_lght_type_get(void)
 {
 	return *Memory::GetAddress<e_light_type*>(0xA3E238);
 }
 
-static bool light_type_is_spherical(e_light_type light_type)
+inline bool light_type_is_spherical(e_light_type light_type)
 {
 	ASSERT(VALID_INDEX(light_type, NUMBER_OF_LIGHT_TYPES));
 	return light_type == _light_type_sphere;

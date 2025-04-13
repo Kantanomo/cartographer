@@ -506,7 +506,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 			}
 
 			profileSettings->user.dwUserIndex = 0;
-			profileSettings->data.type = settingType;
+			profileSettings->data.type = (BYTE)settingType;
 			profileSettings->dwSettingId = pdwSettingIds[lcv];
 
 			if (settingType == XUSER_DATA_TYPE_BINARY || settingType == XUSER_DATA_TYPE_UNICODE)

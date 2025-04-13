@@ -52,10 +52,10 @@ void addDebugText(const wchar_t* format, ...)
 	}
 
 	wchar_t* textBufferW = (wchar_t*)calloc(stringLength, sizeof(wchar_t));
-	_vswprintf(textBufferW, format, valist);
+	usnprintf(textBufferW, stringLength, format, &valist);
 
 	char* textBufferA = (char*)calloc(stringLength, sizeof(char));
-	_snprintf(textBufferA, stringLength, "%ls", textBufferW);
+	csprintf(textBufferA, stringLength, "%ls", textBufferW);
 
 	addDebugTextInternal(textBufferA);
 
@@ -79,7 +79,7 @@ void addDebugText(const char* format, ...)
 	}
 
 	char* textBufferA = (char*)calloc(stringLength, sizeof(char));
-	vsprintf(textBufferA, format, valist);
+	vsprintf(textBufferA, stringLength, format, valist);
 
 	addDebugTextInternal(textBufferA);
 

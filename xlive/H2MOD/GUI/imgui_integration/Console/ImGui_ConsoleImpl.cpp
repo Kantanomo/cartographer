@@ -168,7 +168,7 @@ int CartographerConsole::TextEditCallback(ImGuiInputTextCallbackData* data)
 			&& console_data->CompletionAvailable()
 			&& console_data->m_history_string_index == -1)
 		{
-			const int prev_selected_completion_index = console_data->m_completion_data->SelectedCandidateIndex;
+			//const int prev_selected_completion_index = console_data->m_completion_data->SelectedCandidateIndex;
 			if (data->EventKey == ImGuiKey_UpArrow)
 				console_data->m_completion_data->SelectedCandidateIndex--;
 			else if (data->EventKey == ImGuiKey_DownArrow)
@@ -349,7 +349,6 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 {
 	if (!*p_open) return;
 
-	ImGuiIO& io = ImGui::GetIO();
 	const ImGuiStyle& style = ImGui::GetStyle();
 	const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
 
@@ -554,18 +553,7 @@ void CartographerConsole::Draw(const char* title, bool* p_open)
 
 		if (input_text_active)
 		{
-			// Command-line
-			// ImGui::Separator();
-
-			ImGuiWindowFlags completion_window_flags = 0
-				| ImGuiWindowFlags_NoTitleBar
-				| ImGuiWindowFlags_NoSavedSettings
-				| ImGuiWindowFlags_AlwaysAutoResize
-				| ImGuiWindowFlags_NoMove
-				| ImGuiWindowFlags_NoFocusOnAppearing
-				// | ImGuiWindowFlags_NoResize
-				;
-
+			
 			// window cursor positon 
 			ImVec2 main_window_last_screen_pos_cursor = ImGui::GetCursorScreenPos(); // will use this to display the command completion candidates
 

@@ -1,7 +1,5 @@
 #include "stdafx.h"
-
 #include "Accounts.h"
-#include "simpleini/SimpleIni.h"
 
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -9,6 +7,8 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include "H2MOD/Utils/Utils.h"
+
+#include "simpleini/SimpleIni.h"
 
 #pragma region Config IO
 const wchar_t H2AccountsFilename[] = L"%wshalo2accounts.ini";
@@ -103,7 +103,7 @@ void SaveH2Accounts() {
 		wchar_t fileConfigPathLog[1124];
 		swprintf(fileConfigPathLog, 1024, L"Saving Accounts: \"%ws\"", fileConfigPath);
 		addDebugText(fileConfigPathLog);
-		FILE* fileConfig = _wfopen(fileConfigPath, L"wb");
+		FILE* fileConfig = ufopen(fileConfigPath, L"wb");
 
 		if (fileConfig == nullptr) {
 			_Shell::FileErrorDialog(errno);
@@ -134,7 +134,7 @@ void SaveH2Accounts() {
 			ini.SaveFile(fileConfig);
 
 #pragma endregion
-			fclose(fileConfig);
+			ufclose(fileConfig);
 		}
 		ReleaseAccountConfigLock();
 	}
@@ -230,14 +230,7 @@ static bool accSet;
 static bool tokSet;
 static int interpretConfigSetting(char* fileLine, char* version, int lineNumber) {
 	bool unrecognised = false;
-	bool duplicated = false;
-	bool incorrect = false;
-	bool dontSave = false;
 	int fileLineLen = strlen(fileLine);
-	int tempint1 = -1;
-	unsigned short tempushort1 = -1;
-	int tempint2 = -1;
-	float tempfloat1 = NULL;
 	char tempstr1[33] = { "" };
 	if (fileLine[0] == '#' || fileLine[0] == ';' || fileLineLen <= 2) {
 		unrecognised = true;
@@ -300,7 +293,7 @@ bool ReadH2Accounts() {
 	if (TestGetAccountConfigLock(fileConfigPath)) {
 		addDebugText("Mutex obtained!");
 
-		FILE* fileConfig = _wfopen(fileConfigPath, L"rb");
+		FILE* fileConfig = ufopen(fileConfigPath, L"rb");
 
 		if (!fileConfig) {
 			addDebugText("ERROR: No H2Accounts Files Could Be Found!");
@@ -337,13 +330,13 @@ bool ReadH2Accounts() {
 				else if (AccountCount == -1)
 				{
 					// if AccountCount is not found it's probably an old config file
-					FILE* fileConfig1 = _wfopen(fileConfigPath, L"rb");
+					FILE* fileConfig1 = ufopen(fileConfigPath, L"rb");
 					addDebugText("Old accounts file detected");
 					ReadIniFile(fileConfig1, true, "[H2AccountsVersion:%[^]]]", "1", interpretConfigSetting);
 				}
 			}
 
-			fclose(fileConfig);
+			ufclose(fileConfig);
 		}
 	}
 	else {

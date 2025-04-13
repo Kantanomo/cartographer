@@ -110,7 +110,7 @@ namespace ImGuiHandler {
 					draw_list->AddCircleFilled(Center, current_cartographer_profile->deadzone_radial, ImColor(20, 20, 20, 125), 120);
 				}
 
-				s_gamepad_input_button_state* state = input_get_gamepad_state(current_controller_index);
+				s_gamepad_input_button_state* state = input_get_gamepad_state((uint16)current_controller_index);
 				if (state)
 				{
 					ImVec2 Thumb_Pos(
@@ -166,7 +166,7 @@ namespace ImGuiHandler {
 					ImGui::SameLine();
 					if(ImGui::IsItemEdited())
 					{
-						current_cartographer_profile->field_of_view = PIN(val, 45, 110);
+						current_cartographer_profile->field_of_view = (uint8)PIN(val, 45, 110);
 					}
 
 					ImGui::PushItemWidth(WidthPercentage(10));
@@ -176,7 +176,7 @@ namespace ImGuiHandler {
 					ImGui::SameLine();
 					if (ImGui::IsItemEdited()) 
 					{
-						current_cartographer_profile->field_of_view = PIN(val, 45, 110);
+						current_cartographer_profile->field_of_view = (uint8)PIN(val, 45, 110);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "PlayerFov3"), b2_size))
@@ -194,7 +194,7 @@ namespace ImGuiHandler {
 					ImGui::SliderInt("##VehicleFOV1", &val, 45, 110, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 					{
-						current_cartographer_profile->vehicle_field_of_view = PIN(val, 45, 110);
+						current_cartographer_profile->vehicle_field_of_view = (uint8)PIN(val, 45, 110);
 					}
 
 					ImGui::PushItemWidth(WidthPercentage(10));
@@ -202,7 +202,7 @@ namespace ImGuiHandler {
 					val = current_cartographer_profile->vehicle_field_of_view;
 					ImGui::InputInt("##VehicleFOV2", &val, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						current_cartographer_profile->vehicle_field_of_view = PIN(val, 45, 110);
+						current_cartographer_profile->vehicle_field_of_view = (uint8)PIN(val, 45, 110);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "VehicleFOV3"), b2_size))
@@ -332,7 +332,7 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_lod_tooltip));
 
-					H2Config_static_lod_state = static_lod_state;
+					H2Config_static_lod_state = (int8)static_lod_state;
 
 					ImGui::NextColumn();
 					ImGui::Text(advanced_settings_get_string(_advanced_string_shadow_title));
@@ -519,7 +519,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(ImGui::GetColumnWidth());
 					if (ImGui::Combo("##C_Deadzone_Type", &g_deadzone, items, 3))
 					{
-						current_cartographer_profile->controller_deadzone_type = g_deadzone;
+						current_cartographer_profile->controller_deadzone_type = (int8)g_deadzone;
 						input_abstraction_set_controller_right_thumb_deadzone(current_controller_index);
 					}
 					if (ImGui::IsItemHovered())
@@ -554,7 +554,7 @@ namespace ImGuiHandler {
 						ImGui::PushItemWidth(WidthPercentage(15));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_default, "C_Deadzone_A_X_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
-							current_cartographer_profile->deadzone_axial.x = k_default_right_thumbstick_deadzone_axial_percentage_x;
+							current_cartographer_profile->deadzone_axial.x = k_default_right_thumbstick_deadzone_axial_percentage.x;
 							input_abstraction_set_controller_right_thumb_deadzone(current_controller_index);
 						}
 						ImGui::PopItemWidth();
@@ -580,7 +580,7 @@ namespace ImGuiHandler {
 						ImGui::PushItemWidth(WidthPercentage(12));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_default, "C_Deadzone_A_Y_3"), ImVec2(WidthPercentage(12), item_size.y)))
 						{
-							current_cartographer_profile->deadzone_axial.y = k_default_right_thumbstick_deadzone_axial_percentage_y;
+							current_cartographer_profile->deadzone_axial.y = k_default_right_thumbstick_deadzone_axial_percentage.y;
 							input_abstraction_set_controller_right_thumb_deadzone(current_controller_index);
 						}
 						ImGui::PopItemWidth();
@@ -928,7 +928,6 @@ namespace ImGuiHandler {
 			}
 
 			bool open = *p_open;
-			ImGuiIO& io = ImGui::GetIO();
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoCollapse;
@@ -969,11 +968,14 @@ namespace ImGuiHandler {
 							ImGui::Columns(4, NULL, false);
 							for (auto i = 0; i < 25; i++)
 							{
-								if (ImGui::Checkbox(_itoa(i, integer_string, 10), &ras_layer_overrides[i]))
+								if (_itoa_s(i, integer_string, 10) == ERROR_SUCCESS)
 								{
-									rasterizer_globals->reset_screen = true;
+									if (ImGui::Checkbox(integer_string, &ras_layer_overrides[i]))
+									{
+										rasterizer_globals->reset_screen = true;
+									}
+									ImGui::NextColumn();
 								}
-								ImGui::NextColumn();
 							}
 							ImGui::Columns(1);
 						}
@@ -982,8 +984,12 @@ namespace ImGuiHandler {
 							ImGui::Columns(4, NULL, false);
 							for (auto i = 0; i < 24; i++)
 							{
-								ImGui::Checkbox(_itoa(i, integer_string, 10), &geo_render_overrides[i]);
-								ImGui::NextColumn();
+								if (_itoa_s(i, integer_string, 10) == ERROR_SUCCESS)
+								{
+									ImGui::Checkbox(integer_string, &geo_render_overrides[i]);
+									ImGui::NextColumn();
+								}
+
 							}
 							ImGui::Columns(1);
 						}

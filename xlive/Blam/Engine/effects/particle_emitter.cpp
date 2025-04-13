@@ -61,8 +61,6 @@ void c_particle_emitter::pulse(
 {
 	c_particle_system_definition* particle_system_definition = particle_system->get_definition();
 	real32 scale = 1.0f;
-	effect_datum* effect = (effect_datum*)datum_get(get_effects_table(), particle_system->parent_effect_index);
-	object_datum* object = (object_datum*)object_get_fast_unsafe(effect->object_index);
 
 	_this->m_previous_position = _this->m_position;
 	if (matrix)
@@ -76,7 +74,7 @@ void c_particle_emitter::pulse(
 		calc_matrix(emitter_definition, particle_system, scale, matrix);
 	}
 
-	if (!particle_system_definition->system_is_looping_particle() || _this->particle_index == NONE)
+	if (!particle_system_definition->system_is_looping_particle() || _this->m_particle_index == NONE)
 	{
 		_this->particles_to_emit = emitter_definition->get_particle_emissions_per_tick(particle_state) * delta + _this->particles_to_emit;
 	}
@@ -149,8 +147,6 @@ void c_particle_emitter::adjust_initial_particle_position(
 {
 	c_particle_system_definition* particle_system_definition = particle_system->get_definition();
 	real32 scale = 1.0f;
-	effect_datum* effect = (effect_datum*)datum_get(get_effects_table(), particle_system->parent_effect_index);
-	object_datum* object = (object_datum*)object_get_fast_unsafe(effect->object_index);
 
 	this->m_previous_position = this->m_position;
 	if (matrix)
@@ -164,7 +160,7 @@ void c_particle_emitter::adjust_initial_particle_position(
 		calc_matrix(emitter_definition, particle_system, scale, matrix);
 	}
 
-	datum particle_index = this->particle_index;
+	datum particle_index = this->m_particle_index;
 	real32 particle_count_to_emit = 0.0f;
 
 	// if particle is not none, the particle count got to emit got updated at least once
@@ -176,7 +172,6 @@ void c_particle_emitter::adjust_initial_particle_position(
 	while (particle_index != NONE)
 	{
 		c_particle* particle = (c_particle*)datum_get(get_particle_table(), particle_index);
-		c_particle_definition_interface* particle_system_interface = particle_system_definition->get_particle_system_interface();
 
 		if (!particle_system_definition->system_is_looping_particle())
 		{

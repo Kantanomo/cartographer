@@ -202,18 +202,18 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 		placeholder_email = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_email_text);
 		placeholder_password = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_password_text);
 		placeholder_confirm_password = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_create_button_placeholder_confirm_password_text);
-		wcsncpy(m_account_create.user_name, placeholder_username, XUSER_NAME_SIZE);
-		wcsncpy(m_account_create.email, placeholder_email, ARRAYSIZE(m_account_create.email));
-		wcsncpy(m_account_create.password, placeholder_password, ARRAYSIZE(m_account_create.password));
-		wcsncpy(m_account_create.password_confirmation, placeholder_confirm_password, ARRAYSIZE(m_account_create.password_confirmation));
+		ustrncpy(m_account_create.user_name, placeholder_username, XUSER_NAME_SIZE);
+		ustrncpy(m_account_create.email, placeholder_email, ARRAYSIZE(m_account_create.email));
+		ustrncpy(m_account_create.password, placeholder_password, ARRAYSIZE(m_account_create.password));
+		ustrncpy(m_account_create.password_confirmation, placeholder_confirm_password, ARRAYSIZE(m_account_create.password_confirmation));
 		break;
 	case _cartographer_account_manager_screen_type_add_account:
 		csmemset(&m_account_add, 0, sizeof(m_account_add));
 
 		placeholder_username = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_button_placeholder_username_text);
 		placeholder_password = get_cartographer_account_manager_label(m_cartographer_screen_type, _screen_type_account_add_button_placeholder_password_text);
-		wcsncpy(m_account_add.email_or_username, placeholder_username, ARRAYSIZE(m_account_add.email_or_username));
-		wcsncpy(m_account_add.password, placeholder_password, ARRAYSIZE(m_account_add.password));
+		ustrncpy(m_account_add.email_or_username, placeholder_username, ARRAYSIZE(m_account_add.email_or_username));
+		ustrncpy(m_account_add.password, placeholder_password, ARRAYSIZE(m_account_add.password));
 		break;
 	default:
 		break;
@@ -705,7 +705,7 @@ void* __cdecl c_cartographer_account_manager_menu::load(s_screen_parameters* par
 
 	if (ui_buffer) {
 		account_list_menu = new (ui_buffer) c_cartographer_account_manager_menu(
-			parameters->m_channel_type, parameters->m_window_index, parameters->user_flags, g_open_cartographer_account_manager_context, button_count, selected_button_index);
+			parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags, g_open_cartographer_account_manager_context, button_count, selected_button_index);
 		account_list_menu->m_allocated = true;
 	}
 

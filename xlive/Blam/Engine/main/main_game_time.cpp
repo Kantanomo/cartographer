@@ -10,10 +10,8 @@
 
 /* constants */
 
-enum
-{
-	k_use_precise_counters = true,
-};
+#define USE_PRECISE_COUNTERS 1
+
 
 /* typedefs */
 
@@ -174,7 +172,7 @@ static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER
 
 	real32 dt;
 	// We want the return value to be configurable
-	if (k_use_precise_counters)
+	if (USE_PRECISE_COUNTERS)
 	{
 		// Precise dt
 		dt = main_time_get_delta_sec_precise(shell_time_counter_now(NULL), freq);

@@ -1,8 +1,6 @@
 #include "stdafx.h"
-
 #include "xnet.h"
 
-#include "XLive/xnet/IpManagement/XnIp.h"
 #include "XLive/xnet/Sockets/XSocket.h"
 
 // #58: XNetServerToInAddr
@@ -39,7 +37,7 @@ INT   WINAPI XNetInAddrToServer(const IN_ADDR ina, IN_ADDR *pina)
 INT   WINAPI XNetInAddrToString(const IN_ADDR ina, char * pchBuf, INT cchBuf)
 {
 	LOG_TRACE_NETWORK("XNetInAddrToString");
-	strncpy(pchBuf, inet_ntoa(ina), cchBuf);
+	strncpy_s(pchBuf, cchBuf, inet_ntoa(ina), cchBuf);
 	return 0;
 }
 
@@ -48,15 +46,15 @@ INT WINAPI XNetXnAddrToMachineId(const XNADDR * pxnaddr, ULONGLONG * pqwMachineI
 {
 	LOG_TRACE_NETWORK("XNetXnAddrToMachineId");
 
-
 	// ???
 	return -1;
 
-
+	/*
 	if (pqwMachineId)
 		*pqwMachineId = 0xDEADC0DE;
 
 	return 0;
+	*/
 }
 
 // #67: XNetDnsLookup

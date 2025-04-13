@@ -145,7 +145,6 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {1} - Level: {2}", __FUNCTIONW__, absPlayerIdx, s_player::get_name(playerIdx), level);
 
-				const datum currentWeapon = (datum)k_level_weapons[level];
 
 				if (level == 15)
 				{
@@ -159,7 +158,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				}
 				else
 				{
-					call_give_player_weapon(absPlayerIdx, currentWeapon, 1);
+					call_give_player_weapon(absPlayerIdx, (datum)k_level_weapons[level], 1);
 				}
 			}
 		}
@@ -176,7 +175,6 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
 {
 	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
-	datum playerUnitDatum = s_player::get_unit_index(player_datum);
 	uint64 playerId = NetworkSession::GetPlayerId(absPlayerIdx);
 
 	// in gungame we just keep track of the score
@@ -194,10 +192,12 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {}", __FUNCTIONW__, absPlayerIdx, s_player::get_name(player_datum));
 
 			int32 level = GunGame::gungamePlayers[playerId];
-			level++;
+			++level;
 
 			if (level > 16)
+			{
 				level = 0; // reset level, so we dont keep the player without weapons, in case the game doesnt end
+			}
 
 			GunGame::gungamePlayers[playerId] = level;
 
@@ -217,10 +217,9 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 			else
 			{
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on level {} giving them weapon...", __FUNCTIONW__, s_player::get_name(player_datum), level);
-				const datum weapon = (datum)k_level_weapons[level];
 				s_player::set_player_unit_grenade_count(player_datum, _unit_grenade_human_fragmentation, 0, true);
 				s_player::set_player_unit_grenade_count(player_datum, _unit_grenade_covenant_plasma, 0, true);
-				call_give_player_weapon(absPlayerIdx, weapon, 1);
+				call_give_player_weapon(absPlayerIdx, (datum)k_level_weapons[level], 1);
 			}
 		}
 

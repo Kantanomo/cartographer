@@ -445,7 +445,9 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 	if (m_melee_tick == 1)
 	{
+#if MELEE_DEBUG
 		int added_ticks = m_maximum_counter - 6 - (m_weapon_is_sword ? 7 : 1);
+#endif
 
 		LOG_TRACE_MELEE("{} - update melee at tickrate: {}", __FUNCTION__, time_globals::get()->ticks_per_second);
 		LOG_TRACE_MELEE("{} - added tick count to maximum counter: {}", __FUNCTION__, added_ticks);
@@ -455,15 +457,17 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 	{
 		real_vector3d vector_to_target;
 		vector_from_points3d(player_origin, &m_target_point, &vector_to_target);
+#if MELEE_DEBUG
 		real32 remaining_distance = magnitude3d(&vector_to_target);
-
+#endif
 		real32 unk_real32_distance = dot_product3d(&m_aiming_direction, translational_velocity);
 		unk_real32_distance *= game_tick_length();
 		real32 acceleration = melee_lunge_get_max_speed_per_tick(game_tick_length(), m_distance, m_weapon_is_sword);
 		acceleration = melee_get_acceleration(acceleration);
+#if MELEE_DEBUG
 		real32 unk_velocity = MAX(0.0f, melee_lunge_compute_something_1(unk_real32_distance, acceleration));
-
 		real32 log_magnitude = magnitude3d(&physics_output->translational_velocity);
+#endif
 
 		LOG_TRACE_MELEE("{} : output velocity:       i: {}, j: {}, k: {}, magnitude: {}, decelerating?: {}, remaining distance to target: {}",
 			__FUNCTION__,
@@ -475,10 +479,12 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 			remaining_distance);
 	}
 
+#if MELEE_DEBUG
 	/*LOG_TRACE_MELEE("{} : unk real32 value: {}, remaining distance: {}",
 		__FUNCTION__,
 		unk_velocity,
 		remaining_distance);*/
+#endif
 
 	LOG_TRACE_MELEE("{} : remaining distance in ticks: {} ", __FUNCTION__, m_time_to_target_in_ticks);
 

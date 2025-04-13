@@ -213,7 +213,7 @@ void c_settings_list::handle_item_player_profile(s_event_record** pevent)
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -228,7 +228,7 @@ void c_settings_list::handle_item_variant(s_event_record** pevent)
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -243,7 +243,7 @@ void c_settings_list::handle_item_video(s_event_record** pevent)
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -258,7 +258,7 @@ void c_settings_list::handle_item_audio(s_event_record** pevent)
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -273,7 +273,7 @@ void c_settings_list::handle_item_network(s_event_record** pevent)
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -288,7 +288,7 @@ void c_settings_list::handle_item_about(s_event_record** pevent)
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -375,7 +375,7 @@ void* c_screen_settings::load(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_settings(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags);
+			parameters->m_user_flags);
 
 		screen->m_allocated = true;
 

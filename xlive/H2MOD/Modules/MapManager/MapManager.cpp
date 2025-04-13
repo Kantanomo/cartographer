@@ -373,7 +373,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 
 	curl = curl_interface_init_no_verify();
 	if (curl) {
-		fp = _wfopen(map_path.get_string(), L"wb");
+		fp = ufopen(map_path.get_string(), L"wb");
 		if (fp == nullptr) {
 			LOG_TRACE_GAME(L"{} - unable to open map file at: {}", __FUNCTIONW__, map_path.get_string());
 			curl_easy_cleanup(curl);
@@ -400,7 +400,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 		/* always cleanup */
 		curl_easy_cleanup(curl);
-		fclose(fp);
+		ufclose(fp);
 
 		if (res == CURLE_OK)
 		{

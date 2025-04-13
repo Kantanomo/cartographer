@@ -46,9 +46,9 @@ void __cdecl ok_cancel_dialog_show_hook(e_user_interface_channel_type channel_ty
 
 void* c_screen_error_dialog_ok::load_for_active_users(s_screen_parameters* parameters)
 {
-	if ((parameters->user_flags & 0xFF) == (uint8)NONE)
+	if ((parameters->m_user_flags & 0xFF) == (uint8)NONE)
 	{
-		parameters->user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
+		parameters->m_user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
 	}
 	return INVOKE(0x20E032, 0x0, c_screen_error_dialog_ok::load_for_active_users, parameters);
 }

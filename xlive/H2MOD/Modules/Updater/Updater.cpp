@@ -77,7 +77,7 @@ static size_t header_callback(char* buffer, size_t size, size_t nitems, void* us
 	/* received header is nitems * size long in 'buffer' NOT ZERO TERMINATED */
 	/* 'userdata' is set with CURLOPT_HEADERDATA */
 
-	sscanf(buffer, "Content-Length:%lld", &sizeOfDownload);
+	sscanf_s(buffer, "Content-Length:%lld", &sizeOfDownload);
 	return nitems * size;
 }
 
@@ -89,7 +89,7 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 	curl = curl_interface_init_no_verify();
 	if (curl) {
 		CreateDirTree(local_full_path);
-		fp = _wfopen(local_full_path, L"wb");
+		fp = ufopen(local_full_path, L"wb");
 		if (!fp) {
 			addDebugText("Failed to obtain FILE* for DL from: %s to: %s", url, local_full_path);
 			return 2;
@@ -167,13 +167,8 @@ static int interpretUpdateEntry(char* fileLine, char* version, int lineNumber) {
 		bool unrecognised = false;
 		bool duplicated = false;
 		bool incorrect = false;
-		bool dontSave = false;
 		int fileLineLen = strlen(fileLine);
-		int tempint1 = -1;
 		DWORD tempDWORD = 0;
-		unsigned short tempushort1 = -1;
-		int tempint2 = -1;
-		float tempfloat1 = NULL;
 		char tempstr1[260] = "";
 		char tempstr2[260] = "";
 		if (fileLine[0] == '#' || fileLine[0] == ';' || fileLineLen < 5) {
@@ -244,7 +239,8 @@ static int interpretUpdateEntry(char* fileLine, char* version, int lineNumber) {
 
 
 static void FetchUpdateDetails() {
-	wchar_t* dir_temp = _wgetenv(L"TEMP");
+	wchar_t dir_temp[MAX_PATH];
+	ugetenv(dir_temp, NUMBEROF(dir_temp), L"TEMP");
 
 	wchar_t dir_temp_h2[1024];
 	swprintf(dir_temp_h2, ARRAYSIZE(dir_temp_h2), L"%ws\\Halo2\\", dir_temp);
@@ -283,7 +279,7 @@ static void FetchUpdateDetails() {
 
 		addDebugText("Interpreted the details.");
 
-		int entry_count = UpdateFileEntries.size();
+		entry_count = (int)UpdateFileEntries.size();
 		for (int i = entry_count - 1; i >= 0; i--) {
 			if (!UpdateFileEntries[i]->need_to_update)
 				continue;
@@ -402,7 +398,8 @@ bool DownloadUpdatedFiles() {
 	//download list
 	bool files_downloaded = false;
 
-	wchar_t* dir_temp = _wgetenv(L"TEMP");
+	wchar_t dir_temp[MAX_PATH];
+	ugetenv(dir_temp, NUMBEROF(dir_temp), L"TEMP");
 
 	wchar_t dir_update[1024];
 	swprintf(dir_update, ARRAYSIZE(dir_update), L"%ws\\Halo2\\Update\\", dir_temp);
@@ -464,9 +461,10 @@ void GSDownloadDL() {
 		hThreadDownloader = CreateThread(NULL, 0, DownloadThread, (LPVOID)1, 0, NULL);
 }
 
-void GSDownloadInstall() {
-
-	wchar_t* dir_temp = _wgetenv(L"TEMP");
+void GSDownloadInstall()
+{
+	wchar_t dir_temp[MAX_PATH];
+	ugetenv(dir_temp, NUMBEROF(dir_temp), L"TEMP");
 
 	wchar_t dir_update[1024];
 	swprintf(dir_update, ARRAYSIZE(dir_update), L"%ws\\Halo2\\Update\\", dir_temp);

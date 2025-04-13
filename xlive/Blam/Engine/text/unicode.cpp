@@ -46,7 +46,10 @@ wchar_t* ustrncat(wchar_t* dest, const wchar_t* src, size_t count)
 {
 	ASSERT(dest != NULL);
 	ASSERT(src != NULL);
-	return wcsncat(dest, src, count);
+
+	// Originally used the unsafe version in h2v, adjusted to use the safe version
+	const errno_t error = wcsncat_s(dest, UINT_MAX, src, count);
+	return error == 0 ? dest : NULL;
 }
 
 int32 ustrncmp(const wchar_t* string1, const wchar_t* string2, size_t count)
@@ -426,3 +429,17 @@ size_t utf8_string_length(const utf8* src, size_t size)
 	return MultiByteToWideChar(CP_UTF8, 0, src, size, NULL, 0);
 }
 
+bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name)
+{
+	ASSERT(var_name);
+	size_t required_count;
+	const errno_t err = _wgetenv_s(&required_count, buffer, count, var_name);
+
+	if (required_count > count)
+	{
+		error(3, "%s: increase the number of elements passed to the buffer. Passed: %d | Required: %d", __FUNCTION__, count, required_count);
+	}
+
+
+	return err == ERROR_SUCCESS;
+}

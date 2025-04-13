@@ -325,7 +325,7 @@ int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id mark
 
 bool __cdecl object_force_inside_bsp(datum object_index, const real_point3d* known_good_point, int32 ignore_object_index);
 
-void* object_get_and_verify_type(datum object_index, uint32 object_type_mask);
+void* object_get_and_verify_type(datum object_index, int32 object_type_mask);
 
 #ifdef OBJECT_OVERRIDE_ENABLED
 void object_override_set_shader(datum object_index, datum shader_tag_index);

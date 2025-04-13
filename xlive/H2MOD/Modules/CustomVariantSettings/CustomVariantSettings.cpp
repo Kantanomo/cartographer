@@ -228,8 +228,6 @@ namespace CustomVariantSettings
 		case _random:
 			return p_get_next_hill_index(previousHill);
 		}
-		//Just in case.
-		return -1;
 	}
 
 	void ApplyHooks()

@@ -279,21 +279,23 @@ bool __cdecl user_interface_controller_pick_profile_offline(e_controller_index c
 
 bool __cdecl user_interface_controller_has_gamepad(e_controller_index controller_index)
 {
+	bool result = false;
 	if (VALID_INDEX(controller_index, k_number_of_controllers))
 	{
-		return input_has_gamepad(controller_index, nullptr);
-		//return input_has_gamepad_plugged(controller_index);
+		result = input_has_gamepad((uint16)controller_index, nullptr);
+		//result = input_has_gamepad_plugged(controller_index);
 	}
-	return false;
+	return result;
 }
 
 bool __cdecl user_interface_controller_has_gamepad_just_left(e_controller_index controller_index)
 {
+	bool result = false;
 	if (VALID_INDEX(controller_index, k_number_of_controllers))
 	{
-		return input_gamepad_just_left(controller_index);
+		result = input_gamepad_just_left((uint16)controller_index);
 	}
-	return false;
+	return result;
 }
 
 bool __cdecl user_interface_controller_is_guest(e_controller_index controller_index)
@@ -455,12 +457,12 @@ static void user_interface_controller_update_disconnect(void)
 	{
 
 		s_user_interface_controller& controller_data = g_user_interface_controller_globals->controllers[controller];
-		bool bad_condition = !input_has_gamepad_plugged(controller);
+		bool bad_condition = !input_has_gamepad_plugged((uint16)controller);
 
 		if (controller == k_windows_device_controller_index)
 		{
 			bool is_simulated;
-			bool device_connected = input_has_gamepad(controller, &is_simulated);
+			bool device_connected = input_has_gamepad((uint16)controller, &is_simulated);
 
 			bad_condition = is_simulated &&
 				input_abstraction_get_last_used_device(controller) == k_last_used_device_was_gamepad || !device_connected;

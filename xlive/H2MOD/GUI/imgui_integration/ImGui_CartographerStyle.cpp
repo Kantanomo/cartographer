@@ -129,7 +129,6 @@ void imgui::Cartographer::StyleSetAsDefault(ImGuiStyle* out)
 void imgui::Cartographer::PushStyle()
 {
 	// initialize default window style for each window
-	auto& ImDefaultStyle = ImGui::GetStyle();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, wPadding);
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, fPadding);

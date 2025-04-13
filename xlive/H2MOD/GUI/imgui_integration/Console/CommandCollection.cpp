@@ -30,9 +30,60 @@
 std::mutex commandInsertMtx;
 
 bool readObjectIds = true;
-std::map<std::string, unsigned int> objectIds;
 
-const char command_error_bad_arg[] = "# exception catch (bad arg): ";
+static const char command_error_bad_arg[] = "# exception catch (bad arg): ";
+
+namespace CommandCollection
+{
+	static ConsoleCommand* GetCommandByName(const std::string& name);
+	static void SetVarCommandPtr(const std::string& name, ComVarBase* varPtr);
+
+	// commands
+	static int BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int SetAddressIpv4HandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+
+	static int RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int LeaveNetworkSessionCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int IsSessionHostCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int LogSelectedMapFilenameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int RequestFileNameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int SetMaxPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int WarpFixCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int drop(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+
+	static int Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int game_coop_players(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int game_multiplayer(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int game_splitscreen(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int game_mode(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int change_player_team(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int quit(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int _screenshot_cubemap(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int SetPortNumber(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+
+	// misc
+	static void DeleteObject(datum objectDatumIdx);
+
+	TEST_N_DEF(CC5);
+}
 
 ComVarFromPtr(network_stats_overlay_var_cmd, int, &ImGuiHandler::g_network_stats_overlay,
 	"var_net_metrics", "displays various network parameters, 1 parameter(s): <int>(1 - basic debug info, 2 - complete debug)", 0, 1, CommandCollection::NetworkMetricsCmd);
@@ -56,6 +107,8 @@ ComVarFromPtrIpv4(h2config_set_lan_ipv4_address, &H2Config_ip_lan,
 ComVarFromPtrIpv4(h2config_set_broadcast_ipv4_address, &H2Config_ip_broadcast_override,
 	"var_broadcast_ip_address_override", "sets the broadcast override address", 1, 1, CommandCollection::SetAddressBroadcastIpv4);
 
+TEST_N_DEF(CC1);
+
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
 std::vector<ConsoleCommand*> CommandCollection::commandTable;
@@ -66,6 +119,7 @@ void CommandCollection::InitializeCommands()
 	if (InitializeCommandsMap_initialized) return;
 	InitializeCommandsMap_initialized = true;
 
+	TEST_N_DEF(CC2);
 	InsertCommand(new ConsoleCommand(network_stats_overlay_var_cmd));
 	InsertCommand(new ConsoleCommand(og_frame_limiter_var_cmd));
 	InsertCommand(new ConsoleCommand(rumble_var_cmd));
@@ -130,7 +184,7 @@ void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
 	commandTable.emplace_back(newCommand);
 }
 
-ConsoleCommand* CommandCollection::GetCommandByName(const std::string& name)
+static ConsoleCommand* CommandCollection::GetCommandByName(const std::string& name)
 {
 	std::scoped_lock lock(commandInsertMtx);
 
@@ -146,7 +200,7 @@ ConsoleCommand* CommandCollection::GetCommandByName(const std::string& name)
 }
 
 // in case your variable needs to be set/updated
-void CommandCollection::SetVarCommandPtr(const std::string& name, ComVarBase* varPtr)
+static void CommandCollection::SetVarCommandPtr(const std::string& name, ComVarBase* varPtr)
 {
 	ConsoleCommand* commandPtr = GetCommandByName(name);
 	if (commandPtr != nullptr)
@@ -159,7 +213,7 @@ void CommandCollection::SetVarCommandPtr(const std::string& name, ComVarBase* va
 //	commands
 //////////////////////////////////////////////////////////////////////////
 
-int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	auto booleanCmdVar = ctx.consoleCommand->GetVar<ComVar<bool>>();
@@ -186,7 +240,7 @@ int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens,
 	return 0;
 }
 
-int CommandCollection::SetAddressIpv4HandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::SetAddressIpv4HandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -207,7 +261,7 @@ int CommandCollection::SetAddressIpv4HandlerCmd(const std::vector<std::string>& 
 	return result;
 }
 
-int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	real32 rumbleScale;
@@ -226,7 +280,7 @@ int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, Co
 	return 0;
 }
 
-int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	int32 network_debug_display_type;
@@ -265,7 +319,7 @@ int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens,
 	return 0;
 }
 
-int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -277,14 +331,14 @@ int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens,
 	return BoolVarHandlerCmd(tokens, ctx);
 }
 
-int CommandCollection::LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	gXnIpMgr.LogConnectionsToConsole(outputCb);
 	return 0;
 }
 
-int CommandCollection::LogSelectedMapFilenameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::LogSelectedMapFilenameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -303,7 +357,7 @@ int CommandCollection::LogSelectedMapFilenameCmd(const std::vector<std::string>&
 	return 0;
 }
 
-int CommandCollection::RequestFileNameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::RequestFileNameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -322,7 +376,7 @@ int CommandCollection::RequestFileNameCmd(const std::vector<std::string>& tokens
 	return 0;
 }
 
-int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -340,7 +394,7 @@ int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& to
 	return 0;
 }
 
-int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -359,7 +413,7 @@ int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, 
 	return 0;
 }
 
-int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	int32 peer_index;
@@ -396,7 +450,7 @@ int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, Conso
 	return 0;
 }
 
-int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -412,13 +466,13 @@ int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, Co
 	return 0;
 }
 
-int CommandCollection::ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	mapManager->ReloadAllMaps();
 	return 0;
 }
 
-int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -465,7 +519,7 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 	return 0;
 }
 
-int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -475,7 +529,11 @@ int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, Con
 		outputCb(StringFlag_None, "# not in a network session");
 		return 0;
 	}
+#ifdef CC3
+	TEST_N_DEF(CC3)
+#else
 	else if (!session->is_host())
+#endif
 	{
 		outputCb(StringFlag_None, "# must be network session host");
 		return 0;
@@ -507,7 +565,7 @@ int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, Con
 	return 0;
 }
 
-int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -517,7 +575,11 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 		outputCb(StringFlag_None, "# not in a network session");
 		return 0;
 	}
+#ifdef CC3
+	TEST_N_DEF(CC3)
+#else
 	else if (!session->is_host())
+#endif
 	{
 		outputCb(StringFlag_None, "# must be network session host");
 		return 0;
@@ -564,7 +626,7 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 	return 0;
 }
 
-int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -605,7 +667,7 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 	return 0;
 }
 
-int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	bool warpFixVar;
@@ -627,7 +689,7 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 	return 0;
 }
 
-int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	datum datumIdx;
@@ -654,7 +716,7 @@ int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, 
 	return 0;
 }
 
-int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	outputCb(StringFlag_None, "# object ids reset next time spawn is used");
@@ -662,13 +724,13 @@ int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>&
 	return 0;
 }
 
-int CommandCollection::drop(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::drop(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	cheat_drop_tag_name(tokens[1].c_str());
 	return 0;
 }
 
-int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -699,7 +761,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	return 0;
 }
 
-int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	int* test = nullptr;
 #pragma warning( push )
@@ -712,7 +774,7 @@ int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleComm
 //	commands end
 //////////////////////////////////////////////////////////////////////////
 
-void CommandCollection::DeleteObject(datum objectDatumIdx)
+static void CommandCollection::DeleteObject(datum objectDatumIdx)
 {
 	if (objectDatumIdx != NONE)
 	{
@@ -720,23 +782,23 @@ void CommandCollection::DeleteObject(datum objectDatumIdx)
 	}
 }
 
-int CommandCollection::map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	main_game_launch(tokens[1].c_str());
 	return 0;
 }
 
-int CommandCollection::game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	int difficulty;
 	std::string exception;
 	ComVar(&difficulty).SetFromStr(tokens[1], 0, exception);
 
-	main_game_launch_set_difficulty(difficulty);
+	main_game_launch_set_difficulty((int16)difficulty);
 	return 0;
 }
 
-int CommandCollection::game_coop_players(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::game_coop_players(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	int player_count;
 	std::string exception;
@@ -746,13 +808,13 @@ int CommandCollection::game_coop_players(const std::vector<std::string>& tokens,
 	return 0;
 }
 
-int CommandCollection::game_multiplayer(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::game_multiplayer(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	main_game_launch_set_multiplayer_variant(tokens[1].c_str());
 	return 0;
 }
 
-int CommandCollection::game_splitscreen(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::game_splitscreen(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	int player_count;
 	std::string exception;
@@ -762,7 +824,7 @@ int CommandCollection::game_splitscreen(const std::vector<std::string>& tokens, 
 	return 0;
 }
 
-int CommandCollection::game_mode(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::game_mode(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	int game_mode;
 	std::string exception;
@@ -772,7 +834,7 @@ int CommandCollection::game_mode(const std::vector<std::string>& tokens, Console
 	return 0;
 }
 
-int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	c_network_session* session = NULL;
@@ -791,7 +853,7 @@ int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCom
 	// Encode the data into hex string
 	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
 	{
-		sprintf(&connect_string[2 * i], "%02hhX", session_bytes[i]);
+		csprintf(&connect_string[2 * i], 2, "%02hhX", session_bytes[i]);
 	}
 
 	outputCb(StringFlag_None, "Invite code generated:");
@@ -800,7 +862,7 @@ int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCom
 	return 0;
 }
 
-int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	XSESSION_INFO session;
 	uint8* session_bytes = (uint8*)&session;
@@ -808,7 +870,7 @@ int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCo
 	// Decode the data from hex string
 	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
 	{
-		(void)sscanf(&tokens[1].c_str()[2 * i], "%02hhX", &session_bytes[i]);
+		(void)sscanf_s(&tokens[1].c_str()[2 * i], "%02hhX", &session_bytes[i]);
 	}
 
 	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, &session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
@@ -816,7 +878,7 @@ int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCo
 	return 0;
 }
 
-int CommandCollection::change_player_team(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::change_player_team(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -840,20 +902,20 @@ int CommandCollection::change_player_team(const std::vector<std::string>& tokens
 }
 
 
-int CommandCollection::quit(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::quit(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	main_quit();
 	return 0;
 }
 
-int CommandCollection::_screenshot_cubemap(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::_screenshot_cubemap(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	ImGuiHandler::ToggleWindow("console");	// Close the console window so it doesn't appear in the cubemap screenshot
 	screenshot_cubemap(tokens[1].c_str());
 	return 0;
 }
 
-int CommandCollection::SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -872,7 +934,7 @@ int CommandCollection::SetAddressLANIpv4(const std::vector<std::string>& tokens,
 	return SetAddressIpv4HandlerCmd(tokens, ctx);
 }
 
-int CommandCollection::SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -885,7 +947,7 @@ int CommandCollection::SetAddressBroadcastIpv4(const std::vector<std::string>& t
 	return SetAddressIpv4HandlerCmd(tokens, ctx);
 }
 
-int CommandCollection::SetPortNumber(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+static int CommandCollection::SetPortNumber(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
@@ -917,3 +979,5 @@ int CommandCollection::SetPortNumber(const std::vector<std::string>& tokens, Con
 
 	return 0;
 }
+
+TEST_N_DEF(CC4);

@@ -171,10 +171,13 @@ size_t crash_report_get_text_total_size(const wchar_t* reports_path)
 			file_get_size(&file, &file_size);
 			g_report_text_file_utf8_strings[i] = (utf8*)calloc(file_size + 1, sizeof(utf8));
 			bool result = file_read(&file, file_size, true, g_report_text_file_utf8_strings[i]);
-			g_report_text_file_string_lengths[i] += utf8_string_length(g_report_text_file_utf8_strings[i], file_size);
-			string_length += g_report_text_file_string_lengths[i];
+			if (result)
+			{
+				g_report_text_file_string_lengths[i] += utf8_string_length(g_report_text_file_utf8_strings[i], file_size);
+				string_length += g_report_text_file_string_lengths[i];
 
-			file_close(&file);
+				file_close(&file);
+			}
 		}
 	}
 

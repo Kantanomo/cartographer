@@ -261,7 +261,7 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 			{
 				s_offset_link* link = &loader->m_tag_reference_offsets[loader->m_tag_reference_offset_count];
 				link->cache_offset = file_offset + calc_offset;
-				link->memory_offset = (uint32)buffer + calc_offset;
+				link->memory_offset = (uintptr_t)buffer + calc_offset;
 
 #if TAG_INJECTION_DEBUG
 				csstrncpy(link->name, definition->get_tag_reference_name(i)->get_string(), sizeof(s_offset_link::name));

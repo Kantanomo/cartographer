@@ -132,7 +132,7 @@ uint32 __cdecl cache_file_align_read_size_to_cache_page(uint32 size)
 	return INVOKE(0x647DA, 0x4C831, cache_file_align_read_size_to_cache_page, size);
 }
 
-bool __cdecl cache_file_blocking_read(uint32 a1, uint32 cache_offset, uint32 read_size, void* out_buffer)
+bool __cdecl cache_file_blocking_read(intptr_t a1, uint32 cache_offset, uint32 read_size, void* out_buffer)
 {
 	return INVOKE(0x64D01, 0x4CD58, cache_file_blocking_read, a1, cache_offset, read_size, out_buffer);
 }
@@ -364,7 +364,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 	return true;
 }
 
-datum tag_loaded(uint32 group_tag, const char* name)
+datum tag_loaded(int32 group_tag, const char* name)
 {
 	const s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
 	datum result = NONE;
@@ -418,11 +418,13 @@ const char* tag_get_name(datum tag_index)
 {
 	uint16 tag_name_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index);
 
+#ifdef ASSERTS_ENABLED
 	s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
 	ASSERT(g_cache_file_memory_globals->tags_loaded);
 	
 	// We added a second check if the first one fails, since we're going to be passing it tag indexes in the injected tag area
 	ASSERT(IN_RANGE(tag_name_index, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1) || IN_RANGE(tag_name_index - k_first_injected_datum, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1));
+#endif
 
 	int32 tag_name_offset = g_cache_file_debug_globals.debug_tag_name_offsets[tag_name_index];
 

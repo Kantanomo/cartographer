@@ -87,7 +87,7 @@ void kablam_apply_patches(void)
 	WriteValue<int32>(Memory::GetAddress(0x0, 0x3557FC), 1);
 
 	// set the additional post-game carnage report time
-	WriteValue<uint8>(Memory::GetAddress(0, 0xE590) + 2, H2Config_additional_pcr_time);
+	WriteValue<uint8>(Memory::GetAddress(0, 0xE590) + 2, (uint8)H2Config_additional_pcr_time);
 
 	p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)dedi_registry_hook, 11);
 
@@ -134,7 +134,7 @@ static void vip_lock(e_game_life_cycle state)
 
 static int __cdecl dedi_registry_hook(HKEY hKey, LPCWSTR lpSubKey)
 {
-	char result = p_hookServ1(hKey, lpSubKey);
+	int result = p_hookServ1(hKey, lpSubKey);
 	addDebugText("Post Server Registry Read.");
 	if (csstrnlen(H2Config_dedi_server_playlist, 256) > 0)
 	{

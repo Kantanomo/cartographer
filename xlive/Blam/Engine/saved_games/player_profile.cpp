@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "player_profile.h"
 
-#include "saved_game_files.h"
 #include "saved_game_files_async_windows.h"
 
 void __cdecl saved_game_player_profile_set_default_variant(void* saved_game_variant)
@@ -16,7 +15,7 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 
 	csmemset(profile, 0, sizeof(s_saved_game_player_profile));
 	profile->valid_maybe = true;
-	wcsncpy(profile->name, L"Guest", 16);
+	ustrncpy(profile->name, L"Guest", NUMBEROF(s_saved_game_player_profile::name));
 	profile->profile_traits.profile.primary_color = _player_color_colbat;
 	profile->profile_traits.profile.secondary_color = _player_color_white;
 	profile->profile_traits.profile.tertiary_color = _player_color_white;

@@ -8,8 +8,8 @@ const char command_error_invalid_parameter_count[] = "# %s command error: invali
 ConsoleCommand::ConsoleCommand(const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _input_callback,
 	CommandFlags _flags)
 {
-	strncpy(m_name, _name, ARRAYSIZE(m_name));
-	strncpy(m_command_description, _command_description, ARRAYSIZE(m_command_description));
+	strncpy_s(m_name, _name, ARRAYSIZE(m_name));
+	strncpy_s(m_command_description, _command_description, ARRAYSIZE(m_command_description));
 	m_flags = _flags;
 	m_min_parameter_count = _min_parameter_count;
 	m_max_parameter_count = _max_parameter_count;

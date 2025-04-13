@@ -6,6 +6,15 @@
 #include "networking/logic/life_cycle_manager.h"
 #include "shell/shell.h"
 
+/* constants */
+
+const char* const k_network_protocols_text[] =
+{
+	"<disconnected>",
+	"System-Link",
+	"LIVE",
+};
+
 /* public code */
 
 /* PRIVATE NAMESPACE, acts like static keyword */
@@ -297,7 +306,7 @@ void network_session_set_player_team(datum player_index, e_game_team team)
 			&& session->is_host())
 		{
 			s_membership_player* membership_player = session->get_player_membership(player_index);
-			membership_player->properties[0].team_index = team;
+			membership_player->properties[0].team_index = (int8)team;
 
 			if (session->peer_index_local_peer(membership_player->peer_index))
 			{
@@ -314,7 +323,7 @@ void c_network_session::switch_players_to_teams(datum* player_indexes, int32 pla
 	{
 		for (int32 i = 0; i < player_count; i++)
 		{
-			get_player_membership(player_indexes[i])->properties[0].team_index = team_indexes[i];
+			get_player_membership(player_indexes[i])->properties[0].team_index = (int8)team_indexes[i];
 		}
 		request_membership_update();
 		network_session_membership_update_local_players_teams();

@@ -34,14 +34,14 @@ void __cdecl particle_system_draw(
 	particle_state->set_particle_location(particle_location);
 
 	int32 emitter_index = 0;
-	datum current_particle_emitter_index = particle_location->particle_emitter_index;
+	datum current_particle_emitter_index = particle_location->m_particle_emitter_index;
 	while (current_particle_emitter_index != NONE)
 	{
 		ASSERT(system_def);
 
 		c_particle_emitter* particle_emitter = (c_particle_emitter*)datum_get(get_particle_emitter_table(), DATUM_INDEX_TO_ABSOLUTE_INDEX(current_particle_emitter_index));
 		c_particle_emitter_definition* emitter_def = system_def->emitters[emitter_index];
-		datum current_particle_index = particle_emitter->particle_index;
+		datum current_particle_index = particle_emitter->m_particle_index;
 
 		ASSERT(emitter_def);
 

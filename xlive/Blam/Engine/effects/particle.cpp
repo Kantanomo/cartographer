@@ -25,8 +25,8 @@ void c_particle::adjust_initial_position(
 	{
 		state->set_particle(this);
 
-		c_flags<e_particle_state_flags, uint32, k_particle_state_flags> flags(0xF80Fu);
-		state->state_update(flags);
+		c_flags<e_particle_state_flags, uint32, k_particle_state_flags> state_flags(0xF80Fu);
+		state->state_update(state_flags);
 		emitter_def->initialize_particle(state, this, particle_system);
 		m_position.x *= scale;
 		m_position.y *= scale;

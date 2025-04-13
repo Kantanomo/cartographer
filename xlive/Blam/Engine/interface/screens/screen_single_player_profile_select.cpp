@@ -47,7 +47,7 @@ void c_player_profile_list::update_displayed_profiles(void)
 	uint32 profile_storage_size;
 	s_user_interface_player_profile_storage* profile_storage = this->get_displayed_player_profile_storage(&profile_storage_size);
 
-	uint32 profile_indices[16];
+	int32 profile_indices[16];
 
 	int32 enumerated_file_index = NONE;
 
@@ -97,7 +97,7 @@ void c_player_profile_list::update_displayed_profiles(void)
 
 	for(int32 index = 0; index < k_player_profile_list_display_count; ++index)
 	{
-		const uint32 current_profile_index = profile_indices[index];
+		const int32 current_profile_index = profile_indices[index];
 		if(current_profile_index != NONE)
 		{
 			if(profile_storage_size > 0)

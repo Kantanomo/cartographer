@@ -93,10 +93,10 @@ const wchar_t* saved_games_get_file_type_as_string(e_saved_game_file_type file_t
 
 bool saved_games_append_file_type_to_path(wchar_t* in_path, e_saved_game_file_type file_type, wchar_t* out_path)
 {
-	wcsncpy(out_path, in_path, 256);
+	ustrncpy(out_path, in_path, 256);
 	wchar_t* cat_path = ustrncat(out_path, saved_games_get_file_type_as_string(file_type), 256);
 	cat_path[255] = '\0';
-	wcsncpy(out_path, cat_path, 256);
+	ustrncpy(out_path, cat_path, 256);
 	return true;
 }
 
@@ -114,7 +114,6 @@ void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name
 		if (absolute_index <= last_index || absolute_index == last_index)
 		{
 			s_saved_game_main_menu_globals_default_save_file* default_save = saved_game_main_menu_globals->default_save_files[absolute_index];
-			s_saved_game_player_profile* default_profile = (s_saved_game_player_profile*)default_save->buffer;
 			if ((enumerated_index & 0xF) != 0)
 			{
 				if ((enumerated_index & 0xF) <= 9)
@@ -188,9 +187,12 @@ void saved_game_main_menu_globals_initialize(void)
 void saved_game_files_memory_initialize(int32 unk)
 {
 	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
-	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
 
+#ifdef ASSERTS_ENABLED
+	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
 	ASSERT(saved_game_main_menu_globals);
+#endif
+
 	ASSERT(saved_game_files_globals->memory_initialized_for_game);
 	
 	if (unk == 1)

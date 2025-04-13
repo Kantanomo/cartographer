@@ -172,7 +172,6 @@ void saved_games_async_helper_read_file_success(int8* a1, s_file_reference* file
 {
 	// todo: figure out structure of context for async callbacks
 	int32* unk_1 = ((int32*)a1 + 1);
-	int8* unk_2 = &a1[1];
 
 	e_file_open_error error_result;
 	if(file_open(file_reference, (e_file_open_flags)(_file_open_file_attribute_temp | _permission_read_bit), &error_result))

@@ -37,7 +37,8 @@ void c_controller_settings_edit_list::update_list_items(c_list_item_widget* item
 	c_text_widget* header_text = item->try_find_text_widget(_settings_list_skin_text_header);
 	c_text_widget* value_text = item->try_find_text_widget(_settings_list_skin_text_value);
 
-	string_id header_string, value_string;
+	string_id header_string = _string_id_invalid;
+	string_id value_string = _string_id_empty_string;
 	switch (DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()))
 	{
 			case _item_thumbstick_settings:
@@ -141,12 +142,17 @@ void c_controller_settings_edit_list::update_list_items(c_list_item_widget* item
 	}
 
 	if (header_text)
+	{
 		header_text->set_text_from_string_id(header_string);
+	}
 
 	if (value_text)
+	{
 		value_text->set_text_from_string_id(value_string);
-
+	}
+	return;
 }
+
 __declspec(naked) void jmp_c_controller_settings_edit_list_update_list_items()
 {
 	CLASS_HOOK_JMP(c_controller_settings_edit_list_update_list_items, c_controller_settings_edit_list::update_list_items);

@@ -16,7 +16,7 @@ CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__process_creation, c_simul
 bool c_simulation_entity_database::process_creation(int32 entity_index, e_simulation_entity_type type, uint32 update_mask, int32 block_count, s_replication_allocation_block* blocks)
 {
 	bool result = false;
-	c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(type);
+	//c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(type);
 	s_simulation_game_entity* game_entity = entity_get(entity_index);
 	game_entity->entity_index = entity_index;
 	game_entity->entity_type = type;
@@ -246,7 +246,7 @@ bool c_simulation_entity_database::process_update(int32 entity_index, uint32 upd
 {
 	bool result = false;
 	s_simulation_game_entity* game_entity = entity_get(entity_index);
-	c_simulation_entity_definition* entity_def = m_type_collection->get_entity_definition(game_entity->entity_type);
+	//c_simulation_entity_definition* entity_def = m_type_collection->get_entity_definition(game_entity->entity_type);
 	s_simulation_queue_element* queue_element = *(s_simulation_queue_element**)blocks[_entity_update_block_order_forward_memory_queue_element].block_data;
 	uint8* state_data = (uint8*)blocks[_entity_update_block_order_simulation_entity_state].block_data;
 
@@ -396,7 +396,7 @@ void c_simulation_entity_database::entity_delete_gameworld(int32 entity_index)
 	s_simulation_game_entity* game_entity = entity_get(entity_index);
 	if (game_entity->object_index != NONE)
 	{
-		c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(game_entity->entity_type);
+		//c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(game_entity->entity_type);
 		simulation_queue_entity_deletion_insert(game_entity);
 	}
 

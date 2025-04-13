@@ -84,14 +84,14 @@ void memmove_guarded(void* write_start, const void* src, size_t size, void* boun
 {
 	if (size > 0)
 	{
+#ifdef ASSERTS_ENABLED
 		const void* write_end = (int8*)write_start + size - 1;
 		const void* bounds_upper = (int8*)bounds_lower + bounds_size - 1;
-		
 		CSERIES_ASSERT(bounds_upper >= bounds_lower);
 		CSERIES_ASSERT(bounds_size > 0);
 		CSERIES_ASSERT((write_start >= bounds_lower) && (write_start <= bounds_upper));
 		CSERIES_ASSERT((write_end >= bounds_lower) && (write_end <= bounds_upper));
-
+#endif
 		memmove(write_start, src, size);
 	}
 	return;
@@ -158,11 +158,10 @@ size_t csstrnlen(const char* s, size_t size)
 
 	// Do a manual loop through every character until we reach the null terminator to get the size
 	// This is originally how it was in h2
-	const char* current = s;
 	size_t length = 0;
 	for (; length < size; ++length)
 	{
-		if (current[length] == '\0')
+		if (s[length] == '\0')
 		{
 			break;
 		}
@@ -184,6 +183,19 @@ char* csstrncat(char* s1, char const* s2, size_t size)
 	CSERIES_ASSERT(size > 0 && size <= MAXIMUM_STRING_SIZE);
 	strncat_s(s1, size, s2, UINT_MAX);
 	return s1;
+}
+
+char* csstrnupr(char* s, size_t size)
+{
+	CSERIES_ASSERT(s);
+	CSERIES_ASSERT(size >= 0 && size < MAXIMUM_STRING_SIZE);
+
+	for (size_t i = 0; s[i] != '\0' && i < size; ++i)
+	{
+		s[i] = (char)toupper(s[i]);
+	}
+
+	return s;
 }
 
 int32 csstricmp(const char* s1, const char* s2)

@@ -772,10 +772,6 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
 	}
 
 	// We calculate the sun glow target width and height based on the viewport resolution
-	const s_frame* global_window_parameters = global_window_parameters_get();
-	const int16 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-	const int16 viewport_height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-
 	D3DVIEWPORT9 d3d_viewport;
 	dx9_globals->global_d3d_device->GetViewport(&d3d_viewport);
 

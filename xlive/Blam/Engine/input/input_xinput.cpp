@@ -192,7 +192,7 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 {
 	input_device* gamepad = g_xinput_devices[gamepad_index];
 	XINPUT_STATE state;
-	bool any_button_pressed;
+	bool any_button_pressed = false;
 
 
 	if (!gamepad || gamepad->XGetState(&state) != ERROR_SEVERITY_SUCCESS)

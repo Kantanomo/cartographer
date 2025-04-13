@@ -4,42 +4,39 @@
 c_interpolator_control::c_interpolator_control()
 {
 	this->disable();
-	this->interpolation_type = _interpolation_type_none;
+	this->m_interpolation_type = _interpolation_type_none;
+	return;
 }
 
 real32 c_interpolator_control::get_ratio(void)
 {
-	typedef real32(__thiscall* get_ratio_t)(c_interpolator_control*);
-	get_ratio_t get_ratio = Memory::GetAddress<get_ratio_t>(0x11205B, 0x103579);
-	return get_ratio(this);
+	return INVOKE_TYPE(0x11205B, 0x103579, real32(__thiscall*)(c_interpolator_control*), this);
 }
 
-bool c_interpolator_control::enabled() const
+bool c_interpolator_control::enabled(void) const
 {
-	return this->duration_ticks != 0;
+	return this->m_duration_ticks != 0;
 }
 
-bool c_interpolator_control::finished() const
+bool c_interpolator_control::finished(void) const
 {
-	return this->flags & _interpolator_control_finished;
+	return TEST_BIT(this->m_flags, _interpolator_control_finished_bit);
 }
 
-void c_interpolator_control::disable()
+void c_interpolator_control::disable(void)
 {
-	this->ticks_remaining = 0;
-	this->duration_ticks = 0;
-	this->flags = _interpolator_control_flag_none;
+	this->m_ticks_remaining = 0;
+	this->m_duration_ticks = 0;
+	this->m_flags = _interpolator_control_flag_none;
 }
 
 void c_interpolator_control::set_interpolation_type(e_interpolation_type interpolation_type)
 {
-	this->interpolation_type = interpolation_type;
+	this->m_interpolation_type = interpolation_type;
 }
 
 void c_interpolator_control::set_status(bool a2, real32 duration)
 {
-	typedef void(__thiscall* set_status_t)(c_interpolator_control*, bool, real32);
-	set_status_t set_status = Memory::GetAddress<set_status_t>(0x111F01, 0x10341F);
-	set_status(this, a2, duration);
+	INVOKE_TYPE(0x111F01, 0x10341F, void(__thiscall*)(c_interpolator_control*, bool, real32), this, a2, duration);
 	return;
 }

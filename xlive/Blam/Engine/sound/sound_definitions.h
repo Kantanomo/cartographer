@@ -47,13 +47,13 @@ struct sound_definition_v1
 	e_sound_definition_encoding encoding;
 	e_sound_definition_compression compression;
 
-	uint16 gestalt_playback_parameter_index;
-	uint16 gestalt_pitch_range_index;
-	uint8 gestalt_unknown_index;
-	uint8 gestalt_scale_index;
-	uint8 gestalt_promotion_index;
-	uint8 gestalt_custom_playback_index;
-	uint16 gestalt_extra_info_index;
+	int16 gestalt_playback_parameter_index;
+	int16 gestalt_pitch_range_index;
+	int8 gestalt_unknown_index;
+	int8 gestalt_scale_index;
+	int8 gestalt_promotion_index;
+	int8 gestalt_custom_playback_index;
+	int16 gestalt_extra_info_index;
 	uint32 maximum_play_time;
 };
 ASSERT_STRUCT_SIZE(sound_definition_v1, 20);

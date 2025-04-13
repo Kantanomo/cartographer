@@ -39,7 +39,7 @@ static s_user_interface_tag_globals* _cdecl user_interface_get_tag_globals(void)
 
 bool __cdecl user_interface_globals_is_beta_build();
 int32 __cdecl user_interface_globals_get_game_difficulty();
-uint32 __cdecl user_interface_globals_get_edit_player_profile_index();
+int32 __cdecl user_interface_globals_get_edit_player_profile_index();
 s_saved_game_player_profile* user_interface_globals_get_edit_player_profile();
 e_scenario_type __cdecl user_interface_globals_get_map_type();
 void __cdecl user_interface_globals_set_game_difficulty_real(int32 difficulty);

@@ -19,8 +19,13 @@ DWORD WINAPI XStorageBuildServerPath(DWORD dwUserIndex, XSTORAGE_FACILITY Storag
 
 	if (pwszServerPath)
 	{
+		wchar_t userprofile[MAX_PATH];
+		
+		size_t required_count;
+		_wgetenv_s(&required_count, userprofile, L"USERPROFILE");
+
 		std::wstring itemName(pwszItemName);
-		std::wstring path(_wgetenv(L"USERPROFILE"));
+		std::wstring path(userprofile);
 		std::wstring xuidAsString = std::to_wstring(usersSignInInfo[dwUserIndex].xuid);
 
 		path += L"\\AppData\\Local\\Microsoft\\Halo 2\\XLive\\";
@@ -59,7 +64,7 @@ DWORD WINAPI XStorageBuildServerPath(DWORD dwUserIndex, XSTORAGE_FACILITY Storag
 			return ERROR_INSUFFICIENT_BUFFER;
 		}
 
-		wcsncpy(pwszServerPath, path.c_str(), *pdwServerPathLength);
+		wcsncpy_s(pwszServerPath, *pdwServerPathLength, path.c_str(), MAX_PATH);
 		*pdwServerPathLength = path.length() + 1; // including the null char
 		return ERROR_SUCCESS;
 	}

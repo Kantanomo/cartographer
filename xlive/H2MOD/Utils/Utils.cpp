@@ -77,7 +77,7 @@ bool GetFileLine(FILE* fp, char** fileLine) {
 	bool moreToGo = true;
 	int c, fileLineLen = 256, fileLineCursor = 0;
 	*fileLine = (char*)malloc(fileLineLen);
-	while (c = fgetc(fp)) {
+	while ((c = fgetc(fp))) {
 		if (c == EOF) {
 			moreToGo = false;
 			break;
@@ -89,7 +89,7 @@ bool GetFileLine(FILE* fp, char** fileLine) {
 			break;
 		}
 		else {
-			(*fileLine)[fileLineCursor++] = c;
+			(*fileLine)[fileLineCursor++] = (char)c;
 		}
 		if (fileLineCursor >= fileLineLen - 2) {
 			fileLineLen += 256;
@@ -309,7 +309,7 @@ bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32) {
 		return false;
 	}
 
-	while (bResult = ReadFile(hFile, rgbFile, BUFSIZE, &cbRead, NULL))
+	while ((bResult = ReadFile(hFile, rgbFile, BUFSIZE, &cbRead, NULL)))
 	{
 		if (cbRead == 0) {
 			break;
@@ -394,7 +394,9 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s
 }
 
 int MasterHttpResponse(const char* url, const char* http_request, char** rtn_response) {
+#ifdef LC1
 	TEST_N_DEF(LC1);
+#else
 	int result = ERROR_CODE_CURL_SOCKET_FAILED;//Socket failed to connect to server
 
 	CURL *curl;
@@ -402,7 +404,8 @@ int MasterHttpResponse(const char* url, const char* http_request, char** rtn_res
 
 	/* get a curl handle */
 	curl = curl_interface_init_no_verify();
-	if (curl) {
+	if (curl)
+	{
 		/* First set the URL that is about to receive our POST. This URL can
 		just as well be a https:// URL if that is what should receive the
 		data. */
@@ -435,11 +438,13 @@ int MasterHttpResponse(const char* url, const char* http_request, char** rtn_res
 		/* always cleanup */
 		curl_easy_cleanup(curl);
 	}
-	else {
+	else
+	{
 		result = ERROR_CODE_CURL_HANDLE;//curl handle fail
 	}
 
 	return result;
+#endif
 }
 
 void CreateDirTree(const wchar_t* path) {
@@ -479,7 +484,6 @@ bool HexStrToBytes(const char* hexStr, size_t hexStrLen, uint8_t* outByteBuf, si
 		return false;
 	}
 
-	const uint8_t* byteBufEnd = outByteBuf + outBufLen;
 	hexStrLen = hexStrLen != 0u ? hexStrLen : strlen(hexStr);
 
 	// handle prefixes

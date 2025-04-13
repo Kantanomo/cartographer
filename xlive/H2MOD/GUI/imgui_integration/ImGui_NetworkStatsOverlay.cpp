@@ -44,7 +44,6 @@ void ShowNetworkStatsOverlay(bool* p_open)
 		return;
 
 	static int corner = 0;
-	ImGuiIO& io = ImGui::GetIO();
 	ImGuiWindowFlags window_flags = 0
 		| ImGuiWindowFlags_NoDecoration
 		| ImGuiWindowFlags_AlwaysAutoResize

@@ -200,12 +200,12 @@ int H2Config_forced_event = 0;
 bool H2Config_force_off_d3d9ex = false;
 bool H2Config_force_off_sm3 = false;
 
-int H2Config_hotkeyIdHelp = VK_F2;
-int H2Config_hotkeyIdAlignWindow = VK_F7;
-int H2Config_hotkeyIdWindowMode = VK_F8;
-int H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
-int H2Config_hotkeyIdGuide = VK_HOME;
-int H2Config_hotkeyIdConsole = VK_F10;
+WPARAM H2Config_hotkeyIdHelp = VK_F2;
+WPARAM H2Config_hotkeyIdAlignWindow = VK_F7;
+WPARAM H2Config_hotkeyIdWindowMode = VK_F8;
+WPARAM H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
+WPARAM H2Config_hotkeyIdGuide = VK_HOME;
+WPARAM H2Config_hotkeyIdConsole = VK_F10;
 bool ownsConfigFile = false;
 
 void SaveH2Config()
@@ -568,7 +568,7 @@ void ReadH2Config()
 
 	const bool is_dedicated_server = shell_is_dedicated_server();
 
-	int readInstanceIdFile = g_instance_number;
+	//int readInstanceIdFile = g_instance_number;
 
 
 	wchar_t config_file_path[MAX_PATH];
@@ -585,7 +585,8 @@ void ReadH2Config()
 	}
 	else
 	{
-		ownsConfigFile = (readInstanceIdFile == g_instance_number);
+		// TODO: how to handle this?
+		//ownsConfigFile = (readInstanceIdFile == g_instance_number);
 
 		if (!is_dedicated_server)
 		{
@@ -744,13 +745,13 @@ void ReadH2Config()
 				const char* server_name = NULL; 
 				CONFIG_GET(&ini, "server_name", "", &server_name);
 				if (server_name) {
-					strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
+					strncpy_s(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
 				}
 
 				const char* server_playlist = NULL;
 				CONFIG_GET(&ini, "server_playlist", "", &server_playlist);
 				if (server_playlist) {
-					strncpy(H2Config_dedi_server_playlist, server_playlist, sizeof(H2Config_dedi_server_playlist));
+					strncpy_s(H2Config_dedi_server_playlist, server_playlist, sizeof(H2Config_dedi_server_playlist));
 				}
 
 				CONFIG_GET(&ini, "additional_pcr_time", "25", &H2Config_additional_pcr_time);
@@ -766,19 +767,19 @@ void ReadH2Config()
 				const char* login_identifier = NULL;
 				CONFIG_GET(&ini, "login_identifier", "", &login_identifier);
 				if (login_identifier) {
-					strncpy(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
+					strncpy_s(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
 				}
 
 				const char* login_password = NULL;
 				CONFIG_GET(&ini, "login_password", "", &login_password);
 				if (login_password) {
-					strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
+					strncpy_s(H2Config_login_password, login_password, sizeof(H2Config_login_password));
 				}
 
 				const char* stats_authkey = NULL;
 				CONFIG_GET(&ini, "stats_auth_key", "", &stats_authkey);
 				if (stats_authkey) {
-					strncpy(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey) - 1); // - 1 for the null character
+					strncpy_s(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey) - 1); // - 1 for the null character
 				}
 
 				std::string team_bit_mask(ini.GetValue(k_h2config_version_section, "teams_enabled_bit_flags", H2Config_team_bit_flags_str));

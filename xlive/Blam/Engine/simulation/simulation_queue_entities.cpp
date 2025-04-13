@@ -194,7 +194,7 @@ bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* s
 	bool result = false;
 	int32 encoded_size;
 	uint8 encode_buffer[k_simulation_queue_element_data_size_max];
-	c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(sim_queue_entity_data->entity_type);
+	//c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(sim_queue_entity_data->entity_type);
 
 	// simulation_queue_allocate does set this to NULL
 	// but in case encode_simulation_queue_update_to_buffer fails
@@ -450,7 +450,7 @@ bool simulation_queue_entity_update_allocate(s_simulation_queue_entity_data* sim
 	bool result = false;
 	int32 encoded_size;
 	uint8 encode_buffer[k_simulation_queue_element_data_size_max];
-	c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(sim_queue_entity_data->entity_type);
+	//c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(sim_queue_entity_data->entity_type);
 
 	// simulation_queue_allocate does set this to NULL
 	// but in case encode_simulation_queue_update_to_buffer fails

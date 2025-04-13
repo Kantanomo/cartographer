@@ -2,6 +2,8 @@
 #include "rasterizer_dx9_9on12.h"
 
 #include "rasterizer/dx12/rasterizer_dx12_main.h"
+#include <wrl/client.h>
+
 
 using Microsoft::WRL::ComPtr;
 

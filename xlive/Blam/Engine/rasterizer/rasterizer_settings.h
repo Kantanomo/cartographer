@@ -27,15 +27,15 @@ struct s_aspect_ratio
 
 struct s_display_option
 {
-	int32 width;
-	int32 height;
+	uint32 width;
+	uint32 height;
 	e_display_aspect_ratio aspect_ratio;
 };
 
 struct s_video_mode
 {
-	int32 width;
-	int32 height;
+	uint32 width;
+	uint32 height;
 	uint32 refresh_rate_count;
 	int32 refresh_rate[k_max_default_display_refresh_rate_count];
 };

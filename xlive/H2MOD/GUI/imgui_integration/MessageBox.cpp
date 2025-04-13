@@ -13,8 +13,6 @@ namespace ImGuiHandler
 		const char *message = NULL;
 		void Render(bool* p_open)
 		{
-			bool open = *p_open;
-			ImGuiIO& io = ImGui::GetIO();
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGuiWindowFlags window_flags = 0;
 			window_flags |= ImGuiWindowFlags_NoCollapse;

@@ -30,12 +30,12 @@ void c_xml_definition_agent::init(tag_group type, const wchar_t* plugin_path)
 	if (!error_occured)
 	{
 		tinyxml2::XMLDocument document;
-		tinyxml2::XMLError error = document.LoadFile(file);
+		tinyxml2::XMLError xmlerror = document.LoadFile(file);
 		fclose(file);
 
 		this->m_type = type;
 
-		error_occured = error != tinyxml2::XML_SUCCESS;
+		error_occured = xmlerror != tinyxml2::XML_SUCCESS;
 		if (!error_occured)
 		{
 			tinyxml2::XMLElement* root = document.RootElement();

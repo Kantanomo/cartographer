@@ -386,7 +386,6 @@ void Infection::OnMapLoad(ExecTime execTime, s_game_options* options)
 
 void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 {
-	int32 absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 	datum playerUnitDatum = s_player::get_unit_index(player_index);
 
 	switch (execTime)
@@ -403,7 +402,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 
 					if (player->user_index != NONE)
 					{
-						LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", s_player::get_name(player_index_from_user_index(player->user_index)), player->identifier);
+						LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", s_player::get_name(player_index), player->identifier);
 						user_interface_controller_set_desired_team_index(player->controller_index, k_zombie_team);
 						user_interface_controller_update_network_properties(player->controller_index);
 						s_player::set_unit_character_type(player_index, _character_type_flood);

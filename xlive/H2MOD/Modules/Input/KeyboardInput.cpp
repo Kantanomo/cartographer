@@ -16,7 +16,7 @@
 
 struct s_keyboard_hotkey_data
 {
-	int* message;
+	WPARAM* message;
 	void(__cdecl* callback)();
 };
 

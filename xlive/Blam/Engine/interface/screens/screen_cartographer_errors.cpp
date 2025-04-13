@@ -141,7 +141,7 @@ void* c_cartographer_error_menu::load_by_error_id(e_cartographer_error_id error_
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
+	params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
 	params.m_channel_type = _user_interface_channel_type_game_error;
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;
@@ -158,7 +158,7 @@ void* c_cartographer_error_menu::load(s_screen_parameters* parameters)
 	c_cartographer_error_menu* error_menu = nullptr;
 	BYTE* ui_buffer = ui_pool_allocate_space(sizeof(c_cartographer_error_menu), 0);
 	if (ui_buffer) {
-		error_menu = new (ui_buffer) c_cartographer_error_menu(parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
+		error_menu = new (ui_buffer) c_cartographer_error_menu(parameters->m_channel_type, parameters->m_window_index, parameters->m_user_flags);
 		error_menu->m_allocated	= true;
 	}
 	user_interface_register_screen_to_channel(error_menu, parameters);

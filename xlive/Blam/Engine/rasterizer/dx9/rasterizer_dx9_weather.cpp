@@ -181,7 +181,7 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 {
 	rasterizer_dx9_perf_event_begin("weather particles", NULL);
 
-	bool is_rain = system->m_type == _particle_system_lite_type_rain;
+	const bool is_rain = system->m_type == _particle_system_lite_type_rain;
 	if (pc_geometry_cache_preload_geometry(
 		&system->m_geometry, 
 		(e_pc_geometry_cache_preload_flags)(_pc_geometry_cache_preload_flag_2 | _pc_geometry_cache_preload_blocking)))
@@ -194,9 +194,9 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 		rasterizer_dx9_set_vertex_shader_permutation(_global_vertex_shader_weather_particle, 0, 0);
 		rasterizer_dx9_initialize_camera_projection(false, &global_window_parameters->camera, &global_window_parameters->projection, *rasterizer_dx9_main_render_target_get());
 
-		real_vector2d rain_vector;
-		pixel32 lower_rain_alpha;
-		pixel32 upper_rain_alpha;
+		real_vector2d rain_vector = {};
+		pixel32 lower_rain_alpha = 0;
+		pixel32 upper_rain_alpha = 0;
 		if (is_rain)
 		{
 			rain_vector.i = global_window_parameters->camera.forward.i;
@@ -211,7 +211,7 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 			rasterizer_dx9_set_render_state(D3DRS_POINTSCALEENABLE, TRUE);
 			rasterizer_dx9_set_render_state(D3DRS_POINTSCALE_A, 0);
 			rasterizer_dx9_set_render_state(D3DRS_POINTSCALE_B, 0);
-			rasterizer_dx9_set_render_state(D3DRS_POINTSCALE_C, 0x3F800000);
+			rasterizer_dx9_set_render_state(D3DRS_POINTSCALE_C, 0x3F800000);	// 1.f
 		}
 
 		rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -231,7 +231,6 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 
 		const int16 player_count = PIN(local_player_count(), 1, k_number_of_users);
 		const uint32 count_per_user = data->render_data.count / player_count;
-		const uint32 size = count_per_user * sizeof(s_dx9_weather_triangle_list_vertex) * (2 * is_rain + 1);
 		
 		uint32 used_vertices = 0;
 		s_dx9_weather_triangle_list_vertex* current_primitive = g_weather_particle_primitives;

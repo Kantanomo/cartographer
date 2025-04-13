@@ -8,6 +8,7 @@ HRESULT WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread,
 {
 	return DSERR_NODRIVER;
 
+	/*
 	if (pParams->bCustomVADProvided)
 	{
 		//LOG_TRACE(voice_log, "XHVCreateEngine() - bCustomVADProvided set");
@@ -22,6 +23,7 @@ HRESULT WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread,
 	}
 
 	return E_INVALIDARG;
+	*/
 }
 
 BOOL XHVENGINE::IsHeadsetPresent(DWORD dwUserIndex)
@@ -115,6 +117,7 @@ HRESULT XHVENGINE::GetLocalChatData(DWORD dwUserIndex, PBYTE pbData, PDWORD pdwS
 	// To verify who is talking, add the XUID of the local talker in the first packet
 	return E_PENDING;
 	
+	/*
 	memset(pbData, 0, *pdwSize);
 
 	*pdwPackets = *pdwSize / XHV_VOICECHAT_MODE_PACKET_SIZE;
@@ -136,6 +139,7 @@ HRESULT XHVENGINE::GetLocalChatData(DWORD dwUserIndex, PBYTE pbData, PDWORD pdwS
 	if (pdwPackets) *pdwPackets = 0;
 
 	return E_PENDING;
+	*/
 }
 
 HRESULT XHVENGINE::SetPlaybackPriority(XUID xuidRemoteTalker, DWORD dwUserIndex, int a3)

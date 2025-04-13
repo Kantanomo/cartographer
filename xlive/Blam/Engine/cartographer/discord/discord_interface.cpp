@@ -415,7 +415,7 @@ static void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secr
 	// Decode the data from hex string
 	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
 	{
-		(void)sscanf(&secret[2 * i], "%02hhX", &session_bytes[i]);
+		(void)sscanf_s(&secret[2 * i], "%02hhX", &session_bytes[i]);
 	}
 
 	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, &session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);

@@ -1,10 +1,12 @@
 #include "stdafx.h"
-#include "input_xinput.h"
 #include "input_windows.h"
-#include "input_abstraction.h"
+
 #include "controllers.h"
+#include "input_abstraction.h"
+#include "input_xinput.h"
 
 #include "interface/user_interface_controller.h"
+#include "render/render.h"							/* PC1 */
 #include "shell/shell_windows.h"
 
 extern input_device** g_xinput_devices;
@@ -151,8 +153,10 @@ uint8 __cdecl input_get_connected_gamepads_count()
 		controller != k_no_controller;
 		controller = next_controller(controller))
 	{
-		if (input_has_gamepad_plugged(controller))
-			count++;
+		if (input_has_gamepad_plugged((uint16)controller))
+		{
+			++count;
+		}
 	}
 	return count;
 }

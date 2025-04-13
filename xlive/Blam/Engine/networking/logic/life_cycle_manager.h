@@ -34,8 +34,8 @@ class c_game_life_cycle_handler
 {
 public:
 	c_game_life_cycle_handler_functions* functions;
-	e_game_life_cycle life_cycle;
-	c_game_life_cycle_manager* life_cycle_manager;
+	e_game_life_cycle m_life_cycle;
+	c_game_life_cycle_manager* m_life_cycle_manager;
 	bool field_C;
 	void initialize(c_game_life_cycle_manager* life_cycle_manager, e_game_life_cycle life_cycle, bool a3);
 };
@@ -165,7 +165,7 @@ public:
 	}
 
 	e_game_life_cycle get_life_cycle() const;
-	bool get_active_session(c_network_session** out_session);
+	bool get_active_session(c_network_session** out_session) const;
 	
 	bool state_is_joining() const;
 	bool state_is_in_game() const;

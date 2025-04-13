@@ -27,6 +27,8 @@ enum
 #define XNIP_SET_BIT(_flags, _bit, _value) ((_value) ? ((_flags) |= XNIP_FLAG((_bit))) : ((_flags) &= ~(XNIP_FLAG(_bit))))
 #define XNIP_TEST_BIT(_flags, _bit) (((_flags) & XNIP_FLAG((_bit))) != 0)
 
+TEST_N_DEF(XL0);
+
 enum eXnip_ConnectRequestType : int
 {
 	EXNIP_CONNECTION_REQUEST_INVALID = -1,
@@ -75,9 +77,9 @@ struct XBroadcastPacket
 	XBroadcastPacket()
 	{
 		pckHeader.signature = EXNIP_PACKET_SIGNATURE_XNET_BROADCAST;
-		strncpy(pckHeader.signatureString, XNIP_BROADCAST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
+		strncpy_s(pckHeader.signatureString, XNIP_BROADCAST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
 		ZeroMemory(&data, sizeof(data));
-		data.titleId = -1;
+		data.titleId = (DWORD)-1;
 		data.name.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 	};
 
@@ -95,7 +97,7 @@ struct XNetRequestPacket
 	{
 		pckHeader.signature = EXNIP_PACKET_SIGNATURE_XNET_REQUEST;
 		memset(pckHeader.signatureString, 0, sizeof(pckHeader.signatureString));
-		strncpy(pckHeader.signatureString, XNIP_REQUEST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
+		strncpy_s(pckHeader.signatureString, XNIP_REQUEST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN);
 		ZeroMemory(&data, sizeof(data));
 	}
 
@@ -225,6 +227,8 @@ struct XnIp
 	// key we connected with
 	XnKeyPair* m_keyPair;
 
+	TEST_N_DEF(XL4);
+
 	bool m_valid;
 	int m_connectStatus;
 	int m_connectionPacketsSentCount;
@@ -274,7 +278,11 @@ public:
 
 	IN_ADDR GetOnlineIpAddr() const
 	{
+#ifdef XL5
+		TEST_N_DEF(XL5);
+#else
 		return m_xnaddr.inaOnline;
+#endif
 	}
 
 	IN_ADDR GetLanIpAddr() const

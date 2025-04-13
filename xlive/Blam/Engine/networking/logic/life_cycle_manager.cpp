@@ -73,10 +73,10 @@ static void game_life_cycle_update()
 
 void c_game_life_cycle_handler::initialize(c_game_life_cycle_manager* life_cycle_manager, e_game_life_cycle life_cycle, bool a3)
 {
-	this->life_cycle_manager = life_cycle_manager;
-	this->life_cycle = life_cycle;
+	this->m_life_cycle_manager = life_cycle_manager;
+	this->m_life_cycle = life_cycle;
 	this->field_C = a3;
-	this->life_cycle_manager->m_life_cycle_handlers[this->life_cycle] = this;
+	this->m_life_cycle_manager->m_life_cycle_handlers[this->m_life_cycle] = this;
 }
 
 void __cdecl c_game_life_cycle_handler_joining::check_joining_capability()
@@ -85,7 +85,7 @@ void __cdecl c_game_life_cycle_handler_joining::check_joining_capability()
 	return;
 }
 
-bool c_game_life_cycle_manager::get_active_session(c_network_session** out_session)
+bool c_game_life_cycle_manager::get_active_session(c_network_session** out_session) const
 {
 	bool result = false;
 	*out_session = NULL;

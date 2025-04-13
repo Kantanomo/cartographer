@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "user_interface_globals.h"
-#include "interface/user_interface.h"
 #include "scenario/scenario_definitions.h"
 
 
@@ -15,7 +14,7 @@ int32 __cdecl user_interface_globals_get_game_difficulty()
 	return INVOKE(0x209E98, 0x0, user_interface_globals_get_game_difficulty);
 }
 
-uint32 user_interface_globals_get_edit_player_profile_index()
+int32 user_interface_globals_get_edit_player_profile_index()
 {
 	return INVOKE(0x209BA3, 0, user_interface_globals_get_edit_player_profile_index);
 }

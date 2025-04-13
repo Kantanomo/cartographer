@@ -152,8 +152,8 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 
 	if (game_is_distributed() && !game_is_playback())
 	{
-		c_simulation_type_collection* simulation_type_collection = simulation_get_type_collection();
-		c_simulation_event_definition* sim_event_def = simulation_type_collection->get_event_definition(type);
+		//c_simulation_type_collection* simulation_type_collection = simulation_get_type_collection();
+		//c_simulation_event_definition* sim_event_def = simulation_type_collection->get_event_definition(type);
 
 		// skip postprocess, not available in h2
 		// call postprocess from event def

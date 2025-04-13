@@ -4,6 +4,14 @@
 //
 #pragma once
 
+#pragma region Warnings as errors
+#pragma warning(error: 4700)
+#pragma endregion
+
+#pragma region global disabled warnings
+#pragma warning( disable : 4100)	// Disable unreferenced parameter warning
+#pragma endregion
+
 #define CARTOGRAPHER_HEAP_DEBUG 0
 
 #if CARTOGRAPHER_HEAP_DEBUG
@@ -25,12 +33,6 @@
 // sets the dinput/xinput version, Halo 2 uses the older 9.1.0 version and DirectInput 0x0800
 #define XINPUT_USE_9_1_0
 #define DIRECTINPUT_VERSION 0x0800
-
-#include "version.h"
-
-static_assert(EXECUTABLE_TYPE >= 0 && EXECUTABLE_TYPE <= 7, "EXECUTABLE_TYPE VALUE BELOW 0 OR EXCEEDS 7");
-static_assert(EXECUTABLE_VERSION > 0 && EXECUTABLE_VERSION < 65535, "EXECUTABLE_VERSION VALUE EXCEEDS 65534");
-static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_VERSION VALUE EXCEEDS 65534");
 
 #define TEST_N_DEF(TEST)
 
@@ -77,7 +79,6 @@ static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_
 #include <d3d12.h>
 
 #include <dxgi1_4.h>
-#include <wrl/client.h>
 
 // Cartographer includes
 #include "cseries/cseries.h"
@@ -97,17 +98,21 @@ static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_
 #include "xliveless.h"
 #include "xlivedefs.h"
 
+#pragma warning( push )
+#pragma warning( disable : 4131)	// Disable old style declarator warning
+#pragma warning( disable : 4244)	// Disable loss of data warning
 #include <contrib/minizip/zip.h>
-
-#include "CartographerDllConf.h"
+#pragma warning( pop )
 
 #pragma comment(lib, "IPHLPAPI.lib")
 
-extern std::random_device rd;
+#include "CartographerDllConf.h"
 
-#pragma region Warnings as errors
-#pragma warning(error: 4700)
-#pragma endregion
+static_assert(EXECUTABLE_TYPE >= 0 && EXECUTABLE_TYPE <= 7, "EXECUTABLE_TYPE VALUE BELOW 0 OR EXCEEDS 7");
+static_assert(EXECUTABLE_VERSION > 0 && EXECUTABLE_VERSION < 65535, "EXECUTABLE_VERSION VALUE EXCEEDS 65534");
+static_assert(COMPATIBLE_VERSION > 0 && COMPATIBLE_VERSION < 65535, "COMPATIBLE_VERSION VALUE EXCEEDS 65534");
+
+extern std::random_device rd;
 
 // use this macro to define _time and _clock namespaces
 #define STD_CHRONO_DEFINE_TIME_AND_CLOCK(_time_name, _clock_name) \
