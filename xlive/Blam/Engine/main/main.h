@@ -10,7 +10,7 @@ void __cdecl main_loop(void);
 
 void main_reset_map(void);
 
-void main_quit();
+void main_quit(void);
 
 void __cdecl main_loop_pregame(int32 a1, int32 a2);
 

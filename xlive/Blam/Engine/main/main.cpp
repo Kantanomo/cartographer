@@ -18,9 +18,11 @@ static void __cdecl main_game_reset_map_blue_screen_detection();
 
 /* public code */
 
-void main_apply_patches()
+void main_apply_patches(void)
 {
 	PatchCall(Memory::GetAddress(0x397F6, 0x4130F), main_game_reset_map_blue_screen_detection);
+	PatchCall(Memory::GetAddress(0x39E64, 0xC684), main_loop_body);	// main_loop
+	return;
 }
 
 bool __cdecl cinematic_sound_sync_complete(void)
@@ -40,7 +42,7 @@ void main_reset_map(void)
 	return;
 }
 
-void main_quit()
+void main_quit(void)
 {
 	*Memory::GetAddress<bool*>(0x48220b, 0x4a7083) = true;
 	return;
