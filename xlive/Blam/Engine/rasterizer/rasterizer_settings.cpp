@@ -462,7 +462,7 @@ void create_new_display_setting_array(void)
 
 	if (count == 0)
 	{
-		LOG_CRITICAL_FUNCW("Display Option count is 0, something is definitely wrong here");
+		error(0, "Display Option count is 0, something is definitely wrong here");
 		exit(EXIT_FAILURE);
 	}
 	else

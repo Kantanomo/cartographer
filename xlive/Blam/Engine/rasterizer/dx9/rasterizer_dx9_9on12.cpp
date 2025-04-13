@@ -24,7 +24,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 		|| h_dxgi == NULL
 		|| h_d3d9 == NULL)
 	{
-		LOG_CRITICAL_GAME("Modules: d3d12, dxgi or d3d9 not available!");
+		error(0, "Modules: d3d12, dxgi or d3d9 not available!");
 		return E_FAIL;
 	}
 
@@ -35,7 +35,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 		|| pfn_D3D12CreateDevice == NULL
 		|| pfn_Direct3DCreate9On12 == NULL)
 	{
-		LOG_CRITICAL_GAME("Unable to resolve d3d12, dxgi or d3d9 function pointers!");
+		error(0, "Unable to resolve d3d12, dxgi or d3d9 function pointers!");
 		return E_FAIL;
 	}
 
@@ -44,7 +44,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 	HRESULT hr = pfn_CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
 	if (FAILED(hr))
 	{
-		LOG_CRITICAL_GAME("Failed to create DXGIFactory.");
+		error(0, "Failed to create DXGIFactory.");
 		return E_FAIL;
 	}
 
@@ -53,7 +53,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 	{
 		if (FAILED(hr = dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&dxgi_adapter))))
 		{
-			LOG_CRITICAL_GAME("Failed to get WARP adapter.");
+			error(0, "Failed to get WARP adapter.");
 			return E_FAIL;
 		}
 	}
@@ -61,7 +61,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 	{
 		if (FAILED(hr = dxgiFactory->EnumAdapters(0, &dxgi_adapter)))
 		{
-			LOG_CRITICAL_GAME("Failed to get adapter.");
+			error(0, "Failed to get adapter.");
 			return E_FAIL;
 		}
 	}
@@ -75,11 +75,10 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 
 	if (FAILED(hr))
 	{
-		LOG_CRITICAL_GAME("Failed to create D3D12 device.");
+		error(0, "Failed to create D3D12 device.");
 		return E_FAIL;
 	}
 
-	LOG_INFO_GAME("D3D12 device created successfully using WARP!");
 
 	// Create D3D9On12
 	D3D9ON12_ARGS Args = {};
@@ -89,14 +88,12 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 
 	if (FAILED(hr))
 	{
-		LOG_CRITICAL_GAME("Failed to initialize D3D9On12.");
+		error(0, "Failed to initialize D3D9On12.");
 		return E_FAIL;
 	}
 
 	d3d12_device->AddRef();
 	g_d3d12_device = d3d12_device.Get();
-
-	LOG_INFO_GAME("D3D9On12 initialized successfully!");
 
 	return 0;
 }

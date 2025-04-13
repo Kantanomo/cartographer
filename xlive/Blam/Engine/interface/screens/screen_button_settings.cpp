@@ -483,7 +483,7 @@ void c_screen_button_settings_menu::apply_patches_on_ui_map_load()
 
 	if (main_widget_datum_index == NONE)
 	{
-		LOG_ERROR_FUNC("bad datum found ");
+		error(0, "bad datum found");
 		return;
 	}
 
@@ -539,7 +539,7 @@ void c_screen_button_settings_menu::apply_patches_on_mp_map_load()
 
 	if (main_widget_datum_index == NONE)
 	{
-		LOG_ERROR_FUNC("bad datum found ");
+		error(0, "bad datum found");
 		return;
 	}
 
