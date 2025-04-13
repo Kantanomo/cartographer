@@ -11,7 +11,7 @@
 #include "main/licensing.h"
 #include "math/real_math.h"
 #include "networking/network_configuration.h"
-#include "networking/Transport/network_observer.h"
+#include "networking/session/network_observer.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "saved_games/game_state.h"
 #ifdef _WINDOWS

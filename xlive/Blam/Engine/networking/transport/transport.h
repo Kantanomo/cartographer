@@ -4,6 +4,16 @@
 
 #define k_number_of_transition_functions 8
 
+/* enums */
+
+enum e_transport_type : int32
+{
+	_transport_type_udp = 2,
+	_transport_type_vdp,
+	_transport_type_tcp,
+	k_protocol_count
+};
+
 /* structures */
 
 struct network_address
@@ -39,3 +49,5 @@ void network_transport_apply_patches(void);
 s_transport_globals* transport_globals_get(void);
 
 bool transport_available(void);
+
+int32 __cdecl transport_get_packet_overhead_hook(int32 transport_type);

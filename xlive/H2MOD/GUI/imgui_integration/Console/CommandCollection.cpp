@@ -12,7 +12,7 @@
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
 #include "networking/logic/life_cycle_manager.h"
-#include "networking/NetworkMessageTypeCollection.h"
+#include "networking/messages/network_message_type_collection.h"
 #include "objects/objects.h"
 #include "shell/shell.h"
 #include "text/unicode.h"
@@ -842,8 +842,8 @@ static int CommandCollection::invite(const std::vector<std::string>& tokens, Con
 	bool session_host = session->is_host();
 
 	XSESSION_INFO x_session_info;
-	x_session_info.sessionID = session->session_id;
-	x_session_info.keyExchangeKey = session->xnkey;
+	x_session_info.sessionID = session->m_session_id;
+	x_session_info.keyExchangeKey = session->m_session_key;
 	x_session_info.hostAddress = (session_host ? session->m_session_virtual_couch.xsession_info.hostAddress :
 		session->m_network_observer->m_observer_channels[session->get_session_peer(session->m_session_host_peer_index)->observer_channel_index].xnaddr);
 

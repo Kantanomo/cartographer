@@ -210,6 +210,8 @@ void* csmemset(void* destination, int32 val, size_t size);
 
 void* csmemcpy(void* destination, const void* source, size_t size);
 
+int csmemcmp(const void* p1, const void* p2, size_t size);
+
 int32 vsprintf(char* buffer, size_t size, const char* format, va_list va_args);
 
 /* 

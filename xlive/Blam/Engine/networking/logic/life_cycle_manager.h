@@ -1,7 +1,7 @@
 #pragma once
 
 #include "networking/session/network_session.h"
-#include "networking/transport/network_observer.h"
+#include "networking/session/network_observer.h"
 
 enum e_game_life_cycle : int32
 {

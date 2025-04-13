@@ -7,7 +7,7 @@
 #include "cartographer/config/endpoints.h"
 #include "main/map_repository.h"
 #include "main/game_preferences.h"
-#include "networking/NetworkMessageTypeCollection.h"
+#include "networking/messages/network_message_type_collection.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "shell/shell.h"
 #include "text/unicode.h"

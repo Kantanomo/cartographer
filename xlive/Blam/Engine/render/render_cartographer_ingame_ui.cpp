@@ -12,7 +12,7 @@
 #include "shell/shell_windows.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/network_statistics.h"
-#include "networking/Session/network_session.h"
+#include "networking/session/network_session.h"
 #include "text/draw_string.h"
 #include "text/font_cache.h"
 #include "text/unicode.h"

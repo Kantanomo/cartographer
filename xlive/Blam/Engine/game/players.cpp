@@ -26,7 +26,7 @@ uint8 g_user_weapon_interactions_mask = UINT8_MAX;
 /*
 	- NOTES:
 	- This gets the player data from the game state, thus it is available only during a match or gameplay (game life cycle is in_game or after map has been loaded)
-	- If you need to do something in the pregame lobby, use the functions available in Network Session (Blam/Networking/Session)
+	- If you need to do something in the pregame lobby, use the functions available in Network Session (Blam/networking/session)
 */
 
 s_data_array* s_player::get_data()

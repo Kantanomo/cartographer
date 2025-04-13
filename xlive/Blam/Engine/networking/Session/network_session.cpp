@@ -15,6 +15,9 @@ const char* const k_network_protocols_text[] =
 	"LIVE",
 };
 
+/* gloabls */
+c_network_session_cartographer g_cartographer_network_session;
+
 /* public code */
 
 /* PRIVATE NAMESPACE, acts like static keyword */
@@ -328,4 +331,41 @@ void c_network_session::switch_players_to_teams(datum* player_indexes, int32 pla
 		request_membership_update();
 		network_session_membership_update_local_players_teams();
 	}
+}
+
+bool c_network_session::get_transport_keys(XNKID* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, int32* out_unk) const
+{
+	bool result = false;
+
+	if (!disconnected() && field_48)
+	{
+		if (out_session_id != NULL)
+		{
+			*out_session_id->ab = *m_session_id.ab;
+		}
+
+		if (out_session_key != NULL)
+		{
+			*out_session_key->ab = *m_session_key.ab;
+		}
+
+		if (out_session_key_index != NULL)
+		{
+			*out_session_key_index = m_session_transport_index;
+		}
+
+		if (out_unk != NULL)
+		{
+			*out_unk = field_60;
+		}
+
+		result = true;
+	}
+
+	return result;
+}
+
+bool c_network_session::get_transport_session_id(XNKID* out_session_id) const
+{
+	return get_transport_keys(out_session_id, NULL, NULL, NULL);
 }

@@ -3,8 +3,8 @@
 // Network Observer
 //	- manages network bandwidth based on network conditions
 
-#include "transport.h"
-#include "transport_qos.h"
+#include "networking/transport/transport.h"
+#include "networking/transport/transport_qos.h"
 
 #include "networking/network_statistics.h"
 

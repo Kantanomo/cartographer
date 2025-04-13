@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "network_observer.h"
-#include "network_channel.h"
+#include "networking/delivery/network_channel.h"
 
 #include "shell/shell.h"
 
@@ -192,39 +192,6 @@ void __declspec(naked) jmp_get_bandwidth_results()
 	CLASS_HOOK_JMP(c_network_observer__get_bandwidth_results, c_network_observer::get_bandwidth_results);
 }
 
-// raw WinSock has a 28 bytes packet overhead for the packet header, unlike Xbox LIVE, which has 44 bytes (28 bytes + whatever LIVE packet header adds)
-int32 __cdecl transport_get_packet_overhead_hook(int32 protocol_type)
-{
-	enum e_transport_protocol_type : int32
-	{
-		_protocol_udp_loopback = 2,
-		_protocol_udp,
-		_protocol_tcp, // not entirely sure if this is TCP
-		k_protocol_count
-	};
-
-	switch ((e_transport_protocol_type)protocol_type)
-	{
-
-	// replace XNet UDP header overhead with WinSock overhead
-	case _protocol_udp_loopback:
-		// return 44;
-		return 28;
-
-	case _protocol_udp:
-		//return 48;
-		return 28 + 4;
-		
-	case _protocol_tcp:
-		return 56;
-	
-	default:
-		break;
-	}
-
-	return 0;
-}
-
 CLASS_HOOK_DECLARE_LABEL(c_network_observer__channel_should_send_packet_hook, c_network_observer::channel_should_send_packet_hook);
 bool __thiscall c_network_observer::channel_should_send_packet_hook(
 	int32 network_channel_index,
@@ -337,9 +304,6 @@ void c_network_observer::apply_patches()
 	WriteValue<int32>(Memory::GetAddress(0x1ACCC8, 0x1ACE96) + 6, k_network_heap_size);
 
 	PatchCall(Memory::GetAddress(0x1E0FEE, 0x1B5EDE), jmp_get_bandwidth_results);
-
-	WriteJmpTo(Memory::GetAddress(0x1AC1BD, 0x1A6B76), transport_get_packet_overhead_hook);
-
 	// replace vtable pointer of network_observer::channel_should_send_packet
 	WritePointer(Memory::GetAddress(0x3C615C, 0x381C48), jmp_network_observer_channel_should_send_packet_hook);
 

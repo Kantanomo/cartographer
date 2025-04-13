@@ -12,7 +12,7 @@
 #include "input/input_abstraction.h"
 #include "interface/new_hud.h"
 #include "interface/first_person_weapons.h"
-#include "networking/NetworkMessageTypeCollection.h"
+#include "networking/messages/network_message_type_collection.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "saved_games/cartographer_player_profile.h"

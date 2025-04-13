@@ -1,6 +1,6 @@
 #pragma once
 #include "game/player_constants.h"
-#include "networking/Session/network_session.h"
+#include "networking/session/network_session.h"
 #include "saved_games/game_variant.h"
 #include "simulation/machine_id.h"
 

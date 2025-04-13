@@ -1,7 +1,7 @@
 #pragma once
 
-#include "transport.h"
-#include "network_observer.h"
+#include "networking/transport/transport.h"
+#include "networking/session/network_observer.h"
 
 enum e_network_channel_closure_reason
 {

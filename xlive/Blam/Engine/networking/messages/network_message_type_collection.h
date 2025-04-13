@@ -1,5 +1,20 @@
 #pragma once
-#include "game/game_allegiance.h"
+
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+
+class c_network_message_type_collection
+{
+	uint8 gap_0[32];
+
+public:
+
+	void register_message_type(int32 type, const char* name, int32 a4, int32 size1, int32 size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
+	{
+		INVOKE_TYPE(0x1E81D6, 0x1CA199, void(__thiscall*)(void*, int32, const char*, int32, int32, int32, void*, void*, void*), 
+			this, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
+	}
+};
+ASSERT_STRUCT_SIZE(c_network_message_type_collection, 32);
 
 enum e_network_message_type_collection : int32
 {
@@ -125,51 +140,62 @@ static const char* k_network_message_type_collection_description[] = {
 	"end"
 };
 
-struct s_custom_map_filename
+struct s_network_message_session_data
 {
+	XNKID session_id;
+};
+
+struct s_network_message_custom_map_filename
+{
+	s_network_message_session_data session_data;
 	wchar_t file_name[32];
 	int map_download_id;
 };
 
-struct s_request_map_filename
+struct s_network_message_request_map_filename
 {
+	s_network_message_session_data session_data;
 	unsigned long long player_id;
 	int map_download_id;
 };
 
-struct s_team_change
+struct s_network_message_rank_change
 {
-	e_game_team team_index;
-};
-
-struct s_rank_change
-{
+	s_network_message_session_data session_data;
 	int8 rank;
 };
 
-struct s_anti_cheat
+struct s_network_message_anti_cheat
 {
+	s_network_message_session_data session_data;
 	bool enabled;
 };
 
+struct s_network_message_session_custom_variant_settings
+{
+	s_network_message_session_data session_data;
+	CustomVariantSettings::s_variant_settings settings;
+};
+
 #pragma pack(push, 1)
-struct s_text_chat
+struct s_network_message_text_chat
 {
 	XNKID session_id;
-	unsigned int routed_players_mask;
-	unsigned int metadata;
+
+	uint32 routed_players_mask;
+	uint32 metadata;
 	bool source_is_server;
-	unsigned long long source_player_id;
-	unsigned long long destination_players_ids[16];
-	BYTE gap_99[3];
-	int destination_player_count;
-	wchar_t text[122];
+	uint64 source_player_id;
+	uint64 destination_players_ids[16];
+	uint8 gap_99[3];
+	int32 destination_player_count;
+	wchar_t text_message[122];
 };
 #pragma pack(pop)
-ASSERT_STRUCT_SIZE(s_text_chat, 404);
+ASSERT_STRUCT_SIZE(s_network_message_text_chat, 404);
 
 const char* get_network_message_description(int32 type);
-void register_network_message(void* network_message_collection, int32 type, const char* name, int32 a4, int32 size1, int32 size2, void* write_packet_method, void* read_packet_method, void* unk_callback);
+bool is_message_custom(e_network_message_type_collection type);
 
 namespace NetworkMessage
 {

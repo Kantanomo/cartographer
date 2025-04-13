@@ -183,7 +183,7 @@ struct s_player
 
 	/*
 	- TO NOTE: 
-	- These functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (Blam/Engine/Networking/Session)
+	- These functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (Blam/Engine/networking/session)
 	*/
 
 	static s_data_array* get_data();
