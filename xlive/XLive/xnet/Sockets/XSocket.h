@@ -60,6 +60,11 @@ class XSocketManager
 			m_systemSockHandle = INVALID_SOCKET;
 			m_port = 0;
 		}
+
+		~XInternalSocket()
+		{
+			this->Dispose();
+		}
 	};
 
 	XInternalSocket m_mainUdpSocket;
