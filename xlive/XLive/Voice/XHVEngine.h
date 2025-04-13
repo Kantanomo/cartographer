@@ -95,4 +95,7 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE GetLocalChatData(DWORD dwUserIndex, PBYTE pbData, PDWORD pdwSize, PDWORD pdwPackets);
 	virtual HRESULT STDMETHODCALLTYPE SetPlaybackPriority(XUID xuidRemoteTalker, DWORD dwUserIndex, int a3);
 	virtual HRESULT STDMETHODCALLTYPE SubmitIncomingChatData(XUID xuidRemoteTalker, const BYTE* pbData, PDWORD pdwSize);	// 4C
+
+private:
+	std::atomic<int> m_refCount;
 };

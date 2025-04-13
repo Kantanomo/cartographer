@@ -26,33 +26,52 @@ HRESULT WINAPI XHVCreateEngine(PXHV_INIT_PARAMS pParams, PHANDLE phWorkerThread,
 	*/
 }
 
-BOOL XHVENGINE::IsHeadsetPresent(DWORD dwUserIndex)
-{
-	return false;
-}
-
-BOOL XHVENGINE::IsRemoteTalking(XUID xuid)
-{
-	return false;
-}
-
-BOOL XHVENGINE::IsLocalTalking(DWORD dwUserIndex)
-{
-	return false;
-}
-
 LONG XHVENGINE::AddRef()
 {
-	return S_OK;
+	m_refCount++;
+	return m_refCount;
 }
 
 LONG XHVENGINE::Release()
 {
-	return S_OK;
+	int count = m_refCount--;
+	if (this && count <= 0)
+	{
+		delete this;
+	}
+
+	return count;
+}
+
+BOOL XHVENGINE::IsHeadsetPresent(DWORD dwUserIndex)
+{
+	return FALSE;
+}
+
+BOOL XHVENGINE::IsRemoteTalking(XUID xuid)
+{
+	return FALSE;
+}
+
+BOOL XHVENGINE::IsLocalTalking(DWORD dwUserIndex)
+{
+	return FALSE;
 }
 
 HRESULT XHVENGINE::Lock(XHV_LOCK_TYPE lockType)
 {
+	switch (lockType)
+	{
+	case XHV_LOCK_TYPE_LOCK:
+		break;
+	case XHV_LOCK_TYPE_TRYLOCK:
+		break;
+	case XHV_LOCK_TYPE_UNLOCK:
+		break;
+	default:
+		break;
+	}
+
 	return S_OK;
 }
 
@@ -115,9 +134,7 @@ HRESULT XHVENGINE::GetLocalChatData(DWORD dwUserIndex, PBYTE pbData, PDWORD pdwS
 {
 	// The game uses 10 bytes / voice packet, so we need to split them
 	// To verify who is talking, add the XUID of the local talker in the first packet
-	return E_PENDING;
-	
-	/*
+
 	memset(pbData, 0, *pdwSize);
 
 	*pdwPackets = *pdwSize / XHV_VOICECHAT_MODE_PACKET_SIZE;
@@ -139,7 +156,6 @@ HRESULT XHVENGINE::GetLocalChatData(DWORD dwUserIndex, PBYTE pbData, PDWORD pdwS
 	if (pdwPackets) *pdwPackets = 0;
 
 	return E_PENDING;
-	*/
 }
 
 HRESULT XHVENGINE::SetPlaybackPriority(XUID xuidRemoteTalker, DWORD dwUserIndex, int a3)
