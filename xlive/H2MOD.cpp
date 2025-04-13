@@ -564,9 +564,9 @@ static uint16 __cdecl get_enabled_team_flags(c_network_session* session)
 		if ((default_teams_enabled_flags & FLAG(_game_team_red)) == 0
 			|| (default_teams_enabled_flags & FLAG(_game_team_green)) == 0)
 		{
-			LOG_WARNING_FUNC(" - infection teams disabled in default enabled team flags");
+			error(0, " - infection teams disabled in default enabled team flags");
 			if (MapManager::GetMapFilename(selected_map_file_name))
-				LOG_WARNING_FUNCW(" - perhaps current selected map - {} doesn't support these teams?? overriding anyway", selected_map_file_name.c_str());
+				error(0, " - perhaps current selected map - %ws doesn't support these teams?? overriding anyway", selected_map_file_name.c_str());
 		}
 	}
 	else if (StrStrIW(session->get_game_variant_name(), L"rvb") != NULL)
@@ -576,9 +576,9 @@ static uint16 __cdecl get_enabled_team_flags(c_network_session* session)
 		if ((default_teams_enabled_flags & FLAG(_game_team_red)) == 0
 			|| (default_teams_enabled_flags & FLAG(_game_team_blue)) == 0)
 		{
-			LOG_WARNING_FUNC(" - RvB teams disabled in default enabled team flags");
+			error(0, " - RvB teams disabled in default enabled team flags");
 			if (MapManager::GetMapFilename(selected_map_file_name))
-				LOG_WARNING_FUNCW(" - perhaps current selected map - {} doesn't support these teams??", selected_map_file_name.c_str());
+				error(0, " - perhaps current selected map - %ws doesn't support these teams??", selected_map_file_name.c_str());
 		}
 	}
 

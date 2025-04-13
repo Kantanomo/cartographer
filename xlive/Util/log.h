@@ -27,8 +27,6 @@ public:
 	// Good for checking if the logger is actually able to ouput logs
 	bool is_valid() const;
 
-	std::string name() const { return this->sname; }
-
 	/// <summary>
 	///   <para>Creates a logger which outputs to a file.</para>
 	///   <para>Use logger.is_valid() to check if logging is working.</para>
@@ -42,42 +40,28 @@ public:
 	static h2log* create_console(const std::string &name, bool shouldCreateLog, int debugLogLevel);
 
 #define log_a(level) \
-	if (output != nullptr)                      \
-		output->level(fmt.data(), args...);		\
-	if (!isConsole                              \
-		&& console != nullptr                   \
-		&& console->output != nullptr)          \
-		console->output->level(					\
-			("[" + sname + "] " + fmt).data()   \
-			, args...)
+	if (output != nullptr)													\
+		output->level(fmt.data(), args...);									\
+	if (!isConsole && console != nullptr && console->output != nullptr)		\
+		console->output->level(("[" + sname + "] " + fmt).data(), args...)
 
 #define log_b(level) \
-	if (output != nullptr)                      \
-		output->level(fmt.data(), args...);		\
-	if (!isConsole                              \
-		&& console != nullptr                   \
-		&& console->output != nullptr)          \
-		console->output->level(					\
-			(L"[" + wname + L"] " + fmt).data() \
-			, args...)
+	if (output != nullptr)														\
+		output->level(fmt.data(), args...);										\
+	if (!isConsole && console != nullptr && console->output != nullptr)			\
+		console->output->level((L"[" + wname + L"] " + fmt).data(), args...)	\
 
 #define log_c(level) \
-	if (output != nullptr)                      \
-		output->level(msg.data());				\
-	if (!isConsole                              \
-		&& console != nullptr                   \
-		&& console->output != nullptr)          \
-		console->output->level(					\
-			("[" + sname + "] " + msg).data())
+	if (output != nullptr)												\
+		output->level(msg.data());										\
+	if (!isConsole && console != nullptr && console->output != nullptr)	\
+		console->output->level(("[" + sname + "] " + msg).data())
 
 #define log_d(level) \
-	if (output != nullptr)                      \
-		output->level(msg.data());				\
-	if (!isConsole								\
-		&& console != nullptr                   \
-		&& console->output != nullptr)          \
-		console->output->level(					\
-			(L"[" + wname + L"] " + msg).data())
+	if (output != nullptr)												\
+		output->level(msg.data());										\
+	if (!isConsole && console != nullptr && console->output != nullptr)	\
+		console->output->level((L"[" + wname + L"] " + msg).data())
 
 	// For the most unimportant stuff
 	template<typename... Args>
