@@ -4,17 +4,20 @@
 #include "user_interface_widget_text.h"
 #include "signal_slot.h"
 
-/* macro defines */
+/* constants */
 
+enum
+{
+	k_header_text_block_index = 0,
+	k_button_key_text_block_index = 1,
+	k_sub_header_text_block_index = 2,
+	k_minimum_number_of_default_screen_texts = 2,
+	k_maximum_number_of_button_keys = 4
+};
 
-#define k_header_text_block_index 0
-#define k_button_key_text_block_index 1
-#define k_sub_header_text_block_index 2
-#define k_minimum_number_of_default_screen_texts 2
-#define k_maximum_number_of_button_keys 4
+/* macros */
 
-#define TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(block_idx) \
-			((block_idx) + k_minimum_number_of_default_screen_texts)
+#define TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(block_idx) ((block_idx) + k_minimum_number_of_default_screen_texts)
 
 /* enums */
 

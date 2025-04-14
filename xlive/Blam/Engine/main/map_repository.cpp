@@ -11,6 +11,17 @@
 #include "tag_files/files_windows.h"
 #include "text/unicode.h"
 
+/* prototypes */
+
+static int32 get_directory_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder);
+
+static bool open_cache_header(const wchar_t* file_path, void* cache_header_ptr, HANDLE* map_handle);
+
+static void __cdecl close_cache_header(HANDLE* map_handle);
+
+static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry);
+
+
 #pragma region 50 map limit removal
 
 // TODO: consider replacing this implementation with a linked list
@@ -31,13 +42,6 @@ c_custom_map_manager* get_custom_map_manager()
 const wchar_t* get_custom_map_folder_path()
 {
 	return get_custom_map_manager()->m_custom_maps_folder_path;
-}
-
-int get_directory_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder)
-{
-	typedef int(__cdecl* t_get_directory_path_from_id)(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder);
-	auto p_get_directory_path_by_id = Memory::GetAddressRelative<t_get_directory_path_from_id>(0x48EF9E, 0x474A15);
-	return p_get_directory_path_by_id(id, pMore, pszPath, is_folder);
 }
 
 void c_custom_map_manager::create_custom_map_data_directory()
@@ -668,75 +672,6 @@ bool __thiscall c_custom_map_manager::remove_duplicates_write_entry_data_and_add
 	return p_read_map_data_and_add_entry(this, entry);
 }
 
-bool open_cache_header(const wchar_t* file_path, void* cache_header_ptr, HANDLE* map_handle)
-{
-	typedef char(__cdecl open_cache_header_t)(const wchar_t* file_path, void* lpBuffer, HANDLE* map_handle, DWORD NumberOfBytesRead);
-	auto p_open_cache_header = Memory::GetAddress<open_cache_header_t*>(0x642D0, 0x4C327);
-	return p_open_cache_header(file_path, cache_header_ptr, map_handle, 0);
-}
-
-void close_cache_header(HANDLE* map_handle)
-{
-	typedef void (__cdecl* close_cache_header_t)(HANDLE*);
-	auto p_close_cache_header = Memory::GetAddress<close_cache_header_t>(0x64C03, 0x4CC5A);
-	p_close_cache_header(map_handle);
-}
-
-bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
-{
-	s_cache_header header;
-	HANDLE map_cache_handle;
-	wchar_t* file_name = custom_map_entry->file_path;
-	if (!open_cache_header(file_name, &header, &map_cache_handle))
-		return false;
-	if (header.header_signature != 'head' || header.footer_signature != 'foot' || header.file_size <= 0 || header.version != 8)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
-		return false;
-	}
-	if (header.type > 5 || header.type < 0)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
-		return false;
-	}
-	if (strnlen_s(header.name, k_max_map_name_size) >= 32 || strnlen_s(header.version_string, 32) >= 32)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
-		return false;
-	}
-	if (header.type != scenario_type_multiplayer && header.type != scenario_type_singleplayer)
-	{
-		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
-		return false;
-	}
-
-	close_cache_header(&map_cache_handle);
-	// needed because the game loads the human readable map name and description from scenario after checks
-	// without this the map is just called by it's file name
-
-	// todo move the code for loading the descriptions to our code and get rid of this
-	typedef int (__cdecl* validate_and_add_custom_map_internal_t)(s_custom_map_entry*);
-	auto validate_and_add_custom_map_internal = Memory::GetAddress<validate_and_add_custom_map_internal_t>(0x4F690, 0x56890);
-	if (!validate_and_add_custom_map_internal(custom_map_entry))
-	{
-		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
-		std::wstring fallback_name;
-		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
-			wchar_t fallback_name_c[32];
-			utf8_string_to_wchar_string(header.name, fallback_name_c, NUMBEROF(fallback_name_c));
-			fallback_name.append(fallback_name_c);
-		}
-		else {
-			std::wstring full_file_name = file_name;
-			auto start = full_file_name.find_last_of('\\');
-			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));
-		}
-		wcsncpy_s(custom_map_entry->map_name, fallback_name.c_str(), fallback_name.length());
-	}
-	// load the map even if some of the checks failed, will still mostly work
-	return true;
-}
-
 bool __thiscall c_custom_map_manager::add_custom_map_entry_by_map_file_path(const std::wstring& file_path)
 {
 	return add_custom_map_entry_by_map_file_path(file_path.c_str());
@@ -852,8 +787,6 @@ public:
 
 	c_custom_game_custom_map_list* constructor_hook(int a2)
 	{
-		//CLASS_HOOK_DECLARE_LABEL("c_custom_game_custom_map_list__constructor_hook");
-
 		typedef c_custom_game_custom_map_list*(__thiscall* original_constructor_t)(c_custom_game_custom_map_list*, int);
 		auto p_original_constructor = Memory::GetAddress<original_constructor_t>(0x25AE3B);
 
@@ -898,6 +831,7 @@ public:
 };
 //ASSERT_STRUCT_SIZE(c_custom_game_custom_map_list, 3292);
 
+CLASS_HOOK_DECLARE_LABEL(c_custom_game_custom_map_list__constructor_hook, c_custom_game_custom_map_list::constructor_hook);
 static __declspec(naked) void jmp_c_custom_game_custom_map_list_constructor_hook()
 {
 	CLASS_HOOK_JMP(c_custom_game_custom_map_list__constructor_hook, c_custom_game_custom_map_list::constructor_hook);
@@ -943,6 +877,83 @@ void c_custom_map_manager::ApplyCustomMapExtensionLimitPatches()
 	PatchCall(Memory::GetAddress(0x4D3BA, 0x417FE), validate_and_read_custom_map_data);
 	PatchCall(Memory::GetAddress(0x4CF26, 0x41D4E), validate_and_read_custom_map_data);
 	PatchCall(Memory::GetAddress(0x8928, 0x1B6482), validate_and_read_custom_map_data);
+}
+
+/* private code */
+
+static int32 get_directory_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder)
+{
+	typedef int(__cdecl* t_get_directory_path_from_id)(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder);
+	auto p_get_directory_path_by_id = Memory::GetAddressRelative<t_get_directory_path_from_id>(0x48EF9E, 0x474A15);
+	return p_get_directory_path_by_id(id, pMore, pszPath, is_folder);
+}
+
+static bool open_cache_header(const wchar_t* file_path, void* cache_header_ptr, HANDLE* map_handle)
+{
+	typedef char(__cdecl open_cache_header_t)(const wchar_t* file_path, void* lpBuffer, HANDLE* map_handle, DWORD NumberOfBytesRead);
+	auto p_open_cache_header = Memory::GetAddress<open_cache_header_t*>(0x642D0, 0x4C327);
+	return p_open_cache_header(file_path, cache_header_ptr, map_handle, 0);
+}
+
+static void __cdecl close_cache_header(HANDLE* map_handle)
+{
+	INVOKE(0x64C03, 0x4CC5A, close_cache_header, map_handle);
+	return;
+}
+
+static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
+{
+	s_cache_header header;
+	HANDLE map_cache_handle;
+	wchar_t* file_name = custom_map_entry->file_path;
+	if (!open_cache_header(file_name, &header, &map_cache_handle))
+		return false;
+	if (header.header_signature != 'head' || header.footer_signature != 'foot' || header.file_size <= 0 || header.version != 8)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
+		return false;
+	}
+	if (header.type > 5 || header.type < 0)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
+		return false;
+	}
+	if (strnlen_s(header.name, k_max_map_name_size) >= 32 || strnlen_s(header.version_string, 32) >= 32)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
+		return false;
+	}
+	if (header.type != scenario_type_multiplayer && header.type != scenario_type_singleplayer)
+	{
+		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
+		return false;
+	}
+
+	close_cache_header(&map_cache_handle);
+	// needed because the game loads the human readable map name and description from scenario after checks
+	// without this the map is just called by it's file name
+
+	// todo move the code for loading the descriptions to our code and get rid of this
+	typedef int(__cdecl* validate_and_add_custom_map_internal_t)(s_custom_map_entry*);
+	auto validate_and_add_custom_map_internal = Memory::GetAddress<validate_and_add_custom_map_internal_t>(0x4F690, 0x56890);
+	if (!validate_and_add_custom_map_internal(custom_map_entry))
+	{
+		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
+		std::wstring fallback_name;
+		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
+			wchar_t fallback_name_c[32];
+			utf8_string_to_wchar_string(header.name, fallback_name_c, NUMBEROF(fallback_name_c));
+			fallback_name.append(fallback_name_c);
+		}
+		else {
+			std::wstring full_file_name = file_name;
+			auto start = full_file_name.find_last_of('\\');
+			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));
+		}
+		wcsncpy_s(custom_map_entry->map_name, fallback_name.c_str(), fallback_name.length());
+	}
+	// load the map even if some of the checks failed, will still mostly work
+	return true;
 }
 
 // '50 map limit removal' region end

@@ -173,8 +173,14 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 	case _tag_group_device_light_fixture:
 	case _tag_group_equipment:
 	case _tag_group_garbage:
+	case _tag_group_device_control:
+	case _tag_group_biped:
+	case _tag_group_crate:
 	case _tag_group_creature:
 		base_group.group = _tag_group_object;
+		break;
+	default:
+		// Do nothing
 		break;
 	}
 
