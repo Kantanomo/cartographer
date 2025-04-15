@@ -107,8 +107,6 @@ ComVarFromPtrIpv4(h2config_set_lan_ipv4_address, &H2Config_ip_lan,
 ComVarFromPtrIpv4(h2config_set_broadcast_ipv4_address, &H2Config_ip_broadcast_override,
 	"var_broadcast_ip_address_override", "sets the broadcast override address", 1, 1, CommandCollection::SetAddressBroadcastIpv4);
 
-TEST_N_DEF(CC1);
-
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
 std::vector<ConsoleCommand*> CommandCollection::commandTable;

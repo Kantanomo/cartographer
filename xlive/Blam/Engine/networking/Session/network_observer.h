@@ -296,7 +296,7 @@ struct __declspec(align(4)) s_network_observer_configuration
 	int32 field_100;
 	real32 field_104;
 	int32 avg_payload_size_outside_simulation;
-	int32 avg_payload_size_in_simulation;
+	int32 avg_payload_size_during_simulation;
 	real32 minimum_packet_rate_scale;
 	int32 minimum_estimated_upstream_bandwidth_bps;
 	int32 field_118;

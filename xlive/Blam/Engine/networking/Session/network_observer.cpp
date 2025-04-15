@@ -81,7 +81,7 @@ void __cdecl initialize_network_observer_configuration()
 	g_network_observer_configuration->field_FC = 30;
 	g_network_observer_configuration->field_104 = 0.5f;
 	g_network_observer_configuration->avg_payload_size_outside_simulation = 64;
-	g_network_observer_configuration->avg_payload_size_in_simulation = 96;
+	g_network_observer_configuration->avg_payload_size_during_simulation = 96;
 	g_network_observer_configuration->minimum_packet_rate_scale = 0.33333334f;
 
 	// this is pretty low, could be increased, but doesn't matter since bandwidth tracking is currently disabled
@@ -124,7 +124,7 @@ void __cdecl initialize_network_observer_configuration()
 	// has to be a value which is high enough for the desired packet rate to actually send
 	// and to do so when the stream is actually created, for the full bandwidth at creation
 	// instead of gradually increasing the stream towards stream_maximum_bps (if possible)
-	// formula: packet_rate = stream_bits_per_second / (8 * (avg_payload_size_in_simulation + network_layer_overhead (48 for UDP))
+	// formula: packet_rate = stream_bits_per_second / (8 * (avg_payload_size_during_simulation + network_layer_overhead (48 for UDP))
 	g_network_observer_configuration->stream_default_bps = 71680 /* 8192 */;
 
 	g_network_observer_configuration->field_16C = 320;
