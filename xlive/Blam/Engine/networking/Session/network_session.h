@@ -2,8 +2,8 @@
 
 #include "game/players.h"
 #include "input/controllers.h"
+#include "network_observer.h"
 #include "networking/transport/transport.h"
-#include "networking/transport/network_observer.h"
 #include "saved_games/game_variant.h"
 
 extern const char* const k_network_protocols_text[];
@@ -117,13 +117,39 @@ namespace NetworkSession
 	void LeaveSession();
 }
 
+/* structures */
+
+// CARTOGRAPHER ADDITION
+
+struct s_cartographer_peer_data
+{
+	uint32 cartographer_session_parameters_update_number;
+};
+
+struct s_cartographer_network_session_parameters
+{
+	uint32 incremental_update_number;
+};
+
+class c_network_session_cartographer
+{
+	s_cartographer_peer_data peers[k_network_maximum_machines_per_session];
+
+	s_cartographer_network_session_parameters parameters;
+	s_cartographer_network_session_parameters transmitted_parameters;
+
+public:
+};
+
+// END CARTOGRAPHER ADDITION
+
 #pragma pack(push, 1)
 struct s_session_peer
 {
 	bool peer_valid;
 	bool is_remote_peer;
+	bool mode_transition_pending;
 	bool peer_needs_reestablishment;
-	uint8 gap_3;
 	int32 observer_channel_index;
 	int32 membership_update_number;
 	int32 parameters_update_number;
@@ -305,12 +331,12 @@ public:
 	int32 m_session_index;
 	int32 m_session_type;
 	e_network_session_class m_session_class;
-	XNKID session_id;
+	XNKID m_session_id;
 	wchar_t field_28[16];
-	char field_48;
-	XNKEY xnkey;
+	bool field_48;
+	XNKEY m_session_key;
 	char pad[3];
-	int32 xnkey_index;
+	int32 m_session_transport_index;
 	int32 field_60;
 	int32 m_session_host_peer_index;
 	int32 m_elected_host_peer_index;
@@ -389,6 +415,12 @@ public:
 	void* c_kablam_session_join_request_handler; // dedicated server session join handler
 	char field_7B7C[12];
 
+	e_network_session_state get_session_local_state() const
+	{
+		ASSERT(VALID_INDEX(m_local_state, k_network_session_state_count));
+		return m_local_state;
+	}
+
 	s_membership_peer* get_peer_membership(int32 peer_index)
 	{
 		return &m_session_membership.membership_peers[peer_index];
@@ -446,14 +478,14 @@ public:
 
 	bool disconnected() const
 	{
-		return m_local_state == _network_session_state_none;
+		return get_session_local_state() == _network_session_state_none;
 	}
 
 	bool leaving() const
 	{
 		bool result = false;
 
-		switch (m_local_state)
+		switch (get_session_local_state())
 		{
 		case _network_session_state_peer_join_abort:
 		case _network_session_state_peer_leaving:
@@ -471,18 +503,23 @@ public:
 		return result;
 	}
 
-	bool is_client() const
-	{
-		return m_local_state == _network_session_state_peer_established
-			|| m_local_state == _network_session_state_peer_leaving;
-	}
-
 	bool is_host() const
 	{
-		return m_local_state == _network_session_state_host_established
-			|| m_local_state == _network_session_state_host_disband
-			|| m_local_state == _network_session_state_host_handoff
-			|| m_local_state == _network_session_state_host_reestablish;
+		bool result = get_session_local_state() == _network_session_state_host_established
+			|| get_session_local_state() == _network_session_state_host_disband
+			|| get_session_local_state() == _network_session_state_host_handoff
+			|| get_session_local_state() == _network_session_state_host_reestablish;
+
+		if (result)
+		{
+			ASSERT(m_local_peer_index == m_session_host_peer_index);
+		}
+		else if (established())
+		{
+			ASSERT(m_local_peer_index != m_session_host_peer_index);
+		}
+
+		return result;
 	}
 
 	bool is_peer_local(int32 peer_index) const
@@ -497,14 +534,14 @@ public:
 
 	bool local_state_joining_session() const
 	{
-		return m_local_state == _network_session_state_peer_joining;
+		return get_session_local_state() == _network_session_state_peer_joining;
 	}
 
 	bool established() const
 	{
 		bool result = false;
 
-		switch (m_local_state)
+		switch (get_session_local_state())
 		{
 		case _network_session_state_none:
 		case _network_session_state_peer_joining:
@@ -586,7 +623,7 @@ public:
 		return peer_index;
 	}
 
-	bool is_network_channel_session_host(int32 network_channel_index) const
+	bool channel_is_authoritative(int32 network_channel_index) const
 	{
 		bool result = false;
 
@@ -609,6 +646,9 @@ public:
 	{
 		return m_session_class == _network_session_class_xbox_live;
 	}
+
+	bool get_transport_keys(XNKID* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, int32* out_unk) const;
+	bool get_transport_session_id(XNKID* out_session_id) const;
 
 	const char* describe_network_protocol_type() const
 	{

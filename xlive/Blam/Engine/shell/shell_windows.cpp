@@ -25,6 +25,8 @@ enum
 static LARGE_INTEGER g_startup_counter;
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 
+static bool(__cdecl* p_shell_set_game_cursor_state)(bool enabled);
+
 static bool g_custom_mouse_cursor_enabled = false;
 
 uint32 g_instance_number = 0;
@@ -75,6 +77,8 @@ static void shell_windows_tokenize_command_line_buffer(const wchar_t* argument_b
 static void shell_windows_initialize_arguments(void);
 
 static bool __cdecl shell_windows_is_remote_desktop(void);
+
+static bool shell_set_game_cursor_state_hook(bool enabled);
 
 static void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut);
 
@@ -149,6 +153,7 @@ void shell_windows_apply_patches(void)
 	if (!shell_is_dedicated_server())
 	{
 		WriteJmpTo(Memory::GetAddress(0x7E43), H2WinMain);
+		DETOUR_ATTACH(p_shell_set_game_cursor_state, Memory::GetAddress<decltype(p_shell_set_game_cursor_state)>(0x2E0FB), shell_set_game_cursor_state_hook);
 	}
 
 	// disables profiles/game saves encryption
@@ -399,6 +404,12 @@ static void shell_enable_cursor()
 		INVOKE(0x2EDC4, 0x0, shell_enable_cursor);
 		g_custom_mouse_cursor_enabled = true;
 	}
+}
+
+static bool shell_set_game_cursor_state_hook(bool enabled)
+{
+	g_custom_mouse_cursor_enabled = enabled;
+	return p_shell_set_game_cursor_state(enabled);
 }
 
 static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -3,7 +3,7 @@
 #include "simulation_players.h"
 
 #include "memory/bitstream.h"
-#include "networking/Session/network_session.h"
+#include "networking/session/network_session.h"
 
 /* structures */
 

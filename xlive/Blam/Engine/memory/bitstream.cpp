@@ -67,13 +67,13 @@ void c_bitstream::reset(e_bitstream_state state)
 	}
 }
 
-void c_bitstream::write_string_wchar(const char* name, const void* string, int size_in_words)
+void c_bitstream::write_string_wchar(const char* name, const void* string, int32 size_in_words)
 {
-	typedef void(__thiscall* write_string_wchar_t)(c_bitstream*, const char*, const void*, int);
+	typedef void(__thiscall* write_string_wchar_t)(c_bitstream*, const char*, const void*, int32);
 	INVOKE_TYPE(0xD18DF, 0xCDE99, write_string_wchar_t, this, name, string, size_in_words);
 }
 
-void c_bitstream::read_string_wchar(const char* name, void* string_buffer, int size_in_words)
+void c_bitstream::read_string_wchar(const char* name, void* string_buffer, int32 size_in_words)
 {
 	typedef void(__thiscall* read_string_wchar_t)(c_bitstream*, const char*, void*, int);
 	INVOKE_TYPE(0xD1FA7, 0xCE561, read_string_wchar_t, this, name, string_buffer, size_in_words);
@@ -91,9 +91,9 @@ int32 c_bitstream::read_integer(const char* name, uint32 size_in_bits)
 	return INVOKE_TYPE(0xD1EE5, 0xCE49F, read_integer_t, this, name, size_in_bits);
 }
 
-void c_bitstream::write_raw_data(const char* name, void* data, unsigned int size_in_bits)
+void c_bitstream::write_raw_data(const char* name, const void* data, uint32 size_in_bits)
 {
-	typedef void(__thiscall* write_raw_data_t)(c_bitstream*, const char*, void*, int);
+	typedef void(__thiscall* write_raw_data_t)(c_bitstream*, const char*, const void*, uint32);
 	INVOKE_TYPE(0xD18CD, 0xCDE87, write_raw_data_t, this, name, data, size_in_bits);
 }
 
@@ -121,15 +121,15 @@ void c_bitstream::data_decode_address(const char* name, void* address)
 	INVOKE_TYPE(0xD1FFD, 0xCE5B7, data_decode_address_t, this, name, address);
 }
 
-void c_bitstream::data_encode_quantized_real(const char* name, float value, float min_value, float max_value, int size_in_bits, bool exact_midpoint)
+void c_bitstream::data_encode_quantized_real(const char* name, real32 value, real32 min_value, real32 max_value, int32 size_in_bits, bool exact_midpoint)
 {
-	typedef void(__thiscall* data_encode_quantized_real_t)(c_bitstream*, const char*, float, float, float, int, bool);
+	typedef void(__thiscall* data_encode_quantized_real_t)(c_bitstream*, const char*, real32, real32, real32, int32, bool);
 	INVOKE_TYPE(0xD1B9B, 0xCE155, data_encode_quantized_real_t, this, name, value, min_value, max_value, size_in_bits, exact_midpoint);
 }
 
-float c_bitstream::data_decode_quantized_real(const char* name, float min_value, float max_value, int size_in_bits, bool exact_midpoint)
+real32 c_bitstream::data_decode_quantized_real(const char* name, real32 min_value, real32 max_value, int32 size_in_bits, bool exact_midpoint)
 {
-	typedef float(__thiscall* data_decode_quantized_real_t)(c_bitstream*, const char*, float, float, int, bool);
+	typedef real32(__thiscall* data_decode_quantized_real_t)(c_bitstream*, const char*, real32, real32, int32, bool);
 	return INVOKE_TYPE(0xD2039, 0xCE5F3, data_decode_quantized_real_t, this, name, min_value, max_value, size_in_bits, exact_midpoint);
 }
 
@@ -145,15 +145,15 @@ void c_bitstream::data_decode_unit_vector(const char* name, real_vector3d* out_v
 	INVOKE_TYPE(0xD20F4, 0xCE6AE, data_decode_unit_vector_t, this, name, out_vector);
 }
 
-void c_bitstream::data_encode_signed_integer(const char* name, int value, unsigned int size_in_bits)
+void c_bitstream::data_encode_signed_integer(const char* name, int32 value, uint32 size_in_bits)
 {
-	typedef void(__thiscall* data_encode_signed_integer_t)(c_bitstream*, const char*, int, int);
+	typedef void(__thiscall* data_encode_signed_integer_t)(c_bitstream*, const char*, int32, uint32);
 	INVOKE_TYPE(0xD183B, 0xCDDF5, data_encode_signed_integer_t, this, name, value, size_in_bits);
 }
 
-int c_bitstream::data_decode_signed_integer(const char* name, unsigned int size_in_bits)
+int32 c_bitstream::data_decode_signed_integer(const char* name, uint32 size_in_bits)
 {
-	typedef int(__thiscall* data_decode_signed_integer_t)(c_bitstream*, const char*, unsigned int);
+	typedef int(__thiscall* data_decode_signed_integer_t)(c_bitstream*, const char*, uint32);
 	return INVOKE_TYPE(0xD1EF2, 0xCE4AC, data_decode_signed_integer_t, this, name, size_in_bits);
 }
 

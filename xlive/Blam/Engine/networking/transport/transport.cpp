@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "transport.h"
 
-#include "network_channel.h"
-#include "networking/NetworkMessageTypeCollection.h"
+#include "networking/delivery/network_channel.h"
+#include "networking/messages/network_message_type_collection.h"
 #include "shell/shell.h"
 
 /* typedefs */
@@ -26,6 +26,7 @@ bool __cdecl transport_address_populate_from_network_channel_and_compare(
 	network_address* a1,
 	const network_address* a2,
 	bool check_network_port);
+int32 __cdecl transport_get_packet_overhead_hook(int32 transport_type);
 void transport_address_populate_from_network_channel_and_compare_to_cdecl(void);
 void machine_id_update_patch(void);
 
@@ -50,6 +51,8 @@ void network_transport_apply_patches(void)
 		p_transport_register_transition_functions,
 		Memory::GetAddress<transport_register_transition_functions_t>(0x1AC0C1, 0x1A6A7A),
 		transport_register_transition_functions);
+
+	WriteJmpTo(Memory::GetAddress(0x1AC1BD, 0x1A6B76), transport_get_packet_overhead_hook);
 	return;
 }
 
@@ -62,6 +65,32 @@ bool transport_available(void)
 {
 	s_transport_globals* transport_globals = transport_globals_get();
 	return transport_globals->initialized && transport_globals->field_1;
+}
+
+// raw WinSock has a 28 bytes packet of overhead for the packet header, while Xbox LIVE has 44 bytes (28 bytes + LIVE packet header overhead)
+int32 __cdecl transport_get_packet_overhead_hook(int32 transport_type)
+{
+	int32 result_overhead = 0;
+
+	switch ((e_transport_type)transport_type)
+	{
+		// replace XNet UDP header overhead with WinSock overhead
+	case _transport_type_udp:
+		// return 44;
+		result_overhead = 28;
+		break;
+
+	case _transport_type_vdp:
+		//return 48;
+		result_overhead = 28 + 4;
+		break;
+
+	case _transport_type_tcp:
+		result_overhead = 56;
+		break;
+	}
+
+	return result_overhead;
 }
 
 /* private code */

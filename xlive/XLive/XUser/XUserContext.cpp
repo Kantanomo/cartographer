@@ -4,7 +4,7 @@
 #include "cartographer/discord/discord_interface.h"
 
 #include "game/game.h"
-#include "networking/Session/network_session.h"
+#include "networking/session/network_session.h"
 #include "text/unicode.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"

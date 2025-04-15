@@ -12,6 +12,7 @@ enum
 	MAXIMUM_MEMCPY_SIZE = 0x20000000,
 	MAXIMUM_MEMMOVE_SIZE = 0x20000000,
 	MAXIMUM_MEMSET_SIZE = 0x20000000,
+	MAXIMUM_MEMCMP_SIZE = 0x20000000,
 	MAXIMUM_STRING_SIZE = 0x40000,
 };
 
@@ -111,6 +112,13 @@ void* csmemcpy(void* destination, const void* source, size_t size)
 	ASSERT((byte*)source + size <= (byte*)destination || (byte*)destination + size <= (byte*)source);
 
 	return memcpy(destination, source, size);
+}
+
+int csmemcmp(const void* p1, const void* p2, size_t size)
+{
+	CSERIES_ASSERT(size == 0 || (p1 && p2));
+	CSERIES_ASSERT(size >= 0 && size < MAXIMUM_MEMCMP_SIZE);
+	return memcmp(p1, p2, size);
 }
 
 int32 vsprintf(char* buffer, size_t size, const char* format, va_list va_args)

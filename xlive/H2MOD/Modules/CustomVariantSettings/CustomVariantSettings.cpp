@@ -6,7 +6,7 @@
 #include "game/game.h"
 #include "game/game_time.h"
 #include "networking/logic/life_cycle_manager.h"
-#include "networking/NetworkMessageTypeCollection.h"
+#include "networking/messages/network_message_type_collection.h"
 #include "physics/physics_constants.h"
 #include "shell/shell.h"
 #include "units/units.h"
@@ -43,7 +43,7 @@ namespace CustomVariantSettings
 		return stream->error_occured() == false;
 	}
 
-	void UpdateCustomVariantSettings(s_variant_settings* data)
+	void UpdateCustomVariantSettings(const s_variant_settings* data)
 	{
 		currentVariantSettings = *data;
 	}

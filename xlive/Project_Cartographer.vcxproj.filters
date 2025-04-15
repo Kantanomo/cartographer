@@ -5,10 +5,10 @@
     <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
+    <ClCompile Include="Blam\Engine\networking\messages\network_message_type_collection.cpp" />
     <ClCompile Include="Blam\Engine\Memory\bitstream.cpp" />
-    <ClCompile Include="Blam\Engine\networking\transport\network_channel.cpp" />
-    <ClCompile Include="Blam\Engine\networking\transport\network_observer.cpp" />
+    <ClCompile Include="Blam\Engine\networking\delivery\network_channel.cpp" />
+    <ClCompile Include="Blam\Engine\networking\session\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\networking\session\network_session.cpp" />
     <ClCompile Include="Blam\Engine\kablam\kablam.cpp" />
     <ClCompile Include="Util\log.cpp" />
@@ -453,6 +453,10 @@
     <ClCompile Include="Blam\Engine\sound\game_sound.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\config\endpoints.cpp" />
     <ClCompile Include="Blam\Engine\multithreading\synchronization.cpp" />
+    <ClCompile Include="Blam\Engine\networking\delivery\network_link.cpp" />
+    <ClCompile Include="Blam\Engine\networking\messages\network_message_handler.cpp" />
+    <ClCompile Include="Blam\Engine\networking\messages\network_message_gateway.cpp" />
+    <ClCompile Include="Blam\Engine\networking\session\network_session_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -541,10 +545,10 @@
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
-    <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
+    <ClInclude Include="Blam\Engine\networking\messages\network_message_type_collection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
-    <ClInclude Include="Blam\Engine\networking\transport\network_channel.h" />
-    <ClInclude Include="Blam\Engine\networking\transport\network_observer.h" />
+    <ClInclude Include="Blam\Engine\networking\delivery\network_channel.h" />
+    <ClInclude Include="Blam\Engine\networking\session\network_observer.h" />
     <ClInclude Include="Blam\Engine\networking\session\network_session.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam.h" />
     <ClInclude Include="stdafx.h" />
@@ -1905,6 +1909,10 @@
     <ClInclude Include="Blam\Engine\sound\game_sound.h" />
     <ClInclude Include="Blam\Engine\cartographer\config\endpoints.h" />
     <ClInclude Include="Blam\Engine\multithreading\synchronization.h" />
+    <ClInclude Include="Blam\Engine\networking\delivery\network_link.h" />
+    <ClInclude Include="Blam\Engine\networking\messages\network_message_handler.h" />
+    <ClInclude Include="Blam\Engine\networking\messages\network_message_gateway.h" />
+    <ClInclude Include="Blam\Engine\networking\session\network_session_manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
