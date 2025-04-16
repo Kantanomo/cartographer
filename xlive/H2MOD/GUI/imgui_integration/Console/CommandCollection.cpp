@@ -233,7 +233,7 @@ static int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& 
 	if (!booleanCmdVar->SetFromStr(tokens[1], exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 	}
 	return 0;
 }
@@ -253,7 +253,7 @@ static int CommandCollection::SetAddressIpv4HandlerCmd(const std::vector<std::st
 	else
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 	}
 
 	return result;
@@ -268,7 +268,7 @@ static int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tok
 	if (!ComVar(&rumbleScale).SetFromStr(tokens[1], exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 	}
 	else
 	{
@@ -297,7 +297,7 @@ static int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& 
 	else if (!ComVar(&network_debug_display_type).SetFromStr(tokens[1], 0, exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 	}
 	else
 	{
@@ -422,7 +422,7 @@ static int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens
 		if (!ComVar(&peer_index).SetFromStr(tokens[1], 0, exception))
 		{
 			outputCb(StringFlag_None, command_error_bad_arg);
-			outputCb(StringFlag_None, exception.c_str());
+			outputCb(StringFlag_None, "\t%s", exception.c_str());
 			break;
 		}
 		else if (shell_is_dedicated_server()) {
@@ -646,7 +646,7 @@ static int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& t
 		else if (!ComVar(&max_players).SetFromStr(tokens[1], 0, exception))
 		{
 			outputCb(StringFlag_None, command_error_bad_arg);
-			outputCb(StringFlag_None, exception.c_str());
+			outputCb(StringFlag_None, "\t%s", exception.c_str());
 			break;
 		}
 		else if (max_players < 1 || max_players > 16) {
@@ -679,7 +679,7 @@ static int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens,
 	if (!ComVar(&warpFixVar).SetFromStr(tokens[1], exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 		return 0;
 	}
 
@@ -696,7 +696,7 @@ static int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& t
 	if (!ComVar(&datumIdx).SetFromStr(tokens[1], 0, exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 		return 0;
 	}
 
