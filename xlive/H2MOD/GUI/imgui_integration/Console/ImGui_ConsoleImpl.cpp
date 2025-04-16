@@ -45,10 +45,19 @@ CartographerConsole::CartographerConsole() :
 
 int CartographerConsole::LogToMainTabCb(StringHeaderFlags flags, const char* fmt, ...)
 {
-	va_list valist;
-	va_start(valist, fmt);
-	GetMainConsoleInstance()->GetMainOutput()->AddStringFmt(flags, fmt, valist);
-	va_end(valist);
+	// Disable formatting when we know that we're outputting a command
+	if (TEST_FLAG(StringFlag_Command, flags))
+	{
+		GetMainConsoleInstance()->GetMainOutput()->AddString(flags, fmt);
+	}
+	else
+	{
+		va_list valist;
+		va_start(valist, fmt);
+		GetMainConsoleInstance()->GetMainOutput()->AddStringFmt(flags, fmt, valist);
+		va_end(valist);
+	}
+
 	return 0;
 }
 

@@ -88,6 +88,7 @@ enum StringHeaderFlags_
 	StringFlag_None,
 	StringFlag_History = FLAG(0),			// when going through history with key up/key down, it'll be displayed in the input console
 	StringFlag_CopyToClipboard = FLAG(1),	// when set, it'll copy this string to clipboard, then unset the flag
+	StringFlag_Command = FLAG(2)			// when set, it makes sure we don't format the string (user input)
 };
 
 // pretty much a circular buffer
@@ -189,8 +190,7 @@ public:
 		va_list valist;
 		va_start(valist, fmt);
 
-		char temp_string[2];	// Need this to get the proper buffer size required
-		int buffer_size_needed = vsnprintf(temp_string, NUMBEROF(temp_string), 0, fmt, valist) + 1;
+		int buffer_size_needed = vsnprintf(NULL, 0, fmt, valist) + 1;
 		if (buffer_size_needed)
 		{
 			if ((size_t)buffer_size_needed < m_line_buf_size)
@@ -206,8 +206,7 @@ public:
 
 	void AddStringFmt(StringHeaderFlags flags, const char* fmt, va_list valist)
 	{
-		char temp_string[2];	// Need this to get the proper buffer size required
-		int buffer_size_needed = vsnprintf(temp_string, NUMBEROF(temp_string), 0, fmt, valist) + 1;
+		int buffer_size_needed = vsnprintf(NULL, 0, fmt, valist) + 1;
 		if (buffer_size_needed)
 		{
 			if ((size_t)buffer_size_needed < m_line_buf_size)
