@@ -570,9 +570,6 @@ void ReadH2Config()
 
 	const bool is_dedicated_server = shell_is_dedicated_server();
 
-	//int readInstanceIdFile = g_instance_number;
-
-
 	wchar_t config_file_path[MAX_PATH];
 	config_get_path(config_file_path, NUMBEROF(config_file_path));
 

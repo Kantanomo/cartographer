@@ -145,7 +145,8 @@ void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PA
 }
 
 ///Before the game window appears
-void InitH2Startup() {
+void InitH2Startup()
+{
 	InitializeCriticalSection(&log_section);
 
 	DETOUR_BEGIN();
@@ -191,8 +192,6 @@ void H2DedicatedServerStartup() {
 
 void startup_initialize_log_directories(void)
 {
-	InitOnScreenDebugText();
-
 	EnterCriticalSection(&log_section);
 
 	// prepare default log files if enabled, after we read the H2Config

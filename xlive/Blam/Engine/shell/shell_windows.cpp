@@ -9,6 +9,7 @@
 #include "math/math.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
@@ -116,6 +117,8 @@ bool shell_platform_initialize(void)
 	shell_windows_initialize_arguments();
 	
 	shell_windows_adjust_name();
+
+	InitOnScreenDebugText();
 
 	InitH2Config();
 	PostH2Config();
