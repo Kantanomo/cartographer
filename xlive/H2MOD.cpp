@@ -326,6 +326,8 @@ void H2MOD::Initialize()
 	// Apply patches
 	game_apply_pre_winmain_patches();
 
+	CommandCollection::InitializeCommands();
+
 	if (!shell_is_dedicated_server())
 	{
 		// TODO: remove this garbage
@@ -342,7 +344,6 @@ void H2MOD::Initialize()
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		ImGuiHandler::WeaponOffsets::Initialize();
-		CommandCollection::InitializeCommands();
 		TEST_N_DEF(PC3);
 	}
 	else
