@@ -39,8 +39,7 @@ bool ConsoleCommand::ValidateArgs(ConsoleCommandCtxData* ctxData, const char* co
 	{
 		if (cmdData->Hidden())
 		{
-			outputCb(StringFlag_None, "# unknown command: ");
-			outputCb(StringFlag_History | StringFlag_Command, commandLine);
+			outputCb(StringFlag_None, "# unknown command: %s", commandLine);
 		}
 		else
 		{
@@ -95,8 +94,7 @@ bool ConsoleCommand::HandleCommandLine(const char* commandLine, size_t commandLi
 		}
 		else
 		{
-			consoleOutputCb(StringFlag_None, "# unknown command: ");
-			consoleOutputCb(StringFlag_History | StringFlag_Command, commandLine);
+			consoleOutputCb(StringFlag_None, "# unknown command: %s", commandLine);
 		}
 	}
 
