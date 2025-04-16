@@ -115,10 +115,17 @@ bool shell_platform_initialize(void)
 	shell_windows_calculate_instance_num();
 
 	shell_windows_initialize_arguments();
-	
-	shell_windows_adjust_name();
 
 	InitOnScreenDebugText();
+
+	if (!shell_is_dedicated_server())
+	{
+		shell_windows_adjust_name();
+	}
+	else
+	{
+		H2DedicatedServerStartup();
+	}
 
 	InitH2Config();
 	PostH2Config();
@@ -645,10 +652,10 @@ static void shell_windows_initialize_arguments(void)
 				shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill(Memory::GetAddress(0x269FD5), 8);
 			}
-			else if (is_dedicated_server && wcsstr(current_argument, L"instance:") != NULL)
+			else if (is_dedicated_server && wcsstr(current_argument, L"-instance:") != NULL)
 			{
 				// Get instance number from the argument
-				const wchar_t* instance_name = current_argument + NUMBEROF(L"instance:");
+				const wchar_t* instance_name = current_argument + NUMBEROF(L"-instance:") - 1;
 				ustrncpy(g_shell_windows_instance_name, instance_name, NUMBEROF(g_shell_windows_instance_name));
 			}
 #ifdef _DEBUG

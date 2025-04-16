@@ -110,8 +110,6 @@ void initialize_instance(void)
 		init = true;
 
 		heap_debug_initialize();
-		H2DedicatedServerStartup();
-
 		discord_initialize();
 	}
 	return;

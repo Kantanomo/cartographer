@@ -190,7 +190,7 @@ void __cdecl shell_update(void)
 
 void __cdecl timing_initialize(int32 a1)
 {
-	INVOKE(0x37E39, 0x0, timing_initialize, a1);
+	INVOKE(0x37E39, 0x2B4B6, timing_initialize, a1);
 	return;
 }
 
