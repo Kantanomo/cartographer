@@ -52,8 +52,8 @@ void saved_games_async_helper_get_saved_game_bin_path(uint32 enumerated_file_ind
 	saved_games_get_file_info(&file_info, enumerated_file_index);
 
 	ustrncpy(out_path, file_info.file_path, NUMBEROF(file_info.file_path));
-	ustrncat(out_path, binary_name, ustrnlen(binary_name, NUMBEROF(file_info.file_path)));
-	ustrncat(out_path, L".bin", 4);
+	ustrncat(out_path, binary_name, NUMBEROF(file_info.file_path));
+	ustrncat(out_path, L".bin", NUMBEROF(file_info.file_path));
 	return;
 }
 

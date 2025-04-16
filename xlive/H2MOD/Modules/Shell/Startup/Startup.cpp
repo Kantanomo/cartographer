@@ -71,8 +71,8 @@ void InitLocalAppData()
 	wchar_t appdata_path[MAX_PATH];
 	ugetenv(appdata_path, NUMBEROF(appdata_path), L"localappdata");
 
-	ustrncat(appdata_path, k_microsoft_folder, NUMBEROF(k_microsoft_folder));
-	ustrncat(appdata_path, k_appdata_default_path, NUMBEROF(k_appdata_default_path));
+	ustrncat(appdata_path, k_microsoft_folder, NUMBEROF(appdata_path));
+	ustrncat(appdata_path, k_appdata_default_path, NUMBEROF(appdata_path));
 
 	// Make sure main folder exists and create if not
 	const errno_t error = _waccess_s(appdata_path, 6);
@@ -84,7 +84,7 @@ void InitLocalAppData()
 	// Run folder checks if we're using dev preview paths 
 	if (USE_DEV_PREVIEW_CONFIG_FILE_PATHS)
 	{
-		ustrncat(appdata_path, k_appdata_dev_preview_path, NUMBEROF(k_appdata_dev_preview_path));
+		ustrncat(appdata_path, k_appdata_dev_preview_path, NUMBEROF(appdata_path));
 		
 		// Make sure dev preview folder exists and create if not
 		const errno_t dev_path_error = _waccess_s(appdata_path, 6);

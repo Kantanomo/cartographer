@@ -540,14 +540,9 @@ static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_IN
 
 static void shell_windows_adjust_name(void)
 {
-	const HWND hwnd = *shell_windows_get_hwnd();
 	if (g_instance_number > 1)
 	{
-		wchar_t titleMod[256];
-		wchar_t titleOriginal[256];
-		GetWindowText(hwnd, titleOriginal, 256);
-		wsprintf(titleMod, L"%ls (P%d)", titleOriginal, g_instance_number);
-		SetWindowText(hwnd, titleMod);
+		usnprintf(g_window_name, NUMBEROF(g_window_name), L"%ws (P%d)", g_window_name, g_instance_number);
 	}
 	return;
 }
@@ -562,7 +557,7 @@ static void shell_windows_calculate_instance_num(void)
 		swprintf(mutexName, ARRAYSIZE(mutexName), (shell_is_dedicated_server() ? L"Halo2Server%d" : L"Halo2Player%d"), g_instance_number);
 		HANDLE mutex = CreateMutexW(0, TRUE, mutexName);
 		lastErr = GetLastError();
-		if (lastErr == ERROR_ALREADY_EXISTS)
+		if (lastErr == ERROR_ALREADY_EXISTS && mutex != NULL)
 		{
 			CloseHandle(mutex);
 		}
