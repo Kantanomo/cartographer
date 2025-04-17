@@ -341,12 +341,12 @@ bool c_network_session::get_transport_keys(XNKID* out_session_id, XNKEY* out_ses
 	{
 		if (out_session_id != NULL)
 		{
-			*out_session_id->ab = *m_session_id.ab;
+			csmemcpy(out_session_id->ab, m_session_id.ab, sizeof(out_session_id->ab));
 		}
 
 		if (out_session_key != NULL)
 		{
-			*out_session_key->ab = *m_session_key.ab;
+			csmemcpy(out_session_key->ab, m_session_key.ab, sizeof(out_session_key->ab));
 		}
 
 		if (out_session_key_index != NULL)
