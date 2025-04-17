@@ -9,6 +9,7 @@
 #include "math/math.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
@@ -114,8 +115,17 @@ bool shell_platform_initialize(void)
 	shell_windows_calculate_instance_num();
 
 	shell_windows_initialize_arguments();
-	
-	shell_windows_adjust_name();
+
+	InitOnScreenDebugText();
+
+	if (!shell_is_dedicated_server())
+	{
+		shell_windows_adjust_name();
+	}
+	else
+	{
+		H2DedicatedServerStartup();
+	}
 
 	InitH2Config();
 	PostH2Config();
@@ -540,14 +550,9 @@ static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_IN
 
 static void shell_windows_adjust_name(void)
 {
-	const HWND hwnd = *shell_windows_get_hwnd();
 	if (g_instance_number > 1)
 	{
-		wchar_t titleMod[256];
-		wchar_t titleOriginal[256];
-		GetWindowText(hwnd, titleOriginal, 256);
-		wsprintf(titleMod, L"%ls (P%d)", titleOriginal, g_instance_number);
-		SetWindowText(hwnd, titleMod);
+		usnprintf(g_window_name, NUMBEROF(g_window_name), L"%ws (P%d)", g_window_name, g_instance_number);
 	}
 	return;
 }
@@ -562,7 +567,7 @@ static void shell_windows_calculate_instance_num(void)
 		swprintf(mutexName, ARRAYSIZE(mutexName), (shell_is_dedicated_server() ? L"Halo2Server%d" : L"Halo2Player%d"), g_instance_number);
 		HANDLE mutex = CreateMutexW(0, TRUE, mutexName);
 		lastErr = GetLastError();
-		if (lastErr == ERROR_ALREADY_EXISTS)
+		if (lastErr == ERROR_ALREADY_EXISTS && mutex != NULL)
 		{
 			CloseHandle(mutex);
 		}
@@ -647,10 +652,10 @@ static void shell_windows_initialize_arguments(void)
 				shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill(Memory::GetAddress(0x269FD5), 8);
 			}
-			else if (is_dedicated_server && wcsstr(current_argument, L"instance:") != NULL)
+			else if (is_dedicated_server && wcsstr(current_argument, L"-instance:") != NULL)
 			{
 				// Get instance number from the argument
-				const wchar_t* instance_name = current_argument + NUMBEROF(L"instance:");
+				const wchar_t* instance_name = current_argument + NUMBEROF(L"-instance:") - 1;
 				ustrncpy(g_shell_windows_instance_name, instance_name, NUMBEROF(g_shell_windows_instance_name));
 			}
 #ifdef _DEBUG

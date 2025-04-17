@@ -91,6 +91,7 @@ void shell_command_line_flag_set(e_shell_command_line_flags flag, int32 state)
 // TODO: properly set this up
 const char* shell_get_version(void)
 {
+	// FORMAT: (build_type configuration platform build_number.branch)
 	return "halo2_pc_cache_  release pc 11122.07.08.24.1808.main";
 }
 
@@ -189,7 +190,7 @@ void __cdecl shell_update(void)
 
 void __cdecl timing_initialize(int32 a1)
 {
-	INVOKE(0x37E39, 0x0, timing_initialize, a1);
+	INVOKE(0x37E39, 0x2B4B6, timing_initialize, a1);
 	return;
 }
 

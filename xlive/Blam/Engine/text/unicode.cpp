@@ -48,7 +48,7 @@ wchar_t* ustrncat(wchar_t* dest, const wchar_t* src, size_t count)
 	ASSERT(src != NULL);
 
 	// Originally used the unsafe version in h2v, adjusted to use the safe version
-	const errno_t error = wcsncat_s(dest, UINT_MAX, src, count);
+	const errno_t error = wcsncat_s(dest, count, src, _TRUNCATE);
 	return error == 0 ? dest : NULL;
 }
 

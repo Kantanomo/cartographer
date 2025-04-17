@@ -113,7 +113,7 @@ public:
 		va_end(valist);
 	}
 
-	static int __cdecl LogToMainTabCb(StringHeaderFlags flags, const char* fmt, ...);
+	static int LogToMainTabCb(StringHeaderFlags flags, const char* fmt, ...);
 
 	// commands
 	static int clear_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);

@@ -225,7 +225,7 @@ static int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& 
 	if (tokens.size() - 1 < 1)
 	{
 		booleanCmdVar->SetVal(!booleanCmdVar->GetVal());
-		outputCb(StringFlag_None, "%s", booleanCmdVar->AsString().c_str());
+		outputCb(StringFlag_None, booleanCmdVar->AsString().c_str());
 		return 0;
 	}
 
@@ -233,7 +233,7 @@ static int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& 
 	if (!booleanCmdVar->SetFromStr(tokens[1], exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 	}
 	return 0;
 }
@@ -253,7 +253,7 @@ static int CommandCollection::SetAddressIpv4HandlerCmd(const std::vector<std::st
 	else
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 	}
 
 	return result;
@@ -268,7 +268,7 @@ static int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tok
 	if (!ComVar(&rumbleScale).SetFromStr(tokens[1], exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 	}
 	else
 	{
@@ -297,7 +297,7 @@ static int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& 
 	else if (!ComVar(&network_debug_display_type).SetFromStr(tokens[1], 0, exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 	}
 	else
 	{
@@ -422,7 +422,7 @@ static int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens
 		if (!ComVar(&peer_index).SetFromStr(tokens[1], 0, exception))
 		{
 			outputCb(StringFlag_None, command_error_bad_arg);
-			outputCb(StringFlag_None, "	%s", exception.c_str());
+			outputCb(StringFlag_None, "\t%s", exception.c_str());
 			break;
 		}
 		else if (shell_is_dedicated_server()) {
@@ -646,7 +646,7 @@ static int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& t
 		else if (!ComVar(&max_players).SetFromStr(tokens[1], 0, exception))
 		{
 			outputCb(StringFlag_None, command_error_bad_arg);
-			outputCb(StringFlag_None, "	%s", exception.c_str());
+			outputCb(StringFlag_None, "\t%s", exception.c_str());
 			break;
 		}
 		else if (max_players < 1 || max_players > 16) {
@@ -679,7 +679,7 @@ static int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens,
 	if (!ComVar(&warpFixVar).SetFromStr(tokens[1], exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 		return 0;
 	}
 
@@ -696,7 +696,7 @@ static int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& t
 	if (!ComVar(&datumIdx).SetFromStr(tokens[1], 0, exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
 		return 0;
 	}
 
@@ -836,28 +836,36 @@ static int CommandCollection::invite(const std::vector<std::string>& tokens, Con
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 	c_network_session* session = NULL;
-	network_life_cycle_in_squad_session(&session);
-	bool session_host = session->is_host();
-
-	XSESSION_INFO x_session_info;
-	x_session_info.sessionID = session->m_session_id;
-	x_session_info.keyExchangeKey = session->m_session_key;
-	x_session_info.hostAddress = (session_host ? session->m_session_virtual_couch.xsession_info.hostAddress :
-		session->m_network_observer->m_observer_channels[session->get_session_peer(session->m_session_host_peer_index)->observer_channel_index].xnaddr);
-
-	uint8* session_bytes = (uint8*)&x_session_info;
-	char connect_string[sizeof(XSESSION_INFO) * 2 + 1];
-
-	// Encode the data into hex string
-	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
+	int result = 0;
+	if (network_life_cycle_in_squad_session(&session))
 	{
-		csprintf(&connect_string[2 * i], 2, "%02hhX", session_bytes[i]);
-	}
+		bool session_host = session->is_host();
 
-	outputCb(StringFlag_None, "Invite code generated:");
-	outputCb(StringFlag_CopyToClipboard, connect_string);
-	outputCb(StringFlag_None, "Invite code has been copied to your clipboard.");
-	return 0;
+		XSESSION_INFO x_session_info;
+		x_session_info.sessionID = session->m_session_id;
+		x_session_info.keyExchangeKey = session->m_session_key;
+		x_session_info.hostAddress = (session_host ? session->m_session_virtual_couch.xsession_info.hostAddress :
+			session->m_network_observer->m_observer_channels[session->get_session_peer(session->m_session_host_peer_index)->observer_channel_index].xnaddr);
+
+		uint8* session_bytes = (uint8*)&x_session_info;
+		char connect_string[sizeof(XSESSION_INFO) * 2 + 1];
+
+		// Encode the data into hex string
+		for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
+		{
+			csprintf(&connect_string[2 * i], 2, "%02hhX", session_bytes[i]);
+		}
+
+		outputCb(StringFlag_None, "Invite code generated:");
+		outputCb(StringFlag_CopyToClipboard, connect_string);
+		outputCb(StringFlag_None, "Invite code has been copied to your clipboard.");
+	}
+	else
+	{
+		result = 1;
+		outputCb(StringFlag_None, "Invite code failed to generate. Not in a squad session");
+	}
+	return result;
 }
 
 static int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)

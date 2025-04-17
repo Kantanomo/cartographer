@@ -28,6 +28,9 @@ static const wchar_t* k_h2config_filenames[] = { L"halo2config", L"h2serverconfi
 #define k_h2config_version_section "H2ConfigurationVersion:" k_h2config_version_number
 #define k_h2config_version_debug_section "Debug:" k_h2config_version_number
 
+static const uint16 k_default_base_port = 2000;
+static const char* k_default_base_port_string = "2000";
+
 /* globals */
 
 bool g_force_cartographer_update = false;
@@ -37,7 +40,7 @@ unsigned long H2Config_master_ip = inet_addr("149.56.81.89");
 
 // config variables
 
-unsigned short H2Config_base_port = 2000;
+uint16 H2Config_base_port = k_default_base_port;
 unsigned long H2Config_ip_lan = htonl(INADDR_NONE);
 unsigned long H2Config_ip_broadcast_override = htonl(INADDR_BROADCAST);
 _H2Config_language H2Config_language = { -1, 0 };
@@ -206,7 +209,6 @@ WPARAM H2Config_hotkeyIdWindowMode = VK_F8;
 WPARAM H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
 WPARAM H2Config_hotkeyIdGuide = VK_HOME;
 WPARAM H2Config_hotkeyIdConsole = VK_F10;
-bool ownsConfigFile = false;
 
 void SaveH2Config()
 {
@@ -568,9 +570,6 @@ void ReadH2Config()
 
 	const bool is_dedicated_server = shell_is_dedicated_server();
 
-	//int readInstanceIdFile = g_instance_number;
-
-
 	wchar_t config_file_path[MAX_PATH];
 	config_get_path(config_file_path, NUMBEROF(config_file_path));
 
@@ -585,9 +584,6 @@ void ReadH2Config()
 	}
 	else
 	{
-		// TODO: how to handle this?
-		//ownsConfigFile = (readInstanceIdFile == g_instance_number);
-
 		if (!is_dedicated_server)
 		{
 			extern int current_language_main;
@@ -607,7 +603,7 @@ void ReadH2Config()
 		else
 		{
 			CONFIG_GET(&ini, "h2portable", "false", &g_h2_portable);
-			CONFIG_GET(&ini, "base_port", "2000", &H2Config_base_port);
+			CONFIG_GET(&ini, "base_port", k_default_base_port_string, &H2Config_base_port);
 			CONFIG_GET(&ini, "upnp", "true", &H2Config_upnp_enable);
 			CONFIG_GET(&ini, "enable_xdelay", "true", &H2Config_xDelay);
 
@@ -819,19 +815,20 @@ void ReadH2Config()
 			}
 		}
 
-		fclose(file_config);
-
-		if (!ownsConfigFile)
+		// Increment base port for multiple instances so we don't interfere with each other
+		if (g_instance_number > 1 && H2Config_base_port == k_default_base_port)
 		{
 			if (H2Config_base_port < 64000 + 1)
 			{
-				H2Config_base_port += 1000;
+				H2Config_base_port += 1000 * (uint16)g_instance_number;
 			}
 			else if (H2Config_base_port < 65535 - 10 + 1)
 			{
-				H2Config_base_port += 10;
+				H2Config_base_port += 10 * (uint16)g_instance_number;
 			}
 		}
+
+		fclose(file_config);
 	}
 
 	addDebugText("End reading H2Configuration file.");
