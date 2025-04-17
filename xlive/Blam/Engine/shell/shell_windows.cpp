@@ -118,15 +118,6 @@ bool shell_platform_initialize(void)
 
 	InitOnScreenDebugText();
 
-	if (!shell_is_dedicated_server())
-	{
-		shell_windows_adjust_name();
-	}
-	else
-	{
-		H2DedicatedServerStartup();
-	}
-
 	InitH2Config();
 	PostH2Config();
 
@@ -138,6 +129,16 @@ bool shell_platform_initialize(void)
 		shell_command_line_flag_set(_shell_command_line_flag_nointro, H2Config_skip_intro);
 	}
 	shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);			// ### TODO FIXME: voice-chat is disabled for now
+
+	if (!shell_is_dedicated_server())
+	{
+		shell_windows_adjust_name();
+	}
+	else
+	{
+		H2DedicatedServerStartup();
+	}
+
 	return true;
 }
 
