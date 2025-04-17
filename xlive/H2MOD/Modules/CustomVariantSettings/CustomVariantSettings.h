@@ -44,8 +44,8 @@ namespace CustomVariantSettings
 			return !(*this == other);
 		}
 	};
-	void __cdecl EncodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data);
-	bool __cdecl DecodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data);
+	void EncodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data);
+	void DecodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data);
 
 	void ApplyCustomSettings(s_variant_settings* newVariantSettings);
 	void UpdateCustomVariantSettings(const s_variant_settings* data);

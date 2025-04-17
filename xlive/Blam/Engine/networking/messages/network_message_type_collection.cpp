@@ -75,6 +75,18 @@ bool __cdecl decode_anti_cheat_message(c_bitstream* stream, int a2, s_network_me
 	return stream->error_occured() == false;
 }
 
+void __cdecl encode_custom_variant_settings(c_bitstream* stream, int a2, s_network_message_session_custom_variant_settings* data)
+{
+	stream->write_raw_data("session-id", data->session_data.session_id.ab, SIZEOF_BITS(data->session_data.session_id.ab));
+	CustomVariantSettings::EncodeVariantSettings(stream, a2, &data->settings);
+}
+bool __cdecl decode_custom_variant_settings(c_bitstream* stream, int a2, s_network_message_session_custom_variant_settings* data)
+{
+	stream->write_raw_data("session-id", data->session_data.session_id.ab, SIZEOF_BITS(data->session_data.session_id.ab));
+	CustomVariantSettings::DecodeVariantSettings(stream, a2, &data->settings);
+	return stream->error_occured() == false;
+}
+
 void register_custom_network_message(c_network_message_type_collection* network_message_collection)
 {
 	typedef void(__cdecl* register_test_packet_t)(void*);
@@ -128,8 +140,8 @@ void register_custom_network_message(c_network_message_type_collection* network_
 		0, 
 		k_custom_variant_settings_packet_size, 
 		k_custom_variant_settings_packet_size,
-		(void*)CustomVariantSettings::EncodeVariantSettings, 
-		(void*)CustomVariantSettings::DecodeVariantSettings, 
+		(void*)encode_custom_variant_settings,
+		(void*)decode_custom_variant_settings,
 		NULL);
 }
 

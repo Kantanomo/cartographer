@@ -20,7 +20,7 @@ std::map<std::wstring, CustomVariantSettings::s_variant_settings> customVariantS
 
 namespace CustomVariantSettings
 {
-	void __cdecl EncodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data)
+	void EncodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data)
 	{
 		stream->write_raw_data("gravity", &data->gravity, sizeof(data->gravity) * CHAR_BIT); //16.
 		stream->write_raw_data("game speed", &data->gameSpeed, sizeof(data->gameSpeed) * CHAR_BIT);
@@ -30,7 +30,7 @@ namespace CustomVariantSettings
 		stream->write_bool("infinite grenades", data->infiniteGrenades);
 		stream->write_integer("forced field of view", data->forced_fov, sizeof(data->forced_fov) * CHAR_BIT);
 	}
-	bool __cdecl DecodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data)
+	void DecodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data)
 	{
 		stream->read_raw_data("gravity", &data->gravity, sizeof(data->gravity) * CHAR_BIT);
 		stream->read_raw_data("game speed", &data->gameSpeed, sizeof(data->gameSpeed) * CHAR_BIT);
@@ -40,7 +40,6 @@ namespace CustomVariantSettings
 		data->hillRotation = (e_hill_rotation)stream->read_integer("hill rotation", 8);
 		data->infiniteGrenades = stream->read_bool("infinite grenades");
 		data->forced_fov = (uint8)stream->read_integer("forced field of view", sizeof(data->forced_fov) * CHAR_BIT);
-		return stream->error_occured() == false;
 	}
 
 	void UpdateCustomVariantSettings(const s_variant_settings* data)
@@ -52,7 +51,12 @@ namespace CustomVariantSettings
 	{
 		c_network_session* session = NULL;
 		network_life_cycle_in_squad_session(&session);
-		if (session->is_host() && shell_is_dedicated_server())
+
+		s_network_message_session_custom_variant_settings data;
+
+		if (session->is_host() 
+			&& session->get_transport_session_id(&data.session_data.session_id)
+			&& shell_is_dedicated_server())
 		{
 			//TODO: Find and map out struct with current variant information.
 			auto VariantName = std::wstring(Memory::GetAddress<wchar_t*>(0, 0x534A18));
@@ -61,11 +65,13 @@ namespace CustomVariantSettings
 			if (customVariantSetting != customVariantSettingsMap.end())
 			{
 				currentVariantSettings = customVariantSetting->second;
-				if (currentVariantSettings != defaultCustomVariantSettings) {
+				if (currentVariantSettings != defaultCustomVariantSettings) 
+				{
 					c_network_observer* observer = session->m_network_observer;
 					s_session_peer* peer = session->get_session_peer(peer_index);
 					if (peer_index != NONE && !session->is_peer_local(peer_index))
 					{
+						data.settings = currentVariantSettings;
 						if (peer->is_remote_peer)
 							observer->send_message(
 								session->m_session_index, 
@@ -73,7 +79,7 @@ namespace CustomVariantSettings
 								false, 
 								_custom_variant_settings, 
 								k_custom_variant_settings_packet_size, 
-								&currentVariantSettings);
+								&data);
 					}
 				}
 			}
