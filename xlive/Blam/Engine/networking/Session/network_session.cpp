@@ -333,7 +333,7 @@ void c_network_session::switch_players_to_teams(datum* player_indexes, int32 pla
 	}
 }
 
-bool c_network_session::get_transport_keys(XNKID* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, int32* out_unk) const
+bool c_network_session::get_secure_key(XNKID* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, e_transport_platform* transport_platform) const
 {
 	bool result = false;
 
@@ -341,12 +341,12 @@ bool c_network_session::get_transport_keys(XNKID* out_session_id, XNKEY* out_ses
 	{
 		if (out_session_id != NULL)
 		{
-			csmemcpy(out_session_id->ab, m_session_id.ab, sizeof(out_session_id->ab));
+			*out_session_id = m_session_id;
 		}
 
 		if (out_session_key != NULL)
 		{
-			csmemcpy(out_session_key->ab, m_session_key.ab, sizeof(out_session_key->ab));
+			*out_session_key = m_session_key;
 		}
 
 		if (out_session_key_index != NULL)
@@ -354,9 +354,9 @@ bool c_network_session::get_transport_keys(XNKID* out_session_id, XNKEY* out_ses
 			*out_session_key_index = m_session_transport_index;
 		}
 
-		if (out_unk != NULL)
+		if (transport_platform != NULL)
 		{
-			*out_unk = field_60;
+			*transport_platform = m_session_transport_platform;
 		}
 
 		result = true;
@@ -367,5 +367,5 @@ bool c_network_session::get_transport_keys(XNKID* out_session_id, XNKEY* out_ses
 
 bool c_network_session::get_transport_session_id(XNKID* out_session_id) const
 {
-	return get_transport_keys(out_session_id, NULL, NULL, NULL);
+	return get_secure_key(out_session_id, NULL, NULL, NULL);
 }

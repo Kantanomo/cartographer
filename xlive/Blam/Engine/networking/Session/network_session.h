@@ -337,7 +337,7 @@ public:
 	XNKEY m_session_key;
 	char pad[3];
 	int32 m_session_transport_index;
-	int32 field_60;
+	e_transport_platform m_session_transport_platform;
 	int32 m_session_host_peer_index;
 	int32 m_elected_host_peer_index;
 	uint32 field_6C;
@@ -413,7 +413,10 @@ public:
 	uint32 field_7978;
 	uint8 gap_797C[508];
 	void* c_kablam_session_join_request_handler; // dedicated server session join handler
-	char field_7B7C[12];
+	bool m_time_exists;
+	int8 pad_7B7D[3];
+	uint32 m_time;
+	char field_7B7D[4];
 
 	e_network_session_state get_session_local_state() const
 	{
@@ -647,7 +650,7 @@ public:
 		return m_session_class == _network_session_class_xbox_live;
 	}
 
-	bool get_transport_keys(XNKID* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, int32* out_unk) const;
+	bool get_secure_key(XNKID* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, e_transport_platform* transport_platform) const;
 	bool get_transport_session_id(XNKID* out_session_id) const;
 
 	const char* describe_network_protocol_type() const

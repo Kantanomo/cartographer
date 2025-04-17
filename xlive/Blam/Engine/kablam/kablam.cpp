@@ -41,11 +41,11 @@ static const std::map<const wchar_t*, e_server_console_commands> k_commands_map 
 
 /* globals */
 
-dedi_command_t p_kablam_command_handler;
-kablam_vip_add_t p_kablam_vip_add;
-kablam_vip_clear_t p_kablam_vip_clear;
-kablam_command_play_t* p_kablam_command_play;
-hookServ1_t p_hookServ1;
+static dedi_command_t p_kablam_command_handler;
+static kablam_vip_add_t p_kablam_vip_add;
+static kablam_vip_clear_t p_kablam_vip_clear;
+static kablam_command_play_t* p_kablam_command_play;
+static hookServ1_t p_hookServ1;
 
 static int32 g_message_timeout = 0;
 
@@ -235,7 +235,7 @@ static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wi
 {
 	wchar_t* command = command_line_split_wide[0];
 	if (command[0] == L'$') {
-		server_console_log_to_dedicated_server_console_wide(L"# running custom command: ");
+		server_console_log_to_dedicated_server_console_wide(L"# running custom command: \n");
 		
 		c_static_string<256> command_line;
 		c_static_wchar_string<256> token_wide;
