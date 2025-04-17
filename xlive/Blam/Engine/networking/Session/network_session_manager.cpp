@@ -24,7 +24,7 @@ c_network_session* c_network_session_manager::get_network_session_by_id(const XN
 	for (int32 i = 0; i < k_network_maximum_sessions; i++)
 	{
 		session = m_sessions[i];
-		if (session && session->get_transport_keys(&session_id, NULL, NULL, NULL))
+		if (session && session->get_secure_key(&session_id, NULL, NULL, NULL))
 		{
 			if (csmemcmp(session_id.ab, target_session_id->ab, sizeof(session_id.ab)) == 0)
 				break;

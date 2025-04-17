@@ -334,7 +334,7 @@ static void discord_rich_presence_update(s_discord_data* discord)
 		XSESSION_INFO session;
 		const int32 observer_index = network_session->get_session_peer(network_session->m_session_host_peer_index)->observer_channel_index;
 
-		network_session->get_transport_keys(&session.sessionID, &session.keyExchangeKey, NULL, NULL);
+		network_session->get_secure_key(&session.sessionID, &session.keyExchangeKey, NULL, NULL);
 		session.hostAddress = 
 			(session_host ? network_session->m_session_virtual_couch.xsession_info.hostAddress : network_session->m_network_observer->m_observer_channels[observer_index].xnaddr);
 

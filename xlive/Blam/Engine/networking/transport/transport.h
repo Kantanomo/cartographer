@@ -14,6 +14,11 @@ enum e_transport_type : int32
 	k_protocol_count
 };
 
+enum e_transport_platform : int32
+{
+	// TODO: populate
+};
+
 /* structures */
 
 struct network_address
