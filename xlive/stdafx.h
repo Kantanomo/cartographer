@@ -80,23 +80,31 @@
 
 #include <dxgi1_4.h>
 
-// Cartographer includes
-#include "cseries/cseries.h"
-#include "cseries/cseries_errors.h"
-#include "cseries/cseries_system_memory.h"
-#include "cseries/cseries_windows.h"
-#include "math/math.h"
-#include "math/integer_math.h"
-#include "math/real_math.h"
-#include "memory/static_arrays.h"
+#include "xliveless.h"
+#include "xlivedefs.h"
+
+// cartographer includes
+
+#include "version.h"
+
+#include "CartographerDllConf.h"
 
 #include "Util/curl-interface.h"
 #include "Util/Hooks/Hook.h"
 #include "Util/log.h"
 #include "Util/Memory.h"
 
-#include "xliveless.h"
-#include "xlivedefs.h"
+// blam includes
+
+#include "cseries/cseries.h"
+#include "cseries/cseries_errors.h"
+#include "cseries/cseries_system_memory.h"
+#include "cseries/cseries_windows.h"
+
+#include "math/math.h"
+#include "math/integer_math.h"
+#include "math/real_math.h"
+#include "memory/static_arrays.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4131)	// Disable old style declarator warning
@@ -105,8 +113,6 @@
 #pragma warning( pop )
 
 #pragma comment(lib, "IPHLPAPI.lib")
-
-#include "CartographerDllConf.h"
 
 static_assert(EXECUTABLE_TYPE >= 0 && EXECUTABLE_TYPE <= 7, "EXECUTABLE_TYPE VALUE BELOW 0 OR EXCEEDS 7");
 static_assert(EXECUTABLE_VERSION > 0 && EXECUTABLE_VERSION < 65535, "EXECUTABLE_VERSION VALUE EXCEEDS 65534");

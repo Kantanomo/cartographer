@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cseries/cseries.h"
+
 enum e_context_presence : uint32
 {
 	_context_presence_mainmenu = 0,

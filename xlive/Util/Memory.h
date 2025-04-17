@@ -1,5 +1,8 @@
 #pragma once
 
+#include "cseries/cseries.h"
+#include "cseries/cseries_windows.h"
+
 #define BASE_IMAGE_ADDRESS_HALO2 0x00400000
 #define BASE_IMAGE_ADDRESS_H2SERVER 0x00400000
 

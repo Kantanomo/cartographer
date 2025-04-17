@@ -3,6 +3,8 @@
 #ifndef XLIVELESS_H
 #define XLIVELESS_H
 
+#include "Util/log.h"
+
 #ifdef XLIVELESS_EXPORTS
 #define XLIVELESS_API extern "C" __declspec(dllexport)
 #else
