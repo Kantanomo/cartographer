@@ -8,10 +8,12 @@
 #include "screen_lod_setting.h"
 #include "screen_safe_area_setting.h"
 #include "screen_restore_video_defaults.h"
+#include "screen_vsync_setting.h"
 
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_globals.h"
+#include "main/game_preferences.h"
 #include "tag_files/global_string_ids.h"
 
 
@@ -31,13 +33,17 @@ enum e_mp_video_settings_list_items : uint16
 	_item_gamma_setting,
 	_item_anti_aliasing,
 	_item_safe_area,
+	_item_vsync,
 	_item_restore_defaults,
 
 	k_total_no_of_mp_video_settings_list_items
 };
 
-
 /* globals */
+
+/* externs */
+
+extern const wchar_t* const k_vsync_header_string[k_language_count];
 
 /* prototypes */
 
@@ -99,6 +105,10 @@ void c_multiplayer_video_settings_list::update_list_items(c_list_item_widget* it
 			break;
 		case _item_safe_area:
 			string = _string_id_safe_area;
+			break;		
+		case _item_vsync:
+			string = _string_id_invalid;
+			text->set_text(k_vsync_header_string[get_current_language()]);
 			break;
 		case _item_restore_defaults:
 			string = _string_id_restore_video_defaults;
@@ -146,6 +156,9 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 		break;
 	case _item_safe_area:
 		params.m_load_function = &c_screen_safe_area_menu::load_mp;
+		break;	
+	case _item_vsync:
+		params.m_load_function = &c_screen_vsync_menu::load;
 		break;
 	case _item_restore_defaults:
 		params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load_mp;
