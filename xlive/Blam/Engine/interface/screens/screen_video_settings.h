@@ -7,7 +7,7 @@
 
 /* macro defines */
 
-#define k_no_of_visible_items_for_video_settings 8
+#define k_no_of_visible_items_for_video_settings 8+1
 
 /* constants */
 
@@ -36,7 +36,7 @@ public:
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
 
 };
-ASSERT_STRUCT_SIZE(c_video_settings_list, 0x4E8);
+//ASSERT_STRUCT_SIZE(c_video_settings_list, 0x4E8);
 
 
 
@@ -55,4 +55,4 @@ public:
 	virtual const void* load_proc() const override;
 
 };
-ASSERT_STRUCT_SIZE(c_screen_video_settings, 0xF48);
+//ASSERT_STRUCT_SIZE(c_screen_video_settings, 0xF48);

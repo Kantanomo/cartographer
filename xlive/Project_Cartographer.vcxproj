@@ -700,6 +700,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_squad_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_video_settings.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_vsync_setting.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_bitmap_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_globals.cpp" />
@@ -1013,6 +1014,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_video_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager_strings.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_vsync_setting.h" />
     <ClInclude Include="Blam\Engine\interface\signal_slot.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_bitmap_block.h" />

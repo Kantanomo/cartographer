@@ -202,6 +202,7 @@ int H2Config_forced_event = 0;
 
 bool H2Config_force_off_d3d9ex = false;
 bool H2Config_force_off_sm3 = false;
+bool H2Config_use_vsync = false;
 
 WPARAM H2Config_hotkeyIdHelp = VK_F2;
 WPARAM H2Config_hotkeyIdAlignWindow = VK_F7;
@@ -486,6 +487,7 @@ void SaveH2Config()
 			CONFIG_SET(&ini, "force_off_sm3", &H2Config_force_off_sm3);
 			CONFIG_SET(&ini, "use_d3d9on12", &g_rasterizer_dx9on12_enabled);
 			CONFIG_SET(&ini, "disable_amd_or_ati_patches", &g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
+			CONFIG_SET(&ini, "use_vsync", &H2Config_use_vsync);
 		}
 
 		CONFIG_SET(&ini, "enable_xdelay", &H2Config_xDelay);
@@ -734,6 +736,7 @@ void ReadH2Config()
 					"disable_amd_or_ati_patches",
 					"false",
 					&g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
+				CONFIG_GET(&ini, "use_vsync", "false", &H2Config_use_vsync);
 			}
 			// dedicated server only
 			else

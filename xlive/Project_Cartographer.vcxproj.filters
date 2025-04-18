@@ -467,6 +467,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_lod_setting.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_safe_area_setting.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_restore_video_defaults.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_vsync_setting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1932,6 +1933,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_lod_setting.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_safe_area_setting.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_restore_video_defaults.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_vsync_setting.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

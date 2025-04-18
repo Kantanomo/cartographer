@@ -493,9 +493,10 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 	d3d_present_parameters.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 
 	// ### FIXME: make VSYNC configurable (UI required) !!
-	if (shell_command_line_flag_is_set(_shell_command_line_flag_novsync) 
+	if (shell_command_line_flag_is_set(_shell_command_line_flag_novsync)
 		/* || *rasterizer_low_level_texture_detail_get() */ // low detail textures checked for no vsync
-		|| !shell_windows_pcc_allows_vsync())    
+		|| !H2Config_use_vsync)
+		/* || !shell_windows_pcc_allows_vsync())*/
 	{
 		d3d_present_parameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 	}

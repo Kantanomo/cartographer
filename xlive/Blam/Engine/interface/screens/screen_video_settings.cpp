@@ -8,11 +8,14 @@
 #include "screen_lod_setting.h"
 #include "screen_safe_area_setting.h"
 #include "screen_restore_video_defaults.h"
+#include "screen_vsync_setting.h"
 
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_controller.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "tag_files/global_string_ids.h"
+
+#include "H2MOD/Modules/Shell/Config.h"
 
 /* macro defines */
 
@@ -31,6 +34,7 @@ enum e_video_settings_list_items : uint16
 	_item_anti_aliasing,
 	_item_lod_setting,
 	_item_safe_area,
+	_item_vsync,
 	_item_restore_defaults,
 
 	k_total_no_of_video_settings_list_items
@@ -122,6 +126,11 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 			primary_string = _string_id_safe_area;
 			secondary_string = rasterizer_settings_get_safe_area_string(rasterizer_settings->safe_area);
 			break;
+		case _item_vsync:
+			primary_string = _string_id_invalid;
+			primary_text->set_text(k_vsync_header_string[get_current_language()]);
+			secondary_string = H2Config_use_vsync ? _string_id_on : _string_id_off;
+			break;
 		case _item_restore_defaults:
 			primary_string = _string_id_restore_video_defaults;
 			secondary_string = _string_id_empty_string;
@@ -130,7 +139,10 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 			DISPLAY_ASSERT("primary_string is undefined and will be used");
 		}
 
-		primary_text->set_text_from_string_id(primary_string);
+		if (primary_string != _string_id_invalid)
+		{
+			primary_text->set_text_from_string_id(primary_string);
+		}
 	}
 	else
 	{
@@ -186,6 +198,9 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 		break;
 	case _item_safe_area:
 		params.m_load_function = &c_screen_safe_area_menu::load;
+		break;
+	case _item_vsync:
+		params.m_load_function = &c_screen_vsync_menu::load;
 		break;
 	case _item_restore_defaults:
 		params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load;

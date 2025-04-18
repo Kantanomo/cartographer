@@ -82,6 +82,7 @@ extern bool H2Config_spooky_boy;
 
 extern bool H2Config_force_off_d3d9ex;
 extern bool H2Config_force_off_sm3;
+extern bool H2Config_use_vsync;
 
 #ifndef NDEBUG
 extern int H2Config_forced_event;
