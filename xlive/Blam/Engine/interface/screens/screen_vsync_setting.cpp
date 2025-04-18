@@ -135,6 +135,12 @@ void c_screen_vsync_menu::initialize(s_screen_parameters* parameters)
 		subheader->set_text(k_vsync_description_string);
 }
 
+void c_screen_vsync_menu::post_initialize()
+{
+	c_screen_with_menu::post_initialize();
+	m_vsync_edit_list.set_focused_item_index(H2Config_use_vsync ? _item_on : _item_off);
+}
+
 const void* c_screen_vsync_menu::load_proc() const
 {
 	return &c_screen_vsync_menu::load;

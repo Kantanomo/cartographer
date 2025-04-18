@@ -52,6 +52,7 @@ public:
 
 	virtual ~c_screen_vsync_menu() = default;
 	virtual void initialize(s_screen_parameters* parameters) override;
+	virtual void post_initialize() override;
 	virtual const void* load_proc() const override;
 
 };
