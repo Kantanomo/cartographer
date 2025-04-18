@@ -209,7 +209,8 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 		DISPLAY_ASSERT("unreachable");
 	}
 
-	params.m_load_function(&params);
+	if (params.m_load_function != nullptr)
+		params.m_load_function(&params);
 }
 
 

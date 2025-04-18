@@ -286,7 +286,7 @@ enum e_user_interface_screen_id : uint32
 	_screen_keyboard_settings_menu = 0x102,
 	_screen_pause_settings = 0x103,
 	_screen_keyboard_settings = 0x104,
-	_screen_video_settings2 = 0x105,
+	_screen_video_settings_mp = 0x105,
 	_screen_audio_settings2 = 0x106,
 	_screen_volume_settings = 0x107,
 	_screen_sound_quality = 0x108,

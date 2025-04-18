@@ -48,3 +48,13 @@ void __cdecl user_interface_globals_save_profile_changes_to_disk()
 {
 	INVOKE(0x209C3E, 0x0, user_interface_globals_save_profile_changes_to_disk);
 }
+
+void __cdecl user_interface_globals_finish_saving_profile_changes()
+{
+	INVOKE(0x209D08, 0x0, user_interface_globals_finish_saving_profile_changes);
+}
+
+void __cdecl user_interface_globals_set_edit_player_profile(e_controller_index controller_index, uint32 profile_index, s_saved_game_player_profile* profile)
+{
+	INVOKE(0x209B72, 0x0, user_interface_globals_set_edit_player_profile, controller_index, profile_index, profile);
+}

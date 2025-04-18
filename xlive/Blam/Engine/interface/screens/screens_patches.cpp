@@ -15,6 +15,7 @@
 #include "screen_error_dialog.h"
 #include "screen_button_settings.h"
 #include "screen_controller_settings_menu.h"
+#include "screen_multiplayer_video_settings_menu.h"
 
 void screens_apply_patches_on_map_load()
 {
@@ -46,4 +47,5 @@ void screens_apply_patches()
 	c_screen_error_dialog_ok_cancel::apply_patches();
 	c_screen_button_settings_menu::apply_instance_patches();
 	c_controller_settings_edit_list::apply_instance_patches();
+	c_screen_multiplayer_video_settings::apply_instance_patches();
 }

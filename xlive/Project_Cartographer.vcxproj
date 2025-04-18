@@ -688,6 +688,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_lod_setting.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_main_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_video_settings_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_adapter.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_squad_browser.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_press_start_introduction.cpp" />
@@ -1001,6 +1002,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_lod_setting.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_main_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_video_settings_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_adapter.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_squad_browser.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_press_start_introduction.h" />
