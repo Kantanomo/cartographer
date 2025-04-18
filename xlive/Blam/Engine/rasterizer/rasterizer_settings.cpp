@@ -8,6 +8,7 @@
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "tag_files/global_string_ids.h"
 
 /* typedefs */
 
@@ -334,6 +335,56 @@ DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode wind
 	}
 
 	return result;
+}
+
+string_id rasterizer_settings_get_display_mode_string(int32 display_mode)
+{
+	//return INVOKE(0x250F88, 0x0, rasterizer_settings_get_display_mode_string, display_mode);
+
+	if (display_mode == _rasterizer_window_mode_real_fullscreen)
+		return _string_id_display_mode_full;
+	if (display_mode == _rasterizer_window_mode_windowed)
+		return _string_id_display_mode_window;
+	if (display_mode != _rasterizer_window_mode_funky_fullscreen)
+		return _string_id_empty_string;
+	return _string_id_display_mode_full;
+}
+
+void rasterizer_settings_get_display_option_resolution_string(int32 display_option_index, wchar_t* out_text, int32 out_text_max_length)
+{
+	INVOKE(0x24FF65, 0x0, rasterizer_settings_get_display_option_resolution_string, display_option_index, out_text, out_text_max_length);
+}
+
+string_id rasterizer_settings_get_brightness_level_string(int32 brightness_level)
+{
+	return INVOKE(0x250D30, 0x0, rasterizer_settings_get_brightness_level_string, brightness_level);
+}
+
+string_id rasterizer_settings_get_gamma_setting_string(int32 gamma)
+{
+	return INVOKE(0x250ACD, 0x0, rasterizer_settings_get_gamma_setting_string, gamma);
+}
+
+string_id rasterizer_settings_get_anti_aliasing_string(int32 anti_aliasing)
+{
+	return INVOKE(0x25088E, 0x0, rasterizer_settings_get_anti_aliasing_string, anti_aliasing);
+}
+
+string_id rasterizer_settings_get_lod_setting_string(int32 level_of_detail)
+{
+	return INVOKE(0x250419, 0x0, rasterizer_settings_get_lod_setting_string, level_of_detail);
+}
+
+string_id rasterizer_settings_get_safe_area_string(int32 safe_area)
+{
+	//return INVOKE(0x250670, 0x0, rasterizer_settings_get_safe_area_string, safe_area);
+
+	if (!safe_area)
+		return _string_id_off;
+	else if (safe_area == 1)
+		return _string_id_on;
+
+	return _string_id_empty_string;
 }
 
 

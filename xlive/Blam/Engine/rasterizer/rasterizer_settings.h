@@ -1,5 +1,6 @@
 #pragma once
 #include "rasterizer_globals.h"
+#include "tag_files/string_id.h"
 
 /* constants */
 
@@ -81,3 +82,11 @@ int32 rasterizer_settings_get_refresh_rate(void);
 void __cdecl rasterizer_settings_apply_settings(int32 setting);
 
 DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode window_mode, DWORD* style);
+
+string_id __cdecl rasterizer_settings_get_display_mode_string(int32 display_mode);
+void __cdecl rasterizer_settings_get_display_option_resolution_string(int32 display_option_index, wchar_t* out_text, int32 out_text_max_length);
+string_id __cdecl rasterizer_settings_get_brightness_level_string(int32 brightness_level);
+string_id __cdecl rasterizer_settings_get_gamma_setting_string(int32 gamma);
+string_id __cdecl rasterizer_settings_get_anti_aliasing_string(int32 anti_aliasing);
+string_id __cdecl rasterizer_settings_get_lod_setting_string(int32 level_of_detail);
+string_id __cdecl rasterizer_settings_get_safe_area_string(int32 safe_area);
