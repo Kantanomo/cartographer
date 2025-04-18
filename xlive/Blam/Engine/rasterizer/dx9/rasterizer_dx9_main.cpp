@@ -43,6 +43,7 @@
 #include "saved_games/game_state.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
+#include "shell/shell_windows_pcc.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -285,11 +286,6 @@ int32* hardware_vertex_processing_get(void)
 	return Memory::GetAddress<int32*>(0x9DA8B0);
 }
 
-int32* allow_vsync_get(void)
-{
-	return Memory::GetAddress<int32*>(0x9DA8C8);
-}
-
 bool __cdecl rasterizer_initialize(void)
 {
 	return INVOKE(0x0263359, 0x0, rasterizer_initialize);
@@ -499,7 +495,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 	// ### FIXME: make VSYNC configurable (UI required) !!
 	if (shell_command_line_flag_is_set(_shell_command_line_flag_novsync) 
 		/* || *rasterizer_low_level_texture_detail_get() */ // low detail textures checked for no vsync
-		|| !*allow_vsync_get())    
+		|| !shell_windows_pcc_allows_vsync())    
 	{
 		d3d_present_parameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 	}

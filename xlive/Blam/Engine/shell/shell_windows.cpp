@@ -3,6 +3,7 @@
 
 #include "shell.h"
 #include "shell_windows_internals.h"
+#include "shell_windows_pcc.h"
 
 #include "cseries/cseries_errors.h"
 #include "main/main.h"
@@ -53,8 +54,6 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 static void destroy_windows(void);
 
 static void __cdecl show_fatal_error(int32 error_id);
-
-static bool __cdecl pcc_get_properties(void);
 
 static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -323,7 +322,7 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	ustrncpy(g_window_name, L"Halo 2 - Project Cartographer", NUMBEROF(g_window_name));
 	g_wndproc_procedure = H2WndProc;
 
-	bool pcc_result = pcc_get_properties();
+	bool pcc_result = shell_windows_pcc_initialize();
 	if (!pcc_result)
 	{
 		error(2, "Failed to get PCC info / insufficient system resources");
@@ -392,11 +391,6 @@ static void __cdecl show_fatal_error(int32 error_id)
 	error(2, "error_id: %d", error_id);
 	INVOKE(0x4A2E, 0x0, show_fatal_error, error_id);
 	return;
-}
-
-static bool __cdecl pcc_get_properties(void)
-{
-	return INVOKE(0x260DDD, 0x0, pcc_get_properties);
 }
 
 static void shell_disable_cursor()

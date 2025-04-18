@@ -79,8 +79,6 @@ D3DCAPS9* rasterizer_dx9_caps_get(void);
 
 int32* hardware_vertex_processing_get(void);
 
-int32* allow_vsync_get(void);
-
 bool __cdecl rasterizer_initialize(void);
 
 bool __cdecl rasterizer_dx9_reset(bool create_window);

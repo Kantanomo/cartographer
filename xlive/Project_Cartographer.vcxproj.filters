@@ -458,6 +458,7 @@
     <ClCompile Include="Blam\Engine\networking\messages\network_message_gateway.cpp" />
     <ClCompile Include="Blam\Engine\networking\session\network_session_manager.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_shared_globals.cpp" />
+    <ClCompile Include="Blam\Engine\shell\shell_windows_pcc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1914,6 +1915,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
     <ClInclude Include="Blam\Engine\structures\structure_lightmap.h" />
     <ClInclude Include="Blam\Engine\game\multiplayer_globals.h" />
+    <ClInclude Include="Blam\Engine\shell\shell_windows_pcc.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
