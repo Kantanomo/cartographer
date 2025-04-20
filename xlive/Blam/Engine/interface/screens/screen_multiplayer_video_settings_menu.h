@@ -7,11 +7,13 @@
 
 /* macro defines */
 
-#define k_no_of_visible_items_for_mp_video_settings 5
-
 /* constants */
 
 /* enums */
+enum
+{
+	k_no_of_visible_items_for_mp_video_settings = 5
+};
 
 /* classes */
 

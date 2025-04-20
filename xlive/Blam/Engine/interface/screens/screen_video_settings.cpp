@@ -19,9 +19,9 @@
 
 /* macro defines */
 
-#define k_video_setting_list_name "video settings list"
-
 /* constants */
+
+static const char* k_video_setting_list_name = "video settings list";
 
 /* enums */
 
@@ -29,12 +29,12 @@ enum e_video_settings_list_items : uint16
 {
 	_item_display_mode,
 	_item_resolution,
+	_item_vsync,
 	_item_brightness_level,
 	_item_gamma_setting,
 	_item_anti_aliasing,
 	_item_lod_setting,
 	_item_safe_area,
-	_item_vsync,
 	_item_restore_defaults,
 
 	k_total_no_of_video_settings_list_items
@@ -106,6 +106,11 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 			rasterizer_settings_get_display_option_resolution_string(rasterizer_settings->display_option_index, resolution_text, NUMBEROF(resolution_text));
 			secondary_text->set_text(resolution_text);
 			break;
+		case _item_vsync:
+			primary_string = _string_id_invalid;
+			primary_text->set_text(g_vsync_header_string[get_current_language()]);
+			secondary_string = H2Config_use_vsync ? _string_id_on : _string_id_off;
+			break;
 		case _item_brightness_level:
 			primary_string = _string_id_brightness_level;
 			secondary_string = rasterizer_settings_get_brightness_level_string(rasterizer_settings->brightness);
@@ -125,11 +130,6 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 		case _item_safe_area:
 			primary_string = _string_id_safe_area;
 			secondary_string = rasterizer_settings_get_safe_area_string(rasterizer_settings->safe_area);
-			break;
-		case _item_vsync:
-			primary_string = _string_id_invalid;
-			primary_text->set_text(k_vsync_header_string[get_current_language()]);
-			secondary_string = H2Config_use_vsync ? _string_id_on : _string_id_off;
 			break;
 		case _item_restore_defaults:
 			primary_string = _string_id_restore_video_defaults;
@@ -184,6 +184,9 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 	case _item_resolution:
 		params.m_load_function = &c_screen_resolution_menu::load;
 		break;
+	case _item_vsync:
+		params.m_load_function = &c_screen_vsync_menu::load;
+		break;
 	case _item_brightness_level:
 		params.m_load_function = &c_screen_brightness_level_menu::load;
 		break;
@@ -198,9 +201,6 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 		break;
 	case _item_safe_area:
 		params.m_load_function = &c_screen_safe_area_menu::load;
-		break;
-	case _item_vsync:
-		params.m_load_function = &c_screen_vsync_menu::load;
 		break;
 	case _item_restore_defaults:
 		params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load;

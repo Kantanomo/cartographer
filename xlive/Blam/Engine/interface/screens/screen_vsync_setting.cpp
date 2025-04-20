@@ -11,21 +11,21 @@
 
 /* macro defines */
 
-#define k_vsync_edit_list_name "vsync edit list"
-
 // TODO : currently using c_screen_safe_area_menu tags
 // we should start using custom ui tags in near future
 #define k_vsync_menu_screen_id _screen_safe_area
 
 /* constants */
 
-const wchar_t* const k_vsync_header_string[k_language_count]
+static const char* k_vsync_edit_list_name = "vsync edit list";
+
+const wchar_t* const g_vsync_header_string[k_language_count]
 {
 	L"V-Sync",
 	L"垂直同期",
 	L"V-Sync",
 	L"Synchronisation V",
-	L"sincronización vertical",
+	L"Sincronización vertical",
 	L"Sincronizzazione verticale",
 	L"수직동기화",
 	L"垂直同步",
@@ -130,7 +130,7 @@ void c_screen_vsync_menu::initialize(s_screen_parameters* parameters)
 	ASSERT(header && subheader);
 
 	if (header)
-		header->set_text(k_vsync_header_string[get_current_language()]);
+		header->set_text(g_vsync_header_string[get_current_language()]);
 	if (subheader)
 		subheader->set_text(k_vsync_description_string);
 }

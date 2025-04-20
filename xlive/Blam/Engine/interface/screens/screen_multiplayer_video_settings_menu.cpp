@@ -29,11 +29,11 @@ enum e_mp_video_settings_list_items : uint16
 {
 	_item_display_mode,
 	_item_resolution,
+	_item_vsync,
 	_item_brightness_level,
 	_item_gamma_setting,
 	_item_anti_aliasing,
 	_item_safe_area,
-	_item_vsync,
 	_item_restore_defaults,
 
 	k_total_no_of_mp_video_settings_list_items
@@ -43,7 +43,7 @@ enum e_mp_video_settings_list_items : uint16
 
 /* externs */
 
-extern const wchar_t* const k_vsync_header_string[k_language_count];
+extern const wchar_t* const g_vsync_header_string[k_language_count];
 
 /* prototypes */
 
@@ -94,6 +94,10 @@ void c_multiplayer_video_settings_list::update_list_items(c_list_item_widget* it
 		case _item_resolution:
 			string = _string_id_resolution;
 			break;
+		case _item_vsync:
+			string = _string_id_invalid;
+			text->set_text(g_vsync_header_string[get_current_language()]);
+			break;
 		case _item_brightness_level:
 			string = _string_id_brightness_level;
 			break;
@@ -106,10 +110,6 @@ void c_multiplayer_video_settings_list::update_list_items(c_list_item_widget* it
 		case _item_safe_area:
 			string = _string_id_safe_area;
 			break;		
-		case _item_vsync:
-			string = _string_id_invalid;
-			text->set_text(k_vsync_header_string[get_current_language()]);
-			break;
 		case _item_restore_defaults:
 			string = _string_id_restore_video_defaults;
 			break;
@@ -145,6 +145,9 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 	case _item_resolution:
 		params.m_load_function = &c_screen_resolution_menu::load_mp;
 		break;
+	case _item_vsync:
+		params.m_load_function = &c_screen_vsync_menu::load;
+		break;
 	case _item_brightness_level:
 		params.m_load_function = &c_screen_brightness_level_menu::load_mp;
 		break;
@@ -157,9 +160,6 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 	case _item_safe_area:
 		params.m_load_function = &c_screen_safe_area_menu::load_mp;
 		break;	
-	case _item_vsync:
-		params.m_load_function = &c_screen_vsync_menu::load;
-		break;
 	case _item_restore_defaults:
 		params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load_mp;
 		break;

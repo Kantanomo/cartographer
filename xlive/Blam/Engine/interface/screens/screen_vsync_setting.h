@@ -57,4 +57,4 @@ public:
 
 };
 
-extern const wchar_t* const k_vsync_header_string[k_language_count];
+extern const wchar_t* const g_vsync_header_string[k_language_count];
