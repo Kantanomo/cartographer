@@ -40,6 +40,17 @@ struct s_list_item_datum
 };
 ASSERT_STRUCT_SIZE(s_list_item_datum, 4);
 
+struct s_custom_item_text_mapping
+{
+	int16 item_id;
+	union
+	{
+		string_id item_text;
+		const wchar_t* const* string_collection; // must be of size k_language_count
+	};
+
+	bool is_custom;
+};
 
 /* classes */
 
@@ -71,6 +82,7 @@ public:
 	c_list_item_widget* try_find_item_widget(uint32 idx);
 	datum get_old_data_index();
 	void update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, s_item_text_mapping* mapping, int32 total_mappings) const;
+	void update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, s_custom_item_text_mapping* mapping, int32 total_mappings) const;
 	void set_focused_item_index(datum item_index);
 	void remove_focused_item_datum_from_data_array();
 	void remove_item_from_list(c_list_item_widget* item);

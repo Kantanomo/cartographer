@@ -55,14 +55,26 @@ c_multiplayer_video_settings_list::c_multiplayer_video_settings_list(int16 user_
 	c_list_widget(user_flags),
 	m_slot(this, &c_multiplayer_video_settings_list::handle_item_pressed_event)
 {
-	//we dont need s_list_item_datum here as no of list items remain same
-	m_list_data = ui_list_data_new(k_mp_video_setting_list_name, k_total_no_of_mp_video_settings_list_items, sizeof(datum));
+
+	m_list_data = ui_list_data_new(k_mp_video_setting_list_name, k_total_no_of_mp_video_settings_list_items, sizeof(s_list_item_datum));
+	
+	ASSERT(m_list_data);
 	data_make_valid(m_list_data);
 
-	for (int32 i = 0; i < m_list_data->datum_max_elements; ++i)
-	{
-		datum_new(m_list_data);
-	}
+	// yes this sucks
+#define LIST_ITEM_DATUM_GET_NEW() \
+		(static_cast<s_list_item_datum*>(datum_get(m_list_data, datum_new(m_list_data))))
+
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_display_mode;
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_resolution;
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_vsync;
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_brightness_level;
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_gamma_setting;
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_anti_aliasing;
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_safe_area;
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_restore_defaults;
+
+#undef LIST_ITEM_DATUM_GET_NEW
 
 	linker_type2.link(&m_slot);
 }
@@ -81,45 +93,21 @@ void c_multiplayer_video_settings_list::update_list_items(c_list_item_widget* it
 {
 	ASSERT(item);
 
-	c_text_widget* text = item->try_find_text_widget(_settings_list_skin_text_header);
-	string_id string = _string_id_empty_string;
-
-	if (text)
+	s_custom_item_text_mapping items_map[] =
 	{
-		switch (DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()))
-		{
-		case _item_display_mode:
-			string = _string_id_display_mode;
-			break;
-		case _item_resolution:
-			string = _string_id_resolution;
-			break;
-		case _item_vsync:
-			string = _string_id_invalid;
-			text->set_text(g_vsync_header_string[get_current_language()]);
-			break;
-		case _item_brightness_level:
-			string = _string_id_brightness_level;
-			break;
-		case _item_gamma_setting:
-			string = _string_id_gamma_setting;
-			break;
-		case _item_anti_aliasing:
-			string = _string_id_anti_aliasing;
-			break;
-		case _item_safe_area:
-			string = _string_id_safe_area;
-			break;		
-		case _item_restore_defaults:
-			string = _string_id_restore_video_defaults;
-			break;
-		}
+		{_item_display_mode		,	_string_id_display_mode				},
+		{_item_resolution		,	_string_id_resolution				},
+		{_item_vsync			,	_string_id_invalid			,	true},
+		{_item_brightness_level	,	_string_id_brightness_level			},
+		{_item_gamma_setting	,	_string_id_gamma_setting			},
+		{_item_anti_aliasing	,	_string_id_anti_aliasing			},
+		{_item_safe_area		,	_string_id_safe_area				},
+		{_item_restore_defaults	,	_string_id_restore_video_defaults	},
+	};
 
-		if (string != _string_id_invalid)
-		{
-			text->set_text_from_string_id(string);
-		}
-	}
+	items_map[_item_vsync].string_collection = g_vsync_header_string; // figure out how to assign this in the main array itself
+	this->update_list_items_from_mapping(item, skin_index, 0, items_map, k_total_no_of_mp_video_settings_list_items);
+
 }
 
 void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
@@ -137,34 +125,40 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 	params.m_screen_state.m_last_focused_item_index = NONE;
 	params.m_load_function = nullptr; // stop warning of using uinitialized var
 
-	switch (DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index))
+	if (*pitem_index != NONE)
 	{
-	case _item_display_mode:
-		params.m_load_function = &c_screen_display_mode_menu::load_mp;
-		break;
-	case _item_resolution:
-		params.m_load_function = &c_screen_resolution_menu::load_mp;
-		break;
-	case _item_vsync:
-		params.m_load_function = &c_screen_vsync_menu::load;
-		break;
-	case _item_brightness_level:
-		params.m_load_function = &c_screen_brightness_level_menu::load_mp;
-		break;
-	case _item_gamma_setting:
-		params.m_load_function = &c_screen_gamma_menu::load_mp;
-		break;
-	case _item_anti_aliasing:
-		params.m_load_function = &c_screen_anti_aliasing_menu::load_mp;
-		break;
-	case _item_safe_area:
-		params.m_load_function = &c_screen_safe_area_menu::load_mp;
-		break;	
-	case _item_restore_defaults:
-		params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load_mp;
-		break;
-	default:
-		DISPLAY_ASSERT("unreachable");
+		s_list_item_datum* item = (s_list_item_datum*)datum_try_and_get(m_list_data, *pitem_index);
+		e_mp_video_settings_list_items item_type = (e_mp_video_settings_list_items)item->item_id;
+
+		switch (item_type)
+		{
+		case _item_display_mode:
+			params.m_load_function = &c_screen_display_mode_menu::load_mp;
+			break;
+		case _item_resolution:
+			params.m_load_function = &c_screen_resolution_menu::load_mp;
+			break;
+		case _item_vsync:
+			params.m_load_function = &c_screen_vsync_menu::load;
+			break;
+		case _item_brightness_level:
+			params.m_load_function = &c_screen_brightness_level_menu::load_mp;
+			break;
+		case _item_gamma_setting:
+			params.m_load_function = &c_screen_gamma_menu::load_mp;
+			break;
+		case _item_anti_aliasing:
+			params.m_load_function = &c_screen_anti_aliasing_menu::load_mp;
+			break;
+		case _item_safe_area:
+			params.m_load_function = &c_screen_safe_area_menu::load_mp;
+			break;
+		case _item_restore_defaults:
+			params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load_mp;
+			break;
+		default:
+			DISPLAY_ASSERT("unreachable");
+		}
 	}
 
 	if (params.m_load_function != nullptr)

@@ -43,6 +43,10 @@ enum e_video_settings_list_items : uint16
 
 /* globals */
 
+/* externs */
+
+extern const wchar_t* const g_vsync_header_string[k_language_count];
+
 /* prototypes */
 
 /* private code */
