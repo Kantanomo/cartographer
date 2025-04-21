@@ -1391,7 +1391,6 @@
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
@@ -2322,6 +2321,7 @@
     <ClInclude Include="Blam\Engine\structures\structures.h" />
     <ClInclude Include="Blam\Engine\structures\structure_audibility.h" />
     <ClInclude Include="Blam\Engine\structures\structure_bsp_definitions.h" />
+    <ClInclude Include="Blam\Engine\structures\structure_lightmap.h" />
     <ClInclude Include="Blam\Engine\structures\structure_lightmap_definitions.h" />
     <ClInclude Include="Blam\Engine\structures\structure_runtime_decals.h" />
     <ClInclude Include="Blam\Engine\tag_files\data_reference.h" />
