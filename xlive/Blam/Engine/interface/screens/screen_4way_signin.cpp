@@ -403,7 +403,7 @@ const void* c_screen_4way_signin::load_proc(void) const
 		break;
 
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 	}
 	return NULL;
 }

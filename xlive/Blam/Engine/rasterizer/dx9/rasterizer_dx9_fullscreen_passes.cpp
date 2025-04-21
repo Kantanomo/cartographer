@@ -211,7 +211,7 @@ bool __cdecl rasterizer_dx9_fullscreen_default_with_window_location_build_vertex
 		*(pixel32*)output = global_white_pixel32;
 		break;
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 		result = false;
 	}
 
@@ -240,7 +240,7 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_color_ctx_cb(
 		*(pixel32*)output = *(pixel32*)ctx;
 		break;
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 		result = false;
 		break;
 	}

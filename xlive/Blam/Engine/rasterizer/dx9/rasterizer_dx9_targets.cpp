@@ -327,7 +327,7 @@ bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, e_rasterizer_targ
 		break;
 #endif
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 		break;
 	}
 
@@ -474,7 +474,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 		depth_provided = true;
 		break;
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 		valid_target = false;
 	}
 

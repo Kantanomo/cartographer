@@ -635,7 +635,7 @@ static void screenshot_cubemap_retrieve_rotation_info(
 			x[1] = -1;
 			break;
 		default:
-			DISPLAY_ASSERT("unreachable");
+			unreachable();
 		}
 	}
 	else
