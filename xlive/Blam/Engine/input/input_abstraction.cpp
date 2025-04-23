@@ -253,7 +253,7 @@ void __cdecl input_abstraction_get_default_preferences(s_gamepad_input_preferenc
 			input_abstraction_gamepad_add_jumpy_preset_controls(preference);
 			break;
 		default:
-			DISPLAY_ASSERT("unreachable");
+			unreachable();
 			break;
 		}
 

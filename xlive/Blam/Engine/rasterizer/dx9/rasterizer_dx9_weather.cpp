@@ -170,7 +170,7 @@ bool __cdecl rasterizer_dx9_weather_plate_build_vertex_buffer(
 		*(pixel32*)output = global_white_pixel32;
 		break;
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 		result = false;
 	}
 

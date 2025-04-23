@@ -4,13 +4,20 @@
 #include "tag_files/tag_reference.h"
 #include "tag_files/data_reference.h"
 
-#define MAXIMUM_PARTS_PER_GEOMETRY_SECTION 255
-#define MAXIMUM_SUBPARTS_PER_SECTION 32768
-#define MAXIMUM_VERTICES_PER_GEOMETRY_SECTION 32767
-#define MAXIMUM_STRIP_INDICES_PER_GEOMETRY_SECTION 65535
-#define MAXIMUM_RIGID_POINT_GROUPS_PER_GEOMETRY_SECTION 32767
-#define MAXIMUM_MATERIALS_PER_GEOMETRY 1024
-#define MAXIMUM_PROPERTIES_PER_MATERIAL 16
+/* constants */
+
+enum
+{
+	MAXIMUM_PARTS_PER_GEOMETRY_SECTION = 255,
+	MAXIMUM_SUBPARTS_PER_SECTION = 32768,
+	MAXIMUM_VERTICES_PER_GEOMETRY_SECTION = 32767,
+	MAXIMUM_STRIP_INDICES_PER_GEOMETRY_SECTION = 65535,
+	MAXIMUM_RIGID_POINT_GROUPS_PER_GEOMETRY_SECTION = 32767,
+	MAXIMUM_MATERIALS_PER_GEOMETRY = 1024,
+	MAXIMUM_PROPERTIES_PER_MATERIAL = 16
+};
+
+/* enums */
 
 enum e_geometry_classification : int16
 {
@@ -62,6 +69,8 @@ enum e_geometry_material_property_type : int16
 	_geometry_material_property_type_lightmap_half_life = 2,
 	_geometry_material_property_type_lightmap_diffuse_scale = 3
 };
+
+/* structures */
 
 // max count: 1
 struct geometry_compression_info

@@ -19,6 +19,7 @@
 #include "game/game.h"
 #include "game/game_globals.h"
 #include "game/game_time.h"
+#include "game/multiplayer_globals.h"
 #include "game/player_control.h"
 #include "game/player_vibration.h"
 #include "input/input_xinput.h"
@@ -83,7 +84,6 @@
 #include "widgets/cloth.h"
 #include "widgets/liquid.h"
 
-#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
@@ -225,44 +225,43 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 
 #pragma endregion
 
-void H2MOD::disable_score_announcer_sounds(int sound_flags)
+void H2MOD::disable_score_announcer_sounds(uint32 sound_flags)
 {
 	if (sound_flags)
 	{
-		datum multiplayerGlobalsTagIndex = tag_loaded(_tag_group_multiplayer_globals, "multiplayer\\multiplayer_globals");
-
+		const datum multiplayerGlobalsTagIndex = tag_loaded(_tag_group_multiplayer_globals, "multiplayer\\multiplayer_globals");
 		if (multiplayerGlobalsTagIndex != NONE)
 		{
-			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = (s_multiplayer_globals_group_definition*)tag_get_fast(multiplayerGlobalsTagIndex);
-
-			if (multiplayerGlobalsTag->runtime.count)
+			s_multiplayer_globals_definition* multiplayer_globals = (s_multiplayer_globals_definition*)tag_get_fast(multiplayerGlobalsTagIndex);
+			if (multiplayer_globals->runtime.count)
 			{
-				auto* runtime_tag_block_data = multiplayerGlobalsTag->runtime[0];
+				auto* runtime_tag_block_data = multiplayer_globals->runtime[0];
 
 				if (sound_flags & FLAG(_sound_type_slayer))
 				{
-					runtime_tag_block_data->slayer_events.count = 0;
-					runtime_tag_block_data->slayer_events.data = 0;
+					tag_block<s_multiplayer_event_response_definition>* slayer_events = &runtime_tag_block_data->events[_multiplayer_event_response_game_type_slayer];
+					slayer_events->count = 0;
+					slayer_events->data = 0;
 				}
 
 				if (sound_flags & ALL_SOUNDS_NO_SLAYER) // check if there is any point in running the code below
 				{
-					for (int i = 0; i < runtime_tag_block_data->general_events.count; i++)
+					tag_block<s_multiplayer_event_response_definition>* general_events = &runtime_tag_block_data->events[_multiplayer_event_response_game_type_general];
+					for (int i = 0; i < general_events->count; i++)
 					{
-						using sound_events = s_multiplayer_globals_group_definition::s_runtime_block::s_general_events_block::e_event;
-						auto* general_event = runtime_tag_block_data->general_events[i];
-						auto event = general_event->event;
+						s_multiplayer_event_response_definition* general_event = (*general_events)[i];
+						const e_multiplayer_event_response_event event = general_event->event;
 						if (
-							(sound_flags & FLAG(_sound_type_gained_the_lead) && (event == sound_events::gained_lead || event == sound_events::gained_team_lead))
-							|| (sound_flags & FLAG(_sound_type_team_change) && event == sound_events::player_changed_team)
-							|| (sound_flags & FLAG(_sound_type_lost_the_lead) && (event == sound_events::lost_lead))
-							|| (sound_flags & FLAG(_sound_type_tied_leader) && (event == sound_events::tied_leader || event == sound_events::tied_team_leader))
+							(sound_flags & FLAG(_sound_type_gained_the_lead) && (event == _multiplayer_event_response_general_gained_lead || event == _multiplayer_event_response_general_gained_team_lead))
+							|| (sound_flags & FLAG(_sound_type_team_change) && event == _multiplayer_event_response_general_player_changed_team)
+							|| (sound_flags & FLAG(_sound_type_lost_the_lead) && (event == _multiplayer_event_response_general_lost_lead))
+							|| (sound_flags & FLAG(_sound_type_tied_leader) && (event == _multiplayer_event_response_general_tied_leader || event == _multiplayer_event_response_general_tied_team_leader))
 							)
 						{
 							// disable all sounds from english to chinese
-							for (int j = 0; j < 8; j++)
+							for (size_t language = 0; language < k_language_count; ++language)
 							{
-								(&general_event->sound)[j].index = NONE;
+								general_event->primary_sound.sounds[language].index = NONE;
 							}
 						}
 					}

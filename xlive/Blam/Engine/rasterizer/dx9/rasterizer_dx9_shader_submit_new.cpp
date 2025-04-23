@@ -294,7 +294,7 @@ void c_shader_submission_interface_new::stage_texture(
 			break;
 
 		default:
-			DISPLAY_ASSERT("unreachable");
+			unreachable();
 			continue_staging = false;
 			break;
 		}

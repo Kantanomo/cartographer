@@ -4,7 +4,7 @@
 #include "MapObjectPlacements/Halloween/Coagulation.h"
 #include "MapObjectPlacements/Halloween/Lockout.h"
 
-#include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
+#include "structures/structure_lightmap.h"
 
 #include "models/models.h"
 #include "objects/objects.h"
@@ -53,7 +53,7 @@ void halloween_event_map_load(void)
 
 		if(tag_injection_is_injected(lbitm_datum) && ltmp_datum != NONE)
 		{
-			s_scenario_structure_lightmap_group_definition* ltmp = (s_scenario_structure_lightmap_group_definition*)tag_get_fast(ltmp_datum);
+			structure_lightmap* ltmp = (structure_lightmap*)tag_get_fast(ltmp_datum);
 			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
 		}
 
@@ -67,7 +67,7 @@ void halloween_event_map_load(void)
 
 		if (ltmp_datum != NONE && lbitm_datum != NONE)
 		{
-			s_scenario_structure_lightmap_group_definition* ltmp = (s_scenario_structure_lightmap_group_definition*)tag_get_fast(ltmp_datum);
+			structure_lightmap* ltmp = (structure_lightmap*)tag_get_fast(ltmp_datum);
 			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
 
 			// Null out decorator block since the colour for them is separate from the lightmap colour

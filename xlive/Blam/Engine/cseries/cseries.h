@@ -185,6 +185,8 @@ if (!(STATEMENT))                                               \
 ASSERT_EXCEPTION(STATEMENT, true);	\
 (void)0
 
+#define unreachable() DISPLAY_ASSERT("unreachable")
+
 #else
 #define ASSERT_TRIGGER_EXCEPTION()							(void)(0)
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)   (void)(#STATEMENT)
@@ -192,6 +194,7 @@ ASSERT_EXCEPTION(STATEMENT, true);	\
 #define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           (void)(#STATEMENT)
 #define ASSERT(STATEMENT)                                   (void)(#STATEMENT)
 
+#define unreachable() (void)(0)
 
 #endif // _DEBUG
 

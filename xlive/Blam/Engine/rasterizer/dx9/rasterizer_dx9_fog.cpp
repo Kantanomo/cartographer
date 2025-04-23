@@ -281,7 +281,7 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
 		*(pixel32*)output = global_white_pixel32;
 		break;
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 		result = false;
 	}
 
@@ -360,7 +360,7 @@ bool __cdecl rasterizer_dx9_patchy_fog_apply_from_stencil_build_vertex_buffer(
 		*(pixel32*)output = global_white_pixel32;
 		break;
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 		result = false;
 	}
 
@@ -385,7 +385,7 @@ bool __cdecl rasterizer_dx9_sky_only_fog_build_vertex_buffer(
 		*(pixel32*)output = global_white_pixel32;
 		break;
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 		result = false;
 	}
 

@@ -564,7 +564,7 @@ public:
 			break;
 		
 		default:
-			DISPLAY_ASSERT("unreachable");
+			unreachable();
 			break;
 		}
 
