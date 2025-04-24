@@ -33,7 +33,7 @@ datum c_list_widget::get_old_data_index()
 	return INVOKE_TYPE(0x21383B, 0x0, datum(__thiscall*)(c_list_widget*), this);
 }
 
-void c_list_widget::update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, s_item_text_mapping* mapping, int32 total_mappings) const
+void c_list_widget::update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, const s_item_text_mapping* mapping, int32 total_mappings) const
 {
 	//INVOKE_TYPE(0x2139F8, 0x0, void(__thiscall*)(c_list_widget*, c_list_item_widget*, int32, int32, s_item_text_mapping*, int32), this, item, skin_index, text_widget_idx, mapping, total_mappings);
 
@@ -58,7 +58,7 @@ void c_list_widget::update_list_items_from_mapping(c_list_item_widget* item, int
 }
 
 
-void c_list_widget::update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, s_custom_item_text_mapping* mapping, int32 total_mappings) const
+void c_list_widget::update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, const s_custom_item_text_mapping* mapping, int32 total_mappings) const
 {
 	if (item == nullptr)
 		return;

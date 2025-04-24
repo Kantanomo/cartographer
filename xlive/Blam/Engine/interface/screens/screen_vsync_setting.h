@@ -5,12 +5,14 @@
 #include "interface/user_interface_widget_window.h"
 #include "main/game_preferences.h"
 
-
-/* macro defines */
-
-#define k_no_of_visible_items_for_vsync 2
-
 /* constants */
+
+enum
+{
+	k_no_of_visible_items_for_vsync = 2
+};
+
+extern const wchar_t* const k_vsync_header_string[k_language_count];
 
 /* enums */
 
@@ -56,5 +58,3 @@ public:
 	virtual const void* load_proc() const override;
 
 };
-
-extern const wchar_t* const g_vsync_header_string[k_language_count];

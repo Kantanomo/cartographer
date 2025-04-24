@@ -43,10 +43,6 @@ enum e_video_settings_list_items : uint16
 
 /* globals */
 
-/* externs */
-
-extern const wchar_t* const g_vsync_header_string[k_language_count];
-
 /* prototypes */
 
 /* private code */
@@ -112,7 +108,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 			break;
 		case _item_vsync:
 			primary_string = _string_id_invalid;
-			primary_text->set_text(g_vsync_header_string[get_current_language()]);
+			primary_text->set_text(k_vsync_header_string[get_current_language()]);
 			secondary_string = H2Config_use_vsync ? _string_id_on : _string_id_off;
 			break;
 		case _item_brightness_level:

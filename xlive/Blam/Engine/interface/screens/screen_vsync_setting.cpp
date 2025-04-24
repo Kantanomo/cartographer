@@ -6,20 +6,31 @@
 #include "rasterizer/rasterizer_settings.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
-#include "tag_files/global_string_ids.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
-/* macro defines */
+/* enums */
+
+enum e_vsync_list_items : uint16
+{
+	_item_off,
+	_item_on,
+
+	k_total_no_of_vsync_list_items
+};
+
+/* constants */
 
 // TODO : currently using c_screen_safe_area_menu tags
 // we should start using custom ui tags in near future
 #define k_vsync_menu_screen_id _screen_safe_area
 
-/* constants */
-
 static const char* k_vsync_edit_list_name = "vsync edit list";
 
-const wchar_t* const g_vsync_header_string[k_language_count]
+// TODO : add other languages
+static const wchar_t* const k_vsync_description_string = L"Synchronize your fps with your monitor's refresh rate. Prevents screen-tearing but adds input lag";
+
+
+const wchar_t* const k_vsync_header_string[k_language_count]
 {
 	L"V-Sync",
 	L"垂直同期",
@@ -32,25 +43,9 @@ const wchar_t* const g_vsync_header_string[k_language_count]
 	L"Sincronização V"
 };
 
-// TODO : add other languages
-static const wchar_t* const k_vsync_description_string = L"Synchronize your fps with your monitor's refresh rate. Prevents screen-tearing but adds input lag";
-
-
-/* enums */
-
-enum e_vsync_list_items : uint16
-{
-	_item_off,
-	_item_on,
-
-	k_total_no_of_vsync_list_items
-};
-
 /* globals */
 
 /* prototypes */
-
-/* private code */
 
 /* public code */
 
@@ -130,7 +125,7 @@ void c_screen_vsync_menu::initialize(s_screen_parameters* parameters)
 	ASSERT(header && subheader);
 
 	if (header)
-		header->set_text(g_vsync_header_string[get_current_language()]);
+		header->set_text(k_vsync_header_string[get_current_language()]);
 	if (subheader)
 		subheader->set_text(k_vsync_description_string);
 }
