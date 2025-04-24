@@ -49,7 +49,6 @@
 #include <wincrypt.h>
 #include <mmsystem.h>
 #include <windef.h>
-#include <DbgHelp.h>
 #include <ShlObj_core.h>
 #include <psapi.h>
 #include <TlHelp32.h>
