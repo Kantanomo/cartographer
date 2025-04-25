@@ -274,10 +274,10 @@ namespace playlist_loader
 
 	void initialize()
 	{
-		apply_hooks();
+		//apply_hooks();
 
-		p_playlist_loader_invalid_entry = Memory::GetAddress<playlist_loader_invalid_entry>(0, 0xED2E);
+		//p_playlist_loader_invalid_entry = Memory::GetAddress<playlist_loader_invalid_entry>(0, 0xED2E);
 
-		EventHandler::register_callback(reset_custom_settings, EventType::server_command, EventExecutionType::execute_before, false);
+		//EventHandler::register_callback(reset_custom_settings, EventType::server_command, EventExecutionType::execute_before, false);
 	}
 }

@@ -388,7 +388,8 @@ enum e_headhunter_max_heads_carried : uint8
 	_headhunter_max_heads_carried_five,
 	_headhunter_max_heads_carried_ten,
 
-	k_headhunter_max_heads_carried_count
+	k_headhunter_max_heads_carried_count,
+	k_headhunter_max_heads_carried_bits_required = bits_required_for(FLAG(k_headhunter_max_heads_carried_count - 1))
 };
 
 enum e_headhunter_engine_flags : uint32
