@@ -120,10 +120,7 @@ e_session_protocol __cdecl user_interface_squad_get_active_protocol()
 	            case _game_engine_type_territories:
 	            case _game_engine_type_assault:
 		            {
-	                    if (session_class == _network_session_class_offline)
-	                        return _session_protocol_splitscreen_custom;
-	                    else
-	                       return _session_protocol_system_link_custom;
+						return (e_session_protocol)(2 * (session_class != _network_session_class_offline) + 1);
 		            }
 	            default:
                     return _session_protocol_invalid;
@@ -132,7 +129,7 @@ e_session_protocol __cdecl user_interface_squad_get_active_protocol()
             return _session_protocol_invalid;
         }
 
-        if (session_class != _network_session_class_xbox_live || session->m_session_parameters.party_privacy != 1)
+        if (session_class != _network_session_class_xbox_live || session->m_session_parameters.field_4C90 != 1)
             return _session_protocol_invalid;
 
         if (unk_1 != NONE)
@@ -154,10 +151,7 @@ e_session_protocol __cdecl user_interface_squad_get_active_protocol()
         case _game_engine_type_territories:
         case _game_engine_type_assault:
         {
-            if (session_class == _network_session_class_offline)
-                return _session_protocol_splitscreen_custom;
-            else
-                return _session_protocol_system_link_custom;
+            return _session_protocol_xbox_live_custom;
         }
         default:
             return _session_protocol_invalid;

@@ -11,14 +11,17 @@
 #include "interface/user_interface_text.h"
 #include "items/weapons.h"
 #include "math/random_math.h"
+#include "models/models.h"
 #include "objects/objects.h"
 #include "objects/object_placement.h"
+#include "objects/scenery.h"
 #include "rasterizer/rasterizer_text.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "simulation/game_interface/simulation_game_engine_headhunter.h"
 #include "simulation/game_interface/simulation_game_entities.h"
 #include "simulation/game_interface/simulation_game_events.h"
+#include "tag_files/global_string_ids.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/draw_string.h"
 #include "text/font_cache.h"
@@ -53,31 +56,70 @@ bool c_headhunter_engine::setup()
 
 	s_multiplayer_event_response_definition* head_hunter_events = 
 		(s_multiplayer_event_response_definition*)tag_injection_reserve_cache_memory(
-			sizeof(s_multiplayer_event_response_definition) * runtime->king_events.count, 
+			sizeof(s_multiplayer_event_response_definition) * runtime->king_events.count + 1, 
 			&data_offset);
 
-	csmemcpy(head_hunter_events, runtime->king_events[0], sizeof(s_multiplayer_runtime_globals_definition) * runtime->king_events.count);
+	csmemcpy(head_hunter_events, runtime->king_events[0], sizeof(s_multiplayer_event_response_definition) * runtime->king_events.count);
 
-	runtime->headhunter_events.count = runtime->king_events.count;
+	runtime->headhunter_events.count = runtime->king_events.count + 1;
 	runtime->headhunter_events.data = data_offset;
 
 	for(int32 i = 0; i < runtime->headhunter_events.count; ++i)
 	{
-		head_hunter_events[i].type = _multiplayer_event_response_game_type_headhunter;
+		s_multiplayer_event_response_definition* event = &head_hunter_events[i];
+		event->type = _multiplayer_event_response_game_type_headhunter;
 	}
+
+	runtime->headhunter_events[0]->display_string = 0x110028AB;
+	csmemset(&runtime->headhunter_events[0]->primary_sound, 0, sizeof(s_multiplayer_event_sound_response_definition));
+	// todo: replace sound with injected sound when complete.
+
+	s_multiplayer_event_response_definition* score_event = runtime->headhunter_events[runtime->king_events.count];
+
+	score_event->event = _multiplayer_event_response_headhunter_head_grabbed;
+
+	score_event->audience = _multiplayer_event_response_audience_cause_player;
+
+	datum ping_sound = tag_loaded(_tag_group_sound, "sound\\game_sfx\\multiplayer\\target_point_collected");
+	
+	score_event->primary_sound.english_sound.group.group = _tag_group_sound;
+	score_event->primary_sound.english_sound.index = ping_sound;
+	score_event->primary_sound.chinese_sound.group.group = _tag_group_sound;
+	score_event->primary_sound.chinese_sound.index = ping_sound;
+	score_event->primary_sound.french_sound.group.group = _tag_group_sound;
+	score_event->primary_sound.french_sound.index = ping_sound;
+	score_event->primary_sound.german_sound.group.group = _tag_group_sound;
+	score_event->primary_sound.german_sound.index = ping_sound;
+	score_event->primary_sound.italian_sound.group.group = _tag_group_sound;
+	score_event->primary_sound.italian_sound.index = ping_sound;
+	score_event->primary_sound.japanese_sound.group.group = _tag_group_sound;
+	score_event->primary_sound.japanese_sound.index = ping_sound;
+	score_event->primary_sound.korean_sound.group.group = _tag_group_sound;
+	score_event->primary_sound.korean_sound.index = ping_sound;
+	score_event->primary_sound.portuguese_sound.group.group = _tag_group_sound;
+	score_event->primary_sound.portuguese_sound.index = ping_sound;
 
 	//tag_injection_set_active_map(L"elongation");
 	//if(tag_injection_active_map_verified())
 	//{
-	//	datum small_fire = tag_injection_load(_tag_group_scenery, "effects\\scenery\\fires\\fire_basic_medium", true);
+	//	// effect doesn't actually work?
+	//	datum small_fire = tag_injection_load(_tag_group_scenery, "effects\\scenery\\fires\\fire_basic_small", true);
 	//	if(small_fire)
 	//	{
 	//		tag_injection_inject();
-	//		weapon_definition* ball_weapon = (weapon_definition*)tag_get_fast(g_ball_datum);
-	//		object_attachment_definition* new_attachment = (object_attachment_definition*)tag_injection_extend_block(&ball_weapon->object.attachments, sizeof(object_attachment_definition), 1);
 
-	//		new_attachment->type.index = small_fire;
-	//		new_attachment->type.group.group = _tag_group_scenery;
+	//		weapon_definition* ball_weapon = (weapon_definition*)tag_get_fast(g_ball_datum);
+	//		s_model_definition* ball_model = (s_model_definition*)tag_get_fast(ball_weapon->object.model.index);
+	//		s_model_variant* ball_variant = (s_model_variant*)tag_injection_extend_block(&ball_model->variants, sizeof(s_model_variant), 1);
+
+	//		memset(ball_variant->runtime_model_region_index, -1, sizeof(ball_variant->runtime_model_region_index));
+
+	//		s_model_variant_object* ball_variant_object = (s_model_variant_object*)tag_injection_extend_block(&ball_variant->objects, sizeof(s_model_variant_object), 1);
+
+	//		ball_variant_object->parent_marker = _string_id_ground_point;
+	//		ball_variant_object->child_object.group.group = _tag_group_scenery;
+	//		ball_variant_object->child_object.index = small_fire;
+
 	//	}
 	//}
 
@@ -111,6 +153,24 @@ void c_headhunter_engine::render_game_engine_hud_elements(uint32 user_index)
 	c_king_engine::render_game_engine_hud_elements(user_index);
 }
 
+real32 c_headhunter_engine::get_player_speed_modifier(datum player_index)
+{
+	if(g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)])
+	{
+		const s_game_variant* variant = get_game_variant();
+		switch(variant->game_engine_variant.head_hunter.speed_with_heads)
+		{
+			case _ctf_engine_player_speed_slow:
+				return 0.75f;
+			case _ctf_engine_player_speed_fast:
+				return 1.25f;
+			default: 
+				return 1.f;
+		}
+	}
+	return 1.f;
+}
+
 void c_headhunter_engine::function_16(datum player_index)
 {
 	c_king_engine::function_16(player_index);
@@ -122,7 +182,7 @@ void c_headhunter_engine::player_killed(datum killing_player, datum killed_playe
 
 	s_player* player = s_player::get(killed_player);
 
-	const object_datum* biped_unit = (object_datum*)object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
+	const biped_datum* biped_unit = (biped_datum*)object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
 
 	if (biped_unit != NULL)
 	{
@@ -182,6 +242,14 @@ bool c_headhunter_engine::player_can_interact_with_weapon(datum player_index, da
 					{
 						object_delete(weapon_index);
 						++g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)];
+
+						s_game_engine_event event;
+						game_engine_event_new(_multiplayer_event_response_game_type_headhunter, _multiplayer_event_response_headhunter_head_grabbed, &event);
+						event.player_index = player_index;
+						event.causing_player_index = player_index;
+
+						game_engine_send_event(&event);
+
 						LOG_TRACE_GAME(L"[{}] {} picked up a head", __FUNCTIONW__, player->properties->player_name);
 					}
 				}
@@ -320,7 +388,7 @@ bool c_headhunter_engine::apply_simulation_update(uint32 update_mask, int32 unus
 		return true;
 	}
 
-	return false;
+	return true;
 }
 
 e_simulation_entity_type c_headhunter_engine::get_game_engine_entity_type()

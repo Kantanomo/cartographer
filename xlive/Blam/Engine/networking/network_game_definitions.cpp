@@ -16,7 +16,7 @@ t_network_game_definitions_game_variant p_network_game_definitions_encode_game_v
 void network_game_definitions_apply_patches()
 {
 	DETOUR_ATTACH(p_network_game_definitions_decode_game_variant, Memory::GetAddress<t_network_game_definitions_game_variant>(0x1E2F74, 0x1B45BC), network_game_definitions_decode_game_variant);
-	DETOUR_ATTACH(p_network_game_definitions_encode_game_variant, Memory::GetAddress<t_network_game_definitions_game_variant>(0x1E2865, 0), network_game_definitions_encode_game_variant);
+	DETOUR_ATTACH(p_network_game_definitions_encode_game_variant, Memory::GetAddress<t_network_game_definitions_game_variant>(0x1E2865, 0x1B3EAC), network_game_definitions_encode_game_variant);
 }
 
 void network_game_definitions_encode_game_variant(c_bitstream* packet, s_game_variant* variant)
@@ -125,7 +125,10 @@ void network_game_definitions_encode_game_variant(c_bitstream* packet, s_game_va
 		}
 		case _game_engine_type_headhunter:
 		{
-			// TODO: Encode headhunter parameters when implemented.
+			packet->write_integer("flags", variant->game_engine_variant.head_hunter.flags.get_unsafe(), k_king_engine_flags_bits_required);
+			packet->write_integer("hill-move-time", variant->game_engine_variant.head_hunter.hill_move_time, SHORT_BITS);
+			packet->write_integer("speed-with-heads", variant->game_engine_variant.head_hunter.speed_with_heads, k_ctf_engine_player_speed_bits_required);
+			packet->write_integer("max-heads-carried", variant->game_engine_variant.head_hunter.max_heads_carried, k_headhunter_max_heads_carried_bits_required);
 			break;
 		}
 		case _game_engine_type_juggernaut:
@@ -272,7 +275,10 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 		}
 	case _game_engine_type_headhunter:
 		{
-			// TODO: dencode parameters
+			variant->game_engine_variant.head_hunter.flags.set_unsafe(packet->read_integer("flags", k_king_engine_flags_bits_required));
+			variant->game_engine_variant.head_hunter.hill_move_time = packet->read_integer("hill-move-time", SHORT_BITS);
+			variant->game_engine_variant.head_hunter.speed_with_heads = (e_ctf_engine_player_speed)packet->read_integer("speed-with-heads", k_ctf_engine_player_speed_bits_required);
+			variant->game_engine_variant.head_hunter.max_heads_carried = (e_headhunter_max_heads_carried)packet->read_integer("max-heads-carried", k_headhunter_max_heads_carried_bits_required);
 			break;
 		}
 	case _game_engine_type_juggernaut:

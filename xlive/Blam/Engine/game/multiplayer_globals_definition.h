@@ -136,6 +136,7 @@ enum e_multiplayer_event_response_event : uint16
 	_multiplayer_event_response_headhunter_hill_move = 4,
 	_multiplayer_event_response_headhunter_hill_controlled_team = 5,
 	_multiplayer_event_response_headhunter_hill_contested_team = 6,
+	_multiplayer_event_response_headhunter_head_grabbed = 7,
 
 	// king
 	_multiplayer_event_response_king_game_start = 0,

@@ -18,6 +18,7 @@ public:
 	virtual void function_14(datum player_index) override;
 	virtual void swap_player_indices(uint32 old_index, uint32 new_index) override;
 	virtual void render_game_engine_hud_elements(uint32 user_index) override;
+	virtual real32 get_player_speed_modifier(datum player_index) override;
 	virtual void function_16(datum player_index) override;
 	virtual void player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index) override;
 	virtual bool player_can_interact_with_weapon(datum player_index, datum weapon_index) override;
