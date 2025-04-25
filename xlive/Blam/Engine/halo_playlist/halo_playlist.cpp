@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "halo_playlist.h"
 
+#include "definitions/halo_playlist_match_property.h"
+
 typedef int32(__cdecl* t_halo_playlist_new)(wchar_t*, s_halo_playlist_container*);
 t_halo_playlist_new p_halo_playlist_new;
 
@@ -102,7 +104,7 @@ void c_halo_playlist_reader::parse_file_section(const wchar_t* file_buffer)
 	            }
 	            else if (c == L']' || c == L'\n') 
 	            {
-	                this->process_current_header();
+	                this->evaluate_current_header();
 	                this->reader_current_mode = seek_to_next_line;
 	            }
 	            else 
@@ -117,7 +119,7 @@ void c_halo_playlist_reader::parse_file_section(const wchar_t* file_buffer)
 	        {
 	            if (c == L']' || c == L'\n') 
 	            {
-	                this->process_current_header();
+	                this->evaluate_current_header();
 	                if (c == L'\n') 
 	                {
 	                    this->reader_current_mode = new_line;
@@ -134,7 +136,7 @@ void c_halo_playlist_reader::parse_file_section(const wchar_t* file_buffer)
 	                if (char_index >= 31)
 	                {
 	                    this->header_buffer[char_index] = 0;
-	                    this->error(3, this->reader_current_line, this->header_buffer, L"", L"");
+	                    this->error(_halo_playlist_error_header_name_invalid, this->reader_current_line, this->header_buffer, L"", L"");
 	                    this->reader_current_mode = seek_to_next_line;
 	                }
 	                else 
@@ -167,7 +169,7 @@ void c_halo_playlist_reader::parse_file_section(const wchar_t* file_buffer)
 	                if (char_index >= 31) 
 	                {
 	                    this->buffer[section_index].name_buffer[char_index] = 0;
-	                    this->error(2, this->reader_current_line, this->buffer[section_index].name_buffer, L"", L"");
+	                    this->error(_halo_playlist_error_property_name_invalid, this->reader_current_line, this->buffer[section_index].name_buffer, L"", L"");
 	                    this->reader_current_mode = seek_to_next_line;
 	                }
 	                else 
@@ -210,7 +212,7 @@ void c_halo_playlist_reader::parse_file_section(const wchar_t* file_buffer)
 	                if (char_index >= 31) 
 	                {
 	                    this->buffer[section_index].value_buffer[char_index] = 0;
-	                    this->error(4, this->reader_current_line, this->buffer[section_index].name_buffer, this->buffer[section_index].value_buffer, L"");
+	                    this->error(_halo_playlist_error_property_value_invalid, this->reader_current_line, this->buffer[section_index].name_buffer, this->buffer[section_index].value_buffer, L"");
 	                    this->reader_current_mode = seek_to_next_line;
 	                }
 	                else 
@@ -249,9 +251,120 @@ void c_halo_playlist_reader::parse_file_section(const wchar_t* file_buffer)
     //INVOKE_TYPE(0, 0x12E4F, void(__thiscall*)(c_halo_playlist_reader*, wchar_t*), this, file_buffer);
 }
 
+void c_halo_playlist_reader::evaluate_current_header()
+{
+	this->header_buffer[this->reader_current_char_index] = L'\0';
+
+	if (this->current_section_type != _halo_playlist_header_none)
+		this->process_current_header();
+
+	this->m_current_header_file_line = this->reader_current_line;
+
+	e_halo_playlist_header_type header_type = halo_playlist_item_collection_get_header_type(this->header_buffer);
+	this->current_section_type = header_type;
+	this->section_buffer_current_index = 0;
+
+	switch(header_type)
+	{
+		case _halo_playlist_header_playlist:
+		{
+			if(!this->playlist_header_found)
+			{
+				this->playlist_header_found = true;
+			}
+			else
+			{
+				this->error(_halo_playlist_error_playlist_header_already_defined, this->reader_current_line, L"", L"", L"");
+			}
+			break;
+		}
+		case _halo_playlist_header_variant:
+		{
+			if(this->playlist->variant_count >= 100)
+			{
+				this->error(16, this->reader_current_line, L"", L"", L"");
+				this->current_section_type = _halo_playlist_header_none;
+			}
+			break;
+		}
+		case _halo_playlist_header_match:
+		{
+			if(this->match_count < 100)
+			{
+				csmemset(&this->matches[this->match_count], 0, sizeof(s_halo_playlist_match));
+				this->matches[this->match_count].map_line_in_file = this->reader_current_line;
+			}
+			else
+			{
+				this->error(17, this->reader_current_line, L"", L"", L"");
+				this->current_section_type = _halo_playlist_header_none;
+			}
+			break;
+		}
+		case _halo_playlist_header_none:
+		{
+			break;
+		}
+		default:
+			this->error(_halo_playlist_error_header_name_invalid, this->reader_current_line, L"", L"", L"");
+	}
+
+    //INVOKE_TYPE(0, 0x12D14, void(__thiscall*)(c_halo_playlist_reader*), this);
+}
+
 void c_halo_playlist_reader::process_current_header()
 {
-    INVOKE_TYPE(0, 0x12D14, void(__thiscall*)(c_halo_playlist_reader*), this);
+	switch(this->current_section_type)
+	{
+		case _halo_playlist_header_variant:
+			this->process_variant_header();
+			break;
+		case _halo_playlist_header_match:
+			this->process_match_header();
+			break;
+	}
+	//INVOKE_TYPE(0, 0x12968, void(__thiscall*)(c_halo_playlist_reader*), this);
+}
+
+void c_halo_playlist_reader::process_variant_header()
+{
+	INVOKE_TYPE(0, 0x12284, void(__thiscall*)(c_halo_playlist_reader*), this);
+}
+
+void c_halo_playlist_reader::process_match_header()
+{
+	s_halo_playlist_match* match = &this->matches[this->match_count];
+
+	bool valid = true;
+
+	if(!wcscmp(match->map, L""))
+	{
+		wchar_t* map_string = halo_playlist_item_collection_match_property_get_name(_halo_playlist_match_property_type_map);
+		this->error(_halo_playlist_error_match_property_invalid, match->map_line_in_file, map_string, L"", L"");
+
+		valid = false;
+	}
+
+	if(!wcscmp(match->variant, L""))
+	{
+		wchar_t* variant_string = halo_playlist_item_collection_match_property_get_name(_halo_playlist_match_property_type_variant);
+		this->error(_halo_playlist_error_match_property_invalid, match->variant_line_in_file, variant_string, L"", L"");
+
+		valid = false;
+	}
+
+	if(valid)
+	{
+		if (!match->weight)
+			match->weight = 100;
+
+		if (!match->minimum_players)
+			match->minimum_players = 0;
+		if (!match->maximum_players)
+			match->maximum_players = 16;
+
+		++this->match_count;
+	}
 }
 
 void c_halo_playlist_reader::process_current_property()
@@ -274,6 +387,7 @@ void c_halo_playlist_reader::finalize()
 {
     INVOKE_TYPE(0, 0x12AC7, void(__thiscall*)(c_halo_playlist_reader*), this);
 }
+
 
 void halo_playlist_apply_patches()
 {
