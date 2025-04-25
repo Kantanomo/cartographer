@@ -3,6 +3,17 @@
 #include "saved_games/game_variant.h"
 
 
+enum e_halo_playlist_error
+{
+	_halo_playlist_error_playlist_header_already_defined,
+	_halo_playlist_error_code_1,
+	_halo_playlist_error_property_name_invalid,
+	_halo_playlist_error_header_name_invalid,
+	_halo_playlist_error_property_value_invalid,
+	_halo_playlist_error_code_5,
+	_halo_playlist_error_match_property_invalid
+};
+
 enum e_halo_playlist_reader_seek_mode
 {
 	new_line = 0x0,
@@ -81,7 +92,7 @@ struct c_halo_playlist_reader
 	s_halo_playlist_section_line buffer[112];
 	DWORD section_buffer_current_index;
 	wchar_t header_buffer[32];
-	DWORD field_69E0;
+	DWORD m_current_header_file_line;
 	e_halo_playlist_header_type current_section_type;
 	e_halo_playlist_reader_seek_mode reader_current_mode;
 	uint32 reader_current_char_index;
@@ -90,7 +101,10 @@ struct c_halo_playlist_reader
 	bool unk;
 public:
 	void parse_file_section(const wchar_t* file_buffer);
+	void evaluate_current_header();
 	void process_current_header();
+	void process_variant_header();
+	void process_match_header();
 	void process_current_property();
 	void trim_property_name();
 	void error(int32 error_type, uint32 file_line, wchar_t* property_name, wchar_t* property_value, wchar_t* extra);

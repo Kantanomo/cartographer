@@ -502,6 +502,9 @@
     <ClCompile Include="Blam\Engine\game\multiplayer_globals_definition.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_engine_king.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\halo_playlist.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_header.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_item_collection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2003,9 +2006,10 @@
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_slayer.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_entity_update_encode_helper.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_king.h" />
-    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_base_types.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_item_collection.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_header.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\halo_playlist.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_property.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
