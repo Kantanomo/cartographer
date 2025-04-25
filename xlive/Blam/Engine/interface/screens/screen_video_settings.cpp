@@ -49,7 +49,7 @@ enum e_video_settings_list_items : uint16
 
 /* public code */
 
-c_video_settings_list::c_video_settings_list(int16 user_flags):
+c_video_settings_list::c_video_settings_list(uint16 user_flags):
 	c_list_widget(user_flags),
 	m_slot(this, &c_video_settings_list::handle_item_pressed_event)
 {
@@ -219,7 +219,7 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 // 
 
 
-c_screen_video_settings::c_screen_video_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
+c_screen_video_settings::c_screen_video_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags) :
 	c_screen_with_menu(_screen_video_settings, channel_type, window_index, user_flags, &m_video_settings_list),
 	m_video_settings_list(user_flags)
 {

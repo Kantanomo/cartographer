@@ -38,14 +38,15 @@ enum e_mp_video_settings_list_items : uint16
 static const char k_mp_video_setting_list_name[] = "mp video settings game list";
 static const s_custom_item_text_mapping k_screen_multiplayer_video_settings_menu_items_map[] =
 {
-	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_display_mode), _item_display_mode },
-	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_resolution), _item_resolution },
-	{ k_vsync_header_string, _item_vsync, true },
-	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_brightness_level), _item_brightness_level},
-	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_gamma_setting), _item_gamma_setting },
-	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_anti_aliasing), _item_anti_aliasing },
-	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_safe_area), _item_safe_area, },
-	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_restore_video_defaults), _item_restore_defaults },
+	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_display_mode)					, _item_display_mode 		},
+	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_resolution)					, _item_resolution 			},
+	{ k_vsync_header_string	, _item_vsync, true 															},
+	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_brightness_level)				, _item_brightness_level	},
+	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_gamma_setting)				, _item_gamma_setting 		},
+	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_anti_aliasing)				, _item_anti_aliasing 		},
+	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_safe_area)					, _item_safe_area 			},
+	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_restore_video_defaults)		, _item_restore_defaults 	},
+
 };
 
 /* globals */
@@ -54,7 +55,7 @@ static const s_custom_item_text_mapping k_screen_multiplayer_video_settings_menu
 
 /* public code */
 
-c_multiplayer_video_settings_list::c_multiplayer_video_settings_list(int16 user_flags):
+c_multiplayer_video_settings_list::c_multiplayer_video_settings_list(uint16 user_flags):
 	c_list_widget(user_flags),
 	m_slot(this, &c_multiplayer_video_settings_list::handle_item_pressed_event)
 {
@@ -64,10 +65,20 @@ c_multiplayer_video_settings_list::c_multiplayer_video_settings_list(int16 user_
 	ASSERT(m_list_data);
 	data_make_valid(m_list_data);
 
-	for (int16 i = 0; i < k_total_no_of_mp_video_settings_list_items; ++i)
-	{
-		((s_list_item_datum*)(datum_get(m_list_data, datum_new(m_list_data))))->item_id = i;
-	}
+	// yes this sucks
+#define LIST_ITEM_DATUM_GET_NEW() \
+		(static_cast<s_list_item_datum*>(datum_get(m_list_data, datum_new(m_list_data))))
+
+	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_display_mode;
+	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_resolution;
+	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_vsync;
+	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_brightness_level;
+	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_gamma_setting;
+	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_anti_aliasing;
+	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_safe_area;
+	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_restore_defaults;
+
+#undef LIST_ITEM_DATUM_GET_NEW
 
 	linker_type2.link(&m_slot);
 }
@@ -85,7 +96,7 @@ int32 c_multiplayer_video_settings_list::get_list_items_count()
 void c_multiplayer_video_settings_list::update_list_items(c_list_item_widget* item, int32 skin_index)
 {
 	ASSERT(item);
-	this->update_list_items_from_mapping(item, skin_index, 0, k_screen_multiplayer_video_settings_menu_items_map, k_total_no_of_mp_video_settings_list_items);
+	this->update_list_items_from_mapping(item, skin_index, _default_list_skin_text_main, k_screen_multiplayer_video_settings_menu_items_map, k_total_no_of_mp_video_settings_list_items);
 	return;
 }
 
@@ -161,7 +172,7 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 // 
 
 
-c_screen_multiplayer_video_settings::c_screen_multiplayer_video_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
+c_screen_multiplayer_video_settings::c_screen_multiplayer_video_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags) :
 	c_screen_with_menu(_screen_video_settings_mp, channel_type, window_index, user_flags, &m_mp_video_settings_list),
 	m_mp_video_settings_list(user_flags)
 {
