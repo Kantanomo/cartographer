@@ -310,6 +310,11 @@ void __cdecl rasterizer_settings_apply_settings(int32 setting)
 	return;
 }
 
+void __cdecl rasterizer_settings_write_to_registry()
+{
+	return INVOKE(0x263B0F, 0x0, rasterizer_settings_write_to_registry);
+}
+
 DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode window_mode, DWORD* style)
 {
 	if (style)

@@ -65,6 +65,11 @@ c_video_settings_list::c_video_settings_list(uint16 user_flags):
 	linker_type2.link(&m_slot);
 }
 
+c_video_settings_list::~c_video_settings_list()
+{
+	rasterizer_settings_write_to_registry();
+}
+
 c_list_item_widget* c_video_settings_list::get_list_items()
 {
 	return m_list_items;

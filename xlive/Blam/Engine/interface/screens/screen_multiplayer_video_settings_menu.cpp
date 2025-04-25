@@ -14,6 +14,7 @@
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_globals.h"
 #include "main/game_preferences.h"
+#include "rasterizer/rasterizer_settings.h"
 #include "tag_files/global_string_ids.h"
 
 
@@ -81,6 +82,11 @@ c_multiplayer_video_settings_list::c_multiplayer_video_settings_list(uint16 user
 #undef LIST_ITEM_DATUM_GET_NEW
 
 	linker_type2.link(&m_slot);
+}
+
+c_multiplayer_video_settings_list::~c_multiplayer_video_settings_list()
+{
+	rasterizer_settings_write_to_registry();
 }
 
 c_list_item_widget* c_multiplayer_video_settings_list::get_list_items()

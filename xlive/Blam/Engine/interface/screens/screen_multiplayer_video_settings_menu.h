@@ -32,7 +32,7 @@ public:
 
 	// c_multiplayer_video_settings_list virtual functions
 
-	virtual ~c_multiplayer_video_settings_list() = default;
+	virtual ~c_multiplayer_video_settings_list();
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;

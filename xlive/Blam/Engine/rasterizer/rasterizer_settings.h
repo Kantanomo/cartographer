@@ -81,6 +81,8 @@ int32 rasterizer_settings_get_refresh_rate(void);
 
 void __cdecl rasterizer_settings_apply_settings(int32 setting);
 
+void __cdecl rasterizer_settings_write_to_registry();
+
 DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode window_mode, DWORD* style);
 
 string_id __cdecl rasterizer_settings_get_display_mode_string(int32 display_mode);
