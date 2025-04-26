@@ -85,12 +85,13 @@ public:
 	void set_focused_item_index(datum item_index);
 	void remove_focused_item_datum_from_data_array();
 	void remove_item_from_list(c_list_item_widget* item);
+	void setup_item_indices();
 
 
 	// c_list_widget virtual functions
 
 	virtual ~c_list_widget() = default;
-	virtual int32 setup_children() override;
+	virtual void setup_children() override;
 	virtual void pre_destroy() override;
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;

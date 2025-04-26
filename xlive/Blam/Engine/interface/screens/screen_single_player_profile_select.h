@@ -20,7 +20,7 @@ public:
 	// c_player_profile_list virtual functions
 
 	virtual ~c_player_profile_list() = default;
-	virtual int32 setup_children() override;
+	virtual void setup_children() override;
 	virtual void pre_destroy() override;
 	virtual void update() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;

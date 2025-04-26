@@ -105,12 +105,17 @@ void c_list_widget::remove_item_from_list(c_list_item_widget* item)
 	INVOKE_TYPE(0x2144A4, 0x0, void(__thiscall*)(c_list_widget*, c_list_item_widget*), this, item);
 }
 
+void c_list_widget::setup_item_indices()
+{
+	INVOKE_TYPE(0x2136CE, 0x0, void(__thiscall*)(c_list_widget*), this);
+}
+
 
 // c_list_widget virtual functions
 
-int32 c_list_widget::setup_children()
+void c_list_widget::setup_children()
 {
-	return INVOKE_TYPE(0x213FE5, 0x0, int32(__thiscall*)(c_list_widget*), this);
+	INVOKE_TYPE(0x213FE5, 0x0, void(__thiscall*)(c_list_widget*), this);
 }
 
 void c_list_widget::pre_destroy()

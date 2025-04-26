@@ -5,12 +5,11 @@
 // c_player_widget virtual functions
 
 
-int32 c_player_widget::setup_children()
+void c_player_widget::setup_children()
 {
 	//return INVOKE_TYPE(0x220441, 0x0, int32(__thiscall*)(c_player_widget*), this);
-	int result = c_user_interface_widget::setup_children();
+	c_user_interface_widget::setup_children();
 	this->m_visible = false;
-	return result;
 }
 
 

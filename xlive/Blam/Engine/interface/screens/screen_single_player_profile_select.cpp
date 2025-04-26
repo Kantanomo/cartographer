@@ -14,9 +14,9 @@ enum
 
 /* public code */
 
-int32 c_player_profile_list::setup_children()
+void c_player_profile_list::setup_children()
 {
-	return INVOKE_TYPE(0x237583, 0x0, int32(__thiscall*)(c_player_profile_list*), this);
+	INVOKE_TYPE(0x237583, 0x0, void(__thiscall*)(c_player_profile_list*), this);
 }
 
 void c_player_profile_list::pre_destroy()

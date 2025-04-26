@@ -18,6 +18,15 @@ enum e_display_aspect_ratio : int32
 	_aspect_ratio_16x10 = 2
 };
 
+enum e_display_mode : int32
+{
+	_rasterizer_settings_display_mode_real_fullscreen = 0,
+	_rasterizer_settings_display_mode_windowed = 1,
+	_rasterizer_settings_display_mode_funky_full_screen = 2,
+	
+	_rasterizer_settings_display_mode_last_user_selectable = _rasterizer_settings_display_mode_funky_full_screen,
+};
+
 /* structures */
 
 struct s_aspect_ratio
@@ -44,7 +53,7 @@ ASSERT_STRUCT_SIZE(s_video_mode, 44);
 
 struct s_rasterizer_settings
 {
-	int32 display_mode;
+	e_display_mode display_mode;
 	int32 aspect_ratio;
 	int32 screen_width;
 	int32 screen_height;
@@ -75,7 +84,12 @@ void rasterizer_settings_set_default_settings(void);
 
 void __cdecl rasterizer_settings_create_registry_keys(bool is_game);
 
-void __cdecl rasterizer_settings_set_display_mode(const e_rasterizer_window_mode* display_mode);
+bool __cdecl rasterizer_settings_has_available_video_modes();
+void __cdecl rasterizer_settings_set_display_mode(const e_display_mode* display_mode);
+void __cdecl rasterizer_settings_store_current_settings_for_revert();
+void __cdecl rasterizer_settings_set_display_option(int32* display_option_index);
+void __cdecl rasterizer_settings_process_display_changes(bool force_update_params, bool display_blackness);
+
 
 int32 rasterizer_settings_get_refresh_rate(void);
 
@@ -85,7 +99,7 @@ void __cdecl rasterizer_settings_write_to_registry();
 
 DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode window_mode, DWORD* style);
 
-string_id __cdecl rasterizer_settings_get_display_mode_string(int32 display_mode);
+string_id __cdecl rasterizer_settings_get_display_mode_string(e_display_mode display_mode);
 void __cdecl rasterizer_settings_get_display_option_resolution_string(int32 display_option_index, wchar_t* out_text, int32 out_text_max_length);
 string_id __cdecl rasterizer_settings_get_brightness_level_string(int32 brightness_level);
 string_id __cdecl rasterizer_settings_get_gamma_setting_string(int32 gamma);

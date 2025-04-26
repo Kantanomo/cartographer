@@ -127,7 +127,7 @@ public:
 	// c_user_interface_widget virtual functions
 
 	virtual ~c_user_interface_widget();
-	virtual int32 setup_children();
+	virtual void setup_children();
 	virtual void pre_destroy();
 	virtual void update();
 	virtual void render_widget(rectangle2d* viewport_bounds);

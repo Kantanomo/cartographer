@@ -21,9 +21,9 @@ public:
 	// overrides, only needed ones
 	virtual ~c_brightness_level_edit_list() = default;
 
-	virtual int32 setup_children() override
+	virtual void setup_children() override
 	{
-		return INVOKE_VFPTR_FN(_get_vfptr_table, 1, int32(class_type::**)());
+		INVOKE_VFPTR_FN(_get_vfptr_table, 1, void(class_type::**)());
 	}
 
 	virtual int32 link_item_widgets() override
@@ -75,9 +75,9 @@ public:
 	{
 	}
 
-	virtual int32 setup_children() override
+	virtual void setup_children() override
 	{
-		return INVOKE_VFPTR_FN(_get_vfptr_table, 1, int32(class_type::**)());
+		INVOKE_VFPTR_FN(_get_vfptr_table, 1, void(class_type::**)());
 	}
 
 	virtual void pre_destroy() override

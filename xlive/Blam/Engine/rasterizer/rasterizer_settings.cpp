@@ -99,6 +99,15 @@ void rasterizer_settings_apply_hooks(void)
 
 	// Replace window flags function so we can use the maximize box
 	PatchCall(Memory::GetAddress(0x264553), rasterizer_settings_get_window_flags);
+
+
+	// allow borderless window
+	NopFill(Memory::GetAddress(0x3995A), 5);	//main_kick_startup_masking_sequence
+	NopFill(Memory::GetAddress(0x3A0C3), 5);	//loading?
+	NopFill(Memory::GetAddress(0x24BAA7), 12);	//rasterizer_settings_store_current_settings_for_revert
+	NopFill(Memory::GetAddress(0x250F57), 4);	//c_display_mode_edit_list::setup_children
+	NopFill(Memory::GetAddress(0x26474B), 6);	//rasterizer_settings_create_registry_keys
+
 	return;
 }
 
@@ -188,7 +197,7 @@ void __cdecl rasterizer_settings_update_window_position(void)
 		
 		RECT rect;
 		UINT set_window_pos_flags = SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING;
-		if (rasterizer_settings->display_mode != _rasterizer_window_mode_real_fullscreen)
+		if (rasterizer_settings->display_mode != _rasterizer_settings_display_mode_real_fullscreen)
 		{
 			if (shell_tool_type() == _shell_tool_type_game)
 			{
@@ -287,11 +296,32 @@ void __cdecl rasterizer_settings_create_registry_keys(bool is_game)
 	return;
 }
 
-void __cdecl rasterizer_settings_set_display_mode(const e_rasterizer_window_mode* display_mode)
+bool __cdecl rasterizer_settings_has_available_video_modes()
+{
+	return rasterizer_get_video_mode_count() != NULL;
+}
+
+void __cdecl rasterizer_settings_set_display_mode(const e_display_mode* display_mode)
 {
 	INVOKE(0x2643CA, 0x0, rasterizer_settings_set_display_mode, display_mode);
 	return;
 }
+
+void __cdecl rasterizer_settings_store_current_settings_for_revert()
+{
+	INVOKE(0x24BA9A, 0x0, rasterizer_settings_store_current_settings_for_revert);
+}
+
+void __cdecl rasterizer_settings_set_display_option(int32* display_option_index)
+{
+	INVOKE(0x2643DB, 0x0, rasterizer_settings_set_display_option, display_option_index);
+}
+
+void __cdecl rasterizer_settings_process_display_changes(bool force_update_params, bool display_blackness)
+{
+	INVOKE(0x26444C, 0x0, rasterizer_settings_process_display_changes, force_update_params, display_blackness);
+}
+
 
 int32 rasterizer_settings_get_refresh_rate(void)
 {
@@ -342,17 +372,17 @@ DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode wind
 	return result;
 }
 
-string_id rasterizer_settings_get_display_mode_string(int32 display_mode)
+string_id rasterizer_settings_get_display_mode_string(e_display_mode display_mode)
 {
 	//return INVOKE(0x250F88, 0x0, rasterizer_settings_get_display_mode_string, display_mode);
 
-	if (display_mode == _rasterizer_window_mode_real_fullscreen)
+	if (display_mode == _rasterizer_settings_display_mode_real_fullscreen)
 		return _string_id_display_mode_full;
-	if (display_mode == _rasterizer_window_mode_windowed)
+	if (display_mode == _rasterizer_settings_display_mode_windowed)
 		return _string_id_display_mode_window;
-	if (display_mode != _rasterizer_window_mode_funky_fullscreen)
+	if (display_mode == _rasterizer_settings_display_mode_funky_full_screen)
 		return _string_id_empty_string;
-	return _string_id_display_mode_full;
+	return _string_id_empty_string;
 }
 
 void rasterizer_settings_get_display_option_resolution_string(int32 display_option_index, wchar_t* out_text, int32 out_text_max_length)

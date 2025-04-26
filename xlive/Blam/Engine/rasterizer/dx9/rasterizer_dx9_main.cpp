@@ -749,10 +749,10 @@ bool __cdecl rasterizer_dx9_initialize(void)
 				rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
 			}
 
-			if (shell_command_line_flag_is_set(_shell_command_line_flag_windowed))
+			if (shell_command_line_flag_is_set(_shell_command_line_flag_windowed) && rasterizer_globals->display_parameters.window_mode != _rasterizer_window_mode_funky_fullscreen)
 			{
 				rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
-				const e_rasterizer_window_mode mode = _rasterizer_window_mode_windowed;
+				const e_display_mode mode = _rasterizer_settings_display_mode_windowed;
 				rasterizer_settings_set_display_mode(&mode);
 			}
 
@@ -1066,7 +1066,9 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 				device_mode.dmDisplayFrequency = rasterizer_settings_get_refresh_rate();
 				device_mode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
 
-				LONG change_result = ChangeDisplaySettingsA(&device_mode, 0);
+				// this breaks funky_fullscreen/borderless setting when changing resolutions
+				//LONG change_result = ChangeDisplaySettingsA(&device_mode, 0);
+				const LONG change_result = ERROR_SUCCESS;
 				if (change_result)
 				{
 					error(2, "ChangeDisplaySettings failed: 0x%8x", change_result);

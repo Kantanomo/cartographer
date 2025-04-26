@@ -91,7 +91,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 	string_id secondary_string = _string_id_empty_string;
 
 	s_rasterizer_settings* rasterizer_settings = rasterizer_settings_get();
-	int32 display_mode = rasterizer_settings->display_mode;
+	e_display_mode display_mode = rasterizer_settings->display_mode;
 
 	if (primary_text)
 	{
@@ -99,9 +99,15 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 		{
 		case _item_display_mode:
 			primary_string = _string_id_display_mode;
-			if (display_mode == _rasterizer_window_mode_funky_fullscreen)
-				display_mode = _rasterizer_window_mode_real_fullscreen;
-			secondary_string = rasterizer_settings_get_display_mode_string(display_mode);
+			if (display_mode == _rasterizer_settings_display_mode_funky_full_screen)
+			{
+				secondary_string = _string_id_invalid;
+				secondary_text->set_text(k_borderless_string[get_current_language()]);
+			}
+			else
+			{
+				secondary_string = rasterizer_settings_get_display_mode_string(display_mode);
+			}
 			break;
 		case _item_resolution:
 			primary_string = _string_id_resolution;

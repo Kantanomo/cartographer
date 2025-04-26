@@ -219,9 +219,9 @@ c_user_interface_widget::~c_user_interface_widget(void)
 	return;
 }
 
-int32 c_user_interface_widget::setup_children()
+void c_user_interface_widget::setup_children()
 {
-	return INVOKE_TYPE(0x211E23, 0x0, int32(__thiscall*)(c_user_interface_widget*), this);
+	INVOKE_TYPE(0x211E23, 0x0, void(__thiscall*)(c_user_interface_widget*), this);
 }
 
 void c_user_interface_widget::pre_destroy()
