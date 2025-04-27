@@ -752,14 +752,16 @@ bool __cdecl rasterizer_dx9_initialize(void)
 			if (shell_command_line_flag_is_set(_shell_command_line_flag_windowed) && rasterizer_globals->display_parameters.window_mode != _rasterizer_window_mode_funky_fullscreen)
 			{
 				rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
-				const e_display_mode mode = _rasterizer_settings_display_mode_windowed;
+				const e_rasterizer_window_mode mode = _rasterizer_window_mode_windowed;
 				rasterizer_settings_set_display_mode(&mode);
 			}
 
+			/* fix borderless getting forced in startup
 			if (rasterizer_globals->display_parameters.window_mode == _rasterizer_window_mode_real_fullscreen)
 			{
 				rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_funky_fullscreen;
 			}
+			*/
 
 			HWND hwnd = rasterizer_dx9_create_main_window();
 			result = hwnd != 0;

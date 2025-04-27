@@ -75,13 +75,13 @@ void c_display_mode_edit_list::setup_children()
 	e_display_mode_settings_list_items item_type = _item_first;
 	switch (rasterizer_settings_get()->display_mode)
 	{
-			case _rasterizer_settings_display_mode_real_fullscreen :
+			case _rasterizer_window_mode_real_fullscreen:
 				item_type = _item_fullscreen;
 				break;
-			case _rasterizer_settings_display_mode_windowed :
+			case _rasterizer_window_mode_windowed:
 				item_type = _item_windowed;
 				break;
-			case _rasterizer_settings_display_mode_funky_full_screen :
+			case _rasterizer_window_mode_funky_fullscreen:
 				item_type = _item_borderless;
 				break;
 	}
@@ -106,8 +106,8 @@ void c_display_mode_edit_list::update_list_items(c_list_item_widget* item, int32
 
 	if (item_text)
 	{
-		const e_display_mode mode = (e_display_mode)DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index());
-		if (mode == _rasterizer_settings_display_mode_funky_full_screen)
+		const e_rasterizer_window_mode mode = (e_rasterizer_window_mode)DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index());
+		if (mode == _rasterizer_window_mode_funky_fullscreen)
 		{
 			item_text->set_text(k_borderless_string[get_current_language()]);
 		}
@@ -132,7 +132,7 @@ void c_display_mode_edit_list::handle_item_pressed_event(s_event_record** pevent
 	ASSERT(absolute_index <= _rasterizer_settings_display_mode_last_user_selectable);
 
 	absolute_index = absolute_index > _item_last ? _item_first : absolute_index;
-	const e_display_mode display_mode = (e_display_mode)absolute_index;
+	const e_rasterizer_window_mode display_mode = (e_rasterizer_window_mode)absolute_index;
 
 	if (absolute_index || rasterizer_settings_has_available_video_modes())
 	{

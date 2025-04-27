@@ -197,7 +197,7 @@ void __cdecl rasterizer_settings_update_window_position(void)
 		
 		RECT rect;
 		UINT set_window_pos_flags = SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING;
-		if (rasterizer_settings->display_mode != _rasterizer_settings_display_mode_real_fullscreen)
+		if (rasterizer_settings->display_mode != _rasterizer_window_mode_real_fullscreen)
 		{
 			if (shell_tool_type() == _shell_tool_type_game)
 			{
@@ -301,7 +301,7 @@ bool __cdecl rasterizer_settings_has_available_video_modes()
 	return rasterizer_get_video_mode_count() != NULL;
 }
 
-void __cdecl rasterizer_settings_set_display_mode(const e_display_mode* display_mode)
+void __cdecl rasterizer_settings_set_display_mode(const e_rasterizer_window_mode* display_mode)
 {
 	INVOKE(0x2643CA, 0x0, rasterizer_settings_set_display_mode, display_mode);
 	return;
@@ -372,15 +372,15 @@ DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode wind
 	return result;
 }
 
-string_id rasterizer_settings_get_display_mode_string(e_display_mode display_mode)
+string_id rasterizer_settings_get_display_mode_string(e_rasterizer_window_mode display_mode)
 {
 	//return INVOKE(0x250F88, 0x0, rasterizer_settings_get_display_mode_string, display_mode);
 
-	if (display_mode == _rasterizer_settings_display_mode_real_fullscreen)
+	if (display_mode == _rasterizer_window_mode_real_fullscreen)
 		return _string_id_display_mode_full;
-	if (display_mode == _rasterizer_settings_display_mode_windowed)
+	if (display_mode == _rasterizer_window_mode_windowed)
 		return _string_id_display_mode_window;
-	if (display_mode == _rasterizer_settings_display_mode_funky_full_screen)
+	if (display_mode == _rasterizer_window_mode_funky_fullscreen)
 		return _string_id_empty_string;
 	return _string_id_empty_string;
 }
