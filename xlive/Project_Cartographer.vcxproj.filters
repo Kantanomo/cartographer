@@ -481,6 +481,12 @@
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_header.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_property.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_item_collection.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_variant_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_game_type_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_headhunter_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_score_to_win_round.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_team_scoring.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_game_engine_flags.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1965,6 +1971,12 @@
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_header.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\halo_playlist.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_variant_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_game_type_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_headhunter_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_score_to_win_round.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_team_scoring.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_game_engine_flags.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

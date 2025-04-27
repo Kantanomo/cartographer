@@ -112,7 +112,8 @@ enum e_game_engine_team_score
 	_game_engine_team_score_max = 2,
 
 	k_game_engine_team_score_count,
-	k_game_engine_team_score_bits_required = bits_required_for(k_game_engine_team_score_count - 1)
+	k_game_engine_team_score_bits_required = bits_required_for(k_game_engine_team_score_count - 1),
+	k_game_engine_team_score_invalid = NONE
 };
 
 enum e_game_engine_team_respawn
@@ -541,6 +542,8 @@ ASSERT_STRUCT_SIZE(s_game_variant, 304);
 void game_variant_apply_patches();
 
 s_game_variant* get_game_variant(void);
+
+s_game_variant* __cdecl get_default_game_variant_by_name(wchar_t* name);
 
 void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_variant_description_index game_variant_type);
 

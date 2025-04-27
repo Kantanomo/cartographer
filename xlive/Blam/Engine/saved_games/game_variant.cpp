@@ -29,6 +29,17 @@ s_game_variant* get_game_variant(void)
     return &game_options_get()->game_variant;
 }
 
+s_game_variant* __cdecl get_default_game_variant_by_name(wchar_t* name)
+{
+	// Server only function?
+	if (Memory::dedicatedServer)
+	{
+		return INVOKE(0, 0x678E, get_default_game_variant_by_name, name);
+	}
+	else
+		return nullptr;
+}
+
 void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_variant_description_index game_variant_type)
 {
 	if (game_variant_type < k_base_game_variant_description_count)

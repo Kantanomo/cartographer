@@ -29,7 +29,7 @@ e_halo_playlist_match_property_type halo_playlist_item_collection_get_match_prop
 
 wchar_t* halo_playlist_item_collection_match_property_get_name(e_halo_playlist_match_property_type value)
 {
-	ASSERT(IN_RANGE(value, 0, k_halo_playlist_match_property_type_count));
+	ASSERT(IN_RANGE(value, -1, k_halo_playlist_match_property_type_count));
 
 	s_halo_playlist_item_collection* g_halo_playlist_match_property_collection = Memory::GetAddress<s_halo_playlist_item_collection*>(0, 0x355260);
 

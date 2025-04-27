@@ -672,6 +672,7 @@ static void h2mod_apply_hooks(void)
 	damage_apply_patches();
 	files_windows_apply_patches();
 
+	game_variant_apply_patches();
 	game_engine_apply_patches();
 	simulation_type_collection_apply_patches();
 	simulation_game_events_apply_patches();
@@ -762,7 +763,6 @@ static void h2mod_apply_hooks(void)
 		new_hud_draw_apply_patches();
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
-		game_variant_apply_patches();
 		user_interface_networking_apply_patches();
 		multiplayer_variant_settings_interface_apply_patches();
 
