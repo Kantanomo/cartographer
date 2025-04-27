@@ -70,6 +70,8 @@ void __cdecl rasterizer_discard_refresh_rate(void);
 
 int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(uint32 video_mode_index, uint32 refresh_rate_index);
 
+static void rasterizer_settings_update_display_mode_apply_refresh_rate_fix(void);
+
 /* public code */
 
 void rasterizer_settings_apply_hooks(void)
@@ -89,6 +91,9 @@ void rasterizer_settings_apply_hooks(void)
 	// fix (or workaround) the refresh rate being unset
 	// by some hacky looking code in the game
 	NopFill(Memory::GetAddress(0x26475D), 26);
+
+	// fix refresh rate getting set to 0 when going from fullscreen to windowed/borderless
+	rasterizer_settings_update_display_mode_apply_refresh_rate_fix();
 
 	// Fix antialiasing when using shader model 3
 	PatchCall(Memory::GetAddress(0x250939), rasterizer_settings_set_antialiasing);
@@ -834,4 +839,24 @@ int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(uint32 video_mode_inde
 	}
 
 	return g_video_mode_refresh_rates[0][0];
+}
+
+__declspec(naked) static void rasterizer_settings_update_display_mode_refresh_patch(void)
+{
+	__asm
+	{
+		// original code
+		//mov     dword ptr[esp + 10h], 0
+
+		push   	eax
+		call   	rasterizer_settings_get_refresh_rate
+		mov    	dword ptr[esp + 10h + 8h], eax
+		pop   	eax
+		retn
+	}
+}
+
+static void rasterizer_settings_update_display_mode_apply_refresh_rate_fix(void)
+{
+	Codecave(Memory::GetAddress(0x264263), rasterizer_settings_update_display_mode_refresh_patch, 3);
 }
