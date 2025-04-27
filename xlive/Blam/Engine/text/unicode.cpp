@@ -270,7 +270,7 @@ bool __cdecl uniswcntrl(wchar_t* string)
 {
 	ASSERT(string);
 
-	return INVOKE(0x4C792, 0, uniswcntrl, string);
+	return INVOKE(0x4C792, 0x31B72, uniswcntrl, string);
 }
 
 int32 usnzprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
@@ -438,7 +438,7 @@ size_t utf8_string_length(const utf8* src, size_t size)
 
 bool __cdecl validate_wchar_characters(wchar_t* string)
 {
-	return INVOKE(0x4C706, 0, validate_wchar_characters, string);
+	return INVOKE(0x4C706, 0x31AE6, validate_wchar_characters, string);
 }
 
 bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name)

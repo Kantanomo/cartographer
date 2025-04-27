@@ -30,7 +30,7 @@ struct s_halo_playlist_section_line
 	wchar_t name_buffer[32];
 	wchar_t value_buffer[32];
 	uint32 file_line;
-	bool unk;
+	bool processed;
 };
 ASSERT_STRUCT_SIZE(s_halo_playlist_section_line, 0x88);
 
@@ -103,8 +103,23 @@ public:
 	void parse_file_section(const wchar_t* file_buffer);
 	void evaluate_current_header();
 	void process_current_header();
-	void process_variant_header();
-	void process_match_header();
+
+	void process_variant_section();
+	bool process_variant_match_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_player_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_team_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_vehicle_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_equipment_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_slayer_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_oddball_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_juggernaut_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_king_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_ctf_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_assault_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_territories_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_headhunter_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+
+	void process_match_section();
 	void process_current_property();
 	void trim_property_name();
 	void error(int32 error_type, uint32 file_line, wchar_t* property_name, wchar_t* property_value, wchar_t* extra);

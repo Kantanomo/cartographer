@@ -1,4 +1,5 @@
 #pragma once
+#include "saved_games/game_variant.h"
 
 struct s_halo_playlist_item
 {
@@ -15,3 +16,7 @@ struct s_halo_playlist_item_collection
 ASSERT_STRUCT_SIZE(s_halo_playlist_item_collection, 8);
 
 wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_collection* collection, int32 value);
+
+int32 halo_playlist_item_collection_get_value(s_halo_playlist_item_collection* collection, wchar_t* value);
+
+bool halo_playlist_item_collection_get_boolean_value(wchar_t* value, bool* out_result);

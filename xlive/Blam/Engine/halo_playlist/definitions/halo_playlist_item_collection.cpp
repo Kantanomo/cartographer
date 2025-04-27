@@ -12,3 +12,49 @@ wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_collection*
 	
 	return L"";
 }
+
+int32 halo_playlist_item_collection_get_value(s_halo_playlist_item_collection* collection, wchar_t* value)
+{
+	return INVOKE_TYPE(0, 0xEE41, int32(*)(s_halo_playlist_item_collection*, wchar_t*), collection, value);
+}
+
+bool halo_playlist_item_collection_get_boolean_value(wchar_t* value, bool* out_result)
+{
+	switch(*value)
+	{
+		case L'0':
+		case L'F':
+		case L'N':
+		case L'f':
+		case L'n':
+		{
+			*out_result = false;
+			return false;
+		}
+		case L'1':
+		case L'T':
+		case L'Y':
+		case L't':
+		case L'y':
+		{
+			*out_result = true;
+			return true;
+		}
+		default:
+		{
+			if (_wcsicmp(value, L"on") == 0)
+			{
+				*out_result = true;
+				return true;
+			}
+			if (_wcsicmp(value, L"off") == 0)
+			{
+				*out_result = false;
+				return false;
+			}
+
+			return false;
+		}
+	}
+}
+
