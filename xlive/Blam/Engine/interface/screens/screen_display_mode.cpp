@@ -143,6 +143,7 @@ void c_display_mode_edit_list::handle_item_pressed_event(s_event_record** pevent
 
 		//rewrite this so this we dont have to use force_update , without which windowed to borderless transition fails
 		rasterizer_settings_process_display_changes(true, false); 
+		rasterizer_settings_update_window_position();
 
 		s_screen_parameters params;
 		params.m_flags = 0;

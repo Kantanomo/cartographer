@@ -254,8 +254,8 @@ void __cdecl rasterizer_settings_update_window_position(void)
 		SetWindowPos(
 			g_hwnd,
 			HWND_NOTOPMOST,
-			rect.left,
-			rect.top,
+			0,
+			0,
 			rect.right - rect.left,
 			rect.bottom - rect.top,
 			set_window_pos_flags);
