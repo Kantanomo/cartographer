@@ -250,7 +250,8 @@ enum e_ctf_engine_player_speed
 	_ctf_engine_player_speed_fast = 2,
 
 	k_ctf_engine_player_speed_count,
-	k_ctf_engine_player_speed_bits_required = bits_required_for(k_ctf_engine_player_speed_count - 1)
+	k_ctf_engine_player_speed_bits_required = bits_required_for(k_ctf_engine_player_speed_count - 1),
+	k_ctf_engine_players_speed_invalid = NONE
 };
 
 enum e_oddball_player_speed : uint16
@@ -390,7 +391,8 @@ enum e_headhunter_max_heads_carried : uint8
 	_headhunter_max_heads_carried_ten,
 
 	k_headhunter_max_heads_carried_count,
-	k_headhunter_max_heads_carried_bits_required = bits_required_for(FLAG(k_headhunter_max_heads_carried_count - 1))
+	k_headhunter_max_heads_carried_bits_required = bits_required_for(FLAG(k_headhunter_max_heads_carried_count - 1)),
+	k_headhunter_max_heads_carried_invalid = NONE
 };
 
 enum e_headhunter_engine_flags : uint32
