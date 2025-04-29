@@ -23,7 +23,7 @@ void game_engine_event_new(e_multiplayer_event_response_game_type game_type, e_m
 
 void __cdecl game_engine_send_event(s_game_engine_event* event)
 {
-	INVOKE(0x5DC77, 0, game_engine_send_event, event);
+	INVOKE(0x5DC77, 0x3F8D7, game_engine_send_event, event);
 }
 
 void game_engine_event_evaluate(s_game_engine_event* event, int32 player_index)

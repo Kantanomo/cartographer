@@ -6,7 +6,11 @@
 void game_engine_apply_patches()
 {
 	// todo: server offset
-	PatchCall(Memory::GetAddress(0x1B1E38), game_engine_get_simulation_protocol);
+	PatchCall(Memory::GetAddress(0x1B1E38, 0x197E62), game_engine_get_simulation_protocol);
+	if(Memory::dedicatedServer)
+	{
+		PatchCall(Memory::GetAddress(0, 0x197DF1), game_engine_get_simulation_protocol);
+	}
 
 	test_replace_game_engine_mode(_game_engine_type_headhunter, &g_headhunter_engine);
 }
@@ -17,7 +21,9 @@ c_game_engine* current_game_engine(void)
 
 	ASSERT(game_engine_globals);
 
-	return get_game_mode_engines()[game_engine_globals->game_engine_index];
+	c_game_engine* engine = get_game_mode_engines()[game_engine_globals->game_engine_index];
+
+	return engine;
 }
 
 s_game_engine_globals* game_engine_globals_get(void)

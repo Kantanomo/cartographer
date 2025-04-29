@@ -5,6 +5,9 @@
 #include "definitions/halo_playlist_game_type_property.h"
 #include "definitions/halo_playlist_headhunter_property.h"
 #include "definitions/halo_playlist_match_property.h"
+#include "definitions/halo_playlist_max_heads_carried.h"
+#include "definitions/halo_playlist_moving_hill.h"
+#include "definitions/halo_playlist_player_speed.h"
 #include "definitions/halo_playlist_score_to_win_round.h"
 #include "definitions/halo_playlist_team_scoring.h"
 #include "definitions/halo_playlist_variant_property.h"
@@ -698,21 +701,16 @@ bool c_halo_playlist_reader::process_variant_headhunter_setting(s_halo_playlist_
 			property_result = halo_playlist_item_collection_force_even_teams_write_to_variant(section_item->value_buffer, variant);
 			break;
 		case _halo_playlist_headhunter_property_uncontested_hill:
-			property_result = halo_playlist_item_collection_king_uncontested_hill_write_to_variant(section_item->value_buffer, variant);
+			property_result = halo_playlist_item_collection_headhunter_uncontested_hill_write_to_variant(section_item->value_buffer, variant);
 			break;
 		case _halo_playlist_headhunter_property_moving_hill:
-			break;
-		case _halo_playlist_headhunter_property_team_time_multiplier:
-			break;
-		case _halo_playlist_headhunter_property_extra_damage_on_hill:
-			break;
-		case _halo_playlist_headhunter_property_damage_resistance_on_hill:
-			break;
-		case _halo_playlist_headhunter_property_active_camo_on_hill:
+			property_result = halo_playlist_item_collection_headhunter_hill_move_time_write_to_variant(section_item->value_buffer, variant);
 			break;
 		case _halo_playlist_headhunter_property_max_heads_carried:
+			property_result = halo_playlist_item_collection_max_heads_carried_write_to_variant(section_item->value_buffer, variant);
 			break;
 		case _halo_playlist_headhunter_property_speed_with_heads:
+			property_result = halo_playlist_item_collection_headhunter_speed_with_heads_write_to_variant(section_item->value_buffer, variant);
 			break;
 	}
 
@@ -751,6 +749,7 @@ void c_halo_playlist_reader::process_match_section()
 
 		if (!match->minimum_players)
 			match->minimum_players = 0;
+
 		if (!match->maximum_players)
 			match->maximum_players = 16;
 
@@ -778,7 +777,6 @@ void c_halo_playlist_reader::finalize()
 {
 	INVOKE_TYPE(0, 0x12AC7, void(__thiscall*)(c_halo_playlist_reader*), this);
 }
-
 
 void halo_playlist_apply_patches()
 {

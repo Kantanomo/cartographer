@@ -61,7 +61,7 @@ void c_king_engine_globals::setup_colors()
 
 int32 c_king_engine_globals::get_next_hill_index() const
 {
-	return INVOKE_TYPE(0x10DF1E, 0xDC3CF, int32(__cdecl*)(int32), this->m_hill_id);
+	return INVOKE_TYPE(0x10DF1E, 0xDA4CE, int32(__cdecl*)(int32), this->m_hill_id);
 }
 
 void c_king_engine_globals::setup_points(uint32 hill_index)

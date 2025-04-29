@@ -20,7 +20,7 @@ int16 c_game_statborg::get_team_stat(int32 team_index, e_statborg_entry statisti
 
 int32 c_game_statborg::get_score(int32 player_index)
 {
-	return INVOKE_TYPE(0x5B1F6, 0, int32(__thiscall*)(c_game_statborg*, int32), this, player_index);
+	return INVOKE_TYPE(0x5B1F6, 0x3CE56, int32(__thiscall*)(c_game_statborg*, int32), this, player_index);
 }
 
 typedef void(__thiscall* adjust_player_stat_t)(c_game_statborg* statborg, datum, e_statborg_entry, int16, int32, bool);

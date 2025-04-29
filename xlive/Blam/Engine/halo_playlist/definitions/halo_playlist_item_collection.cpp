@@ -29,7 +29,7 @@ bool halo_playlist_item_collection_get_boolean_value(wchar_t* value, bool* out_r
 		case L'n':
 		{
 			*out_result = false;
-			return false;
+			return true;
 		}
 		case L'1':
 		case L'T':
@@ -50,7 +50,7 @@ bool halo_playlist_item_collection_get_boolean_value(wchar_t* value, bool* out_r
 			if (_wcsicmp(value, L"off") == 0)
 			{
 				*out_result = false;
-				return false;
+				return true;
 			}
 
 			return false;

@@ -36,7 +36,7 @@ bool* from_game_invite_global_get(void)
 
 void user_interface_networking_apply_patches()
 {
-    DETOUR_ATTACH(p_user_interface_squad_get_active_protocol, Memory::GetAddress<t_user_interface_squad_get_active_protocol>(0x215EA9), user_interface_squad_get_active_protocol);
+    DETOUR_ATTACH(p_user_interface_squad_get_active_protocol, Memory::GetAddress<t_user_interface_squad_get_active_protocol>(0x215EA9, 0x1FD528), user_interface_squad_get_active_protocol);
 }
 
 bool session_protocol_has_coop(e_session_protocol protocol)
