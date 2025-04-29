@@ -67,11 +67,12 @@ const wchar_t* k_online_button_text[k_language_count] =
 
 /* prototypes */
 
-bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index controller_index);
-bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index);
-bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_index controller_index);
-bool __cdecl screen_show_screen_4way_signin_xbox_live_callback();
+static bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index controller_index);
+static bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index);
+static bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_index controller_index);
+static bool __cdecl screen_show_screen_4way_signin_xbox_live_callback(void);
 
+/* public */
 
 c_main_menu_list::c_main_menu_list(int16 user_flags) :
 	c_list_widget(user_flags),
@@ -405,7 +406,9 @@ void c_main_menu_list::handle_item_quit(s_event_record** pevent)
 	return INVOKE_TYPE(0xA307, 0x0, void(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 }
 
-bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index controller_index)
+/* private code */
+
+static bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index controller_index)
 {
 	//return INVOKE(0x213673, 0x0, screen_show_campaign_options_without_achievement, controller_index);
 
@@ -425,7 +428,7 @@ bool __cdecl screen_show_campaign_options_without_achievement(e_controller_index
 	return true;
 }
 
-bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index)
+static bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index)
 {
 	online_account_transition_to_offline();
 	user_interface_transition_to_offline();
@@ -453,7 +456,7 @@ bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_ind
 	return true;
 }
 
-bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_index controller_index)
+static bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_index controller_index)
 {
 	online_account_transition_to_offline();
 	user_interface_transition_to_offline();
@@ -494,7 +497,7 @@ bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_ind
 	return true;
 }
 
-bool __cdecl screen_show_screen_4way_signin_xbox_live_callback()
+static bool __cdecl screen_show_screen_4way_signin_xbox_live_callback(void)
 {
 	if (!UserSignedOnline(_controller_index_0))
 		return true;

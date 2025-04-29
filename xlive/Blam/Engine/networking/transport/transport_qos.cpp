@@ -5,15 +5,15 @@
 
 static XNQOS placeholder_xnqos;
 
-s_data_array* transport_qos_attempts_array()
+data_array* transport_qos_attempts_array()
 {
-	return *Memory::GetAddress<s_data_array**>(0x526BF4, 0x991078);
+	return *Memory::GetAddress<data_array**>(0x526BF4, 0x991078);
 }
 
 // stub qos lookup function in-game between peers in a network session
 datum __cdecl transport_qos_target_new_hook(int a1, int a2, int a3, int a4)
 {
-	s_data_array* qos_attempts_array = transport_qos_attempts_array();
+	data_array* qos_attempts_array = transport_qos_attempts_array();
 
 	datum qos_attempt_index = datum_new(qos_attempts_array);
 	if (qos_attempt_index != NONE)

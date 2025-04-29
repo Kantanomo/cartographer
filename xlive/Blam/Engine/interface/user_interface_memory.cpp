@@ -3,7 +3,7 @@
 #include "user_interface_memory.h"
 
 
-s_data_array* __cdecl ui_list_data_new(const char* name, uint32 count, uint32 size)
+data_array* ui_list_data_new(const char* name, uint32 count, uint32 size)
 {
 	return INVOKE(0x20D1FD, 0x0, ui_list_data_new, name, count, size);
 }

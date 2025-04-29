@@ -146,8 +146,6 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 	main_time_globals->field_16[1] = *Memory::GetAddress<__int64*>(0xA3E440);
 
 	player_control_update_dt(dt_sec);
-
-	//LOG_TRACE_GAME("main_time_update() - timeDeltaSeconds: {}", timeDeltaSeconds);
 	return dt_sec;
 }
 

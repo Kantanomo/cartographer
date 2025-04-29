@@ -1,6 +1,6 @@
 #pragma once
 #include "animations/animation_manager.h"
-#include "game/players.h"
+#include "saved_games/player_profile.h"
 
 /* constants */
 

@@ -44,8 +44,8 @@ ASSERT_STRUCT_SIZE(s_game_cluster_bit_vectors, 64);
 struct cluster_partition
 {
 	int32* cluster_references;
-	s_data_array* array0;
-	s_data_array* array1;
+	data_array* array0;
+	data_array* array1;
 };
 
 /* prototypes */

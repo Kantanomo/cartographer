@@ -101,9 +101,9 @@ datum __cdecl effect_new_from_object(
     real_rgb_color* color,
     const void* effect_vector_field);
 
-s_data_array* get_effects_table();
+data_array* get_effects_table();
 
-s_data_array* get_effects_location_table();
+data_array* get_effects_location_table();
 
 real_vector3d* effect_get_velocity(datum effect_index);
 void __cdecl effect_update(datum effect_index, real32 dt);

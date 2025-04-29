@@ -11,7 +11,7 @@ struct pc_geometry_cache_geometry_block
 
 struct pc_geometry_cache_globals
 {
-	s_data_array* geometry_blocks;
+	data_array* geometry_blocks;
 	uint32 cache_base_address;
 	uint32 cache_base_address_allocation_size;
 };

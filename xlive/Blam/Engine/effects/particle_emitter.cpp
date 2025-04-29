@@ -8,9 +8,9 @@
 
 #include "camera/camera.h"
 
-s_data_array* get_particle_emitter_table()
+data_array* get_particle_emitter_table()
 {
-	return *Memory::GetAddress<s_data_array**>(0x4DD090, 0x5053B8);
+	return *Memory::GetAddress<data_array**>(0x4DD090, 0x5053B8);
 }
 
 void c_particle_emitter::adjust_matrix_and_vector_to_effect_camera(bool use_effect_camera, real_matrix3x3* out_matrix, real_vector3d* out_vector) const

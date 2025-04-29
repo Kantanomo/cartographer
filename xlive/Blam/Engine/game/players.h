@@ -186,9 +186,8 @@ struct s_player
 	- These functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (Blam/Engine/networking/session)
 	*/
 
-	static s_data_array* get_data();
+	static data_array* get_data();
 	static bool is_index_valid(datum player_index);
-	static s_player* get(datum player_index);
 	static e_game_team get_team(datum player_index);
 	static s_player* get_from_unit_index(datum unit_index);
 	static void set_team(datum player_index, e_game_team team);
@@ -202,22 +201,34 @@ struct s_player
 ASSERT_STRUCT_SIZE(s_player, 516);
 #pragma pack(pop)
 
-class player_iterator 
+class c_player_in_game_iterator 
 {
 public:
-	player_iterator();
-
-	bool get_next_active_player();
-
-	s_player* get_current_player_data() const;
-	int32 get_current_player_index() const;
-	datum get_current_player_datum_index() const;
-	wchar_t* get_current_player_name() const;
-	uint64 get_current_player_id() const;
+	c_player_in_game_iterator(void);
+	
+	bool next(void);
+	s_player* get_datum(void) const;
+	datum get_index(void) const;
+	int32 get_absolute_index(void) const;
 
 private:
 	s_player* m_current_player;
-	s_data_iterator<s_player> m_data_iterator;
+	data_iterator m_data_iterator;
+};
+
+class c_player_with_unit_iterator
+{
+public:
+	c_player_with_unit_iterator(void);
+
+	bool next(void);
+	s_player* get_datum(void) const;
+	datum get_index(void) const;
+	int32 get_absolute_index(void) const;
+
+private:
+	s_player* m_current_player;
+	data_iterator m_data_iterator;
 };
 
 struct s_persistent_weapon_data

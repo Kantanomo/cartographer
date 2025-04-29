@@ -18,9 +18,9 @@ c_particle_system_definition* c_particle_system::get_definition() const
 	return INVOKE_TYPE(0xC3CE9, 0x0, c_particle_system_definition*(__thiscall*)(const c_particle_system*), this);
 }
 
-s_data_array* get_particle_system_table()
+data_array* get_particle_system_table()
 {
-	return *Memory::GetAddress<s_data_array**>(0x4D83D4, 0x4FFEA8);
+	return *Memory::GetAddress<data_array**>(0x4D83D4, 0x4FFEA8);
 }
 
 void particle_system_update_game_time(datum datum_index)
@@ -45,7 +45,7 @@ void particle_system_reset_dt(datum datum_index)
 
 datum particle_system_get_by_ptr(c_particle_system* particle_system)
 {
-	return DATUM_INDEX_NEW(((char*)particle_system - get_particle_system_table()->data) / sizeof(c_particle_system), particle_system->datum_salt);
+	return DATUM_INDEX_NEW(((char*)particle_system - (char*)get_particle_system_table()->data) / sizeof(c_particle_system), particle_system->datum_salt);
 }
 
 void c_particle_system::destroy_children()

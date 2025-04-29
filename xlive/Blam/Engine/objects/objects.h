@@ -321,7 +321,7 @@ static T* object_get_fast_unsafe(datum object_idx)
 	return (T*)header->datum;
 }
 
-s_data_array* object_header_data_get(void);
+data_array* object_header_data_get(void);
 
 void objects_apply_patches(void);
 
@@ -408,7 +408,7 @@ void __cdecl object_delete_recursive(datum object_index, bool remove_from_map_be
 
 void __cdecl objects_garbage_collection(void);
 
-void __cdecl objects_purge_deleted_objects(void);
+void objects_purge_deleted_objects(void);
 
 void __cdecl object_get_velocities(datum object_index, real_vector3d* translational_velocity, real_vector3d* angular_velocity);
 

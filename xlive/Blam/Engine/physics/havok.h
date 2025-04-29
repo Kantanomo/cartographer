@@ -33,7 +33,7 @@ ASSERT_STRUCT_SIZE(s_havok_game_state, 4);
 
 /* prototypes */
 
-s_data_array* havok_components_get(void);
+data_array* havok_components_get(void);
 
 s_havok_game_state* havok_game_state_get(void);
 

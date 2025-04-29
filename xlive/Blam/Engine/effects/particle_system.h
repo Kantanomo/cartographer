@@ -89,7 +89,7 @@ public:
 };
 ASSERT_STRUCT_SIZE(c_particle_system, 0x54);
 
-s_data_array* get_particle_system_table();
+data_array* get_particle_system_table();
 
 void __cdecl particle_system_remove_from_effects_cache(datum effect_index, datum particle_system_index);
 

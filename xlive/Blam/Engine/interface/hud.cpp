@@ -15,8 +15,6 @@
 #include "main/main_screenshot.h"
 #include "render/render.h"
 
-#include "H2MOD/Utils/Utils.h"
-
 /* constants */
 
 #define k_redraw_map_name "ui_redraw"
@@ -147,12 +145,14 @@ void __cdecl hud_play_unit_sounds(int32 user_index)
 
 void hud_render_player_indicators(datum player_index)
 {
-	s_data_array* player_data_array = s_player::get_data();
+	data_array* player_data_array = s_player::get_data();
 	const s_player* player = (s_player*)datum_get(player_data_array, player_index);
-	if ( game_is_campaign() && !cinematic_in_progress())
+	if (game_is_campaign() && !cinematic_in_progress())
 	{
-		s_data_iterator<s_player> player_iterator(player_data_array);
-		for (s_player* current_player = player_iterator.get_next_datum(); current_player; current_player = player_iterator.get_next_datum())
+		data_iterator iterator;
+		iterator_new(&iterator, player_data_array);
+		s_player* current_player = (s_player*)iterator_next(&iterator);
+		while (current_player != NULL)
 		{
 			/* Original code still checks game engine even though the indicators are never used in multiplayer
 			* 
@@ -162,13 +162,14 @@ void hud_render_player_indicators(datum player_index)
 				is_enemy = game_engine_team_is_enemy((e_game_team)current_player->properties[0].team_index, (e_game_team)player->properties[0].team_index);
 			*/
 
-			bool is_enemy = game_engine_team_is_enemy((e_game_team)current_player->properties[0].team_index, (e_game_team)player->properties[0].team_index);
-			datum current_index = player_iterator.get_current_datum_index();
+			bool is_enemy = player->properties[0].team_index != player->properties[0].team_index;
 
-			if (current_index != player_index && !is_enemy && current_player->unit_index != NONE)
+			if (iterator.index != player_index && !is_enemy && current_player->unit_index != NONE)
 			{
-				hud_render_player_indicator(current_index);
+				hud_render_player_indicator(iterator.index);
 			}
+
+			current_player = (s_player*)iterator_next(&iterator);
 		}
 	}
 	return;

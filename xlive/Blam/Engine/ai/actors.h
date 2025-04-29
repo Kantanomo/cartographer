@@ -238,4 +238,4 @@ struct actor_datum
 };
 ASSERT_STRUCT_SIZE(actor_datum, 0x898);
 
-s_data_array* get_actor_table();
+data_array* get_actor_table();

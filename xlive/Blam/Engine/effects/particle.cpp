@@ -6,9 +6,9 @@
 #include "physics/collisions.h"
 
 
-s_data_array* get_particle_table()
+data_array* get_particle_table()
 {
-	return *Memory::GetAddress<s_data_array**>(0x4DD08C, 0x5053B4);
+	return *Memory::GetAddress<data_array**>(0x4DD08C, 0x5053B4);
 }
 
 void c_particle::adjust_initial_position(

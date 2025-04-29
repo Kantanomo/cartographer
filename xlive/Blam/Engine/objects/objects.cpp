@@ -163,9 +163,9 @@ static int sort_dumps(const dump_datum* dump1, const dump_datum* dump2);
 
 /* public code */
 
-s_data_array* object_header_data_get(void)
+data_array* object_header_data_get(void)
 {
-	return *Memory::GetAddress<s_data_array**>(0x4E461C, 0x50C8EC);
+	return *Memory::GetAddress<data_array**>(0x4E461C, 0x50C8EC);
 };
 
 void objects_apply_patches(void)
@@ -852,17 +852,22 @@ void __cdecl objects_garbage_collection(void)
 	return;
 }
 
-void __cdecl objects_purge_deleted_objects(void)
+void objects_purge_deleted_objects(void)
 {
-	s_data_iterator<object_header_datum> object_header_it(object_header_data_get());
-	while (object_header_it.get_next_datum())
+	data_iterator object_header_it;
+	iterator_new(&object_header_it, object_header_data_get());
+
+	const object_header_datum* object_header = (object_header_datum*)iterator_next(&object_header_it);
+
+	while (object_header)
 	{
-		object_header_datum* object_header = object_header_it.get_current_datum();
 		if (object_header->flags.test(_object_header_being_deleted_bit))
 		{
-			object_pre_delete_recursive(object_header_it.get_current_datum_index());
-			object_delete_recursive(object_header_it.get_current_datum_index(), true);
+			object_pre_delete_recursive(object_header_it.index);
+			object_delete_recursive(object_header_it.index, true);
 		}
+
+		object_header = (object_header_datum*)iterator_next(&object_header_it);
 	}
 	return;
 }
@@ -889,11 +894,14 @@ void __cdecl objects_post_update(void)
 {
 	object_globals_get()->objects_updating = true;
 
-	s_data_iterator<object_header_datum> object_header_it(object_header_data_get());
-	while (object_header_it.get_next_datum())
+	data_iterator iterator;
+	iterator_new(&iterator, object_header_data_get());
+
+	object_header_datum* object_header = (object_header_datum*)iterator_next(&iterator);
+
+	while (object_header)
 	{
-		object_header_datum* object_header = object_header_it.get_current_datum();
-		object_datum* object = object_get_fast_unsafe(object_header_it.get_current_datum_index());
+		object_datum* object = object_get_fast_unsafe(iterator.index);
 
 		object_header->flags.set(_object_header_do_not_update_bit, false);
 
@@ -905,10 +913,10 @@ void __cdecl objects_post_update(void)
 		{
 			object_header->flags.set(_object_header_post_update_bit, false);
 			
-			object_update(object_header_it.get_current_datum_index());
+			object_update(iterator.index);
 
 			if (object_header->flags.test(_object_header_requires_motion_bit))
-				object_move(object_header_it.get_current_datum_index());
+				object_move(iterator.index);
 		}
 
 		if (object_header->flags.test(_object_header_active_bit)
@@ -919,9 +927,11 @@ void __cdecl objects_post_update(void)
 			{
 				// reset the interpolator for this object, if hidden
 				// ### FIXME maybe hook object_hide and reset it there?
-				object_initialize_for_interpolation(object_header_it.get_current_datum_index());
+				object_initialize_for_interpolation(iterator.index);
 			}
 		}
+
+		object_header = (object_header_datum*)iterator_next(&iterator);
 	}
 
 	weapons_fire_barrels();
@@ -974,10 +984,10 @@ void objects_information_get(objects_information* information)
 {
 	csmemset(information, 0, sizeof(objects_information));
 	
-	s_data_array* header_data = object_header_data_get();
+	data_array* header_data = object_header_data_get();
 	object_header_datum* header = (object_header_datum*)header_data->data;
 
-	for (int16 index = 0; index < (int16)header_data->next_unused_index; ++index)
+	for (int16 index = 0; index < (int16)header_data->first_free_absolute_index; ++index)
 	{
 		if (header->identifier)
 		{

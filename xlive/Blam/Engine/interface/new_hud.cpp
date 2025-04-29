@@ -100,8 +100,9 @@ bool __cdecl render_ingame_chat_check(void)
 {
 	if (H2Config_hide_ingame_chat)
 	{
-		datum local_player_datum_index = player_index_from_user_index(0);
-		if (local_player_datum_index != NONE && s_player::get(local_player_datum_index)->is_chatting == 2)
+		const s_player* player = (s_player*)datum_get(s_player::get_data(), player_index_from_user_index(0));
+
+		if (player->is_chatting == 2)
 		{
 			hotkeyFuncToggleHideIngameChat();
 		}
