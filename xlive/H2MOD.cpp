@@ -629,12 +629,6 @@ static void h2mod_apply_hooks(void)
 	// disable part of custom map tag verification
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
 
-	//Disable lightsupressor function
-	if (H2Config_light_suppressor)
-	{
-		NopFill(Memory::GetAddress(0x1922d9), 7);
-	}
-
 	cheats_apply_patches();
 	main_apply_patches();
 	main_game_time_apply_patches();
@@ -676,6 +670,14 @@ static void h2mod_apply_hooks(void)
 
 		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
 
+		// TODO: write proper patch for this so it can be toggled mid-game
+		// Disable lightsupressor function
+
+		if (H2Config_light_suppressor)
+		{
+			NopFill(Memory::GetAddress(0x1922d9), 7);
+		}
+
 		// ### TODO dedi offset
 		Codecave(Memory::GetAddress(0x15E8DC, 0x0), object_function_value_adjust_primary_firing, 4);
 
@@ -685,6 +687,8 @@ static void h2mod_apply_hooks(void)
 		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Memory::GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
 		PatchCall(Memory::GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
+
+		hs_apply_patches();
 
 		new_hud_apply_patches();
 		motion_sensor_apply_patches();
