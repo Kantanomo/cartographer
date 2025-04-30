@@ -4,9 +4,10 @@
 
 #include "cartographer/twizzler/twizzler.h"
 
-#include "networking/session/network_session.h"
-#include "networking/session/network_observer.h"
 #include "networking/delivery/network_channel.h"
+#include "networking/session/network_session.h"
+#include "networking/Session/network_session_manager.h"
+#include "networking/session/network_observer.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -19,12 +20,12 @@
 
 typedef void(__stdcall* t_read_channel_message)(c_network_message_handler* thisx, int32 network_channel_index, e_network_message_type_collection message_type, int32 message_storage_size, uint8* packet);
 
-typedef void(__stdcall* t_handle_out_of_band_message)(c_network_message_handler* thisx, network_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet);
+typedef void(__stdcall* t_handle_out_of_band_message)(c_network_message_handler* thisx, transport_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet);
 
 /* prototypes */
 void network_message_handler_apply_patches();
 
-static void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx, network_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet);
+static void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx, transport_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet);
 static void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32 network_channel_index, e_network_message_type_collection message_type, int32 message_storage_size, uint8* packet);
 
 /* globals */
@@ -42,7 +43,7 @@ void network_message_handler_apply_patches()
 
 /* private code */
 
-void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx, network_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet)
+void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx, transport_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet)
 {
 	c_network_session* session;
 	if (network_life_cycle_in_squad_session(&session))
@@ -62,7 +63,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 		This handles received in-band data
 	*/
 
-	network_address addr{};
+	transport_address addr{};
 	s_network_channel* peer_network_channel = s_network_channel::get(network_channel_index);
 
 	switch (message_type)
@@ -170,7 +171,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 /* ### TODO move these handlers to separate files */
 /* ### TODO move this to cartographer session */
 
-void c_network_message_handler::handle_request_map_filename(const network_address* address, const s_network_message_request_map_filename* received_data)
+void c_network_message_handler::handle_request_map_filename(const transport_address* address, const s_network_message_request_map_filename* received_data)
 {
 	c_network_session* session = m_session_manager->get_network_session_by_id(&received_data->session_data.session_id);
 	if (session)
@@ -211,7 +212,7 @@ void c_network_message_handler::handle_request_map_filename(const network_addres
 	}
 }
 
-void c_network_message_handler::handle_map_filename_response(const network_address* address, int32 channel_index, const s_network_message_custom_map_filename* received_data)
+void c_network_message_handler::handle_map_filename_response(const transport_address* address, int32 channel_index, const s_network_message_custom_map_filename* received_data)
 {
 	c_network_session* session = m_session_manager->get_network_session_by_id(&received_data->session_data.session_id);
 	if (session)
@@ -237,7 +238,7 @@ void c_network_message_handler::handle_map_filename_response(const network_addre
 	}
 }
 
-void c_network_message_handler::handle_player_property_rank(const network_address* address, int32 channel_index, const s_network_message_rank_change* received_data)
+void c_network_message_handler::handle_player_property_rank(const transport_address* address, int32 channel_index, const s_network_message_rank_change* received_data)
 {
 	c_network_session* session = m_session_manager->get_network_session_by_id(&received_data->session_data.session_id);
 	if (session)
@@ -251,7 +252,7 @@ void c_network_message_handler::handle_player_property_rank(const network_addres
 	}
 }
 
-void c_network_message_handler::handle_session_anticheat_status(const network_address* address, int32 channel_index, const s_network_message_anti_cheat* received_data)
+void c_network_message_handler::handle_session_anticheat_status(const transport_address* address, int32 channel_index, const s_network_message_anti_cheat* received_data)
 {
 	c_network_session* session = m_session_manager->get_network_session_by_id(&received_data->session_data.session_id);
 	if (session)
@@ -263,7 +264,7 @@ void c_network_message_handler::handle_session_anticheat_status(const network_ad
 	}
 }
 
-void c_network_message_handler::handle_session_custom_variant_settings(const network_address* address, int32 channel_index, const s_network_message_session_custom_variant_settings* received_data)
+void c_network_message_handler::handle_session_custom_variant_settings(const transport_address* address, int32 channel_index, const s_network_message_session_custom_variant_settings* received_data)
 {
 	c_network_session* session = m_session_manager->get_network_session_by_id(&received_data->session_data.session_id);
 	if (session)
@@ -275,7 +276,7 @@ void c_network_message_handler::handle_session_custom_variant_settings(const net
 	}
 }
 
-void c_network_message_handler::handle_leave_session(const network_address* address, const s_network_message_session_data* received_data)
+void c_network_message_handler::handle_leave_session(const transport_address* address, const s_network_message_session_data* received_data)
 {
 	c_network_session* session = m_session_manager->get_network_session_by_id(&received_data->session_id);
 	if (session)
@@ -290,7 +291,7 @@ void c_network_message_handler::handle_leave_session(const network_address* addr
 	}
 }
 
-void c_network_message_handler::handle_membership_update(const network_address* address, int32 channel_index, const s_network_message_session_data* received_data)
+void c_network_message_handler::handle_membership_update(const transport_address* address, int32 channel_index, const s_network_message_session_data* received_data)
 {
 	c_network_session* session = m_session_manager->get_network_session_by_id(&received_data->session_id);
 	if (session)
@@ -302,7 +303,7 @@ void c_network_message_handler::handle_membership_update(const network_address* 
 	}
 }
 
-void c_network_message_handler::handle_player_add(const network_address* address, const s_network_message_session_data* received_data)
+void c_network_message_handler::handle_player_add(const transport_address* address, const s_network_message_session_data* received_data)
 {
 	c_network_session* session = m_session_manager->get_network_session_by_id(&received_data->session_id);
 	if (session)

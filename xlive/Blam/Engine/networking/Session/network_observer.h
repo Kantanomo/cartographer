@@ -73,7 +73,7 @@ struct alignas(8) s_observer_channel
 	int32 field_50;
 	int32 field_54;
 	int32 field_58;
-	network_address address;
+	transport_address address;
 	datum qos_attempt_index;
 	s_qos_attempt_data qos_attempt;
 	int32 field_94;
@@ -155,7 +155,7 @@ struct alignas(8) s_observer_channel
 };
 ASSERT_STRUCT_SIZE(s_observer_channel, 0x740);
 
-struct alignas(8) c_network_observer
+class alignas(8) c_network_observer
 {
 public:
 	void* vtbl;

@@ -21,7 +21,7 @@ enum e_transport_platform : int32
 
 /* structures */
 
-struct network_address
+struct transport_address
 {
 	union
 	{
@@ -31,7 +31,7 @@ struct network_address
 	short port;
 	short address_type;
 };
-ASSERT_STRUCT_SIZE(network_address, 20);
+ASSERT_STRUCT_SIZE(transport_address, 20);
 
 struct s_transport_globals
 {
@@ -56,3 +56,9 @@ s_transport_globals* transport_globals_get(void);
 bool transport_available(void);
 
 int32 __cdecl transport_get_packet_overhead_hook(int32 transport_type);
+
+void __cdecl transport_register_transition_functions(
+	void* startup_func,
+	void* shutdown_func,
+	void* reset_func,
+	void* reset_parameter);

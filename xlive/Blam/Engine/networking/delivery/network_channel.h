@@ -60,8 +60,8 @@ struct alignas(8) s_network_channel
 	int32 identifier;
 	e_network_channel_state channel_state;
 	e_network_channel_closure_reason closure_reason;
-	network_address old_address;
-	network_address address;
+	transport_address old_address;
+	transport_address address;
 	int8 field_84;
 	int8 gap_85[3];
 	int32 network_connect_start_timepoint;
@@ -78,7 +78,7 @@ struct alignas(8) s_network_channel
 	int8 gap[10];
 
 	static s_network_channel* get(int32 channel_index);
-	bool get_network_address(network_address* address_out);
+	bool get_network_address(transport_address* address_out);
 
 	bool has_simulation_interface() const { return simulation_interface != NULL; }
 	bool is_simulation_authority() const { return has_simulation_interface() && *(bool*)((uint8*)simulation_interface + 48); }

@@ -8,12 +8,12 @@ s_network_channel* s_network_channel::get(int32 channel_index)
 	return &network_channels[channel_index];
 }
 
-bool s_network_channel::get_network_address(network_address* address_out)
+bool s_network_channel::get_network_address(transport_address* address_out)
 {
 	bool result = false;
 	if (channel_state >= _network_channel_state_2)
 	{
-		csmemcpy(address_out, &address, sizeof(network_address));
+		csmemcpy(address_out, &address, sizeof(transport_address));
 		result = true;
 	}
 
