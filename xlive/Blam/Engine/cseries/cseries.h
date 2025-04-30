@@ -152,17 +152,24 @@ static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") e
 static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET ") for " #FIELD " is invalid");
 
 #ifdef ASSERTS_ENABLED
-#define ASSERT_TRIGGER_EXCEPTION()	\
-if (is_debugger_present())			\
-	__debugbreak();					\
-else if (!g_catch_exceptions)		\
-	exit(-1);						\
+#define ASSERT_TRIGGER_EXCEPTION(IS_EXCEPTION)			\
+if (IS_EXCEPTION)										\
+{														\
+	if (!is_debugger_present() && g_catch_exceptions)	\
+		exit(-1);                                       \
+	else                                                \
+		__debugbreak();                                 \
+}														\
+else													\
+{														\
+	if (is_debugger_present() || !g_catch_exceptions)	\
+		__debugbreak();									\
+}														\
 (void)0
 
-
-#define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)       \
-display_assert(STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);   \
-ASSERT_TRIGGER_EXCEPTION();										\
+#define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)		\
+display_assert(STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);	\
+ASSERT_TRIGGER_EXCEPTION(IS_EXCEPTION);							\
 (void)0
 
 #define DISPLAY_ASSERT(STATEMENT)			\
@@ -212,7 +219,7 @@ void* csmemcpy(void* destination, const void* source, size_t size);
 
 int csmemcmp(const void* p1, const void* p2, size_t size);
 
-int32 vsprintf(char* buffer, size_t size, const char* format, va_list va_args);
+int32 vsprintf(char* buffer, size_t size, const char* format, char* ap);
 
 /* 
 * NOTES:
@@ -241,3 +248,6 @@ char* csstrnupr(char* s, size_t size);
 int32 csstricmp(const char* s1, const char* s2);
 
 int32 csstrncmp(const char* s1, const char* s2, size_t size);
+
+// Convert string to lowercase
+char* csstrnlwr(char* s, size_t size);

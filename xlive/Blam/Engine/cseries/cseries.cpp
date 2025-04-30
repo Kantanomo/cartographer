@@ -119,13 +119,13 @@ int csmemcmp(const void* p1, const void* p2, size_t size)
 	return memcmp(p1, p2, size);
 }
 
-int32 vsprintf(char* buffer, size_t size, const char* format, va_list va_args)
+int32 vsprintf(char* buffer, size_t size, const char* format, char* ap)
 {
 	ASSERT(buffer);
 	ASSERT(format);
 	ASSERT(size > 0);
 
-	const int32 result = (int32)_vsnprintf_s(buffer, size, _TRUNCATE, format, va_args);
+	const int32 result = (int32)_vsnprintf_s(buffer, size, _TRUNCATE, format, ap);
 	return result;
 }
 
@@ -215,4 +215,25 @@ int32 csstrncmp(const char* s1, const char* s2, size_t size)
 	ASSERT(s1 && s2);
 	ASSERT(size >= 0 && size < MAXIMUM_STRING_SIZE);
 	return strncmp(s1, s2, size);
+}
+
+char* csstrnlwr(char* s, size_t size)
+{
+	ASSERT(s);
+	ASSERT(size >= 0 && size < MAXIMUM_STRING_SIZE);
+
+	char* current_ptr = s;
+	while (current_ptr[0] != '\0' && size != 0)
+	{
+		// Only convert to lowercase if we're a capital character
+		if (current_ptr[0] >= 'A' && current_ptr[0] <= 'Z')
+		{
+			current_ptr[0] += ' ';
+		}
+
+		++current_ptr;
+		--size;
+	}
+
+	return s;
 }
