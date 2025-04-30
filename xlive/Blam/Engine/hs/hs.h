@@ -126,3 +126,7 @@ struct HaloScriptCommand
 	WORD arg_count;
 	e_hs_type arg_array[1]; // array size is dynamic, but always at least one
 };
+
+/* prototypes */
+
+void hs_apply_patches(void);
