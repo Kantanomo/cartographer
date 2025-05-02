@@ -10,10 +10,22 @@
 #include "main/interpolator.h"
 #include "models/models.h"
 #include "models/render_model_definitions.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "tag_files/global_string_ids.h"
 #include "units/units.h"
 
-bool show_first_person = true;
+/* constants */
+
+enum
+{
+	k_fp_needler_animation_max_rounds_loaded = 44
+};
+
+/* globals */
+
+bool g_show_first_person = true;
+
+/* prototypes */
 
 void __cdecl first_person_weapon_update(int32 user_index, int32 weapon_slot);
 void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_slot);
@@ -32,6 +44,8 @@ void first_person_weapon_build_model_nodes(int32 node_matrices_count,
 	int32* node_remapping_table,
 	s_first_person_model_data* fp_model_data);
 void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* model_data_1, s_first_person_model_data* model_data_2);
+
+/* public code */
 
 s_first_person_weapon* first_person_weapon_get_global(void)
 {
@@ -86,7 +100,7 @@ s_first_person_model_data* first_person_model_data_get(uint32 user_index)
 
 void toggle_first_person(bool state)
 {
-	show_first_person = state;
+	g_show_first_person = state;
 	return;
 }
 
@@ -100,7 +114,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 {
 	s_first_person_weapon* fp_data = first_person_weapons_get(user_index);
 	s_first_person_weapon_data* weapon_data = &fp_data->weapons[weapon_slot];
-	datum weapon_index = weapon_data->weapon_index;
+	const datum weapon_index = weapon_data->weapon_index;
 	if (weapon_index != NONE)
 	{
 		s_game_globals* game_globals = scenario_get_game_globals();
@@ -403,14 +417,14 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 					int16 ammunition_result = weapon->weapon.magazines[0].field_4 - weapon->weapon.magazines[0].field_2;
 
 					int16 ammunition_frame_position;
-					if (ammunition_result < 44)
+					if (ammunition_result < k_fp_needler_animation_max_rounds_loaded)
 					{
 						ammunition_frame_position = weapon->weapon.magazines[0].rounds_loaded_maximum;
 					}
 					else
 					{
 						weapon_magazine_definition* magazine = weapon_definition->weapon.magazines[0];
-						ammunition_result -= 44;
+						ammunition_result -= k_fp_needler_animation_max_rounds_loaded;
 
 						real32 v1 = ((ammunition_result * 0.2f) <= 1.f ? ammunition_result * 0.2f : 1.f);
 
@@ -476,18 +490,31 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 			halo_interpolator_setup_weapon_data(user_index, first_person_weapon_interface->animations.index, weapon_slot, weapon_data->nodes, weapon_data->node_matrices_count);
 			if (!weapon_slot)
 			{
-				int32 adjustment_matrix_index = fp_data->adjustment_matrix_index;
-				if (adjustment_matrix_index == NONE)
+				const int32 adjustment_matrix_index = fp_data->adjustment_matrix_index;
+				const bool valid_adjustment_matrix_index = adjustment_matrix_index != NONE;
+				
+				SET_FLAG(fp_data->flags, _first_person_weapon_valid_adjustment_matrix_bit, valid_adjustment_matrix_index);
+				if (valid_adjustment_matrix_index)
 				{
-					SET_FLAG(fp_data->flags, 2, false);
-				}
-				else
-				{
-					csmemcpy(&fp_data->adjustment_matrix, &weapon_data->nodes[adjustment_matrix_index], sizeof(fp_data->adjustment_matrix));
-					fp_data->adjustment_matrix.position.x = fp_data->adjustment_matrix.position.x - weapon_definition->weapon.first_person_weapon_offset.x;
-					fp_data->adjustment_matrix.position.y = fp_data->adjustment_matrix.position.y - weapon_definition->weapon.first_person_weapon_offset.y;
-					fp_data->adjustment_matrix.position.z = fp_data->adjustment_matrix.position.z - weapon_definition->weapon.first_person_weapon_offset.z;
-					SET_FLAG(fp_data->flags, 2, true);
+					// Grab the weapon offset from the cartographer config from the current weapon index
+					// If the weapon doesn't exist then use the default weapon offset from the weapon tag
+					const s_saved_game_cartographer_player_profile* player_profile = cartographer_player_profile_get_by_user_index(user_index);
+					const e_weapon_offset_weapon weapon_offset_index = cartographer_player_profile_weapon_offsets_get_weapon_index_from_tag_index(weapon->definition_index);
+					
+					const real_point3d* weapon_offset;
+					if (weapon_offset_index != NONE)
+					{
+						weapon_offset = &player_profile->weapon_offsets[weapon_offset_index];
+					}
+					else
+					{
+						weapon_offset = &weapon_definition->weapon.first_person_weapon_offset;
+					}
+
+					fp_data->adjustment_matrix = weapon_data->nodes[adjustment_matrix_index];
+					fp_data->adjustment_matrix.position.x = fp_data->adjustment_matrix.position.x - weapon_offset->x;
+					fp_data->adjustment_matrix.position.y = fp_data->adjustment_matrix.position.y - weapon_offset->y;
+					fp_data->adjustment_matrix.position.z = fp_data->adjustment_matrix.position.z - weapon_offset->z;
 					halo_interpolator_set_target_position_data(user_index, 1, &fp_data->adjustment_matrix);
 				}
 			}
@@ -581,7 +608,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 	// 1. global bool to show first person is enabled
 	// 2. Blind skull isn't enabled
 	// 3. User index is not NONE
-	if (show_first_person
+	if (g_show_first_person
 		&& !ice_cream_flavor_available(_skull_type_blind) 
 		&& user_index != NONE)
 	{

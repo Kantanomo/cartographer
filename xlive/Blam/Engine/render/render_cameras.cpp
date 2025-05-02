@@ -3,7 +3,6 @@
 
 #include "render.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 /* prototypes */

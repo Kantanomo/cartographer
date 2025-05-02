@@ -19,23 +19,32 @@
 
 /* constants */
 
-#define k_cartographer_profile_signature 'cart'
+enum
+{
+	k_cartographer_profile_signature = 'cart'
+};
 
-const wchar_t* k_cartographer_bin_name = L"cartographer_profile";
+static const wchar_t k_cartographer_bin_name[] = L"cartographer_profile";
 
 /* globals */
 
 s_saved_game_cartographer_player_profile g_default_cartographer_profile = {};
 s_cartographer_profile_run_time g_cartographer_profiles[k_number_of_controllers] = {};
 
-/* private prototypes */
+/* prototypes */
+
+static void cartographer_player_profile_header_new(s_saved_game_cartographer_player_profile_main_header* header, e_saved_game_cartographer_player_profile_version version);
 
 static void cartographer_player_profile_new(s_saved_game_cartographer_player_profile_v1* settings);
 
 static void cartographer_player_profile_new(s_saved_game_cartographer_player_profile_v2* settings);
 
+static void cartographer_player_profile_new(s_saved_game_cartographer_player_profile_v3* settings);
+
 // when creating a newer version of the cartographer profile create a function that can upgrade from the previous version to the new one
-static void cartographer_player_profile_upgrade_to_v2(s_saved_game_cartographer_player_profile* settings);
+static void cartographer_player_profile_upgrade_to_v2(s_saved_game_cartographer_player_profile_v1* settings);
+
+static void cartographer_player_profile_upgrade_to_v3(s_saved_game_cartographer_player_profile_v2* settings);
 
 static bool cartographer_player_profile_upgrade_check(s_saved_game_cartographer_player_profile* settings, bool* out_upgrade_performed);
 
@@ -191,17 +200,22 @@ void cartographer_player_profile_save(e_controller_index controller_index)
 
 /* private code */
 
+static void cartographer_player_profile_header_new(s_saved_game_cartographer_player_profile_main_header* header, e_saved_game_cartographer_player_profile_version version)
+{
+	header->version = version;
+	header->signature = k_cartographer_profile_signature;
+	return;
+}
+
 static void cartographer_player_profile_new(s_saved_game_cartographer_player_profile_v1* settings)
 {
-	settings->header.version = _saved_game_cartographer_player_profile_version_1;
-	settings->header.signature = k_cartographer_profile_signature;
+	cartographer_player_profile_header_new(&settings->header, _saved_game_cartographer_player_profile_version_1);
 	return;
 }
 
 static void cartographer_player_profile_new(s_saved_game_cartographer_player_profile_v2* settings)
 {
-	settings->header.version = _saved_game_cartographer_player_profile_version_2;
-	settings->header.signature = k_cartographer_profile_signature;
+	cartographer_player_profile_header_new(&settings->header, _saved_game_cartographer_player_profile_version_2);
 
 	settings->field_of_view = 78;
 	settings->vehicle_field_of_view = 78;
@@ -213,8 +227,7 @@ static void cartographer_player_profile_new(s_saved_game_cartographer_player_pro
 	settings->controller_sensitivity = 0.f;
 	settings->controller_modern = false;
 	settings->controller_deadzone_type = _controller_deadzone_type_axial;
-	settings->deadzone_axial.x = k_default_right_thumbstick_deadzone_axial_percentage.x;
-	settings->deadzone_axial.y = k_default_right_thumbstick_deadzone_axial_percentage.y;
+	settings->deadzone_axial = k_default_right_thumbstick_deadzone_axial_percentage;
 	// set this default to 8 percent
 	settings->deadzone_radial = k_default_right_thumbstick_deadzone_radial_percentage;
 	settings->crosshair_offset = 0.138f;
@@ -222,14 +235,69 @@ static void cartographer_player_profile_new(s_saved_game_cartographer_player_pro
 	return;
 }
 
-static void cartographer_player_profile_upgrade_to_v2(s_saved_game_cartographer_player_profile* settings)
+static void cartographer_player_profile_new(s_saved_game_cartographer_player_profile_v3* settings)
 {
-	cartographer_player_profile_new(settings);
+	cartographer_player_profile_header_new(&settings->header, _saved_game_cartographer_player_profile_version_3);
+
+	settings->field_of_view = 78;
+	settings->vehicle_field_of_view = 78;
+	settings->static_first_person = false;
+	settings->mouse_sensitivity = 0.f;
+	settings->raw_mouse_sensitivity = 25.f;
+	settings->mouse_uniform = false;
+	settings->raw_mouse_input = false;
+	settings->controller_sensitivity = 0.f;
+	settings->controller_modern = false;
+	settings->controller_deadzone_type = _controller_deadzone_type_axial;
+	settings->deadzone_axial = k_default_right_thumbstick_deadzone_axial_percentage;
+
+	// set this default to 8 percent
+	settings->deadzone_radial = k_default_right_thumbstick_deadzone_radial_percentage;
+	settings->crosshair_offset = 0.138f;
+	settings->crosshair_scale = 1.f;
+
+	for (size_t i = 0; i < k_weapon_offset_weapon_count; ++i)
+	{
+		settings->weapon_offsets[i] = k_weapon_offset_constant_data[i].default_offset;
+	}
+
+	return;
+}
+
+static void cartographer_player_profile_upgrade_to_v2(s_saved_game_cartographer_player_profile_v1* settings)
+{
+	cartographer_player_profile_new((s_saved_game_cartographer_player_profile_v2*)settings);
+	return;
+}
+
+static void cartographer_player_profile_upgrade_to_v3(s_saved_game_cartographer_player_profile_v2* settings)
+{
+	s_saved_game_cartographer_player_profile_v2 old_settings = *settings;
+	s_saved_game_cartographer_player_profile_v3* new_settings = (s_saved_game_cartographer_player_profile_v3*)settings;
+
+	cartographer_player_profile_new((s_saved_game_cartographer_player_profile_v3*)new_settings);
+
+	new_settings->field_of_view = old_settings.field_of_view;
+	new_settings->vehicle_field_of_view = old_settings.vehicle_field_of_view;
+	new_settings->static_first_person = old_settings.static_first_person;
+	new_settings->mouse_sensitivity = old_settings.mouse_sensitivity;
+	new_settings->raw_mouse_sensitivity = old_settings.raw_mouse_sensitivity;
+	new_settings->mouse_uniform = old_settings.mouse_uniform;
+	new_settings->raw_mouse_input = old_settings.raw_mouse_input;
+	new_settings->controller_sensitivity = old_settings.controller_sensitivity;
+	new_settings->custom_layout = old_settings.custom_layout;
+	new_settings->controller_modern = old_settings.controller_modern;
+	new_settings->controller_deadzone_type = old_settings.controller_deadzone_type;
+	new_settings->deadzone_axial = old_settings.deadzone_axial;
+	new_settings->deadzone_radial = old_settings.deadzone_radial;
+	new_settings->crosshair_offset = old_settings.crosshair_offset;
+	new_settings->crosshair_scale = old_settings.crosshair_scale;
 	return;
 }
 
 static bool cartographer_player_profile_upgrade_check(s_saved_game_cartographer_player_profile* settings, bool* out_upgrade_performed)
 {
+	bool result = true;
 	uint32 upgrade_iterations = 0;
 
 	while(settings->header.version != k_cartographer_profile_version)
@@ -238,23 +306,30 @@ static bool cartographer_player_profile_upgrade_check(s_saved_game_cartographer_
 		switch(settings->header.version)
 		{
 		case _saved_game_cartographer_player_profile_version_1:
-			cartographer_player_profile_upgrade_to_v2(settings);
+			cartographer_player_profile_upgrade_to_v2((s_saved_game_cartographer_player_profile_v1*)settings);
 			*out_upgrade_performed = true;
 			break;
 		case _saved_game_cartographer_player_profile_version_2:
+			cartographer_player_profile_upgrade_to_v3((s_saved_game_cartographer_player_profile_v2*)settings);
+			*out_upgrade_performed = true;
+			break;
+		case _saved_game_cartographer_player_profile_version_3:
 			break;
 		default:
 			DISPLAY_ASSERT("A cartographer profile version that was un-expected was reached during upgrading!!!");
-			return false;
+			result = false;
+			break;
 		}
 
 		if(++upgrade_iterations == k_saved_game_cartographer_player_profile_version_count)
 		{
 			DISPLAY_ASSERT("Maximum iterations of possible cartographer profile upgrades was reached without success, assuming profile is corrupt.");
-			return false;
+			result = false;
+			break;
 		}
 	}
-	return true;
+
+	return result;
 }
 
 static bool cartographer_player_profile_verify(s_saved_game_cartographer_player_profile* settings, e_saved_game_cartographer_player_profile_version* out_version)

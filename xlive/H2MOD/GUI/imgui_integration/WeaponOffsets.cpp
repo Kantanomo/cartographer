@@ -2,36 +2,23 @@
 
 #include "WeaponOffsetsStringTable.h"
 
-#include "cache/cache_files.h"
-
 #include "game/game.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
-#include "H2MOD/Modules/WeaponOffsets/WeaponOffsetConfig.h"
 
 #include "imgui.h"
 
 /* globals */
 
-c_static_string<256> g_weapon_offsets_temp_string;
+static c_static_string<256> g_weapon_offsets_temp_string;
 
 /* prototypes */
 
-const char* weapon_offsets_get_string(e_weapon_offsets_string string, const char* id = NULL);
+static const char* weapon_offsets_get_string(e_weapon_offsets_string string, const char* id = NULL);
 
 namespace ImGuiHandler {
-	namespace WeaponOffsets {
-		s_weapon_custom_offset g_weap_offset_data[16]
-		{
-			{{{0,0,0}}, NULL}
-		};
-
-		void ApplyOffset(size_t weapon)
-		{
-			if (g_weap_offset_data[weapon].tag != nullptr)
-			{
-				g_weap_offset_data[weapon].tag->weapon.first_person_weapon_offset = g_weap_offset_data[weapon].modified_offset;
-			}
-		}
+	namespace WeaponOffsets
+	{
 		namespace
 		{
 			void OffsetMenu(e_weapon_offset_weapon weapon, const char* slider, e_weapon_offsets_string text, float& offset, float default_value)
@@ -45,23 +32,20 @@ namespace ImGuiHandler {
 				ImGui::Text(weapon_offsets_get_string(text));
 				ImGui::PushItemWidth(WidthPercentage(60));
 				ImGui::SliderFloat(slider, &offset, -0.15f, 0.15f, ""); ImGui::SameLine();
-				if (ImGui::IsItemEdited() && g_weap_offset_data[weapon].tag != nullptr) { ApplyOffset(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));
 				ImGui::InputFloat(sliderId.c_str(), &offset, -0.15f, 0.15f, "%.3f"); ImGui::SameLine();
-				if (ImGui::IsItemEdited() && g_weap_offset_data[weapon].tag != nullptr) { ApplyOffset(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));
 				if (ImGui::Button(weapon_offsets_get_string(_weapon_offsets_string_reset, buttonId.c_str()), b2_size))
 				{
 					offset = default_value;
-					if (g_weap_offset_data[weapon].tag != nullptr) { ApplyOffset(weapon); }
 				}
 				ImGui::PopItemWidth();
 			}
 			void OffsetSettings()
 			{
-				static int selectedOption = _weapon_offset_weapon_battle_rifle;
+				static e_weapon_offset_weapon selected_weapon = _weapon_offset_weapon_battle_rifle;
 
 				// Populate weapon string list
 				const char* weapons[k_weapon_offsets_weapon_title_count];
@@ -73,13 +57,10 @@ namespace ImGuiHandler {
 				}
 
 				// Setup combo box menus for each weapon
-				ImGui::Combo(weapon_offsets_get_string(_weapon_offsets_string_combo_title), &selectedOption, weapons, k_weapon_offset_weapon_count);
-				OffsetMenu((e_weapon_offset_weapon)selectedOption, "##OffsetX", _weapon_offsets_string_weapon_offset_x,
-					g_weap_offset_data[selectedOption].modified_offset.x, k_weapon_custom_offset_constant_data[selectedOption].default_offset.x);
-				OffsetMenu((e_weapon_offset_weapon)selectedOption, "##OffsetY", _weapon_offsets_string_weapon_offset_y,
-					g_weap_offset_data[selectedOption].modified_offset.y, k_weapon_custom_offset_constant_data[selectedOption].default_offset.y);
-				OffsetMenu((e_weapon_offset_weapon)selectedOption, "##OffsetZ", _weapon_offsets_string_weapon_offset_z,
-					g_weap_offset_data[selectedOption].modified_offset.z, k_weapon_custom_offset_constant_data[selectedOption].default_offset.z);
+				ImGui::Combo(weapon_offsets_get_string(_weapon_offsets_string_combo_title), (int*)&selected_weapon, weapons, k_weapon_offset_weapon_count);
+				OffsetMenu(selected_weapon, "##OffsetX", _weapon_offsets_string_weapon_offset_x, g_advanced_settings_current_cartographer_profile->weapon_offsets[selected_weapon].x, k_weapon_offset_constant_data[selected_weapon].default_offset.x);
+				OffsetMenu(selected_weapon, "##OffsetY", _weapon_offsets_string_weapon_offset_y, g_advanced_settings_current_cartographer_profile->weapon_offsets[selected_weapon].y, k_weapon_offset_constant_data[selected_weapon].default_offset.y);
+				OffsetMenu(selected_weapon, "##OffsetZ", _weapon_offsets_string_weapon_offset_z, g_advanced_settings_current_cartographer_profile->weapon_offsets[selected_weapon].z, k_weapon_offset_constant_data[selected_weapon].default_offset.z);
 			}
 		}
 
@@ -88,16 +69,15 @@ namespace ImGuiHandler {
 			bool open = *p_open;
 			
 			ImGuiIO& io = ImGui::GetIO();
-			ImGuiWindowFlags window_flags = 0
-				| ImGuiWindowFlags_NoCollapse
-				| ImGuiWindowFlags_AlwaysVerticalScrollbar
-				;
+			ImGuiWindowFlags window_flags = 0 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysVerticalScrollbar;
 			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
 			ImGui::SetNextWindowSize(ImVec2(450, 320), ImGuiCond_Appearing);
 			ImGui::SetNextWindowSizeConstraints(ImVec2(410, 320), ImVec2(1920, 1080));
 			if (game_is_ui_shell())
+			{
 				ImGui::SetNextWindowBgAlpha(1);
+			}
 			if (ImGui::Begin(weapon_offsets_get_string(_weapon_offsets_string_title), &open, window_flags))
 			{
 				OffsetSettings();
@@ -110,38 +90,24 @@ namespace ImGuiHandler {
 				ImGuiHandler::ToggleWindow(k_weapon_offsets_window_name);
 			}
 		}
+
 		void Open()
 		{
-			ReadWeaponOffsetConfig(g_weap_offset_data, ARRAYSIZE(g_weap_offset_data));
-		}
-		void Close()
-		{
-			SaveWeaponOffsetConfig(g_weap_offset_data, ARRAYSIZE(g_weap_offset_data), false);
 		}
 
-		void MapLoad()
+		void Close()
 		{
-			for (size_t i = 0; i < ARRAYSIZE(k_weapon_custom_offset_constant_data); i++)
+			if (cartographer_player_profile_is_signed_in(g_advanced_settings_current_controller_index))
 			{
-				datum weap_datum = tag_loaded(_tag_group_weapon, k_weapon_custom_offset_constant_data[i].weapon_path);
-				if (weap_datum != NONE)
-				{
-					g_weap_offset_data[i].tag = (weapon_definition*)tag_get_fast(weap_datum);
-					ApplyOffset(i);
-				}
+				cartographer_player_profile_save(g_advanced_settings_current_controller_index);
 			}
-		}
-		void Initialize()
-		{
-			WriteDefaultFile(g_weap_offset_data, ARRAYSIZE(g_weap_offset_data));
-			ReadWeaponOffsetConfig(g_weap_offset_data, ARRAYSIZE(g_weap_offset_data));
 		}
 	}
 }
 
 /* private code */
 
-const char* weapon_offsets_get_string(e_weapon_offsets_string string, const char* id)
+static const char* weapon_offsets_get_string(e_weapon_offsets_string string, const char* id)
 {
 	const e_language language = get_current_language();
 	const char* result = k_weapon_offsets_string_table[language][string];

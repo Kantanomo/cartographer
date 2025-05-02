@@ -85,7 +85,6 @@
 #include "widgets/liquid.h"
 
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
-#include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
@@ -342,7 +341,6 @@ void H2MOD::Initialize()
 		
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
-		ImGuiHandler::WeaponOffsets::Initialize();
 		TEST_N_DEF(PC3);
 	}
 	else
@@ -436,7 +434,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 		game_globals_apply_tag_patches();
 	}
 
-	ImGuiHandler::WeaponOffsets::MapLoad();
+	cartographer_player_profile_weapon_offsets_on_map_load();
 
 	// when the game is minimized, the game might skip loading the main menu
 	// this is where resetAfterMatch var comes in for help
