@@ -71,6 +71,7 @@ void __cdecl rasterizer_discard_refresh_rate(void);
 int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(uint32 video_mode_index, uint32 refresh_rate_index);
 
 static void rasterizer_settings_update_display_mode_apply_refresh_rate_fix(void);
+static void rasterizer_settings_apply_borderless_patches(void);
 
 /* public code */
 
@@ -105,14 +106,8 @@ void rasterizer_settings_apply_hooks(void)
 	// Replace window flags function so we can use the maximize box
 	PatchCall(Memory::GetAddress(0x264553), rasterizer_settings_get_window_flags);
 
-
 	// allow borderless window
-	NopFill(Memory::GetAddress(0x3995A), 5);	//main_kick_startup_masking_sequence
-	NopFill(Memory::GetAddress(0x3A0C3), 5);	//loading?
-	NopFill(Memory::GetAddress(0x24BAA7), 12);	//rasterizer_settings_store_current_settings_for_revert
-	NopFill(Memory::GetAddress(0x250F57), 4);	//c_display_mode_edit_list::setup_children
-	NopFill(Memory::GetAddress(0x26474B), 6);	//rasterizer_settings_create_registry_keys
-
+	rasterizer_settings_apply_borderless_patches();
 	return;
 }
 
@@ -365,7 +360,7 @@ DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode wind
 			WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_DLGFRAME | WS_BORDER :
 			WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_DLGFRAME | WS_BORDER;	// In original h2v WS_MAXIMIZEBOX and WS_SIZEBOX were not included in the window flags
 	}
-	else if (window_mode == _rasterizer_window_mode_funky_fullscreen)
+	else if (window_mode == _rasterizer_window_mode_funky_fullscreen || window_mode == _rasterizer_window_mode_borderless)
 	{
 		if (style)
 		{
@@ -386,6 +381,8 @@ string_id rasterizer_settings_get_display_mode_string(e_rasterizer_window_mode d
 	if (display_mode == _rasterizer_window_mode_windowed)
 		return _string_id_display_mode_window;
 	if (display_mode == _rasterizer_window_mode_funky_fullscreen)
+		return _string_id_empty_string;	
+	if (display_mode == _rasterizer_window_mode_borderless)
 		return _string_id_empty_string;
 	return _string_id_empty_string;
 }
@@ -859,4 +856,21 @@ __declspec(naked) static void rasterizer_settings_update_display_mode_refresh_pa
 static void rasterizer_settings_update_display_mode_apply_refresh_rate_fix(void)
 {
 	Codecave(Memory::GetAddress(0x264263), rasterizer_settings_update_display_mode_refresh_patch, 3);
+}
+
+static void rasterizer_settings_apply_borderless_patches(void)
+{
+	// replace instances of g_rasterizer_settings.display_mode  == _rasterizer_window_mode_funky_fullscreen with _rasterizer_window_mode_borderless
+	// to fix startup resolution issues
+
+	WriteValue<int8>(Memory::GetAddress(0x2643FE + 2), _rasterizer_window_mode_borderless);//rasterizer_settings_set_display_option
+	WriteValue<int8>(Memory::GetAddress(0x26441D + 2), _rasterizer_window_mode_borderless);//rasterizer_settings_set_display_option
+	WriteValue<int8>(Memory::GetAddress(0x263C34 + 2), _rasterizer_window_mode_borderless);//rasterizer_settings_get_display_option_height
+	
+	WriteValue<int8>(Memory::GetAddress(0x264521 + 2), 2);//rasterizer_settings_process_display_changes
+	WriteValue<int32>(Memory::GetAddress(0x264526 + 1), _rasterizer_window_mode_borderless);//rasterizer_settings_process_display_changes
+
+	WriteValue<int8>(Memory::GetAddress(0x26432D + 2), _rasterizer_window_mode_borderless);//rasterizer_settings_update_display_mode
+	WriteValue<int8>(Memory::GetAddress(0x26435A + 2), _rasterizer_window_mode_borderless);//rasterizer_settings_update_display_mode
+	WriteValue<int8>(Memory::GetAddress(0x264383 + 2), _rasterizer_window_mode_borderless);//rasterizer_settings_update_display_mode
 }

@@ -11,7 +11,8 @@ enum e_rasterizer_window_mode : uint32
 {
 	_rasterizer_window_mode_real_fullscreen = 0,
 	_rasterizer_window_mode_windowed = 1,
-	_rasterizer_window_mode_funky_fullscreen = 2
+	_rasterizer_window_mode_funky_fullscreen = 2,
+	_rasterizer_window_mode_borderless = 3,
 };
 
 enum e_display_type : uint8

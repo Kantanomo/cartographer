@@ -99,7 +99,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 		{
 		case _item_display_mode:
 			primary_string = _string_id_display_mode;
-			if (display_mode == _rasterizer_window_mode_funky_fullscreen)
+			if (display_mode == _rasterizer_window_mode_borderless)
 			{
 				secondary_string = _string_id_invalid;
 				secondary_text->set_text(k_borderless_string[get_current_language()]);

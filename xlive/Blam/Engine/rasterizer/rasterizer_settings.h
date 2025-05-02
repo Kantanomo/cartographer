@@ -20,7 +20,7 @@ enum e_display_aspect_ratio : int32
 
 enum 
 {
-	_rasterizer_settings_display_mode_last_user_selectable = _rasterizer_window_mode_funky_fullscreen,
+	_rasterizer_settings_display_mode_last_user_selectable = _rasterizer_window_mode_windowed,
 };
 
 /* structures */
