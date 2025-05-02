@@ -66,8 +66,6 @@ extern bool H2Config_even_shuffle_teams;
 extern bool H2Config_koth_random;
 
 extern WPARAM H2Config_hotkeyIdHelp;
-extern WPARAM H2Config_hotkeyIdAlignWindow;
-extern WPARAM H2Config_hotkeyIdWindowMode;
 extern WPARAM H2Config_hotkeyIdToggleHideIngameChat;
 extern WPARAM H2Config_hotkeyIdGuide;
 extern WPARAM H2Config_hotkeyIdConsole;
