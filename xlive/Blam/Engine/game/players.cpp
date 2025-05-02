@@ -44,7 +44,7 @@ e_game_team s_player::get_team(datum player_index)
 {
 	if (!is_index_valid(player_index))
 	{
-		return _game_team_none;
+		return _game_team_observer;
 	}
 
 	const s_player* player = (s_player*)datum_get(get_data(), player_index);
@@ -438,9 +438,9 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
 	{
 		if (TEST_BIT(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
 		{
-			if (configuration_data->team_index != _game_team_none && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
+			if (configuration_data->team_index != _game_team_observer && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
 			{
-				configuration_data->team_index = _game_team_none;
+				configuration_data->team_index = _game_team_observer;
 			}
 		}
 	}
