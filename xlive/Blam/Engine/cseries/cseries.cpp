@@ -52,7 +52,7 @@ if (!(STATEMENT))					\
 	{											\
 		RaiseException(0x73746Bu, 0, 0, 0);		\
 		/* halt_and_catch_fire(); */			\
-		/* unk_cseries_windows_call(-1, ##STATEMENT); */		\
+		/* cseries_windows_trigger_debug_window(-1, ##STATEMENT); */		\
 	}											\
 	ASSERT_TRIGGER_EXCEPTION();					\
 }												\
@@ -69,10 +69,46 @@ void cseries_initialize(void)
 	return;
 }
 
-void display_assert(char const* condition, char const* file, int32 line, bool assertion_failed)
+#ifdef ASSERTS_ENABLED
+void display_assert(const char* condition, char const* file, int32 line, bool assertion_failed)
 {
+	if (assertion_failed && !is_debugger_present())
+	{
+		error(3, "");
+		// sub_402370(1);
+	}
+
+	error(3, "");
+	if (is_debugger_present())
+	{
+		const char* condition_string = condition != NULL ? condition : "";
+		const char* error_type = assertion_failed ? "ASSERT" : "WARNING";
+		error(3, "%s(%d): %s: %s", file, line, error_type, condition_string);
+	}
+	else
+	{
+		error(3, "%s", shell_get_version());
+		const char* error_type = assertion_failed ? "### ASSERTION FAILED: " : "### RUNTIME WARNING: ";
+		error(3, "%s at %s,#%d", error_type, file, line);
+		if (condition)
+		{
+			error(3, "  %s", condition);
+		}
+	}
+
+	if (assertion_failed)
+	{
+		// cseries_error_callbacks_run();
+		if (!is_debugger_present())
+		{
+			RaiseException(0x73746Bu, 0, 0, 0);
+			// halt_and_catch_fire();
+			// cseries_windows_trigger_debug_window(-1, condition);
+		}
+	}
 	return;
 }
+#endif
 
 void* csmemmove(void* destination, void* source, size_t size)
 {
