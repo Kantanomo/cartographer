@@ -69,7 +69,7 @@
 #include "render/render_submit.h"
 #include "render/render_lod_new.h"
 #include "render/render_weather.h"
-#include "saved_games/cartographer_player_profile.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "saved_games/game_state_procs.h"
 #include "scenario/scenario.h"
 #include "shell/shell.h"

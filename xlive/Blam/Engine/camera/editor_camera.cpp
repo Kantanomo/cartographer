@@ -6,7 +6,7 @@
 
 #include "game/player_control.h"
 #include "objects/objects.h"
-#include "saved_games/cartographer_player_profile.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 typedef void(__cdecl* t_editor_camera_orbiting_update)(s_editor_camera* camera, s_director_update* director_update, s_observer_command* observer_command);
 t_editor_camera_orbiting_update p_editor_camera_orbiting_update;
