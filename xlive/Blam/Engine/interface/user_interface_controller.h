@@ -1,7 +1,20 @@
 #pragma once
 #include "game/game_allegiance.h"
 #include "input/controllers.h"
+#include "networking/network_game_definitions.h"
 #include "saved_games/player_profile.h"
+
+/* enums */
+
+enum e_user_interface_controller_handicap : int8
+{
+	_user_interface_controller_handicap_none = 0,
+	_user_interface_controller_handicap_minor = 1,
+	_user_interface_controller_handicap_moderate = 2,
+	_user_interface_controller_handicap_severe = 3,
+
+	k_user_interface_controller_handicap_count
+};
 
 enum e_user_interface_event_type : uint32
 {
@@ -117,16 +130,6 @@ enum e_user_interface_automation_mode : uint16
 	k_user_interface_automation_modes_count = 0xC,
 };
 
-// Credits :  https://github.com/twist84/ManagedDonkey/blob/main/game/source/interface/user_interface_controller.hpp
-struct s_event_record
-{
-	e_user_interface_event_type type;
-	e_controller_index controller;
-	e_user_interface_controller_component component;
-	uint16 value; // // holds e_user_interface_automation_mode during _user_interface_event_type_automation
-};
-ASSERT_STRUCT_SIZE(s_event_record, 16);
-
 enum e_controller_state_flags
 {
 	_controller_state_is_attached_bit,
@@ -141,6 +144,18 @@ enum e_controller_state_flags
 	k_controller_state_flags_count,
 };
 
+/* structures */
+
+// Credits :  https://github.com/twist84/ManagedDonkey/blob/main/game/source/interface/user_interface_controller.hpp
+struct s_event_record
+{
+	e_user_interface_event_type type;
+	e_controller_index controller;
+	e_user_interface_controller_component component;
+	uint16 value; // // holds e_user_interface_automation_mode during _user_interface_event_type_automation
+};
+ASSERT_STRUCT_SIZE(s_event_record, 16);
+
 struct s_user_interface_controller
 {
 	c_flags_no_init<e_controller_state_flags, uint32, k_controller_state_flags_count> m_flags;
@@ -151,7 +166,7 @@ struct s_user_interface_controller
 	uint32 profile_index;
 	e_game_team player_team;
 	PAD16;
-	e_handicap player_handicap_level;
+	e_user_interface_controller_handicap player_handicap_level;
 	PAD24;
 	int8 bungienet_user;
 	PAD24;
@@ -192,8 +207,8 @@ e_game_team __cdecl user_interface_controller_get_user_active_team(e_controller_
 void __cdecl user_interface_controller_set_desired_team_index(e_controller_index controller_index, e_game_team team);
 bool __cdecl user_interface_controller_get_rumble_enabled(e_controller_index controller_index);
 bool __cdecl user_interface_controller_get_autolevel_enabled(e_controller_index controller_index);
-e_handicap __cdecl user_interface_controller_get_user_handicap_level(e_controller_index controller_index);
-void __cdecl user_interface_controller_set_user_handicap_level(e_controller_index controller_index, e_handicap handicap);
+e_user_interface_controller_handicap __cdecl user_interface_controller_get_user_handicap_level(e_controller_index controller_index);
+void __cdecl user_interface_controller_set_user_handicap_level(e_controller_index controller_index, e_user_interface_controller_handicap handicap);
 void __cdecl user_interface_controller_set_griefer(e_controller_index controller_index, bool griefing);
 wchar_t* __cdecl user_interface_controller_get_player_profile_name(e_controller_index controller_index);
 

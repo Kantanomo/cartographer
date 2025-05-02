@@ -1,8 +1,8 @@
 #pragma once
-
+#include "network_observer.h"
 #include "game/players.h"
 #include "input/controllers.h"
-#include "network_observer.h"
+#include "networking/network_game_definitions.h"
 #include "networking/transport/transport.h"
 #include "saved_games/game_variant.h"
 

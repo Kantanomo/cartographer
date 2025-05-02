@@ -4,13 +4,14 @@
 #include "game/game.h"
 #include "game/game_engine.h"
 #include "game/game_globals.h"
-#include "simulation/game_interface/simulation_game_action.h"
-#include "units/units.h"
+#include "interface/user_interface_controller.h"
 #include "saved_games/game_variant.h"
 #include "scenario/scenario.h"
 #include "shell/shell.h"
+#include "simulation/game_interface/simulation_game_action.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_queue_global_events.h"
+#include "units/units.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -425,7 +426,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
 	}
 
 	// Handicap verification
-	configuration_data->player_handicap_level = PIN(configuration_data->player_handicap_level, _handicap_none, _handicap_severe);
+	configuration_data->player_handicap_level = PIN(configuration_data->player_handicap_level, _user_interface_controller_handicap_none, _user_interface_controller_handicap_severe);
 	
 	// User role verification
 	int8 bungie_user_role = configuration_data->bungie_user_role;
