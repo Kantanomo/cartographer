@@ -29,8 +29,6 @@ static object_datum* halo_interpolator_object_can_interpolate(datum object_index
 
 static void halo_interpolator_interpolate_position_data(int32 user_index, int32 position_index, real_point3d* position);
 
-static void halo_interpolator_interpolate_position_data(int32 user_index, int32 position_index, real_point3d* position);
-
 static void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolation_data);
 
 /* public code */
@@ -227,11 +225,12 @@ void halo_interpolator_setup_new_object(datum object_index)
 	return;
 }
 
-void halo_interpolator_setup_weapon_data(int32 user_index, datum animation_index, int32 weapon_slot, const real_matrix4x3* node_matrices, uint32 nodes_count)
+void halo_interpolator_setup_weapon_data(uint32 user_index, datum animation_index, int32 weapon_slot, const real_matrix4x3* node_matrices, uint32 nodes_count)
 {
 	if (g_frame_data_storage && g_interpolation_update_in_progress)
 	{
 		ASSERT(node_matrices);
+		ASSERT(VALID_INDEX(weapon_slot, k_first_person_max_weapons));
 		ASSERT(VALID_INDEX(nodes_count, MAXIMUM_NODES_PER_MODEL));
 		ASSERT(VALID_INDEX(user_index, k_number_of_users));
 
@@ -348,7 +347,7 @@ bool halo_interpolator_get_interpolated_matrix_from_user_index(uint32 user_index
 	return result;
 }
 
-bool halo_interpolator_interpolate_weapon_node(datum user_index, datum animation_index, int32 node_index, int32 weapon_slot, real_matrix4x3* out_node)
+bool halo_interpolator_interpolate_weapon_node(int32 user_index, datum animation_index, int32 node_index, int32 weapon_slot, real_matrix4x3* out_node)
 {
 	bool result = false;
 	if (g_interpolation_enabled && !cinematic_in_progress())
@@ -357,6 +356,8 @@ bool halo_interpolator_interpolate_weapon_node(datum user_index, datum animation
 			&& g_previous_interpolation_frame_data->initialized
 			&& user_index != NONE)
 		{
+			ASSERT(VALID_INDEX(user_index, k_number_of_users));
+			ASSERT(VALID_INDEX(weapon_slot, k_first_person_max_weapons));
 			datum target_animation_index = g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].animation_index;
 			datum previous_animation_index = g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].animation_index;
 			int32 target_node_count = g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].node_count;
@@ -365,6 +366,8 @@ bool halo_interpolator_interpolate_weapon_node(datum user_index, datum animation
 			{
 				if (target_node_count > 0 && target_node_count == previous_node_count)
 				{
+					ASSERT(VALID_INDEX(node_index, MAXIMUM_NODES_PER_MODEL));
+
 					matrix4x3_interpolate(
 						&g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
 						&g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
@@ -378,7 +381,7 @@ bool halo_interpolator_interpolate_weapon_node(datum user_index, datum animation
 	return result;
 }
 
-bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_index, int32 weapon_slot, real_matrix4x3** nodes, int32* node_matrices_count)
+bool halo_interpolator_interpolate_weapon(int32 user_index, datum animation_index, int32 weapon_slot, real_matrix4x3** nodes, int32* node_matrices_count)
 {
 	bool result = false;
 	if (g_interpolation_enabled && !cinematic_in_progress())
@@ -390,6 +393,8 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
 			&& g_previous_interpolation_frame_data->initialized
 			&& user_index != NONE)
 		{
+			ASSERT(VALID_INDEX(user_index, k_number_of_users));
+			ASSERT(VALID_INDEX(weapon_slot, k_first_person_max_weapons));
 			datum target_animation_index = g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].animation_index;
 			datum previous_animation_index = g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].animation_index;
 			if (target_animation_index == animation_index && previous_animation_index == target_animation_index)
@@ -398,6 +403,7 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
 				int32 previous_node_count = g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].node_count;
 				if (target_node_count > 0 && target_node_count == previous_node_count)
 				{
+					ASSERT(nodes);
 					*nodes = g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes;
 					for (int32 node_index = 0; node_index < target_node_count; node_index++)
 					{
@@ -407,6 +413,8 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
 							g_interpolator_delta,
 							&g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes[node_index]);
 					}
+
+					ASSERT(node_matrices_count);
 					*node_matrices_count = target_node_count;
 					result = true;
 				}
@@ -423,12 +431,14 @@ bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 
 	int32 object_absolute_index;
 	if (halo_interpolator_object_can_interpolate(object_index, &object_absolute_index))
 	{
+		ASSERT(VALID_INDEX(node_index, MAXIMUM_NODES_PER_MODEL));
 		real32 distance = distance_squared3d(
 			&g_previous_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index].position,
 			&g_target_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index].position);
 
 		if (distance < k_interpolation_distance_cutoff)
 		{
+			ASSERT(out_matrix);
 			matrix4x3_interpolate(
 				&g_previous_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index],
 				&g_target_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index],
@@ -585,12 +595,12 @@ static void halo_interpolator_interpolate_position_data(int32 user_index, int32 
 static void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolation_data)
 {
 	interpolation_data->initialized = false;
-	for (size_t i = 0; i < k_number_of_users; i++)
+	for (size_t user_num = 0; user_num < k_number_of_users; ++user_num)
 	{
-		for (size_t j = 0; j < k_interpolation_first_person_weapon_slot_count; j++)
+		for (size_t fp_weapon_num = 0; fp_weapon_num < k_first_person_max_weapons; ++fp_weapon_num)
 		{
-			interpolation_data->weapon_data[i][j].node_count = 0;
-			interpolation_data->weapon_data[i][j].animation_index = NONE;
+			interpolation_data->weapon_data[user_num][fp_weapon_num].node_count = 0;
+			interpolation_data->weapon_data[user_num][fp_weapon_num].animation_index = NONE;
 		}
 	}
 

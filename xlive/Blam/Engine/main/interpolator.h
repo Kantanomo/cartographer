@@ -1,5 +1,6 @@
 #pragma once
 #include "game/player_constants.h"
+#include "interface/first_person_weapons.h"
 #include "models/render_models.h"
 #include "objects/objects.h"
 
@@ -7,7 +8,6 @@
 
 enum
 {
-	k_interpolation_first_person_weapon_slot_count = 4,
 	k_interpolation_positions_count = 2
 };
 
@@ -45,7 +45,7 @@ struct s_interpolation_data
 {
 	bool initialized;
 	s_object_interpolation_data object_data[k_maximum_objects_per_map];
-	s_weapon_interpolation_data weapon_data[k_number_of_users][k_interpolation_first_person_weapon_slot_count];
+	s_weapon_interpolation_data weapon_data[k_number_of_users][k_first_person_max_weapons];
 	s_position_interpolation_data position_data[k_number_of_users][k_interpolation_positions_count];
 	real32 crouch[k_number_of_users];
 };
@@ -88,7 +88,7 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real
 
 void halo_interpolator_setup_new_object(datum object_datum);
 
-void halo_interpolator_setup_weapon_data(int32 user_index, datum animation_index, int32 weapon_slot, const real_matrix4x3* node_matrices, uint32 nodes_count);
+void halo_interpolator_setup_weapon_data(uint32 user_index, datum animation_index, int32 weapon_slot, const real_matrix4x3* node_matrices, uint32 nodes_count);
 
 void halo_interpolator_set_target_position_data(int32 user_index, int32 position_index, real_matrix4x3* matrix);
 
@@ -103,9 +103,9 @@ void halo_interpolator_object_populate_interpolation_data(
 
 bool halo_interpolator_get_interpolated_matrix_from_user_index(uint32 user_index, uint32 position_index, real_matrix4x3* out);
 
-bool halo_interpolator_interpolate_weapon_node(datum user_index, datum animation_index, int32 node_index, int32 weapon_slot, real_matrix4x3* out_node);
+bool halo_interpolator_interpolate_weapon_node(int32 user_index, datum animation_index, int32 node_index, int32 weapon_slot, real_matrix4x3* out_node);
 
-bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_index, int32 weapon_slot, real_matrix4x3** nodes, int32* node_matrices_count);
+bool halo_interpolator_interpolate_weapon(int32 user_index, datum animation_index, int32 weapon_slot, real_matrix4x3** nodes, int32* node_matrices_count);
 
 bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 node_index, real_matrix4x3* out_matrix);
 

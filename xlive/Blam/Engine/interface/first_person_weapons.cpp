@@ -880,7 +880,7 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
 {
 	real_matrix4x3* result = NULL;
 	s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
-	int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
+	const int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
 	if (weapon_slot != NONE)
 	{
 		s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
