@@ -88,9 +88,9 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real
 
 void halo_interpolator_setup_new_object(datum object_datum);
 
-void halo_interpolator_setup_weapon_data(uint32 user_index, datum animation_index, int32 weapon_slot, const real_matrix4x3* node_matrices, uint32 nodes_count);
+void halo_interpolator_setup_weapon_data(int32 user_index, datum animation_index, int32 weapon_slot, const real_matrix4x3* node_matrices, uint32 nodes_count);
 
-void halo_interpolator_set_target_position_data(int32 user_index, int32 position_index, real_matrix4x3* matrix);
+void halo_interpolator_set_target_position_data(int32 user_index, uint32 position_index, real_matrix4x3* matrix);
 
 void halo_interpolator_object_populate_interpolation_data(
 	datum object_index,
@@ -101,7 +101,7 @@ void halo_interpolator_object_populate_interpolation_data(
 	const real_vector3d* up,
 	const real_point3d* center_of_mass);
 
-bool halo_interpolator_get_interpolated_matrix_from_user_index(uint32 user_index, uint32 position_index, real_matrix4x3* out);
+bool halo_interpolator_get_interpolated_matrix_from_user_index(int32 user_index, uint32 position_index, real_matrix4x3* out);
 
 bool halo_interpolator_interpolate_weapon_node(int32 user_index, datum animation_index, int32 node_index, int32 weapon_slot, real_matrix4x3* out_node);
 
@@ -113,4 +113,4 @@ bool halo_interpolator_interpolate_object_position(datum object_index, real_poin
 
 bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_crouch);
 
-bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 position_index, real_point3d* position);
+bool halo_interpolator_interpolate_position_backwards(int32 user_index, uint32 position_index, real_point3d* position);

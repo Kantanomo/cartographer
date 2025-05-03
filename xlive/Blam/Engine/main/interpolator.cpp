@@ -27,7 +27,7 @@ static real32 halo_interpolator_get_interpolation_time_internal(void);
 
 static object_datum* halo_interpolator_object_can_interpolate(datum object_index, int32* out_abs_object_index);
 
-static void halo_interpolator_interpolate_position_data(int32 user_index, int32 position_index, real_point3d* position);
+static void halo_interpolator_interpolate_position_data(int32 user_index, uint32 position_index, real_point3d* position);
 
 static void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolation_data);
 
@@ -225,7 +225,7 @@ void halo_interpolator_setup_new_object(datum object_index)
 	return;
 }
 
-void halo_interpolator_setup_weapon_data(uint32 user_index, datum animation_index, int32 weapon_slot, const real_matrix4x3* node_matrices, uint32 nodes_count)
+void halo_interpolator_setup_weapon_data(int32 user_index, datum animation_index, int32 weapon_slot, const real_matrix4x3* node_matrices, uint32 nodes_count)
 {
 	if (g_frame_data_storage && g_interpolation_update_in_progress)
 	{
@@ -242,7 +242,7 @@ void halo_interpolator_setup_weapon_data(uint32 user_index, datum animation_inde
 	return;
 }
 
-void halo_interpolator_set_target_position_data(int32 user_index, int32 position_index, real_matrix4x3* matrix)
+void halo_interpolator_set_target_position_data(int32 user_index, uint32 position_index, real_matrix4x3* matrix)
 {
 	ASSERT(VALID_INDEX(position_index, k_interpolation_positions_count));
 	ASSERT(VALID_INDEX(user_index, k_number_of_users));
@@ -318,7 +318,7 @@ void halo_interpolator_object_populate_interpolation_data(
 	return;
 }
 
-bool halo_interpolator_get_interpolated_matrix_from_user_index(uint32 user_index, uint32 position_index, real_matrix4x3* out)
+bool halo_interpolator_get_interpolated_matrix_from_user_index(int32 user_index, uint32 position_index, real_matrix4x3* out)
 {
 	ASSERT(VALID_INDEX(position_index, k_interpolation_positions_count));
 	ASSERT(VALID_INDEX(user_index, k_number_of_users));
@@ -500,7 +500,7 @@ bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_
 	return interpolate_object;
 }
 
-bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 position_index, real_point3d* position)
+bool halo_interpolator_interpolate_position_backwards(int32 user_index, uint32 position_index, real_point3d* position)
 {
 	ASSERT(VALID_INDEX(position_index, k_interpolation_positions_count));
 	ASSERT(VALID_INDEX(user_index, k_number_of_users));
@@ -576,7 +576,7 @@ static object_datum* halo_interpolator_object_can_interpolate(datum object_index
 	return result;
 }
 
-static void halo_interpolator_interpolate_position_data(int32 user_index, int32 position_index, real_point3d* position)
+static void halo_interpolator_interpolate_position_data(int32 user_index, uint32 position_index, real_point3d* position)
 {
 	ASSERT(VALID_INDEX(position_index, k_interpolation_positions_count));
 	ASSERT(VALID_INDEX(user_index, k_number_of_users));
