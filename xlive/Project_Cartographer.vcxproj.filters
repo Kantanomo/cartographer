@@ -514,6 +514,19 @@
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_moving_hill.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_max_heads_carried.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_player_speed.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_playlist_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_player_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_team_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_vehicle_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_equipment_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_slayer_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_king_porperty.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_oddball_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_juggernaut_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_ctf_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_assault_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_territories_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_settings_property.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2028,6 +2041,19 @@
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_moving_hill.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_max_heads_carried.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_player_speed.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_playlist_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_player_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_team_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_vehicle_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_equipment_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_slayer_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_king_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_oddball_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_juggernaut_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_ctf_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_assault_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_territories_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_settings_property.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

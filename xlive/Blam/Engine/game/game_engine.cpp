@@ -92,5 +92,5 @@ void __cdecl game_engine_render(void)
 
 void __cdecl game_engine_adjust_score(int32 player_index, int32 amount)
 {
-	INVOKE(0x70E13, 0, game_engine_adjust_score, player_index, amount);
+	INVOKE(0x70E13, 0x6F914, game_engine_adjust_score, player_index, amount);
 }

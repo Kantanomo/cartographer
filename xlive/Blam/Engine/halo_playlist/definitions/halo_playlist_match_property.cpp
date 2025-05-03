@@ -21,7 +21,7 @@
 //
 //s_halo_playlist_item_collection g_halo_playlist_match_property_collection = { g_halo_playlist_match_property_items, k_halo_playlist_match_property_count };
 
-e_halo_playlist_match_property_type halo_playlist_item_collection_get_match_property_type(wchar_t* value)
+e_halo_playlist_match_property_type halo_playlist_item_collection_get_match_property_get_value(wchar_t* value)
 {
 	s_halo_playlist_item_collection* g_halo_playlist_match_property_collection = Memory::GetAddress<s_halo_playlist_item_collection*>(0, 0x355260);
 	return INVOKE_TYPE(0, 0xF3BD, e_halo_playlist_match_property_type(*)(s_halo_playlist_item_collection*, wchar_t*), g_halo_playlist_match_property_collection, value);

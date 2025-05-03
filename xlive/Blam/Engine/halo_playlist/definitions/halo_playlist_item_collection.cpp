@@ -15,7 +15,7 @@ wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_collection*
 
 int32 halo_playlist_item_collection_get_value(s_halo_playlist_item_collection* collection, wchar_t* value)
 {
-	return INVOKE_TYPE(0, 0xEE41, int32(*)(s_halo_playlist_item_collection*, wchar_t*), collection, value);
+	return INVOKE_TYPE(0, 0xF1E9, int32(*)(s_halo_playlist_item_collection*, wchar_t*), collection, value);
 }
 
 bool halo_playlist_item_collection_get_boolean_value(wchar_t* value, bool* out_result)
@@ -56,5 +56,23 @@ bool halo_playlist_item_collection_get_boolean_value(wchar_t* value, bool* out_r
 			return false;
 		}
 	}
+}
+
+int32 halo_playlist_item_collection_get_int_time_value(wchar_t* value)
+{
+	s_halo_playlist_item_collection* integer_item_collection = Memory::GetAddress<s_halo_playlist_item_collection*>(0, 0x355290);
+	return halo_playlist_item_collection_get_value(integer_item_collection, value);
+}
+
+int32 halo_playlist_item_collection_get_int_value(wchar_t* value)
+{
+	s_halo_playlist_item_collection* integer_item_collection = Memory::GetAddress<s_halo_playlist_item_collection*>(0, 0x355210);
+	return halo_playlist_item_collection_get_value(integer_item_collection, value);
+}
+
+int16 halo_playlist_item_collection_player_count_get_value(wchar_t* value)
+{
+	s_halo_playlist_item_collection* player_count_item_collection = Memory::GetAddress<s_halo_playlist_item_collection*>(0, 0x355230);
+	return (int16)halo_playlist_item_collection_get_value(player_count_item_collection, value);
 }
 

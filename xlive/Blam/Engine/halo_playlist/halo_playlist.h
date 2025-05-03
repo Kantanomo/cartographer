@@ -6,12 +6,23 @@
 enum e_halo_playlist_error
 {
 	_halo_playlist_error_playlist_header_already_defined,
-	_halo_playlist_error_code_1,
+	_halo_playlist_error_duplicate_variant_found,
 	_halo_playlist_error_property_name_invalid,
 	_halo_playlist_error_header_name_invalid,
 	_halo_playlist_error_property_value_invalid,
-	_halo_playlist_error_code_5,
-	_halo_playlist_error_match_property_invalid
+	_halo_playlist_error_property_already_defined,
+	_halo_playlist_error_match_property_invalid,
+	_halo_playlist_error_variant_setting_invalid,
+	_halo_playlist_error_variant_base_or_game_type_not_found,
+	_halo_playlist_error_variant_name_not_found,
+	_halo_playlist_error_variant_name_invalid,
+	_halo_playlist_error_variant_name_illegal_character,
+	_halo_playlist_error_variant_invalid,
+	_halo_playlist_error_variant_base_variant_and_game_type_both_set,
+	_halo_playlist_error_code_14,
+	_halo_playlist_error_code_15,
+	_halo_playlist_error_max_variants,
+	_halo_playlist_error_max_matches,
 };
 
 enum e_halo_playlist_reader_seek_mode
@@ -121,8 +132,9 @@ public:
 
 	void process_match_section();
 	void process_current_property();
+	bool property_name_is_valid(wchar_t* property_name);
 	void trim_property_name();
-	void error(int32 error_type, uint32 file_line, wchar_t* property_name, wchar_t* property_value, wchar_t* extra);
+	void error(e_halo_playlist_error error_type, uint32 file_line, wchar_t* property_name = L"", wchar_t* property_value = L"", wchar_t* extra = L"");
 	void finalize();
 };
 
