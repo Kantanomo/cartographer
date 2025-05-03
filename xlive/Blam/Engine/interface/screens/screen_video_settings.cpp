@@ -10,9 +10,10 @@
 #include "screen_restore_video_defaults.h"
 #include "screen_vsync_setting.h"
 
-#include "interface/user_interface_memory.h"
-#include "interface/user_interface_controller.h"
 #include "interface/user_interface_bitmap_block.h"
+#include "interface/user_interface_controller.h"
+#include "interface/user_interface_memory.h"
+#include "interface/user_interface_shared_globals.h"
 #include "interface/user_interface_utilities.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "tag_files/global_string_ids.h"
@@ -200,8 +201,7 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index) == _item_vsync && !g_can_use_vsync)
 	{
 		//disable action when Vsync list item is pressed
-		//user_interface_utilities_play_sound(_user_interface_global_sound_error);
-		user_interface_utilities_play_sound(2);
+		user_interface_utilities_play_sound(_user_interface_global_sound_error);
 		return;
 	}
 

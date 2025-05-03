@@ -1,4 +1,6 @@
 #pragma once
+#include "user_interface_shared_globals.h"
+
 #include "math/color_math.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
@@ -585,91 +587,6 @@ struct s_text_block_reference
 };
 ASSERT_STRUCT_SIZE(s_text_block_reference, 44);
 
-enum e_bitmap_block_reference_flags : int
-{
-	bitmap_block_reference_flag_ignore_for_list_skin_size_calculation = FLAG(0),
-	bitmap_block_reference_flag_swap_on_relative_list_position = FLAG(1),
-	bitmap_block_reference_flag_render_as_progress_bar = FLAG(2)
-};
-
-enum e_bitmap_blend_method : short
-{
-	bitmap_blend_method_standard = 0,
-	bitmap_blend_method_multiply = 1,
-	bitmap_blend_method_unused = 2,
-};
-
-#define k_maximum_number_of_bitmap_blocks 64
-struct s_bitmap_block_reference
-{
-	e_bitmap_block_reference_flags flags;
-	e_animation_index animation_index;
-	short intro_animation_delay_milliseconds;
-	e_bitmap_blend_method bitmap_blend_method;
-	short initial_sprite_frame;
-	point2d topleft;
-	float horiz_texture_wrapssecond;
-	float vert_texture_wrapssecond;
-
-	// bitm
-	tag_reference bitmap_tag;
-	short render_depth_bias;
-	short pad;
-	float sprite_animation_speed_fps;
-	point2d progress_bottomleft;
-	string_id string_identifier;
-	real_vector2d progress_scale;
-};
-ASSERT_STRUCT_SIZE(s_bitmap_block_reference, 56);
-
-enum e_ui_model_scene_reference_flags : int
-{
-	ui_model_scene_reference_flag_unused = FLAG(0)
-};
-
-#define k_maximum_lights_per_ui_scene 8
-struct s_ui_light_reference
-{
-	char name[32];
-};
-ASSERT_STRUCT_SIZE(s_ui_light_reference, 32);
-
-#define k_maximum_objects_per_ui_scene 32
-struct s_ui_object_reference
-{
-	char name[32];
-};
-ASSERT_STRUCT_SIZE(s_ui_object_reference, 32);
-
-#define k_maximum_object_scenes_per_screen 32
-struct s_ui_model_scene_reference
-{
-	/* Explaination("NOTE on coordinate systems", "Halo y-axis=ui z-axis, and Halo z-axis=ui y-axis.
-	As a convention, let's always place objects in the ui scenario such that
-	they are facing in the '-y' direction, and the camera such that is is
-	facing the '+y' direction.This way the ui animation for models(which
-	gets applied to the camera) will always be consisitent.")*/
-
-	e_ui_model_scene_reference_flags flags;
-	e_animation_index animation_index;
-
-	short intro_animation_delay_milliseconds;
-	short render_depth_bias;
-	short pad;
-
-	tag_block<s_ui_object_reference> objects;
-
-	tag_block<s_ui_light_reference> lights;
-
-	real_vector3d animation_scale_factor;
-	real_point3d camera_position;
-	float fov_degress;
-	rectangle2d ui_viewport;
-	string_id unused_intro_anim;
-	string_id unused_outro_anim;
-	string_id unused_ambient_anim;
-};
-ASSERT_STRUCT_SIZE(s_ui_model_scene_reference, 76);
 
 #define k_maximum_text_value_pairs_per_block 100
 struct s_text_value_pair_block_UNUSED
