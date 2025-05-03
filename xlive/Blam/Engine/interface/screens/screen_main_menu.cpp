@@ -146,7 +146,7 @@ void c_main_menu_list::update_list_items(c_list_item_widget* item, int32 skin_in
 	//item_text = item->try_find_text_widget(!is_valid);
 
 	c_text_widget* item_text = item->try_find_text_widget(_main_menu_list_skin_text_main);
-	item->set_item_transitioning();
+	item->set_item_transitioning(true);
 
 	const e_language language = get_current_language();
 	if (item_text)

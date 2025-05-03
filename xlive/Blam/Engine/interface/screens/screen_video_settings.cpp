@@ -12,6 +12,8 @@
 
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_controller.h"
+#include "interface/user_interface_bitmap_block.h"
+#include "interface/user_interface_utilities.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "tag_files/global_string_ids.h"
 
@@ -22,6 +24,8 @@
 /* constants */
 
 static const char* k_video_setting_list_name = "video settings list";
+static const real_rgb_color k_default_text_change_color = { 1.f,1.f,1.f };
+static const real_rgb_color k_list_item_disabled_text_change_color = { 0.7f,0.7f,0.7f};
 
 /* enums */
 
@@ -40,8 +44,16 @@ enum e_video_settings_list_items : uint16
 	k_total_no_of_video_settings_list_items
 };
 
+enum e_settings_list_skin_bitmap_hilite : uint16
+{
+	_bitmap_hilite_sprite_light = 0,
+	_bitmap_hilite_sprite_dark,
+	_bitmap_hilite_sprite_unused,
+};
 
 /* globals */
+
+bool g_can_use_vsync = true;
 
 /* prototypes */
 
@@ -86,6 +98,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 
 	c_text_widget* primary_text = item->try_find_text_widget(_settings_list_skin_text_header);
 	c_text_widget* secondary_text = item->try_find_text_widget(_settings_list_skin_text_value);
+	c_bitmap_widget* hilite_bitmap = item->try_find_bitmap_widget(_settings_list_skin_bitmap_hilite);
 
 	string_id primary_string = _string_id_empty_string;
 	string_id secondary_string = _string_id_empty_string;
@@ -121,6 +134,14 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 			primary_string = _string_id_invalid;
 			primary_text->set_text(k_vsync_header_string[get_current_language()]);
 			secondary_string = H2Config_use_vsync ? _string_id_on : _string_id_off;
+
+			primary_text->set_change_color(g_can_use_vsync ? k_default_text_change_color : k_list_item_disabled_text_change_color);
+			secondary_text->set_change_color(g_can_use_vsync ? k_default_text_change_color : k_list_item_disabled_text_change_color);			
+			if (hilite_bitmap)
+			{
+				hilite_bitmap->verify_and_change_sprite(g_can_use_vsync ? _bitmap_hilite_sprite_light : _bitmap_hilite_sprite_dark);
+			}
+			item->set_item_transitioning(g_can_use_vsync);
 			break;
 		case _item_brightness_level:
 			primary_string = _string_id_brightness_level;
@@ -175,6 +196,14 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
 {
 	//INVOKE_TYPE(0x24961B, 0x0, void(__thiscall*)(c_video_settings_list*, s_event_record**, datum*), this, pevent, pitem_index);
+
+	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index) == _item_vsync && !g_can_use_vsync)
+	{
+		//disable action when Vsync list item is pressed
+		//user_interface_utilities_play_sound(_user_interface_global_sound_error);
+		user_interface_utilities_play_sound(2);
+		return;
+	}
 
 	s_screen_parameters params;
 	params.m_flags = 0;
@@ -234,6 +263,12 @@ c_screen_video_settings::c_screen_video_settings(e_user_interface_channel_type c
 	c_screen_with_menu(_screen_video_settings, channel_type, window_index, user_flags, &m_video_settings_list),
 	m_video_settings_list(user_flags)
 {
+}
+
+void c_screen_video_settings::update()
+{
+	c_screen_with_menu::update();
+	g_can_use_vsync = rasterizer_settings_get()->display_mode == _rasterizer_window_mode_real_fullscreen;
 }
 
 const void* c_screen_video_settings::load_proc() const

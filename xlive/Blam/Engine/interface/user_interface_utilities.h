@@ -14,4 +14,6 @@ void __cdecl user_interface_get_cursor_position(point2d* out_position);
 
 void __cdecl user_interface_get_cursor_position_scaled(point2d* out_position);
 
+void __cdecl user_interface_utilities_play_sound(uint32 sound_type);
+
 void user_interface_utilities_apply_patches();

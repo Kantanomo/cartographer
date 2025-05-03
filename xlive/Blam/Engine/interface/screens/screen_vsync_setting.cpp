@@ -32,9 +32,9 @@ static const wchar_t* const k_vsync_description_string = L"Synchronize your fps 
 
 const wchar_t* const k_vsync_header_string[k_language_count]
 {
-	L"V-Sync",
+	L"VSync",
 	L"垂直同期",
-	L"V-Sync",
+	L"VSync",
 	L"Synchronisation V",
 	L"Sincronización vertical",
 	L"Sincronizzazione verticale",

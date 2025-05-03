@@ -295,7 +295,7 @@ void c_screen_4way_signin::update(void)
 			{
 				// We dont really have a way to determine controller_types between akebono and duke, using either is fine.
 				const int16 bitmap_update_idx = (int16)(gamepad_connected ? _controller_signin_bitmap_akebono : _controller_signin_bitmap_missing);
-				controller_signin_bitmap->verify_and_update_bitmap_index(bitmap_update_idx);
+				controller_signin_bitmap->verify_and_change_sprite(bitmap_update_idx);
 
 
 				if (controller == k_windows_device_controller_index)

@@ -46,49 +46,8 @@ enum e_display_mode_settings_list_items : uint16
 
 /* prototypes */
 
-/* private code */
-
-static e_rasterizer_window_mode item_to_display_mode(e_display_mode_settings_list_items item)
-{
-	e_rasterizer_window_mode window_type;
-	switch (item)
-	{
-	case _item_fullscreen: 
-		window_type = _rasterizer_window_mode_real_fullscreen; 
-		break;
-	case _item_windowed: 
-		window_type = _rasterizer_window_mode_windowed;  
-		break;
-	case _item_borderless: 
-		window_type = _rasterizer_window_mode_borderless; 
-		break;
-
-	default :
-		window_type = _rasterizer_window_mode_funky_fullscreen;
-	}
-	return window_type;
-}
-
-static e_display_mode_settings_list_items display_mode_to_item_type(e_rasterizer_window_mode mode)
-{
-	e_display_mode_settings_list_items item_type;
-	switch (mode)
-	{
-	case _rasterizer_window_mode_real_fullscreen:
-		item_type = _item_fullscreen;
-		break;
-	case _rasterizer_window_mode_windowed:
-		item_type = _item_windowed;
-		break;
-	case _rasterizer_window_mode_borderless:
-		item_type = _item_borderless;
-		break;
-	default:
-		item_type = _item_first;
-	}
-
-	return item_type;
-}
+static e_rasterizer_window_mode item_type_to_display_mode(e_display_mode_settings_list_items item);
+static e_display_mode_settings_list_items display_mode_to_item_type(e_rasterizer_window_mode mode);
 
 /* public code */
 
@@ -136,7 +95,7 @@ void c_display_mode_edit_list::update_list_items(c_list_item_widget* item, int32
 
 	if (item_text)
 	{
-		const e_rasterizer_window_mode mode = item_to_display_mode((e_display_mode_settings_list_items)DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()));
+		const e_rasterizer_window_mode mode = item_type_to_display_mode((e_display_mode_settings_list_items)DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()));
 		if (mode == _rasterizer_window_mode_borderless)
 		{
 			item_text->set_text(k_borderless_string[get_current_language()]);
@@ -162,7 +121,7 @@ void c_display_mode_edit_list::handle_item_pressed_event(s_event_record** pevent
 	// ASSERT(absolute_index <= _rasterizer_settings_display_mode_last_user_selectable);
 
 	absolute_index = absolute_index > _item_last ? _item_first : absolute_index;
-	const e_rasterizer_window_mode display_mode = item_to_display_mode((e_display_mode_settings_list_items)absolute_index);
+	const e_rasterizer_window_mode display_mode = item_type_to_display_mode((e_display_mode_settings_list_items)absolute_index);
 
 	if (absolute_index || rasterizer_settings_has_available_video_modes())
 	{
@@ -266,4 +225,50 @@ void* __cdecl c_screen_display_mode_menu::load_mp(s_screen_parameters* parameter
 	}
 
 	return screen;
+}
+
+
+
+/* private code */
+
+static e_rasterizer_window_mode item_type_to_display_mode(e_display_mode_settings_list_items item)
+{
+	e_rasterizer_window_mode window_type;
+	switch (item)
+	{
+	case _item_fullscreen:
+		window_type = _rasterizer_window_mode_real_fullscreen;
+		break;
+	case _item_windowed:
+		window_type = _rasterizer_window_mode_windowed;
+		break;
+	case _item_borderless:
+		window_type = _rasterizer_window_mode_borderless;
+		break;
+
+	default:
+		window_type = _rasterizer_window_mode_funky_fullscreen;
+	}
+	return window_type;
+}
+
+static e_display_mode_settings_list_items display_mode_to_item_type(e_rasterizer_window_mode mode)
+{
+	e_display_mode_settings_list_items item_type;
+	switch (mode)
+	{
+	case _rasterizer_window_mode_real_fullscreen:
+		item_type = _item_fullscreen;
+		break;
+	case _rasterizer_window_mode_windowed:
+		item_type = _item_windowed;
+		break;
+	case _rasterizer_window_mode_borderless:
+		item_type = _item_borderless;
+		break;
+	default:
+		item_type = _item_first;
+	}
+
+	return item_type;
 }

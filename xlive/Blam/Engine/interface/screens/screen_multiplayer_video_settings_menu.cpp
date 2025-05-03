@@ -72,7 +72,10 @@ c_multiplayer_video_settings_list::c_multiplayer_video_settings_list(uint16 user
 
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_display_mode;
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_resolution;
-	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_vsync;
+	if (rasterizer_settings_get()->display_mode == _rasterizer_window_mode_real_fullscreen)
+	{
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_vsync;
+	}
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_brightness_level;
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_gamma_setting;
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_anti_aliasing;
@@ -153,7 +156,7 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 			params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load_mp;
 			break;
 		default:
-			DISPLAY_ASSERT("unreachable");
+			unreachable();
 		}
 	}
 

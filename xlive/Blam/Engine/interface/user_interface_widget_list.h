@@ -23,6 +23,14 @@ enum e_settings_list_skin_texts
 	k_number_of_settings_list_skin_texts,
 };
 
+enum e_settings_list_skin_bitmaps
+{
+	_settings_list_skin_bitmap_settings_list_bkd = 0,
+	_settings_list_skin_bitmap_hilite = 1,
+	_settings_list_skin_bitmap_hilite_bracket = 2,
+	_settings_list_skin_bitmap_hilite_bracket2 = 3,
+	k_number_of_settings_list_skin_bitmaps,
+};
 
 /* structures */
 

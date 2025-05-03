@@ -66,6 +66,12 @@ void __cdecl user_interface_get_cursor_position_scaled(point2d* out_position)
 	return;
 }
 
+void __cdecl user_interface_utilities_play_sound(uint32 sound_type)
+{
+	INVOKE(0x21DD04, 0x0, user_interface_utilities_play_sound, sound_type);
+}
+
+
 void user_interface_utilities_apply_patches()
 {
 	DETOUR_ATTACH(p_user_interface_get_cursor_position, Memory::GetAddress<user_interface_get_cursor_position_scale_t>(0x21D620), user_interface_get_cursor_position_scaled);

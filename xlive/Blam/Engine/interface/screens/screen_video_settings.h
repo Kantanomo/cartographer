@@ -55,6 +55,7 @@ public:
 	// c_screen_video_settings virtual functions
 
 	virtual ~c_screen_video_settings() = default;
+	virtual void update() override;
 	virtual const void* load_proc() const override;
 
 };
