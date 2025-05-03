@@ -631,7 +631,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 					{
 						// Get the interpolated matrix and use it if we can interpolate
 						real_matrix4x3 interpolated_adjustment_matrix;
-						bool interpolated_matrix = halo_interpolator_get_interpolated_matrix_from_user_index(user_index, 1u, &interpolated_adjustment_matrix);
+						bool interpolated_matrix = halo_interpolator_get_interpolated_matrix_from_user_index(user_index, 1, &interpolated_adjustment_matrix);
 						real_matrix4x3* adjustment_matrix = (interpolated_matrix ? &interpolated_adjustment_matrix : &first_person_data->adjustment_matrix);
 
 						real_matrix4x3 inverse_adjustment_matrix;

@@ -235,15 +235,12 @@ void __cdecl game_initialize(void)
 	}
 
 	// Interpolation allocation
-	if (shell_tool_type() != _shell_tool_type_editing_tools && !shell_is_dedicated_server())
+	const bool initialize_interpolation = shell_tool_type() != _shell_tool_type_editing_tools && !shell_is_dedicated_server();
+	if (initialize_interpolation)
 	{
 		halo_interpolator_initialize();
-		halo_interpolator_set_interpolation_enabled(true);
 	}
-	else
-	{
-		halo_interpolator_set_interpolation_enabled(false);
-	}
+	halo_interpolator_set_interpolation_enabled(initialize_interpolation);
 	return;
 }
 
@@ -257,6 +254,8 @@ void __cdecl game_dispose(void)
         g_game_systems[system_index].dispose_proc();
     }
     
+	halo_interpolator_dispose();
+
     // reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_hook())
     timeEndPeriod(SYSTEM_TIMER_RESOLUTION_MS);
     return;
