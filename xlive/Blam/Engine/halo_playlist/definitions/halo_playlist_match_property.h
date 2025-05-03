@@ -11,8 +11,9 @@ enum e_halo_playlist_match_property_type : int32
 	_halo_playlist_match_property_type_minimum_players,
 	_halo_playlist_match_property_type_maximum_players,
 
-	k_halo_playlist_match_property_type_count
+	k_halo_playlist_match_property_type_count,
+	k_halo_playlist_match_property_invalid = NONE
 };
 
-e_halo_playlist_match_property_type halo_playlist_item_collection_get_match_property_type(wchar_t* value);
+e_halo_playlist_match_property_type halo_playlist_item_collection_get_match_property_get_value(wchar_t* value);
 wchar_t* halo_playlist_item_collection_match_property_get_name(e_halo_playlist_match_property_type value);

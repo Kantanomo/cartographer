@@ -82,7 +82,7 @@ void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_var
 				variant->game_engine_variant.head_hunter.speed_with_heads = _ctf_engine_player_speed_normal;
 				variant->game_engine_variant.head_hunter.max_heads_carried = _headhunter_max_heads_carried_none;
 
-				memset((int8*)&variant->vehicle_respawn_setting, 0, 12);
+				csmemset((int8*)&variant->vehicle_respawn_setting, 0, 12);
 
 				break;
 			}
