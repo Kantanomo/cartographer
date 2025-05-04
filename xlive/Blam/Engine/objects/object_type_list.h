@@ -45,5 +45,6 @@ enum e_object_type : int32
 	_object_mask_creature = FLAG(_object_type_creature),
 
 	_object_mask_sightblocking = FLAG(_object_type_vehicle) | FLAG(_object_type_scenery) | FLAG(_object_type_machine),
-	_object_mask_cannot_interpolate = FLAG(_object_type_sound_scenery) | FLAG(_object_type_light_fixture) | FLAG(_object_type_control) | FLAG(_object_type_machine) | FLAG(_object_type_scenery) | FLAG(_object_type_projectile)
+	_object_mask_cannot_interpolate = FLAG(_object_type_sound_scenery) | FLAG(_object_type_light_fixture) | FLAG(_object_type_control) | FLAG(_object_type_machine) | FLAG(_object_type_scenery) | FLAG(_object_type_projectile),
+	_object_mask_havok = FLAG(_object_type_creature) | FLAG(_object_type_crate) | FLAG(_object_type_machine) | FLAG(_object_type_vehicle) | FLAG(_object_type_biped)
 };

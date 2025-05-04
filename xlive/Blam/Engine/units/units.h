@@ -242,3 +242,5 @@ void __cdecl unit_control(datum unit_index, unit_control_data* control_data);
 e_game_team unit_get_team_index(datum unit_index);
 
 bool __cdecl unit_desires_tight_camera_track(datum unit_index);
+
+bool unit_does_not_show_readied_weapon(datum unit_index);

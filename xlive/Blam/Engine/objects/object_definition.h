@@ -8,29 +8,37 @@
 
 #include "tag_files/string_id.h"
 
-#define k_maximum_object_functions 256
-#define k_maximum_number_of_attachments_per_object 16
-#define MAXIMUM_WIDGETS_PER_OBJECT 4
-#define k_object_change_color_count 4
-#define MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_INITIAL_PERMUTATIONS 32
-#define MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_FUNCTIONS 4
+/* constants */
+
+enum
+{
+	k_maximum_object_functions = 256,
+	k_maximum_number_of_attachments_per_object = 16,
+	MAXIMUM_WIDGETS_PER_OBJECT = 4,
+	k_object_change_color_count = 4,
+	MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_INITIAL_PERMUTATIONS = 32,
+	MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_FUNCTIONS = 4
+};
+
+/* enums */
 
 enum e_object_definition_flags : int16
 {
-	_object_definition_does_not_cast_shadow = FLAG(0),
-	_object_definition_search_cardinal_direction_lightmaps_on_failure = FLAG(1),
-	_object_definition_unused = FLAG(2),
-	_object_definition_not_a_pathfinding_obstacle = FLAG(3),
-	_object_definition_extension_of_parent = FLAG(4),	// Object passes all function values to parent and uses parents markers
-	_object_definition_does_not_cause_collision_damage = FLAG(5),
-	_object_definition_early_mover = FLAG(6),
-	_object_definition_early_mover_localized_physics = FLAG(7),
-	_object_definition_use_static_massive_lightmap_sample = FLAG(8),
-	_object_definition_object_scales_attachments = FLAG(9),
-	_object_definition_inherits_players_appearance = FLAG(10),
-	_object_definition_dead_bipeds_cant_localize = FLAG(11),
-	_object_definition_attach_to_clusters_by_dynamic_sphere = FLAG(12),	// Use this for the mac gun on spacestation
-	_object_definition_effects_created_by_this_object_do_not_spawn_objects_in_multiplayer = FLAG(13),
+	_object_definition_does_not_cast_shadow_bit = 0,
+	_object_definition_search_cardinal_direction_lightmaps_on_failure_bit = 1,
+	_object_definition_unused_bit = 2,
+	_object_definition_not_a_pathfinding_obstacle_bit = 3,
+	_object_definition_extension_of_parent_bit = 4,	// Object passes all function values to parent and uses parents markers
+	_object_definition_does_not_cause_collision_damage_bit = 5,
+	_object_definition_early_mover_bit = 6,
+	_object_definition_early_mover_localized_physics_bit = 7,
+	_object_definition_use_static_massive_lightmap_sample_bit = 8,
+	_object_definition_object_scales_attachments_bit = 9,
+	_object_definition_inherits_players_appearance_bit = 10,
+	_object_definition_dead_bipeds_cant_localize_bit = 11,
+	_object_definition_attach_to_clusters_by_dynamic_sphere_bit = 12,	// Use this for the mac gun on spacestation
+	_object_definition_effects_created_by_this_object_do_not_spawn_objects_in_multiplayer_bit = 13,
+	k_number_of_object_definition_flags
 };
 
 enum e_object_definition_runtime_flags : int32
@@ -189,7 +197,7 @@ ASSERT_STRUCT_SIZE(object_change_color_definition, 16);
 struct _object_definition
 {
 	int16/*e_object_type*/ object_type;
-	e_object_definition_flags flags;
+	c_flags_no_init<e_object_definition_flags, uint16, k_number_of_object_definition_flags> flags;
 	real32 bounding_radius;				// World Units
 	real_point3d bounding_offset;
 	real32 acceleration_scale;			// marine 1.0, grunt 1.4, elite 0.9, hunter 0.5, etc.

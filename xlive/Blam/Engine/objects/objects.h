@@ -8,12 +8,14 @@
 #include "models/render_model_definitions.h"
 
 /* constants */
-
-#define k_maximum_objects_per_map 2048
+enum
+{
+	k_maximum_objects_per_map = 2048
+};
 
 /* enums */
 
-enum e_object_data_flags : int32
+enum e_object_data_flags : uint32
 {
 	_object_hidden_bit = 0,
 	_object_always_active_bit = 1,
@@ -63,12 +65,19 @@ enum e_object_physics_flags : uint16
 	_object_physics_bit_9 = 9,
 	_object_physics_bit_10 = 10,
 	_object_physics_bit_11 = 11,
+	_object_physics_bit_12 = 12,
 	k_object_physics_flags_count
 };
 
 enum e_object_damage_flags : uint16
 {
 	_object_is_dead_bit = 2,
+};
+
+enum e_object_simulation_flags : uint8
+{
+	_object_simulation_attached_bit = 0,
+	k_object_simulation_flags_count
 };
 
 enum e_object_header_flags : uint8
@@ -169,7 +178,7 @@ struct _object_datum
 	int8 model_variant_id;					// hlmt variant tag_block index
 	int8 gap_D3;
 	int32 simulation_entity_index;
-	bool attached_to_simulation;
+	c_flags_no_init<e_object_simulation_flags, uint8, k_object_simulation_flags_count> simulation_flags;
 	int8 gap_D9[3];
 	datum object_projectile_datum;
 	uint16 destroyed_constraints_flag;
@@ -214,6 +223,18 @@ struct object_marker
 };
 ASSERT_STRUCT_SIZE(object_marker, 112);
 
+struct object_damage_section
+{
+	int8 gap0[8];
+};
+ASSERT_STRUCT_SIZE(object_damage_section, 8);
+
+struct object_region_information
+{
+	int8 gap0[8];
+};
+ASSERT_STRUCT_SIZE(object_region_information, 8);
+
 /* prototypes */
 
 // Get the object fast, with no validation from datum index
@@ -246,6 +267,8 @@ void __cdecl object_update_collision_culling(datum object_datum);
 
 bool __cdecl object_header_block_allocate(datum object_datum, int16 offset, int16 padded_size, int16 alignment_bits);
 
+e_object_type object_get_type(datum object_index);
+
 // Sets the mode_tag_index and coll_tag_index parameters (if they exist)
 // Returns whether or not the render model has PRT or Lighting Info
 bool __cdecl object_is_prt_and_lightmapped(datum object_datum, datum* mode_tag_index, datum* coll_tag_index);
@@ -267,7 +290,7 @@ void __cdecl object_compute_node_matrices_with_children(datum object_index);
 
 void __cdecl object_reconnect_to_physics(datum object_index);
 
-datum __cdecl object_new(object_placement_data* placement_data);
+datum __cdecl object_new(object_placement_data* data);
 
 void __cdecl object_delete(datum object_idx);
 
@@ -326,6 +349,8 @@ int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id mark
 bool __cdecl object_force_inside_bsp(datum object_index, const real_point3d* known_good_point, int32 ignore_object_index);
 
 void* object_get_and_verify_type(datum object_index, int32 object_type_mask);
+
+void object_set_hidden(datum object_index, bool hidden);
 
 #ifdef OBJECT_OVERRIDE_ENABLED
 void object_override_set_shader(datum object_index, datum shader_tag_index);

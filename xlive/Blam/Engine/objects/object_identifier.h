@@ -18,15 +18,18 @@ private:
 	e_object_source m_source;
 
 public:
-	c_object_identifier() = default;
-	~c_object_identifier() = default;
-	void clear();
-	void clear_for_deletion();
+	c_object_identifier(void) = default;
+	~c_object_identifier(void) = default;
+	void clear(void);
+	void clear_for_deletion(void);
 	void create_dynamic(e_object_type type);
 
-	int16 get_origin_bsp() const;
-	e_object_source get_source() const;
-	e_object_type get_type() const;
-	int32 get_unique_id() const;
+	int16 get_origin_bsp(void) const;
+	e_object_source get_source(void) const;
+	e_object_type get_type(void) const;
+	int32 get_unique_id(void) const;
+
+	bool is_scenario_object(void) const;
+	datum find_object_index(void) const;
 };
 ASSERT_STRUCT_SIZE(c_object_identifier, 8);

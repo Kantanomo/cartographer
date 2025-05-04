@@ -17,7 +17,7 @@ void object_early_mover_new(datum object_index)
 	const object_definition* object_def = (object_definition*)tag_get_fast(object->definition_index);
 	s_object_early_movers_globals* object_early_movers_globals = object_early_movers_globals_get();
 
-	if (TEST_FLAG(object_def->object.flags, _object_definition_early_mover) && object_early_movers_globals->object_index_count < MAXIMUM_OBJECT_EARLY_MOVERS_PER_MAP)
+	if (object_def->object.flags.test(_object_definition_early_mover_bit) && object_early_movers_globals->object_index_count < MAXIMUM_OBJECT_EARLY_MOVERS_PER_MAP)
 	{
 		object->object.physics_flags.set(_object_is_early_mover_bit, true);
 		object_early_movers_globals->early_mover_objects[object_early_movers_globals->object_index_count++] = object_index;
