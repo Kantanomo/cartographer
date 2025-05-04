@@ -1,5 +1,6 @@
 #pragma once
 #include "multiplayer_globals_definition.h"
+#include "saved_games/game_variant.h"
 #include "simulation/game_interface/simulation_game_events.h"
 
 /* public code */
@@ -15,3 +16,5 @@ s_multiplayer_event_response_definition* game_engine_find_event_response(s_game_
 void game_engine_event_execute(s_multiplayer_event_response_definition* event_response, s_game_engine_event* event, int32 player_index);
 // ### TODO: function name
 bool __cdecl sub_4701B6(datum player_index);
+
+e_game_variant_description_index game_engine_type_get_variant_description_index(e_game_engine_type type);

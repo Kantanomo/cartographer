@@ -2,6 +2,14 @@
 #include "definitions/halo_playlist_header.h"
 #include "saved_games/game_variant.h"
 
+enum e_halo_playlist_loading_result
+{
+	_halo_playlist_loading_result_success,
+	_halo_playlist_loading_result_code_1,
+	_halo_playlist_loading_result_code_2,
+	_halo_playlist_loading_result_unexpected_end_of_file,
+	_halo_playlist_loading_result_empty_playlist
+};
 
 enum e_halo_playlist_error
 {
@@ -27,23 +35,23 @@ enum e_halo_playlist_error
 
 enum e_halo_playlist_reader_seek_mode
 {
-	new_line = 0x0,
-	header_start = 0x2,
-	header_read = 0x3,
-	property_name_read = 0x4,
-	property_deliminator_scan = 0x5,
-	property_value_read = 0x6,
-	seek_to_next_line = 0x7,
+	_halo_playlist_reader_seek_mode_new_line = 0x0,
+	_halo_playlist_reader_seek_mode_header_start = 0x2,
+	_halo_playlist_reader_seek_mode_header_read = 0x3,
+	_halo_playlist_reader_seek_mode_property_name_read = 0x4,
+	_halo_playlist_reader_seek_mode_property_deliminator_scan = 0x5,
+	_halo_playlist_reader_seek_mode_property_value_read = 0x6,
+	_halo_playlist_reader_seek_mode_seek_to_next_line = 0x7,
 };
 
-struct s_halo_playlist_section_line
+struct s_halo_playlist_section_item
 {
 	wchar_t name_buffer[32];
 	wchar_t value_buffer[32];
 	uint32 file_line;
 	bool processed;
 };
-ASSERT_STRUCT_SIZE(s_halo_playlist_section_line, 0x88);
+ASSERT_STRUCT_SIZE(s_halo_playlist_section_item, 0x88);
 
 struct s_halo_playlist_match
 {
@@ -97,18 +105,18 @@ ASSERT_STRUCT_SIZE(s_halo_playlist_container, 0x1E81C);
 
 struct c_halo_playlist_reader
 {
-	s_halo_playlist* playlist;
-	s_halo_playlist_match matches[100];
-	uint32 match_count;
-	s_halo_playlist_section_line buffer[112];
-	DWORD section_buffer_current_index;
-	wchar_t header_buffer[32];
+	s_halo_playlist* m_playlist;
+	s_halo_playlist_match m_matches[100];
+	uint32 m_match_count;
+	s_halo_playlist_section_item m_section_items[112];
+	DWORD m_section_items_count;
+	wchar_t m_section_header_buffer[32];
 	DWORD m_current_header_file_line;
-	e_halo_playlist_header_type current_section_type;
-	e_halo_playlist_reader_seek_mode reader_current_mode;
-	uint32 reader_current_char_index;
-	uint32 reader_current_line;
-	bool playlist_header_found;
+	e_halo_playlist_header_type m_current_section_type;
+	e_halo_playlist_reader_seek_mode m_current_reader_mode;
+	uint32 m_current_reader_char_index;
+	uint32 m_current_reader_line;
+	bool m_playlist_header_found;
 	bool unk;
 public:
 	void parse_file_section(const wchar_t* file_buffer);
@@ -116,19 +124,19 @@ public:
 	void process_current_header();
 
 	void process_variant_section();
-	bool process_variant_match_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_player_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_team_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_vehicle_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_equipment_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_slayer_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_oddball_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_juggernaut_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_king_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_ctf_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_assault_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_territories_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
-	bool process_variant_headhunter_setting(s_halo_playlist_section_line* section_item, s_game_variant* variant);
+	bool process_variant_match_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_player_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_team_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_vehicle_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_equipment_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_slayer_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_oddball_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_juggernaut_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_king_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_ctf_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_assault_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_territories_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_headhunter_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
 
 	void process_match_section();
 	void process_current_property();
