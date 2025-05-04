@@ -10,9 +10,9 @@ void c_model_widget::apply_appearance_and_character(s_player_profile_traits* app
 
 // c_model_widget virtual functions
 
-int32 c_model_widget::setup_children()
+void c_model_widget::setup_children()
 {
-	return INVOKE_TYPE(0x2407A7, 0x0, int32(__thiscall*)(c_model_widget*), this);
+	INVOKE_TYPE(0x2407A7, 0x0, void(__thiscall*)(c_model_widget*), this);
 }
 
 void c_model_widget::render_widget(rectangle2d* viewport_bounds)

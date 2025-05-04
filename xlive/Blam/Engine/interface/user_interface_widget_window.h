@@ -286,7 +286,7 @@ enum e_user_interface_screen_id : uint32
 	_screen_keyboard_settings_menu = 0x102,
 	_screen_pause_settings = 0x103,
 	_screen_keyboard_settings = 0x104,
-	_screen_video_settings2 = 0x105,
+	_screen_video_settings_mp = 0x105,
 	_screen_audio_settings2 = 0x106,
 	_screen_volume_settings = 0x107,
 	_screen_sound_quality = 0x108,
@@ -465,7 +465,7 @@ protected:
 
 public:
 
-	c_screen_with_menu(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags , c_list_widget* list);
+	c_screen_with_menu(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags , c_list_widget* list);
 	c_text_widget* get_screen_subheader_text();
 
 

@@ -122,12 +122,13 @@ public:
 	void set_controller_mask(uint32 user_mask);
 	void set_controller_mask_recursive(uint32 user_mask);
 	void start_widget_animation(int32 type);
+	void set_change_color(const real_rgb_color new_color);
 
 	
 	// c_user_interface_widget virtual functions
 
 	virtual ~c_user_interface_widget();
-	virtual int32 setup_children();
+	virtual void setup_children();
 	virtual void pre_destroy();
 	virtual void update();
 	virtual void render_widget(rectangle2d* viewport_bounds);

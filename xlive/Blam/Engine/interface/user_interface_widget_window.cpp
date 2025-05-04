@@ -227,7 +227,7 @@ void user_interface_register_screen_to_channel(c_screen_widget* new_screen, s_sc
 
 
 
-c_screen_with_menu::c_screen_with_menu(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, c_list_widget* list):
+c_screen_with_menu::c_screen_with_menu(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags, c_list_widget* list):
 	c_screen_widget(menu_id,channel_type,window_index,user_flags)
 {
 	this->m_child_list = list;

@@ -638,7 +638,7 @@ void c_screen_squad_settings::update()
 		option_value_text_block->set_text_from_string_id(value_string);
 	if (option_bitmap)
 	{
-		option_bitmap->verify_and_update_bitmap_index(bitm_index);
+		option_bitmap->verify_and_change_sprite(bitm_index);
 		option_bitmap->set_render_scale(&option_render_scale);
 	}
 

@@ -193,6 +193,11 @@ void c_user_interface_widget::start_widget_animation(int32 type)
 	INVOKE_TYPE(0x212604, 0x0, void(__thiscall*)(c_user_interface_widget*, int32), this, type);
 }
 
+void c_user_interface_widget::set_change_color(const real_rgb_color new_color)
+{
+	m_widget_color = new_color;
+}
+
 void c_user_interface_widget::destroy_recursive()
 {
 	c_user_interface_widget* child_widget = m_child_widget;
@@ -219,9 +224,9 @@ c_user_interface_widget::~c_user_interface_widget(void)
 	return;
 }
 
-int32 c_user_interface_widget::setup_children()
+void c_user_interface_widget::setup_children()
 {
-	return INVOKE_TYPE(0x211E23, 0x0, int32(__thiscall*)(c_user_interface_widget*), this);
+	INVOKE_TYPE(0x211E23, 0x0, void(__thiscall*)(c_user_interface_widget*), this);
 }
 
 void c_user_interface_widget::pre_destroy()

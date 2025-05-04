@@ -43,6 +43,7 @@
 #include "saved_games/game_state.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
+#include "shell/shell_windows_pcc.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -285,11 +286,6 @@ int32* hardware_vertex_processing_get(void)
 	return Memory::GetAddress<int32*>(0x9DA8B0);
 }
 
-int32* allow_vsync_get(void)
-{
-	return Memory::GetAddress<int32*>(0x9DA8C8);
-}
-
 bool __cdecl rasterizer_initialize(void)
 {
 	return INVOKE(0x0263359, 0x0, rasterizer_initialize);
@@ -497,9 +493,10 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 	d3d_present_parameters.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 
 	// ### FIXME: make VSYNC configurable (UI required) !!
-	if (shell_command_line_flag_is_set(_shell_command_line_flag_novsync) 
+	if (shell_command_line_flag_is_set(_shell_command_line_flag_novsync)
 		/* || *rasterizer_low_level_texture_detail_get() */ // low detail textures checked for no vsync
-		|| !*allow_vsync_get())    
+		|| !H2Config_use_vsync)
+		/* || !shell_windows_pcc_allows_vsync())*/
 	{
 		d3d_present_parameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 	}
@@ -752,17 +749,17 @@ bool __cdecl rasterizer_dx9_initialize(void)
 				rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
 			}
 
-			if (shell_command_line_flag_is_set(_shell_command_line_flag_windowed))
+			if (shell_command_line_flag_is_set(_shell_command_line_flag_windowed) && rasterizer_globals->display_parameters.window_mode != _rasterizer_window_mode_borderless)
 			{
 				rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
 				const e_rasterizer_window_mode mode = _rasterizer_window_mode_windowed;
 				rasterizer_settings_set_display_mode(&mode);
 			}
-
+	
 			if (rasterizer_globals->display_parameters.window_mode == _rasterizer_window_mode_real_fullscreen)
 			{
 				rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_funky_fullscreen;
-			}
+			}		
 
 			HWND hwnd = rasterizer_dx9_create_main_window();
 			result = hwnd != 0;
@@ -1076,7 +1073,7 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 					rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
 				}
 			}
-			else
+			else 
 			{
 				rasterizer_dx9_window_change_display_settings(0);
 			}

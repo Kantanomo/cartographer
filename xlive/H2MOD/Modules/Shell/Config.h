@@ -66,8 +66,6 @@ extern bool H2Config_even_shuffle_teams;
 extern bool H2Config_koth_random;
 
 extern WPARAM H2Config_hotkeyIdHelp;
-extern WPARAM H2Config_hotkeyIdAlignWindow;
-extern WPARAM H2Config_hotkeyIdWindowMode;
 extern WPARAM H2Config_hotkeyIdToggleHideIngameChat;
 extern WPARAM H2Config_hotkeyIdGuide;
 extern WPARAM H2Config_hotkeyIdConsole;
@@ -82,6 +80,7 @@ extern bool H2Config_spooky_boy;
 
 extern bool H2Config_force_off_d3d9ex;
 extern bool H2Config_force_off_sm3;
+extern bool H2Config_use_vsync;
 
 #ifndef NDEBUG
 extern int H2Config_forced_event;

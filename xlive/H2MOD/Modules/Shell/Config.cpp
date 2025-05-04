@@ -202,10 +202,9 @@ int H2Config_forced_event = 0;
 
 bool H2Config_force_off_d3d9ex = false;
 bool H2Config_force_off_sm3 = false;
+bool H2Config_use_vsync = false;
 
 WPARAM H2Config_hotkeyIdHelp = VK_F2;
-WPARAM H2Config_hotkeyIdAlignWindow = VK_F7;
-WPARAM H2Config_hotkeyIdWindowMode = VK_F8;
 WPARAM H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
 WPARAM H2Config_hotkeyIdGuide = VK_HOME;
 WPARAM H2Config_hotkeyIdConsole = VK_F10;
@@ -486,6 +485,7 @@ void SaveH2Config()
 			CONFIG_SET(&ini, "force_off_sm3", &H2Config_force_off_sm3);
 			CONFIG_SET(&ini, "use_d3d9on12", &g_rasterizer_dx9on12_enabled);
 			CONFIG_SET(&ini, "disable_amd_or_ati_patches", &g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
+			CONFIG_SET(&ini, "use_vsync", &H2Config_use_vsync);
 		}
 
 		CONFIG_SET(&ini, "enable_xdelay", &H2Config_xDelay);
@@ -526,14 +526,6 @@ void SaveH2Config()
 			vkstring.set("#");
 			GetVKeyCodeString(H2Config_hotkeyIdHelp, &vkstring);
 			CONFIG_SET_C(&ini, "hotkey_help", H2Config_hotkeyIdHelp, vkstring.get_string());
-
-			vkstring.set("#");
-			GetVKeyCodeString(H2Config_hotkeyIdAlignWindow, &vkstring);
-			CONFIG_SET_C(&ini, "hotkey_align_window", H2Config_hotkeyIdAlignWindow, vkstring.get_string());
-
-			vkstring.set("#");
-			GetVKeyCodeString(H2Config_hotkeyIdWindowMode, &vkstring);
-			CONFIG_SET_C(&ini, "hotkey_window_mode", H2Config_hotkeyIdWindowMode, vkstring.get_string());
 
 			vkstring.set("#");
 			GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat, &vkstring);
@@ -674,8 +666,6 @@ void ReadH2Config()
 				CONFIG_GET(&ini, "hide_ingame_chat", "false", &H2Config_hide_ingame_chat);
 
 				CONFIG_GET(&ini, "hotkey_help", "0x72", &H2Config_hotkeyIdHelp); // VK_F2
-				CONFIG_GET(&ini, "hotkey_align_window", "0x76", &H2Config_hotkeyIdAlignWindow); // VK_F7
-				CONFIG_GET(&ini, "hotkey_window_mode", "0x77", &H2Config_hotkeyIdWindowMode); // VK_F8
 				CONFIG_GET(&ini, "hotkey_hide_ingame_chat", "0x78", &H2Config_hotkeyIdToggleHideIngameChat); // VK_F9
 				CONFIG_GET(&ini, "hotkey_guide", "0x24", &H2Config_hotkeyIdGuide); // VK_HOME
 				CONFIG_GET(&ini, "hotkey_console", "0x79", &H2Config_hotkeyIdConsole); // VK_F10
@@ -734,6 +724,7 @@ void ReadH2Config()
 					"disable_amd_or_ati_patches",
 					"false",
 					&g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
+				CONFIG_GET(&ini, "use_vsync", "false", &H2Config_use_vsync);
 			}
 			// dedicated server only
 			else

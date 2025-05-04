@@ -23,6 +23,14 @@ enum e_settings_list_skin_texts
 	k_number_of_settings_list_skin_texts,
 };
 
+enum e_settings_list_skin_bitmaps
+{
+	_settings_list_skin_bitmap_settings_list_bkd = 0,
+	_settings_list_skin_bitmap_hilite = 1,
+	_settings_list_skin_bitmap_hilite_bracket = 2,
+	_settings_list_skin_bitmap_hilite_bracket2 = 3,
+	k_number_of_settings_list_skin_bitmaps,
+};
 
 /* structures */
 
@@ -40,6 +48,16 @@ struct s_list_item_datum
 };
 ASSERT_STRUCT_SIZE(s_list_item_datum, 4);
 
+struct s_custom_item_text_mapping
+{
+	union
+	{
+		const wchar_t* const* string_collection; // must be of size k_language_count
+		string_id item_text;
+	};
+	int16 item_id;
+	bool is_custom;
+};
 
 /* classes */
 
@@ -70,16 +88,18 @@ public:
 
 	c_list_item_widget* try_find_item_widget(uint32 idx);
 	datum get_old_data_index();
-	void update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, s_item_text_mapping* mapping, int32 total_mappings) const;
+	void update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, const s_item_text_mapping* mapping, int32 total_mappings) const;
+	void update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, const s_custom_item_text_mapping* mapping, int32 total_mappings) const;
 	void set_focused_item_index(datum item_index);
 	void remove_focused_item_datum_from_data_array();
 	void remove_item_from_list(c_list_item_widget* item);
+	void setup_item_indices();
 
 
 	// c_list_widget virtual functions
 
 	virtual ~c_list_widget() = default;
-	virtual int32 setup_children() override;
+	virtual void setup_children() override;
 	virtual void pre_destroy() override;
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
@@ -104,3 +124,9 @@ private:
 	}
 };
 ASSERT_STRUCT_SIZE(c_list_widget, 0xB0);
+
+/* macros */
+
+// This isn't a nice solution but seems to be the only way to set the string_id field when initializing a constant variable of s_custom_item_text_mapping
+// The value set will end up the same when casted to an address so this won't introduce any unintended behaviour
+#define STRING_ID_TO_CUSTOM_ITEM_MAPPING(sid) (const wchar_t* const*)(sid)

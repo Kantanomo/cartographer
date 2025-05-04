@@ -3,6 +3,8 @@
 
 #include "hud.h"
 #include "user_interface_controller.h"
+#include "user_interface_shared_globals.h"
+
 #include "render/render.h"
 
 datum __cdecl user_interface_get_widget_tag_index_from_screen_id(e_user_interface_screen_id screen_id)
@@ -65,6 +67,13 @@ void __cdecl user_interface_get_cursor_position_scaled(point2d* out_position)
 	}
 	return;
 }
+
+void __cdecl user_interface_utilities_play_sound(e_user_interface_global_sound sound_type)
+{
+	INVOKE(0x21DD04, 0x0, user_interface_utilities_play_sound, sound_type);
+	return;
+}
+
 
 void user_interface_utilities_apply_patches()
 {

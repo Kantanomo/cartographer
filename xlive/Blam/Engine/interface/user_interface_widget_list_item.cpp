@@ -19,11 +19,11 @@ datum c_list_item_widget::get_last_data_index(void) const
 	return this->m_last_data_index;
 }
 
-void c_list_item_widget::set_item_transitioning()
+void c_list_item_widget::set_item_transitioning(bool state)
 {
 	// only used by main_menu_list ?
 	// maybe transitioning?
-	this->field_78 = true;
+	this->field_78 = state;
 }
 
 

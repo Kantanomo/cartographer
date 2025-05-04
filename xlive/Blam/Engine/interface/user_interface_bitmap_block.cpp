@@ -12,7 +12,7 @@ bitmap_data* c_bitmap_widget::get_current_bitmap_data()
 	return INVOKE_TYPE(0x21C941, 0x0, bitmap_data * (__thiscall*)(c_bitmap_widget*), this);
 }
 
-void c_bitmap_widget::verify_and_update_bitmap_index(int16 index)
+void c_bitmap_widget::verify_and_change_sprite(int16 index)
 {
 	INVOKE_TYPE(0x21C300, 0x0, void(__thiscall*)(c_bitmap_widget*, int16), this, index);
 }
