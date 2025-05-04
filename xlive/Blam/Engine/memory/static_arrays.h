@@ -593,3 +593,9 @@ const wchar_t* c_static_wchar_string<T>::append_print(const wchar_t* format, ...
 	va_end(args);
 	return m_string;
 }
+
+/* globals */
+
+#ifdef ASSERTS_ENABLED
+extern c_static_string<256> g_static_string_assert_text;
+#endif
