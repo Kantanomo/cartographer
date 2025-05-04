@@ -247,11 +247,23 @@ static void observer_update_internal(int32 user_index)
 		scenario_location_from_point(&location, &point);
 		collision_result collision;
 		collision.global_material_index = NONE;
-		uint32 flags = (scenario_location_underwater(&location, &point, NULL) ? 0x808C0D : 0x808C0F);
 
-		if (collision_test_line((e_collision_test_flags)flags, &observer->result.position, &point, NONE, NONE, &collision))
+		const e_collision_test_flags underwater_flags = (e_collision_test_flags)
+		(
+			FLAG(_collision_test_structure_bit) | FLAG(_collision_test_instanced_geometry_bit) | FLAG(_collision_test_objects_bit) |
+			FLAG(_collision_test_bit_10) | FLAG(_collision_test_bit_11) | FLAG(_collision_test_bit_15) | FLAG(_collision_test_bit_23)
+		);
+		
+		const e_collision_test_flags default_flags = (e_collision_test_flags)
+		(
+			FLAG(_collision_test_structure_bit) | FLAG(_collision_test_media_bit) | FLAG(_collision_test_instanced_geometry_bit) | FLAG(_collision_test_objects_bit) |
+			FLAG(_collision_test_bit_10) | FLAG(_collision_test_bit_11) | FLAG(_collision_test_bit_15) | FLAG(_collision_test_bit_23)
+		);
+
+		const e_collision_test_flags flags = (scenario_location_underwater(&location, &point, NULL) ? underwater_flags : default_flags);
+		if (collision_test_line(flags, &observer->result.position, &point, NONE, NONE, &collision))
 		{
-			points_interpolate(&observer->result.position, &point, collision.t * 0.89999998f, &point);
+			points_interpolate(&observer->result.position, &point, collision.t * 0.9f, &point);
 		}
 	}
 
