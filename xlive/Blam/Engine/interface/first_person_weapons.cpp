@@ -631,7 +631,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 					{
 						// Get the interpolated matrix and use it if we can interpolate
 						real_matrix4x3 interpolated_adjustment_matrix;
-						bool interpolated_matrix = halo_interpolator_get_interpolated_matrix_from_user_index(user_index, 1u, &interpolated_adjustment_matrix);
+						bool interpolated_matrix = halo_interpolator_get_interpolated_matrix_from_user_index(user_index, 1, &interpolated_adjustment_matrix);
 						real_matrix4x3* adjustment_matrix = (interpolated_matrix ? &interpolated_adjustment_matrix : &first_person_data->adjustment_matrix);
 
 						real_matrix4x3 inverse_adjustment_matrix;
@@ -880,7 +880,7 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
 {
 	real_matrix4x3* result = NULL;
 	s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
-	int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
+	const int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
 	if (weapon_slot != NONE)
 	{
 		s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);

@@ -1,11 +1,13 @@
 #pragma once
 #include "animations/animation_manager.h"
 #include "game/players.h"
-#include "math/matrix_math.h"
 
-#define MAXIMUM_NUMBER_OF_FIRST_PERSON_MODELS 4
-#define MAXIMUM_NODES_PER_FIRST_PERSON_MODEL 64
-#define k_first_person_max_weapons 2
+enum
+{
+	MAXIMUM_NUMBER_OF_FIRST_PERSON_MODELS = 4,
+	MAXIMUM_NODES_PER_FIRST_PERSON_MODEL = 64,
+	k_first_person_max_weapons = 2,
+};
 
 enum e_first_person_weapon_data_flags : uint32
 {
