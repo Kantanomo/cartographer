@@ -258,6 +258,11 @@ inline bool valid_real_point3d(real_point3d const* p)
 	return valid_real(p->x) && valid_real(p->y) && valid_real(p->z);
 }
 
+inline bool valid_real_vector3d(real_vector3d const* v)
+{
+	return valid_real(v->i) && valid_real(v->j) && valid_real(v->k);
+}
+
 inline bool valid_real_vector3d_axes3(const real_vector3d* f, const real_vector3d* l, const real_vector3d* u)
 {
 	return 
@@ -475,6 +480,22 @@ if (!valid_real_normal3d(normal))				\
 }												\
 (void)0
 
+#define assert_valid_real_point3d(point)		\
+if (!valid_real_point3d(point))					\
+{												\
+	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_point3d(%f, %f, %f)", #point, (*point).x, (*point).y, (*point).z);	\
+	DISPLAY_ASSERT(string);						\
+}												\
+(void)0
+
+#define assert_valid_real_vector3d(vector)		\
+if (!valid_real_vector3d(vector))				\
+{												\
+	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_vector3d(%f, %f, %f)", #vector, (*vector).i, (*vector).j, (*vector).k);	\
+	DISPLAY_ASSERT(string);						\
+}												\
+(void)0
+
 #define assert_valid_real_vector3d_axes2(forward, up)	\
 if (!valid_real_vector3d_axes2(forward, up))			\
 {														\
@@ -545,6 +566,8 @@ if (!valid_real_matrix4x3(matrix))				\
 #else
 #define assert_valid_real(value)						(void)0
 #define assert_valid_real_normal3d(normal)				(void)0
+#define assert_valid_real_point3d(normal)				(void)0
+#define assert_valid_real_vector3d(normal)				(void)0
 #define assert_valid_real_vector3d_axes2(forward, up)	(void)0
 #define assert_valid_real_matrix4x3(matrix)				(void)0
 #endif
