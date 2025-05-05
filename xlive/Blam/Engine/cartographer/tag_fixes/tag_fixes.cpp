@@ -42,6 +42,8 @@ static void tag_fixes_environment(void);
 // Add back misty rain weather effect on delta halo
 static void tag_fixes_misty_rain(void);
 
+static void tag_fixes_elite_mp(void);
+
 // Explanation:
 // Hud offsets were doubled as a hack by hired gun when they upscaled the hud for H2V by 2
 // However, these numbers were only doubled for fullscreen offsets and not the offsets used when in splitscreen
@@ -51,7 +53,8 @@ static void tag_fixes_split_screen_hud(void);
 // Change sound_classes data to equivalents in original halo 2
 static void sound_classes_fix_values(void);
 
-static void tag_fixes_elite_mp(void);
+// Fix the gravity throne so it uses it's collision model
+static void gravity_throne_collision_fix(void);
 
 /* public code */
 
@@ -65,6 +68,7 @@ void main_tag_fixes(void)
 	tag_fixes_misty_rain();
 	tag_fixes_split_screen_hud();
 	sound_classes_fix_values();
+	gravity_throne_collision_fix();
 
 	// disabled till z-fighting is fixed.
 	//tag_fixes_elite_mp();
@@ -401,6 +405,25 @@ static void sound_classes_fix_values(void)
 		sound_classes->sound_classes[_sound_class_device_machinery]->gain_bounds = { -0.f, -4.f };
 		sound_classes->sound_classes[_sound_class_device_stationary]->gain_bounds = { -0.f, -4.f };
 		sound_classes->sound_classes[_sound_class_ambient_machinery]->gain_bounds = { -0.f, -4.f };
+	}
+	return;
+}
+
+static void gravity_throne_collision_fix(void)
+{
+	const char* tag_name = "objects\\vehicles\\gravity_throne\\gravity_throne";
+	const datum model_index =  tag_loaded(_tag_group_model, tag_name);
+	if (model_index != NONE)
+	{
+		const datum collision_index = tag_loaded(_tag_group_collision_model, tag_name);
+		if (collision_index != NONE)
+		{
+			s_model_definition* model_definition = (s_model_definition*)tag_get_fast(model_index);
+			ASSERT(model_definition);
+
+			model_definition->collision_model.index = collision_index;
+			model_definition->collision_model.group = { _tag_group_collision_model };
+		}
 	}
 	return;
 }
