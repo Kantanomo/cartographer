@@ -6,7 +6,7 @@
 
 #include "game/player_constants.h"
 #include "main/game_preferences.h"
-#include "saved_games/cartographer_player_profile.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 

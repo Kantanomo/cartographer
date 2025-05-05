@@ -1,5 +1,6 @@
 #pragma once
 #include "input/controllers.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 /* constants */
 
@@ -27,6 +28,11 @@ enum e_imgui_window_type
 	_imgui_window_console,
 	k_imgui_window_type_count
 };
+
+/* globals */
+
+extern s_saved_game_cartographer_player_profile* g_advanced_settings_current_cartographer_profile;
+extern e_controller_index g_advanced_settings_current_controller_index;
 
 namespace ImGuiHandler
 {
@@ -83,7 +89,5 @@ namespace ImGuiHandler
 		void Render(bool* p_open);
 		void Open();
 		void Close();
-		void MapLoad();
-		void Initialize();
 	}
 }

@@ -202,8 +202,10 @@ ASSERT_EXCEPTION(STATEMENT, true);	\
 
 void cseries_initialize(void);
 
+#ifdef ASSERTS_ENABLED
 // TODO implement
 void display_assert(char const* condition, char const* file, int32 line, bool assertion_failed);
+#endif
 
 void* csmemmove(void* destination, void* source, size_t size);
 

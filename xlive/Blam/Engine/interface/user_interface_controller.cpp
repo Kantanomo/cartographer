@@ -9,7 +9,7 @@
 
 #include "game/game_time.h"
 #include "networking/online/online_account_xbox.h"
-#include "saved_games/cartographer_player_profile.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "scenario/scenario_definitions.h"
 #include "scenario/scenario.h"
 #include "sound/sound_manager.h"

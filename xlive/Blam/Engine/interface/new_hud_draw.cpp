@@ -14,7 +14,7 @@
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "rasterizer/rasterizer_text.h"
 #include "render/render.h"
-#include "saved_games/cartographer_player_profile.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "text/draw_string.h"
 
 /* globals */

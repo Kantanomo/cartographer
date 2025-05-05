@@ -1,9 +1,8 @@
 #pragma once
-#include "items/weapon_definitions.h"
 
 /* enums */
 
-enum e_weapon_offset_weapon : uint8
+enum e_weapon_offset_weapon : int8
 {
 	_weapon_offset_weapon_battle_rifle,
 	_weapon_offset_weapon_beam_rifle,
@@ -22,7 +21,8 @@ enum e_weapon_offset_weapon : uint8
 	_weapon_offset_weapon_smg,
 	_weapon_offset_weapon_sniper_rifle,
 
-	k_weapon_offset_weapon_count
+	k_weapon_offset_weapon_count,
+	_weapon_offset_weapon_invalid = NONE
 };
 
 /* structures */
@@ -30,21 +30,15 @@ enum e_weapon_offset_weapon : uint8
 struct s_weapon_custom_offset_constant_data
 {
 	const real_point3d default_offset;
-	const char *const weapon_path;
-};
-
-struct s_weapon_custom_offset
-{
-	real_point3d modified_offset;
-	weapon_definition* tag;
+	const char* const weapon_path;
 };
 
 /* constants */
 
-extern const s_weapon_custom_offset_constant_data k_weapon_custom_offset_constant_data[16];
+extern const s_weapon_custom_offset_constant_data k_weapon_offset_constant_data[k_weapon_offset_weapon_count];
 
-/* prototypes */
+/* public code */
 
-void ReadWeaponOffsetConfig(s_weapon_custom_offset* weaponOffsets, int count);
-void SaveWeaponOffsetConfig(const s_weapon_custom_offset* customOffsets, int count, bool defaultOffsets);
-void WriteDefaultFile(const s_weapon_custom_offset* weaponOffsets, int count);
+void cartographer_player_profile_weapon_offsets_on_map_load(void);
+
+e_weapon_offset_weapon cartographer_player_profile_weapon_offsets_get_weapon_index_from_tag_index(datum weapon_index);

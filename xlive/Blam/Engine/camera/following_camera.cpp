@@ -6,7 +6,7 @@
 #include "observer.h"
 #include "game/game_globals.h"
 #include "game/player_control.h"
-#include "saved_games/cartographer_player_profile.h"
+#include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 //void following_camera_update_apply_camera_track(s_unit_camera* unit_camera, real32 delta, real_vector3d* forward_out, 
 //	real_point3d* position_out, bool tight_camera_track)

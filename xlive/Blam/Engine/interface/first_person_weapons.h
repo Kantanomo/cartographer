@@ -2,6 +2,8 @@
 #include "animations/animation_manager.h"
 #include "game/players.h"
 
+/* constants */
+
 enum
 {
 	MAXIMUM_NUMBER_OF_FIRST_PERSON_MODELS = 4,
@@ -9,11 +11,20 @@ enum
 	k_first_person_max_weapons = 2,
 };
 
+/* enums */
+
 enum e_first_person_weapon_data_flags : uint32
 {
 	_weapon_node_table_valid_bit = 1,
 	_arm_node_table_valid_bit = 2,
 };
+
+enum e_first_person_weapon_flags : uint32
+{
+	_first_person_weapon_valid_adjustment_matrix_bit = 2
+};
+
+/* structures */
 
 struct s_first_person_model_data
 {
@@ -57,7 +68,7 @@ ASSERT_STRUCT_SIZE(s_first_person_weapon_data, 4112);
 
 struct s_first_person_weapon
 {
-	uint32 flags;
+	/*e_first_person_weapon_flags*/ uint32 flags;
 	datum unit_index;
 	e_character_type character_type;
 	int8 pad[3];
@@ -82,6 +93,8 @@ struct s_first_person_orientations
 	real_orientation hand_orientations[MAXIMUM_NODES_PER_FIRST_PERSON_MODEL];
 };
 ASSERT_STRUCT_SIZE(s_first_person_orientations, 4096);
+
+/* prototypes */
 
 s_first_person_weapon* first_person_weapon_get_global(void);
 s_first_person_weapon* first_person_weapons_get(uint32 user_index);
