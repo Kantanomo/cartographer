@@ -68,7 +68,7 @@ struct s_saved_game_cartographer_player_profile_v3
 	uint8 field_of_view;
 	uint8 vehicle_field_of_view;
 	bool static_first_person;
-	uint8 pad_0[1];
+	bool controller_aim_assist_enabled;
 	real32 mouse_sensitivity;
 	real32 raw_mouse_sensitivity;
 	bool mouse_uniform;
