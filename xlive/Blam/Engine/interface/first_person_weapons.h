@@ -96,21 +96,20 @@ ASSERT_STRUCT_SIZE(s_first_person_orientations, 4096);
 
 /* prototypes */
 
-s_first_person_weapon* first_person_weapon_get_global(void);
-s_first_person_weapon* first_person_weapons_get(uint32 user_index);
-s_first_person_orientations* first_person_orientations_get_global(void);
-s_first_person_orientations* first_person_orientations_get(uint32 user_index, uint32 weapon_slot);
-s_first_person_model_data* first_person_model_data_get_global(void);
+void first_person_weapons_apply_patches(void);
+
 s_first_person_model_data* first_person_model_data_get(uint32 user_index);
 
-void toggle_first_person(bool state);
+void first_person_weapons_toggle(bool state);
+
+int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_index, int32 maximum_model_count, s_first_person_model_data* fp_model_data);
 
 void first_person_weapon_apply_camera_effect(int32 user_index, real_matrix4x3* effect_matrix);
 
 real_matrix4x3* first_person_weapon_get_relative_node_matrix(int32 user_index, datum weapon_index, int16 node_index);
+
 real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index);
 
 void __cdecl first_person_weapon_get_worldspace_node_matrix(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix);
-void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix);
 
-void first_person_weapons_apply_patches(void);
+void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix);

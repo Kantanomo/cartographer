@@ -166,7 +166,7 @@ bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point
 	return mass_interpolated;
 }
 
-bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real_matrix4x3** node_matrices, int32* out_node_count)
+bool halo_interpolator_interpolate_object_node_matrices(datum object_index, const real_matrix4x3** node_matrices, int32* out_node_count)
 {
 	bool result = false;
 	int32 out_abs_object_index;

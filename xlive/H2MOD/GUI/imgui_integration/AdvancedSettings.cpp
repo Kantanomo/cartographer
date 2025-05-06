@@ -265,7 +265,7 @@ namespace ImGuiHandler {
 
 						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_show_first_person), &g_showFP);
 						if (ImGui::IsItemEdited())
-							toggle_first_person(g_showFP);
+							first_person_weapons_toggle(g_showFP);
 						ImGui::Columns(1);
 						ImGui::NewLine();
 					}

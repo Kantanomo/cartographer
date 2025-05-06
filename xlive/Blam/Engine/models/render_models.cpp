@@ -28,7 +28,7 @@ int32 __cdecl render_model_get_markers_by_name(
 	int32 a4,
 	int32* node_remapping_table,
 	int32 node_count,
-	real_matrix4x3* node_matrices,
+	const real_matrix4x3* node_matrices,
 	bool object_is_mirrored,
 	object_marker* markers,
 	int32 count)

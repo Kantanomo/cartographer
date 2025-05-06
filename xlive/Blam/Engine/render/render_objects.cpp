@@ -1,21 +1,22 @@
 #include "stdafx.h"
-
 #include "render_objects.h"
+
 #include "interface/first_person_weapons.h"
+#include "main/interpolator.h"
+#include "models/models.h"
 #include "objects/objects.h"
 #include "objects/object_definition.h"
-#include "models/models.h"
 
-#include "main/interpolator.h"
+/* public code */
 
-void object_get_model_node_data(
+void render_object_get_model_node_data(
 	datum object_index,
 	bool first_person,
 	int16 render_model_index_index,
 	uint32* flags,
 	datum* out_object_index,
 	datum* render_model_index,
-	real_matrix4x3** object_node_matrices,
+	const real_matrix4x3** object_node_matrices,
 	int32* object_node_matrix_count)
 {
 	ASSERT(flags && object_index && render_model_index && object_node_matrices && object_node_matrix_count);
@@ -26,8 +27,8 @@ void object_get_model_node_data(
 	int32 block_count;
 	if (first_person)
 	{
-		s_first_person_model_data* model_data = first_person_model_data_get(render_model_index_index);
-		render_model_definition* render_model = (render_model_definition*)tag_get_fast(model_data->render_model_index);
+		const s_first_person_model_data* model_data = first_person_model_data_get(render_model_index_index);
+		const render_model_definition* render_model = (render_model_definition*)tag_get_fast(model_data->render_model_index);
 		ASSERT(render_model);
 
 		*render_model_index = model_data->render_model_index;

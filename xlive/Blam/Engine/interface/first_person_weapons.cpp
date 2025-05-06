@@ -27,15 +27,34 @@ bool g_show_first_person = true;
 
 /* prototypes */
 
-void __cdecl first_person_weapon_update(int32 user_index, int32 weapon_slot);
-void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_slot);
-void first_person_weapon_build_model_nodes_from_remapping_table(datum render_model_tag_index,
+static s_first_person_weapon* first_person_weapon_get_global(void);
+
+static s_first_person_weapon* first_person_weapons_get(uint32 user_index);
+
+static s_first_person_weapon_data* first_person_weapon_data_get(uint32 weapon_slot, s_first_person_weapon* first_person_data);
+
+static int32 first_person_weapon_slot_by_weapon_datum_index(int32 user_index, datum weapon_index);
+
+static s_first_person_orientations* first_person_orientations_get_global(void);
+
+static s_first_person_orientations* first_person_orientations_get(uint32 user_index, uint32 weapon_slot);
+
+static s_first_person_model_data* first_person_model_data_get_global(void);
+
+static void first_person_apply_interpolation_patches(void);
+
+static void __cdecl first_person_weapon_update(int32 user_index, int32 weapon_slot);
+
+static void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_slot);
+
+static void first_person_weapon_build_model_nodes_from_remapping_table(datum render_model_tag_index,
 	int32 max_node_count,
 	real_matrix4x3* camera_matrix,
 	real_matrix4x3* fp_model_nodes,
 	real_matrix4x3* node_matrices,
 	int32* node_remapping_table);
-void first_person_weapon_build_model_nodes(int32 node_matrices_count,
+
+static void first_person_weapon_build_model_nodes(int32 node_matrices_count,
 	datum unit_index,
 	datum render_model_tag_index,
 	uint32 fp_flags,
@@ -43,7 +62,8 @@ void first_person_weapon_build_model_nodes(int32 node_matrices_count,
 	real_matrix4x3* node_matrices,
 	int32* node_remapping_table,
 	s_first_person_model_data* fp_model_data);
-void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* model_data_1, s_first_person_model_data* model_data_2);
+
+static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* model_data_1, s_first_person_model_data* model_data_2);
 
 // Grab the weapon offset from the cartographer config from the current weapon index
 // If the weapon doesn't exist then use the default weapon offset from the weapon tag
@@ -51,24 +71,310 @@ static const real_point3d* first_person_weapons_get_weapon_offset(datum user_ind
 
 /* public code */
 
-s_first_person_weapon* first_person_weapon_get_global(void)
+void first_person_weapons_apply_patches(void)
+{
+	first_person_apply_interpolation_patches();
+	return;
+}
+
+s_first_person_model_data* first_person_model_data_get(uint32 user_index)
+{
+	return &first_person_model_data_get_global()[user_index];
+}
+
+void first_person_weapons_toggle(bool state)
+{
+	g_show_first_person = state;
+	return;
+}
+
+int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_index, int32 maximum_model_count, s_first_person_model_data* fp_model_data)
+{
+	int32 model_count = 0;
+	
+	// Only show the first person model if the following are true:
+	// 1. global bool to show first person is enabled
+	// 2. Blind skull isn't enabled
+	// 3. User index is not NONE
+	if (g_show_first_person
+		&& !ice_cream_flavor_available(_skull_type_blind) 
+		&& user_index != NONE)
+	{
+		bool weapon_flag_0 = false;
+		bool weapon_flag_1 = false;
+
+		s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
+		for (uint32 weapon_index = 0; weapon_index < k_first_person_max_weapons; weapon_index++)
+		{
+			s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_index, first_person_data);
+			weapon_flag_0 |= TEST_BIT(weapon_data->flags, 0);
+			weapon_flag_1 |= weapon_data->weapon_index != NONE;
+		}
+		if (weapon_flag_0 && weapon_flag_1)
+		{
+			if (first_person_data->unit_index == unit_index && first_person_data->unit_index != NONE)
+			{
+				s_game_globals* globals = scenario_get_game_globals();
+				if (IN_RANGE(first_person_data->character_type, _character_type_masterchief, globals->player_representation.count - 1))
+				{
+					const s_game_globals_player_representation* player_rep = globals->player_representation[first_person_data->character_type];
+					const datum fp_hands_index = player_rep->first_person_hands.index;
+					const datum fp_body_index = player_rep->first_person_body.index;
+					datum unit_model_index = NONE;
+					int32 node_count = 0;
+					const real_matrix4x3* node_matrices = NULL;
+					const object_datum* object = object_get_fast_unsafe(unit_index);
+					const object_definition* object_def = (object_definition*)tag_get_fast(object->definition_index);
+
+					const datum object_model_index = object_def->object.model.index;
+					if (object_model_index != NONE)
+					{
+						const s_model_definition* model = (s_model_definition*)tag_get_fast(object_model_index);
+						if (model->animation_graph.index != NONE)
+						{
+							unit_model_index = model->render_model.index;
+							if (!halo_interpolator_interpolate_object_node_matrices(unit_index, &node_matrices, &node_count))
+							{
+								node_matrices = object_get_node_matrices(unit_index, &node_count);
+							}
+						}
+					}
+					real_matrix4x3 camera_matrix;
+					render_camera* global_camera = get_global_camera();
+					matrix4x3_from_point_and_vectors(&camera_matrix, &global_camera->point, &global_camera->forward, &global_camera->up);
+					if (TEST_BIT(first_person_data->flags, 2))
+					{
+						// Get the interpolated matrix and use it if we can interpolate
+						real_matrix4x3 interpolated_adjustment_matrix;
+						bool interpolated_matrix = halo_interpolator_get_interpolated_matrix_from_user_index(user_index, 1, &interpolated_adjustment_matrix);
+						real_matrix4x3* adjustment_matrix = (interpolated_matrix ? &interpolated_adjustment_matrix : &first_person_data->adjustment_matrix);
+
+						real_matrix4x3 inverse_adjustment_matrix;
+						matrix4x3_inverse(adjustment_matrix, &inverse_adjustment_matrix);
+						matrix4x3_multiply(&camera_matrix, &inverse_adjustment_matrix, &camera_matrix);
+					}
+					first_person_data->identity_matrix = camera_matrix;
+
+					for (uint32 weapon_slot = 0; weapon_slot < k_first_person_max_weapons; weapon_slot++)
+					{
+						s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
+						if (TEST_BIT(weapon_data->flags, 0) 
+							&& weapon_data->weapon_index != NONE 
+							&& maximum_model_count > 1 
+							&& TEST_BIT(weapon_data->flags, _arm_node_table_valid_bit)
+							&& fp_hands_index != NONE)
+						{
+							weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
+							weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
+							weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
+							datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
+
+							real_matrix4x3* model_nodes;
+							bool interpolated = halo_interpolator_interpolate_weapon(user_index, weapon_animations_index, weapon_slot, &model_nodes, &weapon_data->node_matrices_count);
+							if (!interpolated)
+							{
+								model_nodes = weapon_data->nodes;
+							}
+
+							first_person_weapon_build_model_nodes(
+								weapon_data->node_matrices_count,
+								unit_index,
+								fp_hands_index,
+								1,
+								&camera_matrix,
+								model_nodes,
+								weapon_data->hands_node_remapping_table,
+								fp_model_data);
+						}
+					}
+
+					model_count++;
+					s_first_person_model_data* current_fp_model_data = &fp_model_data[model_count];
+
+					for (uint32 weapon_slot = 0; weapon_slot < k_first_person_max_weapons; weapon_slot++)
+					{
+						s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
+						if (TEST_BIT(weapon_data->flags, 0) && weapon_data->weapon_index != NONE)
+						{
+							weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
+							weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
+							weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
+
+							datum weapon_model_index;
+							datum weapon_animations_index;
+							if (interface_def)
+							{
+								weapon_model_index = interface_def->model.index;
+								weapon_animations_index = interface_def->animations.index;
+							}
+							else
+							{
+								weapon_model_index = NONE;
+								weapon_animations_index = NONE;
+							}
+							
+							real_matrix4x3* model_nodes = NULL;
+							bool interpolated = halo_interpolator_interpolate_weapon(user_index, weapon_animations_index, weapon_slot, &model_nodes, &weapon_data->node_matrices_count);
+							if (model_count < maximum_model_count && TEST_BIT(weapon_data->flags, _weapon_node_table_valid_bit) && weapon_model_index != NONE)
+							{
+								if (!interpolated)
+								{
+									model_nodes = weapon_data->nodes;
+								}
+
+								first_person_weapon_build_model_nodes(
+									NONE,
+									weapon_data->weapon_index,
+									weapon_model_index,
+									1,
+									&camera_matrix,
+									model_nodes,
+									weapon_data->weapon_node_remapping_table,
+									current_fp_model_data);
+								++model_count;
+								current_fp_model_data = &fp_model_data[model_count];
+							}
+						}
+					}
+
+					if (model_count < maximum_model_count && fp_body_index != NONE && unit_model_index != NONE && node_matrices)
+					{
+						render_model_definition* body_render_model = (render_model_definition*)tag_get_fast(fp_body_index);
+						render_model_definition* unit_render_model = (render_model_definition*)tag_get_fast(unit_model_index);
+						if (body_render_model->nodes.count == unit_render_model->nodes.count
+							&& body_render_model->node_list_checksum == unit_render_model->node_list_checksum)
+						{
+							real_angle angle = body_render_model->dont_draw_over_camera_cosine_angle;
+							if (angle == 0.0f || angle > global_camera->forward.k)
+							{
+								int32 node_count_copied = node_count;
+								s_first_person_model_data* current_data = &fp_model_data[model_count];
+								current_data->object_index = unit_index;
+								current_data->render_model_index = fp_body_index;
+								current_data->flags = 0;
+								if (node_count > MAXIMUM_NODES_PER_FIRST_PERSON_MODEL)
+								{
+									node_count_copied = 64;
+								}
+								csmemcpy(current_data->nodes, node_matrices, 52 * node_count_copied);
+								++model_count;
+							}
+						}
+					}
+					first_person_weapon_apply_ik(user_index, fp_model_data, &fp_model_data[1]);
+				}
+			}
+		}
+	}
+
+	ASSERT(model_count <= maximum_model_count);
+	return model_count;
+}
+
+void first_person_weapon_apply_camera_effect(int32 user_index, real_matrix4x3* effect_matrix)
+{
+	s_first_person_weapon* fp = first_person_weapons_get(user_index);
+	if (fp->adjustment_matrix_index != NONE && TEST_BIT(fp->flags, 2))
+	{
+		real_matrix4x3 interpolated_adjustment_matrix;
+		bool can_interpolate = halo_interpolator_get_interpolated_matrix_from_user_index(user_index, 1, &interpolated_adjustment_matrix);
+
+		real_matrix4x3* matrix_to_multiply = (can_interpolate ? &interpolated_adjustment_matrix : &fp->adjustment_matrix);
+		matrix4x3_multiply(effect_matrix, matrix_to_multiply, effect_matrix);
+	}
+
+	return;
+}
+
+void __cdecl first_person_weapon_get_worldspace_node_matrix(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix)
+{
+	INVOKE(0x228CC6, 0, first_person_weapon_get_worldspace_node_matrix, user_index, weapon_index, node_index, out_matrix);
+}
+
+void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix)
+{
+	real_matrix4x3 result = *first_person_weapon_get_relative_node_matrix_interpolated(user_index, weapon_index, node_index);
+
+	s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
+	int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
+	if (weapon_slot != NONE)
+	{
+		s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
+		if (TEST_BIT(weapon_data->flags, 0)
+			&& weapon_data->weapon_index != NONE)
+		{
+			matrix4x3_multiply(&first_person_data->identity_matrix, &result, out_matrix);
+		}
+	}
+	return;
+}
+
+real_matrix4x3* first_person_weapon_get_relative_node_matrix(int32 user_index, datum weapon_index, int16 node_index)
+{
+	return INVOKE(0x228C6F, 0, first_person_weapon_get_relative_node_matrix, user_index, weapon_index, node_index);
+}
+
+real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index)
+{
+	real_matrix4x3* result = NULL;
+	s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
+	const int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
+	if (weapon_slot != NONE)
+	{
+		s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
+		if (TEST_BIT(weapon_data->flags, 0)
+			&& weapon_data->weapon_index != NONE)
+		{
+			weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
+			weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
+			weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
+			datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
+
+			// ### FIXME either make use across the entire code of the intermediate buffer
+			// or remove it entirely
+
+			result = &g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes[node_index];
+			if (!halo_interpolator_interpolate_weapon_node(user_index, weapon_animations_index, node_index, weapon_slot, result))
+			{
+				result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
+			}
+		}
+		else
+		{
+			result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
+		}
+	}
+	
+	return result;
+}
+
+/* private code */
+
+static void first_person_apply_interpolation_patches(void)
+{
+	PatchCall(Memory::GetAddress(0x22B2D4), first_person_weapons_update_nodes);
+	PatchCall(Memory::GetAddress(0x195EDA), first_person_weapon_build_models);
+	return;
+}
+
+static s_first_person_weapon* first_person_weapon_get_global(void)
 {
 	return *Memory::GetAddress<s_first_person_weapon**>(0x977104, 0x99FBC4);
 }
 
-s_first_person_weapon* first_person_weapons_get(uint32 user_index)
+static s_first_person_weapon* first_person_weapons_get(uint32 user_index)
 {
 	ASSERT(VALID_INDEX(user_index, k_number_of_users));
 	return &first_person_weapon_get_global()[user_index];
 }
 
-s_first_person_weapon_data* first_person_weapon_data_get(uint32 weapon_slot, s_first_person_weapon* first_person_data)
+static s_first_person_weapon_data* first_person_weapon_data_get(uint32 weapon_slot, s_first_person_weapon* first_person_data)
 {
 	ASSERT(VALID_INDEX(weapon_slot, k_first_person_max_weapons));
 	return &first_person_data->weapons[weapon_slot];
 }
 
-int32 first_person_weapon_slot_by_weapon_datum_index(int32 user_index, datum weapon_index)
+static int32 first_person_weapon_slot_by_weapon_datum_index(int32 user_index, datum weapon_index)
 {
 	for (int32 i = 0; i < k_first_person_max_weapons; i++)
 	{
@@ -82,39 +388,28 @@ int32 first_person_weapon_slot_by_weapon_datum_index(int32 user_index, datum wea
 	return NONE;
 }
 
-s_first_person_orientations* first_person_orientations_get_global(void)
+static s_first_person_orientations* first_person_orientations_get_global(void)
 {
 	return *Memory::GetAddress<s_first_person_orientations**>(0x977100, 0x99FBC0);
 }
 
-s_first_person_orientations* first_person_orientations_get(uint32 user_index, uint32 weapon_slot)
+static s_first_person_orientations* first_person_orientations_get(uint32 user_index, uint32 weapon_slot)
 {
 	return &first_person_orientations_get_global()[(k_first_person_max_weapons * user_index) + weapon_slot];
 }
 
-s_first_person_model_data* first_person_model_data_get_global(void)
+static s_first_person_model_data* first_person_model_data_get_global(void)
 {
 	return Memory::GetAddress<s_first_person_model_data*>(0x4E8F48, 0x50EDF0);
 }
 
-s_first_person_model_data* first_person_model_data_get(uint32 user_index)
-{
-	return &first_person_model_data_get_global()[user_index];
-}
-
-void toggle_first_person(bool state)
-{
-	g_show_first_person = state;
-	return;
-}
-
-void __cdecl first_person_weapon_update(int32 user_index, int32 weapon_slot)
+static void __cdecl first_person_weapon_update(int32 user_index, int32 weapon_slot)
 {
 	INVOKE(0x229068, 0x20D720, first_person_weapon_update, user_index, weapon_slot);
 	return;
 }
 
-void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_slot)
+static void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_slot)
 {
 	s_first_person_weapon* fp_data = first_person_weapons_get(user_index);
 	s_first_person_weapon_data* weapon_data = &fp_data->weapons[weapon_slot];
@@ -132,7 +427,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 		ASSERT(first_person_weapon_interface);
 
 		render_model_definition* weapon_model = (render_model_definition*)tag_get_fast(first_person_weapon_interface->model.index);
-		
+
 		ASSERT(player_representation);
 		render_model_definition* hands_model = (render_model_definition*)tag_get_fast(player_representation->first_person_hands.index);
 
@@ -153,7 +448,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 		int16 node_count = weapon_data->animation_manager.get_node_count();
 		s_first_person_orientations* fp_orientations = first_person_orientations_get(user_index, weapon_slot);
 		weapon_data->node_orientations_count = node_count;
-		
+
 		// Clear weapon orientations
 		if (node_count > 0)
 		{
@@ -242,7 +537,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 							0);
 					}
 					bool pitch_turn_valid = false;
-					if (weapon_data->pitch_turn_animation_id.valid() && 
+					if (weapon_data->pitch_turn_animation_id.valid() &&
 						weapon_data->animation_manager.setup_animation_channel_by_index(&weapon_channel, weapon_data->pitch_turn_animation_id, 0))
 					{
 						weapon_channel.apply_weighted_blend_screen_node_orientations(
@@ -473,7 +768,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 					fp_orientations->weapon_orientations);
 			}
 			SET_FLAG(fp_data->flags, 1, true);
-			
+
 
 			const real_point3d* weapon_offset = first_person_weapons_get_weapon_offset(user_index, weapon_definition, weapon);
 
@@ -499,7 +794,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 			{
 				const int32 adjustment_matrix_index = fp_data->adjustment_matrix_index;
 				const bool valid_adjustment_matrix_index = adjustment_matrix_index != NONE;
-				
+
 				SET_FLAG(fp_data->flags, _first_person_weapon_valid_adjustment_matrix_bit, valid_adjustment_matrix_index);
 				if (valid_adjustment_matrix_index)
 				{
@@ -516,8 +811,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 	return;
 }
 
-
-void first_person_weapon_build_model_nodes_from_remapping_table(datum render_model_tag_index,
+static void first_person_weapon_build_model_nodes_from_remapping_table(datum render_model_tag_index,
 	int32 max_node_count,
 	real_matrix4x3* camera_matrix,
 	real_matrix4x3* fp_model_nodes,
@@ -552,7 +846,7 @@ void first_person_weapon_build_model_nodes_from_remapping_table(datum render_mod
 	return;
 }
 
-void __cdecl first_person_weapon_build_model_nodes(int32 node_matrices_count,
+static void __cdecl first_person_weapon_build_model_nodes(int32 node_matrices_count,
 	datum unit_index,
 	datum render_model_tag_index,
 	uint32 fp_flags,
@@ -592,190 +886,7 @@ void __cdecl first_person_weapon_build_model_nodes(int32 node_matrices_count,
 	}
 }
 
-int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_index, int32 maximum_model_count, s_first_person_model_data* fp_model_data)
-{
-	int32 model_count = 0;
-	
-	// Only show the first person model if the following are true:
-	// 1. global bool to show first person is enabled
-	// 2. Blind skull isn't enabled
-	// 3. User index is not NONE
-	if (g_show_first_person
-		&& !ice_cream_flavor_available(_skull_type_blind) 
-		&& user_index != NONE)
-	{
-		bool weapon_flag_0 = false;
-		bool weapon_flag_1 = false;
-
-		s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
-		for (uint32 weapon_index = 0; weapon_index < k_first_person_max_weapons; weapon_index++)
-		{
-			s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_index, first_person_data);
-			weapon_flag_0 |= TEST_BIT(weapon_data->flags, 0);
-			weapon_flag_1 |= weapon_data->weapon_index != NONE;
-		}
-		if (weapon_flag_0 && weapon_flag_1)
-		{
-			if (first_person_data->unit_index == unit_index && first_person_data->unit_index != NONE)
-			{
-				s_game_globals* globals = scenario_get_game_globals();
-				if (IN_RANGE(first_person_data->character_type, _character_type_masterchief, globals->player_representation.count - 1))
-				{
-					const s_game_globals_player_representation* player_rep = globals->player_representation[first_person_data->character_type];
-					const datum fp_hands_index = player_rep->first_person_hands.index;
-					const datum fp_body_index = player_rep->first_person_body.index;
-					datum unit_model_index = NONE;
-					int32 node_count = 0;
-					real_matrix4x3* node_matrices = NULL;
-					const object_datum* object = object_get_fast_unsafe(unit_index);
-					const object_definition* object_def = (object_definition*)tag_get_fast(object->definition_index);
-
-					const datum object_model_index = object_def->object.model.index;
-					if (object_model_index != NONE)
-					{
-						const s_model_definition* model = (s_model_definition*)tag_get_fast(object_model_index);
-						if (model->animation_graph.index != NONE)
-						{
-							unit_model_index = model->render_model.index;
-							if (!halo_interpolator_interpolate_object_node_matrices(unit_index, &node_matrices, &node_count))
-							{
-								node_matrices = object_get_node_matrices(unit_index, &node_count);
-							}
-						}
-					}
-					real_matrix4x3 camera_matrix;
-					render_camera* global_camera = get_global_camera();
-					matrix4x3_from_point_and_vectors(&camera_matrix, &global_camera->point, &global_camera->forward, &global_camera->up);
-					if (TEST_BIT(first_person_data->flags, 2))
-					{
-						// Get the interpolated matrix and use it if we can interpolate
-						real_matrix4x3 interpolated_adjustment_matrix;
-						bool interpolated_matrix = halo_interpolator_get_interpolated_matrix_from_user_index(user_index, 1, &interpolated_adjustment_matrix);
-						real_matrix4x3* adjustment_matrix = (interpolated_matrix ? &interpolated_adjustment_matrix : &first_person_data->adjustment_matrix);
-
-						real_matrix4x3 inverse_adjustment_matrix;
-						matrix4x3_inverse(adjustment_matrix, &inverse_adjustment_matrix);
-						matrix4x3_multiply(&camera_matrix, &inverse_adjustment_matrix, &camera_matrix);
-					}
-					first_person_data->identity_matrix = camera_matrix;
-
-					for (uint32 weapon_slot = 0; weapon_slot < k_first_person_max_weapons; weapon_slot++)
-					{
-						s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
-						if (TEST_BIT(weapon_data->flags, 0) 
-							&& weapon_data->weapon_index != NONE 
-							&& maximum_model_count > 1 
-							&& TEST_BIT(weapon_data->flags, _arm_node_table_valid_bit)
-							&& fp_hands_index != NONE)
-						{
-							weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
-							weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
-							weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
-							datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
-
-							real_matrix4x3* model_nodes;
-							bool interpolated = halo_interpolator_interpolate_weapon(user_index, weapon_animations_index, weapon_slot, &model_nodes, &weapon_data->node_matrices_count);
-							if (!interpolated)
-							{
-								model_nodes = weapon_data->nodes;
-							}
-
-							first_person_weapon_build_model_nodes(
-								weapon_data->node_matrices_count,
-								unit_index,
-								fp_hands_index,
-								1,
-								&camera_matrix,
-								model_nodes,
-								weapon_data->hands_node_remapping_table,
-								fp_model_data);
-						}
-					}
-
-					model_count++;
-					s_first_person_model_data* current_fp_model_data = &fp_model_data[model_count];
-
-					for (uint32 weapon_slot = 0; weapon_slot < k_first_person_max_weapons; weapon_slot++)
-					{
-						s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
-						if (TEST_BIT(weapon_data->flags, 0) && weapon_data->weapon_index != NONE)
-						{
-							weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
-							weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
-							weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
-
-							datum weapon_model_index;
-							datum weapon_animations_index;
-							if (interface_def)
-							{
-								weapon_model_index = interface_def->model.index;
-								weapon_animations_index = interface_def->animations.index;
-							}
-							else
-							{
-								weapon_model_index = NONE;
-								weapon_animations_index = NONE;
-							}
-							
-							real_matrix4x3* model_nodes = NULL;
-							bool interpolated = halo_interpolator_interpolate_weapon(user_index, weapon_animations_index, weapon_slot, &model_nodes, &weapon_data->node_matrices_count);
-							if (model_count < maximum_model_count && TEST_BIT(weapon_data->flags, _weapon_node_table_valid_bit) && weapon_model_index != NONE)
-							{
-								if (!interpolated)
-								{
-									model_nodes = weapon_data->nodes;
-								}
-
-								first_person_weapon_build_model_nodes(
-									NONE,
-									weapon_data->weapon_index,
-									weapon_model_index,
-									1,
-									&camera_matrix,
-									model_nodes,
-									weapon_data->weapon_node_remapping_table,
-									current_fp_model_data);
-								++model_count;
-								current_fp_model_data = &fp_model_data[model_count];
-							}
-						}
-					}
-
-					if (model_count < maximum_model_count && fp_body_index != NONE && unit_model_index != NONE && node_matrices)
-					{
-						render_model_definition* body_render_model = (render_model_definition*)tag_get_fast(fp_body_index);
-						render_model_definition* unit_render_model = (render_model_definition*)tag_get_fast(unit_model_index);
-						if (body_render_model->nodes.count == unit_render_model->nodes.count
-							&& body_render_model->node_list_checksum == unit_render_model->node_list_checksum)
-						{
-							real_angle angle = body_render_model->dont_draw_over_camera_cosine_angle;
-							if (angle == 0.0f || angle > global_camera->forward.k)
-							{
-								int32 node_count_copied = node_count;
-								s_first_person_model_data* current_data = &fp_model_data[model_count];
-								current_data->object_index = unit_index;
-								current_data->render_model_index = fp_body_index;
-								current_data->flags = 0;
-								if (node_count > MAXIMUM_NODES_PER_FIRST_PERSON_MODEL)
-								{
-									node_count_copied = 64;
-								}
-								csmemcpy(current_data->nodes, node_matrices, 52 * node_count_copied);
-								++model_count;
-							}
-						}
-					}
-					first_person_weapon_apply_ik(user_index, fp_model_data, &fp_model_data[1]);
-				}
-			}
-		}
-	}
-
-	ASSERT(model_count <= maximum_model_count);
-	return model_count;
-}
-
-void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* fp_hands_model_data, s_first_person_model_data* fp_weapon_model_data)
+static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* fp_hands_model_data, s_first_person_model_data* fp_weapon_model_data)
 {
 	s_first_person_weapon* fp_data = first_person_weapons_get(user_index);
 	datum unit_index = fp_data->unit_index;
@@ -800,9 +911,9 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
 					ik_point_iterator iterator;
 					while (fp_data->weapons[0].animation_manager.find_next_weapon_ik_point(&iterator))
 					{
-						if (iterator.attach_to_marker != NONE 
-							&& iterator.attach_to_marker 
-							&& IN_RANGE(fp_data->character_type, _character_type_masterchief, globals->player_representation.count - 1) )
+						if (iterator.attach_to_marker != NONE
+							&& iterator.attach_to_marker
+							&& IN_RANGE(fp_data->character_type, _character_type_masterchief, globals->player_representation.count - 1))
 						{
 							const s_game_globals_player_representation* player_rep = globals->player_representation[fp_data->character_type];
 							datum fp_hands_model_index = player_rep->first_person_hands.index;
@@ -823,7 +934,7 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
 
 									const render_model_marker_group* fp_hands_marker_group = fp_hands_model->marker_groups[fp_hands_marker_group_index];
 									const render_model_marker_group* fp_weapon_marker_group = fp_weapon_model->marker_groups[fp_weapon_marker_group_index];
-									
+
 									if (fp_hands_marker_group->markers.count > 0 && fp_weapon_marker_group->markers.count > 0)
 									{
 										const render_model_marker* fp_hands_marker = fp_hands_marker_group->markers[0];
@@ -850,98 +961,9 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
 			}
 		}
 	}
-}
-
-void first_person_weapon_apply_camera_effect(int32 user_index, real_matrix4x3* effect_matrix)
-{
-	s_first_person_weapon* fp = first_person_weapons_get(user_index);
-	if (fp->adjustment_matrix_index != NONE && TEST_BIT(fp->flags, 2))
-	{
-		real_matrix4x3 interpolated_adjustment_matrix;
-		bool can_interpolate = halo_interpolator_get_interpolated_matrix_from_user_index(user_index, 1, &interpolated_adjustment_matrix);
-
-		real_matrix4x3* matrix_to_multiply = (can_interpolate ? &interpolated_adjustment_matrix : &fp->adjustment_matrix);
-		matrix4x3_multiply(effect_matrix, matrix_to_multiply, effect_matrix);
-	}
 
 	return;
 }
-
-void __cdecl first_person_weapon_get_worldspace_node_matrix(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix)
-{
-	INVOKE(0x228CC6, 0, first_person_weapon_get_worldspace_node_matrix, user_index, weapon_index, node_index, out_matrix);
-}
-
-void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix)
-{
-	real_matrix4x3 result = *first_person_weapon_get_relative_node_matrix_interpolated(user_index, weapon_index, node_index);
-
-	s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
-	int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
-	if (weapon_slot != NONE)
-	{
-		s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
-		if (TEST_BIT(weapon_data->flags, 0)
-			&& weapon_data->weapon_index != NONE)
-		{
-			matrix4x3_multiply(&first_person_data->identity_matrix, &result, out_matrix);
-		}
-	}
-	return;
-}
-
-real_matrix4x3* first_person_weapon_get_relative_node_matrix(int32 user_index, datum weapon_index, int16 node_index)
-{
-	return INVOKE(0x228C6F, 0, first_person_weapon_get_relative_node_matrix, user_index, weapon_index, node_index);
-}
-
-real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index)
-{
-	real_matrix4x3* result = NULL;
-	s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
-	const int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
-	if (weapon_slot != NONE)
-	{
-		s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
-		if (TEST_BIT(weapon_data->flags, 0)
-			&& weapon_data->weapon_index != NONE)
-		{
-			weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
-			weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);
-			weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
-			datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
-
-			// ### FIXME either make use across the entire code of the intermediate buffer
-			// or remove it entirely
-
-			result = &g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes[node_index];
-			if (!halo_interpolator_interpolate_weapon_node(user_index, weapon_animations_index, node_index, weapon_slot, result))
-			{
-				result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
-			}
-		}
-		else
-		{
-			result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
-		}
-	}
-	
-	return result;
-}
-
-void first_persoon_apply_interpolation_patches(void)
-{
-	PatchCall(Memory::GetAddress(0x22B2D4), first_person_weapons_update_nodes);
-	PatchCall(Memory::GetAddress(0x195EDA), first_person_weapon_build_models);
-}
-
-void first_person_weapons_apply_patches(void)
-{
-	first_persoon_apply_interpolation_patches();
-	return;
-}
-
-/* private code */
 
 static const real_point3d* first_person_weapons_get_weapon_offset(datum user_index, const struct weapon_definition* weapon_definition, const weapon_datum* weapon)
 {
