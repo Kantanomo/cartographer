@@ -84,7 +84,7 @@ void halo_interpolator_update_end(void);
 
 bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point3d* center_of_mass);
 
-bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real_matrix4x3** node_matrices, int32* out_node_count);
+bool halo_interpolator_interpolate_object_node_matrices(datum object_index, const real_matrix4x3** node_matrices, int32* out_node_count);
 
 void halo_interpolator_setup_new_object(datum object_datum);
 

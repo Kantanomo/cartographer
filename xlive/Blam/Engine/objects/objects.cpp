@@ -673,7 +673,7 @@ real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_cou
 	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->object.nodes_block, sizeof(real_matrix4x3), out_node_count);
 }
 
-int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_matrix_count, real_matrix4x3* object_skinning_matrices, real_matrix4x3* out_object_skinning_matrices)
+int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_matrix_count, const real_matrix4x3* object_skinning_matrices, real_matrix4x3* out_object_skinning_matrices)
 {
 	return INVOKE(0x1963C7, 0x0, object_get_skinning_matrices, object_index, skinning_matrix_count, object_skinning_matrices, out_object_skinning_matrices);
 }
@@ -1281,7 +1281,7 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 			s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_model_index);
 
 			int32 node_count;
-			real_matrix4x3* node_matrices;
+			const real_matrix4x3* node_matrices;
 
 			if (!halo_interpolator_interpolate_object_node_matrices(object_index, &node_matrices, &node_count))
 			{

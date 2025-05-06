@@ -143,7 +143,7 @@ int32 render_object_cache_get_pool_size(int32 object_model_count)
 int __cdecl sub_77DEBD(
     datum object_index,
     datum model_definition_index,
-    real_matrix4x3* input_object_node_matrices,
+    const real_matrix4x3* input_object_node_matrices,
     uint8* section_indices,
     int32 level_of_detail,
     bool first_person,
@@ -235,14 +235,14 @@ void __cdecl object_build_render_cache_and_info(
 
         uint32 flags;
         int32 object_node_count;
-        real_matrix4x3* object_node_matrices;
+        const real_matrix4x3* object_node_matrices;
 
         bool object_is_cached = false;
         bool object_render_valid = true;
 
         real_matrix4x3 skinning_matrices[MAXIMUM_NODES_PER_MODEL];
 
-        object_get_model_node_data(
+        render_object_get_model_node_data(
             object_index,
             info->first_person,
             (int16)render_model_storage_index,
