@@ -36,4 +36,4 @@ private:
 	static void update_scores();
 };
 
-static c_headhunter_engine g_headhunter_engine;
+c_headhunter_engine* get_global_headhunter_engine_instance();

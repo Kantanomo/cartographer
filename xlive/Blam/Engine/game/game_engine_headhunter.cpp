@@ -27,6 +27,7 @@
 #include "text/font_cache.h"
 #include "units/bipeds.h"
 
+static c_headhunter_engine g_headhunter_engine;
 static c_headhunter_engine_globals* g_headhunter_engine_globals {};
 static datum g_ball_datum = NONE;
 
@@ -56,7 +57,7 @@ bool c_headhunter_engine::setup()
 
 	s_multiplayer_event_response_definition* head_hunter_events = 
 		(s_multiplayer_event_response_definition*)tag_injection_reserve_cache_memory(
-			sizeof(s_multiplayer_event_response_definition) * runtime->king_events.count + 1, 
+			sizeof(s_multiplayer_event_response_definition) * (runtime->king_events.count + 1), 
 			&data_offset);
 
 	csmemcpy(head_hunter_events, runtime->king_events[0], sizeof(s_multiplayer_event_response_definition) * runtime->king_events.count);
@@ -74,30 +75,30 @@ bool c_headhunter_engine::setup()
 	csmemset(&runtime->headhunter_events[0]->primary_sound, 0, sizeof(s_multiplayer_event_sound_response_definition));
 	// todo: replace sound with injected sound when complete.
 
-	s_multiplayer_event_response_definition* score_event = runtime->headhunter_events[runtime->king_events.count];
+	s_multiplayer_event_response_definition* skull_pickup_event = runtime->headhunter_events[runtime->king_events.count];
 
-	score_event->event = _multiplayer_event_response_headhunter_head_grabbed;
+	skull_pickup_event->event = _multiplayer_event_response_headhunter_head_grabbed;
 
-	score_event->audience = _multiplayer_event_response_audience_cause_player;
+	skull_pickup_event->audience = _multiplayer_event_response_audience_cause_player;
 
 	datum ping_sound = tag_loaded(_tag_group_sound, "sound\\game_sfx\\multiplayer\\target_point_collected");
 	
-	score_event->primary_sound.english_sound.group.group = _tag_group_sound;
-	score_event->primary_sound.english_sound.index = ping_sound;
-	score_event->primary_sound.chinese_sound.group.group = _tag_group_sound;
-	score_event->primary_sound.chinese_sound.index = ping_sound;
-	score_event->primary_sound.french_sound.group.group = _tag_group_sound;
-	score_event->primary_sound.french_sound.index = ping_sound;
-	score_event->primary_sound.german_sound.group.group = _tag_group_sound;
-	score_event->primary_sound.german_sound.index = ping_sound;
-	score_event->primary_sound.italian_sound.group.group = _tag_group_sound;
-	score_event->primary_sound.italian_sound.index = ping_sound;
-	score_event->primary_sound.japanese_sound.group.group = _tag_group_sound;
-	score_event->primary_sound.japanese_sound.index = ping_sound;
-	score_event->primary_sound.korean_sound.group.group = _tag_group_sound;
-	score_event->primary_sound.korean_sound.index = ping_sound;
-	score_event->primary_sound.portuguese_sound.group.group = _tag_group_sound;
-	score_event->primary_sound.portuguese_sound.index = ping_sound;
+	skull_pickup_event->primary_sound.english_sound.group.group = _tag_group_sound;
+	skull_pickup_event->primary_sound.english_sound.index = ping_sound;
+	skull_pickup_event->primary_sound.chinese_sound.group.group = _tag_group_sound;
+	skull_pickup_event->primary_sound.chinese_sound.index = ping_sound;
+	skull_pickup_event->primary_sound.french_sound.group.group = _tag_group_sound;
+	skull_pickup_event->primary_sound.french_sound.index = ping_sound;
+	skull_pickup_event->primary_sound.german_sound.group.group = _tag_group_sound;
+	skull_pickup_event->primary_sound.german_sound.index = ping_sound;
+	skull_pickup_event->primary_sound.italian_sound.group.group = _tag_group_sound;
+	skull_pickup_event->primary_sound.italian_sound.index = ping_sound;
+	skull_pickup_event->primary_sound.japanese_sound.group.group = _tag_group_sound;
+	skull_pickup_event->primary_sound.japanese_sound.index = ping_sound;
+	skull_pickup_event->primary_sound.korean_sound.group.group = _tag_group_sound;
+	skull_pickup_event->primary_sound.korean_sound.index = ping_sound;
+	skull_pickup_event->primary_sound.portuguese_sound.group.group = _tag_group_sound;
+	skull_pickup_event->primary_sound.portuguese_sound.index = ping_sound;
 
 	//tag_injection_set_active_map(L"elongation");
 	//if(tag_injection_active_map_verified())
@@ -123,6 +124,7 @@ bool c_headhunter_engine::setup()
 	//	}
 	//}
 
+	g_headhunter_engine_globals->m_hill_id = -1;
 	return c_king_engine::setup();
 }
 
@@ -289,8 +291,8 @@ void c_headhunter_engine::update()
 		player_iterator it;
 		while(it.get_next_active_player())
 		{
-			if (it.get_current_player_data()->field_19C)
-				players_mask |= 1 << it.get_current_player_index();
+			if (it.get_current_player_data()->player_on_hill_time)
+				players_mask |= FLAG(it.get_current_player_index());
 		}
 
 		if(players_mask != g_headhunter_engine_globals->m_players_in_hill)
@@ -362,11 +364,31 @@ void c_headhunter_engine::build_simulation_update(uint32* update_mask, int32 unu
 {
 	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
 
-	c_king_engine::build_simulation_update(update_mask , unused, state_data);
+	//c_king_engine::build_simulation_update(update_mask , unused, state_data);
+
+	uint32 out_mask = 0;
+	if(*update_mask & 31)
+	{
+		c_king_engine::function_43(*update_mask & 31, &out_mask, state_data);
+	}
+	if((*update_mask & 32) != 0 && game_state_data->hill_id != g_headhunter_engine_globals->m_hill_id)
+	{
+		out_mask |= 0x20;
+		game_state_data->hill_id = g_headhunter_engine_globals->m_hill_id;
+	}
+
+	if((*update_mask & 64) != 0)
+	{
+		if(game_state_data->players_in_hill != g_headhunter_engine_globals->m_players_in_hill)
+		{
+			game_state_data->players_in_hill = g_headhunter_engine_globals->m_players_in_hill;
+			out_mask |= 0x40;
+		}
+	}
 
 	memcpy(game_state_data->player_skull_count, g_headhunter_engine_globals->m_player_skull_count, sizeof(game_state_data->player_skull_count));
 
-	uint32 out_mask = (uint32)(*update_mask | FLAG(_headhunter_engine_state_flag_player_skull_count));
+	out_mask |= FLAG(_headhunter_engine_state_flag_player_skull_count);
 
 	*update_mask = out_mask;
 }
@@ -379,6 +401,7 @@ bool c_headhunter_engine::apply_simulation_update(uint32 update_mask, int32 unus
 
 	if(!c_king_engine::apply_simulation_update(update_mask, unused, state_data))
 	{
+		LOG_INFO_GAME("[{}] king sim fail", __FUNCTION__);
 		return false;
 	}
 
@@ -465,12 +488,12 @@ void c_headhunter_engine::update_scores()
 	player_iterator it;
 	while (it.get_next_active_player())
 	{
-		if (it.get_current_player_data()->field_19C)
+		if (it.get_current_player_data()->player_on_hill_time)
 		{
-			players_in_hill_mask |= 1 << it.get_current_player_index();
+			players_in_hill_mask |= FLAG(it.get_current_player_index());
 
 			if (it.get_current_player_data()->properties->team_index != NONE)
-				teams_in_hill_mask |= 1 << it.get_current_player_data()->properties->team_index;
+				teams_in_hill_mask |= FLAG(it.get_current_player_data()->properties->team_index);
 		}
 	}
 
@@ -507,7 +530,30 @@ void c_headhunter_engine::update_scores()
 				{
 					if(!(g_headhunter_engine_globals->m_team_control_accumulator[i] % time_globals::get()->ticks_per_second))
 					{
-						// todo: finish team scoring nightmare
+						player_iterator it;
+						while (it.get_next_active_player())
+						{
+							s_player* player = it.get_current_player_data();
+
+							if (g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()] > 0)
+							{
+								if (player->player_on_hill_time && !(player->player_on_hill_time % time_globals::get()->ticks_per_second))
+								{
+									c_game_statborg* statborg = game_engine_get_statborg();
+
+									int32 current_score = statborg->get_score(it.get_current_player_index());
+
+									// todo: have to rewrite the game results functions to add a new carry type for skulls pickedup
+									// game_results_add_carry_event();
+
+									game_engine_adjust_score(it.get_current_player_index(), g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()]);
+
+									g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()] = 0;
+
+									// todo: add c_slayer_engine::update_scores function that plays a sound when N kills to win
+								}
+							}
+						}
 					}
 				}
 			}
@@ -515,29 +561,34 @@ void c_headhunter_engine::update_scores()
 		else
 		{
 			player_iterator it;
-			while(it.get_next_active_player())
+			while (it.get_next_active_player())
 			{
 				s_player* player = it.get_current_player_data();
-				if(player->field_19C && !(player->field_19C % time_globals::get()->ticks_per_second))
+
+				if (g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()] > 0)
 				{
-					c_game_statborg* statborg = game_engine_get_statborg();
+					if (player->player_on_hill_time && !(player->player_on_hill_time % time_globals::get()->ticks_per_second))
+					{
+						c_game_statborg* statborg = game_engine_get_statborg();
 
-					int32 current_score = statborg->get_score(it.get_current_player_index());
+						int32 current_score = statborg->get_score(it.get_current_player_index());
 
-					// todo: have to rewrite the game results functions to add a new carry type for skulls pickedup
-					// game_results_add_carry_event();
+						// todo: have to rewrite the game results functions to add a new carry type for skulls pickedup
+						// game_results_add_carry_event();
 
-					game_engine_adjust_score(it.get_current_player_index(), g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()]);
+						game_engine_adjust_score(it.get_current_player_index(), g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()]);
 
-					g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()] = 0;
+						g_headhunter_engine_globals->m_player_skull_count[it.get_current_player_index()] = 0;
 
-					// todo: add c_slayer_engine::update_scores function that plays a sound when N kills to win
+						// todo: add c_slayer_engine::update_scores function that plays a sound when N kills to win
+					}
 				}
 			}
-
 		}
 	}
-
-
 }
 
+c_headhunter_engine* get_global_headhunter_engine_instance()
+{
+	return &g_headhunter_engine;
+}

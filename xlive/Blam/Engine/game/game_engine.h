@@ -2,12 +2,6 @@
 
 #include "game_engine_ctf.h"
 #include "game_engine_headhunter.h"
-#include "game_engine_juggernaut.h"
-#include "game_engine_king.h"
-#include "game_engine_oddball.h"
-#include "game_engine_slayer.h"
-#include "game_engine_territories.h"
-#include "game_engine_test.h"
 #include "game/game_allegiance.h"
 #include "game_statborg.h"
 #include "players.h"
@@ -25,14 +19,6 @@ enum
 	k_maximum_game_engine_event_responses_per_type = 128
 };
 
-static c_ctf_engine g_game_engine_ctf;
-static c_juggernaut_engine g_juggernaut_engine;
-static c_slayer_engine g_slayer_engine;
-static c_king_engine g_king_engine;
-static c_territories_engine g_territories_engine;
-static c_oddball_engine g_oddball_engine;
-static c_game_engine* g_test_engine_ptr = &g_test_engine;
-static c_headhunter_engine* g_headhunter_engine_ptr = &g_headhunter_engine;
 /* enums */
 
 enum e_network_game_simulation_protocol
@@ -382,6 +368,6 @@ bool game_engine_in_round();
 
 c_game_engine** get_game_mode_engines();
 
-void test_replace_game_engine_mode(e_game_engine_type type, c_game_engine* engine);
+void game_engine_list_set(e_game_engine_type type, c_game_engine* engine);
 
 e_network_game_simulation_protocol game_engine_get_simulation_protocol(s_game_variant* variant);
