@@ -45,6 +45,10 @@ void first_person_weapon_build_model_nodes(int32 node_matrices_count,
 	s_first_person_model_data* fp_model_data);
 void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* model_data_1, s_first_person_model_data* model_data_2);
 
+// Grab the weapon offset from the cartographer config from the current weapon index
+// If the weapon doesn't exist then use the default weapon offset from the weapon tag
+static const real_point3d* first_person_weapons_get_weapon_offset(datum user_index, const struct weapon_definition* weapon_definition, const weapon_datum* weapon);
+
 /* public code */
 
 s_first_person_weapon* first_person_weapon_get_global(void)
@@ -470,8 +474,11 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 			}
 			SET_FLAG(fp_data->flags, 1, true);
 			
+
+			const real_point3d* weapon_offset = first_person_weapons_get_weapon_offset(user_index, weapon_definition, weapon);
+
 			real_matrix4x3 matrix;
-			matrix4x3_translation(&matrix, &weapon_definition->weapon.first_person_weapon_offset);
+			matrix4x3_translation(&matrix, weapon_offset);
 			weapon_data->node_matrices_count = weapon_data->node_orientations_count;
 			if (weapon_data->child_node_index == NONE || weapon_data->alternate_parent_node_index == NONE)
 			{
@@ -496,21 +503,6 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 				SET_FLAG(fp_data->flags, _first_person_weapon_valid_adjustment_matrix_bit, valid_adjustment_matrix_index);
 				if (valid_adjustment_matrix_index)
 				{
-					// Grab the weapon offset from the cartographer config from the current weapon index
-					// If the weapon doesn't exist then use the default weapon offset from the weapon tag
-					const s_saved_game_cartographer_player_profile* player_profile = cartographer_player_profile_get_by_user_index(user_index);
-					const e_weapon_offset_weapon weapon_offset_index = cartographer_player_profile_weapon_offsets_get_weapon_index_from_tag_index(weapon->definition_index);
-					
-					const real_point3d* weapon_offset;
-					if (weapon_offset_index != NONE)
-					{
-						weapon_offset = &player_profile->weapon_offsets[weapon_offset_index];
-					}
-					else
-					{
-						weapon_offset = &weapon_definition->weapon.first_person_weapon_offset;
-					}
-
 					fp_data->adjustment_matrix = weapon_data->nodes[adjustment_matrix_index];
 					fp_data->adjustment_matrix.position.x = fp_data->adjustment_matrix.position.x - weapon_offset->x;
 					fp_data->adjustment_matrix.position.y = fp_data->adjustment_matrix.position.y - weapon_offset->y;
@@ -947,4 +939,27 @@ void first_person_weapons_apply_patches(void)
 {
 	first_persoon_apply_interpolation_patches();
 	return;
+}
+
+/* private code */
+
+static const real_point3d* first_person_weapons_get_weapon_offset(datum user_index, const struct weapon_definition* weapon_definition, const weapon_datum* weapon)
+{
+	ASSERT(weapon_definition);
+	ASSERT(weapon);
+
+	const s_saved_game_cartographer_player_profile* player_profile = cartographer_player_profile_get_by_user_index(user_index);
+	const e_weapon_offset_weapon weapon_offset_index = cartographer_player_profile_weapon_offsets_get_weapon_index_from_tag_index(weapon->definition_index);
+
+	const real_point3d* weapon_offset;
+	if (weapon_offset_index != NONE)
+	{
+		weapon_offset = &player_profile->weapon_offsets[weapon_offset_index];
+	}
+	else
+	{
+		weapon_offset = &weapon_definition->weapon.first_person_weapon_offset;
+	}
+
+	return weapon_offset;
 }
