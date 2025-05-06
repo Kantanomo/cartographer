@@ -454,7 +454,6 @@
     <ClCompile Include="Blam\Engine\game\game_engine_oddball.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_slayer.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_territories.cpp" />
-    <ClCompile Include="Blam\Engine\game\game_engine_test.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_game_engine_category.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_custom_game_profile_select.cpp" />
     <ClCompile Include="Blam\Engine\filesys\pc_saved_game.cpp" />
@@ -1959,7 +1958,6 @@
     <ClInclude Include="Blam\Engine\game\game_engine_king.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_oddball.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_slayer.h" />
-    <ClInclude Include="Blam\Engine\game\game_engine_test.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_game_engine_category.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_custom_game_profile_select.h" />
     <ClInclude Include="Blam\Engine\devices\device_controls.h" />

@@ -12,7 +12,7 @@ void game_engine_apply_patches()
 		PatchCall(Memory::GetAddress(0, 0x197DF1), game_engine_get_simulation_protocol);
 	}
 
-	test_replace_game_engine_mode(_game_engine_type_headhunter, &g_headhunter_engine);
+	game_engine_list_set(_game_engine_type_headhunter, get_global_headhunter_engine_instance());
 }
 
 c_game_engine* current_game_engine(void)
@@ -41,7 +41,7 @@ c_game_engine** get_game_mode_engines()
 	return Memory::GetAddress<c_game_engine**>(0x4D8548, 0x4F3CE4);
 }
 
-void test_replace_game_engine_mode(e_game_engine_type type, c_game_engine* engine)
+void game_engine_list_set(e_game_engine_type type, c_game_engine* engine)
 {
 	Memory::GetAddress<c_game_engine**>(0x4D8548, 0x4F3CE4)[type] = engine;
 }

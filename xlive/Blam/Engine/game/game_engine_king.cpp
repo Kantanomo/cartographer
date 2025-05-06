@@ -121,7 +121,7 @@ void c_king_engine_globals::alert_players_of_players_in_hill(uint16 old_players_
 			s_player* player = it.get_current_player_data();
 			int8 team_index = player->properties[0].team_index;
 
-			if(player->field_19C && team_index != -1 && TEST_BIT(new_players_team_mask, team_index))
+			if(player->player_on_hill_time && team_index != -1 && TEST_BIT(new_players_team_mask, team_index))
 			{
 				last_matching_player_index = it.get_current_player_index();
 				break;
@@ -162,7 +162,7 @@ void c_king_engine_globals::alert_players_of_players_in_hill(uint16 old_players_
 						s_player* player = it.get_current_player_data();
 						int8 team_index = player->properties[0].team_index;
 
-						if (player->field_19C && team_index != -1 && TEST_BIT(new_players_team_mask, team_index))
+						if (player->player_on_hill_time && team_index != -1 && TEST_BIT(new_players_team_mask, team_index))
 						{
 							last_matching_player_index = it.get_current_player_index();
 							break;
