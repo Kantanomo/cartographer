@@ -3,10 +3,14 @@
 
 #include "cache/predicted_resources.h"
 #include "game/aim_assist.h"
-#include "game/players.h"
-
 #include "math/periodic_functions.h"
 #include "objects/damage_reporting.h"
+
+/* forward declarations */
+
+enum e_character_type : int8;
+
+/* enums */
 
 enum e_weapon_definition_flags : int32
 {
@@ -408,7 +412,7 @@ struct _weapon_definition
 
 
 	// Explaination("old obsolete export to functions", "")
-	real32 readyTimeSeconds;
+	real32 ready_time;					// Seconds
 	tag_reference ready_effect;         //
 	tag_reference ready_damage_effect;  // jpt!
 
@@ -520,6 +524,8 @@ struct weapon_definition
 	_weapon_definition weapon;
 };
 ASSERT_STRUCT_SIZE(weapon_definition, 796);
+
+/* prototypes */
 
 weapon_first_person_interface_definition* first_person_interface_definition_get(const weapon_definition* definition, e_character_type character_type);
 

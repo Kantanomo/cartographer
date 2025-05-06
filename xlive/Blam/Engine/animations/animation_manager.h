@@ -3,8 +3,6 @@
 #include "animation_interpolation.h"
 #include "ik_point_iterator.h"
 
-#include "math/matrix_math.h"
-
 class c_animation_manager
 {
 public:

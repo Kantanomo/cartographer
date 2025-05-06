@@ -5,10 +5,6 @@
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_controller.h"
 #include "rasterizer/rasterizer_settings.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
-
-
-/* macro defines */
 
 /* constants */
 

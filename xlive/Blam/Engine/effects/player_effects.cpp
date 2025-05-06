@@ -4,6 +4,7 @@
 #include "game/game_time.h"
 #include "game/player_vibration.h"
 #include "main/interpolator.h"
+#include "math/matrix_math.h"
 #include "math/random_math.h"
 
 /* prototypes */

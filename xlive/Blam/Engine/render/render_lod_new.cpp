@@ -4,7 +4,10 @@
 #include "render.h"
 
 #include "game/player_control.h"
+#include "memory/data.h"
 #include "models/render_models.h"
+#include "models/render_model_definitions.h"
+#include "objects/objects.h"
 #include "rasterizer/rasterizer_memory.h"
 #include "render/render_objects.h"
 

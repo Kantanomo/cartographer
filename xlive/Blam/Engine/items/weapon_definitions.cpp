@@ -1,6 +1,16 @@
 #include "stdafx.h"
 #include "weapon_definitions.h"
 
+#include "game/players.h"
+
+/* public code */
+
+void weapon_definitions_apply_patches(void)
+{
+	DetourFunc(Memory::GetAddress<uint8*>(0x190164, 0x17CE56), (uint8*)first_person_interface_definition_get, 11);
+	return;
+}
+
 weapon_first_person_interface_definition* first_person_interface_definition_get(const weapon_definition* definition, e_character_type character_type)
 {
 	weapon_first_person_interface_definition* result = NULL;
@@ -35,10 +45,4 @@ weapon_first_person_interface_definition* first_person_interface_definition_get(
 		}
 	}
 	return result;
-}
-
-void weapon_definitions_apply_patches(void)
-{
-	DetourFunc(Memory::GetAddress<uint8*>(0x190164, 0x17CE56), (uint8*)first_person_interface_definition_get, 11);
-	return;
 }

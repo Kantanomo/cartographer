@@ -6,6 +6,7 @@
 #include "game/game.h"
 #include "game/game_engine_util.h"
 #include "game/game_statborg.h"
+#include "game/players.h"
 #include "items/weapons.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "shell/shell.h"
