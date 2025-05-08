@@ -486,7 +486,7 @@ bool __cdecl screenshot_render(window_bound* window)
 		if (movie_globals->in_progress)
 		{
 			++movie_globals->recording_frame_index;
-			if (movie_globals->recording_stop_tick > get_game_time_ticks())
+			if (movie_globals->recording_stop_tick > game_time_get())
 				result = false;
 			else
 				movie_globals->in_progress = false;
