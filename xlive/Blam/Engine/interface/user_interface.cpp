@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "user_interface.h"
 
-#include "game/game.h"
 #include "cutscene/cinematics.h"
+#include "game/game.h"
 
 #include "XLive/xbox/xbox.h"
 

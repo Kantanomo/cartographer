@@ -407,7 +407,7 @@ public:
 	c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags);
 	
 
-	const e_user_interface_screen_id get_id();
+	const e_user_interface_screen_id get_id() const;
 	c_text_widget* get_screen_header_text();
 	c_text_widget* get_screen_button_key_text();
 	c_text_widget* try_find_screen_text(uint32 idx);

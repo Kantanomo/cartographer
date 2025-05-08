@@ -43,7 +43,7 @@ c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_inte
 	this->field_A01 = false;
 }
 
-const e_user_interface_screen_id c_screen_widget::get_id()
+const e_user_interface_screen_id c_screen_widget::get_id() const
 {
 	return m_screen_id;
 }

@@ -4,8 +4,26 @@
 #include "hud.h"
 #include "user_interface_controller.h"
 #include "user_interface_shared_globals.h"
+#include "user_interface_widget_window.h"
 
 #include "render/render.h"
+#include "rasterizer/rasterizer_globals.h"
+
+/* typedefs */
+
+typedef void(__cdecl* user_interface_get_cursor_position_scale_t)(point2d* out_position);
+
+/* globals */
+
+user_interface_get_cursor_position_scale_t p_user_interface_get_cursor_position;
+
+/* public code */
+
+void user_interface_utilities_apply_patches(void)
+{
+	DETOUR_ATTACH(p_user_interface_get_cursor_position, Memory::GetAddress<user_interface_get_cursor_position_scale_t>(0x21D620), user_interface_get_cursor_position_scaled);
+	return;
+}
 
 datum __cdecl user_interface_get_widget_tag_index_from_screen_id(e_user_interface_screen_id screen_id)
 {
@@ -42,9 +60,6 @@ void user_interface_get_cursor_position(point2d* out_position)
 	INVOKE(0x2EC6D, 0, user_interface_get_cursor_position, out_position);
 }
 
-typedef void(__cdecl* user_interface_get_cursor_position_scale_t)(point2d* out_position);
-user_interface_get_cursor_position_scale_t p_user_interface_get_cursor_position;
-
 void __cdecl user_interface_get_cursor_position_scaled(point2d* out_position)
 {
 	if (out_position)
@@ -53,17 +68,28 @@ void __cdecl user_interface_get_cursor_position_scaled(point2d* out_position)
 		// Get the current cursor position
 		user_interface_get_cursor_position(&temp_position);
 
-		window_bound* bounds = get_user_window_bounds(0);
+		const window_bound* user_bounds = get_user_window_bounds(0);
 
-		temp_position.x = (int16)(temp_position.x - bounds->rasterizer_camera.viewport_bounds.right / 2.f);
-		temp_position.y = (int16)((bounds->rasterizer_camera.viewport_bounds.bottom / 2.f) - temp_position.y);
+		// Don't adjust the cursor scale by viewport bounds if we're in campaign, as the pause menu takes up the full screen
+		point2d bounds;
+		if (user_interface_in_screen(_user_interface_channel_type_gameshell_screen, _window_4, _screen_single_player_pause_game) )
+		{
+			const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+			bounds = { (int16)rasterizer_globals->resolution_x, (int16)rasterizer_globals->resolution_y };
+		}
+		else
+		{
+			bounds = { user_bounds->rasterizer_camera.viewport_bounds.right, user_bounds->rasterizer_camera.window_bounds.bottom };
+		}
+
+		temp_position.x = (int16)(temp_position.x - (bounds.x / 2.f));
+		temp_position.y = (int16)((bounds.y / 2.f) - temp_position.y);
 
 		temp_position.x = (int16)(temp_position.x / *get_ui_scale());
 		temp_position.y = (int16)(temp_position.y / *get_ui_scale());
 
 		// Convert to integer coordinates
-		out_position->x = temp_position.x;
-		out_position->y = temp_position.y;
+		*out_position = temp_position;
 	}
 	return;
 }
@@ -71,12 +97,5 @@ void __cdecl user_interface_get_cursor_position_scaled(point2d* out_position)
 void __cdecl user_interface_utilities_play_sound(e_user_interface_global_sound sound_type)
 {
 	INVOKE(0x21DD04, 0x0, user_interface_utilities_play_sound, sound_type);
-	return;
-}
-
-
-void user_interface_utilities_apply_patches()
-{
-	DETOUR_ATTACH(p_user_interface_get_cursor_position, Memory::GetAddress<user_interface_get_cursor_position_scale_t>(0x21D620), user_interface_get_cursor_position_scaled);
 	return;
 }
