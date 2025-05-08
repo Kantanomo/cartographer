@@ -18,7 +18,7 @@ struct s_cartographer_error_globals
 
 /* constants */
 
-const s_cartographer_error_globals k_cartographer_error_globals[k_language_count][k_cartographer_error_id_count] =
+static const s_cartographer_error_globals k_cartographer_error_globals[k_language_count][k_cartographer_error_id_count] =
 {
 	{
 		{
@@ -96,10 +96,6 @@ const s_cartographer_error_globals k_cartographer_error_globals[k_language_count
 		{
 			L"BANNED Email Provider!",
 			L"The Email Address you have entered is using a domain name that has been banned! We do not allow disposable email addresses! If this is a mistake please contact an admin."
-		},
-		{
-			L"Account Successfully Created!",
-			L"The account you just entered has been successfully created! You may now use those details to login."
 		},
 		{
 			L"Verification Email Sent!",
