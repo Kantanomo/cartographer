@@ -71,7 +71,22 @@ enum e_object_physics_flags : uint16
 
 enum e_object_damage_flags : uint16
 {
-	_object_is_dead_bit = 2,
+	_object_damage_bit_0,
+	_object_damage_bit_1,
+	_object_is_dead_bit,
+	_object_damage_bit_3,
+	_object_damage_bit_4,
+	_object_damage_bit_5,
+	_object_damage_bit_6,
+	_object_damage_bit_7,
+	_object_damage_bit_8,
+	_object_damage_bit_9,
+	_object_damage_bit_10,
+	_object_damage_bit_11,
+	_object_damage_bit_12,
+	_object_damage_bit_13,
+	_object_damage_bit_14,
+	k_object_damage_flags_count,
 };
 
 enum e_object_simulation_flags : uint8
@@ -94,6 +109,17 @@ enum e_object_header_flags : uint8
 };
 
 /* structures */
+
+struct object_iterator
+{
+	uint32 type_flags;
+	uint8 flags;
+	int8 pad;
+	int16 absolute_index;
+	datum index;
+	uint32 signature;
+};
+ASSERT_STRUCT_SIZE(object_iterator, 16);
 
 struct object_header_block_reference
 {
@@ -195,7 +221,7 @@ struct _object_datum
 	int16 body_stun_ticks;
 	int8 byte_108;
 	int8 byte_109;
-	e_object_damage_flags object_damage_flags;
+	c_flags_no_init<e_object_damage_flags, uint16, k_object_damage_flags_count> object_damage_flags;
 	object_header_block_reference original_orientation_block;
 	object_header_block_reference node_orientation_block;
 	object_header_block_reference nodes_block;
@@ -235,6 +261,55 @@ struct object_region_information
 };
 ASSERT_STRUCT_SIZE(object_region_information, 8);
 
+#ifdef OBJECT_DEBUG
+struct objects_information
+{
+	int16 object_count;
+	int16 free_objects;
+	int16 active_object_count;
+	int16 active_garbage_object_count;
+	real32 used_memory;
+	real32 contiguous_used_memory;
+};
+#endif
+
+/* classes */
+
+class c_object_iterator_base
+{
+public:
+	datum get_index(void) const;
+
+protected:
+	void object_iterator_begin_internal(int32 type_flags, uint8 flags);
+	object_iterator m_iterator;
+};
+
+template <typename T>
+class c_object_iterator : public c_object_iterator_base
+{
+public:
+	void begin(int32 type_flags, uint8 flags)
+	{
+		object_iterator_begin_internal(type_flags, flags);
+		return;
+	}
+
+	bool next(void)
+	{
+		m_current = (T*)object_iterator_next(&m_iterator);
+		return m_current != NULL;
+	}
+
+	T* get_datum(void) const
+	{
+		return m_current;
+	}
+
+private:
+	T* m_current;
+};
+
 /* prototypes */
 
 // Get the object fast, with no validation from datum index
@@ -254,6 +329,10 @@ void __cdecl objects_initialize_for_new_map(void);
 
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
 void* __cdecl object_try_and_get_and_verify_type(datum object_index, int32 object_type_flags);
+
+void __cdecl object_iterator_new(object_iterator* iterator, int32 type_flags, uint8 flags);
+
+void* __cdecl object_iterator_next(object_iterator* iterator);
 
 void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference);
 
@@ -350,10 +429,20 @@ bool __cdecl object_force_inside_bsp(datum object_index, const real_point3d* kno
 
 void* object_get_and_verify_type(datum object_index, int32 object_type_mask);
 
+datum object_get_ultimate_parent(datum object_index);
+
+#ifdef OBJECT_DEBUG
+void objects_information_get(objects_information* information);
+#endif
+
 void object_set_hidden(datum object_index, bool hidden);
 
 #ifdef OBJECT_OVERRIDE_ENABLED
 void object_override_set_shader(datum object_index, datum shader_tag_index);
 
 datum object_override_get_shader(datum object_index);
+#endif
+
+#ifdef OBJECT_DEBUG
+void objects_dump_memory(void);
 #endif

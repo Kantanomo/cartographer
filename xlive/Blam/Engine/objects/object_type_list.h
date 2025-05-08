@@ -19,7 +19,9 @@ enum e_object_type : int32
 	_object_type_sound_scenery = 10,
 	_object_type_crate = 11,
 	_object_type_creature = 12,
+
 	k_object_types_count,
+	NUMBER_OF_OBJECT_TYPES = k_object_types_count,	// Duplicate constant? Both names appear in halo 2
 
 	_object_mask_all = NONE,
 	_object_mask_unit = FLAG(_object_type_biped) | FLAG(_object_type_vehicle),
@@ -47,4 +49,11 @@ enum e_object_type : int32
 	_object_mask_sightblocking = FLAG(_object_type_vehicle) | FLAG(_object_type_scenery) | FLAG(_object_type_machine),
 	_object_mask_cannot_interpolate = FLAG(_object_type_sound_scenery) | FLAG(_object_type_light_fixture) | FLAG(_object_type_control) | FLAG(_object_type_machine) | FLAG(_object_type_scenery) | FLAG(_object_type_projectile),
 	_object_mask_havok = FLAG(_object_type_creature) | FLAG(_object_type_crate) | FLAG(_object_type_machine) | FLAG(_object_type_vehicle) | FLAG(_object_type_biped)
+
+	
+};
+
+inline e_object_type operator++(e_object_type& type)
+{
+	return (e_object_type)++((int32&)type);
 };

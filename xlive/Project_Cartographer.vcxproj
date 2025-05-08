@@ -132,7 +132,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -214,7 +214,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -291,7 +291,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -359,7 +359,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>

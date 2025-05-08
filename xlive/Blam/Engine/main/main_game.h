@@ -33,3 +33,5 @@ void main_game_launch(const char* map_name);
 void main_game_apply_patches(void);
 
 void main_game_set_global_scenario_index(datum scenario_index);
+
+datum main_game_get_global_scenario_index(void);

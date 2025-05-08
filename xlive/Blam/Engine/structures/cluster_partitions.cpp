@@ -19,7 +19,8 @@ void __cdecl cluster_partition_make_valid(cluster_partition* partition)
 	return;
 }
 
-void __cdecl cluster_partition_reconnect(cluster_partition* partition,
+void __cdecl cluster_partition_reconnect(
+	const cluster_partition* partition,
 	datum object_datum,
 	int32* first_cluster_reference,
 	const real_point3d* position,

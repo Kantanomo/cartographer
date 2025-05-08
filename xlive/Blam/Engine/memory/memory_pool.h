@@ -1,5 +1,7 @@
 #pragma once
 
+/* structures */
+
 struct s_memory_pool
 {
 	uint32 signature;
@@ -9,11 +11,17 @@ struct s_memory_pool
 	uint32 free_size;
 	uint32 offset_to_data;
 	uint32 first_block_handle;
-	uint32 last_block_handle;
+	void* last_block_handle;
 	bool reference_tracking;
 	bool allocation_from_anywhere_in_pool;
 	bool verification_enabled;
 	bool unk_bool_3F;
 };
+
+/* prototypes */
+
+uint32 memory_pool_get_free_size(const s_memory_pool* memory_pool);
+
+uint32 memory_pool_get_contiguous_free_size(const s_memory_pool* memory_pool);
 
 int32 __cdecl memory_pool_block_free(s_memory_pool* memory_pool, void** payload_data);

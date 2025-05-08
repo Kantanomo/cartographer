@@ -11,8 +11,10 @@
 #include "devices/devices.h"
 #include "effects/effects.h"
 #include "game/game.h"
+#include "game/game_time.h"
 #include "items/weapons.h"
 #include "main/interpolator.h"
+#include "main/main_game.h"
 #include "memory/memory_pool.h"
 #include "models/models.h"
 #include "objects/lights.h"
@@ -49,6 +51,21 @@ struct s_object_override_data
 };
 #endif
 
+#ifdef OBJECT_DEBUG
+struct dump_datum
+{
+	int32 definition_index;
+	e_object_type object_type;
+	int16 maximum_size;
+	int32 total_size;
+	int16 count;
+	int16 active_count;
+	int16 garbage_count;
+	int16 dead_count;
+	int16 outside_map_count;
+	int16 at_rest_count;
+};
+#endif
 
 /* globals */
 
@@ -58,9 +75,14 @@ t_object_new p_object_new;
 s_object_override_data g_object_override_data[k_maximum_object_override_count];
 #endif
 
+#ifdef OBJECT_DEBUG
+int32 debug_last_out_of_memory_dump_game_time;
+int32 g_object_memory_dump_number;
+#endif
+
 /* prototypes */
 
-static s_memory_pool* get_object_table(void);
+static s_memory_pool* object_memory_pool_get(void);
 
 static datum** game_state_object_name_list_get(void);
 
@@ -131,6 +153,14 @@ static int32 object_find_override_index(datum object_index);
 static int32 object_get_override_index(datum object_index);
 #endif
 
+#ifdef OBJECT_DEBUG
+static void object_add_to_dump(datum object_index, dump_datum* dump);
+
+static void object_dump_print_info(_iobuf* handle, const dump_datum* dump);
+
+static int sort_dumps(const dump_datum* dump1, const dump_datum* dump2);
+#endif
+
 /* public code */
 
 s_data_array* object_header_data_get(void)
@@ -145,6 +175,23 @@ void objects_apply_patches(void)
 	s_game_systems* g_game_systems = get_game_systems();
 	WritePointer((uintptr_t)&g_game_systems[28].reset_proc, objects_initialize_for_new_map);
 	return;
+}
+
+void c_object_iterator_base::object_iterator_begin_internal(int32 type_flags, uint8 flags)
+{
+	// TOOD: implement
+	// data_verify(object_header_data_get());
+	m_iterator.signature = 0x86868686;
+	m_iterator.type_flags = type_flags != 0 ? type_flags : _object_mask_all;
+	m_iterator.flags = flags;
+	m_iterator.absolute_index = 0;
+	m_iterator.index = NONE;
+	return;
+}
+
+datum c_object_iterator_base::get_index(void) const
+{
+	return m_iterator.index;
 }
 
 void __cdecl objects_initialize_for_new_map(void)
@@ -170,12 +217,26 @@ void __cdecl objects_initialize_for_new_map(void)
 #ifdef OBJECT_OVERRIDE_ENABLED
 	csmemset(g_object_override_data, 0, sizeof(g_object_override_data));
 #endif
+#ifdef OBJECT_DEBUG
+	debug_last_out_of_memory_dump_game_time = NONE;
+#endif
 	return;
 }
 
 void* __cdecl object_try_and_get_and_verify_type(datum object_index, int32 object_type_flags)
 {
 	return INVOKE(0x1304E3, 0x11F3A6, object_try_and_get_and_verify_type, object_index, object_type_flags);
+}
+
+void __cdecl object_iterator_new(object_iterator* iterator, int32 type_flags, uint8 flags)
+{
+	INVOKE(0x130547, 0x11F40A, object_iterator_new, iterator, type_flags, flags);
+	return;
+}
+
+void* __cdecl object_iterator_next(object_iterator* iterator)
+{
+	return INVOKE(0x130574, 0x11F437, object_iterator_next, iterator);
 }
 
 void* object_header_block_get(datum object_datum, const object_header_block_reference* reference)
@@ -651,7 +712,13 @@ datum __cdecl object_new(object_placement_data* data)
 		const char* object_name = tag_name_strip_path(object_path);
 		error(_error_category_objects, 3, "%s: cannot create %s", message, object_name);
 
-		// TODO: error globals here 
+#ifdef OBJECT_DEBUG
+		if (debug_last_out_of_memory_dump_game_time == NONE || (debug_last_out_of_memory_dump_game_time + game_seconds_integer_to_ticks(5) >= (int32)game_time_get()))
+		{
+			objects_dump_memory();
+			debug_last_out_of_memory_dump_game_time = game_time_get();
+		}
+#endif
 	}
 
 	return object_index;
@@ -891,6 +958,47 @@ void* object_get_and_verify_type(datum object_index, int32 object_type_mask)
 	return (void*)object;
 }
 
+datum object_get_ultimate_parent(datum object_index)
+{
+	datum result = NONE;
+	while (object_index != NONE)
+	{
+		result = object_index;
+		object_index =  ((object_datum*)object_get_and_verify_type(object_index, _object_mask_all))->object.parent_object_index;
+	}
+	return result;
+}
+
+#ifdef OBJECT_DEBUG
+void objects_information_get(objects_information* information)
+{
+	csmemset(information, 0, sizeof(objects_information));
+	
+	s_data_array* header_data = object_header_data_get();
+	object_header_datum* header = (object_header_datum*)header_data->data;
+
+	for (int16 index = 0; index < (int16)header_data->next_unused_index; ++index)
+	{
+		if (header->identifier)
+		{
+			++information->object_count;
+			if (header->flags.test(_object_header_active_bit))
+			{
+				++information->active_object_count;
+			}
+		}
+		++header;
+	}
+	
+	const s_memory_pool* object_memory_pool = object_memory_pool_get();
+	information->free_objects = k_maximum_objects_per_map - information->object_count;
+	information->active_garbage_object_count = (int16)object_globals_get()->active_garbage_object_count;
+	information->used_memory = 1.f - memory_pool_get_free_size(object_memory_pool) / 1048576.f;
+	information->contiguous_used_memory = memory_pool_get_contiguous_free_size(object_memory_pool) / 1048576.f;
+	return;
+}
+#endif
+
 void __cdecl object_set_hidden(datum object_index, bool hidden)
 {
 	//INVOKE(0x1362C9, 0x125199, object_set_hidden, object_index, hidden);
@@ -957,9 +1065,119 @@ datum object_override_get_shader(datum object_index)
 }
 #endif
 
+#ifdef OBJECT_DEBUG
+void objects_dump_memory(void)
+{
+	dump_datum object_type_dumps[NUMBER_OF_OBJECT_TYPES];
+	dump_datum dumps[k_maximum_objects_per_map];
+
+	int16 object_count = 0;
+	int16 overflowed_object_count = 0;
+
+	csmemset(dumps, 0, sizeof(dumps));
+	csmemset(object_type_dumps, 0, sizeof(object_type_dumps));
+
+	for (e_object_type type = _object_type_biped; type < NUMBEROF(object_type_dumps); ++type)
+	{
+		object_type_dumps[type].object_type = type;
+		object_type_dumps[type].definition_index = NONE;
+	}
+
+	c_object_iterator<object_datum> object_iterator;
+	object_iterator.begin(_object_mask_all, 0);
+
+	while (object_iterator.next())
+	{
+		const object_datum* object = object_iterator.get_datum();
+		int32 index = NONE;
+		for (int16 object_num = 0; object_num < object_count; ++object_num)
+		{
+			if (dumps[object_num].definition_index == object->definition_index)
+			{
+				index = object_num;
+				break;
+			}
+		}
+
+		if (index == NONE)
+		{
+			if (object_count >= k_maximum_objects_per_map)
+			{
+				++overflowed_object_count;
+			}
+			else
+			{
+				index = object_count++;
+				dumps[index].object_type = _object_type_none;
+				dumps[index].definition_index = object->definition_index;
+			}
+		}
+
+		const object_header_datum* header = (object_header_datum*)datum_get(object_header_data_get(), object_iterator.get_index());
+		if (index != NONE)
+		{
+			object_add_to_dump(object_iterator.get_index(), &dumps[index]);
+		}
+
+		ASSERT((header->type >= 0) && (header->type < NUMBER_OF_OBJECT_TYPES));
+		object_add_to_dump(object_iterator.get_index(), &object_type_dumps[(uint8)header->type]);
+	}
+
+	qsort(dumps, object_count, sizeof(dump_datum), (_CoreCrtNonSecureSearchSortCompareFunction)sort_dumps);
+	qsort(object_type_dumps, NUMBEROF(object_type_dumps), sizeof(dump_datum), (_CoreCrtNonSecureSearchSortCompareFunction)sort_dumps);
+
+	const char* tag_path = tag_get_name(main_game_get_global_scenario_index());
+	const char* tag_name = tag_name_strip_path(tag_path);
+
+	char filepath[256];
+	csprintf(filepath, NUMBEROF(filepath), "%s_object_memory%d.txt", tag_name, g_object_memory_dump_number++);
+	_iobuf* file;
+	const errno_t error = fopen_s(&file, filepath, "a+b");
+	if (error == 0)
+	{
+		objects_information information;
+		objects_information_get(&information);
+		fprintf(file,
+			"#%d objects (#%d active) using %3.2f%% of available memory\n\n",
+			information.object_count,
+			information.active_object_count,
+			information.used_memory * 100.f);
+		fprintf(file, "OBJECTS BY TYPE\n");
+		fprintf(file, "number (active) [garbage/   dead/outside/at-rest] maxsize totsize\n");
+		
+		for (int16 type_num = 0; type_num < NUMBEROF(object_type_dumps); ++type_num)
+		{
+			object_dump_print_info(file, &object_type_dumps[type_num]);
+		}
+
+		fprintf(file, "\n");
+		fprintf(file, "OBJECTS BY DEFINITION\n");
+		fprintf(file, "number (active) [garbage/   dead/outside/at-rest] maxsize totsize\n");
+		for (int16 object_num = 0; object_num < object_count; ++object_num)
+		{
+			object_dump_print_info(file, &dumps[object_num]);
+		}
+
+		fprintf(file, "\n");
+		if (overflowed_object_count > 0)
+		{
+			fprintf(
+				file,
+				"WARNING: overflowed k_maximum_objects_per_map (%d), this dump does not include %d objects that would not fit!\n",
+				k_maximum_objects_per_map,
+				overflowed_object_count);
+		}
+			
+		fprintf(file, "\n");
+		fclose(file);
+	}
+	return;
+}
+#endif
+
 /* private code */
 
-static s_memory_pool* get_object_table(void)
+static s_memory_pool* object_memory_pool_get(void)
 {
 	return *Memory::GetAddress<s_memory_pool**>(0x4E4610, 0x50C8E0);
 };
@@ -1043,7 +1261,7 @@ static void free_object_memory(datum object_index)
 	object_header->flags.set_unsafe(0);
 	if (object_header->datum != NULL)
 	{
-		memory_pool_block_free(get_object_table(), &object_header->datum);
+		memory_pool_block_free(object_memory_pool_get(), &object_header->datum);
 	}
 	datum_delete(object_header_data_get(), object_index);
 	return;
@@ -1214,7 +1432,7 @@ static void object_reconnect_to_map(s_location* location, datum object_index)
 	s_object_payload payload;
 	object_get_payload(object_index, &payload);
 
-	cluster_partition* partition = collideable_object_cluster_partition_get();
+	const cluster_partition* partition = collideable_object_cluster_partition_get();
 	if (!object->object.flags.test(_object_uses_collidable_list_bit))
 	{
 		partition = noncollideable_object_cluster_partition_get();
@@ -1265,7 +1483,7 @@ static void object_reconnect_to_map(s_location* location, datum object_index)
 
 static void object_get_payload(datum object_index, s_object_payload* payload)
 {
-	const object_datum* object = object_get_fast_unsafe(object_index);
+	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
 	uint16 object_collision_cull_flags = 0;
 	if (object->object.flags.test(_object_uses_collidable_list_bit))
 	{
@@ -1317,12 +1535,12 @@ static void object_initialize_for_interpolation(datum object_index)
 			if (attachment->type.index != NONE)
 			{
 				tag_group type = attachment->type.group;
-				if (type.group == 'lens'
-					|| type.group == 'ligh'
-					|| type.group == 'MGS2'
-					|| type.group == 'tdtl'
-					|| type.group == 'cont'
-					|| type.group == 'effe')
+				if (type.group == _tag_group_lens_flare
+					|| type.group == _tag_group_light
+					|| type.group == _tag_group_light_volume
+					|| type.group == _tag_group_liquid
+					|| type.group == _tag_group_contrail
+					|| type.group == _tag_group_effect)
 				{
 					break;
 				}
@@ -1510,5 +1728,94 @@ static int32 object_get_override_index(datum object_index)
 
 	ASSERT(object->object.flags.test(_object_has_override_bit) == (override_index != NONE));
 	return override_index;
+}
+#endif
+
+#ifdef OBJECT_DEBUG
+static void object_add_to_dump(datum object_index, dump_datum* dump)
+{
+	const object_header_datum* header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+	
+	if (header->data_size > dump->maximum_size)
+	{
+		dump->maximum_size = header->data_size;
+	}
+
+	dump->total_size += header->data_size;
+	++dump->count;
+
+	if (header->flags.test(_object_header_active_bit))
+	{
+		++dump->active_count;
+	}
+
+	if (object->object.flags.test(_object_garbage_bit))
+	{
+		++dump->garbage_count;
+	}
+
+	if (object->object.object_damage_flags.test(_object_is_dead_bit))
+	{
+		++dump->dead_count;
+	}
+
+	if (object->object.physics_flags.test(_object_physics_bit_8))
+	{
+		++dump->at_rest_count;
+	}
+
+	const object_datum* parent = (object_datum*)object_get_and_verify_type(object_get_ultimate_parent(object_index), _object_mask_all);
+	if (parent->object.flags.test(_object_outside_of_map_bit) || parent->object.location.cluster_index == NONE)
+	{
+		++dump->outside_map_count;
+	}
+	return;
+}
+
+static void object_dump_print_info(_iobuf* handle, const dump_datum* dump)
+{
+	const char* name = "unknown";
+	if (dump->definition_index == NONE)
+	{
+		if (dump->object_type != NONE)
+		{
+			name = object_type_get_name(dump->object_type);
+		}
+	}
+	else
+	{
+		name = tag_get_name(dump->definition_index);
+	}
+
+	fprintf(
+		handle,
+		"% 6d (% 6d) [% 7d/% 7d/% 7d/% 7d] % 7d % 7d %s\r\n",
+		dump->count,
+		dump->active_count,
+		dump->garbage_count,
+		dump->dead_count,
+		dump->outside_map_count,
+		dump->at_rest_count,
+		dump->maximum_size,
+		dump->total_size,
+		name);
+	return;
+}
+
+
+static int sort_dumps(const dump_datum* dump1, const dump_datum* dump2)
+{
+	int result = NONE;
+	if (dump1->total_size < dump2->total_size)
+	{
+		result = 1;
+	}
+	else if (dump1->total_size <= dump2->total_size)
+	{
+		result = 0;
+	}
+
+	return NONE;
 }
 #endif
