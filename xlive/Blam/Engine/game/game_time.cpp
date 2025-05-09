@@ -13,9 +13,12 @@ time_globals* time_globals::get()
 	return *Memory::GetAddress<time_globals**>(0x4C06E4, 0x4CF0EC);
 }
 
-uint32 get_game_time_ticks(void)
+uint32 game_time_get(void)
 {
-	return time_globals::get()->passed_ticks_count;
+	const time_globals* game_time_globals = time_globals::get();
+	ASSERT(game_time_globals && game_time_globals->initialized);
+
+	return game_time_globals->passed_ticks_count;
 }
 
 int time_globals::get_tickrate()
@@ -25,7 +28,7 @@ int time_globals::get_tickrate()
 
 real32 game_tick_length(void)
 {
-	time_globals* game_time_globals = time_globals::get();
+	const time_globals* game_time_globals = time_globals::get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
 
@@ -139,6 +142,16 @@ void __cdecl game_time_update(real32 dt, real32* out_time_delta, int32* out_targ
 {
 	INVOKE(0x7C1BF, 0x0, game_time_update, dt, out_time_delta, out_target_tick_count);
 	return;
+}
+
+int32 game_seconds_integer_to_ticks(int32 seconds)
+{
+	const time_globals* game_time_globals = time_globals::get();
+
+	ASSERT(game_time_globals);
+	ASSERT(game_time_globals->initialized);
+
+	return seconds * game_time_globals->ticks_per_second;
 }
 
 void game_time_apply_patches()

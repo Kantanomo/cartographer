@@ -110,3 +110,17 @@ void object_type_postprocess_node_matrices(datum object_datum, int32 node_count,
 	}
 	return;
 }
+
+const char* object_type_get_name(e_object_type object_type)
+{
+	if (object_type > k_object_types_count)
+	{
+		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "#%d isn't a valid object type in [#0,#%d)", object_type, k_object_types_count);
+		DISPLAY_ASSERT(string);
+	}
+
+	object_type_definition** object_type_definitions = get_object_type_definitions();
+	ASSERT(object_type_definitions[object_type]);
+
+	return object_type_definitions[object_type]->name;
+}

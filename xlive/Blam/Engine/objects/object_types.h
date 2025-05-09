@@ -106,4 +106,4 @@ bool object_type_compute_activation(datum object_datum, s_game_cluster_bit_vecto
 
 void object_type_postprocess_node_matrices(datum object_datum, int32 node_count, real_matrix4x3* node_matracies);
 
-
+const char* object_type_get_name(e_object_type object_type);

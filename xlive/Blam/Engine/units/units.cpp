@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "units.h"
 
+#include "unit_definitions.h"
+
 #include "tag_files/global_string_ids.h"
 
 /* prototypes */
@@ -93,6 +95,15 @@ e_game_team unit_get_team_index(datum unit_index)
 bool __cdecl unit_desires_tight_camera_track(datum unit_index)
 {
 	return INVOKE(0x13F63B, 0, unit_desires_tight_camera_track, unit_index);
+}
+
+bool unit_does_not_show_readied_weapon(datum unit_index)
+{
+	const unit_datum* unit = (unit_datum*)object_get_and_verify_type(unit_index, _object_mask_unit);
+	const struct unit_definition* unit_definition = (struct unit_definition*)tag_get_fast(unit->definition_index);
+	ASSERT(unit_definition);
+
+	return unit_definition->unit.flags.test(_unit_definition_doesnt_show_readied_weapon_bit);
 }
 
 /* private code */

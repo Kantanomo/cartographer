@@ -10,35 +10,36 @@
 
 enum e_unit_definition_flags : int32
 {
-	_unit_definition_circular_aiming = FLAG(0),
-	_unit_definition_destroyed_after_dying = FLAG(1),
-	_unit_definition_halfspeed_interpolation = FLAG(2),
-	_unit_definition_fires_from_camera = FLAG(3),
-	_unit_definition_entrance_inside_bounding_sphere = FLAG(4),
-	_unit_definition_doesnt_show_readied_weapon = FLAG(5),
-	_unit_definition_causes_passenger_dialogue = FLAG(6),
-	_unit_definition_resists_pings = FLAG(7),
-	_unit_definition_melee_attack_is_fatal = FLAG(8),
-	_unit_definition_dont_reface_during_pings = FLAG(9),
-	_unit_definition_HasNoAiming = FLAG(10),
-	_unit_definition_simple_creature = FLAG(11),
-	_unit_definition_impact_melee_attaches_to_unit = FLAG(12),
-	_unit_definition_impact_melee_dies_on_shields = FLAG(13),
-	_unit_definition_cannot_open_doors_automatically = FLAG(14),
-	_unit_definition_melee_attackers_cannot_attach = FLAG(15),
-	_unit_definition_not_instantly_killed_by_melee = FLAG(16),
-	_unit_definition_shield_sapping = FLAG(17),
-	_unit_definition_runs_around_flaming = FLAG(18),
-	_unit_definition_inconsequential = FLAG(19),
-	_unit_definition_special_cinematic_unit = FLAG(20),
-	_unit_definition_ignored_by_autoaiming = FLAG(21),
-	_unit_definition_shields_fry_infection_forms = FLAG(22),
-	_unit_definition_unused = FLAG(23),
-	_unit_definition_unused_1 = FLAG(24),
-	_unit_definition_acts_as_gunner_for_parent = FLAG(25),
-	_unit_definition_controlled_by_parent_gunner = FLAG(26),
-	_unit_definition_parents_primary_weapon = FLAG(27),
-	_unit_definition_unit_has_boost = FLAG(28)
+	_unit_definition_circular_aiming_bit = 0,
+	_unit_definition_destroyed_after_dying_bit = 1,
+	_unit_definition_halfspeed_interpolation_bit = 2,
+	_unit_definition_fires_from_camera_bit = 3,
+	_unit_definition_entrance_inside_bounding_sphere_bit = 4,
+	_unit_definition_doesnt_show_readied_weapon_bit = 5,
+	_unit_definition_causes_passenger_dialogue_bit = 6,
+	_unit_definition_resists_pings_bit = 7,
+	_unit_definition_melee_attack_is_fatal_bit = 8,
+	_unit_definition_dont_reface_during_pings_bit = 9,
+	_unit_definition_has_no_aiming_bit = 10,
+	_unit_definition_simple_creature_bit = 11,
+	_unit_definition_impact_melee_attaches_to_unit_bit = 12,
+	_unit_definition_impact_melee_dies_on_shields_bit = 13,
+	_unit_definition_cannot_open_doors_automatically_bit = 14,
+	_unit_definition_melee_attackers_cannot_attach_bit = 15,
+	_unit_definition_not_instantly_killed_by_melee_bit = 16,
+	_unit_definition_shield_sapping_bit = 17,
+	_unit_definition_runs_around_flaming_bit = 18,
+	_unit_definition_inconsequential_bit = 19,
+	_unit_definition_special_cinematic_unit_bit = 20,
+	_unit_definition_ignored_by_autoaiming_bit = 21,
+	_unit_definition_shields_fry_infection_forms_bit = 22,
+	_unit_definition_unused_bit = 23,
+	_unit_definition_unused_1_bit = 24,
+	_unit_definition_acts_as_gunner_for_parent_bit = 25,
+	_unit_definition_controlled_by_parent_gunner_bit = 26,
+	_unit_definition_parents_primary_weapon_bit = 27,
+	_unit_definition_unit_has_boost_bit = 28,
+	k_number_of_unit_definition_flags
 };
 
 enum e_unit_seat_definition_flags : uint32
@@ -198,7 +199,7 @@ ASSERT_STRUCT_SIZE(s_unit_lipsync_scales, 8);
 
 struct _unit_definition
 {
-	e_unit_definition_flags flags;
+	c_flags_no_init<e_unit_definition_flags, uint32, k_number_of_unit_definition_flags> flags;
 	e_game_team default_team;
 	e_ai_sound_volume constant_sound_volume;
 	tag_reference integrated_light_toggle;  // effe

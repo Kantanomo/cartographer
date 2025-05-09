@@ -78,6 +78,9 @@ namespace CommandCollection
 	static int SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int SetPortNumber(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+#ifdef OBJECT_DEBUG
+	static int _objects_dump_memory(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+#endif
 
 	// misc
 	static void DeleteObject(datum objectDatumIdx);
@@ -154,6 +157,9 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand("sv_change_player_team", "changes the player team to the specivied team", 2, 2, CommandCollection::change_player_team));
 	InsertCommand(new ConsoleCommand("quit", "quits the game to desktop", 0, 0, CommandCollection::quit));
 	InsertCommand(new ConsoleCommand("screenshot_cubemap", "takes a cubemap screenshot and saves as <name>.tif", 1, 1, CommandCollection::_screenshot_cubemap));
+#ifdef OBJECT_DEBUG
+	InsertCommand(new ConsoleCommand("objects_dump_memory", "debugs object memory usage", 0, 0, CommandCollection::_objects_dump_memory));
+#endif
 
 	atexit([]() -> void {
 		for (auto command : commandTable)
@@ -985,5 +991,13 @@ static int CommandCollection::SetPortNumber(const std::vector<std::string>& toke
 
 	return 0;
 }
+
+#ifdef OBJECT_DEBUG
+static int CommandCollection::_objects_dump_memory(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	objects_dump_memory();
+	return 0;
+}
+#endif
 
 TEST_N_DEF(CC4);

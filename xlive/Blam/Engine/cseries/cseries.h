@@ -47,8 +47,12 @@ static_assert(sizeof(real64) == 8);
 typedef long datum;
 static_assert(sizeof(datum) == 4);
 
-#define k_kilo 1024
-#define k_unsigned_short_max 0xffff
+enum
+{
+	k_kilo = 1024,
+	SHORT_MAX = 32767,
+	k_unsigned_short_max = 0xffff
+};
 
 #define SIZEOF_BITS(value) (8 * sizeof(value))
 #define CHAR_BITS SIZEOF_BITS(int8)

@@ -25,7 +25,7 @@ struct time_globals
 };
 ASSERT_STRUCT_SIZE(time_globals, 36);
 
-uint32 get_game_time_ticks(void);
+uint32 game_time_get(void);
 
 real32 game_tick_length(void);
 
@@ -38,6 +38,8 @@ void game_time_set_paused(bool pause);
 void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_game_dt);
 
 void __cdecl game_time_update(real32 dt, real32* out_time_delta, int32* out_target_tick_count);
+
+int32 game_seconds_integer_to_ticks(int32 seconds);
 
 void game_time_apply_patches();
 

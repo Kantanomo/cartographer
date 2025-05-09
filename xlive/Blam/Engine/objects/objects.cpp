@@ -11,8 +11,10 @@
 #include "devices/devices.h"
 #include "effects/effects.h"
 #include "game/game.h"
+#include "game/game_time.h"
 #include "items/weapons.h"
 #include "main/interpolator.h"
+#include "main/main_game.h"
 #include "memory/memory_pool.h"
 #include "models/models.h"
 #include "objects/lights.h"
@@ -33,6 +35,10 @@ enum
 	k_maximum_object_override_count = 16
 };
 
+/* typedefs */
+
+typedef datum(__cdecl* t_object_new)(object_placement_data* data);
+
 /* structures */
 
 #ifdef OBJECT_OVERRIDE_ENABLED
@@ -45,15 +51,38 @@ struct s_object_override_data
 };
 #endif
 
+#ifdef OBJECT_DEBUG
+struct dump_datum
+{
+	int32 definition_index;
+	e_object_type object_type;
+	int16 maximum_size;
+	int32 total_size;
+	int16 count;
+	int16 active_count;
+	int16 garbage_count;
+	int16 dead_count;
+	int16 outside_map_count;
+	int16 at_rest_count;
+};
+#endif
+
 /* globals */
+
+t_object_new p_object_new;
 
 #ifdef OBJECT_OVERRIDE_ENABLED
 s_object_override_data g_object_override_data[k_maximum_object_override_count];
 #endif
 
+#ifdef OBJECT_DEBUG
+int32 debug_last_out_of_memory_dump_game_time;
+int32 g_object_memory_dump_number;
+#endif
+
 /* prototypes */
 
-static s_memory_pool* get_object_table(void);
+static s_memory_pool* object_memory_pool_get(void);
 
 static datum** game_state_object_name_list_get(void);
 
@@ -114,11 +143,23 @@ static void object_reset_interpolation(datum object_index);
 
 static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count, bool is_unit);
 
+static void object_disconnect_from_map(datum object_index, bool disconnect_this_object, bool reconnect_this_object);
+
+#ifdef OBJECT_OVERRIDE_ENABLED
 static s_object_override_data* object_override_data_get(size_t override_index);
 
 static int32 object_find_override_index(datum object_index);
 
 static int32 object_get_override_index(datum object_index);
+#endif
+
+#ifdef OBJECT_DEBUG
+static void object_add_to_dump(datum object_index, dump_datum* dump);
+
+static void object_dump_print_info(_iobuf* handle, const dump_datum* dump);
+
+static int sort_dumps(const dump_datum* dump1, const dump_datum* dump2);
+#endif
 
 /* public code */
 
@@ -134,6 +175,23 @@ void objects_apply_patches(void)
 	s_game_systems* g_game_systems = get_game_systems();
 	WritePointer((uintptr_t)&g_game_systems[28].reset_proc, objects_initialize_for_new_map);
 	return;
+}
+
+void c_object_iterator_base::object_iterator_begin_internal(int32 type_flags, uint8 flags)
+{
+	// TOOD: implement
+	// data_verify(object_header_data_get());
+	m_iterator.signature = 0x86868686;
+	m_iterator.type_flags = type_flags != 0 ? type_flags : _object_mask_all;
+	m_iterator.flags = flags;
+	m_iterator.absolute_index = 0;
+	m_iterator.index = NONE;
+	return;
+}
+
+datum c_object_iterator_base::get_index(void) const
+{
+	return m_iterator.index;
 }
 
 void __cdecl objects_initialize_for_new_map(void)
@@ -159,12 +217,26 @@ void __cdecl objects_initialize_for_new_map(void)
 #ifdef OBJECT_OVERRIDE_ENABLED
 	csmemset(g_object_override_data, 0, sizeof(g_object_override_data));
 #endif
+#ifdef OBJECT_DEBUG
+	debug_last_out_of_memory_dump_game_time = NONE;
+#endif
 	return;
 }
 
 void* __cdecl object_try_and_get_and_verify_type(datum object_index, int32 object_type_flags)
 {
 	return INVOKE(0x1304E3, 0x11F3A6, object_try_and_get_and_verify_type, object_index, object_type_flags);
+}
+
+void __cdecl object_iterator_new(object_iterator* iterator, int32 type_flags, uint8 flags)
+{
+	INVOKE(0x130547, 0x11F40A, object_iterator_new, iterator, type_flags, flags);
+	return;
+}
+
+void* __cdecl object_iterator_next(object_iterator* iterator)
+{
+	return INVOKE(0x130574, 0x11F437, object_iterator_next, iterator);
 }
 
 void* object_header_block_get(datum object_datum, const object_header_block_reference* reference)
@@ -216,6 +288,12 @@ bool __cdecl object_header_block_allocate(datum object_datum, int16 offset, int1
 	return INVOKE(0x130BC6, 0x11FA89, object_header_block_allocate, object_datum, offset, padded_size, alignment_bits);
 }
 
+e_object_type object_get_type(datum object_index)
+{
+	const object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	return (e_object_type)object_header->type;
+}
+
 bool __cdecl object_is_prt_and_lightmapped(datum object_datum, datum* mode_tag_index, datum* coll_tag_index)
 {
 	return INVOKE(0x131B0E, 0x1209DE, object_is_prt_and_lightmapped, object_datum, mode_tag_index, coll_tag_index);
@@ -261,300 +339,372 @@ void __cdecl object_reconnect_to_physics(datum object_index)
 	return;
 }
 
-// TODO: recombine object_new and object_new_internal and add position/vector assertions
-datum object_new_internal(datum object_index, object_placement_data* data)
+datum __cdecl object_new(object_placement_data* data)
 {
-	bool process_is_game_client = !shell_is_dedicated_server();
+	datum object_index = NONE;
+	bool out_of_objects = false;
 
-	const object_definition* object_def = (object_definition*)tag_get_fast(data->tag_index);
-	const s_model_definition* model_definition = NULL;
+	assert_valid_real_point3d(&data->position);
+	assert_valid_real_vector3d_axes2(&data->forward, &data->up);
+	assert_valid_real_vector3d(&data->angular_velocity);
+	assert_valid_real_vector3d(&data->translational_velocity);
+	
+	ASSERT(data->scale > 0.f);
 
-	const datum object_model_index = object_def->object.model.index;
-	if (object_model_index != NONE)
+	if (!data->flags.test(_scenario_object_placement_bit_4) && data->tag_index != NONE)
 	{
-		model_definition = (s_model_definition*)tag_get_fast(object_model_index);
+		object_type_adjust_placement(data);
 	}
 
-	halo_interpolator_setup_new_object(object_index);
-	object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
-	object_datum* object = object_get_fast_unsafe(object_index);
-
-	object_header->flags.set(_object_header_post_update_bit, true);
-	object_header->type = (int8)object_def->object.object_type;
-	object->definition_index = data->tag_index;
-
-	if (data->object_identifier.get_source() == NONE)
+	if (data->tag_index != NONE)
 	{
-		object->object.object_identifier.create_dynamic((e_object_type)object_def->object.object_type);
-		object->object.placement_index = NONE;
-		object->object.structure_bsp_index = (uint8)get_global_structure_bsp_index();
-	}
-	else
-	{
-		ASSERT(data->scenario_datum_index != NONE);
-		ASSERT(data->object_identifier.get_type() == object_def->object.object_type);
-		object->object.object_identifier = data->object_identifier;
-		object->object.placement_index = (int16)data->scenario_datum_index;
-		object->object.structure_bsp_index = (uint8)data->object_identifier.get_origin_bsp();
-	}
+		const bool process_is_game_client = !shell_is_dedicated_server();
 
-	object->object.position = data->position;
-	object->object.forward = data->forward;
-	object->object.up = data->up;
-	object->object.translational_velocity = data->translational_velocity;
-	object->object.angular_velocity = data->angular_velocity;
-	object->object.scale = data->scale;
+		const struct object_definition* object_definition = (struct object_definition*)tag_get_fast(data->tag_index);
+		const s_model_definition* model_definition = NULL;
 
-	bool enable = data->flags.test(_scenario_object_placement_bit_0);
-	object->object.flags.set(_object_mirrored_bit, enable);
-	enable = model_definition && model_definition->collision_model.index != NONE;
-	object->object.flags.set(_object_uses_collidable_list_bit, enable);
-
-	datum mode_index;
-	datum coll_index;
-	enable = object_is_prt_and_lightmapped(object_index, &mode_index, &coll_index);
-	object->object.flags.set(_object_has_prt_or_lighting_info_bit, enable);
-
-	object_header->cluster_index = NONE;
-	location_invalidate(&object->object.location);
-	object->object.first_cluster_reference = NONE;
-	object->object.parent_object_index = NONE;
-	object->object.next_index = NONE;
-	object->object.current_weapon_datum = NONE;
-	object->object.name_list_index = NONE;
-	object->object.netgame_equipment_index = NONE;
-	object->object.byte_108 = NONE;
-	object->object.byte_109 = NONE;
-	object->object.placement_policy = data->placement_policy;
-	if (TEST_FLAG(object_def->object.flags, _object_definition_does_not_cast_shadow))
-	{
-		object->object.flags.set(_object_shadowless_bit, true);
-	}
-
-	if (object->object.flags.test(_object_hidden_bit))
-	{
-		object->object.flags.set(_object_hidden_bit, false);
-		if (object_is_connected_to_map(object_index))
+		const datum object_model_index = object_definition->object.model.index;
+		if (object_model_index != NONE)
 		{
-			object_connect_lights_recursive(object_index, false, true, false, false);
-		}
-		object_update_collision_culling(object_index);
-	}
-
-	object->object.damage_owner_target_model_abs_index = data->damage_owner.owner_team_index;
-	object->object.damage_owner_owner_index = data->damage_owner.owner_player_index;
-	object->object.damage_owner_object_index = data->damage_owner.owner_object_index;
-	object->object.model_variant_id = NONE;
-	object->object.cached_render_state_index = NONE;
-	object->object.field_D0 = NONE;
-	object->object.physics_flags.set_unsafe(0);
-	object->object.physics_flags.set(_object_physics_bit_8, data->flags.test(_scenario_object_placement_bit_3));
-	object->object.havok_datum = NONE;
-	object->object.simulation_entity_index = NONE;
-	object->object.attached_to_simulation = false;
-	object->object.destroyed_constraints_flag = data->destroyed_constraints_flag;
-	object->object.loosened_constraints_flag = data->loosened_constraints_flag;
-
-	uint32 node_count = 1;
-	uint32 collision_regions_count = 1;
-	uint32 damage_info_damage_sections_size = 0;
-
-	bool allow_interpolation = false;
-	bool valid_animation_manager = false;
-
-	if (model_definition)
-	{
-		if (model_definition->nodes.count >= 1)
-		{
-			node_count = model_definition->nodes.count;
-		}
-		else
-		{
-			const char* model_name = tag_get_name(object_model_index);
-			const char* object_name = tag_get_name(data->tag_index);
-			error(_error_category_objects, 2, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
+			model_definition = (s_model_definition*)tag_get_fast(object_model_index);
 		}
 
-
-		if (model_definition->collision_regions.count >= 1)
+		if (data->object_identifier.is_scenario_object())
 		{
-			collision_regions_count = model_definition->collision_regions.count;
-		}
-		else
-		{
-			const char* model_name = tag_get_name(object_model_index);
-			const char* object_name = tag_get_name(data->tag_index);
-			error(_error_category_objects, 2, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
-		}
-
-		if (model_definition->new_damage_info.count > 0 && model_definition->new_damage_info.data != NONE)
-		{
-			damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.count;
-		}
-
-		if (model_definition->animation_graph.index != NONE)
-		{
-			c_animation_manager animation_manager;
-			if (animation_manager.reset_graph(model_definition->animation_graph.index, object_model_index, true))
+			const datum found_object_index = data->object_identifier.find_object_index();
+			if (found_object_index != NONE)
 			{
-				valid_animation_manager = true;
-				allow_interpolation = !TEST_FLAG(FLAG(object_def->object.object_type), _object_mask_cannot_interpolate);
+#ifdef ASSERTS_ENABLED
+				const char* string = g_static_string_assert_text.print("object_new creating duplicate of 0x%x", found_object_index);
+				DISPLAY_ASSERT(string);
+#endif
+			}
+		}
 
-				// allow interpolation if object is device and device flags include interpolation
-				if (TEST_FLAG(FLAG(object_def->object.object_type), _object_mask_device))
-				{
-					device_definition* device_def = (device_definition*)tag_get_fast(data->tag_index);
-					if (TEST_FLAG(device_def->device.flags, _device_definition_allow_interpolation))
-					{
-						allow_interpolation = true;
-					}
-				}
+		if (TEST_BIT(_object_mask_havok, object_definition->object.object_type))
+		{
+			havok_memory_garbage_collect();
+		}
+
+		object_index = object_allocate_header(data->tag_index);
+		
+		if (object_index == NONE)
+		{
+			out_of_objects = true;
+		}
+		else
+		{
+			halo_interpolator_setup_new_object(object_index);
+			object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+			object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+
+			bool object_animation_and_attachments_cleared = false;
+			bool object_type_created = false;
+			bool can_create_object = true;
+			bool valid_animation_manager = false;
+
+			object_header->flags.set(_object_header_post_update_bit, true);
+			object_header->type = (int8)object_definition->object.object_type;
+			object->definition_index = data->tag_index;
+
+			if (data->object_identifier.get_source() == NONE)
+			{
+				object->object.object_identifier.create_dynamic((e_object_type)object_definition->object.object_type);
+				object->object.placement_index = NONE;
+				object->object.structure_bsp_index = (uint8)get_global_structure_bsp_index();
 			}
 			else
 			{
-				const char* model_path = tag_get_name(object_model_index);
-				const char* model_name = tag_name_strip_path(model_path);
-				const char* graph_path = tag_get_name(model_definition->animation_graph.index);
-				const char* graph_name = tag_name_strip_path(graph_path);
-				error(_error_category_animation, 2, "graph '%s' is not compatible with model '%s'", graph_name, model_name);
+				if (data->object_identifier.is_scenario_object())
+				{
+					ASSERT(data->scenario_datum_index != NONE);
+				}
+				ASSERT(data->object_identifier.get_type() == object_definition->object.object_type);
+				object->object.object_identifier = data->object_identifier;
+				object->object.placement_index = (int16)data->scenario_datum_index;
+				object->object.structure_bsp_index = (uint8)data->object_identifier.get_origin_bsp();
 			}
-		}
-	}
 
+			object->object.position = data->position;
+			object->object.forward = data->forward;
+			object->object.up = data->up;
+			object->object.translational_velocity = data->translational_velocity;
+			object->object.angular_velocity = data->angular_velocity;
+			object->object.scale = data->scale;
 
-	const int16 orientation_size = (int16)(!allow_interpolation ? 0 : 32 * node_count);
+			bool enable = data->flags.test(_scenario_object_placement_bit_0);
+			object->object.flags.set(_object_mirrored_bit, enable);
+			enable = model_definition && model_definition->collision_model.index != NONE;
+			object->object.flags.set(_object_uses_collidable_list_bit, enable);
 
-	// TODO: header asserts here
+			datum mode_index;
+			datum coll_index;
+			enable = object_is_prt_and_lightmapped(object_index, &mode_index, &coll_index);
+			object->object.flags.set(_object_has_prt_or_lighting_info_bit, enable);
 
-	// Allocate object header blocks
-	bool can_create_object =
-		object_header_block_allocate(object_index, offsetof(object_datum, object.object_attachments_block), (uint16)8 * (uint16)object_def->object.attachments.count, 0)
-		&& object_header_block_allocate(object_index, offsetof(object_datum, object.damage_sections_block), (int16)(8 * damage_info_damage_sections_size), 0)
-		&& object_header_block_allocate(object_index, offsetof(object_datum, object.change_color_block), (uint16)24 * (uint16)object_def->object.change_colors.count, 0)
-		&& object_header_block_allocate(object_index, offsetof(object_datum, object.nodes_block), (int16)(sizeof(real_matrix4x3) * node_count), 0)
-		&& object_header_block_allocate(object_index, offsetof(object_datum, object.collision_regions_block), (int16)(10 * collision_regions_count), 0)
-		&& object_header_block_allocate(object_index, offsetof(object_datum, object.original_orientation_block), orientation_size, 4)
-		&& object_header_block_allocate(object_index, offsetof(object_datum, object.node_orientation_block), orientation_size, 4)
-		&& object_header_block_allocate(object_index, offsetof(object_datum, object.animation_manager_block), (valid_animation_manager ? 144 : 0), 0)
-		&& havok_can_allocate_space_for_instance_of_object_definition(data->tag_index);
+			object_header->cluster_index = NONE;
+			location_invalidate(&object->object.location);
+			object->object.first_cluster_reference = NONE;
+			object->object.parent_object_index = NONE;
+			object->object.next_index = NONE;
+			object->object.current_weapon_datum = NONE;
+			object->object.name_list_index = NONE;
+			object->object.netgame_equipment_index = NONE;
+			object->object.byte_108 = NONE;
+			object->object.byte_109 = NONE;
+			object->object.placement_policy = data->placement_policy;
 
-	// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
-	bool out_of_objects = !can_create_object;
-	if (can_create_object)
-	{
-		if (valid_animation_manager)
-		{
-			ASSERT(model_definition);
-			ASSERT(model_definition->animation_graph.index != NONE);
-			ASSERT(object);
+			if (object_definition->object.flags.test(_object_definition_does_not_cast_shadow_bit))
+			{
+				object->object.flags.set(_object_shadowless_bit, true);
+			}
 
-			c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->object.animation_manager_block);
-			animation_manager->initialize();
+			object_set_hidden(object_index, false);
+
+			object->object.damage_owner_target_model_abs_index = data->damage_owner.owner_team_index;
+			object->object.damage_owner_owner_index = data->damage_owner.owner_player_index;
+			object->object.damage_owner_object_index = data->damage_owner.owner_object_index;
+			object->object.model_variant_id = NONE;
+			object->object.cached_render_state_index = NONE;
+			object->object.field_D0 = NONE;
+			object->object.physics_flags.clear();
+			object->object.physics_flags.set(_object_physics_bit_8, data->flags.test(_scenario_object_placement_bit_3));
+			object->object.havok_datum = NONE;
+			object->object.simulation_entity_index = NONE;
+			object->object.simulation_flags.clear();
+			object->object.destroyed_constraints_flag = data->destroyed_constraints_flag;
+			object->object.loosened_constraints_flag = data->loosened_constraints_flag;
+
+			uint32 node_count = 1;
+			uint32 region_count = 1;
+			uint32 damage_section_count = 0;
+			bool can_interpolate = false;
+
+			if (model_definition)
+			{
+				if (model_definition->nodes.count < 1)
+				{
+					const char* model_name = tag_get_name(object_model_index);
+					const char* object_name = tag_get_name(data->tag_index);
+					error(_error_category_objects, 2, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
+				}
+				else
+				{
+					node_count = model_definition->nodes.count;
+				}
+
+				if (model_definition->collision_regions.count < 1)
+				{
+					const char* model_name = tag_get_name(object_model_index);
+					const char* object_name = tag_get_name(data->tag_index);
+					error(_error_category_objects, 2, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
+				}
+				else
+				{
+					region_count = model_definition->collision_regions.count;
+				}
+
+				if (model_definition->new_damage_info.count > 0 && model_definition->new_damage_info.data != NONE)
+				{
+					damage_section_count = model_definition->new_damage_info[0]->damage_sections.count;
+				}
+
+				if (model_definition->animation_graph.index != NONE)
+				{
+					c_animation_manager animation_manager;
+					if (animation_manager.reset_graph(model_definition->animation_graph.index, object_model_index, true))
+					{
+						valid_animation_manager = true;
+						can_interpolate = !TEST_FLAG(FLAG(object_definition->object.object_type), _object_mask_cannot_interpolate);
+
+						// allow interpolation if object is device and device flags include interpolation
+						if (TEST_FLAG(FLAG(object_definition->object.object_type), _object_mask_device))
+						{
+							device_definition* device_def = (device_definition*)tag_get_fast(data->tag_index);
+							if (TEST_FLAG(device_def->device.flags, _device_definition_allow_interpolation))
+							{
+								can_interpolate = true;
+							}
+						}
+					}
+					else
+					{
+						const char* model_path = tag_get_name(object_model_index);
+						const char* model_name = tag_name_strip_path(model_path);
+						const char* graph_path = tag_get_name(model_definition->animation_graph.index);
+						const char* graph_name = tag_name_strip_path(graph_path);
+						error(_error_category_animation, 2, "graph '%s' is not compatible with model '%s'", graph_name, model_name);
+					}
+				}
+			}
+
+			// Allocate object header blocks
+
+			ASSERT(object_definition->object.attachments.count <= SHORT_MAX / sizeof(struct object_attachment));
+			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.object_attachments_block), (uint16)(sizeof(object_attachment) * object_definition->object.attachments.count), 0);
 			
-			bool graph_reset = animation_manager->reset_graph(model_definition->animation_graph.index, object_model_index, true);
-			ASSERT(graph_reset);
+			ASSERT(damage_section_count <= SHORT_MAX / sizeof(struct object_damage_section));
+			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.damage_sections_block), (int16)(sizeof(object_damage_section) * damage_section_count), 0);
+			
 
-			object->object.flags.set(_object_dynamic_lighting_recompute_bit, graph_reset);
-		}
+			ASSERT(object_definition->object.change_colors.count <= SHORT_MAX / (2 * sizeof(real_rgb_color)));
+			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.change_color_block), (int16)(2 * sizeof(real_rgb_color) * object_definition->object.change_colors.count), 0);
+			
 
-		// Null attachment block
-		if (object_def->object.attachments.count > 0)
-		{
-			ASSERT(object);
-			int32 attachments_count;
-			object_attachment* object_attachments_block = (object_attachment*)object_header_block_get_with_count(object_index,
-				&object->object.object_attachments_block,
-				sizeof(object_attachment),
-				&attachments_count);
+			ASSERT(node_count <= SHORT_MAX / (sizeof(real_matrix4x3)));
+			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.nodes_block), (int16)(sizeof(real_matrix4x3) * node_count), 0);
 
-			csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
-		}
 
-		if (object_type_new(object_index, data, &out_of_objects))
-		{
-			bool object_flag_check = object->object.flags.test(_object_deleted_when_deactivated_bit);
-			if (data->flags.test(_scenario_object_placement_bit_1) || data->flags.test(_scenario_object_placement_bit_2))
+			ASSERT(region_count <= SHORT_MAX / (2 * sizeof(char) + sizeof(struct object_region_information)));
+			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.collision_regions_block), (int16)((2 * sizeof(char) + sizeof(struct object_region_information)) * region_count), 0);
+
+
+			ASSERT(!can_interpolate || node_count <= SHORT_MAX / (sizeof(real_orientation)));
+			const int16 orientation_size = (int16)(!can_interpolate ? 0 : 32 * node_count);
+			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.original_orientation_block), orientation_size, 4);
+			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.node_orientation_block), orientation_size, 4);
+			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.animation_manager_block), (valid_animation_manager ? 144 : 0), 0);
+			can_create_object &= havok_can_allocate_space_for_instance_of_object_definition(data->tag_index);
+
+			// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
+			out_of_objects = !can_create_object;
+
+			// Get the object, we do this so we can verify that we're able to retrieve it in the future
+			object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+			
+			if (can_create_object)
 			{
-				object->object.flags.set(_object_deleted_when_deactivated_bit, false);
+				if (valid_animation_manager)
+				{
+					ASSERT(model_definition);
+					ASSERT(model_definition->animation_graph.index != NONE);
+					ASSERT(object);
+
+					c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->object.animation_manager_block);
+					animation_manager->initialize();
+
+					bool graph_reset = animation_manager->reset_graph(model_definition->animation_graph.index, object_model_index, true);
+					ASSERT(graph_reset);
+
+					object->object.flags.set(_object_dynamic_lighting_recompute_bit, graph_reset);
+				}
+
+				// Null attachment block
+				if (object_definition->object.attachments.count > 0)
+				{
+					ASSERT(object);
+					int32 attachments_count;
+					object_attachment* object_attachments_block = (object_attachment*)object_header_block_get_with_count(object_index,
+						&object->object.object_attachments_block,
+						sizeof(object_attachment),
+						&attachments_count);
+
+					csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
+				}
+				object_animation_and_attachments_cleared = true;
 			}
 
-			object_variant_index_update(object_index, data->variant_name);
-			update_object_region_information(object_index, data->region_index);
-			object_set_initial_change_colors(object_index, data->active_change_colors_mask, data->change_colors);
-			object_initialize_vitality(object_index, NULL, NULL);
-			object_compute_change_colors(object_index);
-			object->object.emblem_info = data->emblem_info;
 
-			if (object->object.animation_manager_block.offset != NONE)
+			if (can_create_object)
 			{
-				object_reset_interpolation(object_index);
+				can_create_object = object_type_new(object_index, data, &out_of_objects);
+				object_type_created = true;
+				// Get the object, we do this so we can verify that we're able to retrieve it in the future
+				object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
 			}
 
-			object_compute_node_matrices_with_children(object_index);
-
-			// If the object (can) connect to the map we make sure it gets connected
-			if (objects_can_connect_to_map())
+			if (can_create_object)
 			{
-				data->object_is_inside_cluster = set_object_position_if_in_cluster(&data->location, object_index);
+				bool object_flag_check = object->object.flags.test(_object_deleted_when_deactivated_bit);
+				if (data->flags.test(_scenario_object_placement_bit_1) || data->flags.test(_scenario_object_placement_bit_2))
+				{
+					object->object.flags.set(_object_deleted_when_deactivated_bit, false);
+				}
 
-				// If the object is inside a cluster set the location to the one passed in the placement data
-				// If not then pass null
-				s_location* p_location = (data->object_is_inside_cluster ? &data->location : NULL);
-				object_reconnect_to_map(p_location, object_index);
-			}
+				object_variant_index_update(object_index, data->variant_name);
+				update_object_region_information(object_index, data->region_index);
+				object_set_initial_change_colors(object_index, data->active_change_colors_mask, data->change_colors);
+				object_initialize_vitality(object_index, NULL, NULL);
+				object_compute_change_colors(object_index);
+				object->object.emblem_info = data->emblem_info;
 
-			object_postprocess_node_matrices(object_index);
-			object_initialize_for_interpolation(object_index);
+				if (object->object.animation_manager_block.offset != NONE)
+				{
+					object_reset_interpolation(object_index);
+				}
 
-			object_wake(object_index);
+				object_compute_node_matrices_with_children(object_index);
 
-			object->object.physics_flags.set(_object_physics_bit_2, data->flags.test(_scenario_object_placement_bit_5));
-
-			object_reconnect_to_physics(object_index);
-			object_initialize_effects(object_index);
-			object_type_create_children(object_index);
-
-			const datum object_creation_effect_index = object_def->object.creation_effect.index;
-			if (object_creation_effect_index != NONE)
-			{
-				effect_new_from_object(object_creation_effect_index, &data->damage_owner, object_index, 0.f, 0.f, NULL, NULL);
-			}
-
-			// Not 100% sure what this function does but it has to do with occlusion
-			// This function is nulled out on the dedi
-			if (process_is_game_client)
-			{
-				object_occlusion_data_initialize(object_index);
-			}
-
-			object->object.flags.set(_object_deleted_when_deactivated_bit, object_flag_check);
-			object_early_mover_new(object_index);
-
-			if (object->object.flags.test(_object_deleted_when_deactivated_bit) && !object_header->flags.test(_object_header_active_bit))
-			{
+				// If the object (can) connect to the map we make sure it gets connected
 				if (objects_can_connect_to_map())
 				{
-					if (!data->flags.test(_scenario_object_placement_bit_1) && (!data->flags.test(_scenario_object_placement_bit_2) || object->object.location.cluster_index != NONE))
+					data->object_is_inside_cluster = set_object_position_if_in_cluster(&data->location, object_index);
+
+					// If the object is inside a cluster set the location to the one passed in the placement data
+					// If not then pass null
+					s_location* p_location = (data->object_is_inside_cluster ? &data->location : NULL);
+					object_reconnect_to_map(p_location, object_index);
+				}
+
+				object_postprocess_node_matrices(object_index);
+				object_initialize_for_interpolation(object_index);
+
+				object_wake(object_index);
+
+				object->object.physics_flags.set(_object_physics_bit_2, data->flags.test(_scenario_object_placement_bit_5));
+
+				object_reconnect_to_physics(object_index);
+				object_initialize_effects(object_index);
+				object_type_create_children(object_index);
+
+				const datum object_creation_effect_index = object_definition->object.creation_effect.index;
+				if (object_creation_effect_index != NONE)
+				{
+					effect_new_from_object(object_creation_effect_index, &data->damage_owner, object_index, 0.f, 0.f, NULL, NULL);
+				}
+
+				// Not 100% sure what this function does but it has to do with occlusion
+				// This function is nulled out on the dedi
+				if (process_is_game_client)
+				{
+					object_occlusion_data_initialize(object_index);
+				}
+
+				object->object.flags.set(_object_deleted_when_deactivated_bit, object_flag_check);
+				object_early_mover_new(object_index);
+
+				if (
+					object->object.flags.test(_object_deleted_when_deactivated_bit) && 
+					!object_header->flags.test(_object_header_active_bit) && 
+					objects_can_connect_to_map() && 
+					!data->flags.test(_scenario_object_placement_bit_1))
+				{
+					if (!data->flags.test(_scenario_object_placement_bit_2))
+					{
+						if (object->object.location.cluster_index != NONE)
+						{
+							object_delete(object_index);
+						}
+					}
+					else
 					{
 						object_delete(object_index);
 					}
 				}
 			}
+
+			if (!can_create_object)
+			{
+				if (object_type_created)
+				{
+					object_type_delete(object_index);
+				}
+				free_object_memory(object_index);
+				object_index = NONE;
+			}
 		}
-		else
-		{
-			object_type_delete(object_index);
-			free_object_memory(object_index);
-			object_index = NONE;
-		}
-	}
-	else
-	{
-		free_object_memory(object_index);
-		object_index = NONE;
 	}
 
-#ifdef _DEBUG
 	if (object_index == NONE && data->tag_index != NONE)
 	{
 		const char* message = out_of_objects ? "OUT OF OBJECTS" : "OBJECT CREATION FAILED";
@@ -562,46 +712,15 @@ datum object_new_internal(datum object_index, object_placement_data* data)
 		const char* object_name = tag_name_strip_path(object_path);
 		error(_error_category_objects, 3, "%s: cannot create %s", message, object_name);
 
-		// TODO: error globals here 
-	}
+#ifdef OBJECT_DEBUG
+		if (debug_last_out_of_memory_dump_game_time == NONE || (debug_last_out_of_memory_dump_game_time + game_seconds_integer_to_ticks(5) >= (int32)game_time_get()))
+		{
+			objects_dump_memory();
+			debug_last_out_of_memory_dump_game_time = game_time_get();
+		}
 #endif
-
-	return object_index;
-}
-
-typedef datum (__cdecl* t_object_new)(object_placement_data* placement_data);
-t_object_new p_object_new;
-
-// Creates a new object
-datum __cdecl object_new(object_placement_data* placement_data)
-{
-	datum object_index = NONE;
-
-	if (!placement_data->flags.test(_scenario_object_placement_bit_4) 
-		&& placement_data->tag_index != NONE)
-	{
-		object_type_adjust_placement(placement_data);
 	}
 
-	if (placement_data->tag_index != NONE)
-	{
-	 	const object_definition* object_def = (object_definition*)tag_get_fast(placement_data->tag_index);
-
-		if (
-			TEST_FLAG(FLAG(object_def->object.object_type),
-				(FLAG(_object_type_creature) | FLAG(_object_type_crate) | FLAG(_object_type_machine) | FLAG(_object_type_vehicle) | FLAG(_object_type_biped)))
-			)
-		{
-			havok_memory_garbage_collect();
-		}
-
-		object_index = object_allocate_header(placement_data->tag_index);
-		if (object_index != NONE)
-		{
-			object_index = object_new_internal(object_index, placement_data);
-		}
-	}
-	
 	return object_index;
 }
 
@@ -839,6 +958,89 @@ void* object_get_and_verify_type(datum object_index, int32 object_type_mask)
 	return (void*)object;
 }
 
+datum object_get_ultimate_parent(datum object_index)
+{
+	datum result = NONE;
+	while (object_index != NONE)
+	{
+		result = object_index;
+		object_index =  ((object_datum*)object_get_and_verify_type(object_index, _object_mask_all))->object.parent_object_index;
+	}
+	return result;
+}
+
+#ifdef OBJECT_DEBUG
+void objects_information_get(objects_information* information)
+{
+	csmemset(information, 0, sizeof(objects_information));
+	
+	s_data_array* header_data = object_header_data_get();
+	object_header_datum* header = (object_header_datum*)header_data->data;
+
+	for (int16 index = 0; index < (int16)header_data->next_unused_index; ++index)
+	{
+		if (header->identifier)
+		{
+			++information->object_count;
+			if (header->flags.test(_object_header_active_bit))
+			{
+				++information->active_object_count;
+			}
+		}
+		++header;
+	}
+	
+	const s_memory_pool* object_memory_pool = object_memory_pool_get();
+	information->free_objects = k_maximum_objects_per_map - information->object_count;
+	information->active_garbage_object_count = (int16)object_globals_get()->active_garbage_object_count;
+	information->used_memory = 1.f - memory_pool_get_free_size(object_memory_pool) / 1048576.f;
+	information->contiguous_used_memory = memory_pool_get_contiguous_free_size(object_memory_pool) / 1048576.f;
+	return;
+}
+#endif
+
+void __cdecl object_set_hidden(datum object_index, bool hidden)
+{
+	//INVOKE(0x1362C9, 0x125199, object_set_hidden, object_index, hidden);
+	
+	item_datum* object = (item_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+	if (TEST_BIT(_object_mask_item, object_get_type(object_index)) && object->item.flags.test(_item_in_unit_inventory_bit))
+	{
+		const bool hidden_in_inventory = object->item.flags.test(_item_hidden_in_unit_inventory_bit);
+		if (unit_does_not_show_readied_weapon(object->item.inventory_owner_unit_index))
+		{
+			ASSERT(hidden || !hidden_in_inventory);
+		}
+		else
+		{
+			ASSERT(hidden == hidden_in_inventory);
+		}
+	}
+
+	if (!hidden || object->object.flags.test(_object_hidden_bit))
+	{
+		if (!hidden && object->object.flags.test(_object_hidden_bit))
+		{
+			object->object.flags.set(_object_hidden_bit, false);
+			if (object_is_connected_to_map(object_index))
+			{
+				object_disconnect_from_map(object_index, false, true);
+			}
+			object_update_collision_culling(object_index);
+		}
+	}
+	else
+	{
+		object->object.flags.set(_object_hidden_bit, false);
+		if (object_is_connected_to_map(object_index))
+		{
+			object_disconnect_from_map(object_index, true, false);
+		}
+		object_update_collision_culling(object_index);
+	}
+	return;
+}
+
 #ifdef OBJECT_OVERRIDE_ENABLED
 void object_override_set_shader(datum object_index, datum shader_tag_index)
 {
@@ -863,9 +1065,119 @@ datum object_override_get_shader(datum object_index)
 }
 #endif
 
+#ifdef OBJECT_DEBUG
+void objects_dump_memory(void)
+{
+	dump_datum object_type_dumps[NUMBER_OF_OBJECT_TYPES];
+	dump_datum dumps[k_maximum_objects_per_map];
+
+	int16 object_count = 0;
+	int16 overflowed_object_count = 0;
+
+	csmemset(dumps, 0, sizeof(dumps));
+	csmemset(object_type_dumps, 0, sizeof(object_type_dumps));
+
+	for (e_object_type type = _object_type_biped; type < NUMBEROF(object_type_dumps); ++type)
+	{
+		object_type_dumps[type].object_type = type;
+		object_type_dumps[type].definition_index = NONE;
+	}
+
+	c_object_iterator<object_datum> object_iterator;
+	object_iterator.begin(_object_mask_all, 0);
+
+	while (object_iterator.next())
+	{
+		const object_datum* object = object_iterator.get_datum();
+		int32 index = NONE;
+		for (int16 object_num = 0; object_num < object_count; ++object_num)
+		{
+			if (dumps[object_num].definition_index == object->definition_index)
+			{
+				index = object_num;
+				break;
+			}
+		}
+
+		if (index == NONE)
+		{
+			if (object_count >= k_maximum_objects_per_map)
+			{
+				++overflowed_object_count;
+			}
+			else
+			{
+				index = object_count++;
+				dumps[index].object_type = _object_type_none;
+				dumps[index].definition_index = object->definition_index;
+			}
+		}
+
+		const object_header_datum* header = (object_header_datum*)datum_get(object_header_data_get(), object_iterator.get_index());
+		if (index != NONE)
+		{
+			object_add_to_dump(object_iterator.get_index(), &dumps[index]);
+		}
+
+		ASSERT((header->type >= 0) && (header->type < NUMBER_OF_OBJECT_TYPES));
+		object_add_to_dump(object_iterator.get_index(), &object_type_dumps[(uint8)header->type]);
+	}
+
+	qsort(dumps, object_count, sizeof(dump_datum), (_CoreCrtNonSecureSearchSortCompareFunction)sort_dumps);
+	qsort(object_type_dumps, NUMBEROF(object_type_dumps), sizeof(dump_datum), (_CoreCrtNonSecureSearchSortCompareFunction)sort_dumps);
+
+	const char* tag_path = tag_get_name(main_game_get_global_scenario_index());
+	const char* tag_name = tag_name_strip_path(tag_path);
+
+	char filepath[256];
+	csprintf(filepath, NUMBEROF(filepath), "%s_object_memory%d.txt", tag_name, g_object_memory_dump_number++);
+	_iobuf* file;
+	const errno_t error = fopen_s(&file, filepath, "a+b");
+	if (error == 0)
+	{
+		objects_information information;
+		objects_information_get(&information);
+		fprintf(file,
+			"#%d objects (#%d active) using %3.2f%% of available memory\n\n",
+			information.object_count,
+			information.active_object_count,
+			information.used_memory * 100.f);
+		fprintf(file, "OBJECTS BY TYPE\n");
+		fprintf(file, "number (active) [garbage/   dead/outside/at-rest] maxsize totsize\n");
+		
+		for (int16 type_num = 0; type_num < NUMBEROF(object_type_dumps); ++type_num)
+		{
+			object_dump_print_info(file, &object_type_dumps[type_num]);
+		}
+
+		fprintf(file, "\n");
+		fprintf(file, "OBJECTS BY DEFINITION\n");
+		fprintf(file, "number (active) [garbage/   dead/outside/at-rest] maxsize totsize\n");
+		for (int16 object_num = 0; object_num < object_count; ++object_num)
+		{
+			object_dump_print_info(file, &dumps[object_num]);
+		}
+
+		fprintf(file, "\n");
+		if (overflowed_object_count > 0)
+		{
+			fprintf(
+				file,
+				"WARNING: overflowed k_maximum_objects_per_map (%d), this dump does not include %d objects that would not fit!\n",
+				k_maximum_objects_per_map,
+				overflowed_object_count);
+		}
+			
+		fprintf(file, "\n");
+		fclose(file);
+	}
+	return;
+}
+#endif
+
 /* private code */
 
-static s_memory_pool* get_object_table(void)
+static s_memory_pool* object_memory_pool_get(void)
 {
 	return *Memory::GetAddress<s_memory_pool**>(0x4E4610, 0x50C8E0);
 };
@@ -949,7 +1261,7 @@ static void free_object_memory(datum object_index)
 	object_header->flags.set_unsafe(0);
 	if (object_header->datum != NULL)
 	{
-		memory_pool_block_free(get_object_table(), &object_header->datum);
+		memory_pool_block_free(object_memory_pool_get(), &object_header->datum);
 	}
 	datum_delete(object_header_data_get(), object_index);
 	return;
@@ -1120,7 +1432,7 @@ static void object_reconnect_to_map(s_location* location, datum object_index)
 	s_object_payload payload;
 	object_get_payload(object_index, &payload);
 
-	cluster_partition* partition = collideable_object_cluster_partition_get();
+	const cluster_partition* partition = collideable_object_cluster_partition_get();
 	if (!object->object.flags.test(_object_uses_collidable_list_bit))
 	{
 		partition = noncollideable_object_cluster_partition_get();
@@ -1171,7 +1483,7 @@ static void object_reconnect_to_map(s_location* location, datum object_index)
 
 static void object_get_payload(datum object_index, s_object_payload* payload)
 {
-	const object_datum* object = object_get_fast_unsafe(object_index);
+	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
 	uint16 object_collision_cull_flags = 0;
 	if (object->object.flags.test(_object_uses_collidable_list_bit))
 	{
@@ -1223,12 +1535,12 @@ static void object_initialize_for_interpolation(datum object_index)
 			if (attachment->type.index != NONE)
 			{
 				tag_group type = attachment->type.group;
-				if (type.group == 'lens'
-					|| type.group == 'ligh'
-					|| type.group == 'MGS2'
-					|| type.group == 'tdtl'
-					|| type.group == 'cont'
-					|| type.group == 'effe')
+				if (type.group == _tag_group_lens_flare
+					|| type.group == _tag_group_light
+					|| type.group == _tag_group_light_volume
+					|| type.group == _tag_group_liquid
+					|| type.group == _tag_group_contrail
+					|| type.group == _tag_group_effect)
 				{
 					break;
 				}
@@ -1326,6 +1638,12 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 	return (marker != 0 ? (int16)marker_index : 1);
 }
 
+static void object_disconnect_from_map(datum object_index, bool disconnect_this_object, bool reconnect_this_object)
+{
+	object_connect_lights_recursive(object_index, disconnect_this_object, reconnect_this_object, false, false);
+	return;
+}
+
 #ifdef OBJECT_OVERRIDE_ENABLED
 static s_object_override_data* object_override_data_get(size_t override_index)
 {
@@ -1410,5 +1728,94 @@ static int32 object_get_override_index(datum object_index)
 
 	ASSERT(object->object.flags.test(_object_has_override_bit) == (override_index != NONE));
 	return override_index;
+}
+#endif
+
+#ifdef OBJECT_DEBUG
+static void object_add_to_dump(datum object_index, dump_datum* dump)
+{
+	const object_header_datum* header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+	
+	if (header->data_size > dump->maximum_size)
+	{
+		dump->maximum_size = header->data_size;
+	}
+
+	dump->total_size += header->data_size;
+	++dump->count;
+
+	if (header->flags.test(_object_header_active_bit))
+	{
+		++dump->active_count;
+	}
+
+	if (object->object.flags.test(_object_garbage_bit))
+	{
+		++dump->garbage_count;
+	}
+
+	if (object->object.object_damage_flags.test(_object_is_dead_bit))
+	{
+		++dump->dead_count;
+	}
+
+	if (object->object.physics_flags.test(_object_physics_bit_8))
+	{
+		++dump->at_rest_count;
+	}
+
+	const object_datum* parent = (object_datum*)object_get_and_verify_type(object_get_ultimate_parent(object_index), _object_mask_all);
+	if (parent->object.flags.test(_object_outside_of_map_bit) || parent->object.location.cluster_index == NONE)
+	{
+		++dump->outside_map_count;
+	}
+	return;
+}
+
+static void object_dump_print_info(_iobuf* handle, const dump_datum* dump)
+{
+	const char* name = "unknown";
+	if (dump->definition_index == NONE)
+	{
+		if (dump->object_type != NONE)
+		{
+			name = object_type_get_name(dump->object_type);
+		}
+	}
+	else
+	{
+		name = tag_get_name(dump->definition_index);
+	}
+
+	fprintf(
+		handle,
+		"% 6d (% 6d) [% 7d/% 7d/% 7d/% 7d] % 7d % 7d %s\r\n",
+		dump->count,
+		dump->active_count,
+		dump->garbage_count,
+		dump->dead_count,
+		dump->outside_map_count,
+		dump->at_rest_count,
+		dump->maximum_size,
+		dump->total_size,
+		name);
+	return;
+}
+
+
+static int sort_dumps(const dump_datum* dump1, const dump_datum* dump2)
+{
+	int result = NONE;
+	if (dump1->total_size < dump2->total_size)
+	{
+		result = 1;
+	}
+	else if (dump1->total_size <= dump2->total_size)
+	{
+		result = 0;
+	}
+
+	return NONE;
 }
 #endif

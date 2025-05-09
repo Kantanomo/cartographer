@@ -71,7 +71,7 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 	
 	real32 dt_sec = 0.0f;
 	LARGE_INTEGER freq = shell_time_counter_freq();
-	int32 game_time = game_in_progress() ? get_game_time_ticks() : 0;
+	int32 game_time = game_in_progress() ? game_time_get() : 0;
 
 	// TranslateMessage()
 	shell_update();
