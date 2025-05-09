@@ -4,7 +4,10 @@
 
 #include "simulation/game_interface/simulation_game_entities.h"
 
-#define k_simulation_entity_database_maximum_entities 1024
+enum
+{
+	k_simulation_entity_database_maximum_entities = 1024
+};
 
 // Forward declaration
 class c_replication_entity_manager_client;
