@@ -289,6 +289,7 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		std::thread(playSound).detach();
 }
 
+// TODO: remove this function and adjust the original function
 void H2MOD::RefreshTogglexDelay() {
 	BYTE xDelayJMP[] = { 0x74 };
 	if (!H2Config_xDelay)
@@ -758,8 +759,6 @@ static void h2mod_apply_hooks(void)
 static void h2mod_apply_tweaks(void)
 {
 	addDebugText("Begin Startup Tweaks.");
-
-	H2MOD::RefreshTogglexDelay();
 
 	if (shell_is_dedicated_server())
 	{

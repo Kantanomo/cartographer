@@ -10,6 +10,7 @@
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
+#include "H2MOD.h"
 #include "H2MOD/GUI/imgui_integration/Console/ComVar.h"
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 
@@ -831,6 +832,7 @@ void InitH2Config()
 {
 	H2Config_disable_ingame_keyboard = g_instance_number > 1 ? true : false;
 	ReadH2Config();
+	H2MOD::RefreshTogglexDelay();
 }
 void DeinitH2Config()
 {
