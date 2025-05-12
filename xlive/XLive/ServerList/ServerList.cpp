@@ -14,11 +14,11 @@
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 
-const char k_cartographer_add_server_url[] = k_cartographer_url_https"/live/add_server.php";
-const char k_cartographer_del_server_url[] = k_cartographer_url_https"/live/del_server.php";
-const char k_cartographer_server_list_url[] = k_cartographer_url_https"/live/server_list.php";
-const char k_cartographer_server_url[] = k_cartographer_url_https"/live/servers/";
-const char k_cartographer_dedi_count_url[] = k_cartographer_url_https"/live/dedicount.php";
+static const char k_cartographer_add_server_url[] = k_cartographer_url_https"/live/add_server.php";
+static const char k_cartographer_del_server_url[] = k_cartographer_url_https"/live/del_server.php";
+static const char k_cartographer_server_list_url[] = k_cartographer_url_https"/live/server_list.php";
+static const char k_cartographer_server_url[] = k_cartographer_url_https"/live/servers/";
+static const char k_cartographer_dedi_count_url[] = k_cartographer_url_https"/live/dedicount.php";
 
 using namespace rapidjson;
 
@@ -831,7 +831,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		document.AddMember("dwFilledPublicSlots", Value().SetInt(dwFilledPublicSlots), docAllocator);
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), docAllocator);
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), docAllocator);
-		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), docAllocator);
+		document.AddMember("dwPort", Value().SetUint(H2Config_base_port), docAllocator);
 		TEST_N_DEF(XL6);
 		document.AddMember("lanaddr", Value().SetUint(localUser->m_xnaddr.ina.s_addr), docAllocator);
 		document.AddMember("xnkid", xnkid_val, docAllocator);

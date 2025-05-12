@@ -26,9 +26,9 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 
 			LOG_TRACE_GAME("Achievement {0} unlock attempt by Player {1} - id2: {2}", pAchievement[i].dwAchievementId, pAchievement[i].dwUserIndex, achievementID);
 
-			if (achievementList[achievementID] == false)
+			if (g_achievement_list[achievementID] == false)
 			{
-				achievementList[achievementID] = true;
+				g_achievement_list[achievementID] = true;
 
 				std::string AchievementData;
 
@@ -251,7 +251,7 @@ int AchievementEnumerator(DWORD cbBuffer, CHAR* pvBuffer, PDWORD pcItemsReturned
 	{
 		XACHIEVEMENT_DETAILS aaa;
 		memset(&aaa, 0, sizeof(XACHIEVEMENT_DETAILS));
-		bool achieved = achievementList[achievementEnumeratorIndex + 1];
+		bool achieved = g_achievement_list[achievementEnumeratorIndex + 1];
 
 		// check max
 		if ((achievementCount - (achievementEnumeratorIndex + 1)) >= cbBuffer / sizeof(XACHIEVEMENT_DETAILS))
