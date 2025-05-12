@@ -1164,7 +1164,7 @@ struct scenario
 	tag_block<cs_script_data> scripting_data;
 	tag_block<scenario_cutscene_flag> cutscene_flags;
 	tag_block<scenario_cutscene_camera_point> cutscene_camera_points;
-	tag_block<s_scenario_cutscene_title> cutsceneTitles;
+	tag_block<s_scenario_cutscene_title> cutscene_chapter_titles;
 
 	tag_reference custom_object_names;      // unic
 	tag_reference chapter_title_text;       // unic
