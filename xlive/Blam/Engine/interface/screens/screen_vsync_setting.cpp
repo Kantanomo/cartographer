@@ -24,11 +24,20 @@ enum e_vsync_list_items : uint16
 // we should start using custom ui tags in near future
 #define k_vsync_menu_screen_id _screen_safe_area
 
-static const char* k_vsync_edit_list_name = "vsync edit list";
+static const char k_vsync_edit_list_name[] = "vsync edit list";
 
-// TODO : add other languages
-static const wchar_t* const k_vsync_description_string = L"Synchronize your fps with your monitor's refresh rate. Prevents screen-tearing but adds input lag";
-
+static const wchar_t* const k_vsync_description_string[k_language_count] =
+{
+	L"Synchronize your FPS with your monitor's refresh rate. Prevents screen-tearing but adds input lag",
+	L"モニターのリフレッシュレートとフレームレートを同期します。ティアリングは防げますが、入力遅延が発生します",
+	L"Synchronisieren Sie Ihre FPS mit der Bildwiederholfrequenz Ihres Monitors. Verhindert Screen Tearing, erhöht aber die Eingangsverzögerung",
+	L"Synchronisez vos images par seconde avec la fréquence de rafraîchissement de votre écran. Cela évite les déchirures d'écran, mais augmente le temps de latence",
+	L"Sincroniza tus FPS con la tasa de refresco de tu monitor. Previene el desgarro de pantalla pero añade input lag",
+	L"Sincronizza i tuoi FPS con la frequenza di aggiornamento del monitor. Previene lo screen tearing ma aumenta il ritardo di input",
+	L"FPS를 모니터 주사율과 동기화하세요. 화면 찢김 현상은 방지하지만 입력 지연이 발생합니다",
+	L"将帧率与显示器刷新率同步。避免画面撕裂，但会增加输入延迟",
+	L"Sincronize os seus fps com a taxa de atualização do seu monitor. Evita ecrã rasgado, mas adiciona atraso de entrada"
+};
 
 const wchar_t* const k_vsync_header_string[k_language_count]
 {
@@ -124,10 +133,18 @@ void c_screen_vsync_menu::initialize(s_screen_parameters* parameters)
 
 	ASSERT(header && subheader);
 
+	const e_language language = get_current_language();
+
 	if (header)
-		header->set_text(k_vsync_header_string[get_current_language()]);
+	{
+		header->set_text(k_vsync_header_string[language]);
+	}
+
 	if (subheader)
-		subheader->set_text(k_vsync_description_string);
+	{
+		subheader->set_text(k_vsync_description_string[language]);
+	}
+	return;
 }
 
 void c_screen_vsync_menu::post_initialize()
