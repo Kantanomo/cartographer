@@ -14,6 +14,7 @@ class c_headhunter_engine : public c_king_engine
 public:
 	virtual e_game_engine_type get_type() override;
 	virtual bool setup() override;
+	virtual bool function_4();
 	virtual void send_game_start_event(datum player_index) override;
 	virtual void function_14(datum player_index) override;
 	virtual void swap_player_indices(uint32 old_index, uint32 new_index) override;

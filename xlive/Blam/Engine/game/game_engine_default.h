@@ -67,7 +67,7 @@ public:
 	virtual void build_simulation_update(uint32* update_mask, int32 unused, void* state_data)  = 0;
 	virtual bool apply_simulation_update(uint32 update_mask, int32 unused, void* state_data) = 0;
 	virtual void set_player_simulation_baseline_data(int32 unused, int32 unused_2, void* unk);
-	virtual void build_player_simulation_update(int16 abs_player_index, void* unk, int32 unused, void* unk_2);
-	virtual bool apply_player_simulation_update(int16 abs_player_index, int8 flags, int32 unused, void* unk);
+	virtual void build_player_simulation_update(int16 abs_player_index, int32* update_mask, int32 unused, void* unk_2);
+	virtual bool apply_player_simulation_update(int16 abs_player_index, int32* update_mask, int32 unused, void* unk);
 	virtual uint32 get_territory_name(wchar_t* a1, int32 a2, int32 a3, wchar_t* a4, wchar_t* a5);
 };

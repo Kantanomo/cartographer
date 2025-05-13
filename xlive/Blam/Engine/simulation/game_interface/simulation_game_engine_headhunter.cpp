@@ -40,18 +40,18 @@ bool c_simulation_headhunter_engine_globals_definition::entity_update_encode(boo
 	uint32* update_mask_written, uint32 state_data_size, void* state_data, void* telemetry_data, c_bitstream* packet,
 	int32 required_leave_space_bits)
 {
-	//if (!c_simulation_game_engine_definition::entity_update_encode(
-	//	a1,
-	//	update_mask & k_game_engine_state_data_flags_mask,
-	//	update_mask_written,
-	//	state_data_size,
-	//	state_data,
-	//	telemetry_data,
-	//	packet,
-	//	required_leave_space_bits))
-	//{
-	//	return false;
-	//}
+	////if (!c_simulation_game_engine_definition::entity_update_encode(
+	////	a1,
+	////	update_mask & k_game_engine_state_data_flags_mask,
+	////	update_mask_written,
+	////	state_data_size,
+	////	state_data,
+	////	telemetry_data,
+	////	packet,
+	////	required_leave_space_bits))
+	////{
+	////	return false;
+	////}
 
 	if (!c_simulation_king_engine_globals_definition::entity_update_encode(
 		a1,

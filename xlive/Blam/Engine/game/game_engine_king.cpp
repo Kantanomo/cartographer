@@ -5,6 +5,8 @@
 #include "math/random_math.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
+#include "simulation/game_interface/simulation_game_engine.h"
+#include "simulation/game_interface/simulation_game_engine_king.h"
 #include "simulation/game_interface/simulation_game_events.h"
 
 void c_king_engine_globals::setup()
@@ -47,7 +49,6 @@ void c_king_engine_globals::setup()
 
 		c_king_engine_globals::set_hill_count(total_hill_count);
 	}
-
 	this->setup_colors();
 }
 
@@ -282,5 +283,33 @@ void c_king_engine::build_simulation_update(uint32* unk, int32 unused, void* sta
 
 bool c_king_engine::apply_simulation_update(uint32 flags, int32 unused, void* state_data)
 {
-	return INVOKE_TYPE(0x10FEB1, 0xDC461, bool(__thiscall*)(c_game_engine*, uint32, int32, void*), this, flags, unused, state_data);
+	bool result = true;
+	if((flags & k_game_engine_state_data_flags_mask) != 0)
+	{
+		result = c_king_engine::function_44(flags & k_game_engine_state_data_flags_mask, state_data) != 0;
+	}
+
+	s_king_engine_state_data* game_state_data = (s_king_engine_state_data*)state_data;
+
+	s_game_engine_globals* engine_globals = game_engine_globals_get();
+
+	c_king_engine_globals* king_globals = (c_king_engine_globals*)engine_globals->game_engine_globals;
+
+	if(TEST_BIT(flags, _king_engine_state_data_flag_hill_id_exists))
+	{
+		if(game_state_data->hill_id != king_globals->m_hill_id)
+		{
+			king_globals->m_hill_id = game_state_data->hill_id;
+			king_globals->setup_points(king_globals->m_hill_id);
+		}
+	}
+
+	if(TEST_BIT(flags, _king_engine_state_data_flag_players_in_hill_exists))
+	{
+		if (game_state_data->players_in_hill != king_globals->m_hill_id)
+			king_globals->m_players_in_hill = game_state_data->players_in_hill;
+	}
+
+	return result;
+	//return INVOKE_TYPE(0x10FEB1, 0xDC461, bool(__thiscall*)(c_game_engine*, uint32, int32, void*), this, flags, unused, state_data);
 }
