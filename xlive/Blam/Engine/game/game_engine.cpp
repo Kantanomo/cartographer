@@ -13,6 +13,7 @@ void game_engine_apply_patches()
 	}
 
 	game_engine_list_set(_game_engine_type_headhunter, get_global_headhunter_engine_instance());
+	//game_engine_list_set(_game_engine_type_headhunter, get_game_mode_engines()[_game_engine_type_koth]);
 }
 
 c_game_engine* current_game_engine(void)

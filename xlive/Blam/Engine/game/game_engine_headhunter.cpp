@@ -7,7 +7,9 @@
 #include "game_time.h"
 #include "camera/camera.h"
 #include "interface/hud.h"
+#include "interface/hud_definitions.h"
 #include "interface/new_hud.h"
+#include "interface/new_hud_definitions.h"
 #include "interface/user_interface_text.h"
 #include "items/weapons.h"
 #include "math/random_math.h"
@@ -38,6 +40,8 @@ e_game_engine_type c_headhunter_engine::get_type()
 
 bool c_headhunter_engine::setup()
 {
+	c_king_engine::setup();
+
 	s_game_engine_globals* engine_globals = game_engine_globals_get();
 
 	g_headhunter_engine_globals = (c_headhunter_engine_globals*)engine_globals->game_engine_globals;
@@ -100,6 +104,17 @@ bool c_headhunter_engine::setup()
 	skull_pickup_event->primary_sound.portuguese_sound.group.group = _tag_group_sound;
 	skull_pickup_event->primary_sound.portuguese_sound.index = ping_sound;
 
+	// swap the indicator for the hill from crown to skull
+	datum hud_globals_datum = tag_loaded(_tag_group_hud_globals, "ui\\hud\\default");
+
+	if (hud_globals_datum != NONE)
+	{
+		hud_globals_definition* hud_globals = (hud_globals_definition*)tag_get_fast(hud_globals_datum);
+
+		hud_globals->new_globals.waypoints[6]->onscreen_sequence_index = 4;
+		hud_globals->new_globals.waypoints[6]->offscreen_sequence_index = 4;
+		hud_globals->new_globals.waypoints[6]->occluded_sequence_index = 4;
+	}
 	//tag_injection_set_active_map(L"elongation");
 	//if(tag_injection_active_map_verified())
 	//{
@@ -124,8 +139,19 @@ bool c_headhunter_engine::setup()
 	//	}
 	//}
 
+	return true;
+}
+
+bool c_headhunter_engine::function_4()
+{
+	s_game_variant* variant = get_game_variant();
+
+	// instead of a hill being spawned at the start of a round, an intentional delay has been set so people can't speed run the point.
 	g_headhunter_engine_globals->m_hill_id = -1;
-	return c_king_engine::setup();
+	g_headhunter_engine_globals->m_ticks_till_hill_move = time_globals::seconds_to_ticks_real(15);
+	//g_headhunter_engine_globals->setup_points(g_headhunter_engine_globals->m_hill_id);
+
+	return true;
 }
 
 void c_headhunter_engine::send_game_start_event(datum player_index)
@@ -180,8 +206,6 @@ void c_headhunter_engine::function_16(datum player_index)
 
 void c_headhunter_engine::player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index)
 {
-	c_king_engine::player_killed(killing_player, killed_player, suicide, unk_index);
-
 	s_player* player = s_player::get(killed_player);
 
 	const biped_datum* biped_unit = (biped_datum*)object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
@@ -367,22 +391,23 @@ void c_headhunter_engine::build_simulation_update(uint32* update_mask, int32 unu
 	//c_king_engine::build_simulation_update(update_mask , unused, state_data);
 
 	uint32 out_mask = 0;
-	if(*update_mask & 31)
+
+	if(*update_mask & k_game_engine_state_data_flags_mask)
 	{
-		c_king_engine::function_43(*update_mask & 31, &out_mask, state_data);
+		c_king_engine::function_43(*update_mask & k_game_engine_state_data_flags_mask, &out_mask, state_data);
 	}
-	if((*update_mask & 32) != 0 && game_state_data->hill_id != g_headhunter_engine_globals->m_hill_id)
+	if(TEST_BIT(*update_mask, _king_engine_state_data_flag_hill_id_exists) && game_state_data->hill_id != g_headhunter_engine_globals->m_hill_id)
 	{
-		out_mask |= 0x20;
+		out_mask |= FLAG(_king_engine_state_data_flag_hill_id_exists);
 		game_state_data->hill_id = g_headhunter_engine_globals->m_hill_id;
 	}
 
-	if((*update_mask & 64) != 0)
+	if(TEST_BIT(*update_mask, _king_engine_state_data_flag_players_in_hill_exists))
 	{
 		if(game_state_data->players_in_hill != g_headhunter_engine_globals->m_players_in_hill)
 		{
 			game_state_data->players_in_hill = g_headhunter_engine_globals->m_players_in_hill;
-			out_mask |= 0x40;
+			out_mask |= FLAG(_king_engine_state_data_flag_players_in_hill_exists);
 		}
 	}
 
@@ -397,11 +422,8 @@ bool c_headhunter_engine::apply_simulation_update(uint32 update_mask, int32 unus
 {
 	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
 
-	LOG_INFO_GAME("[{}] {} {} {}", __FUNCTION__, game_state_data->hill_id, game_state_data->players_in_hill, game_state_data->player_skull_count[1]);
-
 	if(!c_king_engine::apply_simulation_update(update_mask, unused, state_data))
 	{
-		LOG_INFO_GAME("[{}] king sim fail", __FUNCTION__);
 		return false;
 	}
 

@@ -70,6 +70,7 @@ void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_var
 
 				variant->max_players = k_maximum_players;
 				variant->max_living_players = k_maximum_players;
+				variant->lives_per_round = 0;
 				variant->maximum_allowable_teams = k_game_multiplayer_team_count;
 				variant->game_engine_variant.head_hunter.hill_move_time = 0;
 				variant->respawn_time = 5;

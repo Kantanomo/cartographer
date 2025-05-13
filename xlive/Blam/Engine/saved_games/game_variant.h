@@ -383,7 +383,7 @@ enum e_juggernaut_engine_flags
 	k_juggernaut_engine_clear_unused_bits_mask = FLAG(_juggernaut_is_damage_resistant_bit | _juggernaut_has_infinite_ammo_bit | _juggernaut_does_extra_damage_bit | _juggernaut_betrayal_point_loss_bit | _juggernaut_has_active_camo_bit | _juggernaut_has_supershield_bit | _juggernaut_has_motion_sensor_bit)
 };
 
-enum e_headhunter_max_heads_carried : uint8
+enum e_headhunter_max_heads_carried : int8
 {
 	_headhunter_max_heads_carried_none,
 	_headhunter_max_heads_carried_one,
