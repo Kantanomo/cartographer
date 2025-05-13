@@ -157,6 +157,8 @@ void InitH2Startup()
 	shell_apply_patches();
 	shell_windows_apply_patches();
 
+	startup_force_working_directory_to_process_directory();
+
 	DETOUR_COMMIT();	
 	
 	InitLocalAppData();
@@ -224,7 +226,7 @@ static void startup_force_working_directory_to_process_directory(void)
 	
 	// Remove the exe name by terminating the string at the last backslash character
 	const int32 backslash_index = path.last_index_of(L"\\");
-	path.get_buffer()[backslash_index] = L'\0';
+	path.get_buffer()[backslash_index + 1] = L'\0';
 
 	ustrncpy(g_h2_process_file_path, path.get_string(), MAX_PATH);
 
