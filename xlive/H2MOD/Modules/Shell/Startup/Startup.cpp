@@ -6,6 +6,7 @@
 
 
 #include "cseries/cseries_windows_debug_pc.h"
+#include "kablam/kablam.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
@@ -103,14 +104,16 @@ void InitLocalAppData()
 // by default useAppDataLocalPath is set to true, if not specified
 void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path)
 {
-	const wchar_t* process_name = shell_is_dedicated_server() ? k_server_process_name : k_client_process_name;
+	const bool is_dedi = shell_is_dedicated_server();
+	const wchar_t* process_name = is_dedi ? k_server_process_name : k_client_process_name;
 	
 	// We set the instance string based on whether or not 
 	const wchar_t* instance_string;
 	wchar_t instance_number_string[4];
-	if (config_use_instance_name())
+
+	if (config_use_instance_name(&instance_string))
 	{
-		instance_string =  g_shell_windows_instance_name;
+		// Do nothing, instance_string is set by the above function
 	}
 	else
 	{
@@ -124,8 +127,9 @@ void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PA
 	folders.append(process_name);
 	folders.append(L"\\instance");
 	folders.append(instance_string);
-
-	path->set(g_h2_portable ? L"" : g_h2_appdata_local_path);
+	
+	// Place logs in server folder when portable or dedi
+	path->set(g_h2_portable || is_dedi ? L"" : g_h2_appdata_local_path);
 	path->append(folders.get_string());
 
 	// try making logs directory

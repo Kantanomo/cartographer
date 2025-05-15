@@ -4,6 +4,7 @@
 #include "simpleini/SimpleIni.h"
 
 #include "cartographer/twizzler/twizzler.h"
+#include "kablam/kablam.h"
 #include "render/render_lod_new.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "rasterizer/dx9/rasterizer_dx9_9on12.h"
@@ -58,7 +59,7 @@ bool H2Config_shader_lod_max = false;
 bool H2Config_light_suppressor = false;
 bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
-char H2Config_dedi_server_playlist[256] = { "" };
+char H2Config_dedi_server_playlist[MAX_PATH] = { "" };
 int H2Config_additional_pcr_time = 25;
 bool H2Config_debug_log = false;
 int H2Config_debug_log_level = 2;
@@ -840,10 +841,13 @@ void DeinitH2Config()
 }
 #pragma endregion
 
-bool config_use_instance_name(void)
+bool config_use_instance_name(const wchar_t** instance_name)
 {
+	ASSERT(instance_name);
+
+	*instance_name = kablam_shell_argument_get(L"-instance:");
 	// If is dedicated server and the instance name is set then use the instance name for the config
-	return shell_is_dedicated_server() && ustrnlen(g_shell_windows_instance_name, NUMBEROF(g_shell_windows_instance_name)) > 0;
+	return shell_is_dedicated_server() && *instance_name != NULL;
 }
 
 static bool config_local_instance_exists(wchar_t* config_file_path, size_t count)
@@ -859,10 +863,12 @@ static bool config_local_instance_exists(wchar_t* config_file_path, size_t count
 static void config_get_formatted_path(wchar_t* config_file_path, const wchar_t* main_path, size_t count)
 {
 	const bool is_dedicated_server = shell_is_dedicated_server();
+	const wchar_t* instance_name;
+
 	// If is dedicated server and the instance name is set then use the instance name for the config
-	if (config_use_instance_name())
+	if (config_use_instance_name(&instance_name))
 	{
-		usnprintf(config_file_path, count, L"%ws%ws%ws.ini", main_path, k_h2config_filenames[is_dedicated_server], g_shell_windows_instance_name);
+		usnprintf(config_file_path, count, L"%ws%ws%ws.ini", main_path, k_h2config_filenames[is_dedicated_server], instance_name);
 	}
 	// Use instance number by default
 	else
