@@ -111,16 +111,11 @@ void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PA
 	const wchar_t* instance_string = NULL;
 	wchar_t instance_number_string[4];
 
-	if (config_use_instance_name(&instance_string))
-	{
-		// Do nothing, instance_string is set by the above function
-	}
-	else
+	if (!config_use_instance_name(&instance_string))
 	{
 		usnprintf(instance_number_string, NUMBEROF(instance_number_string), L"%d", g_instance_number);
 		instance_string = instance_number_string;
 	}
-
 
 	c_static_wchar_string<MAX_PATH> folders;
 	folders.append(L"logs\\");
