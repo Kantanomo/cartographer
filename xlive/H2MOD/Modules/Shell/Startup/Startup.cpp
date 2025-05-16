@@ -108,7 +108,7 @@ void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PA
 	const wchar_t* process_name = is_dedi ? k_server_process_name : k_client_process_name;
 	
 	// We set the instance string based on whether or not 
-	const wchar_t* instance_string;
+	const wchar_t* instance_string = NULL;
 	wchar_t instance_number_string[4];
 
 	if (config_use_instance_name(&instance_string))

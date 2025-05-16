@@ -963,6 +963,7 @@
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
     <ClCompile Include="Blam\Engine\kablam\kablam_config.cpp" />
+    <ClCompile Include="Blam\Engine\kablam\kablam_log.cpp" />
     <ClCompile Include="Blam\Engine\main\console.cpp" />
     <ClCompile Include="Blam\Engine\main\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
@@ -1393,6 +1394,7 @@
     <ClInclude Include="Blam\Engine\items\vehicle_collection_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_config.h" />
+    <ClInclude Include="Blam\Engine\kablam\kablam_log.h" />
     <ClInclude Include="Blam\Engine\main\console.h" />
     <ClInclude Include="Blam\Engine\main\game_preferences.h" />
     <ClInclude Include="Blam\Engine\main\interpolator.h" />

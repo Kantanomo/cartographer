@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "kablam.h"
 
-#include "kablam/kablam_config.h"
+#include "kablam_config.h"
+#include "kablam_log.h"
 
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
@@ -38,9 +39,11 @@ static int32 g_message_timeout = 0;
 
 /* prototypes */
 
-static bool __cdecl should_start_pregame_countdown_hook(void);
+static bool kablam_arguments_populate(void);
 
 static int32 get_active_count_from_bitflags(uint16 teams_bit_flags);
+
+static bool __cdecl should_start_pregame_countdown_hook(void);
 
 static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wide, int split_count, bool a3);
 
@@ -69,6 +72,9 @@ void kablam_apply_patches(void)
 
 	PatchCall(Memory::GetAddress(0x0, 0xBF43), should_start_pregame_countdown_hook);
 
+	PatchCall(Memory::GetAddress(0x0, 0xCBE2), kablam_arguments_populate);
+
+	kablam_log_apply_patches();
 	server_console_apply_hooks();
 	kablam_config_apply_patches();
 	return;
@@ -86,6 +92,13 @@ const wchar_t* __cdecl kablam_shell_argument_get(const wchar_t* string)
 }
 
 /* private code */
+
+static bool kablam_arguments_populate(void)
+{
+	INVOKE(0x0, 0x9C3B, kablam_arguments_populate);
+	kablam_log_initialize();
+	return true;
+}
 
 static int32 get_active_count_from_bitflags(uint16 teams_bit_flags)
 {

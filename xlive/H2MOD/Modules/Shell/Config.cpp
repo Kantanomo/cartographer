@@ -845,7 +845,11 @@ bool config_use_instance_name(const wchar_t** instance_name)
 {
 	ASSERT(instance_name);
 
-	*instance_name = kablam_shell_argument_get(L"-instance:");
+	if (shell_is_dedicated_server())
+	{
+		*instance_name = kablam_shell_argument_get(L"-instance:");
+	}
+
 	// If is dedicated server and the instance name is set then use the instance name for the config
 	return shell_is_dedicated_server() && *instance_name != NULL;
 }
@@ -863,7 +867,7 @@ static bool config_local_instance_exists(wchar_t* config_file_path, size_t count
 static void config_get_formatted_path(wchar_t* config_file_path, const wchar_t* main_path, size_t count)
 {
 	const bool is_dedicated_server = shell_is_dedicated_server();
-	const wchar_t* instance_name;
+	const wchar_t* instance_name = NULL;
 
 	// If is dedicated server and the instance name is set then use the instance name for the config
 	if (config_use_instance_name(&instance_name))
