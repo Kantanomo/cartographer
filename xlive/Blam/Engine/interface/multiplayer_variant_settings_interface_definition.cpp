@@ -2,6 +2,8 @@
 #include "multiplayer_variant_settings_interface_definition.h"
 
 #include "multiplayer_variant_interface_headhunter_strings.h"
+#include "cache/cache_files.h"
+#include "text/text_group.h"
 #include "text/unicode.h"
 
 /* private code */
@@ -134,6 +136,8 @@ void multiplayer_variant_settings_interface_apply_patches()
 	WritePointer(Memory::GetAddress(0x464E14), &multiplayer_variant_settings_interface_parse_headhunter_uncontested_bin);
 	WritePointer(Memory::GetAddress(0x464E18), &multiplayer_variant_settings_interface_parse_headhunter_speed_with_heads);
 	WritePointer(Memory::GetAddress(0x464E1C), &multiplayer_variant_settings_interface_parse_headhunter_max_heads_carried);
+
+	PatchCall(Memory::GetAddress(0x21138B), multiplayer_variant_settings_interface_get_variant_setting_string);
 }
 
 s_variant_setting_edit_reference* __cdecl multiplayer_variant_settings_interface_get_category_reference(e_variant_setting_category_type category_type)
@@ -143,6 +147,9 @@ s_variant_setting_edit_reference* __cdecl multiplayer_variant_settings_interface
 		// return the setting reference for king on headhunter game modes
 		case _variant_setting_category_type_game_head_hunter:
 			return INVOKE(0x23ACDC, 0, multiplayer_variant_settings_interface_get_category_reference, _variant_setting_category_type_game_king);
+
+		case _variant_setting_category_type_quick_options_head_hunter:
+			return INVOKE(0x23ACDC, 0, multiplayer_variant_settings_interface_get_category_reference, _variant_setting_category_type_quick_options_king);
 
 		default:
 			return INVOKE(0x23ACDC, 0, multiplayer_variant_settings_interface_get_category_reference, category_type);
@@ -168,6 +175,132 @@ void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(
 s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_parameter_label(s_text_value_pair_definition* text_value_pair, int32 value)
 {
 	return INVOKE(0x23AD57, 0, multiplayer_variant_settings_interface_get_variant_parameter_label, text_value_pair, value);
+}
+
+void multiplayer_variant_settings_interface_get_variant_setting_string(s_game_variant* variant, c_text_widget* widget, int32 setting_index,	wchar_t* separator, wchar_t* buffer)
+{
+	e_variant_setting_category_type category = _variant_setting_category_type_none;
+	switch(variant->variant_game_engine_index)
+	{
+		case _game_engine_type_ctf:
+			category = _variant_setting_category_type_quick_options_ctf;
+			break;
+		case _game_engine_type_slayer:
+			category = _variant_setting_category_type_quick_options_slayer;
+			break;
+		case _game_engine_type_oddball:
+			category = _variant_setting_category_type_quick_options_oddball;
+			break;
+		case _game_engine_type_koth:
+			category = _variant_setting_category_type_quick_options_king;
+			break;
+		case _game_engine_type_headhunter:
+			category = _variant_setting_category_type_quick_options_head_hunter;
+			break;
+		case _game_engine_type_juggernaut:
+			category = _variant_setting_category_type_quick_options_juggernaut;
+			break;
+		case _game_engine_type_territories:
+			category = _variant_setting_category_type_quick_options_territories;
+			break;
+		case _game_engine_type_assault:
+			category = _variant_setting_category_type_quick_options_assault;
+			break;
+		case _game_engine_type_race:
+		default:
+			DISPLAY_ASSERT("invalid game engine index provided");
+			break;
+	}
+
+	switch (category)
+	{
+		case _variant_setting_category_type_quick_options_head_hunter:
+		{
+			s_variant_setting_edit_reference* slayer_reference = multiplayer_variant_settings_interface_get_category_reference(_variant_setting_category_type_quick_options_slayer);
+			s_variant_setting_edit_reference* king_reference = multiplayer_variant_settings_interface_get_category_reference(_variant_setting_category_type_quick_options_king);
+
+			if(slayer_reference && king_reference)
+			{
+				s_text_value_pair_definition* option;
+				wchar_t label_buffer[512];
+				wchar_t value_buffer[512];
+
+				switch(setting_index)
+				{
+					case 0: // Score to Win Round
+					{
+						// use slayer reference parsing because the scoring for head hunter is not time based.
+						option = (s_text_value_pair_definition*)tag_get_fast(slayer_reference->options[setting_index]->index);
+						break;
+					}
+					case 4: // Max Heads Carried
+					{
+						option = nullptr;
+						multiplayer_variant_settings_interface_get_custom_variant_parameter_label(variant, _variant_setting_parameter_type_headhunter_max_heads_carried, variant->game_engine_variant.head_hunter.max_heads_carried, value_buffer);
+						multiplayer_variant_settings_interface_get_custom_variant_parameter_title(variant, _variant_setting_parameter_type_headhunter_max_heads_carried, label_buffer);
+						break;
+					}
+					default:
+					{
+						option = (s_text_value_pair_definition*)tag_get_fast(king_reference->options[setting_index]->index);
+						break;
+					}
+				}
+
+				if(option)
+				{
+					int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, option->parameter);
+					s_text_value_pair_reference_new* setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(option, setting_value);
+
+					text_group_get_unicode_string(option->string_list.index, option->title_text, label_buffer);
+
+					if (setting_label)
+						text_group_get_unicode_string(option->string_list.index, setting_label->label_string, value_buffer);
+				}
+
+				if(widget)
+				{
+					usnzprintf(buffer, 512, L"%s%s%s", label_buffer, separator, value_buffer);
+					widget->set_text(buffer);
+					widget->set_visible(true);
+				}
+			}
+			break;
+		}
+		default:
+		{
+			s_variant_setting_edit_reference* reference = multiplayer_variant_settings_interface_get_category_reference(category);
+
+			if (reference && setting_index >= 0 && setting_index < reference->options.count)
+			{
+				s_text_value_pair_definition* option = (s_text_value_pair_definition*)tag_get_fast(reference->options[setting_index]->index);
+
+				wchar_t label_buffer[512];
+				wchar_t value_buffer[512];
+
+				if (option)
+				{
+					int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, option->parameter);
+					s_text_value_pair_reference_new* setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(option, setting_value);
+
+					text_group_get_unicode_string(option->string_list.index, option->title_text, label_buffer);
+
+					if (setting_label)
+						text_group_get_unicode_string(option->string_list.index, setting_label->label_string, value_buffer);
+				}
+				if (widget)
+				{
+					if (ustrnlen(value_buffer, 511) > 0)
+					{
+						usnzprintf(buffer, 512, L"%s%s%s", label_buffer, separator, value_buffer);
+						widget->set_text(buffer);
+						widget->set_visible(true);
+					}
+				}
+			}
+			break;
+		}
+	}
 }
 
 void multiplayer_variant_settings_interface_get_custom_variant_parameter_label(s_game_variant* variant, e_variant_setting_parameter_type type, int32 value, wchar_t* out_string)

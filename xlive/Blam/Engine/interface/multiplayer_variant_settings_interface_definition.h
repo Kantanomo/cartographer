@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "user_interface_widget_text.h"
 #include "main/game_preferences.h"
 #include "saved_games/game_variant.h"
 #include "tag_files/global_string_ids.h"
@@ -459,7 +460,7 @@ void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(
 
 s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_parameter_label(s_text_value_pair_definition* text_value_pair, int32 value);
 
-
+void __cdecl multiplayer_variant_settings_interface_get_variant_setting_string(s_game_variant* variant, c_text_widget* widget, int32 setting_index, wchar_t* separator, wchar_t* buffer);
 
 bool multiplayer_variant_settings_interface_parameter_is_custom(s_game_variant* variant, e_variant_setting_parameter_type type);
 
