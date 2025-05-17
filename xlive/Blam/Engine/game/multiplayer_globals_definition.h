@@ -1,62 +1,34 @@
 #pragma once
-#include "game_allegiance.h"
-#include "game_statborg.h"
-#include "players.h"
-
-#include "main/game_preferences.h"
 #include "math/color_math.h"
-#include "saved_games/game_variant.h"
-#include "tag_files/string_id.h"
+#include "memory/static_arrays.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 
-/* constants */
-
-enum
-{
-	k_maximum_game_engine_event_responses_per_type = 128
-};
-
-/* enums */
-
-enum e_game_engine_timer_type
-{
-
-	k_game_engine_timer_count = 3
-};
-
-enum e_game_engine_state
-{
-
-	k_game_engine_state_count = 4
-};
-
-enum e_valid_multiplayer_games : short
-{
-	valid_multiplayer_game_capture_the_flag = FLAG(0),
-	valid_multiplayer_game_slayer = FLAG(1),
-	valid_multiplayer_game_oddball = FLAG(2),
-	valid_multiplayer_game_king_of_the_hill = FLAG(3),
-	valid_multiplayer_game_juggernaut = FLAG(4),
-	valid_multiplayer_game_territories = FLAG(5),
-	valid_multiplayer_game_assault = FLAG(6),
-};
-
-enum e_relevant_multiplayer_games : int
-{
-	relevant_multiplayer_game_capture_the_flag = FLAG(0),
-	relevant_multiplayer_game_slayer = FLAG(1),
-	relevant_multiplayer_game_oddball = FLAG(2),
-	relevant_multiplayer_game_king_of_the_hill = FLAG(3),
-	relevant_multiplayer_game_juggernaut = FLAG(4),
-	relevant_multiplayer_game_territories = FLAG(5),
-	relevant_multiplayer_game_assault = FLAG(6)
-};
+#define k_maximum_game_engine_event_responses_per_type 128
+#define k_maximum_status_response_count 32
 
 enum e_multiplayer_event_response_flags : uint16
 {
 	_multiplayer_event_response_quantity_message = 0,
 	k_multiplayer_event_response_flags_count
+};
+
+enum e_multiplayer_event_response_game_type : uint16
+{
+	_multiplayer_event_response_game_type_general = 0,
+	_multiplayer_event_response_game_type_flavor = 1,
+	_multiplayer_event_response_game_type_slayer = 2,
+	_multiplayer_event_response_game_type_capture_the_flag = 3,
+	_multiplayer_event_response_game_type_oddball = 4,
+	_multiplayer_event_response_game_type_unused_5 = 5,
+	_multiplayer_event_response_game_type_king_of_the_hill = 6,
+	_multiplayer_event_response_game_type_unused_7 = 7,
+	_multiplayer_event_response_game_type_juggernaut = 8,
+	_multiplayer_event_response_game_type_assault = 9,
+	_multiplayer_event_response_game_type_unused_10 = 10,
+	_multiplayer_event_response_game_type_unused_11 = 11,
+	_multiplayer_event_response_game_type_unused_12 = 12,
+	_multiplayer_event_response_game_type_unused_13 = 13
 };
 
 enum e_multiplayer_event_response_event : uint16
@@ -155,17 +127,8 @@ enum e_multiplayer_event_response_event : uint16
 	_multiplayer_event_response_oddball_ball_reset = 4,
 	_multiplayer_event_response_oddball_ball_tick = 5,
 
-	// headhunter
-	_multiplayer_event_response_headhunter_game_start = 0,
-	_multiplayer_event_response_headhunter_hill_controlled = 1,
-	_multiplayer_event_response_headhunter_hill_contested = 2,
-	_multiplayer_event_response_headhunter_hill_tick = 3,
-	_multiplayer_event_response_headhunter_hill_move = 4,
-	_multiplayer_event_response_headhunter_hill_controlled_team = 5,
-	_multiplayer_event_response_headhunter_hill_contested_team = 6,
-
 	// king
-	_multiplayer_event_response_king_game_start = 0,
+	_multiplayer_event_response_king_GameStart = 0,
 	_multiplayer_event_response_king_hill_controlled = 1,
 	_multiplayer_event_response_king_hill_contested = 2,
 	_multiplayer_event_response_king_hill_tick = 3,
@@ -207,7 +170,6 @@ enum e_multiplayer_event_response_event : uint16
 	_multiplayer_event_response_assault_bomb_contested = 16,
 };
 
-
 enum e_multiplayer_event_response_audience : uint16
 {
 	_multiplayer_event_response_audience_cause_player = 0,
@@ -226,216 +188,256 @@ enum e_multiplayer_event_response_audience_filter : uint16
 	_multiplayer_event_response_audience_filter_effect_team = 4,
 };
 
-enum e_multiplayer_event_response_game_type : uint16
-{
-	_multiplayer_event_response_game_type_general = 0,
-	_multiplayer_event_response_game_type_flavor = 1,
-	_multiplayer_event_response_game_type_slayer = 2,
-	_multiplayer_event_response_game_type_capture_the_flag = 3,
-	_multiplayer_event_response_game_type_oddball = 4,
-	_multiplayer_event_response_game_type_headhunter = 5,
-	_multiplayer_event_response_game_type_king_of_the_hill = 6,
-	_multiplayer_event_response_game_type_unused_7 = 7,
-	_multiplayer_event_response_game_type_juggernaut = 8,
-	_multiplayer_event_response_game_type_territories = 9,
-	_multiplayer_event_response_game_type_assault = 10,
-	_multiplayer_event_response_game_type_unused_10 = 11,
-	_multiplayer_event_response_game_type_unused_11 = 12,
-	_multiplayer_event_response_game_type_unused_12 = 13,
-	_multiplayer_event_response_game_type_unused_13 = 14,
-	k_multiplayer_event_response_game_type_count
-};
-
 enum e_multiplayer_response_sound_flags : uint16
 {
 	_multiplayer_event_response_sound_announcer_sound = 0,
 	k_multiplayer_event_response_sound_flags_count
 };
 
-/* structures */
-
-class c_game_engine
+enum e_game_engine_status_response_flags : uint16
 {
-public:
-	virtual e_game_engine_type get_type() = 0;
-
-	/*
-		Called on scenario load, returns success
-		game engine will be disabled on failure
-	*/
-	virtual bool setup() = 0;
-
-	/* Called on scenario cleanup/exit */
-	virtual void cleanup() = 0;
-	virtual bool unk_function_4() = 0;
-	virtual bool unk_function_5(int arg1) = 0;
-	virtual void unk_function_players_1(datum player_index) = 0;
-	virtual void update_player__maybe__maybe_spawn(int event_type) = 0;
-	virtual void unk_function_8(int arg1) = 0;
-	virtual void unk_function_9(int arg1) = 0;
-	virtual void unk_function_players_2(int arg1, int arg2) = 0;
-	virtual void unk_function_11(int arg1) = 0;
-	virtual void unk_function_12() = 0;
-	virtual void unk_function_13() = 0;
-	virtual void unk_function_14(int arg1) = 0;
-
-	/* Render 3d objects (e.g hologram around hill in KotH) */
-	virtual void render_in_world(int32 user_index) = 0;
-	virtual void unk_function_16(int arg1) = 0;
-	virtual int unk_function_17(int arg1, int arg2) = 0;
-	virtual int unk_function_18(int arg1, int arg2) = 0;
-	virtual void unk_function_19() = 0;
-	virtual float player_speed_multiplier(datum player_index) = 0;
-	virtual int unk_function_21(int arg1) = 0;
-	virtual void unk_function_22(int arg1) = 0;
-	virtual void unk_function_23(int arg1) = 0;
-	virtual void unk_function_24(int arg1, int arg2) = 0;
-	virtual int unk_function_25(int arg1, int arg2) = 0;
-	virtual int unk_function_26(int arg1, int arg2, int arg3) = 0;
-	virtual int unk_function_27() = 0;
-	virtual bool is_team_enemy(e_game_team team_a, e_game_team team_b) = 0;
-	virtual void unk_function_29(int arg1) = 0;
-	virtual void unk_function_30(int arg1, int arg2, int arg3) = 0;
-	virtual void unk_function_31(int arg1, int arg2, char arg3, int arg4) = 0;
-	virtual int unk_function_32(int arg1, int arg2, int arg3) = 0;
-	virtual void unk_function_33(int arg1, int arg2) = 0;
-	virtual int unk_function_34(int arg1, int arg2) = 0;
-	virtual bool unk_function_35(int arg1) = 0;
-	virtual int unk_function_36(int arg1, int arg2) = 0;
-	virtual void unk_function_37(int arg1) = 0;
-	virtual int unk_function_38(int arg1, int arg2) = 0;
-	virtual bool should_garbage_collect(int arg1) = 0;
-	virtual void unk_function_40() = 0;
-	virtual void unk_function_41() = 0;
-	virtual void* unk_function_42(void* arg1) = 0;
-	virtual void* unk_function_43(char a1, size_t* a2, void* a3) = 0;
-	virtual bool unk_function_44(char a1, void* a2) = 0;
-	virtual int unk_function_45(char a1, int a2) = 0;
-	virtual int unk_function_46(char a1, int a2, int a3) = 0;
-	virtual bool unk_function_47(char a1, int a2, int a3) = 0;
-	virtual void* unk_function_48(int a1, int a2, void* a3) = 0;
-	virtual void unk_function_49(int arg1, int arg2, int arg3, int arg4) = 0;
-	virtual bool unk_function_50(__int16 a1, __int16 a2, int a3, int a4) = 0;
-	virtual int unk_function_51(int arg1, int arg2, int arg3, int arg4, int arg5) = 0;
-private:
+	_game_engine_status_response_flag_unused = 0,
+	k_game_engine_status_response_flag_count
 };
 
-struct s_game_engine_global_player_info
+enum e_game_engine_status_state : uint16
 {
-	bool valid;
-	uint8 pad_1[3];
-	real_point3d point;
-	short field_10;
-	short field_12;
-	uint8 field_14[4];
+	_game_engine_status_state_waiting_for_space_to_clear = 0,
+	_game_engine_status_state_observing = 1,
+	_game_engine_status_state_respawning_soon = 2,
+	_game_engine_status_state_sitting_out = 3,
+	_game_engine_status_state_out_of_lives = 4,
+	_game_engine_status_state_playing_winning = 5,
+	_game_engine_status_state_playing_tied = 6,
+	_game_engine_status_state_playing_losing = 7,
+	_game_engine_status_state_game_over_won = 8,
+	_game_engine_status_state_game_over_tied = 9,
+	_game_engine_status_state_game_over_lost = 10,
+	_game_engine_status_state_you_have_flag = 11,
+	_game_engine_status_state_enemy_has_flag = 12,
+	_game_engine_status_state_flag_not_home = 13,
+	_game_engine_status_state_carrying_oddball = 14,
+	_game_engine_status_state_you_are_juggernaut = 15,
+	_game_engine_status_state_you_control_hill = 16,
+	_game_engine_status_state_switching_sides_soon = 17,
+	_game_engine_status_state_player_recently_started = 18,
+	_game_engine_status_state_you_have_bomb = 19,
+	_game_engine_status_state_flag_contested = 20,
+	_game_engine_status_state_bomb_contested = 21,
+	_game_engine_status_state_limited_lives_left_multiple = 22,
+	_game_engine_status_state_limited_lives_left_single = 23,
+	_game_engine_status_state_limited_lives_left_final = 24,
+	_game_engine_status_state_playing_winning_unlimited = 25,
+	_game_engine_status_state_playing_tied_unlimited = 26,
+	_game_engine_status_state_playing_losing_unlimited = 27,
 };
-ASSERT_STRUCT_SIZE(s_game_engine_global_player_info, 24);
 
-struct s_simulation_player_netdebug_data
+struct s_multiplayer_universal_globals_definition
 {
-	int32 field_0;
-	int32 field_4;
-	int16 client_rtt_msec;
-	int16 client_packet_rate;
-	int16 client_throughput;
-	int16 client_packet_loss_percentage;
+	tag_reference random_player_names;
+	tag_reference team_names;
+
+	tag_block<real_rgb_color> team_colors;
+
+	tag_reference multiplayer_text;
 };
-ASSERT_STRUCT_SIZE(s_simulation_player_netdebug_data, 16);
+ASSERT_STRUCT_SIZE(s_multiplayer_universal_globals_definition, 32);
 
-struct s_game_engine_globals
+struct s_multiplayer_event_response_sound
 {
-	uint32 flags;
-	int16 team_flags;
-	uint16 field_6;
-	uint16 field_8;
-	uint16 team_bitmask;
-	uint16 field_C;
-	int16 field_E;
-	uint16 field_10;
-	uint16 field_12[8];
-	uint32 field_24;
-	uint32 field_28;
-	int32 player_entity_index[k_maximum_players];
-	int16 field_6C;
-	int16 round_index;
-	int16 field_72;
-	uint32 gap_74[28];
-	real32 unk_local_player_hud_field[k_number_of_users];
-	uint8 field_F4;
-	uint8 pad_F5[4];
-	uint8 gapF9[523];
-	c_game_statborg game_statborg;
-	s_game_engine_global_player_info player_info[k_maximum_players];
-	uint32 ticks;
-	s_simulation_player_netdebug_data netdebug_data[k_maximum_players];
-	uint8 gap81C[1064];
-	int32 field_C44;
-	uint8 gap_C48[12];
-	int32 game_engine_index;
-	uint8 gapC58[132];
-};
-ASSERT_STRUCT_SIZE(s_game_engine_globals, 0xCDC);
+	c_flags_no_init<e_multiplayer_response_sound_flags, uint16, k_multiplayer_event_response_sound_flags_count> sound_flags;
 
-// max count: 10
-struct s_multiplayer_event_sound_response_definition
-{
-	e_multiplayer_response_sound_flags sound_flags;
-	int16 pad;
-	tag_reference sounds[k_language_count];
+	int16 pad_1;
+
+	tag_reference english_sound;
+	tag_reference japanese_sound;
+	tag_reference german_sound;
+	tag_reference french_sound;
+	tag_reference spanish_sound;
+	tag_reference italian_sound;
+	tag_reference korean_sound;
+	tag_reference chinese_sound;
+	tag_reference portuguese_sound;
 	real32 probability;
 };
-ASSERT_STRUCT_SIZE(s_multiplayer_event_sound_response_definition, 80);
 
-// max count: k_maximum_game_engine_event_responses_per_type
+// max: k_maximum_game_engine_event_responses_per_type
 struct s_multiplayer_event_response_definition
 {
-	e_multiplayer_event_response_flags flags;
+	c_flags_no_init<e_multiplayer_event_response_flags, uint16, k_multiplayer_event_response_flags_count> flags;
 	e_multiplayer_event_response_game_type type;
 	e_multiplayer_event_response_event event;
 	e_multiplayer_event_response_audience audience;
 
-	int16 pad1;
-	int16 pad2;
+	int16 pad_1;
 
 	string_id display_string;
-	
+
 	e_multiplayer_event_response_audience_filter required_field;
 	e_multiplayer_event_response_audience_filter excluded_audience;
 
 	string_id primary_string;
-	int32 primary_string_duration;	// seconds
+	uint32 primary_string_duration;
 
-	string_id display_string_plural;
-	int32 pad3[7];
+	string_id plural_display_string;
 
-	// announcer only
+	int8 pad_2[28];
+
+	// for announcer sound only
 	real32 sound_delay;
 
-	s_multiplayer_event_sound_response_definition primary_sound;
-
-	int8 pad_5[16];
-	tag_block<s_multiplayer_event_sound_response_definition> sound_permutations;
+	s_multiplayer_event_response_sound primary_sound;
+	int8 pad_3[16];
+	tag_block<s_multiplayer_event_response_sound> sound_permutations;
 };
 ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 168);
 
-/* prototypes */
+struct s_multiplayer_runtime_globals_dynamic_spawn_area
+{
+	real_bounds radius;
+	real32 weight;
+	int8 pad[16];
+};
+ASSERT_STRUCT_SIZE(s_multiplayer_runtime_globals_dynamic_spawn_area, 28);
 
-c_game_engine* current_game_engine(void);
+struct s_multiplayer_constants
+{
+	real32 maximum_random_spawn_bias;
+	real32 teleporter_recharge_time;
 
-s_game_engine_globals* game_engine_globals_get(void);
+	real32 grenade_danger_weight;
+	real_bounds grenade_danger_radius;
+	real32 grenade_danger_lead_time;
 
-c_game_engine** get_game_mode_engines(void);
+	real32 vehicle_danger_min_speed_world_units_seconds;
+	real32 vehicle_danger_weight;
+	real32 vehicle_danger_radius;
+	real32 vehicle_danger_lead_time_seconds;
 
-s_simulation_player_netdebug_data* game_engine_get_netdebug_data(datum player_index);
+	/// how nearby a player is to count a vehicle as 'occupied'
+	real32 vehicle_nearby_player_distance;
 
-void __cdecl game_engine_apply_map_patches(void);
+	int8 pad_1[148];
 
-bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
+	tag_reference hill_shader;
 
-bool __cdecl game_engine_variant_cleanup(uint16* flags);
+	int8 pad_2[16];
 
-void __cdecl game_engine_player_activated(datum player_index);
+	real32 flag_reset_stop_distance;
 
-bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b);
+	tag_reference bomb_explode_effect;
+	tag_reference bomb_explode_damage_effect;
+	tag_reference bomb_defuse_effect;
 
-void __cdecl game_engine_render(void);
+	string_id bomb_defusal_string;
+	string_id blocked_teleporter_string;
+
+	int8 pad_3[100];
+};
+ASSERT_STRUCT_SIZE(s_multiplayer_constants, 352);
+
+// max: k_maximum_status_response_count
+struct s_game_engine_status_response
+{
+	c_flags_no_init<e_game_engine_status_response_flags, uint16, k_game_engine_status_response_flag_count> flags;
+	int16 pad_1;
+
+	e_game_engine_status_state state;
+	int16 pad_2;
+
+	string_id free_for_all_message;
+	string_id team_message;
+
+	tag_reference unused;
+
+	int32 pad_3;
+};
+ASSERT_STRUCT_SIZE(s_game_engine_status_response, 28);
+
+struct s_multiplayer_runtime_globals_definition
+{
+	tag_reference flag;
+	tag_reference ball;
+	tag_reference unit;
+	tag_reference flag_shader;
+	tag_reference hill_shader;
+	tag_reference head;
+	tag_reference juggernaut_powerup;
+	tag_reference da_bomb;
+
+	tag_reference unused[5];
+
+	// max: 20
+	tag_block<tag_reference> weapons;
+	// max: 20
+	tag_block<tag_reference> vehicles;
+	// max: 20
+	tag_block<tag_reference> grenades;
+	// max: 20
+	tag_block<tag_reference> powerups;
+
+	tag_reference in_game_text;
+
+	// max: 60
+	tag_block<tag_reference> sounds;
+
+	tag_block<s_multiplayer_event_response_definition> general_events;
+	tag_block<s_multiplayer_event_response_definition> flavor_events;
+	tag_block<s_multiplayer_event_response_definition> slayer_events;
+	tag_block<s_multiplayer_event_response_definition> ctf_events;
+	tag_block<s_multiplayer_event_response_definition> oddball_events;
+	tag_block<s_multiplayer_event_response_definition> unused_5_events;
+	tag_block<s_multiplayer_event_response_definition> king_events;
+	tag_block<s_multiplayer_event_response_definition> unused_7_events;
+	tag_block<s_multiplayer_event_response_definition> juggernaut_events;
+	tag_block<s_multiplayer_event_response_definition> assault_events;
+	tag_block<s_multiplayer_event_response_definition> unused_10_events;
+	tag_block<s_multiplayer_event_response_definition> unused_11_events;
+	tag_block<s_multiplayer_event_response_definition> unused_12_events;
+	tag_block<s_multiplayer_event_response_definition> unused_13_events;
+
+	tag_reference default_item_collection_1;
+	tag_reference default_item_collection_2;
+
+	uint32 default_frag_grenade_count;
+	uint32 default_plasma_grenade_count;
+
+	int8 pad_1[40];
+
+	real32 dynamic_spawn_zone_upper_height;
+	real32 dynamic_spawn_zone_lower_height;
+
+	int8 pad_2[40];
+
+	s_multiplayer_runtime_globals_dynamic_spawn_area enemy;
+	s_multiplayer_runtime_globals_dynamic_spawn_area friend_;
+	s_multiplayer_runtime_globals_dynamic_spawn_area enemy_vehicle;
+	s_multiplayer_runtime_globals_dynamic_spawn_area friendly_vehicle;
+	s_multiplayer_runtime_globals_dynamic_spawn_area empty_vehicle;
+	s_multiplayer_runtime_globals_dynamic_spawn_area oddball_inclusion;
+	s_multiplayer_runtime_globals_dynamic_spawn_area oddball_exclusion;
+	s_multiplayer_runtime_globals_dynamic_spawn_area hill_inclusion;
+	s_multiplayer_runtime_globals_dynamic_spawn_area hill_exclusion;
+	s_multiplayer_runtime_globals_dynamic_spawn_area last_race_flag;
+	s_multiplayer_runtime_globals_dynamic_spawn_area dead_ally;
+	s_multiplayer_runtime_globals_dynamic_spawn_area controlled_territory;
+
+	int8 pad_3[608];
+
+	tag_block<s_multiplayer_constants> multiplayer_constants;
+	tag_block<s_game_engine_status_response> state_responses;
+
+	tag_reference scoreboard_hud_definition;
+	tag_reference scoreboard_emblem_shader;
+	tag_reference scoreboard_emblem_bitmap;
+	tag_reference scoreboard_dead_emblem_shader;
+	tag_reference scoreboard_dead_emblem_bitmap;
+};
+ASSERT_STRUCT_SIZE(s_multiplayer_runtime_globals_definition, 1376);
+
+struct s_multiplayer_globals_definition
+{
+	tag_block<s_multiplayer_universal_globals_definition> universal;
+	tag_block<s_multiplayer_runtime_globals_definition> runtime;
+};
+ASSERT_STRUCT_SIZE(s_multiplayer_globals_definition, 16);

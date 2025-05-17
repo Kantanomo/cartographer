@@ -438,6 +438,7 @@
     <ClCompile Include="Blam\Engine\input\input_process.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_error_dialog.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_default.cpp" />
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
@@ -1173,6 +1174,7 @@
     <ClInclude Include="Blam\Engine\items\equipment.h" />
     <ClInclude Include="Blam\Engine\items\garbage.h" />
     <ClInclude Include="Blam\Engine\items\item_collection_definition.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
     <ClInclude Include="Blam\Engine\objects\crates.h" />
     <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
     <ClInclude Include="Blam\Engine\devices\device_controls.h" />
@@ -1909,6 +1911,9 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\weather_plate_world.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\vertex_shaders_dx9\preprocessed_hlsl_from_tool\compiled\debug_screenspace_world.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_ProdigyCleanTTF.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_ctf.h" />
+    <ClInclude Include="Blam\Engine\game\multiplayer_globals_definition.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_default.h" />
     <ClInclude Include="Blam\Engine\items\projectiles.h" />
     <ClInclude Include="Blam\Engine\objects\object_location.h" />
     <ClInclude Include="Blam\Engine\game\player_constants.h" />

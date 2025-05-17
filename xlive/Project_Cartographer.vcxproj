@@ -892,6 +892,7 @@
     <ClCompile Include="Blam\Engine\effects\particle_update.cpp" />
     <ClCompile Include="Blam\Engine\filesys\pc_file_system.cpp" />
     <ClCompile Include="Blam\Engine\game\game.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_default.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
     <ClCompile Include="Blam\Engine\game\game_results.cpp" />
@@ -1294,6 +1295,8 @@
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\game.h" />
     <ClInclude Include="Blam\Engine\game\game_allegiance.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_ctf.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_default.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_territories.h" />
@@ -1302,6 +1305,7 @@
     <ClInclude Include="Blam\Engine\game\game_results.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
     <ClInclude Include="Blam\Engine\game\materials.h" />
+    <ClInclude Include="Blam\Engine\game\multiplayer_globals_definition.h" />
     <ClInclude Include="Blam\Engine\game\multiplayer_globals.h" />
     <ClInclude Include="Blam\Engine\game\player_constants.h" />
     <ClInclude Include="Blam\Engine\game\player_vibration.h" />
