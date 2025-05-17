@@ -45,9 +45,9 @@ e_saved_game_file_type get_saved_game_file_type_from_item_index(uint32 index)
 }
 
 
-int32 c_screen_game_engine_category_list::setup_children()
+void c_screen_game_engine_category_list::setup_children()
 {
-	return INVOKE_TYPE(0x249F46, 0, int32(__thiscall*)(c_screen_game_engine_category_list*), this);
+	INVOKE_TYPE(0x249F46, 0, int32(__thiscall*)(c_screen_game_engine_category_list*), this);
 }
 
 c_list_item_widget* c_screen_game_engine_category_list::get_list_items()
@@ -90,7 +90,7 @@ void c_screen_game_engine_category_list::update_list_items(c_list_item_widget* i
 
 		ASSERT(user_interface_shared_globals);
 
-		text_group_get_unicode_string(user_interface_shared_globals->game_type_strings.index, items_map[item_datum->item_id].item_text, temp);
+		text_group_get_unicode_string(user_interface_shared_globals->gametype_strings.index, items_map[item_datum->item_id].item_text, temp);
 
 		item_text->set_text(temp);
 	}
@@ -109,7 +109,7 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 			s_saved_game_player_profile* edit_profile = user_interface_globals_get_edit_player_profile();
 			if (edit_profile)
 			{
-				uint8 unk_type = item->item_id;
+				uint8 unk_type = (uint8)item->item_id;
 				switch (item->item_id)
 				{
 				case 0:
@@ -187,11 +187,11 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 		}
 		else
 		{
-			s_screen_parameters params;
+			s_screen_parameters params {};
 			params.m_flags = 0;
 			params.m_window_index = _window_4;
 			params.m_context = NULL;
-			params.user_flags = FLAG((*pevent)->controller);
+			params.m_user_flags = FLAG((*pevent)->controller);
 			params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 			params.m_screen_state.field_0 = NONE;
 			params.m_screen_state.m_last_focused_item_order = NONE;
@@ -294,8 +294,9 @@ void c_screen_game_engine_category_list::apply_patches()
 
 c_screen_game_engine_category_list::c_screen_game_engine_category_list(int16 user_flags) :
 	c_list_widget(user_flags),
-	m_slot(this, &c_screen_game_engine_category_list::handle_item_pressed_event),
-	data{}
+	type(),
+	data{},
+    m_slot(this, &c_screen_game_engine_category_list::handle_item_pressed_event)
 {
 	m_list_data = ui_list_data_new(k_game_engine_category_list_name, k_screen_game_engine_item_count, sizeof(s_list_item_datum));
 
@@ -320,7 +321,7 @@ void* c_screen_game_engine_category::load_settings(s_screen_parameters* paramete
 		screen = new (pool) c_screen_game_engine_category(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_game_engine_category_listing,
 			_screen_game_engine_category_settings,
 			0,
@@ -350,7 +351,7 @@ void* c_screen_game_engine_category::load_lobby(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_game_engine_category(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_multiplayer_variant_typelobby,
 			_screen_game_engine_category_lobby,
 			0,
@@ -383,7 +384,7 @@ void* c_screen_game_engine_category::load_1(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_game_engine_category(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_multiplayer_variant_typelobby,
 			_screen_game_engine_category_lobby,
 			1,
@@ -413,7 +414,7 @@ void* c_screen_game_engine_category::load_2(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_game_engine_category(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_multiplayer_variant_typelobby,
 			_screen_game_engine_category_lobby,
 			0,
@@ -443,7 +444,7 @@ void* c_screen_game_engine_category::load_3(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_game_engine_category(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_multiplayer_variant_typelobby,
 			_screen_game_engine_category_lobby,
 			0,
@@ -476,7 +477,7 @@ void* c_screen_game_engine_category::load_4(s_screen_parameters* parameters)
 		screen = new (pool) c_screen_game_engine_category(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_multiplayer_variant_typelobby,
 			_screen_game_engine_category_lobby,
 			0,

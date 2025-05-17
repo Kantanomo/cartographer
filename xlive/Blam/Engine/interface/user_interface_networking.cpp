@@ -97,13 +97,13 @@ e_session_protocol __cdecl user_interface_squad_get_active_protocol()
 
         if(!network_session_get_scenario_id(&unk_1, &unk_2, &unk_3, &custom_map_id))
         {
-            unk_1 = NONE;
-            unk_2 = NONE;
+            unk_1 = UINT_MAX;
+            unk_2 = UINT_MAX;
             custom_map_id = nullptr;
         }
         if(session_class <= _network_session_class_system_link)
         {
-            if (unk_1 != NONE)
+            if (unk_1 != UINT_MAX)
                 return session_class != 0 ? _session_protocol_system_link_coop : _session_protocol_splitscreen_coop;
 
             if(session_variant)
@@ -132,7 +132,7 @@ e_session_protocol __cdecl user_interface_squad_get_active_protocol()
         if (session_class != _network_session_class_xbox_live || session->m_session_parameters.field_4C90 != 1)
             return _session_protocol_invalid;
 
-        if (unk_1 != NONE)
+        if (unk_1 != UINT_MAX)
             return _session_protocol_xbox_live_coop;
 
         if (!session_variant)

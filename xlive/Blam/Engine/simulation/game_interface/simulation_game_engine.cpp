@@ -28,7 +28,8 @@ int32 c_simulation_game_engine_definition::sub_A9004D(int a2, DWORD a3)
 int8 c_simulation_game_engine_definition::creation_minimum_required_bits(s_simulation_game_entity* entity, void* a3, int32* minimum_required_bits)
 {
 	*minimum_required_bits = 0;
-	return (char)a3;
+	int8 result = reinterpret_cast<int8>(a3);
+	return result;
 }
 
 void c_simulation_game_engine_definition::write_creation_description_to_string(s_simulation_game_entity* entity, void* tel_data, int32 buffer_size, char* buffer)

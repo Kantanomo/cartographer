@@ -83,7 +83,7 @@ bool c_juggernaut_engine::test_variant_engine_flag(datum player_index, e_game_en
 
 void c_juggernaut_engine::get_player_state_index(datum player_index, bool* always_returned_true)
 {
-	INVOKE_TYPE(0xD3564, 0xCFB24, void(__thiscall*)(c_game_engine*, char, bool*), this, player_index, always_returned_true);
+	INVOKE_TYPE(0xD3564, 0xCFB24, void(__thiscall*)(c_game_engine*, datum, bool*), this, player_index, always_returned_true);
 }
 
 e_simulation_entity_type c_juggernaut_engine::get_game_engine_entity_type()

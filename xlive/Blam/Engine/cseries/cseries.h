@@ -51,8 +51,6 @@ static_assert(sizeof(datum) == 4);
 typedef int32 enumerated_file_index;
 static_assert(sizeof(enumerated_file_index) == 4);
 
-#define k_kilo 1024
-#define k_unsigned_short_max 0xffff
 enum
 {
 	k_kilo = 1024,

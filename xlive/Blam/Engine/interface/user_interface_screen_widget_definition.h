@@ -337,7 +337,7 @@ enum e_button_flags : int
 struct s_button_widget_reference
 {
 	e_text_flags text_flags;
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 	short pad;
 
@@ -441,7 +441,7 @@ struct s_list_reference
 	short num_visible_items;
 	point2d bottom_left;
 
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 
 	// Explaination("UNUSED", "This is unused")
@@ -489,7 +489,7 @@ ASSERT_STRUCT_SIZE(s_table_view_list_row_reference_OBSOLETE, 16);
 struct s_table_view_list_reference_OBSOLETE
 {
 	e_table_view_list_reference_flags flags;
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 
 	e_custom_font custom_font;
@@ -504,7 +504,7 @@ ASSERT_STRUCT_SIZE(s_table_view_list_reference_OBSOLETE, 40);
 struct s_text_block_reference
 {
 	e_text_flags text_flags;
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 	short pad0;
 
@@ -538,7 +538,7 @@ struct s_hud_block_reference
 {
 	e_hud_block_reference_flags flags;
 
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 	short render_depth_bias;
 	short starting_bitmap_sequence_index;
@@ -579,7 +579,7 @@ ASSERT_STRUCT_SIZE(s_player_block_reference, 24);
 struct s_window_pane_reference
 {
 	short pad;
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 
 	// Explaination("Button Definitions", "If the pane contains buttons, define them here")
 	tag_block<s_button_widget_reference> buttons;

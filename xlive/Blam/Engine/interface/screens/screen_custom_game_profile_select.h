@@ -47,7 +47,7 @@ public:
 
 	c_custom_game_profile_list(int16 user_flags);
 
-	virtual int32 setup_children() override;
+	virtual void setup_children() override;
 	virtual void update() override;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;

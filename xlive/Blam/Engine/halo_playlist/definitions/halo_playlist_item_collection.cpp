@@ -6,7 +6,7 @@ wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_collection*
 	if (collection->count <= 0)
 		return L"";
 
-	for(int32 i = 0; i < collection->count; ++i)
+	for(uint32 i = 0; i < collection->count; ++i)
 		if (collection->items[i].value == value)
 			return collection->items[i].name;
 	

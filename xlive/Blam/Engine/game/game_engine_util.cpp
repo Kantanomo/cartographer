@@ -321,7 +321,7 @@ void game_engine_event_execute(s_multiplayer_event_response_definition* event_re
 				text_group_get_unicode_string(runtime->in_game_text.index, event_response->primary_string, primary_string);
 				game_engine_build_event_string(primary_string, event, 256, formatted_string);
 
-				int32 display_time = time_globals::seconds_to_ticks_round(event_response->primary_string_duration);
+				int32 display_time = time_globals::seconds_to_ticks_round((real32)event_response->primary_string_duration);
 				hud_messaging_display_primary_text(player->user_index, formatted_string, display_time);
 			}
 		}

@@ -506,7 +506,7 @@ bool __cdecl screen_show_screen_4way_signin_xbox_live_callback()
 			_user_interface_channel_type_game_error,
 			_ui_error_xblive_user_not_authorized,
 			_window_4,
-			NONE,// allow all controllers
+			(uint16)NONE,// allow all controllers
 			user_interface_controller_sign_out_all_controllers,
 			nullptr);
 	}

@@ -390,7 +390,7 @@ void c_halo_playlist_reader::process_variant_section()
                     variant_name_found = true;
                     variant_file_line = file_section->file_line;
                     if (!wcscmp(file_section->value_buffer, L"") ||
-                        wcsncpy_s(variant_name, NUMBEROF(variant_name), file_section->value_buffer, NONE))
+                        wcsncpy_s(variant_name, NUMBEROF(variant_name), file_section->value_buffer, UINT_MAX))
                     {
                         this->error(_halo_playlist_error_property_value_invalid, variant_file_line, file_section->name_buffer, file_section->value_buffer);
                     }
@@ -412,7 +412,7 @@ void c_halo_playlist_reader::process_variant_section()
                     }
                     else
                     {
-                        wcsncpy_s(base_variant_name, 32, file_section->value_buffer, -1);
+                        wcsncpy_s(base_variant_name, 32, file_section->value_buffer, UINT_MAX);
                         base_game_variant = get_default_game_variant_by_name(base_variant_name);
 
                         if (!base_game_variant)
@@ -491,7 +491,7 @@ void c_halo_playlist_reader::process_variant_section()
             else
             {
                 bool variant_name_exists = false;
-                for(int32 i = 0; i < this->m_playlist->variant_count; ++i)
+                for(uint32 i = 0; i < this->m_playlist->variant_count; ++i)
                 {
                     if(_wcsicmp(this->m_playlist->variants[i].variant_name, variant_name) == 0)
                     {
@@ -512,7 +512,7 @@ void c_halo_playlist_reader::process_variant_section()
             }
 
             new_variant.flags &= ~1u;
-            wcsncpy_s(new_variant.variant_name, 32, variant_name, -1);
+            wcsncpy_s(new_variant.variant_name, 32, variant_name, UINT_MAX);
 
             e_game_variant_description_index variant_description_index = game_engine_type_get_variant_description_index(new_variant.variant_game_engine_index);
 
@@ -861,7 +861,7 @@ void c_halo_playlist_reader::process_current_property()
                 {
                     if(!wcscmp(match->variant, L""))
                     {
-                        if(!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->variant, NUMBEROF(match->variant), section->value_buffer, NONE))
+                        if(!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->variant, NUMBEROF(match->variant), section->value_buffer, UINT_MAX))
                         {
                             match->variant_line_in_file = this->m_current_reader_line;
                         }
@@ -881,7 +881,7 @@ void c_halo_playlist_reader::process_current_property()
                 {
                     if(!wcscmp(match->map, L""))
                     {
-                        if(!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->map, NUMBEROF(match->map), section->value_buffer, NONE))
+                        if(!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->map, NUMBEROF(match->map), section->value_buffer, UINT_MAX))
                         {
                             match->map_line_in_file = this->m_current_reader_line;
                         }

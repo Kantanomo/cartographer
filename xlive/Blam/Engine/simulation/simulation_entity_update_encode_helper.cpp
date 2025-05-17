@@ -6,7 +6,7 @@ bool c_entity_update_encode_helper::setup(c_bitstream* bitstream, uint32 require
 	this->m_update_considered_mask = 0;
 	this->m_update_written_mask = 0;
 	this->m_update_overflowed_mask = 0;
-	this->m_current_update_component_index = NONE;
+	this->m_current_update_component_index = UINT_MAX;
 	this->m_block_name = nullptr;
 
 	this->m_update_mask = update_mask;
@@ -15,7 +15,7 @@ bool c_entity_update_encode_helper::setup(c_bitstream* bitstream, uint32 require
 	this->m_update_component_count = update_component_count;
 	this->m_bitstream = bitstream;
 	this->m_current_leave_space_bits = this->m_update_component_count + this->m_required_leave_space_bits;
-	this->m_able_to_write_update = bitstream->get_space_left_in_bits() >= this->m_current_leave_space_bits;
+	this->m_able_to_write_update = bitstream->get_space_left_in_bits() >= (int32)this->m_current_leave_space_bits;
 
 	return this->m_able_to_write_update;
 }
@@ -49,7 +49,7 @@ void c_entity_update_encode_helper::commit()
 			this->m_update_written_mask &= ~FLAG(this->m_current_update_component_index);
 			this->m_bitstream->pop_position(true);
 		}
-		else if(this->m_bitstream->get_space_left_in_bits() < this->m_current_leave_space_bits)
+		else if(this->m_bitstream->get_space_left_in_bits() < (int32)this->m_current_leave_space_bits)
 		{
 			this->m_update_overflowed_mask |= FLAG(this->m_current_update_component_index);
 			this->m_bitstream->pop_position(true);
@@ -68,7 +68,7 @@ void c_entity_update_encode_helper::commit()
 		this->m_bitstream->write_bool(this->m_block_name, false);
 
 	--this->m_current_leave_space_bits;
-	this->m_current_update_component_index = NONE;
+	this->m_current_update_component_index = UINT_MAX;
 	this->m_block_name = nullptr;
 }
 

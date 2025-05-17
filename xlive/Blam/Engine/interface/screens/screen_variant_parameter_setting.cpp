@@ -343,7 +343,7 @@ void* c_screen_variant_parameter_setting::load_quick_options(s_screen_parameters
 		screen = new (pool) c_screen_variant_parameter_setting(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_variant_param_setting_format
 		);
 
@@ -369,7 +369,7 @@ void* c_screen_variant_parameter_setting::load_settings(s_screen_parameters* par
 		screen = new (pool) c_screen_variant_parameter_setting(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_variant_param_setting_format
 		);
 
@@ -397,7 +397,7 @@ void c_screen_variant_parameter_setting::new_instance(e_variant_setting_paramete
 	params.m_flags = 0;
 	params.m_window_index = ui_window;
 	params.m_context = NULL;
-	params.user_flags = user_flags;
+	params.m_user_flags = user_flags;
 	params.m_channel_type = ui_channel;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;

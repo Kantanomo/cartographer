@@ -12,7 +12,7 @@ void game_engine_event_new(e_multiplayer_event_response_game_type game_type, e_m
 	event->game_type = game_type;
 	event->pad = 0;
 	event->event_type = event_type;
-	event->player_index = NONE;
+	event->player_index = UINT_MAX;
 	event->causing_player_index = NONE;
 	event->causing_player_team = NONE;
 	event->effect_player_index = NONE;

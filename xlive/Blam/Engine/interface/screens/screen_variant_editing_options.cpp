@@ -121,7 +121,7 @@ c_variant_editing_options_list::c_variant_editing_options_list(uint16 user_flags
 	data_make_valid(this->m_list_data);
 	for(int32 i = 0; i < this->m_list_data->datum_max_elements; ++i)
 	{
-		((s_list_item_datum*)datum_get(this->m_list_data, datum_new(this->m_list_data)))->item_id = i;
+		((s_list_item_datum*)datum_get(this->m_list_data, datum_new(this->m_list_data)))->item_id = (int16)i;
 	}
 
 	this->linker_type2.link(&this->m_slot);
@@ -144,7 +144,7 @@ void* c_screen_variant_editing_options::load_editor(s_screen_parameters* paramet
 		screen = new (pool) c_screen_variant_editing_options(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_variant_editing_options_menu
 		);
 

@@ -1,13 +1,17 @@
 #include "stdafx.h"
 #include "game_engine.h"
 
+#include "game_engine_default.h"
+#include "game_engine_headhunter.h"
+#include "saved_games/game_variant.h"
+
 /* public code */
 
 void game_engine_apply_patches()
 {
 	// todo: server offset
 	PatchCall(Memory::GetAddress(0x1B1E38, 0x197E62), game_engine_get_simulation_protocol);
-	if(Memory::dedicatedServer)
+	if(Memory::g_memory_is_dedicated_server)
 	{
 		PatchCall(Memory::GetAddress(0, 0x197DF1), game_engine_get_simulation_protocol);
 	}

@@ -40,7 +40,7 @@ public:
 	c_screen_game_engine_category_list(int16 user_flags);
 
 	virtual ~c_screen_game_engine_category_list() = default;
-	int32 setup_children() override;
+	void setup_children() override;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;

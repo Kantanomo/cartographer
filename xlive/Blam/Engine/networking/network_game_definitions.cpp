@@ -177,7 +177,7 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 		return false;
 	}
 
-	variant->flags = packet->read_integer("variant-flags", 1);
+	variant->flags = (int16)packet->read_integer("variant-flags", 1);
 
 	packet->read_string_wchar("variant-desc", variant->variant_name, NUMBEROF(variant->variant_name));
 
@@ -241,7 +241,7 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 	{
 	case _game_engine_type_ctf:
 		{
-			variant->game_engine_variant.ctf.flags.set_unsafe(packet->read_integer("flags", k_ctf_engine_flags_bits_required));
+			variant->game_engine_variant.ctf.flags.set_unsafe((uint8)packet->read_integer("flags", k_ctf_engine_flags_bits_required));
 			variant->game_engine_variant.ctf.flag_reset_time = packet->read_integer("flag-reset-time", SHORT_BITS);
 			variant->game_engine_variant.ctf.speed_with_flag = (e_ctf_engine_player_speed)packet->read_integer("speed-with-flag", k_ctf_engine_player_speed_bits_required);
 			variant->game_engine_variant.ctf.flag_hit_damage = (e_game_engine_weapon_hit)packet->read_integer("flag-hit-damage", k_game_engine_weapon_hit_bits_required);
@@ -257,7 +257,7 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 	case _game_engine_type_oddball:
 		{
 			variant->game_engine_variant.oddball.flags.set_unsafe(packet->read_integer("flags", k_oddball_engine_flags_bits_required));
-			variant->game_engine_variant.oddball.ball_count = packet->read_integer("ball-count", bits_required_for(k_game_engine_oddball_maximum_balls));
+			variant->game_engine_variant.oddball.ball_count = (uint16)packet->read_integer("ball-count", bits_required_for(k_game_engine_oddball_maximum_balls));
 			variant->game_engine_variant.oddball.ball_hit_damage = (e_game_engine_weapon_hit)packet->read_integer("ball-hit-damage", k_game_engine_weapon_hit_bits_required);
 			variant->game_engine_variant.oddball.speed_with_ball = (e_oddball_player_speed)packet->read_integer("speed-with-ball", k_oddball_player_speed_bits_required);
 			variant->game_engine_variant.oddball.waypoint_to_ball = (e_oddball_engine_waypoint_type)packet->read_integer("waypoint-to-ball", k_oddball_waypoint_type_bits_required);
@@ -266,7 +266,7 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 	case _game_engine_type_koth:
 		{
 			variant->game_engine_variant.king.flags.set_unsafe(packet->read_integer("flags", k_king_engine_flags_bits_required));
-			variant->game_engine_variant.king.hill_move_time = packet->read_integer("hill-move-time", SHORT_BITS);
+			variant->game_engine_variant.king.hill_move_time = (uint16)packet->read_integer("hill-move-time", SHORT_BITS);
 			break;
 		}
 	case _game_engine_type_race:
@@ -276,7 +276,7 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 	case _game_engine_type_headhunter:
 		{
 			variant->game_engine_variant.head_hunter.flags.set_unsafe(packet->read_integer("flags", k_king_engine_flags_bits_required));
-			variant->game_engine_variant.head_hunter.hill_move_time = packet->read_integer("hill-move-time", SHORT_BITS);
+			variant->game_engine_variant.head_hunter.hill_move_time = (uint16)packet->read_integer("hill-move-time", SHORT_BITS);
 			variant->game_engine_variant.head_hunter.speed_with_heads = (e_ctf_engine_player_speed)packet->read_integer("speed-with-heads", k_ctf_engine_player_speed_bits_required);
 			variant->game_engine_variant.head_hunter.max_heads_carried = (e_headhunter_max_heads_carried)packet->read_integer("max-heads-carried", k_headhunter_max_heads_carried_bits_required);
 			break;
@@ -289,16 +289,16 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 		}
 	case _game_engine_type_territories:
 		{
-			variant->game_engine_variant.territories.territory_count = packet->read_integer("territory-count", bits_required_for(k_maximum_territories_flags));
-			variant->game_engine_variant.territories.territory_contest_time = packet->read_integer("territory-contest-time", SHORT_BITS);
-			variant->game_engine_variant.territories.territory_capture_time = packet->read_integer("territory-capture-time", SHORT_BITS);
+			variant->game_engine_variant.territories.territory_count = (uint16)packet->read_integer("territory-count", bits_required_for(k_maximum_territories_flags));
+			variant->game_engine_variant.territories.territory_contest_time = (uint16)packet->read_integer("territory-contest-time", SHORT_BITS);
+			variant->game_engine_variant.territories.territory_capture_time = (uint16)packet->read_integer("territory-capture-time", SHORT_BITS);
 			break;
 		}
 	case _game_engine_type_assault:
 		{
-			variant->game_engine_variant.assault.bomb_arming_time = packet->read_integer("bomb-arming-time", SHORT_BITS);
-			variant->game_engine_variant.assault.bomb_fuse_time = packet->read_integer("bomb-fuse-time", SHORT_BITS);
-			variant->game_engine_variant.assault.flags.set_unsafe(packet->read_integer("flags", k_ctf_engine_flags_bits_required));
+			variant->game_engine_variant.assault.bomb_arming_time = (uint16)packet->read_integer("bomb-arming-time", SHORT_BITS);
+			variant->game_engine_variant.assault.bomb_fuse_time = (uint16)packet->read_integer("bomb-fuse-time", SHORT_BITS);
+			variant->game_engine_variant.assault.flags.set_unsafe((uint8)packet->read_integer("flags", k_ctf_engine_flags_bits_required));
 			variant->game_engine_variant.assault.flag_reset_time = packet->read_integer("flag-reset-time", SHORT_BITS);
 			variant->game_engine_variant.assault.speed_with_flag = (e_ctf_engine_player_speed)packet->read_integer("speed-with-flag", k_ctf_engine_player_speed_bits_required);
 			variant->game_engine_variant.assault.flag_hit_damage = (e_game_engine_weapon_hit)packet->read_integer("flag-hit-damage", k_game_engine_weapon_hit_bits_required);

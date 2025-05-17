@@ -248,7 +248,7 @@ void c_custom_game_profile_list::sub_6515A6()
 	INVOKE_TYPE(0x2515A6, 0, void(__thiscall*)(c_custom_game_profile_list*), this);
 }
 
-int32 c_custom_game_profile_list::setup_children()
+void c_custom_game_profile_list::setup_children()
 {
 	//this->perform_save_type_search();
 	//this->sub_613E7C((s_list_item_datum*)datum_next(this->m_list_data, NONE));
@@ -262,7 +262,7 @@ int32 c_custom_game_profile_list::setup_children()
 	//this->field_A2 = 0;
 
 	//return result;
-	return INVOKE_TYPE(0x251AE9, 0, int32(__thiscall*)(c_custom_game_profile_list*), this);
+	INVOKE_TYPE(0x251AE9, 0, void(__thiscall*)(c_custom_game_profile_list*), this);
 }
 
 void c_custom_game_profile_list::update()
@@ -296,7 +296,7 @@ void* c_screen_custom_game_profile_select::load_settings(s_screen_parameters* pa
 		screen = new (pool) c_screen_custom_game_profile_select(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_custom_game_menu
 		);
 
@@ -330,7 +330,7 @@ void* c_screen_custom_game_profile_select::load_lobby(s_screen_parameters* param
 		screen = new (pool) c_screen_custom_game_profile_select(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_multiplayer_variant_listlobby
 		);
 
@@ -364,7 +364,7 @@ void* c_screen_custom_game_profile_select::load_unused(s_screen_parameters* para
 		screen = new (pool) c_screen_custom_game_profile_select(
 			parameters->m_channel_type,
 			parameters->m_window_index,
-			parameters->user_flags,
+			parameters->m_user_flags,
 			_screen_custom_game_menu
 		);
 

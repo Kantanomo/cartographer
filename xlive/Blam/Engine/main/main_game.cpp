@@ -8,7 +8,7 @@
 
 /* constants */
 
-s_variant_description_map k_launch_multiplayer_variants[k_variant_count] =
+s_variant_description_map k_launch_multiplayer_variants[k_base_game_variant_description_count] =
 {
 	{ "slayer", _game_variant_description_slayer },
 	{ "oddball", _game_variant_description_oddball },
@@ -100,7 +100,7 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 void main_game_launch_set_multiplayer_variant(const char* variant_name)
 {	
 	size_t i = 0;
-	for (; i < k_variant_count; ++i)
+	for (; i < k_base_game_variant_description_count; ++i)
 	{
 		if (!csstricmp(variant_name, k_launch_multiplayer_variants[i].name))
 		{
@@ -115,7 +115,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
     }
     else
     {
-        game_variant_create_default_new(&g_main_game_launch_options.game_variant, variants[i].index);
+        game_variant_create_default_new(&g_main_game_launch_options.game_variant, k_launch_multiplayer_variants[i].index);
     }
 
 	g_main_game_launch_options.game_variant.round_time_limit = 0;

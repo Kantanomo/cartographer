@@ -65,7 +65,6 @@ ASSERT_STRUCT_SIZE(s_saved_game_player_profile, 4616);
 
 
 void __cdecl saved_game_player_profile_set_default_training_data(void* saved_game_variant);
-void __cdecl saved_game_player_profile_set_input_preferences(s_gamepad_input_preferences* input_preferences, s_saved_game_profile_input_preferences* profile_input_preferences);
 
 void saved_game_player_profile_default_new(s_saved_game_player_profile* profile, int32 default_profile_type);
 bool saved_game_player_profile_read_file(enumerated_file_index enumerated_file_index, s_saved_game_player_profile* profile);

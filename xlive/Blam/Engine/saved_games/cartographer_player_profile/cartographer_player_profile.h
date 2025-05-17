@@ -14,7 +14,7 @@ enum e_saved_game_cartographer_player_profile_version : uint32
 	k_saved_game_cartographer_player_profile_version_count,
 };
 
-enum e_cartographer_controller_deadzone_type : uint8 
+enum e_cartographer_controller_deadzone_type : uint8
 {
 	_controller_deadzone_type_axial,
 	_controller_deadzone_type_radial,
@@ -99,8 +99,8 @@ union s_saved_game_cartographer_player_profile_container
 
 struct s_cartographer_profile_run_time
 {
-	s_saved_game_cartographer_player_profile profile;
-	enumerated_file_index enumerated_file_index;
+	s_saved_game_cartographer_player_profile_container profile;
+	int32 enumerated_file_index;
 	e_controller_index controller_index;
 	int32 user_index;
 	uint32 gamepad_index;

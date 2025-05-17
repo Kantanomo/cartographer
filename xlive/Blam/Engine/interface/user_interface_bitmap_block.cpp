@@ -98,6 +98,6 @@ void __cdecl user_interface_set_bitmap_from_variant(s_game_variant* variant, c_b
 			break;
 	}
 
-	widget->verify_and_update_bitmap_index(bitmap_index);
+	widget->verify_and_change_sprite(bitmap_index);
 	widget->set_visible(true);
 }

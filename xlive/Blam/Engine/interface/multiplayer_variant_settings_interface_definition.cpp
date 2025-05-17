@@ -12,7 +12,7 @@ static void multiplayer_variant_settings_interface_parse_headhunter_moving_bin(e
 {
 	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_int16;
 	*out_offset = offsetof(s_game_variant, game_engine_variant.head_hunter.hill_move_time);
-	*(uint32*)out_variable = 1.f;
+	*(real32*)out_variable = 1.f;
 }
 
 static void multiplayer_variant_settings_interface_parse_headhunter_point_multiplier(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)

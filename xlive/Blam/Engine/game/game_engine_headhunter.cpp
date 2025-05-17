@@ -148,7 +148,7 @@ bool c_headhunter_engine::function_4()
 
 	// instead of a hill being spawned at the start of a round, an intentional delay has been set so people can't speed run the point.
 	g_headhunter_engine_globals->m_hill_id = -1;
-	g_headhunter_engine_globals->m_ticks_till_hill_move = time_globals::seconds_to_ticks_real(15);
+	g_headhunter_engine_globals->m_ticks_till_hill_move = time_globals::seconds_to_ticks_round(15);
 	//g_headhunter_engine_globals->setup_points(g_headhunter_engine_globals->m_hill_id);
 
 	return true;
@@ -210,9 +210,13 @@ void c_headhunter_engine::player_killed(datum killing_player, datum killed_playe
 
 	const biped_datum* biped_unit = (biped_datum*)object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
 
-	if (biped_unit != NULL)
+	uint16 player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(killed_player);
+
+	if (biped_unit != NULL && IN_RANGE(player_index, 0, k_maximum_players))
 	{
-		LOG_TRACE_GAME(L"[{}] {} Died dropping {} skulls", __FUNCTIONW__, player->properties->player_name, g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(killed_player)] + 1);
+		
+
+		LOG_TRACE_GAME(L"[{}] {} Died dropping {} skulls", __FUNCTIONW__, player->properties->player_name, g_headhunter_engine_globals->m_player_skull_count[player_index] + 1);
 
 		object_placement_data placement_data;
 
@@ -221,7 +225,7 @@ void c_headhunter_engine::player_killed(datum killing_player, datum killed_playe
 		placement_data.position = biped_unit->object.position;
 
 
-		for (int32 i = 0; i < g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(killed_player)] + 1; ++i)
+		for (int32 i = 0; i < g_headhunter_engine_globals->m_player_skull_count[player_index] + 1; ++i)
 		{
 			uint32* r_seed = get_local_random_seed_address();
 
@@ -238,7 +242,7 @@ void c_headhunter_engine::player_killed(datum killing_player, datum killed_playe
 			simulation_action_object_create(object_new(&placement_data));
 		}
 
-		g_headhunter_engine_globals->m_player_skull_count[DATUM_INDEX_TO_ABSOLUTE_INDEX(killed_player)] = 0;
+		g_headhunter_engine_globals->m_player_skull_count[player_index] = 0;
 	}
 }
 
@@ -256,7 +260,7 @@ bool c_headhunter_engine::player_can_interact_with_weapon(datum player_index, da
 
 			const biped_datum* player_biped = (biped_datum*)object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
 
-			if (player_biped && !TEST_BIT(player_biped->object.object_damage_flags, _object_is_dead_bit))
+			if (player_biped && !player_biped->object.object_damage_flags.test(_object_is_dead_bit))
 			{
 				constexpr real32 k_distance_from_skull_auto_pickup = 0.3f;
 
@@ -337,7 +341,7 @@ void c_headhunter_engine::update()
 
 			if(g_headhunter_engine_globals->m_ticks_till_hill_move <= 0)
 			{
-				g_headhunter_engine_globals->m_ticks_till_hill_move = time_globals::seconds_to_ticks_real(variant->game_engine_variant.king.hill_move_time);
+				g_headhunter_engine_globals->m_ticks_till_hill_move = time_globals::seconds_to_ticks_round(variant->game_engine_variant.king.hill_move_time);
 
 				int32 next_hill_index = g_headhunter_engine_globals->get_next_hill_index();
 				if(next_hill_index != NONE)
@@ -399,7 +403,7 @@ void c_headhunter_engine::build_simulation_update(uint32* update_mask, int32 unu
 	if(TEST_BIT(*update_mask, _king_engine_state_data_flag_hill_id_exists) && game_state_data->hill_id != g_headhunter_engine_globals->m_hill_id)
 	{
 		out_mask |= FLAG(_king_engine_state_data_flag_hill_id_exists);
-		game_state_data->hill_id = g_headhunter_engine_globals->m_hill_id;
+		game_state_data->hill_id = (uint16)g_headhunter_engine_globals->m_hill_id;
 	}
 
 	if(TEST_BIT(*update_mask, _king_engine_state_data_flag_players_in_hill_exists))
@@ -507,15 +511,15 @@ void c_headhunter_engine::update_scores()
 	uint32 players_in_hill_mask = 0;
 	uint32 teams_in_hill_mask = 0;
 
-	player_iterator it;
-	while (it.get_next_active_player())
+	player_iterator mask_it;
+	while (mask_it.get_next_active_player())
 	{
-		if (it.get_current_player_data()->player_on_hill_time)
+		if (mask_it.get_current_player_data()->player_on_hill_time)
 		{
-			players_in_hill_mask |= FLAG(it.get_current_player_index());
+			players_in_hill_mask |= FLAG(mask_it.get_current_player_index());
 
-			if (it.get_current_player_data()->properties->team_index != NONE)
-				teams_in_hill_mask |= FLAG(it.get_current_player_data()->properties->team_index);
+			if (mask_it.get_current_player_data()->properties->team_index != NONE)
+				teams_in_hill_mask |= FLAG(mask_it.get_current_player_data()->properties->team_index);
 		}
 	}
 

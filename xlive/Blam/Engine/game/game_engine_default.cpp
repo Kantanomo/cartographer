@@ -84,7 +84,7 @@ real32 c_game_engine::get_player_speed_modifier(datum player_index)
 uint32 c_game_engine::function_21(datum object_index)
 {
 	LOG_INFO_GAME("[{}]", __FUNCTION__);
-	return NONE;
+	return UINT_MAX;
 }
 
 void c_game_engine::update_object_color_change(datum object_index)

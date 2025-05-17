@@ -94,5 +94,5 @@ bool c_slayer_engine::apply_simulation_update(uint32 flags, int32 unused, void* 
 	//}
 	//return true;
 
-	return INVOKE_TYPE(0x110DE4, 0xDD394, bool(__thiscall*)(c_game_engine*, int16, int32, void*), this, flags, unused, state_data);
+	return INVOKE_TYPE(0x110DE4, 0xDD394, bool(__thiscall*)(c_game_engine*, uint32, int32, void*), this, flags, unused, state_data);
 }

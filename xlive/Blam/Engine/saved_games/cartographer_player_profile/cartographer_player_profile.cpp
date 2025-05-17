@@ -303,10 +303,10 @@ static bool cartographer_player_profile_upgrade_check(s_saved_game_cartographer_
 	bool result = true;
 	uint32 upgrade_iterations = 0;
 
-	while(settings->current.header.version != k_cartographer_profile_version)
+	while (settings->current.header.version != k_cartographer_profile_version)
 	{
 		// when creating a newer version of the cartographer profile create a new case to call the new upgrade to function
-		switch(settings->current.header.version)
+		switch (settings->current.header.version)
 		{
 		case _saved_game_cartographer_player_profile_version_1:
 			cartographer_player_profile_upgrade_to_v2(settings);
@@ -324,7 +324,7 @@ static bool cartographer_player_profile_upgrade_check(s_saved_game_cartographer_
 			break;
 		}
 
-		if(++upgrade_iterations == k_saved_game_cartographer_player_profile_version_count)
+		if (++upgrade_iterations == k_saved_game_cartographer_player_profile_version_count)
 		{
 			DISPLAY_ASSERT("Maximum iterations of possible cartographer profile upgrades was reached without success, assuming profile is corrupt.");
 			result = false;

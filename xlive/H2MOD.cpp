@@ -19,7 +19,6 @@
 #include "game/game.h"
 #include "game/game_globals.h"
 #include "game/game_time.h"
-#include "game/multiplayer_globals.h"
 #include "game/player_control.h"
 #include "game/player_vibration.h"
 #include "input/input_xinput.h"
@@ -242,14 +241,14 @@ void H2MOD::disable_score_announcer_sounds(uint32 sound_flags)
 
 				if (sound_flags & FLAG(_sound_type_slayer))
 				{
-					tag_block<s_multiplayer_event_response_definition>* slayer_events = &runtime_tag_block_data->events[_multiplayer_event_response_game_type_slayer];
+					tag_block<s_multiplayer_event_response_definition>* slayer_events = &runtime_tag_block_data->slayer_events;
 					slayer_events->count = 0;
 					slayer_events->data = 0;
 				}
 
 				if (sound_flags & ALL_SOUNDS_NO_SLAYER) // check if there is any point in running the code below
 				{
-					tag_block<s_multiplayer_event_response_definition>* general_events = &runtime_tag_block_data->events[_multiplayer_event_response_game_type_general];
+					tag_block<s_multiplayer_event_response_definition>* general_events = &runtime_tag_block_data->general_events;
 					for (int i = 0; i < general_events->count; i++)
 					{
 						s_multiplayer_event_response_definition* general_event = (*general_events)[i];
@@ -264,7 +263,15 @@ void H2MOD::disable_score_announcer_sounds(uint32 sound_flags)
 							// disable all sounds from english to chinese
 							for (size_t language = 0; language < k_language_count; ++language)
 							{
-								general_event->primary_sound.sounds[language].index = NONE;
+								general_event->primary_sound.english_sound.index = NONE;
+								general_event->primary_sound.spanish_sound.index = NONE;
+								general_event->primary_sound.chinese_sound.index = NONE;
+								general_event->primary_sound.french_sound.index = NONE;
+								general_event->primary_sound.german_sound.index = NONE;
+								general_event->primary_sound.italian_sound.index = NONE;
+								general_event->primary_sound.japanese_sound.index = NONE;
+								general_event->primary_sound.korean_sound.index = NONE;
+								general_event->primary_sound.portuguese_sound.index = NONE;
 							}
 						}
 					}

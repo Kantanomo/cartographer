@@ -1,4 +1,5 @@
 #pragma once
+#include "game_allegiance.h"
 #include "networking/logic/network_session_interface.h"
 #include "simulation/game_interface/simulation_game_engine_player.h"
 

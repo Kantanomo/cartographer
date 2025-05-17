@@ -78,7 +78,7 @@ e_global_string_id saved_game_get_type_string_id(e_saved_game_file_type type)
 		_string_id_territories_display_name
 	};
 
-	if (type <= k_number_of_saved_game_file_types)
+	if (VALID_INDEX(type, k_number_of_saved_game_file_types))
 		return saved_game_file_type_string_ids[type];
 
 	return saved_game_file_type_string_ids[0];
@@ -94,8 +94,8 @@ bool saved_game_get_file_info(s_saved_game_main_menu_globals_save_file_info* out
 		// file is not a default save
 		if (!ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_index))
 		{
-			auto abs_index = ENUMERATED_INDEX_GET_ABS_INDEX(enumerated_index);
-			auto last_index = saved_game_main_menu_globals->save_files.get_count() - 1;
+			uint32 abs_index = ENUMERATED_INDEX_GET_ABS_INDEX(enumerated_index);
+			uint32 last_index = saved_game_main_menu_globals->save_files.get_count() - 1;
 			if ((abs_index <= last_index || abs_index == last_index))
 			{
 				csmemcpy(out_info, saved_game_main_menu_globals->save_files[abs_index], saved_game_main_menu_globals->save_files.get_type_size());
@@ -137,13 +137,17 @@ uint32 saved_game_get_file_size_kb_for_type(e_saved_game_file_type type)
 
 const wchar_t* saved_game_get_file_type_as_string(e_saved_game_file_type file_type)
 {
-	return file_type < k_number_of_saved_game_file_types ? k_saved_game_file_type_strings[file_type] : L"unknown";
+	if (VALID_INDEX(file_type, k_number_of_saved_game_file_types))
+		return k_saved_game_file_type_strings[file_type];
+
+	return L"unknown";
 }
 
 bool saved_game_new_main_menu_globals_save_file(s_saved_game_main_menu_globals_save_file_info* new_save, e_saved_game_file_type file_type, wchar_t* out_path)
 {
-	wcsncpy(out_path, new_save->file_path, 256);
-	wchar_t* cat_path = ustrnzcat(out_path, saved_game_get_file_type_as_string(file_type), 256);
+	wchar_t temp_buffer[256];
+	wcsncpy_s(temp_buffer, new_save->file_path, 256);
+	wchar_t* cat_path = ustrncat(temp_buffer, saved_game_get_file_type_as_string(file_type), 256);
 	cat_path[255] = '\0';
 	ustrncpy(out_path, cat_path, 256);
 	return true;
@@ -264,7 +268,7 @@ bool __cdecl saved_game_create_save_game_directory(e_saved_game_file_type type, 
 
 	return *out_string != 0;
 
-	return INVOKE(0x4333A, 0, saved_game_create_save_game_directory, type, out_string);
+	//return INVOKE(0x4333A, 0, saved_game_create_save_game_directory, type, out_string);
 }
 
 e_game_variant_description_index saved_game_type_to_variant_description(const e_saved_game_file_type type)
@@ -361,10 +365,10 @@ enumerated_file_index saved_game_create_file(e_saved_game_file_type type, e_cont
 			s_file_reference filo;
 
 			new_main_menu_save.type = type;
-			new_main_menu_save.language_id = saved_game_files_globals->language_id;
+			new_main_menu_save.language_id = (byte)saved_game_files_globals->language_id;
 
-			wcsncpy(new_main_menu_save.display_name, new_file_name, 17u);
-			wcsncpy(new_main_menu_save.file_path, wide_save_location, MAX_PATH);
+			wcsncpy_s(new_main_menu_save.display_name, new_file_name, 17u);
+			wcsncpy_s(new_main_menu_save.file_path, wide_save_location, MAX_PATH);
 
 
 			saved_game_new_main_menu_globals_save_file(&new_main_menu_save, type, saved_game_full_path);
@@ -416,7 +420,7 @@ enumerated_file_index saved_game_create_new_game_variant(e_controller_index orig
 
 	ASSERT(game_variant_cleanup(&new_variant));
 	
-	wcsncpy(new_variant.variant_name, name, NUMBEROF(new_variant.variant_name));
+	wcsncpy_s(new_variant.variant_name, name, NUMBEROF(new_variant.variant_name));
 
 	if(saved_games_async_helper_write_variant(enumerated_file_index, &new_variant))
 	{

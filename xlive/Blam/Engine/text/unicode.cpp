@@ -266,6 +266,19 @@ int32 uprintf(const wchar_t* format, ...)
 	return result;
 }
 
+int32 usnprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
+{
+	va_list va_args;
+	va_start(va_args, format);
+
+	ASSERT(string != NULL);
+	ASSERT(size > 0);
+
+	int32 result = _vsnwprintf_s(string, size - 1, UINT_MAX, format, va_args);
+	va_end(va_args);
+	return result;
+}
+
 bool __cdecl uniswcntrl(wchar_t* string)
 {
 	ASSERT(string);
