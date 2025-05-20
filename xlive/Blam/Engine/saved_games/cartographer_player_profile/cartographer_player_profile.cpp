@@ -25,6 +25,7 @@ enum
 };
 
 static const wchar_t k_cartographer_bin_name[] = L"cartographer_profile";
+const ControllerInput::CustomControllerLayout k_default_controller_layout;
 
 /* globals */
 
@@ -225,6 +226,7 @@ static void cartographer_player_profile_new(s_saved_game_cartographer_player_pro
 	settings->mouse_uniform = false;
 	settings->raw_mouse_input = false;
 	settings->controller_sensitivity = 0.f;
+	settings->custom_layout = k_default_controller_layout;
 	settings->controller_modern = false;
 	settings->controller_deadzone_type = _controller_deadzone_type_axial;
 	settings->deadzone_axial = k_default_right_thumbstick_deadzone_axial_percentage;
@@ -247,6 +249,7 @@ static void cartographer_player_profile_new(s_saved_game_cartographer_player_pro
 	settings->mouse_uniform = false;
 	settings->raw_mouse_input = false;
 	settings->controller_sensitivity = 0.f;
+	settings->custom_layout = k_default_controller_layout;
 	settings->controller_modern = false;
 	settings->controller_deadzone_type = _controller_deadzone_type_axial;
 	settings->deadzone_axial = k_default_right_thumbstick_deadzone_axial_percentage;
