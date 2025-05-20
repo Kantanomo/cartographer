@@ -1,5 +1,6 @@
 #pragma once
 
+#ifndef SPDLOG_DISABLED
 // Disable sign/unsigned comparison mismatch in spdlog
 #pragma warning( push )
 #pragma warning( disable : 4389)
@@ -168,3 +169,4 @@ private:
 	std::shared_ptr<spdlog::logger> output = nullptr;
 
 };
+#endif

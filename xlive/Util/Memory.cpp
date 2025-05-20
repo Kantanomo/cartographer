@@ -95,7 +95,7 @@ void Memory::Initialize()
 		Memory::SetBaseAddress((DWORD)game_info.base, true);
 		break;
 	default:
-		assert(0);
+		unreachable();
 		break;
 	}
 }

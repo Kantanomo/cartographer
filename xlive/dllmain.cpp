@@ -125,7 +125,7 @@ void exit_instance(void)
 	DeinitCustomLanguage();
 	DeinitH2Config();
 
-#ifndef NO_TRACE
+#ifndef SPDLOG_DISABLED
 	EnterCriticalSection(&log_section);
 	delete xlive_log;
 	delete h2mod_log;

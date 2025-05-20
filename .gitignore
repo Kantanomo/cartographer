@@ -23,8 +23,7 @@ xliveless.v12.suo
 /Directx SDK/include
 /Halo2
 /Halo2Server
-/xlive/Debug
-/xlive/Release
+/xlive/objects
 *.opensdf
 *.user
 *.ipch

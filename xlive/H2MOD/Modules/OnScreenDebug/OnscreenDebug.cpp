@@ -30,8 +30,9 @@ void addDebugTextInternal(char* text) {
 
 	CircularStringBuffer* output = GetMainConsoleInstance()->GetTabOutput(_console_tab_logs);
 	output->AddString(StringFlag_None, text, lenInput);
+#ifndef SPDLOG_DISABLED
 	onscreendebug_log->debug(text);
-
+#endif
 	if (endChar) {
 		return addDebugTextInternal(endChar + 1);
 	}
@@ -88,10 +89,12 @@ void addDebugText(const char* format, ...)
 }
 
 void InitOnScreenDebugText() {
+#ifndef SPDLOG_DISABLED
 	initialisedDebugText = true;
 
 	c_static_wchar_string<MAX_PATH> path;
 	prepareLogFileName(L"h2onscreendebug", &path);
 	onscreendebug_log = h2log::create("OnScreenDebug", path.get_string(), true, 0); // we always create onscreendebuglog, which logs everything (log level 0)
 	addDebugText("Initialized onscreendebug log");
+#endif
 }

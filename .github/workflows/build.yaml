@@ -14,7 +14,7 @@ jobs:
       matrix:
         # Use this when we fix llvm builds
         #BUILD_CONFIGURATION: [debug_msvc, debug_llvm, release_msvc, release_llvm]
-        BUILD_CONFIGURATION: [debug_msvc, release_msvc]
+        BUILD_CONFIGURATION: [debug_msvc, release_msvc, release_min_msvc]
 
     runs-on: windows-2022
 
@@ -35,4 +35,4 @@ jobs:
         path: |
             ./Halo2/xlive.dll
             ./Halo2/xlive.map
-            ./xlive/${{matrix.BUILD_CONFIGURATION}}/xlive.pdb
+            ./xlive/objects/${{matrix.BUILD_CONFIGURATION}}/xlive.pdb

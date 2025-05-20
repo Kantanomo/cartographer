@@ -3,7 +3,9 @@
 #ifndef XLIVELESS_H
 #define XLIVELESS_H
 
+#ifndef SPDLOG_DISABLED
 #include "Util/log.h"
+#endif
 
 #ifdef XLIVELESS_EXPORTS
 #define XLIVELESS_API extern "C" __declspec(dllexport)
@@ -25,6 +27,7 @@
 
 extern HMODULE hThis;
 
+#ifndef SPDLOG_DISABLED
 extern h2log *xlive_log;
 extern h2log *h2mod_log;
 extern h2log *network_log;
@@ -214,51 +217,57 @@ inline T verify_output(T output, const char *expression, const char *func_name, 
 */
 #define LOG_CHECK(...) \
 	verify_output((__VA_ARGS__), #__VA_ARGS__, __FUNCTION__, __FILE__, __LINE__)
-
-
 #else
-#define LOG_TRACE()
-#define LOG_DEBUG()
-#define LOG_INFO()
-#define LOG_WARNING()
-#define LOG_ERROR()
-#define LOG_CRITICAL()
+
+#define LIMITED_LOG(log_limit, logger, ...) (void)0
+
+#define LOG_TRACE(logger, msg, ...) (void)0
+#define LOG_DEBUG(logger, msg, ...) (void)0
+#define LOG_INFO(logger, msg, ...) (void)0
+#define LOG_WARNING(logger, msg, ...) (void)0
+#define LOG_ERROR(logger, msg, ...) (void)0
+#define LOG_CRITICAL(logger, msg, ...) (void)0
 
 // Mod-specific logging
-#define LOG_TRACE_GAME()
-#define LOG_DEBUG_GAME()
-#define LOG_INFO_GAME()
-#define LOG_WARNING_GAME()
-#define LOG_ERROR_GAME()
-#define LOG_CRITICAL_GAME()
+#define LOG_TRACE_GAME(msg, ...) (void)0
+#define LOG_DEBUG_GAME(msg, ...) (void)0
+#define LOG_INFO_GAME(msg, ...) (void)0
+#define LOG_WARNING_GAME(msg, ...) (void)0
+#define LOG_ERROR_GAME(msg, ...) (void)0
+#define LOG_CRITICAL_GAME(msg, ...) (void)0
 
 // Function calls
-#define LOG_TRACE_FUNC()
-#define LOG_TRACE_FUNCW()
-#define LOG_DEBUG_FUNC()
-#define LOG_DEBUG_FUNCW()
-#define LOG_INFO_FUNC()
-#define LOG_INFO_FUNCW()
-#define LOG_WARNING_FUNC()
-#define LOG_WARNING_FUNCW()
-#define LOG_ERROR_FUNC()
-#define LOG_ERROR_FUNCW()
-#define LOG_CRITICAL_FUNC()
-#define LOG_CRITICAL_FUNCW()
+#define LOG_TRACE_FUNC(msg, ...) (void)0
+#define LOG_TRACE_FUNCW(msg, ...) (void)0
+#define LOG_DEBUG_FUNC(msg, ...) (void)0
+#define LOG_DEBUG_FUNCW(msg, ...) (void)0
+#define LOG_INFO_FUNC(msg, ...) (void)0
+#define LOG_INFO_FUNCW(msg, ...) (void)0
+#define LOG_WARNING_FUNC(msg, ...) (void)0
+#define LOG_WARNING_FUNCW(msg, ...) (void)0
+#define LOG_ERROR_FUNC(msg, ...) (void)0
+#define LOG_ERROR_FUNCW(msg, ...) (void)0
+#define LOG_CRITICAL_FUNC(msg, ...) (void)0
+#define LOG_CRITICAL_FUNCW(msg, ...) (void)0
 
 // Networking
-#define LOG_TRACE_NETWORK()
-#define LOG_DEBUG_NETWORK()
-#define LOG_INFO_NETWORK()
-#define LOG_WARNING_NETWORK()
-#define LOG_ERROR_NETWORK()
-#define LOG_CRITICAL_NETWORK()
+#define LOG_TRACE_NETWORK(msg, ...) (void)0
+#define LOG_DEBUG_NETWORK(msg, ...) (void)0
+#define LOG_INFO_NETWORK(msg, ...) (void)0
+#define LOG_WARNING_NETWORK(msg, ...) (void)0
+#define LOG_ERROR_NETWORK(msg, ...) (void)0
+#define LOG_CRITICAL_NETWORK(msg, ...) (void)0
 
 // xLiveLess
-#define LOG_TRACE_XLIVE()
-#define LOG_DEBUG_XLIVE()
-#define LOG_INFO_XLIVE()
-#define LOG_WARNING_XLIVE()
-#define LOG_ERROR_XLIVE()
-#define LOG_CRITICAL_XLIVE()
+#define LOG_TRACE_XLIVE(msg, ...) (void)0
+#define LOG_DEBUG_XLIVE(msg, ...) (void)0
+#define LOG_INFO_XLIVE(msg, ...) (void)0
+#define LOG_WARNING_XLIVE(msg, ...) (void)0
+#define LOG_ERROR_XLIVE(msg, ...) (void)0
+#define LOG_CRITICAL_XLIVE(msg, ...) (void)0
+
+#define LOG_CHECK(...) (__VA_ARGS__)
+
+#endif
+
 #endif
