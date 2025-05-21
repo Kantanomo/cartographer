@@ -26,7 +26,21 @@ public:
 	{
 		ASSERT(g_memory_is_dedicated_server || client != 0);
 		ASSERT(!g_memory_is_dedicated_server || server != 0);
-		return GetBaseAddress() + (g_memory_is_dedicated_server ? server : client);
+		
+	// NOTE:
+	// if server or client is equal to 0 then we pass the same address for both (ONLY ON RELEASE BUILDS)
+	// REASON:
+	// optimizes out a cmov or related instruction when building release whenever we call a function that doesn't have a dedi address specified
+#ifdef NDEBUG
+		const uintptr_t address = 
+			(g_memory_is_dedicated_server ? 
+				(server) != 0 ? server : client : 
+				(client) != 0 ? client : server
+			);
+#else
+		const uintptr_t address = (g_memory_is_dedicated_server ? server : client);
+#endif
+		return GetBaseAddress() + address;
 	}
 	
 	template <typename T = void*>
