@@ -26,24 +26,28 @@ void kablam_log_apply_patches(void)
 
 void kablam_log_initialize(void)
 {
-	wchar_t log_name[MAX_PATH] = L"reports\\";
-
-	// Make sure reports folder exists
-	CreateDirectoryW(log_name, NULL);
-
-	const wchar_t* instance_name = kablam_shell_argument_get(L"-instance:");
-	if (instance_name)
+	// Only log if -log parameter is present
+	if (kablam_shell_argument_index_get(L"-log") != NONE)
 	{
-		// Make sure instance folder exists
-		ustrncat(log_name, instance_name, NUMBEROF(log_name));
-		ustrncat(log_name, L"\\", NUMBEROF(log_name));
+		wchar_t log_name[MAX_PATH] = L"reports\\";
+
+		// Make sure reports folder exists
 		CreateDirectoryW(log_name, NULL);
+
+		const wchar_t* instance_name = kablam_shell_argument_get(L"-instance:");
+		if (instance_name)
+		{
+			// Make sure instance folder exists
+			ustrncat(log_name, instance_name, NUMBEROF(log_name));
+			ustrncat(log_name, L"\\", NUMBEROF(log_name));
+			CreateDirectoryW(log_name, NULL);
+		}
+
+		ustrncat(log_name, L"kablam.txt", NUMBEROF(log_name));
+
+		*Memory::GetAddress<bool*>(0x0, 0x4904E8) = true;	// Set logging to true
+		*Memory::GetAddress<_iobuf**>(0x0, 0x4904EC) = ufopen(log_name, L"a+b");
 	}
-
-	ustrncat(log_name, L"kablam.txt", NUMBEROF(log_name));
-
-	*Memory::GetAddress<bool*>(0x0, 0x4904E8) = true;	// Set logging to true
-	*Memory::GetAddress<_iobuf**>(0x0, 0x4904EC) = ufopen(log_name, L"a+b");
 	return;
 }
 
