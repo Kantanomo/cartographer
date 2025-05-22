@@ -10,6 +10,7 @@
 #include "math/math.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
@@ -136,6 +137,9 @@ bool shell_platform_initialize(void)
 	if (!is_dedi)
 	{
 		shell_windows_adjust_name();
+	
+		// TODO: remove this garbage
+		custom_language_initialize();
 	}
 	else
 	{
