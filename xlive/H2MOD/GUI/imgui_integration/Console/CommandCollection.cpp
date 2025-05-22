@@ -859,7 +859,7 @@ static int CommandCollection::invite(const std::vector<std::string>& tokens, Con
 		// Encode the data into hex string
 		for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
 		{
-			csprintf(&connect_string[2 * i], 2, "%02hhX", session_bytes[i]);
+			csprintf(&connect_string[2 * i], 3, "%02hhX", session_bytes[i]);
 		}
 
 		outputCb(StringFlag_None, "Invite code generated:");
