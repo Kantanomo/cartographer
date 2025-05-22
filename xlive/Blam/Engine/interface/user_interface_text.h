@@ -221,8 +221,8 @@ protected:
 public:
 	c_user_interface_text();
 
-	const real_rgb_color* get_color();
-	const int32 get_font();
+	const real_rgb_color* get_color(void) const;
+	int32 get_font(void) const;
 
 	void set_font(int32 font_type);
 	void set_pulsating(bool pulsating);

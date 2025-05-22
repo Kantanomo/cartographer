@@ -71,3 +71,7 @@ ASSERT_STRUCT_SIZE(c_kablam_command_send_msg, 260);
 /* prototypes */
 
 void kablam_apply_patches(void);
+
+int32 __cdecl kablam_shell_argument_index_get(const wchar_t* string);
+
+const wchar_t* __cdecl kablam_shell_argument_get(const wchar_t* string);

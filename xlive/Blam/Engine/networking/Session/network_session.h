@@ -61,6 +61,15 @@ enum e_network_session_mode
 	k_network_session_mode_count = 10
 };
 
+enum e_network_game_privacy : int32
+{
+	_network_game_privacy_open,
+	_network_game_privacy_gold,
+	_network_game_privacy_invite,
+	_network_game_privacy_closed,
+	k_network_game_privacy_count
+};
+
 /* constants */
 
 #define k_network_maximum_sessions 2
@@ -179,7 +188,7 @@ struct s_session_parameters
 	uint32 system_language_id;
 	bool dedicated_server;
 	char pad_1[3];
-	int32 party_privacy;
+	e_network_game_privacy party_privacy;
 	int32 max_peers;
 	int32 max_party_players;
 	int32 gap_4C84;

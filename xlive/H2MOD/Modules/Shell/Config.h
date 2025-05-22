@@ -5,7 +5,7 @@ void InitH2Config();
 void DeinitH2Config();
 void SaveH2Config();
 void ReadH2Config();
-bool config_use_instance_name(void);
+bool config_use_instance_name(const wchar_t** instance_name);
 
 #ifndef _CARTOGRAPHER_DLL_CONF
 // temporary config files 
@@ -51,7 +51,7 @@ extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
 extern bool H2Config_voice_chat;
 extern char H2Config_dedi_server_name[XUSER_NAME_SIZE];
-extern char H2Config_dedi_server_playlist[256];
+extern char H2Config_dedi_server_playlist[MAX_PATH];
 extern int H2Config_additional_pcr_time;
 extern bool H2Config_debug_log;
 extern int H2Config_debug_log_level;

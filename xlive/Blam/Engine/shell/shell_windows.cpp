@@ -41,8 +41,6 @@ wchar_t g_window_classname[64] = {};
 
 wchar_t g_window_name[64] = {};
 
-wchar_t g_shell_windows_instance_name[13];
-
 /* prototypes */
 
 static DWORD WINAPI timeGetTime_hook();
@@ -111,14 +109,20 @@ HWND* shell_windows_get_hwnd(void)
 
 bool shell_platform_initialize(void)
 {
+	const bool is_dedi = shell_is_dedicated_server();
+
 	shell_windows_calculate_instance_num();
 
 	shell_windows_initialize_arguments();
 
 	InitOnScreenDebugText();
 
-	InitH2Config();
-	PostH2Config();
+	// TODO: initialize the ini config in the same place between client and dedi 
+	if (!is_dedi)
+	{
+		InitH2Config();
+		PostH2Config();
+	}
 
 	startup_initialize_log_directories();
 
@@ -129,7 +133,7 @@ bool shell_platform_initialize(void)
 	}
 	shell_command_line_flag_set(_shell_command_line_flag_disable_voice_chat, true);			// ### TODO FIXME: voice-chat is disabled for now
 
-	if (!shell_is_dedicated_server())
+	if (!is_dedi)
 	{
 		shell_windows_adjust_name();
 	}
@@ -646,12 +650,6 @@ static void shell_windows_initialize_arguments(void)
 				/* g_depth_bias always NULL rather than taking any value from
 				shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
 				NopFill(Memory::GetAddress(0x269FD5), 8);
-			}
-			else if (is_dedicated_server && wcsstr(current_argument, L"-instance:") != NULL)
-			{
-				// Get instance number from the argument
-				const wchar_t* instance_name = current_argument + NUMBEROF(L"-instance:") - 1;
-				ustrncpy(g_shell_windows_instance_name, instance_name, NUMBEROF(g_shell_windows_instance_name));
 			}
 #ifdef _DEBUG
 			else if (_wcsnicmp(current_argument, L"-dev_flag:", 10) == 0)
