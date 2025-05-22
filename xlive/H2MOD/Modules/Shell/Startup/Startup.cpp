@@ -24,6 +24,7 @@ static const wchar_t k_appdata_dev_preview_path[] = L"DevPreview\\";
 
 namespace filesystem = std::filesystem;
 
+#ifndef SPDLOG_DISABLED
 // xLiveLess specific logger
 h2log *xlive_log = nullptr;
 
@@ -41,7 +42,7 @@ h2log *onscreendebug_log = nullptr;
 
 // Console logger, receives output from all loggers
 h2log *console_log = nullptr;
-
+#endif
 
 wchar_t g_h2_process_file_path[MAX_PATH];
 wchar_t g_h2_appdata_local_path[MAX_PATH];
@@ -194,6 +195,7 @@ void H2DedicatedServerStartup() {
 
 void startup_initialize_log_directories(void)
 {
+#ifndef SPDLOG_DISABLED
 	EnterCriticalSection(&log_section);
 
 	// prepare default log files if enabled, after we read the H2Config
@@ -214,6 +216,7 @@ void startup_initialize_log_directories(void)
 	LOG_DEBUG_NETWORK(DLL_VERSION_STR);
 
 	LeaveCriticalSection(&log_section);
+#endif
 	return;
 }
 

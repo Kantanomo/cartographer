@@ -252,10 +252,12 @@ static bool cheat_place_tag(const real_vector3d* forward, datum tag_index, const
 	else
 	{
 		object_force_inside_bsp(object_index, position, NONE);
+#ifdef OBJECT_OVERRIDE_ENABLED
 		if (shader_tag_index != NONE)
 		{
 			object_override_set_shader(object_index, shader_tag_index);
 		}
+#endif
 
 		if (object->object.object_type == _object_type_biped && ((unit_datum*)object_get_and_verify_type(object_index, _object_mask_biped))->unit.weapon_index == NONE)
 		{

@@ -9,17 +9,23 @@ Global
 		debug_llvm|x86 = debug_llvm|x86
 		debug_msvc|x86 = debug_msvc|x86
 		release_llvm|x86 = release_llvm|x86
+		release_min_llvm|x86 = release_min_llvm|x86
+		release_min_msvc|x86 = release_min_msvc|x86
 		release_msvc|x86 = release_msvc|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.debug_llvm|x86.ActiveCfg = Debug LLVM|Win32
-		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.debug_llvm|x86.Build.0 = Debug LLVM|Win32
-		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.debug_msvc|x86.ActiveCfg = Debug|Win32
-		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.debug_msvc|x86.Build.0 = Debug|Win32
-		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_llvm|x86.ActiveCfg = Release LLVM|Win32
-		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_llvm|x86.Build.0 = Release LLVM|Win32
-		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_msvc|x86.ActiveCfg = Release|Win32
-		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_msvc|x86.Build.0 = Release|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.debug_llvm|x86.ActiveCfg = debug_llvm|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.debug_llvm|x86.Build.0 = debug_llvm|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.debug_msvc|x86.ActiveCfg = debug_msvc|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.debug_msvc|x86.Build.0 = debug_msvc|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_llvm|x86.ActiveCfg = release_llvm|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_llvm|x86.Build.0 = release_llvm|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_min_llvm|x86.ActiveCfg = release_min_llvm|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_min_llvm|x86.Build.0 = release_min_llvm|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_min_msvc|x86.ActiveCfg = release_min_msvc|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_min_msvc|x86.Build.0 = release_min_msvc|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_msvc|x86.ActiveCfg = release_msvc|Win32
+		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_msvc|x86.Build.0 = release_msvc|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

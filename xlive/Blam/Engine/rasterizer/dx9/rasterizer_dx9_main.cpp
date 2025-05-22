@@ -288,7 +288,7 @@ int32* hardware_vertex_processing_get(void)
 
 bool __cdecl rasterizer_initialize(void)
 {
-	return INVOKE(0x0263359, 0x0, rasterizer_initialize);
+	return INVOKE(0x263359, 0x0, rasterizer_initialize);
 }
 
 bool __cdecl rasterizer_dx9_reset(bool create_window)
@@ -555,7 +555,10 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 
 			if (!d3d_present_parameters.SwapEffect)
 			{
+				// Introduced in Windows Vista and depreciated in Windows 8
+#if WINVER > 0x0600 && WINVER < 0x0602
 				DwmEnableComposition(0);
+#endif
 			}
 		}
 	}

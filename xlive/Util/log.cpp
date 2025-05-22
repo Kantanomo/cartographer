@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "log.h"
 
+#ifndef SPDLOG_DISABLED
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
@@ -81,3 +82,4 @@ h2log* h2log::create_console(const std::string &name, bool shouldCreateLog, int 
 	
 	return nullptr;
 }
+#endif
