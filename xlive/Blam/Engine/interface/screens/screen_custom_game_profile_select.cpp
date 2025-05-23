@@ -95,7 +95,7 @@ void c_custom_game_profile_list::handle_item_pressed_event(s_event_record** peve
 					return;
 				}
 
-				c_network_session* network_session;
+				c_network_session* network_session {};
 				network_life_cycle_in_squad_session(&network_session);
 
 				if(!network_session->established() || ENUMERATED_INDEX_IS_DEFAULT_SAVE(selected_item->enumerated_index))
@@ -163,7 +163,7 @@ void c_custom_game_profile_list::handle_item_pressed_event(s_event_record** peve
 				_vkbd_context_variant_name_entry,
 				saved_game_get_variant_file_type(ui_variant),
 				ui_variant->variant_name,
-				NUMBEROF(ui_variant->variant_name));
+				32);
 			return;
 		}
 		else if(saved_game_load_game_variant(new_variant_index, &variant))
@@ -176,17 +176,17 @@ void c_custom_game_profile_list::handle_item_pressed_event(s_event_record** peve
 			user_interface_construct_default_game_variant_from_file_type(ui_variant, this->save_game_type);
 			ui_load_virtual_keyboard_variant(
 				(*pevent)->controller,
-				_vkbd_context_variant_name_rename,
+				_vkbd_context_variant_name_entry,
 				saved_game_get_variant_file_type(ui_variant),
 				ui_variant->variant_name,
-				NUMBEROF(ui_variant->variant_name));
+				32);
 			return;
 		}
 	}
 
 	c_screen_error_dialog_ok::load_for_disk_result(this->m_controllers_mask, files_globals->saved_file_creation_result);
 
-	INVOKE_TYPE(0x251B7E, 0, void(__thiscall*)(c_custom_game_profile_list*, s_event_record**, datum*), this, pevent, pitem_index);
+	//INVOKE_TYPE(0x251B7E, 0, void(__thiscall*)(c_custom_game_profile_list*, s_event_record**, datum*), this, pevent, pitem_index);
 }
 
 void c_custom_game_profile_list::perform_save_type_search()

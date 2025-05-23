@@ -7,6 +7,7 @@
 #include "interface/hud_messaging.h"
 #include "main/game_preferences.h"
 #include "math/random_math.h"
+#include "sound/game_sound.h"
 #include "text/text_group.h"
 
 /* public code */
@@ -44,7 +45,14 @@ bool game_engine_has_teams()
 
 void game_engine_event_play_sound(datum sound, int32 delay_time, s_game_engine_event* event, bool is_announcer)
 {
-	INVOKE(0xD0F72, 0, game_engine_event_play_sound, sound, delay_time, event, is_announcer);
+	if (event->event_type == _multiplayer_event_response_headhunter_head_grabbed)
+	{
+		unspatialized_impulse_sound_new(sound, 1.0f);
+	}
+	else
+	{
+		INVOKE(0xD0F72, 0, game_engine_event_play_sound, sound, delay_time, event, is_announcer);
+	}
 }
 
 void game_engine_build_event_string(wchar_t* input, s_game_engine_event* event, int32 buffer_size, wchar_t* buffer)

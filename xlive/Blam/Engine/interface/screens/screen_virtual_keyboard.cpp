@@ -209,7 +209,18 @@ void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_t
 void ui_load_virtual_keyboard_variant(e_controller_index controller_index, e_vkbd_context_type type,
 	e_saved_game_file_type save_type, wchar_t* text, uint32 text_size)
 {
-	return INVOKE(0x23CAB2, 0, ui_load_virtual_keyboard_variant, controller_index, type, save_type, text, text_size);
+
+	s_screen_parameters virtual_keyboard_params;
+	virtual_keyboard_params.m_context = nullptr;
+	virtual_keyboard_params.data_new(0, 1 << controller_index, _user_interface_channel_type_keyboard, _window_4, c_screen_virtual_keyboard::load);
+	c_screen_virtual_keyboard* virtual_keyboard = (c_screen_virtual_keyboard*)virtual_keyboard_params.ui_screen_load_proc_exec();
+
+	virtual_keyboard->set_context(type);
+	virtual_keyboard->m_buffer_length = 32;
+
+	virtual_keyboard->set_input_string_buffer(text, text_size);
+	virtual_keyboard->m_saved_game_file_type = save_type;
+	//return INVOKE(0x23CAB2, 0, ui_load_virtual_keyboard_variant, controller_index, type, save_type, text, text_size);
 }
 
 typedef bool(__thiscall* t_load_player_profile_edit)(c_screen_virtual_keyboard*);

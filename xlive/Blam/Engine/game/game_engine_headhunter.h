@@ -16,16 +16,12 @@ public:
 	virtual bool setup() override;
 	virtual bool function_4();
 	virtual void send_game_start_event(datum player_index) override;
-	virtual void function_14(datum player_index) override;
 	virtual void swap_player_indices(uint32 old_index, uint32 new_index) override;
 	virtual void render_game_engine_hud_elements(uint32 user_index) override;
 	virtual real32 get_player_speed_modifier(datum player_index) override;
-	virtual void function_16(datum player_index) override;
 	virtual void player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index) override;
 	virtual bool player_can_interact_with_weapon(datum player_index, datum weapon_index) override;
-	virtual void function_33(datum player_index, void* unk) override;
 	virtual bool function_34(datum player_index, void* unk) override;
-	virtual bool function_35(int32 unk_index) override;
 	virtual void update() override;
 	virtual void set_simulation_baseline_data(int32 unused, void* state_data) override;
 	virtual void build_simulation_update(uint32* update_mask, int32 unused, void* state_data) override;

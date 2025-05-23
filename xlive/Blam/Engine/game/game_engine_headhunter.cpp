@@ -6,27 +6,21 @@
 #include "game_engine_util.h"
 #include "game_time.h"
 #include "camera/camera.h"
-#include "interface/hud.h"
 #include "interface/hud_definitions.h"
 #include "interface/new_hud.h"
 #include "interface/new_hud_definitions.h"
 #include "interface/user_interface_text.h"
 #include "items/weapons.h"
 #include "math/random_math.h"
-#include "models/models.h"
 #include "objects/objects.h"
 #include "objects/object_placement.h"
-#include "objects/scenery.h"
 #include "rasterizer/rasterizer_text.h"
-#include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "simulation/game_interface/simulation_game_engine_headhunter.h"
 #include "simulation/game_interface/simulation_game_entities.h"
 #include "simulation/game_interface/simulation_game_events.h"
-#include "tag_files/global_string_ids.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/draw_string.h"
-#include "text/font_cache.h"
 #include "units/bipeds.h"
 
 static c_headhunter_engine g_headhunter_engine;
@@ -84,6 +78,8 @@ bool c_headhunter_engine::setup()
 	skull_pickup_event->event = _multiplayer_event_response_headhunter_head_grabbed;
 
 	skull_pickup_event->audience = _multiplayer_event_response_audience_cause_player;
+
+	skull_pickup_event->primary_sound.sound_flags.set(_multiplayer_event_response_sound_announcer_sound, false);
 
 	datum ping_sound = tag_loaded(_tag_group_sound, "sound\\game_sfx\\multiplayer\\target_point_collected");
 	
@@ -149,7 +145,6 @@ bool c_headhunter_engine::function_4()
 	// instead of a hill being spawned at the start of a round, an intentional delay has been set so people can't speed run the point.
 	g_headhunter_engine_globals->m_hill_id = -1;
 	g_headhunter_engine_globals->m_ticks_till_hill_move = time_globals::seconds_to_ticks_round(15);
-	//g_headhunter_engine_globals->setup_points(g_headhunter_engine_globals->m_hill_id);
 
 	return true;
 }
@@ -160,11 +155,6 @@ void c_headhunter_engine::send_game_start_event(datum player_index)
 	game_engine_event_new(_multiplayer_event_response_game_type_headhunter, _multiplayer_event_response_headhunter_game_start, &event);
 	event.player_index = player_index;
 	game_engine_send_event(&event);
-}
-
-void c_headhunter_engine::function_14(datum player_index)
-{
-	c_king_engine::function_14(player_index);
 }
 
 void c_headhunter_engine::swap_player_indices(uint32 old_index, uint32 new_index)
@@ -199,11 +189,6 @@ real32 c_headhunter_engine::get_player_speed_modifier(datum player_index)
 	return 1.f;
 }
 
-void c_headhunter_engine::function_16(datum player_index)
-{
-	c_king_engine::function_16(player_index);
-}
-
 void c_headhunter_engine::player_killed(datum killing_player, datum killed_player, bool suicide, int32 unk_index)
 {
 	s_player* player = s_player::get(killed_player);
@@ -214,8 +199,6 @@ void c_headhunter_engine::player_killed(datum killing_player, datum killed_playe
 
 	if (biped_unit != NULL && IN_RANGE(player_index, 0, k_maximum_players))
 	{
-		
-
 		LOG_TRACE_GAME(L"[{}] {} Died dropping {} skulls", __FUNCTIONW__, player->properties->player_name, g_headhunter_engine_globals->m_player_skull_count[player_index] + 1);
 
 		object_placement_data placement_data;
@@ -223,7 +206,6 @@ void c_headhunter_engine::player_killed(datum killing_player, datum killed_playe
 		object_placement_data_new(&placement_data, g_ball_datum, -1, 0);
 
 		placement_data.position = biped_unit->object.position;
-
 
 		for (int32 i = 0; i < g_headhunter_engine_globals->m_player_skull_count[player_index] + 1; ++i)
 		{
@@ -292,11 +274,6 @@ bool c_headhunter_engine::player_can_interact_with_weapon(datum player_index, da
 	return c_king_engine::player_can_interact_with_weapon(player_index, weapon_index);
 }
 
-void c_headhunter_engine::function_33(datum player_index, void* unk)
-{
-	c_king_engine::function_33(player_index, unk);
-}
-
 bool c_headhunter_engine::function_34(datum player_index, void* unk)
 {
 	// reworks behavior of spawn zones based on if the game engine has teams
@@ -304,11 +281,6 @@ bool c_headhunter_engine::function_34(datum player_index, void* unk)
 	// the default behaviour for a game engine is to operate as if teams are enabled
 	// causing every player in a FFA match to spawn on top of each other in red team spawn zone
 	return game_engine_has_teams();
-}
-
-bool c_headhunter_engine::function_35(int32 unk_index)
-{
-	return c_king_engine::function_35(unk_index);
 }
 
 void c_headhunter_engine::update()
@@ -329,7 +301,6 @@ void c_headhunter_engine::update()
 			g_headhunter_engine_globals->m_players_in_hill = players_mask;
 			simulation_action_game_engine_globals_update(64);
 		}
-
 
 		c_headhunter_engine::update_scores();
 
@@ -391,8 +362,6 @@ void c_headhunter_engine::set_simulation_baseline_data(int32 unused, void* state
 void c_headhunter_engine::build_simulation_update(uint32* update_mask, int32 unused, void* state_data)
 {
 	s_headhunter_engine_state_data* game_state_data = (s_headhunter_engine_state_data*)state_data;
-
-	//c_king_engine::build_simulation_update(update_mask , unused, state_data);
 
 	uint32 out_mask = 0;
 
@@ -501,7 +470,7 @@ uint8 c_headhunter_engine::variant_get_max_heads_carried()
 		default:
 			{
 				DISPLAY_ASSERT("INVALID VARIANT SETTING FOR HEAD HUNTER HEADS CARRIED");
-				return 0;
+				return UINT8_MAX;
 			}
 	}
 }

@@ -116,7 +116,7 @@ ASSERT_STRUCT_SIZE(c_virtual_keyboard_button, 0x100);
 
 class c_screen_virtual_keyboard : protected c_screen_widget
 {
-protected:
+public:
 	e_vkbd_context_type m_context;
 	e_saved_game_file_type m_saved_game_file_type;
 	wchar_t m_buffer[256];
