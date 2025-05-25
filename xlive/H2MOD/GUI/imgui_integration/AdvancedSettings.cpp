@@ -603,74 +603,80 @@ namespace ImGuiHandler {
 						ImGui::PopItemWidth();
 					}
 					ImGui::NewLine();
-					ImGui::Text("Controller Layout");
+
+					ImGui::Text("Custom Controller Layout");
+					ImGui::Checkbox("##Custom Controller Layout", &g_advanced_settings_current_cartographer_profile->controller_custom_layout_enabled);
 					ImGui::NewLine();
-					ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
-					ImGui::NewLine();
-					ImGui::Columns(3, NULL, false);
-					for (auto i = 0; i < 14; i++)
+
+					if (g_advanced_settings_current_cartographer_profile->controller_custom_layout_enabled)
 					{
-						ImGui::Text(k_button_items[i]);
-						ImGui::PushItemWidth(ImGui::GetColumnWidth());
-
-						// 2 digit number + null terminator
-						char index_string[3];
-						csprintf(index_string, NUMBEROF(index_string), "%d", i);
-
-						c_static_string<8> label("##C_L");
-						label.append(index_string);
-						if (ImGui::Combo(label.get_string(), &g_button_placeholders[i], k_action_items, 14))
+						ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
+						ImGui::NewLine();
+						ImGui::Columns(3, NULL, false);
+						for (auto i = 0; i < 14; i++)
 						{
-							switch (k_button_values[i])
+							ImGui::Text(k_button_items[i]);
+							ImGui::PushItemWidth(ImGui::GetColumnWidth());
+
+							// 2 digit number + null terminator
+							char index_string[3];
+							csprintf(index_string, NUMBEROF(index_string), "%d", i);
+
+							c_static_string<8> label("##C_L");
+							label.append(index_string);
+							if (ImGui::Combo(label.get_string(), &g_button_placeholders[i], k_action_items, 14))
 							{
-							case XINPUT_GAMEPAD_DPAD_UP:
-								g_advanced_settings_current_cartographer_profile->custom_layout.DPAD_UP = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_DPAD_DOWN:
-								g_advanced_settings_current_cartographer_profile->custom_layout.DPAD_DOWN = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_DPAD_LEFT:
-								g_advanced_settings_current_cartographer_profile->custom_layout.DPAD_LEFT = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_DPAD_RIGHT:
-								g_advanced_settings_current_cartographer_profile->custom_layout.DPAD_RIGHT = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_START:
-								g_advanced_settings_current_cartographer_profile->custom_layout.START = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_BACK:
-								g_advanced_settings_current_cartographer_profile->custom_layout.BACK = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_LEFT_THUMB:
-								g_advanced_settings_current_cartographer_profile->custom_layout.LEFT_THUMB = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_RIGHT_THUMB:
-								g_advanced_settings_current_cartographer_profile->custom_layout.RIGHT_THUMB = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_LEFT_SHOULDER:
-								g_advanced_settings_current_cartographer_profile->custom_layout.LEFT_SHOULDER = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_RIGHT_SHOULDER:
-								g_advanced_settings_current_cartographer_profile->custom_layout.RIGHT_SHOULDER = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_A:
-								g_advanced_settings_current_cartographer_profile->custom_layout.A = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_B:
-								g_advanced_settings_current_cartographer_profile->custom_layout.B = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_X:
-								g_advanced_settings_current_cartographer_profile->custom_layout.X = k_button_values[g_button_placeholders[i]];
-								break;
-							case XINPUT_GAMEPAD_Y:
-								g_advanced_settings_current_cartographer_profile->custom_layout.Y = k_button_values[g_button_placeholders[i]];
-								break;
+								switch (k_button_values[i])
+								{
+								case XINPUT_GAMEPAD_DPAD_UP:
+									g_advanced_settings_current_cartographer_profile->custom_layout.DPAD_UP = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_DPAD_DOWN:
+									g_advanced_settings_current_cartographer_profile->custom_layout.DPAD_DOWN = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_DPAD_LEFT:
+									g_advanced_settings_current_cartographer_profile->custom_layout.DPAD_LEFT = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_DPAD_RIGHT:
+									g_advanced_settings_current_cartographer_profile->custom_layout.DPAD_RIGHT = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_START:
+									g_advanced_settings_current_cartographer_profile->custom_layout.START = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_BACK:
+									g_advanced_settings_current_cartographer_profile->custom_layout.BACK = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_LEFT_THUMB:
+									g_advanced_settings_current_cartographer_profile->custom_layout.LEFT_THUMB = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_RIGHT_THUMB:
+									g_advanced_settings_current_cartographer_profile->custom_layout.RIGHT_THUMB = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_LEFT_SHOULDER:
+									g_advanced_settings_current_cartographer_profile->custom_layout.LEFT_SHOULDER = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_RIGHT_SHOULDER:
+									g_advanced_settings_current_cartographer_profile->custom_layout.RIGHT_SHOULDER = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_A:
+									g_advanced_settings_current_cartographer_profile->custom_layout.A = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_B:
+									g_advanced_settings_current_cartographer_profile->custom_layout.B = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_X:
+									g_advanced_settings_current_cartographer_profile->custom_layout.X = k_button_values[g_button_placeholders[i]];
+									break;
+								case XINPUT_GAMEPAD_Y:
+									g_advanced_settings_current_cartographer_profile->custom_layout.Y = k_button_values[g_button_placeholders[i]];
+									break;
+								}
 							}
+							ImGui::PopItemWidth();
+							ImGui::NextColumn();
 						}
-						ImGui::PopItemWidth();
-						ImGui::NextColumn();
+						ImGui::Columns(1);
 					}
-					ImGui::Columns(1);
 				}
 			}
 			void HostSettings()

@@ -244,6 +244,7 @@ static void cartographer_player_profile_new(s_saved_game_cartographer_player_pro
 	settings->field_of_view = 78;
 	settings->vehicle_field_of_view = 78;
 	settings->static_first_person = false;
+	settings->controller_custom_layout_enabled = false;
 	settings->mouse_sensitivity = 0.f;
 	settings->raw_mouse_sensitivity = 25.f;
 	settings->mouse_uniform = false;
