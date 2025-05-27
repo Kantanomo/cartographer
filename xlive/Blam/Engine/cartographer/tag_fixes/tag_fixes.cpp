@@ -327,10 +327,10 @@ static void tag_fixes_split_screen_hud(void)
 				// if the bitmaps aren't redone uncomment out the if statement and they'll be generally fixed.
 				//if (bitmap_widget->widget_inputs.input_1 != hud_input_type_weapon_clip_ammo)
 				//{
-					bitmap_widget->halfscreen_offset.x *= 2;
-					bitmap_widget->halfscreen_offset.y *= 2;
-					bitmap_widget->quarterscreen_offset.x *= 2;
-					bitmap_widget->quarterscreen_offset.y *= 2;
+					bitmap_widget->screen_offsets[_screen_split_type_half].x *= 2;
+					bitmap_widget->screen_offsets[_screen_split_type_half].y *= 2;
+					bitmap_widget->screen_offsets[_screen_split_type_quarter].x *= 2;
+					bitmap_widget->screen_offsets[_screen_split_type_quarter].y *= 2;
 				//}
 				//else
 				//{
@@ -347,10 +347,10 @@ static void tag_fixes_split_screen_hud(void)
 			for (int32 i = 0; i < hud->text_widgets.count; ++i)
 			{
 				s_hud_text_widget_definition* text_widget = hud->text_widgets[i];
-				text_widget->halfscreen_offset.x *= 2;
-				text_widget->halfscreen_offset.y *= 2;
-				text_widget->quarterscreen_offset.x *= 2;
-				text_widget->quarterscreen_offset.y *= 2;
+				text_widget->screen_offsets[_screen_split_type_half].x *= 2;
+				text_widget->screen_offsets[_screen_split_type_half].y *= 2;
+				text_widget->screen_offsets[_screen_split_type_quarter].x *= 2;
+				text_widget->screen_offsets[_screen_split_type_quarter].y *= 2;
 			}
 
 			g_already_adjusted_blocks[g_adjusted_blocks_count++] = hud->text_widgets.data;
@@ -361,10 +361,10 @@ static void tag_fixes_split_screen_hud(void)
 			for (int32 i = 0; i < hud->screen_effect_widgets.count; ++i)
 			{
 				s_hud_screen_effect_widget_definition* effect_widget = hud->screen_effect_widgets[i];
-				effect_widget->halfscreen_offset.x *= 2;
-				effect_widget->halfscreen_offset.y *= 2;
-				effect_widget->quarterscreen_offset.x *= 2;
-				effect_widget->quarterscreen_offset.y *= 2;
+				effect_widget->screen_offsets[_screen_split_type_half].x *= 2;
+				effect_widget->screen_offsets[_screen_split_type_half].y *= 2;
+				effect_widget->screen_offsets[_screen_split_type_quarter].x *= 2;
+				effect_widget->screen_offsets[_screen_split_type_quarter].y *= 2;
 			}
 
 			g_already_adjusted_blocks[g_adjusted_blocks_count++] = hud->screen_effect_widgets.data;

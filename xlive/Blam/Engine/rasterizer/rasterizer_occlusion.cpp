@@ -7,7 +7,7 @@
 
 /* public code */
 
-void rasterizer_occlusion_initialize(void)
+void __cdecl rasterizer_occlusion_initialize(void)
 {
 	INVOKE(0x27E1E4, 0x0, rasterizer_occlusion_initialize);
 	return;

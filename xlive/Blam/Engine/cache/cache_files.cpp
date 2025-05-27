@@ -104,7 +104,7 @@ datum __cdecl tag_iterator_next(tag_iterator* itr)
 	return INVOKE(0x3172C, 0x255DC, tag_iterator_next, itr);
 }
 
-void cache_file_map_clear_all_failures(void)
+void __cdecl cache_file_map_clear_all_failures(void)
 {
 	INVOKE(0x64551, 0x4C5A8, cache_file_map_clear_all_failures);
 	return;

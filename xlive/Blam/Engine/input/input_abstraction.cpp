@@ -323,13 +323,13 @@ void __cdecl input_abstraction_get_default_preferences(s_gamepad_input_preferenc
 	return;
 }
 
-void input_abstraction_set_controller_settings_from_preferences(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings)
+void __cdecl input_abstraction_set_controller_settings_from_preferences(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings)
 {
 	INVOKE(0x61B62, 0, input_abstraction_set_controller_settings_from_preferences, preferences, controller_settings);
 	return;
 }
 
-void input_abstraction_set_preferences_from_controller_settings(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings)
+void __cdecl input_abstraction_set_preferences_from_controller_settings(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings)
 {
 	INVOKE(0x61AD0, 0, input_abstraction_set_preferences_from_controller_settings, preferences, controller_settings);
 	return;

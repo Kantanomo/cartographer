@@ -1,4 +1,6 @@
 #pragma once
+#include "new_hud_definitions.h"
+
 #include "game/game_engine_territories.h"
 #include "game/players.h"
 #include "math/color_math.h"
@@ -109,10 +111,14 @@ void new_hud_apply_patches(void);
 
 void should_draw_hud_override_set(bool flag);
 s_new_hud_engine_globals* get_new_hud_engine_globals(void);
-s_new_hud_globals_player_info* new_hud_engine_globals_get_player_data(int32 local_player_index);
-void new_hud_engine_globals_set_drawing_player_index(datum player_datum);
+s_new_hud_globals_player_info* __cdecl new_hud_engine_globals_get_player_data(int32 local_player_index);
+void __cdecl new_hud_engine_globals_set_drawing_player_index(datum player_datum);
 s_hud_scripted_globals* get_hud_scripted_globals(void);
 s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_user_index);
+
+void __cdecl new_hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_point);
+
+uint32 __cdecl new_hud_text_get_split_screen_font_type(e_hud_anchor anchor);
 
 // Checks if we shouldn't draw the hud
 bool new_hud_dont_draw(void);

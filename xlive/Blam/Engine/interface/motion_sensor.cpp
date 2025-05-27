@@ -157,7 +157,7 @@ void __cdecl motion_sensor_draw_screen(int32 local_render_user_index, int32 unus
 	}
 }
 
-void motion_sensor_render_update(real_point2d* position, real32 pulse)
+void __cdecl motion_sensor_render_update(real_point2d* position, real32 pulse)
 {
 	render_camera* global_camera = get_global_camera();
 

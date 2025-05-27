@@ -387,27 +387,28 @@ string_id rasterizer_settings_get_display_mode_string(e_rasterizer_window_mode d
 	return _string_id_empty_string;
 }
 
-void rasterizer_settings_get_display_option_resolution_string(int32 display_option_index, wchar_t* out_text, int32 out_text_max_length)
+void __cdecl rasterizer_settings_get_display_option_resolution_string(int32 display_option_index, wchar_t* out_text, int32 out_text_max_length)
 {
 	INVOKE(0x24FF65, 0x0, rasterizer_settings_get_display_option_resolution_string, display_option_index, out_text, out_text_max_length);
+	return;
 }
 
-string_id rasterizer_settings_get_brightness_level_string(int32 brightness_level)
+string_id __cdecl rasterizer_settings_get_brightness_level_string(int32 brightness_level)
 {
 	return INVOKE(0x250D30, 0x0, rasterizer_settings_get_brightness_level_string, brightness_level);
 }
 
-string_id rasterizer_settings_get_gamma_setting_string(int32 gamma)
+string_id __cdecl rasterizer_settings_get_gamma_setting_string(int32 gamma)
 {
 	return INVOKE(0x250ACD, 0x0, rasterizer_settings_get_gamma_setting_string, gamma);
 }
 
-string_id rasterizer_settings_get_anti_aliasing_string(int32 anti_aliasing)
+string_id __cdecl rasterizer_settings_get_anti_aliasing_string(int32 anti_aliasing)
 {
 	return INVOKE(0x25088E, 0x0, rasterizer_settings_get_anti_aliasing_string, anti_aliasing);
 }
 
-string_id rasterizer_settings_get_lod_setting_string(int32 level_of_detail)
+string_id __cdecl rasterizer_settings_get_lod_setting_string(int32 level_of_detail)
 {
 	return INVOKE(0x250419, 0x0, rasterizer_settings_get_lod_setting_string, level_of_detail);
 }

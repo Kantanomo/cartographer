@@ -67,7 +67,7 @@ __declspec(naked) void jmp_build_player_list()
 }
 #pragma endregion
 
-void* c_screen_network_squad_browser::load(s_screen_parameters* parameters)
+void* __cdecl c_screen_network_squad_browser::load(s_screen_parameters* parameters)
 {
 	return INVOKE(0x21A238, 0x0, c_screen_network_squad_browser::load, parameters);
 }

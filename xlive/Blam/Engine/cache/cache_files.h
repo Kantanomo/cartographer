@@ -163,7 +163,7 @@ tag_iterator* tag_iterator_new(tag_iterator* itr, e_tag_group type);
 
 datum __cdecl tag_iterator_next(tag_iterator* itr);
 
-void cache_file_map_clear_all_failures(void);
+void __cdecl cache_file_map_clear_all_failures(void);
 
 // Get tag data from tag index
 void* __cdecl tag_get_fast(datum tag_index);

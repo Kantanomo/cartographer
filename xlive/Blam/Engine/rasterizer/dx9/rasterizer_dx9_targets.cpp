@@ -560,7 +560,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 	return;
 }
 
-bool __cdecl rasterizer_target_get_resolution(e_rasterizer_target rasterizer_target, uint32* resolution_x, uint32* resolution_y)
+bool __cdecl rasterizer_target_get_resolution(int32 rasterizer_target, uint32* resolution_x, uint32* resolution_y)
 {
 	return INVOKE(0x280413, 0x0, rasterizer_target_get_resolution, rasterizer_target, resolution_x, resolution_y);
 }

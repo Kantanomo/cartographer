@@ -76,7 +76,9 @@ pixel32 real_argb_color_to_pixel32(const real_argb_color* color)
 
 void pixel32_to_real_rgb_color(pixel32 pixel_color, real_rgb_color* out_color)
 {
-	INVOKE(0x75FE2, 0, pixel32_to_real_rgb_color, pixel_color, out_color);
+	out_color->red = (real32)((pixel_color >> 16) & 255) / 255.f;
+	out_color->green = (real32)((pixel_color >> 8) & 255) / 255.f;
+	out_color->blue = (real32)((pixel_color >> 0) & 255) / 255.f;
 	return;
 }
 

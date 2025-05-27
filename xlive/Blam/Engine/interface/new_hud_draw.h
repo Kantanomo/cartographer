@@ -1,5 +1,4 @@
 #pragma once
-#include "new_hud_definitions.h"
 
 struct s_draw_hud_widget_input_results
 {
@@ -28,4 +27,14 @@ void new_hud_draw_apply_patches(void);
 
 void new_hud_draw_deinitialize(void);
 
-void hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_point);
+void __cdecl render_ingame_user_interface_hud_element(
+	real32 left,
+	real32 top,
+	int16 x,
+	int16 y,
+	real32 scale,
+	real32 rotation_rad,
+	datum bitmap_tag_index,
+	datum bitmap,
+	real_rectangle2d* bounds,
+	datum shader_tag_index);
