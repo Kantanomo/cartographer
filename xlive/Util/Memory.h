@@ -11,18 +11,18 @@ class Memory
 public:
 	static void Initialize();
 
-	static DWORD GetAddress()
+	static uintptr_t GetAddress()
 	{
 		return GetBaseAddress();
 	}
 
-	static DWORD GetAddress(DWORD client)
+	static uintptr_t GetAddress(uintptr_t client)
 	{
 		ASSERT(client != 0);
 		return GetBaseAddress() + client;
 	}
 
-	static DWORD GetAddress(DWORD client, DWORD server)
+	static uintptr_t GetAddress(uintptr_t client, uintptr_t server)
 	{
 		ASSERT(g_memory_is_dedicated_server || client != 0);
 		ASSERT(!g_memory_is_dedicated_server || server != 0);
@@ -32,50 +32,55 @@ public:
 	// REASON:
 	// optimizes out a cmov or related instruction when building release whenever we call a function that doesn't have a dedi address specified
 #ifdef NDEBUG
-		const uintptr_t address = 
-			(g_memory_is_dedicated_server ? 
-				(server) != 0 ? server : client : 
-				(client) != 0 ? client : server
-			);
-#else
-		const uintptr_t address = (g_memory_is_dedicated_server ? server : client);
+		// FIXME: Enabling this will break things, there's some form of corruption in the project that gets triggered when this optimization is used
+		/*
+		if (server == 0)
+		{
+			server = client;
+		}
+		else if (client == 0)
+		{
+			client = server;
+		}
+		*/
 #endif
+		const uintptr_t address = g_memory_is_dedicated_server ? server : client;
 		return GetBaseAddress() + address;
 	}
 	
 	template <typename T = void*>
-	static T GetAddress(DWORD client)
+	static T GetAddress(uintptr_t client)
 	{
-		return reinterpret_cast<T>((DWORD)GetAddress(client));
+		return reinterpret_cast<T>((uintptr_t)GetAddress(client));
 	}
 
 	template <typename T = void*>
-	static T GetAddress(DWORD client, DWORD server)
+	static T GetAddress(uintptr_t client, uintptr_t server)
 	{
-		return reinterpret_cast<T>((DWORD)GetAddress(client, server));
+		return reinterpret_cast<T>((uintptr_t)GetAddress(client, server));
 	}
 
-	static DWORD GetAddressRelative(DWORD client, DWORD server = 0)
+	static uintptr_t GetAddressRelative(uintptr_t client, uintptr_t server = 0)
 	{
 		return GetAddress(client - BASE_IMAGE_ADDRESS_HALO2, server - BASE_IMAGE_ADDRESS_H2SERVER);
 	}
 
 	template <typename T = void*>
-	static T GetAddressRelative(DWORD client, DWORD server = 0)
+	static T GetAddressRelative(uintptr_t client, uintptr_t server = 0)
 	{
-		return reinterpret_cast<T>((DWORD)GetAddress(client - BASE_IMAGE_ADDRESS_HALO2, server - BASE_IMAGE_ADDRESS_H2SERVER));
+		return reinterpret_cast<T>((uintptr_t)GetAddress(client - BASE_IMAGE_ADDRESS_HALO2, server - BASE_IMAGE_ADDRESS_H2SERVER));
 	}
 
-	static void SetBaseAddress(DWORD base, bool isDedicatedServer)
+	static void SetBaseAddress(uintptr_t base, bool isDedicatedServer)
 	{
 		baseAddress = base;
 		g_memory_is_dedicated_server = isDedicatedServer;
 	}
 
 	// gets base address
-	static DWORD GetBaseAddress() { return baseAddress; }
+	static uintptr_t GetBaseAddress() { return baseAddress; }
 
-	static DWORD baseAddress;
+	static uintptr_t baseAddress;
 	static bool g_memory_is_dedicated_server;
 };
 

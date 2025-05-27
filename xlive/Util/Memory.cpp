@@ -15,7 +15,7 @@ struct ProcessInfo
 	H2Type process_type;
 };
 
-DWORD Memory::baseAddress;
+uintptr_t Memory::baseAddress;
 bool Memory::g_memory_is_dedicated_server;
 
 ProcessInfo game_info;
