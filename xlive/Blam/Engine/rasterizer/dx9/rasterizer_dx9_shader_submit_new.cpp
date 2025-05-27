@@ -320,14 +320,16 @@ void __cdecl rasterizer_shader_submit(datum shader_index, int32 a2, int32 render
 	return;
 }
 
-void rasterizer_flags_unknown_function_1()
+void __cdecl rasterizer_flags_unknown_function_1()
 {
 	INVOKE(0x2664EA, 0, rasterizer_flags_unknown_function_1);
+	return;
 }
 
-void rasterizer_flags_unknown_function_2(int32* a1)
+void __cdecl rasterizer_flags_unknown_function_2(int32* a1)
 {
 	INVOKE(0x266415, 0, rasterizer_flags_unknown_function_2, a1);
+	return;
 }
 
 int32* rasterizer_unknown_shader_submit_unknown_value_get()

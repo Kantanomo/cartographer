@@ -44,6 +44,6 @@ bool cinematic_is_running(void);
 
 bool cinematic_in_progress(void);
 
-void cinematics_draw_line(rectangle2d* points, pixel32 rect_color);
+void __cdecl cinematics_draw_line(rectangle2d* points, pixel32 rect_color);
 
 void cinematics_apply_patches(void);

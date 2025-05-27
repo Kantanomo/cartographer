@@ -14,12 +14,12 @@ int32 __cdecl user_interface_globals_get_game_difficulty()
 	return INVOKE(0x209E98, 0x0, user_interface_globals_get_game_difficulty);
 }
 
-int32 user_interface_globals_get_edit_player_profile_index()
+int32 __cdecl user_interface_globals_get_edit_player_profile_index()
 {
 	return INVOKE(0x209BA3, 0, user_interface_globals_get_edit_player_profile_index);
 }
 
-s_saved_game_player_profile* user_interface_globals_get_edit_player_profile()
+s_saved_game_player_profile* __cdecl user_interface_globals_get_edit_player_profile()
 {
 	return INVOKE(0x209B9D, 0, user_interface_globals_get_edit_player_profile);
 }

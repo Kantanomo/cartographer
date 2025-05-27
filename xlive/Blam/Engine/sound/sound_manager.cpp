@@ -7,7 +7,7 @@ void __cdecl sound_initialize(void)
 	return;
 }
 
-void sound_idle()
+void __cdecl sound_idle()
 {
 	INVOKE(0x2D9B2, 0, sound_idle);
 }

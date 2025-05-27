@@ -309,7 +309,7 @@ void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 u
 	return;
 }
 
-real_matrix4x3* first_person_weapon_get_relative_node_matrix(int32 user_index, datum weapon_index, int16 node_index)
+real_matrix4x3* __cdecl first_person_weapon_get_relative_node_matrix(int32 user_index, datum weapon_index, int16 node_index)
 {
 	return INVOKE(0x228C6F, 0, first_person_weapon_get_relative_node_matrix, user_index, weapon_index, node_index);
 }

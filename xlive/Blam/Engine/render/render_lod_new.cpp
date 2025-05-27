@@ -31,12 +31,12 @@ int8 render_object_cache_get_level_of_detail(datum object_index)
     return result;
 }
 
-int8* render_object_cache_get_unk1(datum object_index)
+int8* __cdecl render_object_cache_get_unk1(datum object_index)
 {
     return INVOKE(0x196322, 0x0, render_object_cache_get_unk1, object_index);
 }
 
-s_render_cache_storage* render_object_cache_get_render_state(datum object_index)
+s_render_cache_storage* __cdecl render_object_cache_get_render_state(datum object_index)
 {
     return INVOKE(0x196397, 0x0, render_object_cache_get_render_state, object_index);
 }
@@ -55,7 +55,7 @@ bool render_object_cache_storage_is_object_cached(s_render_cache_storage* storag
     return result;
 }
 
-void render_object_update_change_colors(datum object_index, bool a2)
+void __cdecl render_object_update_change_colors(datum object_index, bool a2)
 {
     INVOKE(0x195F91, 0x0, render_object_update_change_colors, object_index, a2);
     return;
@@ -123,7 +123,7 @@ bool __cdecl sub_59D024_to_usercall(
 }
 #pragma warning( pop ) 
 
-int32 sub_77DCF6_get_unk_count(datum model_index, int32 level_of_detail, uint8* region_section_indices)
+int32 __cdecl sub_77DCF6_get_unk_count(datum model_index, int32 level_of_detail, uint8* region_section_indices)
 {
     return INVOKE(0x37DCF6, 0x0, sub_77DCF6_get_unk_count, model_index, level_of_detail, region_section_indices);
 }

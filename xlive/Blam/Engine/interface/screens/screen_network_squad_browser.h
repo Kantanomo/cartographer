@@ -78,7 +78,7 @@ public:
 
 	void build_players_list_fix(c_player_widget_representation* representations, int32 player_count);
 
-	static void* load(s_screen_parameters* parameters);
+	static void* __cdecl load(s_screen_parameters* parameters);
 	static void apply_patches();
 };
 ASSERT_STRUCT_SIZE(c_screen_network_squad_browser, 0x1F0C);

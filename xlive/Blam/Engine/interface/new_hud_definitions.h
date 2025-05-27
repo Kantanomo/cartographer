@@ -1,5 +1,7 @@
 #pragma once
 #include "math/function_definitions.h"
+#include "memory/static_arrays.h"
+#include "render/render.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_reference.h"
 #include "text/text.h"
@@ -326,7 +328,7 @@ struct s_hud_widget_state_definition
 	e_widget_state_game_engine_state_flags yes_game_engine_state_flags;
 
 	e_widget_state_unit_flags no_unit_flags;
-	c_flags_no_init<e_widget_state_extra_flags, uint16, k_widget_state_weapon_extra_flag_count> no_extra_flags;
+	e_widget_state_extra_flags no_extra_flags;
 	e_widget_state_weapon_flags no_weapon_flags;
 	e_widget_state_game_engine_state_flags no_game_engine_state_flags;
 
@@ -390,17 +392,12 @@ struct s_hud_bitmap_widget_definition
 	tag_reference bitmap;    // bitm
 	tag_reference shader;    // shad
 
-	char fullscreen_sequence_index;
-	char halfscreen_sequence_index;
-	char quarterscreen_sequence_index;
-	char pad;
-	point2d fullscreen_offset;
-	point2d halfscreen_offset;
-	point2d quarterscreen_offset;
+	int8 screen_sequence_indices[k_split_screen_type_count];
+	int8 pad;
 
-	real_point2d fullscreen_registration_point;
-	real_point2d halfscreen_registration_point;
-	real_point2d quarterscreen_registration_point;
+	point2d screen_offsets[k_split_screen_type_count];
+
+	real_point2d registration_points[k_split_screen_type_count];
 	tag_block<s_hud_widget_effect_definition> effect;
 
 
@@ -435,18 +432,13 @@ struct s_hud_text_widget_definition
 	tag_reference shader;   // shad
 	string_id string;
 	e_text_justification justification;
-	short pad;
+	int16 pad;
 
-	e_font_index fullscreen_font_index;
-	e_font_index halfscreen_font_index;
-	e_font_index quarterscreen_font_index;
-	byte pad1;
-	float fullscreen_scale;
-	float halfscreen_scale;
-	float quarterscreen_scale;
-	point2d fullscreen_offset;
-	point2d halfscreen_offset;
-	point2d quarterscreen_offset;
+	e_font_index screen_font_indices[k_split_screen_type_count];
+	int8 pad1;
+
+	real32 screen_scales[k_split_screen_type_count];
+	point2d screen_offsets[k_split_screen_type_count];
 	tag_block<s_hud_widget_effect_definition> effect;
 };
 ASSERT_STRUCT_SIZE(s_hud_text_widget_definition, 84);
@@ -487,13 +479,10 @@ struct s_hud_screen_effect_widget_definition
 	tag_reference fullscreen_screen_effect; // egor
 	s_screen_effect_bonus_struct_block splitscreen_screen_effects;  // waa
 
-	char fullscreen_sequence_index;
-	char halfscreen_sequence_index;
-	char quarterscreen_sequence_index;
-	char pad;
-	point2d fullscreen_offset;
-	point2d halfscreen_offset;
-	point2d quarterscreen_offset;
+	int8 screen_sequence_indices[k_split_screen_type_count];
+	int8 pad;
+
+	point2d screen_offsets[k_split_screen_type_count];
 };
 ASSERT_STRUCT_SIZE(s_hud_screen_effect_widget_definition, 80);
 

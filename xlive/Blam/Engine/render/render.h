@@ -92,18 +92,6 @@ extern bool render_lens_flares_enabled;
 
 /* public code */
 
-bool __cdecl render_ingame_user_interface_hud_element_hook(
-	real32 left,
-	real32 top,
-	int16 x,
-	int16 y,
-	real32 scale,
-	real32 rotation_rad,
-	datum bitmap_tag_index,
-	datum bitmap,
-	real_rectangle2d* bounds,
-	datum shader_tag_index);
-
 void render_apply_patches(void);
 
 window_bound* get_user_window_bounds(int32 user_index);

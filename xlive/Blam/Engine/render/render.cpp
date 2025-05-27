@@ -37,27 +37,6 @@
 #include "structures/structures.h"
 #include "widgets/liquid.h"
 
-/* type definitions */
-
-typedef bool(__cdecl* t_render_ingame_user_interface_hud_element)(
-	real32 left,
-	real32 top,
-	int16 x,
-	int16 y,
-	real32 scale,
-	real32 rotation_rad,
-	datum bitmap_tag_index,
-	datum bitmap,
-	real_rectangle2d* bounds,
-	datum shader_tag_index);
-
-typedef bool(__cdecl* t_render_ingame_user_interface_hud_indicators_element_hook)(
-	int32* a1,
-	datum tag_index,
-	datum bitmap_index,
-	int32* a4,
-	datum shader_index);
-
 /* globals */
 
 bool g_render_layer_view_4 = false;
@@ -69,9 +48,6 @@ bool render_decals_enabled = true;
 bool render_lens_flares_enabled = true;
 bool render_patchy_fog_enabled = true;
 bool render_water_enabled = true;
-
-t_render_ingame_user_interface_hud_element p_draw_ingame_user_interface_hud_element;
-t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_interface_hud_indicators_element;
 
 e_controller_index g_render_current_controller_index = _controller_index_0;
 uint32 g_render_current_user_index = 0;
@@ -93,13 +69,6 @@ int32* global_sky_index_get(void);
 s_scenario_fog_result* global_fog_result_get(void);
 bool* global_byte_4E6938_get(void);
 void __cdecl rasterizer_render_scene(bool is_texture_camera);
-
-bool __cdecl render_ingame_user_interface_hud_indicators_element_hook(
-	int32* a1,
-	datum tag_index,
-	datum bitmap_index,
-	int32* a4,
-	datum shader_index);
 
 void render_view(
 	real_rectangle2d* frustum_bounds,
@@ -138,9 +107,6 @@ void render_apply_patches(void)
 {
 	PatchCall(Memory::GetAddress(0x19224A), render_window);
 	PatchCall(Memory::GetAddress(0x19DA7C), render_window);
-
-	DETOUR_ATTACH(p_draw_ingame_user_interface_hud_element, Memory::GetAddress<t_render_ingame_user_interface_hud_element>(0x221E3B), render_ingame_user_interface_hud_element_hook);
-	DETOUR_ATTACH(p_render_ingame_user_interface_hud_indicators_element, Memory::GetAddress<t_render_ingame_user_interface_hud_indicators_element_hook>(0x221C77), render_ingame_user_interface_hud_indicators_element_hook);
 	return;
 }
 
@@ -808,78 +774,6 @@ void __cdecl rasterizer_render_scene(bool is_texture_camera)
 {
 	INVOKE(0x25F015, 0x0, rasterizer_render_scene, is_texture_camera);
 	return;
-}
-
-void rasterizer_setup_2d_vertex_shader_user_interface_constants()
-{
-	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
-
-	real_vector4d vc[5];
-	int16 width, height;
-
-	render_camera* global_camera = get_global_camera();
-
-	rectangle2d screen_bounds = global_camera->viewport_bounds;
-	width = rectangle2d_width(&screen_bounds);
-	height = rectangle2d_height(&screen_bounds);
-
-	// vertex shaders use normalized device coordinates system (NDC)
-	vc[0].i = 2.0f / (real32)width; // x
-	vc[0].j = 0.0f;
-	vc[0].k = 0.0f;
-	vc[0].l = -(1.0f / (real32)width + 1.0f) - ((real32)screen_bounds.left * 2.0f / width); // offset from x
-
-	vc[1].i = 0.0f;
-	vc[1].j = -(2.0f / (real32)height); // y
-	vc[1].k = 0.0f;
-	vc[1].l = (1.0f / (real32)height + 1.0f) + ((real32)screen_bounds.top * 2.0f / height); // offset from y
-
-	vc[2].i = 0.0f;
-	vc[2].j = 0.0f;
-	vc[2].k = 0.0f; // z
-	vc[2].l = 0.5f; // acts as an offset, facing (<=1.0f is towards the viewport, above 1.0f facing from the viewport)
-
-	vc[3].i = 0.0f;
-	vc[3].j = 0.0f;
-	vc[3].k = 0.0f;
-	vc[3].l = 1.0f; // w scaling component
-
-	// the c181 register seems unused?
-	vc[4].i = 0.0f;
-	vc[4].j = 0.0f;
-	vc[4].k = 0.0f;
-	vc[4].l = 0.0f;
-
-	// avoid unnecessary API calls by testing the user mode memory cache
-	if (rasterizer_get_main_vertex_shader_cache()->test_cache(177, vc, NUMBEROF(vc)))
-	{
-		global_d3d_device->SetVertexShaderConstantF(177, (const real32*)vc, NUMBEROF(vc));
-	}
-	return;
-}
-
-// hud fixes 
-
-bool __cdecl render_ingame_user_interface_hud_element_hook(
-	real32 left,
-	real32 top,
-	int16 x,
-	int16 y,
-	real32 scale,
-	real32 rotation_rad,
-	datum bitmap_tag_index,
-	datum bitmap,
-	real_rectangle2d* bounds,
-	datum shader_tag_index)
-{
-	rasterizer_setup_2d_vertex_shader_user_interface_constants();
-	return p_draw_ingame_user_interface_hud_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, bounds, shader_tag_index);
-}
-
-bool __cdecl render_ingame_user_interface_hud_indicators_element_hook(int32* a1, datum tag_index, datum bitmap_index, int32* a4, datum shader_index)
-{
-	rasterizer_setup_2d_vertex_shader_user_interface_constants();
-	return p_render_ingame_user_interface_hud_indicators_element(a1, tag_index, bitmap_index, a4, shader_index);
 }
 
 void render_view(

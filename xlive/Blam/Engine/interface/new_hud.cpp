@@ -46,14 +46,15 @@ s_new_hud_engine_globals* get_new_hud_engine_globals(void)
 	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4, 0x99E93C);
 }
 
-s_new_hud_globals_player_info* new_hud_engine_globals_get_player_data(int32 local_player_index)
+s_new_hud_globals_player_info* __cdecl new_hud_engine_globals_get_player_data(int32 local_player_index)
 {
 	return INVOKE(0x2237ED, 0, new_hud_engine_globals_get_player_data, local_player_index);
 }
 
-void new_hud_engine_globals_set_drawing_player_index(datum player_datum)
+void __cdecl new_hud_engine_globals_set_drawing_player_index(datum player_datum)
 {
 	INVOKE(0x224B53, 0, new_hud_engine_globals_set_drawing_player_index, player_datum);
+	return;
 }
 
 s_hud_scripted_globals* get_hud_scripted_globals(void)
@@ -64,6 +65,17 @@ s_hud_scripted_globals* get_hud_scripted_globals(void)
 s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_user_index)
 {
 	return &Memory::GetAddress<s_new_hud_temporary_user_state*>(0x9766D0, 0)[local_user_index];
+}
+
+void __cdecl new_hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_point)
+{
+	INVOKE(0x223969, 0, new_hud_widget_anchor_calculate_point, anchor, out_point);
+	return;
+}
+
+uint32 __cdecl new_hud_text_get_split_screen_font_type(e_hud_anchor anchor)
+{
+	return INVOKE(0x224030, 0, new_hud_text_get_split_screen_font_type, anchor);
 }
 
 bool new_hud_dont_draw(void)

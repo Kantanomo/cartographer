@@ -124,7 +124,7 @@ void initialize_runtime_sound_gestalt_definition()
 		if(global_sound_gestalt->buffer)
 			CSERIES_FREE(global_sound_gestalt->buffer - *(int*)(global_sound_gestalt->buffer - 4));
 
-		csmemset(&global_sound_gestalt, 0, sizeof(runtime_global_sound_gestalt));
+		csmemset(global_sound_gestalt, 0, sizeof(runtime_global_sound_gestalt));
 	}
 
 	if(game_globals->sound_globals.count)

@@ -401,7 +401,7 @@ static void __cdecl show_fatal_error(int32 error_id)
 	return;
 }
 
-static void shell_disable_cursor()
+static void __cdecl shell_disable_cursor()
 {
 	if (g_custom_mouse_cursor_enabled)
 	{
@@ -410,7 +410,7 @@ static void shell_disable_cursor()
 	}
 }
 
-static void shell_enable_cursor()
+static void __cdecl shell_enable_cursor()
 {
 	if (!g_custom_mouse_cursor_enabled)
 	{

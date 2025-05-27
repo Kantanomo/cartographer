@@ -11,15 +11,38 @@
 #include "camera/camera.h"
 
 #include "game/players.h"
+#include "rasterizer/dx9/rasterizer_dx9.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "rasterizer/rasterizer_text.h"
 #include "render/render.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "text/draw_string.h"
 
-/* globals */
+/* type definitions */
 
-static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
+typedef void(__cdecl* t_render_ingame_user_interface_hud_element)(
+	real32 left,
+	real32 top,
+	int16 x,
+	int16 y,
+	real32 scale,
+	real32 rotation_rad,
+	datum bitmap_tag_index,
+	datum bitmap,
+	real_rectangle2d* bounds,
+	datum shader_tag_index);
+
+typedef void(__cdecl* t_render_ingame_user_interface_hud_indicators_element_hook)(
+	int32* a1,
+	datum tag_index,
+	datum bitmap_index,
+	int32* a4,
+	datum shader_index);
+
+/* constants */
+
+static const pixel32 k_draw_hud_bitmap_widget_shield_pixel_colors[9]
 {
 	D3DCOLOR_ARGB(0, 0, 0, 0),
 	D3DCOLOR_ARGB(0, 255, 0, 0),
@@ -32,12 +55,23 @@ static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
 	D3DCOLOR_ARGB(0, 0,120,240),
 };
 
+/* globals */
+
+static t_render_ingame_user_interface_hud_element p_draw_ingame_user_interface_hud_element;
+static t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_interface_hud_indicators_element;
+
 // storage for bitmaps that contain crosshairs
 uint32 g_draw_hud_crosshair_bitmap_cache_count;
 datum* g_draw_hud_crosshair_bitmap_cache;
 
 // k_number_of_users, we have 4 bits left to spare in this value
 uint8 g_draw_hud_user_draw_player_indicators_mask;
+
+/* prototypes */
+
+static void rasterizer_setup_2d_vertex_shader_user_interface_constants(void);
+
+static void __cdecl render_ingame_user_interface_hud_indicators_element_hook(int32* a1, datum tag_index, datum bitmap_index, int32* a4, datum shader_index);
 
 /* private code */
 
@@ -75,22 +109,7 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 	// If returned bitmap index is NONE the draw call will exit early.
 	*out_bitmap_index = NONE;
 
-	int32 sequence_index = 0;
-
-	switch (get_screen_split_type(local_render_user_index))
-	{
-	case _screen_split_type_full:
-		sequence_index = bitmap_widget->fullscreen_sequence_index;
-		break;
-	case _screen_split_type_half:
-		sequence_index = bitmap_widget->halfscreen_sequence_index;
-		break;
-	case _screen_split_type_quarter:
-		sequence_index = bitmap_widget->quarterscreen_sequence_index;
-		break;
-	default:
-		sequence_index = bitmap_widget->fullscreen_sequence_index;
-	}
+	const int32 sequence_index = bitmap_widget->screen_sequence_indices[get_screen_split_type(local_render_user_index)];
 
 	if (bitmap_widget->shader.index == NONE || bitmap_widget->bitmap.index == NONE || sequence_index < 0)
 		return;
@@ -140,10 +159,12 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 
 	int8 sprite_index = 0;
 	if (bitmap_sequence->sprites.count > 1 && player_user_is_elite_or_dervish(local_render_user_index))
+	{
 		sprite_index = 1;
+	}
 
-	bitmap_group_sprite* bitmap_sprite = bitmap_sequence->sprites[sprite_index];
-	bitmap_data* bitmap_data = bitmap->bitmaps[bitmap_sprite->bitmap_index];
+	const bitmap_group_sprite* bitmap_sprite = bitmap_sequence->sprites[sprite_index];
+	const bitmap_data* bitmap_data = bitmap->bitmaps[bitmap_sprite->bitmap_index];
 
 	*out_width_pixels = bitmap_data->width;
 	*out_height_pixels = bitmap_data->height;
@@ -152,6 +173,7 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 	bounds->y1 = bitmap_sprite->bounds.y1;
 	bounds->x0 = bitmap_sprite->bounds.x0;
 	bounds->x1 = bitmap_sprite->bounds.x1;
+	return;
 }
 
 real32 __cdecl draw_hud_widget_get_value(int32 unused, string_id input_name)
@@ -167,6 +189,7 @@ void hud_widget_effect_evaluate(uint32 local_render_user_index, s_new_hud_tempor
 		const real32 theta_result = widget_effect->theta.function.evaluate(theta_value, 1.f);
 		*out_theta += widget_effect->theta.function.unknown_post_evaluate_function(theta_result);
 	}
+
 	if (out_offset && widget_effect->flags.test(hud_widget_effect_flag_apply_offset))
 	{
 		ASSERT(out_scale);
@@ -180,6 +203,7 @@ void hud_widget_effect_evaluate(uint32 local_render_user_index, s_new_hud_tempor
 		out_offset->x += out_scale->x * widget_effect->horizontal_offset.function.unknown_post_evaluate_function(horizontal_result);
 		out_offset->y += out_scale->y * widget_effect->vertical_offset.function.unknown_post_evaluate_function(vertical_result);
 	}
+
 	if (out_scale && widget_effect->flags.test(hud_widget_effect_flag_apply_scale))
 	{
 		const real32 horizontal_value = draw_hud_widget_get_value(NONE, widget_effect->horizontal_scale.input_name);
@@ -191,11 +215,6 @@ void hud_widget_effect_evaluate(uint32 local_render_user_index, s_new_hud_tempor
 		out_scale->x *= widget_effect->horizontal_scale.function.unknown_post_evaluate_function(horizontal_result);
 		out_scale->y *= widget_effect->vertical_scale.function.unknown_post_evaluate_function(vertical_result);
 	}
-}
-
-void hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_point)
-{
-	INVOKE(0x223969, 0, hud_widget_anchor_calculate_point, anchor, out_point);
 	return;
 }
 
@@ -215,12 +234,12 @@ bool draw_hud_bitmap_is_crosshair(datum bitmap_datum)
 	return result;
 }
 
-void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_temporary_user_state* user_state, s_hud_bitmap_widget_definition* bitmap_widget, real32* widget_function_results)
+void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_temporary_user_state* user_state, s_hud_bitmap_widget_definition* bitmap_widget, s_draw_hud_widget_input_results* widget_function_results)
 {
 	if (bitmap_widget->bitmap.index == NONE || bitmap_widget->shader.index == NONE)
 		return;
 
-	real_rectangle2d bitmap_bounds{};
+	real_rectangle2d bitmap_bounds;
 	int16 bitmap_index = NONE;
 	int16 bitmap_width = 0;
 	int16 bitmap_height = 0;
@@ -231,15 +250,16 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 		return;
 
 	s_draw_hud_widget_input_results* hud_input_results = global_hud_draw_widget_function_results_get();
+	*hud_input_results = *widget_function_results;
 
-	memcpy(hud_input_results, widget_function_results, sizeof(real32) * 4);
-
-	real_point2d offset_result{ 0, 0 };
-	real_point2d scale_result{ 1.f, 1.f };
-	real32 theta_result = 0;
+	real_point2d offset_result = {};
+	real_point2d scale_result = { 1.f, 1.f };
+	real32 theta_result = 0.f;
 
 	if (bitmap_widget->effect.count > 0)
+	{
 		hud_widget_effect_evaluate(local_render_user_index, user_state, bitmap_widget->effect[0], &offset_result, &scale_result, &theta_result);
+	}
 
 	bitmap_width = (int16)(bitmap_width * scale_result.x);
 	bitmap_height = (int16)(bitmap_height * scale_result.y);
@@ -248,7 +268,7 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 
 	if (bitmap_widget->anchor == _hud_anchor_crosshair)
 	{
-		if(draw_hud_bitmap_is_crosshair(bitmap_widget->bitmap.index))
+		if (draw_hud_bitmap_is_crosshair(bitmap_widget->bitmap.index))
 		{
 			s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(local_render_user_index);
 			hud_scale = *get_secondary_hud_scale() * profile_settings->crosshair_scale;
@@ -259,52 +279,40 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 		}
 	}
 
-	real_point2d anchor_point{};
+	real_point2d anchor_point;
+	new_hud_widget_anchor_calculate_point(bitmap_widget->anchor, &anchor_point);
 
-	hud_widget_anchor_calculate_point(bitmap_widget->anchor, &anchor_point);
+	const point2d screen_offset = bitmap_widget->screen_offsets[get_screen_split_type(local_render_user_index)];
+	const real_point2d registration_point = bitmap_widget->registration_points[get_screen_split_type(local_render_user_index)];
+	const real_point2d bitmap_size{ (real32)bitmap_width, (real32)bitmap_height };
 
-	point2d screen_offset;
-	real_point2d registration_point;
-
-	switch (get_screen_split_type(local_render_user_index))
+	const real_point2d calc_registration =
 	{
-	case _screen_split_type_half:
-		screen_offset = bitmap_widget->halfscreen_offset;
-		registration_point = bitmap_widget->halfscreen_registration_point;
-		break;
-	case _screen_split_type_quarter:
-		screen_offset = bitmap_widget->quarterscreen_offset;
-		registration_point = bitmap_widget->quarterscreen_registration_point;
-		break;
-	default:
-	case _screen_split_type_full:
-		screen_offset = bitmap_widget->fullscreen_offset;
-		registration_point = bitmap_widget->fullscreen_registration_point;
-		break;
-	}
+		((bitmap_bounds.x1 - bitmap_bounds.x0) * registration_point.x) * bitmap_size.x,
+		((bitmap_bounds.y1 - bitmap_bounds.y0) * registration_point.y) * bitmap_size.y
+	};
+	
+	const real_point2d calc_offset =
+	{
+		(real32)screen_offset.x + offset_result.x,
+		(real32)screen_offset.y + offset_result.y
+	};
 
-	real32 calc_registration_x = ((bitmap_bounds.x1 - bitmap_bounds.x0) * registration_point.x) * (real32)bitmap_width;
-	real32 calc_offset_x = (real32)screen_offset.x + offset_result.x;
+	real_point2d final_location;
+	final_location.x = (((calc_offset.x - calc_registration.x) + bitmap_bounds.x0) * hud_scale) + anchor_point.x;
+	final_location.y = (((calc_offset.y - calc_registration.y) + bitmap_bounds.y0) * hud_scale) + anchor_point.y;
 
-	real32 calc_registration_y = ((bitmap_bounds.y1 - bitmap_bounds.y0) * registration_point.y) * (real32)bitmap_height;
-	real32 calc_offset_y = (real32)screen_offset.y + offset_result.y;
-
-	real32 final_point_x = (((calc_offset_x - calc_registration_x) + bitmap_bounds.x0) * hud_scale) + anchor_point.x;
-	real32 final_point_y = (((calc_offset_y - calc_registration_y) + bitmap_bounds.y0) * hud_scale) + anchor_point.y;
-
-	real_point2d final_location{ final_point_x, final_point_y };
-	real_point2d bitmap_size{ (real32)bitmap_width, (real32)bitmap_height };
 
 	if (bitmap_widget->flags.test(bitmap_widget_flag_flip_horizontally))
 	{
-		real32 bounds_left = bitmap_bounds.x0;
+		const real32 bounds_left = bitmap_bounds.x0;
 		bitmap_bounds.x0 = bitmap_bounds.x1;
 		bitmap_bounds.x1 = bounds_left;
 	}
 
 	if (bitmap_widget->flags.test(bitmap_widget_flag_flip_vertically))
 	{
-		real32 bounds_top = bitmap_bounds.y0;
+		const real32 bounds_top = bitmap_bounds.y0;
 		bitmap_bounds.y0 = bitmap_bounds.y1;
 		bitmap_bounds.y1 = bounds_top;
 	}
@@ -381,21 +389,21 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 
 				if (shield_layer_level != 0)
 				{
-					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_secondary_color_get());
-					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_tertiary_color_get());
+					pixel32_to_real_rgb_color(k_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_secondary_color_get());
+					pixel32_to_real_rgb_color(k_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_tertiary_color_get());
 				}
 				else if (player_user_is_elite_or_dervish(local_render_user_index))
 				{
-					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[5], global_hud_draw_widget_special_hud_type_secondary_color_get());
-					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[6], global_hud_draw_widget_special_hud_type_tertiary_color_get());
+					pixel32_to_real_rgb_color(k_draw_hud_bitmap_widget_shield_pixel_colors[5], global_hud_draw_widget_special_hud_type_secondary_color_get());
+					pixel32_to_real_rgb_color(k_draw_hud_bitmap_widget_shield_pixel_colors[6], global_hud_draw_widget_special_hud_type_tertiary_color_get());
 				}
 				else
 				{
-					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[7], global_hud_draw_widget_special_hud_type_secondary_color_get());
-					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[8], global_hud_draw_widget_special_hud_type_tertiary_color_get());
+					pixel32_to_real_rgb_color(k_draw_hud_bitmap_widget_shield_pixel_colors[7], global_hud_draw_widget_special_hud_type_secondary_color_get());
+					pixel32_to_real_rgb_color(k_draw_hud_bitmap_widget_shield_pixel_colors[8], global_hud_draw_widget_special_hud_type_tertiary_color_get());
 				}
 
-				render_ingame_user_interface_hud_element_hook(
+				render_ingame_user_interface_hud_element(
 					final_location.x,
 					final_location.y,
 					bitmap_width,
@@ -431,7 +439,7 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 
 				real32 adjusted_location_x = base_location + distance_per_territory * index;
 
-				render_ingame_user_interface_hud_element_hook(
+				render_ingame_user_interface_hud_element(
 					adjusted_location_x,
 					final_location.y,
 					bitmap_width,
@@ -452,7 +460,7 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 	if (!special_draw_case)
 	{
 		if (!bitmap_widget->flags.test(bitmap_widget_flag_scope_stretch)) {
-			render_ingame_user_interface_hud_element_hook(
+			render_ingame_user_interface_hud_element(
 				final_location.x,
 				final_location.y,
 				bitmap_width,
@@ -472,9 +480,9 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 			bitmap_bounds.y0 = bitmap_bounds.y0 - ((bitmap_bounds.y1 - bitmap_bounds.y0) * 9.f);
 			bitmap_bounds.x0 = bitmap_bounds.x0 - ((bitmap_bounds.x1 - bitmap_bounds.x0) * 9.f);
 
-			hud_scale = hud_scale * 10;
+			hud_scale *= 10.f;
 
-			render_ingame_user_interface_hud_element_hook(
+			render_ingame_user_interface_hud_element(
 				final_location.x,
 				final_location.y,
 				(int16)bitmap_size.x,
@@ -488,13 +496,13 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 		}
 		if (bitmap_widget->flags.test(bitmap_widget_flag_scope_mirror_horizontally))
 		{
-			real_rectangle2d flipped_bounds{};
+			real_rectangle2d flipped_bounds;
 			flipped_bounds.y0 = bitmap_bounds.y0;
 			flipped_bounds.y1 = bitmap_bounds.y1;
 			flipped_bounds.x0 = bitmap_bounds.x1;
 			flipped_bounds.x1 = bitmap_bounds.x0;
 
-			render_ingame_user_interface_hud_element_hook(
+			render_ingame_user_interface_hud_element(
 				(bitmap_size.x * hud_scale) + final_location.x,
 				final_location.y,
 				(int16)bitmap_size.x,
@@ -508,15 +516,14 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 		}
 		if (bitmap_widget->flags.test(bitmap_widget_flag_scope_mirror_vertically))
 		{
-			real_rectangle2d flipped_bounds{};
-
+			real_rectangle2d flipped_bounds;
 			flipped_bounds.y0 = bitmap_bounds.y1;
 			flipped_bounds.y1 = bitmap_bounds.y0;
 			flipped_bounds.x0 = bitmap_bounds.x0;
 			flipped_bounds.x1 = bitmap_bounds.x1;
 
 
-			render_ingame_user_interface_hud_element_hook(
+			render_ingame_user_interface_hud_element(
 				final_location.x,
 				bitmap_size.y * hud_scale + final_location.y,
 				(int16)bitmap_size.x,
@@ -528,15 +535,14 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 				&flipped_bounds,
 				bitmap_widget->shader.index);
 		}
-		if (bitmap_widget->flags.test(bitmap_widget_flag_scope_mirror_horizontally) &&
-			bitmap_widget->flags.test(bitmap_widget_flag_scope_mirror_vertically))
+		if (bitmap_widget->flags.test(bitmap_widget_flag_scope_mirror_horizontally) && bitmap_widget->flags.test(bitmap_widget_flag_scope_mirror_vertically))
 		{
-			real_rectangle2d flipped_bounds{};
+			real_rectangle2d flipped_bounds;
 			flipped_bounds.y0 = bitmap_bounds.y1;
 			flipped_bounds.y1 = bitmap_bounds.y0;
 			flipped_bounds.x0 = bitmap_bounds.x1;
 			flipped_bounds.x1 = bitmap_bounds.x0;
-			render_ingame_user_interface_hud_element_hook(
+			render_ingame_user_interface_hud_element(
 				(bitmap_size.x * hud_scale) + final_location.x,
 				bitmap_size.y * hud_scale + final_location.y,
 				(int16)bitmap_size.x,
@@ -551,19 +557,16 @@ void __cdecl draw_hud_bitmap_widget(int32 local_render_user_index, s_new_hud_tem
 	}
 }
 
-uint32 draw_hud_text_get_split_screen_font_type(e_hud_anchor anchor)
-{
-	return INVOKE(0x224030, 0, draw_hud_text_get_split_screen_font_type, anchor);
-}
-
 void __cdecl draw_hud_resolve_string_id_to_value(string_id string, wchar_t* out_string)
 {
 	INVOKE(0x224B26, 0, draw_hud_resolve_string_id_to_value, string, out_string);
+	return;
 }
 
 void __cdecl draw_hud_fixup_private_characters(wchar_t* string)
 {
 	INVOKE(0x2309D6, 0, draw_hud_fixup_private_characters, string);
+	return;
 }
 
 int32 draw_hud_get_draw_string_font_index(int32 font_index)
@@ -648,20 +651,8 @@ void draw_hud_text_get_string(s_draw_hud_widget_input_results* widget_function_r
 		draw_hud_fixup_private_characters(out_string->get_buffer());
 	}
 
-	*out_font = _font_index_invalid;
-	uint32 split_screen_font_type = draw_hud_text_get_split_screen_font_type(text_widget->anchor);
-	switch(split_screen_font_type)
-	{
-	case 1:
-		*out_font = draw_hud_get_draw_string_font_index(text_widget->halfscreen_font_index);
-		break;
-	case 2:
-		*out_font = draw_hud_get_draw_string_font_index(text_widget->quarterscreen_font_index);
-		break;
-	default:
-		*out_font = draw_hud_get_draw_string_font_index(text_widget->fullscreen_font_index);
-		break;
-	}
+	*out_font = draw_hud_get_draw_string_font_index(text_widget->screen_font_indices[new_hud_text_get_split_screen_font_type(text_widget->anchor)]);
+	return;
 }
 
 
@@ -687,28 +678,16 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		real_point2d offset_result {0,0};
 		real_point2d scale_result {1.f,1.f};
 
-		if(text_widget->effect.count > 0)
+		if (text_widget->effect.count > 0)
+		{
 			hud_widget_effect_evaluate(local_render_user_index, user_state, text_widget->effect[0], &offset_result, &scale_result, nullptr);
 
-		real_point2d anchor_point;
-
-		hud_widget_anchor_calculate_point(text_widget->anchor, &anchor_point);
-
-		point2d screen_offset;
-
-		switch (get_screen_split_type(local_render_user_index))
-		{
-		case _screen_split_type_half:
-			screen_offset = text_widget->halfscreen_offset;
-			break;
-		case _screen_split_type_quarter:
-			screen_offset = text_widget->quarterscreen_offset;
-			break;
-		default:
-		case _screen_split_type_full:
-			screen_offset = text_widget->fullscreen_offset;
-			break;
 		}
+
+		real_point2d anchor_point;
+		new_hud_widget_anchor_calculate_point(text_widget->anchor, &anchor_point);
+
+		const point2d screen_offset = text_widget->screen_offsets[get_screen_split_type(local_render_user_index)];
 
 		real32 final_location_x = (((screen_offset.x + offset_result.x) * *get_primary_hud_scale()) * scale_result.x + anchor_point.x) - get_global_camera()->viewport_bounds.left;
 		real32 final_location_y = (((screen_offset.y + offset_result.y) * *get_primary_hud_scale()) * scale_result.y + anchor_point.y) - get_global_camera()->viewport_bounds.top;
@@ -842,6 +821,9 @@ void new_hud_draw_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x226702), draw_hud_player_indicators);
 	PatchCall(Memory::GetAddress(0x224F46), draw_hud_bitmap_widget);
 	PatchCall(Memory::GetAddress(0x224FDA), draw_hud_text_widget);
+	
+	DETOUR_ATTACH(p_draw_ingame_user_interface_hud_element, Memory::GetAddress<t_render_ingame_user_interface_hud_element>(0x221E3B), render_ingame_user_interface_hud_element);
+	DETOUR_ATTACH(p_render_ingame_user_interface_hud_indicators_element, Memory::GetAddress<t_render_ingame_user_interface_hud_indicators_element_hook>(0x221C77), render_ingame_user_interface_hud_indicators_element_hook);
 	return;
 }
 
@@ -851,5 +833,77 @@ void new_hud_draw_deinitialize(void)
 	{
 		free(g_draw_hud_crosshair_bitmap_cache);
 	}
+	return;
+}
+
+void __cdecl render_ingame_user_interface_hud_element(
+	real32 left,
+	real32 top,
+	int16 x,
+	int16 y,
+	real32 scale,
+	real32 rotation_rad,
+	datum bitmap_tag_index,
+	datum bitmap,
+	real_rectangle2d* bounds,
+	datum shader_tag_index)
+{
+	rasterizer_setup_2d_vertex_shader_user_interface_constants();
+	p_draw_ingame_user_interface_hud_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, bounds, shader_tag_index);
+	return;
+}
+
+static void rasterizer_setup_2d_vertex_shader_user_interface_constants(void)
+{
+	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+	real_vector4d vc[5];
+	int16 width, height;
+
+	render_camera* global_camera = get_global_camera();
+
+	rectangle2d screen_bounds = global_camera->viewport_bounds;
+	width = rectangle2d_width(&screen_bounds);
+	height = rectangle2d_height(&screen_bounds);
+
+	// vertex shaders use normalized device coordinates system (NDC)
+	vc[0].i = 2.0f / (real32)width; // x
+	vc[0].j = 0.0f;
+	vc[0].k = 0.0f;
+	vc[0].l = -(1.0f / (real32)width + 1.0f) - ((real32)screen_bounds.left * 2.0f / width); // offset from x
+
+	vc[1].i = 0.0f;
+	vc[1].j = -(2.0f / (real32)height); // y
+	vc[1].k = 0.0f;
+	vc[1].l = (1.0f / (real32)height + 1.0f) + ((real32)screen_bounds.top * 2.0f / height); // offset from y
+
+	vc[2].i = 0.0f;
+	vc[2].j = 0.0f;
+	vc[2].k = 0.0f; // z
+	vc[2].l = 0.5f; // acts as an offset, facing (<=1.0f is towards the viewport, above 1.0f facing from the viewport)
+
+	vc[3].i = 0.0f;
+	vc[3].j = 0.0f;
+	vc[3].k = 0.0f;
+	vc[3].l = 1.0f; // w scaling component
+
+	// the c181 register seems unused?
+	vc[4].i = 0.0f;
+	vc[4].j = 0.0f;
+	vc[4].k = 0.0f;
+	vc[4].l = 0.0f;
+
+	// avoid unnecessary API calls by testing the user mode memory cache
+	if (rasterizer_get_main_vertex_shader_cache()->test_cache(177, vc, NUMBEROF(vc)))
+	{
+		global_d3d_device->SetVertexShaderConstantF(177, (const real32*)vc, NUMBEROF(vc));
+	}
+	return;
+}
+
+static void __cdecl render_ingame_user_interface_hud_indicators_element_hook(int32* a1, datum tag_index, datum bitmap_index, int32* a4, datum shader_index)
+{
+	rasterizer_setup_2d_vertex_shader_user_interface_constants();
+	p_render_ingame_user_interface_hud_indicators_element(a1, tag_index, bitmap_index, a4, shader_index);
 	return;
 }
