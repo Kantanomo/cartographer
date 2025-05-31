@@ -92,6 +92,7 @@ void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_var
 
 	//variant->cartographer_match_settings.flags.set(_cartographer_match_settings_infinite_grenades, true);
 	//variant->cartographer_match_settings.flags.set(_cartographer_match_settings_infinite_ammo, true);
+	variant->cartographer_match_settings.gravity = 0.5f;
 }
 bool __cdecl game_variant_cleanup(s_game_variant* variant)
 {

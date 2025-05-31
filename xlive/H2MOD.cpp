@@ -673,6 +673,7 @@ static void h2mod_apply_hooks(void)
 	user_interface_networking_apply_patches();
 	unit_action_system_apply_patches();
 	weapons_apply_patches();
+	physics_constants_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
