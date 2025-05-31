@@ -237,6 +237,8 @@ void __cdecl unit_get_head_position_interpolated(datum unit_index, real_point3d*
 
 void __cdecl unit_get_camera_position(datum unit_index, real_point3d* out_point);
 
+void __cdecl unit_get_aiming_vector(datum unit_index, real_vector3d* out_vector);
+
 void __cdecl unit_control(datum unit_index, unit_control_data* control_data);
 
 e_game_team unit_get_team_index(datum unit_index);

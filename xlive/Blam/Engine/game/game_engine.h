@@ -23,18 +23,6 @@ enum e_network_game_simulation_protocol
 	k_network_game_simulation_protocol_count = 3,
 };
 
-enum e_game_engine_timer_type
-{
-
-	k_game_engine_timer_count = 3
-};
-
-enum e_game_engine_state
-{
-
-	k_game_engine_state_count = 4
-};
-
 enum e_valid_multiplayer_games : short
 {
 	valid_multiplayer_game_capture_the_flag = FLAG(0),
@@ -60,35 +48,6 @@ enum e_relevant_multiplayer_games : int
 enum e_multiplayer_event_response_definition_flags : int16
 {
 	_multiplayer_event_response_definition_flag_quantity_message = FLAG(0)
-};
-
-enum e_multiplayer_event : int16
-{
-	_multiplayer_event_game_start = 0,
-	_multiplayer_event_hill_controlled = 1,
-	_multiplayer_event_hill_contested = 2,
-	_multiplayer_event_hill_tick = 3,
-	_multiplayer_event_hill_move = 4,
-	_multiplayer_event_hill_controlled_team = 5,
-	_multiplayer_event_hill_contested_team = 6
-};
-
-enum e_multiplayer_event_audience : int16
-{
-	_multiplayer_event_audience_cause_player = 0,
-	_multiplayer_event_audience_cause_team = 1,
-	_multiplayer_event_audience_effect_player = 2,
-	_multiplayer_event_audience_effect_team = 3,
-	_multiplayer_event_audience_all = 4
-};
-
-enum e_multiplayer_event_audience_type : int16
-{
-	_multiplayer_event_audience_type_none = 0,
-	_multiplayer_event_audience_type_cause_player = 1,
-	_multiplayer_event_audience_type_cause_team = 2,
-	_multiplayer_event_audience_type_effect_player = 3,
-	_multiplayer_event_audience_type_effect_team = 4
 };
 
 enum e_multiplayer_event_sound_flags : int16

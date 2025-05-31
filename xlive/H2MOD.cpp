@@ -105,6 +105,7 @@
 #include "halo_playlist/halo_playlist.h"
 #include "interface/multiplayer_variant_settings_interface_definition.h"
 #include "interface/user_interface_networking.h"
+#include "items/weapons.h"
 #include "networking/network_game_definitions.h"
 #include "simulation/game_interface/simulation_game_engine_slayer.h"
 
@@ -670,6 +671,8 @@ static void h2mod_apply_hooks(void)
 	simulation_type_collection_apply_patches();
 	simulation_game_events_apply_patches();
 	user_interface_networking_apply_patches();
+	unit_action_system_apply_patches();
+	weapons_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -768,6 +771,7 @@ static void h2mod_apply_hooks(void)
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
 		multiplayer_variant_settings_interface_apply_patches();
+
 
 		
 	}

@@ -410,6 +410,16 @@ enum e_headhunter_engine_flags : uint32
 	k_headhunter_engine_flags_count
 };
 
+enum e_cartographer_match_settings_flags : uint32
+{
+	_cartographer_match_settings_thirty_tick_rate = 0,
+	_cartographer_match_settings_infinite_ammo = 1,
+	_cartographer_match_settings_infinite_grenades = 2,
+	_cartographer_match_settings_explosion_physics = 3,
+
+	k_cartographer_match_settings_flags_count
+};
+
 struct s_variant_description_map
 {
 	const char* name;
@@ -485,6 +495,21 @@ union s_game_engine_variant
 };
 ASSERT_STRUCT_SIZE(s_game_engine_variant, 64);
 
+
+
+union s_cartographer_match_settings
+{
+	struct
+	{
+		c_flags_no_init<e_cartographer_match_settings_flags, uint32, k_cartographer_match_settings_flags_count> flags;
+		real32 game_speed;
+		real32 gravity;
+	};
+private:
+	int32 unused_match_settings[6];
+};
+ASSERT_STRUCT_SIZE(s_cartographer_match_settings, 24);
+
 struct s_game_variant
 {
 	int16 flags;
@@ -499,7 +524,8 @@ struct s_game_variant
 	int32 score_to_win_round;
 	int32 round_time_limit;
 	e_game_engine_join_in_progress join_in_progress_setting;
-	int32 unused_match_settings[6];
+	s_cartographer_match_settings cartographer_match_settings;
+	//int32 unused_match_settings[6];
 
 	/* player settings */
 	int32 max_players;

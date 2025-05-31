@@ -54,4 +54,7 @@ struct weapon_datum
 ASSERT_STRUCT_SIZE(weapon_datum, 604);
 
 int32 __cdecl weapon_get_rounds_total(datum object_index, int32 magazine_index, bool a3);
+
 void __cdecl weapons_fire_barrels(void);
+
+void weapons_apply_patches();

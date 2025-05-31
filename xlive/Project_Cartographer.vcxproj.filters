@@ -526,6 +526,7 @@
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_assault_property.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_territories_property.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_settings_property.cpp" />
+    <ClCompile Include="Blam\Engine\units\unit_action_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -572,7 +573,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\core.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\format-inl.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\format.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\locale.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\ostream.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\posix.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\printf.h" />
@@ -611,7 +611,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_message_type_collection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
@@ -1999,7 +1998,6 @@
     <ClInclude Include="Blam\Engine\networking\session\network_session_manager.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
     <ClInclude Include="Blam\Engine\structures\structure_lightmap.h" />
-    <ClInclude Include="Blam\Engine\game\multiplayer_globals.h" />
     <ClInclude Include="Blam\Engine\shell\shell_windows_pcc.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_display_mode.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_resolution.h" />
@@ -2052,6 +2050,43 @@
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_assault_property.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_territories_property.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_settings_property.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\backtracer-inl.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\backtracer.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\log_msg_buffer-inl.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\log_msg_buffer.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\synchronous_factory.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\tcp_client-windows.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\tcp_client.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\udp_client-windows.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\udp_client.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\windows_include.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\args.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\base.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\compile.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\os.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\std.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\xchar.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\chrono.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\compile.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\ranges.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\std.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\xchar.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\fwd.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\mdc.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\pattern_formatter-inl.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\pattern_formatter.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\callback_sink.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\dup_filter_sink.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\hourly_file_sink.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\kafka_sink.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\mongo_sink.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\qt_sinks.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\ringbuffer_sink.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\stdout_sinks-inl.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\tcp_sink.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\udp_sink.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\win_eventlog_sink.h" />
+    <ClInclude Include="3rdparty\spdlog\include\spdlog\stopwatch.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

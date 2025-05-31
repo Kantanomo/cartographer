@@ -89,6 +89,9 @@ void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_var
 			}
 		}
     }
+
+	//variant->cartographer_match_settings.flags.set(_cartographer_match_settings_infinite_grenades, true);
+	//variant->cartographer_match_settings.flags.set(_cartographer_match_settings_infinite_ammo, true);
 }
 bool __cdecl game_variant_cleanup(s_game_variant* variant)
 {
@@ -239,6 +242,7 @@ bool __cdecl game_variant_cleanup(s_game_variant* variant)
 	base_variant.round_time_limit = 480;
 	base_variant.betrayal_penalty = 10;
 	memset(&base_variant.vehicle_respawn_setting, 0, 12);
+
 
 	memcpy(variant, &base_variant, sizeof(s_game_variant));
 	return false;

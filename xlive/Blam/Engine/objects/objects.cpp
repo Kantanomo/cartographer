@@ -406,7 +406,7 @@ datum __cdecl object_new(object_placement_data* data)
 			object_header->flags.set(_object_header_post_update_bit, true);
 			object_header->type = (int8)object_definition->object.object_type;
 			object->definition_index = data->tag_index;
-
+			
 			if (data->object_identifier.get_source() == NONE)
 			{
 				object->object.object_identifier.create_dynamic((e_object_type)object_definition->object.object_type);
@@ -1730,6 +1730,11 @@ static int32 object_get_override_index(datum object_index)
 	return override_index;
 }
 #endif
+
+void __cdecl object_attach_to_node(datum parent_index, datum child_index, uint16 node_index)
+{
+	INVOKE(0x13768C, 0x12655C, object_attach_to_node, parent_index, child_index, node_index);
+}
 
 #ifdef OBJECT_DEBUG
 static void object_add_to_dump(datum object_index, dump_datum* dump)

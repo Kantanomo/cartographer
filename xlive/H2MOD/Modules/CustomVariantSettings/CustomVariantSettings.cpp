@@ -88,7 +88,7 @@ namespace CustomVariantSettings
 	void ResetSettings()
 	{
 		currentVariantSettings = defaultCustomVariantSettings;
-		ApplyCustomSettings(&currentVariantSettings);
+		//ApplyCustomSettings(&currentVariantSettings);
 	}
 
 	void OnPlayerSpawn(datum playerIndex)
@@ -250,7 +250,7 @@ namespace CustomVariantSettings
 		EventHandler::register_callback(OnGameLifeCycleUpdate, EventType::gamelifecycle_change);
 		EventHandler::register_callback(OnMatchCountdown, EventType::countdown_start, EventExecutionType::execute_after);
 		EventHandler::register_callback(OnNetworkPlayerEvent, EventType::network_player, EventExecutionType::execute_after);
-		EventHandler::register_callback(ApplyCurrentSettings, EventType::blue_screen, EventExecutionType::execute_after);
+		//EventHandler::register_callback(ApplyCurrentSettings, EventType::blue_screen, EventExecutionType::execute_after);
 		EventHandler::register_callback(OnPlayerSpawn, EventType::player_spawn, EventExecutionType::execute_after);
 	}
 }
