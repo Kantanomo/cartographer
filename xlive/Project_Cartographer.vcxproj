@@ -1741,6 +1741,7 @@
     <ClInclude Include="Blam\Engine\physics\collision_models.h" />
     <ClInclude Include="Blam\Engine\physics\collision_model_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\havok.h" />
+    <ClInclude Include="Blam\Engine\physics\havok_component.h" />
     <ClInclude Include="Blam\Engine\physics\havok_memory.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
     <ClInclude Include="Blam\Engine\physics\physics_model_definitions.h" />

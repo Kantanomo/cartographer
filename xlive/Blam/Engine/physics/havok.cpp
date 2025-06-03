@@ -1,7 +1,67 @@
 #include "stdafx.h"
 #include "havok.h"
 
-bool __cdecl havok_can_allocate_space_for_instance_of_object_definition(datum tag_index)
+#include "havok_component.h"
+
+#include "cache/cache_files.h"
+#include "objects/object_definition.h"
+#include "objects/object_type_list.h"
+
+/* prototypes */
+
+static s_havok_globals* havok_globals_get(void);
+
+/* public code */
+
+s_data_array* havok_components_get(void)
 {
-	return INVOKE(0x9FE55, 0x920B5, havok_can_allocate_space_for_instance_of_object_definition, tag_index);
+	return *Memory::GetAddress<s_data_array**>(0x4D8624, 0x4FFF84);
+}
+
+s_havok_game_state* havok_game_state_get(void)
+{
+	return *Memory::GetAddress<s_havok_game_state**>(0x4CE83C, 0x4F5028);
+}
+
+bool havok_can_modify_state(void)
+{
+	return havok_memory_allocator_locked() || is_havok_update_memory_initialized();
+}
+
+bool havok_can_allocate_space_for_instance_of_object_definition(datum tag_index)
+{
+	//return INVOKE(0x9FE55, 0x920B5, havok_can_allocate_space_for_instance_of_object_definition, tag_index);
+	
+	const object_definition* definition = (object_definition*)tag_get_fast(tag_index);
+
+	ASSERT(definition);
+	ASSERT(havok_can_modify_state());
+
+	bool result = true;
+	if (TEST_FLAG(definition->object.object_type, _object_mask_havok))
+	{
+		const s_havok_game_state* g_havok_game_state = havok_game_state_get();
+		if (havok_globals_get()->rigid_bodies_active)
+		{
+			const s_data_array* g_havok_component_data = havok_components_get();
+
+			ASSERT(g_havok_component_data->maximum_count == c_havok_component::k_maximum_havok_component_count);
+			ASSERT(g_havok_game_state->havok_components_allocated == g_havok_component_data->actual_count);
+
+			result = g_havok_component_data->actual_count < g_havok_component_data->maximum_count;
+		}
+		else
+		{
+			result = g_havok_game_state->havok_components_allocated < c_havok_component::k_maximum_havok_component_count;
+		}
+	}
+
+	return result;
+}
+
+/* private code */
+
+static s_havok_globals* havok_globals_get(void)
+{
+	return Memory::GetAddress<s_havok_globals*>(0x418AC8, 0x3BBDEC);
 }

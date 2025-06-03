@@ -181,7 +181,7 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 
 	data_make_valid(account_list_data);
 
-	for (int32 i = 0; i < this->m_list_data->datum_max_elements; i++) {
+	for (int32 i = 0; i < this->m_list_data->maximum_count; i++) {
 		datum_new(this->m_list_data);
 	}
 
@@ -260,7 +260,7 @@ void c_cartographer_account_manager_edit_list::update_list_items(c_list_item_wid
 	c_text_widget* text_widget = item->try_find_text_widget(_default_list_skin_text_main);
 	if (text_widget)
 	{
-		int32 button_count_allocated = m_list_data->datum_max_elements;
+		int32 button_count_allocated = m_list_data->maximum_count;
 		const wchar_t* button_label = nullptr;
 
 		// + 1 for the unicode character (nullptr included in original string size)
