@@ -299,7 +299,7 @@ static unsigned __stdcall discord_thread_proc(void* pArguments)
 	}
 	else
 	{
-		error(2, "Failed to create Discord Game SDK instance: %d\n", res);
+		error(_error_silent, "Failed to create Discord Game SDK instance: %d\n", res);
 		result = 1;
 	}
 
@@ -380,7 +380,7 @@ static void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
 		csprintf(&g_discord_globals.activity.secrets.join[2 * i], NUMBEROF(g_discord_globals.activity.secrets.join), "%02hhX", session_bytes[i]);
 	}
 
-	error(0, "Encoded join secret: %s", g_discord_globals.activity.secrets.join);
+	error(_error_immediate, "Encoded join secret: %s", g_discord_globals.activity.secrets.join);
 	return;
 }
 
@@ -409,7 +409,7 @@ static void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secr
 {
 	XSESSION_INFO session;
 	uint8* session_bytes = (uint8*)&session;
-	error(0, "Join secret: %s", secret);
+	error(_error_immediate, "Join secret: %s", secret);
 
 	// Decode the data from hex string
 	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
@@ -423,7 +423,7 @@ static void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secr
 
 static void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message)
 {
-	error(0, message);
+	error(_error_immediate, message);
 	return;
 }
 

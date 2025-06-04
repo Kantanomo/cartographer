@@ -55,7 +55,7 @@ void dump_timestamp_get(c_static_wchar_string<64>* timestamp)
 	const errno_t err = localtime_s(&tm_info, &timer);
 	if (err)
 	{
-		error(3, "Error occurred when getting timestamp: %d", err);
+		error(_error_log, "Error occurred when getting timestamp: %d", err);
 	}
 	else
 	{
@@ -123,7 +123,7 @@ void crash_archive_create_and_populate(const char* zip_file_path)
 
 	if (zipClose(zip_file, NULL) != Z_OK)
 	{
-		error(3, "Failed to close %ws", zip_file_path);
+		error(_error_log, "Failed to close %ws", zip_file_path);
 	}
 	
 	return;
@@ -166,7 +166,7 @@ void crash_archive_add_dump_file(zipFile zip_file)
 
 	if (!compress_file_to_zip(zip_file, &minidump_file, k_crash_minidump_file_name))
 	{
-		error(3, "Failed to add %ws to archive", minidump_path.get_string());
+		error(_error_log, "Failed to add %ws to archive", minidump_path.get_string());
 	}
 
 	return;
@@ -192,7 +192,7 @@ void crash_archive_add_crash_report_files(zipFile zip_file)
 
 		if (!compress_file_to_zip(zip_file, &report_file, utf8_path))
 		{
-			error(3, "Failed to add %ws to archive", k_report_text_file_names[i]);
+			error(_error_log, "Failed to add %ws to archive", k_report_text_file_names[i]);
 		}
 	}
 
@@ -217,7 +217,7 @@ void write_crash_dump_files(_EXCEPTION_POINTERS* ExceptionInfo, c_static_wchar_s
 	DWORD error_val = GetLastError();
 	if (error_val != 0)
 	{
-		error(3, "CreateFileW returned error: %d %ws", error_val, minidump_path.get_string());
+		error(_error_log, "CreateFileW returned error: %d %ws", error_val, minidump_path.get_string());
 	}
 	
 
@@ -246,12 +246,12 @@ void write_crash_dump_files(_EXCEPTION_POINTERS* ExceptionInfo, c_static_wchar_s
 		error_val = GetLastError();
 		if (error_val != 0)
 		{
-			error(3, "MiniDumpWriteDump returned error: %lu", error_val);
+			error(_error_log, "MiniDumpWriteDump returned error: %lu", error_val);
 		}
 	}
 	else
 	{
-		error(3, "Halo 2 has crashed and a dump file has been saved to \"%ws\".", minidump_path.get_string());
+		error(_error_log, "Halo 2 has crashed and a dump file has been saved to \"%ws\".", minidump_path.get_string());
 	}
 
 	crash_info_text_files_create(report_path->get_string(), &minidump_info);

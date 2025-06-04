@@ -554,7 +554,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 	}
 	else
 	{
-		error(2, "### ERROR %s failed", __FUNCTION__);
+		error(_error_silent, "### ERROR %s failed", __FUNCTION__);
 	}
 
 	return;
@@ -806,7 +806,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
 		!dx9_globals->global_d3d_surface_sun_glow_secondary)
 	{
 		result = false;
-		error(2, "### ERROR rasterizer_secondary_targets_initialize() failed to create offscreen surface(s)");
+		error(_error_silent, "### ERROR rasterizer_secondary_targets_initialize() failed to create offscreen surface(s)");
 	}
 
 	return result;

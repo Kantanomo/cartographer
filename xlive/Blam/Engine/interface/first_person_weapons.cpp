@@ -559,7 +559,7 @@ static void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 we
 						int16 frame_count = weapon_state_animation->get_frame_count();
 						if (frame_count < 9)
 						{
-							error(2, "### first-person overlays animation has %d frames (needs to be %d)", frame_count, 9);
+							error(_error_silent, "### first-person overlays animation has %d frames (needs to be %d)", frame_count, 9);
 							weapon_data->overlay_animation_id.clear();
 						}
 						else

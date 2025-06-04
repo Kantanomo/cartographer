@@ -36,25 +36,25 @@ void display_assert(const char* condition, char const* file, int32 line, bool as
 {
 	if (assertion_failed && !is_debugger_present())
 	{
-		error(3, "");
+		error(_error_log, "");
 		// sub_402370(1);
 	}
 
-	error(3, "");
+	error(_error_log, "");
 	if (is_debugger_present())
 	{
 		const char* condition_string = condition != NULL ? condition : "";
 		const char* error_type = assertion_failed ? "ASSERT" : "WARNING";
-		error(3, "%s(%d): %s: %s", file, line, error_type, condition_string);
+		error(_error_log, "%s(%d): %s: %s", file, line, error_type, condition_string);
 	}
 	else
 	{
-		error(3, "%s", shell_get_version());
+		error(_error_log, "%s", shell_get_version());
 		const char* error_type = assertion_failed ? "### ASSERTION FAILED: " : "### RUNTIME WARNING: ";
-		error(3, "%s at %s,#%d", error_type, file, line);
+		error(_error_log, "%s at %s,#%d", error_type, file, line);
 		if (condition)
 		{
-			error(3, "  %s", condition);
+			error(_error_log, "  %s", condition);
 		}
 	}
 

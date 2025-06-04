@@ -692,7 +692,7 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 	}
 	else
 	{
-		error(3, "### ERROR %s() failed", __FUNCTION__);
+		error(_error_log, "### ERROR %s() failed", __FUNCTION__);
 	}
 
 	return succeeded;
@@ -879,7 +879,7 @@ bool __cdecl rasterizer_dx9_initialize(void)
 
 		if (!result)
 		{
-			error(3, "### ERROR failed to initialize rasterizer");
+			error(_error_log, "### ERROR failed to initialize rasterizer");
 		}
 	}
 
@@ -1072,7 +1072,7 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 				LONG change_result = ChangeDisplaySettingsA(&device_mode, 0);
 				if (change_result)
 				{
-					error(2, "ChangeDisplaySettings failed: 0x%8x", change_result);
+					error(_error_silent, "ChangeDisplaySettings failed: 0x%8x", change_result);
 					rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
 				}
 			}
@@ -1133,7 +1133,7 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 			FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM, 0, GetLastError(), 0x400, (LPSTR)&buffer, 0, NULL);
 			MessageBoxA(0, buffer, "ERROR - failed to create window", MB_ICONASTERISK);
 			LocalFree(buffer);
-			error(2, "### ERROR failed to create a window");
+			error(_error_silent, "### ERROR failed to create a window");
 		}
 	}
 
@@ -1207,7 +1207,7 @@ static bool rasterizer_dx9_should_use_d3d9ex(void)
 	{
 		if (version_information.dwMajorVersion < 6)
 		{
-			error(2, "### ERROR this machine isn't vista!");
+			error(_error_silent, "### ERROR this machine isn't vista!");
 			
 			// By default it quits but let's ignore this for now...
 			/*
@@ -1237,7 +1237,7 @@ static bool rasterizer_dx9_get_create_ex_proc(void)
 		rasterizer_globals->d3d9_create_ex_proc = (decltype(Direct3DCreate9Ex)*)GetProcAddress(module, "Direct3DCreate9Ex");
 		if (!rasterizer_globals->d3d9_create_ex_proc)
 		{
-			error(2, "### ERROR failed to obtain Direct3DCreate9Ex function pointer");
+			error(_error_silent, "### ERROR failed to obtain Direct3DCreate9Ex function pointer");
 			/*
 			main_quit();
 			result = false;
@@ -1246,7 +1246,7 @@ static bool rasterizer_dx9_get_create_ex_proc(void)
 	}
 	else
 	{
-		error(2, "### ERROR failed to dynamically load d3d9.dll");
+		error(_error_silent, "### ERROR failed to dynamically load d3d9.dll");
 		main_quit();
 		result = false;
 	}
@@ -1266,7 +1266,7 @@ static bool rasterizer_dx9_create_device_interface(void)
 		hr = rasterizer_dx9_create_through_d3d9on12(&dx9_globals->global_d3d_interface, false /*use_warp*/);
 		if (FAILED(hr))
 		{
-			error(2, "### ERROR failed to create D3D object through d3d9on12");
+			error(_error_silent, "### ERROR failed to create D3D object through d3d9on12");
 			main_quit();
 			result = false;
 		}
@@ -1276,7 +1276,7 @@ static bool rasterizer_dx9_create_device_interface(void)
 		hr = rasterizer_globals->d3d9_create_ex_proc(D3D_SDK_VERSION, &dx9_globals->global_d3d_interface);
 		if (FAILED(hr))
 		{
-			error(2, "### ERROR failed to create D3D object with the Ex version of D3D");
+			error(_error_silent, "### ERROR failed to create D3D object with the Ex version of D3D");
 			main_quit();
 			result = false;
 		}
@@ -1288,7 +1288,7 @@ static bool rasterizer_dx9_create_device_interface(void)
 
 	if (dx9_globals->global_d3d_interface == NULL)
 	{
-		error(3, "### ERROR failed to create D3D object");
+		error(_error_log, "### ERROR failed to create D3D object");
 		main_quit();
 		result = false;
 	}

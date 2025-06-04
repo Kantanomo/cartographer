@@ -24,7 +24,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 		|| h_dxgi == NULL
 		|| h_d3d9 == NULL)
 	{
-		error(0, "Modules: d3d12, dxgi or d3d9 not available!");
+		error(_error_immediate, "Modules: d3d12, dxgi or d3d9 not available!");
 		return E_FAIL;
 	}
 
@@ -35,7 +35,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 		|| pfn_D3D12CreateDevice == NULL
 		|| pfn_Direct3DCreate9On12 == NULL)
 	{
-		error(0, "Unable to resolve d3d12, dxgi or d3d9 function pointers!");
+		error(_error_immediate, "Unable to resolve d3d12, dxgi or d3d9 function pointers!");
 		return E_FAIL;
 	}
 
@@ -44,7 +44,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 	HRESULT hr = pfn_CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
 	if (FAILED(hr))
 	{
-		error(0, "Failed to create DXGIFactory.");
+		error(_error_immediate, "Failed to create DXGIFactory.");
 		return E_FAIL;
 	}
 
@@ -53,7 +53,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 	{
 		if (FAILED(hr = dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&dxgi_adapter))))
 		{
-			error(0, "Failed to get WARP adapter.");
+			error(_error_immediate, "Failed to get WARP adapter.");
 			return E_FAIL;
 		}
 	}
@@ -61,7 +61,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 	{
 		if (FAILED(hr = dxgiFactory->EnumAdapters(0, &dxgi_adapter)))
 		{
-			error(0, "Failed to get adapter.");
+			error(_error_immediate, "Failed to get adapter.");
 			return E_FAIL;
 		}
 	}
@@ -75,7 +75,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 
 	if (FAILED(hr))
 	{
-		error(0, "Failed to create D3D12 device.");
+		error(_error_immediate, "Failed to create D3D12 device.");
 		return E_FAIL;
 	}
 
@@ -88,7 +88,7 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp
 
 	if (FAILED(hr))
 	{
-		error(0, "Failed to initialize D3D9On12.");
+		error(_error_immediate, "Failed to initialize D3D9On12.");
 		return E_FAIL;
 	}
 
