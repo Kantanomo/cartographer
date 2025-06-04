@@ -550,7 +550,7 @@ c_xml_definition_agent* c_tag_injecting_manager::get_agent(tag_group group)
 		if (null_terminated_class[3] == ' ')
 			null_terminated_class[3] = '\0';
 
-		error(0, "%s: failed to initialize agent for %s", __FUNCTION__, null_terminated_class);
+		error(_error_immediate, "%s: failed to initialize agent for %s", __FUNCTION__, null_terminated_class);
 		return nullptr;
 	}
 	return &this->m_agents[tag_group_get_as_index(group)];

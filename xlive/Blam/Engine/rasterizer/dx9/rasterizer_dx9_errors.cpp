@@ -88,7 +88,7 @@ void rasterizer_dx9_errors_log(HRESULT hr, const char* format, ...)
 		break;
 	}
 
-	error(2, "%s in %s (code=%d, error=%s)", hr_string, error_string, hr, buffer);
+	error(_error_silent, "%s in %s (code=%d, error=%s)", hr_string, error_string, hr, buffer);
 	if (hr == E_OUTOFMEMORY)
 	{
 		// TODO: implement this

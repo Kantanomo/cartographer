@@ -144,7 +144,7 @@ static void crash_window_message_create(const wchar_t* reports_path, const wchar
 	int32 result = SHFileOperationW(&file_op);
 	if (result)
 	{
-		error(0, "SHFileOperationW failed to delete folder %ws with error %d", reports_path, result);
+		error(_error_immediate, "SHFileOperationW failed to delete folder %ws with error %d", reports_path, result);
 	}
 	return;
 }
@@ -323,7 +323,7 @@ static void crash_window_wm_create(HWND hwnd)
 
 	if (g_crash_hbitmap == NULL)
 	{
-		error(0, "%s: Failed to load header image", __FUNCTION__);
+		error(_error_immediate, "%s: Failed to load header image", __FUNCTION__);
 	}
 
 	return;

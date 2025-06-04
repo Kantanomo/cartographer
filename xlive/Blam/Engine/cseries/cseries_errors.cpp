@@ -29,11 +29,11 @@ const s_error_category k_category_constants[k_error_category_count] =
 
 /* prototypes */
 
-static void error_internal(e_error_category category, int32 priority, const char* format /*, va_list va_args*/);
+static void error_internal(e_error_category category, e_error_priority priority, const char* format /*, va_list va_args*/);
 
 /* public code */
 
-void error(int32 priority, const char* format, ...)
+void error(e_error_priority priority, const char* format, ...)
 {
 #ifdef ERRORS_ENABLED
 	va_list va_args;
@@ -46,7 +46,7 @@ void error(int32 priority, const char* format, ...)
 	return;
 }
 
-void error(e_error_category category, int32 priority, const char* format, ...)
+void error(e_error_category category, e_error_priority priority, const char* format, ...)
 {
 #ifdef ERRORS_ENABLED
 	va_list va_args;
@@ -61,7 +61,7 @@ void error(e_error_category category, int32 priority, const char* format, ...)
 
 /* private code */
 
-static void error_internal(e_error_category category, int32 priority, const char* format /*, va_list va_args*/)
+static void error_internal(e_error_category category, e_error_priority priority, const char* format /*, va_list va_args*/)
 {
 #ifdef ERRORS_ENABLED
 	LOG_INFO_GAME(format/*, va_args*/);

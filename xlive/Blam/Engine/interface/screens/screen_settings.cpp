@@ -398,7 +398,7 @@ void c_screen_settings::apply_patches_on_map_load()
 
 	if (main_widget_datum_index == NONE)
 	{
-		error(0, "bad datum found");
+		error(_error_immediate, "bad datum found");
 		return;
 	}
 

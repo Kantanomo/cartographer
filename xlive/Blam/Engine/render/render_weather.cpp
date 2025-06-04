@@ -56,7 +56,7 @@ void __cdecl c_particle_system_lite::initialize(void)
 			HRESULT hr = global_d3d_device->CreatePixelShader(bytecode[i], &g_d3d9_weather_shaders[i]);
 			if (!SUCCEEDED(hr))
 			{
-				error(2, "render:weather: c_particle_system_lite::initialize: CreatePixelShader failed with hr == 0x%08x", hr);
+				error(_error_silent, "render:weather: c_particle_system_lite::initialize: CreatePixelShader failed with hr == 0x%08x", hr);
 				g_d3d9_weather_shaders[i] = NULL;
 			}
 		}

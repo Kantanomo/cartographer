@@ -3,6 +3,15 @@
 
 /* enums */
 
+enum e_error_priority : int32
+{
+	_error_immediate = 0,
+	_error_delayed = 1,
+	_error_silent = 2,
+	_error_log = 3,
+	k_error_priority_count,
+};
+
 enum e_error_category : int32
 {
 	_error_category_generic = 0,
@@ -42,7 +51,7 @@ struct s_error_category
 /* prototypes */
 
 // TODO implement this properly (using spdlog as a temp solution)
-void error(int32 priority, const char* format, ...);
+void error(e_error_priority priority, const char* format, ...);
 
 // TODO implement this properly (using spdlog as a temp solution)
-void error(e_error_category category, int32 priority, const char* format, ...);
+void error(e_error_category category, e_error_priority priority, const char* format, ...);

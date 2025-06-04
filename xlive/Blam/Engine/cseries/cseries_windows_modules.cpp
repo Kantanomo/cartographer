@@ -30,7 +30,7 @@ size_t module_info_populate(uint32 process_id, s_loaded_module_info* module_info
 				// Get the full path to the module's file.
 				if (GetModuleFileNameExW(process_handle, temp_module_handle[i], module_info[i].module_path.get_buffer(), MAX_PATH) == false)
 				{
-					error(0, "GetModuleFileNameEx returned error: %lu", GetLastError());
+					error(_error_immediate, "GetModuleFileNameEx returned error: %lu", GetLastError());
 				}
 				module_info[i].module_handle = temp_module_handle[i];
 			}
@@ -55,7 +55,7 @@ void* module_data_load(const wchar_t* file_name)
 	HANDLE file = CreateFileW(file_name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (file == INVALID_HANDLE_VALUE)
 	{
-		error(0, "Could not read file: %ws", file_name);
+		error(_error_immediate, "Could not read file: %ws", file_name);
 	}
 
 	DWORD bytes_read = 0;
@@ -68,7 +68,7 @@ void* module_data_load(const wchar_t* file_name)
 		const DWORD error_val = GetLastError();
 		if (error_val != 0)
 		{
-			error(0, "ReadFile returned error: %lu", error_val);
+			error(_error_immediate, "ReadFile returned error: %lu", error_val);
 		}
 	}
 

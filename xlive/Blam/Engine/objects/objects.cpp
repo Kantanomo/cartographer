@@ -486,7 +486,7 @@ datum __cdecl object_new(object_placement_data* data)
 				{
 					const char* model_name = tag_get_name(object_model_index);
 					const char* object_name = tag_get_name(data->tag_index);
-					error(_error_category_objects, 2, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
+					error(_error_category_objects, _error_silent, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
 				}
 				else
 				{
@@ -497,7 +497,7 @@ datum __cdecl object_new(object_placement_data* data)
 				{
 					const char* model_name = tag_get_name(object_model_index);
 					const char* object_name = tag_get_name(data->tag_index);
-					error(_error_category_objects, 2, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
+					error(_error_category_objects, _error_silent, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
 				}
 				else
 				{
@@ -533,7 +533,7 @@ datum __cdecl object_new(object_placement_data* data)
 						const char* model_name = tag_name_strip_path(model_path);
 						const char* graph_path = tag_get_name(model_definition->animation_graph.index);
 						const char* graph_name = tag_name_strip_path(graph_path);
-						error(_error_category_animation, 2, "graph '%s' is not compatible with model '%s'", graph_name, model_name);
+						error(_error_category_animation, _error_silent, "graph '%s' is not compatible with model '%s'", graph_name, model_name);
 					}
 				}
 			}
@@ -710,7 +710,7 @@ datum __cdecl object_new(object_placement_data* data)
 		const char* message = out_of_objects ? "OUT OF OBJECTS" : "OBJECT CREATION FAILED";
 		const char* object_path = tag_get_name(data->tag_index);
 		const char* object_name = tag_name_strip_path(object_path);
-		error(_error_category_objects, 3, "%s: cannot create %s", message, object_name);
+		error(_error_category_objects, _error_log, "%s: cannot create %s", message, object_name);
 
 #ifdef OBJECT_DEBUG
 		if (debug_last_out_of_memory_dump_game_time == NONE || (debug_last_out_of_memory_dump_game_time + game_seconds_integer_to_ticks(5) >= (int32)game_time_get()))
@@ -1455,7 +1455,7 @@ static void object_reconnect_to_map(s_location* location, datum object_index)
 	if (cluster_overflow)
 	{
 		const char* name = tag_get_name(object->definition_index);
-		error(_error_category_objects, 2, "### WARNING object %s touched too many clusters", name);
+		error(_error_category_objects, _error_silent, "### WARNING object %s touched too many clusters", name);
 	}
 
 	object_connect_lights_recursive(object_index, false, true, false, false);

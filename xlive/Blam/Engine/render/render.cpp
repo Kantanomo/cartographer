@@ -333,7 +333,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
 	}
 	else
 	{
-		error(2, "Tried to render a view with a field of view of %f", window->render_camera.vertical_field_of_view);
+		error(_error_silent, "Tried to render a view with a field of view of %f", window->render_camera.vertical_field_of_view);
 	}
 
 	return;

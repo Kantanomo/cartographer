@@ -261,7 +261,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 		}
 		else if (!custom_map)
 		{
-			error(3, "the cache file '%s' belongs to an incompatible build (%s)", cache_file_memory_globals->header.name, cache_file_memory_globals->header.version_string);
+			error(_error_log, "the cache file '%s' belongs to an incompatible build (%s)", cache_file_memory_globals->header.name, cache_file_memory_globals->header.version_string);
 		}
 	}
 
@@ -277,8 +277,8 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 
 	if(!cache_file_memory_globals->tag_cache_base_address)
 	{
-		error(3, "failed to allocate the physical memory for the tags");
-		error(3, "cache file header is invalid");
+		error(_error_log, "failed to allocate the physical memory for the tags");
+		error(_error_log, "cache file header is invalid");
 		scenario_tags_load_internal_panic();
 		return false;
 	}

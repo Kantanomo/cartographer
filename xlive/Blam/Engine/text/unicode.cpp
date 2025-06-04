@@ -437,7 +437,7 @@ bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name)
 
 	if (required_count > count)
 	{
-		error(3, "%s: increase the number of elements passed to the buffer. Passed: %d | Required: %d", __FUNCTION__, count, required_count);
+		error(_error_log, "%s: increase the number of elements passed to the buffer. Passed: %d | Required: %d", __FUNCTION__, count, required_count);
 	}
 
 
