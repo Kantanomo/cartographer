@@ -6,11 +6,16 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 
-const char k_cartographer_unlock_url[] = k_cartographer_url_https"/achievement-api/unlock.php";
-const char k_cartographer_achivement_list_url[] = k_cartographer_url_https"/achievement-api/achievement_list.php?xuid=";
+/* constants */
+
+static const char k_cartographer_unlock_url[] = k_cartographer_url_https"/achievement-api/unlock.php";
+static const char k_cartographer_achivement_list_url[] = k_cartographer_url_https"/achievement-api/achievement_list.php?xuid=";
+
+bool g_achievement_list[42];
 
 using namespace rapidjson;
-std::map<DWORD, bool> achievementList;
+
+
 std::unordered_map<std::string, bool> AchievementMap;
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -52,10 +57,12 @@ void AchievementUnlock(unsigned long long xuid, int achievement_id, XOVERLAPPED*
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buffer.GetString());
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
-
 	}
+
+	return;
 }
 
+// TODO: add extra verification for json returned from dedi
 void GetAchievements(unsigned long long xuid)
 {
 	CURL *curl;
@@ -63,8 +70,8 @@ void GetAchievements(unsigned long long xuid)
 	std::string readBuffer;
 
 	curl = curl_interface_init_no_verify();
-	if (curl) {
-
+	if (curl)
+	{
 		c_static_string<512> server_url(k_cartographer_achivement_list_url);
 		server_url.append(std::to_string(xuid).c_str());
 		curl_easy_setopt(curl, CURLOPT_URL, server_url.get_string());
@@ -74,14 +81,30 @@ void GetAchievements(unsigned long long xuid)
 		curl_easy_cleanup(curl);
 
 		rapidjson::Document document;
-
 		document.Parse(readBuffer.c_str());
 
-		achievementList.clear();
-		for (auto& achievement : document["achievements"].GetArray())
+		csmemset(g_achievement_list, false, sizeof(g_achievement_list));
+		for (rapidjson::Value& achievement : document["achievements"].GetArray())
 		{
-			int id = (int)std::stoll(achievement.GetString());
-			achievementList[id] = 1;
+			// TODO: remove string conversion once master is updated and just do achievement.GetUint() 
+			if (achievement.IsString() || achievement.IsUint())
+			{
+				const uint32 id = achievement.IsString() ? (uint32)std::stoll(achievement.GetString()) : achievement.GetUint();
+				if (VALID_INDEX(id, NUMBEROF(g_achievement_list)))
+				{
+					g_achievement_list[id] = true;
+				}
+				else
+				{
+					error(_error_immediate, "invalid achievement index provided: %d", id);
+				}
+			}
+			else
+			{
+				error(_error_immediate, "invalid data type in achievements array");
+			}
 		}
 	}
+
+	return;
 }
