@@ -7,7 +7,10 @@
 
 /* constants */
 
-#define MAXIMUM_CLUSTERS_PER_STRUCTURE 512
+enum
+{
+	MAXIMUM_CLUSTERS_PER_STRUCTURE = 512
+};
 
 /* structures */
 
