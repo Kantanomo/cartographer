@@ -43,7 +43,6 @@
 #include "saved_games/game_state.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
-#include "shell/shell_windows_pcc.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -63,7 +62,7 @@ typedef bool(__cdecl* rasterizer_dx9_initialize_t)(void);
 
 /* constants */
 
-const D3DBLEND k_blend_operation[k_shader_framebuffer_blend_function_count] =
+static const D3DBLEND k_blend_operation[k_shader_framebuffer_blend_function_count] =
 {
   D3DBLEND_ZERO,
   D3DBLEND_ZERO,
@@ -79,7 +78,7 @@ const D3DBLEND k_blend_operation[k_shader_framebuffer_blend_function_count] =
   (D3DBLEND)NONE
 };
 
-const D3DBLEND k_dst_blend[k_shader_framebuffer_blend_function_count] =
+static const D3DBLEND k_dst_blend[k_shader_framebuffer_blend_function_count] =
 {
   D3DBLEND_INVSRCALPHA,
   D3DBLEND_ZERO,
@@ -95,7 +94,7 @@ const D3DBLEND k_dst_blend[k_shader_framebuffer_blend_function_count] =
   (D3DBLEND)NONE
 };
 
-const D3DBLEND k_src_blend[k_shader_framebuffer_blend_function_count] =
+static const D3DBLEND k_src_blend[k_shader_framebuffer_blend_function_count] =
 {
   D3DBLEND_SRCALPHA,
   D3DBLEND_DESTCOLOR,
@@ -111,7 +110,7 @@ const D3DBLEND k_src_blend[k_shader_framebuffer_blend_function_count] =
   (D3DBLEND)NONE
 };
 
-const uint32 k_rasterizer_dx9_texture_usage[] =
+static const uint32 k_rasterizer_dx9_texture_usage[] =
 {
 	0,
 	D3DUSAGE_RENDERTARGET,
@@ -119,7 +118,7 @@ const uint32 k_rasterizer_dx9_texture_usage[] =
 	0
 };
 
-const D3DPOOL k_rasterizer_dx9_texture_pool[] =
+static const D3DPOOL k_rasterizer_dx9_texture_pool[] =
 {
 	D3DPOOL_MANAGED,
 	D3DPOOL_DEFAULT,
@@ -127,14 +126,14 @@ const D3DPOOL k_rasterizer_dx9_texture_pool[] =
 	D3DPOOL_MANAGED
 };
 
-const uint32 k_rasterizer_dx9_vertex_usage[] =
+static const uint32 k_rasterizer_dx9_vertex_usage[] =
 {
 	D3DUSAGE_WRITEONLY,
 	D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
 	D3DUSAGE_WRITEONLY
 };
 
-const D3DPOOL k_rasterizer_dx9_vertex_pool[] =
+static const D3DPOOL k_rasterizer_dx9_vertex_pool[] =
 {
 	D3DPOOL_MANAGED,
 	D3DPOOL_MANAGED,
@@ -149,7 +148,7 @@ const uint32 k_rasterizer_dx9ex_texture_usage[] =
 	0
 };
 
-const D3DPOOL k_rasterizer_dx9ex_texture_pool[] =
+static const D3DPOOL k_rasterizer_dx9ex_texture_pool[] =
 {
 	D3DPOOL_DEFAULT,
 	D3DPOOL_DEFAULT,
@@ -157,35 +156,36 @@ const D3DPOOL k_rasterizer_dx9ex_texture_pool[] =
 	D3DPOOL_DEFAULT
 };
 
-const uint32 k_rasterizer_dx9ex_vertex_usage[] =
+static const uint32 k_rasterizer_dx9ex_vertex_usage[] =
 {
 	D3DUSAGE_WRITEONLY,
 	D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
 	D3DUSAGE_WRITEONLY
 };
 
-const D3DPOOL k_rasterizer_dx9ex_vertex_pool[] =
+static const D3DPOOL k_rasterizer_dx9ex_vertex_pool[] =
 {
 	D3DPOOL_DEFAULT,
 	D3DPOOL_DEFAULT,
 	D3DPOOL_DEFAULT
 };
 
-const char* global_d3d_vs_prime_source = "float4 main(float4 pos : POSITION) : POSITION { return pos; }";
+static const char* global_d3d_vs_prime_source = "float4 main(float4 pos : POSITION) : POSITION { return pos; }";
 
-/* globals */
-
-rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
-rasterizer_dx9_initialize_t p_rasterizer_dx9_initialize;
-
-datum g_last_bitmap_tag_index = 0;
-
-const D3DVERTEXELEMENT9 global_d3d_vd_source[] = 
+static const D3DVERTEXELEMENT9 global_d3d_vd_source[] =
 {
 	{ 0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
 	D3DDECL_END()
 };
-s_rasterizer_parameters g_rasterizer_parameters = {};
+
+/* globals */
+
+static rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
+static rasterizer_dx9_initialize_t p_rasterizer_dx9_initialize;
+
+static datum g_last_bitmap_tag_index = 0;
+
+static s_rasterizer_parameters g_rasterizer_parameters = {};
 
 /* prototypes */
 

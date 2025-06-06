@@ -70,7 +70,7 @@ c_video_settings_list::c_video_settings_list(uint16 user_flags):
 	m_list_data = ui_list_data_new(k_video_setting_list_name, k_total_no_of_video_settings_list_items, sizeof(datum));
 	data_make_valid(m_list_data);
 
-	for (int32 i = 0; i < m_list_data->datum_max_elements; ++i)
+	for (int32 i = 0; i < m_list_data->maximum_count; ++i)
 	{
 		datum_new(m_list_data);
 	}

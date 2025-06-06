@@ -81,7 +81,7 @@ c_main_menu_list::c_main_menu_list(int16 user_flags) :
 	m_list_data = ui_list_data_new(k_main_menu_list_name, k_total_no_of_main_menu_list_items, sizeof(datum));
 	data_make_valid(m_list_data);
 
-	for (int32 i = 0; i < m_list_data->datum_max_elements; ++i)
+	for (int32 i = 0; i < m_list_data->maximum_count; ++i)
 	{
 		datum_new(m_list_data);
 	}

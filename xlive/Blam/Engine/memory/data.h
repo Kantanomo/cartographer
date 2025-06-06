@@ -4,7 +4,7 @@
 struct s_data_array
 {
 	char name[32];				// 0x0
-	int32 datum_max_elements;			// 0x20
+	int32 maximum_count;			// 0x20
 	int32 datum_element_size;			// 0x24
 	int8 alignment_bits;				// 0x28
 	bool is_valid;					// 0x29
@@ -13,7 +13,7 @@ struct s_data_array
 	void **allocator;				// 0x30
 	int bit_index_size;				// 0x34
 	int next_unused_index;					// 0x38
-	int total_elements_used;		// 0x3C 
+	int actual_count;		// 0x3C 
 	int field_40;					// 0x40
 	char* data;						// 0x44
 	int32 *in_use_bit_vector;		// 0x48
@@ -56,7 +56,7 @@ public:
 		{
 			result = nullptr;
 			m_last_datum_index = NONE;
-			m_current_absolute_index = m_data_array->datum_max_elements;
+			m_current_absolute_index = m_data_array->maximum_count;
 		}
 		else
 		{
@@ -95,7 +95,7 @@ public:
 
 	int32 get_data_count() const
 	{
-		return m_data_array->total_elements_used;
+		return m_data_array->actual_count;
 	}
 
 	void reset()

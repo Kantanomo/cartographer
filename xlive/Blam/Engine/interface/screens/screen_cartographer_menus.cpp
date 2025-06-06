@@ -205,7 +205,7 @@ c_cartographer_guide_edit_list::c_cartographer_guide_edit_list(uint16 _flags) :
 
 	data_make_valid(account_list_data);
 
-	for (int32 i = 0; i < this->m_list_data->datum_max_elements; i++) {
+	for (int32 i = 0; i < this->m_list_data->maximum_count; i++) {
 		datum_new(this->m_list_data);
 	}
 
@@ -328,7 +328,7 @@ c_cartographer_credits_edit_list::c_cartographer_credits_edit_list(uint16 _flags
 
 	data_make_valid(account_list_data);
 
-	for (int32 i = 0; i < this->m_list_data->datum_max_elements; i++) {
+	for (int32 i = 0; i < this->m_list_data->maximum_count; i++) {
 		datum_new(this->m_list_data);
 	}
 
@@ -422,7 +422,7 @@ c_cartographer_update_edit_list::c_cartographer_update_edit_list(uint16 _flags) 
 
 	data_make_valid(update_list_data);
 
-	for (int32 i = 0; i < this->m_list_data->datum_max_elements; i++) {
+	for (int32 i = 0; i < this->m_list_data->maximum_count; i++) {
 		datum_new(this->m_list_data);
 	}
 
@@ -629,7 +629,7 @@ c_cartographer_update_notice_edit_list::c_cartographer_update_notice_edit_list(u
 
 	data_make_valid(account_list_data);
 
-	for (int32 i = 0; i < this->m_list_data->datum_max_elements; i++) {
+	for (int32 i = 0; i < this->m_list_data->maximum_count; i++) {
 		datum_new(this->m_list_data);
 	}
 

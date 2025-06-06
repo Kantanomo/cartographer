@@ -3,6 +3,7 @@
 
 #include "render.h"
 
+#include "math/matrix_math.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 /* prototypes */
@@ -156,4 +157,10 @@ bool render_camera_world_to_screen(
 	}
 
 	return within_screen_bounds;
+}
+
+void __cdecl render_camera_build(render_camera* camera, s_observer_result* result, int16* a3, int16* a4)
+{
+	INVOKE(0x194E75, 0x0, render_camera_build, camera, result, a3, a4);
+	return;
 }

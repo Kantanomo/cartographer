@@ -1,5 +1,5 @@
 #pragma once
-#include "math/matrix_math.h"
+#include "camera/observer.h"
 
 struct render_camera
 {
@@ -66,3 +66,5 @@ bool render_camera_world_to_screen(
 	const rectangle2d* viewport_bounds,
 	const real_point3d* view_point,
 	real_point2d* screen_point);
+
+void __cdecl render_camera_build(render_camera* camera, s_observer_result* result, int16* a3, int16* a4);

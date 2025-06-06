@@ -122,7 +122,7 @@ void __cdecl main_render(void)
 	rasterizer_get_screen_and_frame_bounds(
 		&window->rasterizer_camera.viewport_bounds,
 		&window->rasterizer_camera.window_bounds);
-	set_window_camera_values(&window->rasterizer_camera, 0, 0, 0);
+	render_camera_build(&window->rasterizer_camera, 0, 0, 0);
 
 	window->render_camera = window->rasterizer_camera;
 	if (screenshot_render(&g_window_bounds[1]))
@@ -145,7 +145,7 @@ void __cdecl main_render_previous_backbuffer(int32 a1, int32 a2)
 		&g_window_bounds[0].rasterizer_camera.viewport_bounds,
 		&g_window_bounds[0].rasterizer_camera.window_bounds);
 
-	set_window_camera_values(&g_window_bounds[0].rasterizer_camera, 0, 0, 0);
+	render_camera_build(&g_window_bounds[0].rasterizer_camera, 0, 0, 0);
 	
 	g_window_bounds[0].render_camera = g_window_bounds[0].rasterizer_camera;
 	render_nonplayer_frame(g_window_bounds);
@@ -175,12 +175,6 @@ void __cdecl main_render_previous_backbuffer(int32 a1, int32 a2)
 		backbuffer->Release();
 	}
 
-	return;
-}
-
-void __cdecl set_window_camera_values(render_camera* camera, s_observer_result* result, int16* a3, int16* a4)
-{
-	INVOKE(0x194E75, 0x0, set_window_camera_values, camera, result, a3, a4);
 	return;
 }
 
