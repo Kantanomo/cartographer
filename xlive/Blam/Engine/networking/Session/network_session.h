@@ -1,6 +1,7 @@
 #pragma once
 #include "network_observer.h"
-#include "game/players.h"
+#include "game/game_allegiance.h"
+#include "game/player_constants.h"
 #include "input/controllers.h"
 #include "networking/network_game_definitions.h"
 #include "networking/transport/transport.h"
