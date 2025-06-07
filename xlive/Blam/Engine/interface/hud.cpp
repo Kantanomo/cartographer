@@ -15,20 +15,21 @@
 #include "main/main_screenshot.h"
 #include "render/render.h"
 
+/* typedefs */
+
+typedef void(__cdecl* update_hud_elements_display_settings_t)(int32 new_hud_size, int32 new_safe_area);
+
 /* constants */
 
-#define k_redraw_map_name "ui_redraw"
+static const char k_redraw_map_name[] = "ui_redraw";
 
 /* globals */
 
-real32 g_original_primary_hud_scale;
-real32 g_original_secondary_hud_scale;
-
-/* typedefs */
+static real32 g_original_primary_hud_scale;
+static real32 g_original_secondary_hud_scale;
 
 // Used to grab the default crosshair size before we modify it
-typedef void(__cdecl* update_hud_elements_display_settings_t)(int32 new_hud_size, int32 new_safe_area);
-update_hud_elements_display_settings_t p_update_hud_elements_display_settings;
+static update_hud_elements_display_settings_t p_update_hud_elements_display_settings;
 
 /* prototypes */
 
@@ -154,15 +155,15 @@ void hud_render_player_indicators(datum player_index)
 		s_player* current_player = (s_player*)iterator_next(&iterator);
 		while (current_player != NULL)
 		{
-			/* Original code still checks game engine even though the indicators are never used in multiplayer
-			* 
+			bool is_enemy;
 			if (game_is_campaign())
+			{
 				is_enemy = current_player->properties[0].team_index != player->properties[0].team_index;
+			}
 			else
+			{
 				is_enemy = game_engine_team_is_enemy((e_game_team)current_player->properties[0].team_index, (e_game_team)player->properties[0].team_index);
-			*/
-
-			bool is_enemy = player->properties[0].team_index != player->properties[0].team_index;
+			}
 
 			if (iterator.index != player_index && !is_enemy && current_player->unit_index != NONE)
 			{
