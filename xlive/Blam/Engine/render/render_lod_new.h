@@ -1,5 +1,6 @@
 #pragma once
 #include "render/render_lights.h"
+#include "objects/scenery.h"
 
 enum e_render_lod : int8
 {
@@ -37,7 +38,7 @@ struct s_render_object_info
 	int8 field_C6[160];
 	int16 object_count;
 	int16 level_of_detail;
-	int16 field_16A;
+	e_scenery_lightmapping_policy scenery_lightmapping_policy;
 	bool first_person;
 	uint8 gap_16D[3];
 	uint32 field_170;
