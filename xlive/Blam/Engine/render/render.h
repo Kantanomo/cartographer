@@ -98,8 +98,6 @@ window_bound* get_user_window_bounds(int32 user_index);
 
 int32 get_global_render_window_count();
 
-bool get_global_render_split_horizontally();
-
 e_controller_index global_render_current_controller_index();
 
 uint32 global_render_current_user_index();
