@@ -45,7 +45,7 @@ void __cdecl effects_frame_advance(real32 dt)
 
 void __cdecl effect_update(datum effect_index, real32 dt)
 {
-	void* fn = Memory::GetAddress<void*>(0xAA9FF, 0x0);
+	void* fn = Memory::GetAddress<void*>(0xAA9FF);
 
 	__asm
 	{

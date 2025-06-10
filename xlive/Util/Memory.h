@@ -27,23 +27,6 @@ public:
 		ASSERT(g_memory_is_dedicated_server || client != 0);
 		ASSERT(!g_memory_is_dedicated_server || server != 0);
 		
-	// NOTE:
-	// if server or client is equal to 0 then we pass the same address for both (ONLY ON RELEASE BUILDS)
-	// REASON:
-	// optimizes out a cmov or related instruction when building release whenever we call a function that doesn't have a dedi address specified
-#ifdef NDEBUG
-		// FIXME: Enabling this will break things, there's some form of corruption in the project that gets triggered when this optimization is used
-		/*
-		if (server == 0)
-		{
-			server = client;
-		}
-		else if (client == 0)
-		{
-			client = server;
-		}
-		*/
-#endif
 		const uintptr_t address = g_memory_is_dedicated_server ? server : client;
 		return GetBaseAddress() + address;
 	}

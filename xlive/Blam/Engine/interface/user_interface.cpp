@@ -105,7 +105,7 @@ void __cdecl user_interface_update(real32 dt)
 	user_interface_precise_accumulator_msec += (dt * 1000.f) - floor(dt * 1000.f);
 	if (user_interface_precise_accumulator_msec >= 1.f)
 	{
-		*Memory::GetAddress<int32*>(0x971900, 0x0) += (int32)user_interface_precise_accumulator_msec;
+		*Memory::GetAddress<int32*>(0x971900) += (int32)user_interface_precise_accumulator_msec;
 		user_interface_precise_accumulator_msec -= (int32)user_interface_precise_accumulator_msec;
 	}
 

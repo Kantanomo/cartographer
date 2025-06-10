@@ -19,8 +19,8 @@ bool __cdecl rasterizer_dx9_update_water_refraction_surface(void);
 
 void rasterizer_dx9_water_apply_patches(void)
 {
-	PatchCall(Memory::GetAddress(0x1A07B5, 0x0), rasterizer_dx9_update_water_refraction_surface);
-	PatchCall(Memory::GetAddress(0x28158F, 0x0), rasterizer_dx9_update_water_refraction_surface);
+	PatchCall(Memory::GetAddress(0x1A07B5), rasterizer_dx9_update_water_refraction_surface);
+	PatchCall(Memory::GetAddress(0x28158F), rasterizer_dx9_update_water_refraction_surface);
 	return;
 }
 

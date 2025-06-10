@@ -1208,7 +1208,7 @@ static void objects_apply_interpolation_patches(void)
 
 		PatchCall(Memory::GetAddress(0x4A53C, 0x437BA), objects_post_update);
 		PatchCall(Memory::GetAddress(0xCD744, 0xB8ABD), object_get_origin_interpolated);
-		PatchCall(Memory::GetAddress(0x1549AE, 0x0), object_get_origin_interpolated);
+		PatchCall(Memory::GetAddress(0x1549AE), object_get_origin_interpolated);
 		PatchCall(Memory::GetAddress(0x13D406, 0x12C255), object_get_center_of_mass_interpolated);
 
 		// Prevents the game from passing the runtime_node_flags to the animation manager when updating object_node_matricies
@@ -1240,8 +1240,8 @@ static void object_get_markers_by_string_id_replace_calls(void)
 	// PatchCall(Memory::GetAddress(0x138257, 0x1214CB), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
 	// PatchCall(Memory::GetAddress(0x134C26, 0x123AF6), internal_object_get_markers_by_string_id);	// object_animation_callback
 
-	PatchCall(Memory::GetAddress(0xAAFA4, 0x0), object_get_markers_by_string_id);			// Function for creating effects at markers
-	PatchCall(Memory::GetAddress(0xFDF7D, 0x0), object_get_markers_by_string_id);			// effect_on_new_object_marker	
+	PatchCall(Memory::GetAddress(0xAAFA4), object_get_markers_by_string_id);			// Function for creating effects at markers
+	PatchCall(Memory::GetAddress(0xFDF7D), object_get_markers_by_string_id);			// effect_on_new_object_marker	
 	return;
 }
 

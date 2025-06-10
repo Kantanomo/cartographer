@@ -228,7 +228,7 @@ void __declspec(naked) jmp_c_screen_virtual_keyboard__load_player_profile_edit()
 
 void c_screen_virtual_keyboard::apply_patches()
 {
-	DETOUR_ATTACH(p_load_player_profile_edit, Memory::GetAddress<t_load_player_profile_edit>(0x23C7B2, 0x0), jmp_c_screen_virtual_keyboard__load_player_profile_edit);
+	DETOUR_ATTACH(p_load_player_profile_edit, Memory::GetAddress<t_load_player_profile_edit>(0x23C7B2), jmp_c_screen_virtual_keyboard__load_player_profile_edit);
 }
 
 void ui_set_virtual_keyboard_in_use(bool state)
