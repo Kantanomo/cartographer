@@ -526,7 +526,7 @@ render_layer_2:
 				!g_fog_result->field_96)
 			{
 				rasterizer_dx9_perf_event_begin("patchy_fog", NULL);
-				render_patchy_fog(*visible_geometry_group_count_get() <= 0, true);
+				render_patchy_fog(render_section_visibility_get_model_group_count() <= 0, true);
 				rasterizer_dx9_perf_event_end("patchy_fog");
 			}
 
@@ -679,7 +679,7 @@ render_widgets:
 			{
 				render_patchy_fog(1, 1);
 			}
-			else if (*visible_geometry_group_count_get() > 0)
+			else if (render_section_visibility_get_model_group_count() > 0)
 			{
 				render_patchy_fog(1, 0);
 			}
