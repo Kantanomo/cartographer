@@ -98,7 +98,7 @@ void data_dispose(data_array* data)
 	csmemset(data, 0, 76u);
 	if (data->allocator)
 	{
-		data->allocator->free(data);
+		data->allocator->free_block(data);
 	}
 	return;
 }

@@ -39,7 +39,7 @@ class c_allocation_base
 {
 public:
 	virtual void* alloc(size_t bytes) = 0;
-	virtual void* free(void* block) = 0;
+	virtual void* free_block(void* block) = 0;
 };
 
 
@@ -47,7 +47,7 @@ class c_normal_allocation : public c_allocation_base
 {
 public:
 	virtual void* alloc(size_t bytes);
-	virtual void* free(void* block);
+	virtual void* free_block(void* block);
 };
 
 /* prototypes */
