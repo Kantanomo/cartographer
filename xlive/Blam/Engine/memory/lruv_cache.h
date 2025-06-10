@@ -25,7 +25,7 @@ struct s_lruv_cache
 	int32 first_block_index;
 	int32 last_block_index;
 	int32 pages[8];
-	s_data_array* next_block;
+	data_array* next_block;
 	int8 signature[4];
 	void* allocate_proc;
 };

@@ -5,9 +5,9 @@
 #include "particle_state.h"
 #include "particle_emitter.h"
 
-s_data_array* get_particle_location_table()
+data_array* get_particle_location_table()
 {
-	return *Memory::GetAddress<s_data_array**>(0x4DD094, 0);
+	return *Memory::GetAddress<data_array**>(0x4DD094, 0);
 }
 
 void c_particle_location::frame_advance(c_particle_system* particle_system, c_particle_system_definition* particle_system_definition, real32 delta)

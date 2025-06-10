@@ -1,22 +1,24 @@
 #pragma once
 #include "game/materials.h"
-#include "math/matrix_math.h"
 #include "objects/damage_reporting.h"
 #include "physics/physics_models.h"
 #include "tag_files/data_reference.h"
 #include "tag_files/tag_block.h"
 
-#define k_maximum_variants_per_model 64
-#define MAXIMUM_PERMUTATIONS_PER_MODEL_REGION 32
-#define MAXIMUM_STATES_PER_MODEL_PERMUTATION 10
-#define k_maximum_objects_per_model_variant 16
-#define MAXIMUM_MATERIALS_PER_MODEL 32
-#define MAXIMUM_DAMAGE_SECTIONS_PER_MODEL 16
-#define MAXIMUM_RESPONSES_PER_DAMAGE_SECTION 16
-#define MAXIMUM_DAMAGE_SEAT_INFOS_PER_MODEL 16
-#define MAXIMUM_DAMAGE_CONSTRAINT_INFOS_PER_MODEL 16
-#define MAXIMUM_MODEL_TARGETS_PER_MODEL 32
-#define k_scenario_load_maximum_parameter_blocks 32
+enum
+{
+	MAXIMUM_STATES_PER_MODEL_PERMUTATION = 10,
+	MAXIMUM_MATERIALS_PER_MODEL = 32,
+	MAXIMUM_DAMAGE_SECTIONS_PER_MODEL = 16,
+	MAXIMUM_RESPONSES_PER_DAMAGE_SECTION = 16,
+	MAXIMUM_DAMAGE_SEAT_INFOS_PER_MODEL = 16,
+	MAXIMUM_DAMAGE_CONSTRAINT_INFOS_PER_MODEL = 16,
+	MAXIMUM_MODEL_TARGETS_PER_MODEL = 32,
+
+	k_maximum_variants_per_model = 64,
+	k_maximum_objects_per_model_variant = 16,
+	k_scenario_load_maximum_parameter_blocks = 32
+};
 
 enum e_shadow_fade_distance : int16
 {

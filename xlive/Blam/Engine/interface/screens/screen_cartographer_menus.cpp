@@ -200,7 +200,7 @@ c_cartographer_guide_edit_list::c_cartographer_guide_edit_list(uint16 _flags) :
 	c_list_widget(_flags),
 	m_slot_2(this, &c_cartographer_guide_edit_list::handle_item_pressed_event)
 {
-	s_data_array* account_list_data = ui_list_data_new(k_cartographer_guide_list_name, k_total_no_of_cartographer_guide_list_items, sizeof(datum));
+	data_array* account_list_data = ui_list_data_new(k_cartographer_guide_list_name, k_total_no_of_cartographer_guide_list_items, sizeof(datum));
 	this->m_list_data = account_list_data;
 
 	data_make_valid(account_list_data);
@@ -323,7 +323,7 @@ c_cartographer_credits_edit_list::c_cartographer_credits_edit_list(uint16 _flags
 	c_list_widget(_flags),
 	m_slot_2(this, &c_cartographer_credits_edit_list::handle_item_pressed_event)
 {
-	s_data_array* account_list_data = ui_list_data_new(k_cartographer_credits_list_name, k_total_no_of_cartographer_credits_list_items, sizeof(datum));
+	data_array* account_list_data = ui_list_data_new(k_cartographer_credits_list_name, k_total_no_of_cartographer_credits_list_items, sizeof(datum));
 	this->m_list_data = account_list_data;
 
 	data_make_valid(account_list_data);
@@ -417,7 +417,7 @@ c_cartographer_update_edit_list::c_cartographer_update_edit_list(uint16 _flags) 
 	c_list_widget(_flags),
 	m_slot_2(this, &c_cartographer_update_edit_list::handle_item_pressed_event)
 {
-	s_data_array* update_list_data = ui_list_data_new(k_cartographer_update_list_name, k_total_no_of_cartographer_update_list_items, sizeof(datum));
+	data_array* update_list_data = ui_list_data_new(k_cartographer_update_list_name, k_total_no_of_cartographer_update_list_items, sizeof(datum));
 	this->m_list_data = update_list_data;
 
 	data_make_valid(update_list_data);
@@ -624,7 +624,7 @@ c_cartographer_update_notice_edit_list::c_cartographer_update_notice_edit_list(u
 	c_list_widget(_flags),
 	m_slot_2(this, &c_cartographer_update_notice_edit_list::handle_item_pressed_event)
 {
-	s_data_array* account_list_data = ui_list_data_new(k_cartographer_update_notice_list_name, k_total_no_of_cartographer_update_notice_list_items, sizeof(datum));
+	data_array* account_list_data = ui_list_data_new(k_cartographer_update_notice_list_name, k_total_no_of_cartographer_update_notice_list_items, sizeof(datum));
 	this->m_list_data = account_list_data;
 
 	data_make_valid(account_list_data);

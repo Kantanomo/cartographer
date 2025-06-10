@@ -5,6 +5,11 @@
 #include "memory/data.h"
 #include "objects/objects.h"
 
+data_array* cloth_get_data_array(void)
+{
+	return *Memory::GetAddress<data_array**>(0x4E66A8);
+}
+
 void __cdecl sub_58F279(datum cloth_index)
 {
 	INVOKE(0x18F279, 0, sub_58F279, cloth_index);
@@ -42,22 +47,23 @@ t_cloth_frame_advance p_cloth_frame_advance;
 
 void cloth_frame_advance(real32 dt)
 {
-	s_data_iterator<s_cloth> cloth_it(*Memory::GetAddress<s_data_array**>(0x4E66A8));
+	data_array* cloth_array = cloth_get_data_array();
 
-	while (cloth_it.get_next_datum())
+	for (datum index = data_next_index(cloth_array, NONE); index != NONE; index = data_next_index(cloth_array, index))
 	{
-		s_cloth* cloth = cloth_it.get_current_datum();
 		if (time_globals::available())
 		{
+			s_cloth* cloth = (s_cloth*)datum_get(cloth_array, index);
 			cloth->accum += dt;
+
 			if (cloth->accum > game_tick_length())
 			{
 				cloth->accum -= (int32)(cloth->accum / game_tick_length()) * game_tick_length();
-				sub_58F279(cloth_it.get_current_datum_index());
-				sub_58E82F(cloth_it.get_current_datum_index());
-				sub_58EF0E(cloth_it.get_current_datum_index());
+				sub_58F279(index);
+				sub_58E82F(index);
+				sub_58EF0E(index);
 			}
-			sub_58EE82(cloth_it.get_current_datum_index());
+			sub_58EE82(index);
 		}
 	}
 }

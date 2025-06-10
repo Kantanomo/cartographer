@@ -5,6 +5,7 @@
 #include "memory/bitstream.h"
 #include "game/game.h"
 #include "game/game_time.h"
+#include "game/players.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/messages/network_message_type_collection.h"
 #include "physics/physics_constants.h"

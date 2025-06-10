@@ -15,19 +15,18 @@ transport_register_transition_functions_t p_transport_register_transition_functi
 
 /* prototypes */
 
-void __cdecl transport_register_transition_functions(
-	void* startup_func,
-	void* shutdown_func,
-	void* reset_func,
-	void* reset_parameter);
-bool __cdecl transport_address_equivalent(const network_address* a1, const network_address* a2, bool check_network_port);
+bool __cdecl transport_address_equivalent(const transport_address* a1, const transport_address* a2, bool check_network_port);
+
 bool __cdecl transport_address_populate_from_network_channel_and_compare(
 	s_network_channel* network_channel,
-	network_address* a1,
-	const network_address* a2,
+	transport_address* a1,
+	const transport_address* a2,
 	bool check_network_port);
+
 int32 __cdecl transport_get_packet_overhead_hook(int32 transport_type);
+
 void transport_address_populate_from_network_channel_and_compare_to_cdecl(void);
+
 void machine_id_update_patch(void);
 
 /* public code */
@@ -93,8 +92,6 @@ int32 __cdecl transport_get_packet_overhead_hook(int32 transport_type)
 	return result_overhead;
 }
 
-/* private code */
-
 void __cdecl transport_register_transition_functions(
 	void* startup_func,
 	void* shutdown_func,
@@ -115,15 +112,17 @@ void __cdecl transport_register_transition_functions(
 	return;
 }
 
-bool __cdecl transport_address_equivalent(const network_address* a1, const network_address* a2, bool check_network_port)
+/* private code */
+
+bool __cdecl transport_address_equivalent(const transport_address* a1, const transport_address* a2, bool check_network_port)
 {
 	return INVOKE(0x1F1EB1, 0x1B3BE0, transport_address_equivalent, a1, a2, check_network_port);
 }
 
 bool __cdecl transport_address_populate_from_network_channel_and_compare(
 	s_network_channel* network_channel,
-	network_address* a1,
-	const network_address* a2,
+	transport_address* a1,
+	const transport_address* a2,
 	bool check_network_port)
 {
 	bool equal = false;

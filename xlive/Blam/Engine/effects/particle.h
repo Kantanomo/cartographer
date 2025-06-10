@@ -49,4 +49,4 @@ public:
 		real32 scale);
 };
 
-s_data_array* get_particle_table();
+data_array* get_particle_table();

@@ -208,11 +208,10 @@ static void setup_game_options_text(const wchar_t* reports_path)
 	FILE* file;
 	errno_t error = _wfopen_s(&file, report_info_path_game_options->get_string(), L"w+");
 
-	const s_main_game_globals* main_game_globals = get_main_game_globals();
-
-	if (!error && file != NULL && main_game_globals != NULL)
+	// We want to make sure the game is active before we get the game options, otherwise we'll crash if the game hasn't initialized it
+	if (!error && file != NULL && game_is_active())
 	{
-		const s_game_options* game_options = &main_game_globals->options;
+		const s_game_options* game_options = game_options_get();
 
 		fwprintf(file, L"GAME OPTIONS\n");
 		fwprintf(file, L"%ls", k_crash_message_header_break);
@@ -421,8 +420,7 @@ static void setup_rasterizer_text(const wchar_t* reports_path)
 
 	FILE* file;
 	errno_t error = _wfopen_s(&file, report_info_path_game_globals->get_string(), L"w+");
-	const s_main_game_globals* game_globals = get_main_game_globals();
-	if (!error && file != NULL && game_globals != NULL)
+	if (!error && file != NULL)
 	{
 		fwprintf(file, L"RASTERIZER\n");
 		fwprintf(file, L"%ls", k_crash_message_header_break);

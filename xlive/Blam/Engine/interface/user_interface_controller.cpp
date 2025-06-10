@@ -174,12 +174,12 @@ bool __cdecl user_interface_controller_get_autolevel_enabled(e_controller_index 
 	return INVOKE(0x207627, 0, user_interface_controller_get_autolevel_enabled, controller_index);
 }
 
-e_handicap __cdecl user_interface_controller_get_user_handicap_level(e_controller_index controller_index)
+e_user_interface_controller_handicap __cdecl user_interface_controller_get_user_handicap_level(e_controller_index controller_index)
 {
 	return INVOKE(0x206938, 0, user_interface_controller_get_user_handicap_level, controller_index);
 }
 
-void __cdecl user_interface_controller_set_user_handicap_level(e_controller_index controller_index, e_handicap handicap)
+void __cdecl user_interface_controller_set_user_handicap_level(e_controller_index controller_index, e_user_interface_controller_handicap handicap)
 {
 	INVOKE(0x206923, 0, user_interface_controller_set_user_handicap_level, controller_index, handicap);
 	return;

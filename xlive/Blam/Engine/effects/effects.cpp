@@ -5,14 +5,14 @@
 #include "main/interpolator.h"
 #include "objects/objects.h"
 
-s_data_array* get_effects_table()
+data_array* get_effects_table()
 {
-	return *Memory::GetAddress<s_data_array**>(0x4CE884, 0x4F5070);
+	return *Memory::GetAddress<data_array**>(0x4CE884, 0x4F5070);
 }
 
-s_data_array* get_effects_location_table()
+data_array* get_effects_location_table()
 {
-	return *Memory::GetAddress<s_data_array**>(0x4CE880, 0x4F506C);
+	return *Memory::GetAddress<data_array**>(0x4CE880, 0x4F506C);
 }
 
 real_vector3d* effect_get_velocity(datum effect_index)

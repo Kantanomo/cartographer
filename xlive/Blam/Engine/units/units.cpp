@@ -89,7 +89,7 @@ void __cdecl unit_control(datum unit_index, unit_control_data* control_data)
 e_game_team unit_get_team_index(datum unit_index)
 {
 	const unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);
-	return (unit ? unit->unit.unit_team : _game_team_none);
+	return (unit ? unit->unit.unit_team : _game_team_observer);
 }
 
 bool __cdecl unit_desires_tight_camera_track(datum unit_index)

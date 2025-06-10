@@ -4,13 +4,14 @@
 #include "game/game.h"
 #include "game/game_engine.h"
 #include "game/game_globals.h"
-#include "simulation/game_interface/simulation_game_action.h"
-#include "units/units.h"
+#include "interface/user_interface_controller.h"
 #include "saved_games/game_variant.h"
 #include "scenario/scenario.h"
 #include "shell/shell.h"
+#include "simulation/game_interface/simulation_game_action.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_queue_global_events.h"
+#include "units/units.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -29,9 +30,9 @@ uint8 g_user_weapon_interactions_mask = UINT8_MAX;
 	- If you need to do something in the pregame lobby, use the functions available in Network Session (Blam/networking/session)
 */
 
-s_data_array* s_player::get_data()
+data_array* s_player::get_data()
 {
-	return *Memory::GetAddress<s_data_array**>(0x4A8260, 0x4D64C4);
+	return *Memory::GetAddress<data_array**>(0x4A8260, 0x4D64C4);
 }
 
 bool s_player::is_index_valid(datum player_index)
@@ -40,35 +41,33 @@ bool s_player::is_index_valid(datum player_index)
 	return player_abs_index >= 0 && player_abs_index < k_maximum_players;
 }
 
-s_player* s_player::get(datum player_index)
-{
-	if (!is_index_valid(player_index))
-	{
-		return nullptr;
-	}
-	return (s_player*)&get_data()->data[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index) * get_data()->datum_element_size];
-}
-
 e_game_team s_player::get_team(datum player_index)
 {
 	if (!is_index_valid(player_index))
 	{
-		return _game_team_none;
+		return _game_team_observer;
 	}
-	return (e_game_team)get(player_index)->properties[0].team_index;
+
+	const s_player* player = (s_player*)datum_get(get_data(), player_index);
+	return (e_game_team)player->properties[0].team_index;
 }
 
 s_player* s_player::get_from_unit_index(datum unit_index)
 {
-	player_iterator playersIt;
-	while (playersIt.get_next_active_player())
+	s_player* result = NULL;
+	c_player_in_game_iterator iterator;
+	
+	while (iterator.get_datum())
 	{
-		datum unit_datum_index_check = playersIt.get_current_player_data()->unit_index;
-
-		if (unit_index == unit_datum_index_check)
-			return playersIt.get_current_player_data();
+		s_player* player = iterator.get_datum();;
+		if (unit_index == player->unit_index)
+		{
+			result = player;
+			break;
+		}
 	}
-	return nullptr;
+
+	return result;
 }
 
 void s_player::set_team(datum player_index, e_game_team team)
@@ -77,7 +76,8 @@ void s_player::set_team(datum player_index, e_game_team team)
 	{
 		return;
 	}
-	get(player_index)->properties[0].team_index = (int8)team;
+	s_player* player = (s_player*)datum_get(get_data(), player_index);
+	player->properties[0].team_index = (int8)team;
 }
 
 void s_player::set_unit_character_type(datum player_index, e_character_type character_type)
@@ -86,7 +86,7 @@ void s_player::set_unit_character_type(datum player_index, e_character_type char
 	{
 		return;
 	}
-	s_player* player = get(player_index);
+	s_player* player = (s_player*)datum_get(get_data(), player_index);
 
 	player->properties[0].profile_traits.profile.player_character_type = character_type;
 	// shouldn't be needed
@@ -100,7 +100,10 @@ void s_player::set_unit_speed(datum player_index, float speed)
 	{
 		return;
 	}
-	get(player_index)->unit_speed = speed;
+
+	s_player* player = (s_player*)datum_get(get_data(), player_index);
+	player->unit_speed = speed;
+	return;
 }
 
 const wchar_t* s_player::get_name(datum player_index)
@@ -109,7 +112,9 @@ const wchar_t* s_player::get_name(datum player_index)
 	{
 		return L"";
 	}
-	return get(player_index)->properties[0].player_name;
+
+	const s_player* player = (s_player*)datum_get(get_data(), player_index);
+	return player->properties[0].player_name;
 }
 
 datum s_player::get_unit_index(datum player_index)
@@ -119,7 +124,8 @@ datum s_player::get_unit_index(datum player_index)
 		return NONE;
 	}
 
-	return get(player_index)->unit_index;
+	const s_player* player = (s_player*)datum_get(get_data(), player_index);
+	return player->unit_index;
 }
 
 // TODO: remove this
@@ -152,53 +158,84 @@ uint64 s_player::get_id(datum player_index)
 		return 0ull;
 	}
 
-	return get(player_index)->identifier;
+	const s_player* player = (s_player*)datum_get(get_data(), player_index);
+	return player->identifier;
 }
 
-player_iterator::player_iterator() :
-	m_data_iterator(s_player::get_data())
+c_player_in_game_iterator::c_player_in_game_iterator(void)
 {
-	m_current_player = NULL;
+	iterator_new(&m_data_iterator, s_player::get_data());
+	return;
 }
 
-bool player_iterator::get_next_active_player()
+c_player_with_unit_iterator::c_player_with_unit_iterator(void)
 {
-	m_current_player = m_data_iterator.get_next_datum();
+	iterator_new(&m_data_iterator, s_player::get_data());
+	return;
+}
+
+bool c_player_in_game_iterator::next(void)
+{
+	m_current_player = (s_player*)iterator_next(&m_data_iterator);
 
 	while (m_current_player)
 	{
 		if (!TEST_BIT(m_current_player->flags, _player_left_game_bit))
+		{
 			break;
+		}
 
-		m_current_player = m_data_iterator.get_next_datum();
+		m_current_player = (s_player*)iterator_next(&m_data_iterator);
 	}
 
 	return m_current_player != nullptr;
 }
 
-s_player* player_iterator::get_current_player_data() const
+s_player* c_player_in_game_iterator::get_datum(void) const
 {
 	return m_current_player;
 }
 
-int32 player_iterator::get_current_player_index() const
+datum c_player_in_game_iterator::get_index(void) const
 {
-	return m_data_iterator.get_current_absolute_index();
+	return m_data_iterator.index;
 }
 
-datum player_iterator::get_current_player_datum_index() const
+int32 c_player_in_game_iterator::get_absolute_index(void) const
 {
-	return m_data_iterator.get_current_datum_index();
+	return m_data_iterator.absolute_index;
 }
 
-wchar_t* player_iterator::get_current_player_name() const
+bool c_player_with_unit_iterator::next(void)
 {
-	return m_current_player->properties[0].player_name;
+	m_current_player = (s_player*)iterator_next(&m_data_iterator);
+
+	while (m_current_player)
+	{
+		if (m_current_player->unit_index != NONE)
+		{
+			break;
+		}
+
+		m_current_player = (s_player*)iterator_next(&m_data_iterator);
+	}
+
+	return m_current_player != nullptr;
 }
 
-uint64 player_iterator::get_current_player_id() const
+s_player* c_player_with_unit_iterator::get_datum(void) const
 {
-	return s_player::get_id(this->get_current_player_index());
+	return m_current_player;
+}
+
+datum c_player_with_unit_iterator::get_index(void) const
+{
+	return m_data_iterator.index;
+}
+
+int32 c_player_with_unit_iterator::get_absolute_index(void) const
+{
+	return m_data_iterator.absolute_index;
 }
 
 s_players_globals* get_players_globals()
@@ -389,7 +426,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
 	}
 
 	// Handicap verification
-	configuration_data->player_handicap_level = PIN(configuration_data->player_handicap_level, _handicap_none, _handicap_severe);
+	configuration_data->player_handicap_level = PIN(configuration_data->player_handicap_level, _user_interface_controller_handicap_none, _user_interface_controller_handicap_severe);
 	
 	// User role verification
 	int8 bungie_user_role = configuration_data->bungie_user_role;
@@ -402,9 +439,9 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
 	{
 		if (TEST_BIT(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
 		{
-			if (configuration_data->team_index != _game_team_none && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
+			if (configuration_data->team_index != _game_team_observer && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
 			{
-				configuration_data->team_index = _game_team_none;
+				configuration_data->team_index = _game_team_observer;
 			}
 		}
 	}
@@ -416,10 +453,12 @@ void __cdecl players_update_activation(void)
 {
 	if (!game_is_predicted())
 	{
-		s_data_iterator<s_player> player_it(s_player::get_data());
-		while (player_it.get_next_datum())
+		data_iterator iterator;
+		iterator_new(&iterator, s_player::get_data());
+
+		s_player* player = (s_player*)iterator_next(&iterator);
+		while (player)
 		{
-			s_player* player = player_it.get_current_datum();
 			if (!TEST_BIT(player->flags, _player_left_game_bit))
 			{
 				bool machine_active_in_game = TEST_BIT(player->flags, _player_active_in_game_bit);
@@ -439,11 +478,10 @@ void __cdecl players_update_activation(void)
 
 				if (TEST_BIT(player->flags, _player_active_in_game_bit) != machine_active_in_game)
 				{
-					datum player_index = player_it.get_current_datum_index();
 					if (insert_event)
 					{
 						s_simulation_queue_player_event_data event_data{ machine_active_in_game };
-						simulation_queue_player_event_insert(_simulation_queue_player_event_update, player_index, &event_data);
+						simulation_queue_player_event_insert(_simulation_queue_player_event_update, iterator.index, &event_data);
 					}
 					else
 					{
@@ -451,11 +489,13 @@ void __cdecl players_update_activation(void)
 
 						if (machine_active_in_game)
 						{
-							game_engine_player_activated(player_index);
+							game_engine_player_activated(iterator.index);
 						}
 					}
 				}
 			}
+
+			player = (s_player*)iterator_next(&iterator);
 		}
 	}
 	return;

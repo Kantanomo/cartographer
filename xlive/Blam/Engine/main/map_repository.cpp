@@ -797,7 +797,7 @@ public:
 		// here we replace the custom map list allocator
 		DWORD thisptr = (DWORD)this;
 
-		s_data_array** custom_map_menu_list = (s_data_array**)(thisptr + 112);
+		data_array** custom_map_menu_list = (data_array**)(thisptr + 112);
 
 		// first we get the map count
 		*custom_map_menu_list = nullptr;

@@ -160,11 +160,10 @@ bool Infection::shouldEndGame()
 {
 	int humanCount, zombieCount, playerCount;
 	humanCount = zombieCount = playerCount = 0;
-	player_iterator player_it;
-	while (player_it.get_next_active_player())
+	c_player_in_game_iterator player_it;
+	while (player_it.next())
 	{
-		uint64 playerIdentifier = player_it.get_current_player_id();
-		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
+		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), player_it.get_datum()->identifier) != Infection::zombieIdentifiers.end();
 
 		if (isZombie)
 			zombieCount++;
@@ -192,11 +191,11 @@ void Infection::preSpawnServerSetup() {
 	c_network_session* session = NULL;
 	network_life_cycle_in_squad_session(&session);
 	
-	player_iterator player_it;
-	while (player_it.get_next_active_player())
+	c_player_in_game_iterator player_it;
+	while (player_it.next())
 	{
-		int32 currentPlayerIndex = player_it.get_current_player_index();
-		uint64 playerIdentifier = player_it.get_current_player_id();
+		int32 currentPlayerIndex = player_it.get_absolute_index();
+		uint64 playerIdentifier = player_it.get_datum()->identifier;
 		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
 
 		bool zombie_team_status_human = isZombie == false && s_player::get_team(currentPlayerIndex) == k_zombie_team;
@@ -213,7 +212,7 @@ void Infection::preSpawnServerSetup() {
 			if (s_player::get_team(currentPlayerIndex) != k_zombie_team) 
 			{
 				// prevent the fucks from switching to humans in the pre-game lobby after joining
-				session->switch_player_team(player_it.get_current_player_datum_index(), k_zombie_team);
+				session->switch_player_team(player_it.get_absolute_index(), k_zombie_team);
 			}
 		}
 		else 
@@ -398,7 +397,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 			{
 				if (s_player::get_team(player_index) != k_zombie_team)
 				{
-					s_player* player = s_player::get(player_index);
+					s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
 
 					if (player->user_index != NONE)
 					{
@@ -456,7 +455,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 		if (!shell_is_dedicated_server())
 		{
-			s_player* player = s_player::get(playerIdx);
+			s_player* player = (s_player*)datum_get(s_player::get_data(), playerIdx);
 			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}", absPlayerIdx, player->identifier);
 
 			if(player->user_index != NONE)
@@ -483,7 +482,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		// client only
 		if (!shell_is_dedicated_server())
 		{
-			s_player* player = s_player::get(playerIdx);
+			s_player* player = (s_player*)datum_get(s_player::get_data(), playerIdx);
 
 			if(player->user_index != NONE)
 			{

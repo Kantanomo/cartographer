@@ -1,8 +1,9 @@
 #pragma once
-
-#include "game/players.h"
-#include "input/controllers.h"
 #include "network_observer.h"
+#include "game/game_allegiance.h"
+#include "game/player_constants.h"
+#include "input/controllers.h"
+#include "networking/network_game_definitions.h"
 #include "networking/transport/transport.h"
 #include "saved_games/game_variant.h"
 
@@ -590,9 +591,9 @@ public:
 		return TEST_BIT(m_session_membership.players_active_mask, DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index));
 	}
 
-	int32 get_peer_index_from_address(const network_address* address)
+	int32 get_peer_index_from_address(const transport_address* address)
 	{
-		return INVOKE_BY_TYPE(0x1C71DF, 0x19E9CF, int32(__thiscall*)(c_network_session*, const network_address*), this, address);
+		return INVOKE_BY_TYPE(0x1C71DF, 0x19E9CF, int32(__thiscall*)(c_network_session*, const transport_address*), this, address);
 	}
 
 	void request_membership_update()

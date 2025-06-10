@@ -7,7 +7,10 @@
 #include "camera/camera.h"
 #include "cache/pc_texture_cache.h"
 #include "game/players.h"
+#include "math/matrix_math.h"
 #include "units/units.h"
+
+/* public code */
 
 void hud_render_player_indicator(datum player_index)
 {

@@ -19,9 +19,6 @@ enum
 
 /* prototypes */
 
-uint32* network_adapter_get_count(void);
-s_network_adapter* network_adapters_get(void);
-
 // Populates adapter_address parameter passed with all the network adapters connected to the device
 // Make sure that adapter_address is free'd using CSERIES_FREE after it's no longer used
 uint32 network_adapter_addresses_populate(IP_ADAPTER_ADDRESSES** adapter_address);
@@ -45,6 +42,11 @@ void network_configuration_apply_patches(void)
 	return;
 }
 
+s_network_configuration* global_network_configuration_get(void)
+{
+	return Memory::GetAddress<s_network_configuration*>(0x4F8118, 0x522668);
+}
+
 int32 __cdecl network_adapter_index_get(void)
 {
 	return INVOKE(0x1AAEFF, 0x0, network_adapter_index_get);
@@ -63,11 +65,9 @@ void __cdecl network_configuration_initialize(void)
 
 void __cdecl get_network_adapters(void)
 {
-	uint32* network_adapter_count = network_adapter_get_count();
-	*network_adapter_count = 0;
+	global_network_configuration_get()->adapter_count = 0;
 
 	IP_ADAPTER_ADDRESSES* adapter_address = NULL;
-
 	uint32 error = network_adapter_addresses_populate(&adapter_address);
 
 	if (!error)
@@ -85,16 +85,6 @@ void __cdecl get_network_adapters(void)
 }
 
 /* private code */
-
-uint32* network_adapter_get_count(void)
-{
-	return Memory::GetAddress<uint32*>(0x4F98C4, 0x523E14);
-}
-
-s_network_adapter* network_adapters_get(void)
-{
-	return Memory::GetAddress<s_network_adapter*>(0x4F98D0, 0x523E20);
-}
 
 uint32 network_adapter_addresses_populate(IP_ADAPTER_ADDRESSES** adapter_address)
 {
@@ -132,14 +122,14 @@ uint32 network_adapter_addresses_populate(IP_ADAPTER_ADDRESSES** adapter_address
 bool network_adapter_is_duplicate(const IP_ADAPTER_ADDRESSES* adapter_address)
 {
 	bool duplicate_adapter_detected = false;
-	const uint32 network_adapter_count = *network_adapter_get_count();
+	const s_network_configuration* g_network_configuration = global_network_configuration_get();
 
 	// Check for duplicate adapters after the first one is added
-	if (network_adapter_count > 0)
+	if (g_network_configuration->adapter_count > 0)
 	{
-		for (uint32 i = 0; i < network_adapter_count; i++)
+		for (uint32 i = 0; i < g_network_configuration->adapter_count; ++i)
 		{
-			s_network_adapter* adapter = &network_adapters_get()[i];
+			const s_network_adapter* adapter = &g_network_configuration->network_adapters[i];
 			int32 index = csstrncmp(adapter_address->AdapterName, adapter->adapter_name, NUMBEROF(s_network_adapter::adapter_name)) == 0;
 			if (index)
 			{
@@ -154,8 +144,7 @@ bool network_adapter_is_duplicate(const IP_ADAPTER_ADDRESSES* adapter_address)
 
 void network_adapter_populate_globals(IP_ADAPTER_ADDRESSES* adapter_address)
 {
-	uint32* network_adapter_count = network_adapter_get_count();
-
+	s_network_configuration* g_network_configuration = global_network_configuration_get();
 	do
 	{
 		bool ethernet_or_wifi = adapter_address->IfType == IF_TYPE_ETHERNET_CSMACD || adapter_address->IfType == IF_TYPE_IEEE80211;
@@ -163,16 +152,16 @@ void network_adapter_populate_globals(IP_ADAPTER_ADDRESSES* adapter_address)
 		{
 			if (!network_adapter_is_duplicate(adapter_address))
 			{
-				s_network_adapter* adapter = &network_adapters_get()[*network_adapter_count];
+				s_network_adapter* adapter = &g_network_configuration->network_adapters[g_network_configuration->adapter_count];
 				csstrncpy(adapter->adapter_name, adapter_address->AdapterName, NUMBEROF(s_network_adapter::adapter_name));
 				ustrncpy(adapter->friendly_name, adapter_address->FriendlyName, NUMBEROF(s_network_adapter::friendly_name));
 				ustrncpy(adapter->description, adapter_address->Description, NUMBEROF(s_network_adapter::description));
-				++*network_adapter_count;
+				++g_network_configuration->adapter_count;
 			}
 		}
 		adapter_address = adapter_address->Next;
 	}
-	while (adapter_address && *network_adapter_count < k_network_adapter_max_count);
+	while (adapter_address && g_network_configuration->adapter_count < k_network_adapter_max_count);
 	
 	return;
 }

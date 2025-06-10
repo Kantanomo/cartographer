@@ -6,6 +6,7 @@
 
 #include "game/cheats.h"
 #include "game/game.h"
+#include "game/players.h"
 #include "main/main.h"
 #include "main/main_game.h"
 #include "main/main_game_time.h"

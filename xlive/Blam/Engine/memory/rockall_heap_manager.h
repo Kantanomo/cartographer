@@ -1,5 +1,11 @@
 #pragma once
 
+/* typedefs */
+
+typedef void* (rockall_allocator_t)(void*, size_t);
+
+/* structures */
+
 struct c_fixed_memory_rockall_frontend_vtbl
 {
 	bool(__thiscall* Delete)(int a1, int a2, int a3);
@@ -20,9 +26,30 @@ struct c_fixed_memory_rockall_frontend_vtbl
 	int(__thiscall* SpecialNew)(int a1, int a2);
 };
 
+/* classes */
+
 class c_fixed_memory_rockall_frontend
 {
 public:
-	virtual bool Delete(int a2, int a3) = 0;
+	virtual bool Delete(int32 a2, int32 a3) = 0;
 	virtual bool Details(const uint8* memory_block, int32* out_size) = 0;
 };
+
+class c_allocation_base
+{
+public:
+	virtual void* alloc(size_t bytes) = 0;
+	virtual void* free_block(void* block) = 0;
+};
+
+
+class c_normal_allocation : public c_allocation_base
+{
+public:
+	virtual void* alloc(size_t bytes);
+	virtual void* free_block(void* block);
+};
+
+/* prototypes */
+
+c_normal_allocation* normal_allocation_global_get(void);

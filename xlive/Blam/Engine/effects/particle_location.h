@@ -25,4 +25,4 @@ struct c_particle_location
 };
 ASSERT_STRUCT_SIZE(c_particle_location, 0x34);
 
-s_data_array* get_particle_location_table();
+data_array* get_particle_location_table();

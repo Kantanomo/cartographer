@@ -13,9 +13,9 @@ static s_havok_globals* havok_globals_get(void);
 
 /* public code */
 
-s_data_array* havok_components_get(void)
+data_array* havok_components_get(void)
 {
-	return *Memory::GetAddress<s_data_array**>(0x4D8624, 0x4FFF84);
+	return *Memory::GetAddress<data_array**>(0x4D8624, 0x4FFF84);
 }
 
 s_havok_game_state* havok_game_state_get(void)
@@ -43,7 +43,7 @@ bool havok_can_allocate_space_for_instance_of_object_definition(datum tag_index)
 		const s_havok_game_state* g_havok_game_state = havok_game_state_get();
 		if (havok_globals_get()->rigid_bodies_active)
 		{
-			const s_data_array* g_havok_component_data = havok_components_get();
+			const data_array* g_havok_component_data = havok_components_get();
 
 			ASSERT(g_havok_component_data->maximum_count == c_havok_component::k_maximum_havok_component_count);
 			ASSERT(g_havok_game_state->havok_components_allocated == g_havok_component_data->actual_count);

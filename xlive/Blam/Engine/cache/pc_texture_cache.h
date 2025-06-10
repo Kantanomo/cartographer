@@ -9,7 +9,7 @@
 // todo: unfinished very large struct
 struct s_pc_texture_cache_globals
 {
-	s_data_array* predicted_textures;
+	data_array* predicted_textures;
 };
 
 /* prototypes */

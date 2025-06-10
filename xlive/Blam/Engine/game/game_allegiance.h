@@ -37,6 +37,8 @@ enum e_game_team : int16
 	_game_team_unused14 = 14,
 	_game_team_unused15 = 15,
 
+	k_maximum_teams,
+
 	// Shared
-	_game_team_none = NONE
+	_game_team_observer = NONE
 };

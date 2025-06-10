@@ -6,6 +6,7 @@
 #include "game/game.h"
 #include "game/game_engine_util.h"
 #include "game/game_statborg.h"
+#include "game/players.h"
 #include "items/weapons.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "shell/shell.h"
@@ -72,7 +73,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 {
 	if (skull_datum == NONE) { return; }
 
-	s_player* player = s_player::get(player_datum);
+	s_player* player = (s_player*)datum_get(s_player::get_data(), player_datum);
 	int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
 
 	c_game_statborg* game_statborg = game_engine_get_statborg();

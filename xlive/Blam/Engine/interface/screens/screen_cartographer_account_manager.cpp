@@ -176,7 +176,7 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 	this->m_cartographer_screen_type = _screen_type;
 	this->m_default_focused_item = _default_selected_button;
 
-	s_data_array* account_list_data = ui_list_data_new(k_cartographer_account_manager_list_name, _button_count, sizeof(datum));
+	data_array* account_list_data = ui_list_data_new(k_cartographer_account_manager_list_name, _button_count, sizeof(datum));
 	this->m_list_data = account_list_data;
 
 	data_make_valid(account_list_data);

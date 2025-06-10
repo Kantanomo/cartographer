@@ -5,6 +5,7 @@
 #include "observer.h"
 #include "game/game_globals.h"
 #include "game/player_control.h"
+#include "math/matrix_math.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "units/units.h"
 #include "units/unit_definitions.h"

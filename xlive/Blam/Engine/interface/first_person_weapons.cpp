@@ -8,6 +8,7 @@
 #include "items/weapons.h"
 #include "items/weapon_definitions.h"
 #include "main/interpolator.h"
+#include "math/matrix_math.h"
 #include "models/models.h"
 #include "models/render_model_definitions.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"

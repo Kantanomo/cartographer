@@ -49,7 +49,7 @@
 #include "networking/network_utilities.h"
 #include "networking/memory/networking_memory.h"
 #include "networking/network_configuration.h"
-#include "networking/Transport/transport.h"
+#include "networking/transport/transport.h"
 #include "units/bipeds.h"
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/rasterizer_main.h"
@@ -758,8 +758,10 @@ static void h2mod_apply_tweaks(void)
 
 	if (shell_is_dedicated_server())
 	{
+
 	}
-	else {//is client
+	else
+	{
 
 		bool intro_high_quality_flag = true;//clients should set on halo2.exe -highquality
 

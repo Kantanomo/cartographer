@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "render_models.h"
 
+#include "objects/objects.h"
+
 /* public code */
 
 int32 __cdecl render_model_find_marker_group_by_name(datum render_model_index, string_id name)

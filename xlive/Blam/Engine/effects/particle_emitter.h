@@ -54,4 +54,4 @@ struct c_particle_emitter
 };
 ASSERT_STRUCT_SIZE(c_particle_emitter, 0x4C);
 
-s_data_array* get_particle_emitter_table();
+data_array* get_particle_emitter_table();

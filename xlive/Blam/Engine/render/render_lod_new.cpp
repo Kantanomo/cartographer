@@ -4,7 +4,10 @@
 #include "render.h"
 
 #include "game/player_control.h"
+#include "memory/data.h"
 #include "models/render_models.h"
+#include "models/render_model_definitions.h"
+#include "objects/objects.h"
 #include "rasterizer/rasterizer_memory.h"
 #include "render/render_objects.h"
 
@@ -16,9 +19,9 @@ uint32 render_object_cache_create_index()
 	return result;
 }
 
-s_data_array* get_cached_object_render_states_array()
+data_array* get_cached_object_render_states_array()
 {
-    return *Memory::GetAddress<s_data_array**>(0x4EC384, 0x0);
+    return *Memory::GetAddress<data_array**>(0x4EC384, 0x0);
 }
 
 int8 render_object_cache_get_level_of_detail(datum object_index)
