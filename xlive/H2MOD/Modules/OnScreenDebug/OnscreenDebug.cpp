@@ -28,8 +28,10 @@ void addDebugTextInternal(char* text) {
 
 	std::lock_guard lg(addTextMutex);
 
+#ifdef TERMINAL_ENABLED
 	CircularStringBuffer* output = GetMainConsoleInstance()->GetTabOutput(_console_tab_logs);
 	output->AddString(StringFlag_None, text, lenInput);
+#endif
 #ifndef SPDLOG_DISABLED
 	onscreendebug_log->debug(text);
 #endif

@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef TERMINAL_ENABLED
+
 #include "CommandsUtil.h"
 #include "ComVar.h"
 
@@ -111,3 +113,5 @@ protected:
 private:
 	ExecuteCommandCallbackT* p_exec_command_cb;
 };
+
+#endif

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "ImGui_ConsoleImpl.h"
 
+#ifdef TERMINAL_ENABLED
+
 #include "CommandCollection.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
@@ -601,3 +603,5 @@ int CartographerConsole::set_opacity_cb(const std::vector<std::string>& tokens, 
 	}
 	return 0;
 }
+
+#endif

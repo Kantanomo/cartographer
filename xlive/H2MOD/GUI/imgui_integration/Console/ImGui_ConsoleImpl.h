@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef TERMINAL_ENABLED
+
 #include "imgui.h"
 #include "CommandHandler.h"
 
@@ -126,6 +128,8 @@ do { \
 CartographerConsole::LogToTab(_console_tab_logs, \
 	header ": " "   %s() -> " fmt, __FUNCTION__, __VA_ARGS__); \
 } while (0)
+
+#endif
 
 #define SIM_EVENT_QUEUE_DBG(fmt, ...)
 //#define SIM_EVENT_QUEUE_DBG(fmt, ...) QUICK_DBG("sim-event-queue", fmt, __VA_ARGS__)

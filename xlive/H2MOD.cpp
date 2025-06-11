@@ -324,7 +324,9 @@ void H2MOD::Initialize()
 	// Apply patches
 	game_apply_pre_winmain_patches();
 
+#ifdef TERMINAL_ENABLED
 	CommandCollection::InitializeCommands();
+#endif
 
 	if (!shell_is_dedicated_server())
 	{

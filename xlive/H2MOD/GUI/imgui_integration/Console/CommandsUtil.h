@@ -3,6 +3,8 @@
 struct StringLineHeader;
 typedef int StringHeaderFlags;
 
+#ifdef TERMINAL_ENABLED
+
 #define MAX_CONSOLE_INPUT_BUFFER 256
 
 inline bool InputTextContainsCommandSubstring(const char* command, const char* input_text, bool test_only_first_token)
@@ -293,3 +295,5 @@ private:
 		}
 	}
 };
+
+#endif

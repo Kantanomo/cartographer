@@ -1,4 +1,7 @@
 #pragma once
+
+#ifdef TERMINAL_ENABLED
+
 #include "CommandHandler.h"
 
 namespace CommandCollection
@@ -8,3 +11,5 @@ namespace CommandCollection
 	void InitializeCommands();
 	void InsertCommand(ConsoleCommand* newCommand);
 }
+
+#endif

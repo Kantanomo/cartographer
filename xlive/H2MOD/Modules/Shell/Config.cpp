@@ -96,10 +96,12 @@ static std::enable_if_t<!std::is_same_v<T, bool> && std::is_integral_v<T>, bool>
 		//CartographerConsole::LogToTab(_console_tab_logs, "config: success setting \"%s\"", config_name);
 		result = true;
 	}
+#ifdef TERMINAL_ENABLED
 	else
 	{
 		CartographerConsole::LogToTab(_console_tab_logs, "get config: %s, default: %s - threw exception: [%s]", config_name, default_setting, exception.c_str());
 	}
+#endif
 
 	return result;
 }
@@ -116,10 +118,12 @@ static std::enable_if_t<std::is_same_v<T, bool>, bool>
 		//CartographerConsole::LogToTab(_console_tab_logs, "config: success setting \"%s\"", config_name);
 		result = true;
 	}
+#ifdef TERMINAL_ENABLED
 	else
 	{
 		CartographerConsole::LogToTab(_console_tab_logs, "get config: %s, default: %s - threw exception: [%s]", config_name, default_setting, exception.c_str());
 	}
+#endif
 
 	return result;
 }
@@ -154,7 +158,9 @@ set_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* c
 	catch (...)
 	{
 		result = false;
+#ifdef TERMINAL_ENABLED
 		CartographerConsole::LogToTab(_console_tab_logs, "set config: %s, threw exception!", config_name);
+#endif
 	}
 
 	if (result)
