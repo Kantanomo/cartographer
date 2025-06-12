@@ -19,7 +19,7 @@ static e_scenery_lightmapping_policy render_lod_new_get_scenery_lightmapping_pol
 
 uint32 render_object_cache_create_index()
 {
-	uint32 result = (*get_global_window_bound_index() << 30) | (*global_frame_num_get() & 0x3FFFFFFF);
+	uint32 result = (*get_global_window_bound_index() << 30) | (*global_frame_index_get() & 0x3FFFFFFF);
 	return result;
 }
 
@@ -399,7 +399,7 @@ void __cdecl object_build_render_cache_and_info(
 
                 if (*(datum*)(cached_object_render_state + 4) == info->object_index[render_model_storage_index])
                 {
-                    *(uint32*)(cached_object_render_state + 12) = *global_frame_num_get();
+                    *(uint32*)(cached_object_render_state + 12) = *global_frame_index_get();
                 }
             }
         }

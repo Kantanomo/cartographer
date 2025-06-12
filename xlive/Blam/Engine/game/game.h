@@ -1,13 +1,26 @@
 #pragma once
-
 #include "game_options.h"
 #include "structures/cluster_partitions.h"
 
-#define k_game_maximum_ragdolls 3
-#define k_game_maximum_ragdolls_new 6
+/* constants */
 
-#define k_game_maximum_players_to_allow_ragdolls 8
-#define k_game_maximum_players_to_allow_ragdolls_new 16
+enum
+{
+	k_game_maximum_ragdolls = 3,
+	k_game_maximum_ragdolls_new = 6,
+	k_game_maximum_players_to_allow_ragdolls = 8,
+	k_game_maximum_players_to_allow_ragdolls_new = 16
+};
+
+/* typedefs */
+
+typedef void(__cdecl* initialize_proc_t)(void);
+typedef void(__cdecl* dispose_proc_t)(void);
+typedef void(__cdecl* reset_proc_t)(void);
+typedef void(__cdecl* dispose_from_old_map_proc_t)(void);
+typedef void(__cdecl* activation_proc_t)(s_game_cluster_bit_vectors*, s_game_cluster_bit_vectors*);
+
+/* structures */
 
 struct s_main_game_globals
 {
@@ -35,13 +48,6 @@ struct s_main_game_globals
 };
 ASSERT_STRUCT_SIZE(s_main_game_globals, 0x1270);
 
-
-typedef void(__cdecl* initialize_proc_t)(void);
-typedef void(__cdecl* dispose_proc_t)(void);
-typedef void(__cdecl* reset_proc_t)(void);
-typedef void(__cdecl* dispose_from_old_map_proc_t)(void);
-typedef void(__cdecl* activation_proc_t)(s_game_cluster_bit_vectors*, s_game_cluster_bit_vectors*);
-
 struct s_game_systems
 {
 	initialize_proc_t initialize_proc;
@@ -66,9 +72,14 @@ struct s_date_and_time
 	int32 second;
 };
 
-s_game_systems* get_game_systems();
+/* prototypes */
+
+void game_apply_pre_winmain_patches(void);
+
+s_game_systems* get_game_systems(void);
 
 s_main_game_globals* get_main_game_globals(void);
+
 bool map_initialized(void);
 s_game_options* game_options_get(void);
 s_game_variant* current_game_variant(void);
@@ -101,4 +112,11 @@ void __cdecl game_dispose(void);
 
 bool __cdecl main_events_pending(void);
 
-void game_apply_pre_winmain_patches(void);
+void __cdecl game_tick(void);
+
+void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt);
+
+void __cdecl game_initialize_for_new_map(const s_game_options* options);
+
+void __cdecl game_frame(real32 dt);
+

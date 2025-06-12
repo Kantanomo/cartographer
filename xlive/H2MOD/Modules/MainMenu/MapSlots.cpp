@@ -25,11 +25,14 @@ enum e_default_maps_to_add
 
 /* constants */
 
-#define k_multiplayer_first_unused_slot 23
-#define k_max_map_slots 49
-#define k_starting_map_index 3000
+enum
+{
+	k_multiplayer_first_unused_slot = 23,
+	k_max_map_slots = 49,
+	k_starting_map_index = 3000
+};
 
-const wchar_t* k_default_maps_to_add[k_default_map_to_add_count] = 
+static const wchar_t* k_default_maps_to_add[k_default_map_to_add_count] = 
 {
 	L"highplains",
 	L"derelict"
@@ -37,7 +40,7 @@ const wchar_t* k_default_maps_to_add[k_default_map_to_add_count] =
 
 /* globals */
 
-s_multiplayer_ui_level_definition g_added_multiplayer_level_data[k_default_map_to_add_count] = {};
+static s_multiplayer_ui_level_definition g_added_multiplayer_level_data[k_default_map_to_add_count] = {};
 
 /* prototypes */
 
@@ -60,12 +63,11 @@ namespace MapSlots
 			map_location.append(k_default_maps_to_add[i]);
 			map_location.append(L".map");
 
-			FILE* map_handle = NULL;
-			errno_t error = _wfopen_s(&map_handle, map_location.get_string(), L"rb");
-			if (!error && map_handle != NULL)
+			FILE* map_handle = ufopen(map_location.get_string(), L"rb");
+			if (map_handle != NULL)
 			{
 				map_slots_get_multiplayer_level_data(map_handle, &g_added_multiplayer_level_data[i]);
-				fclose(map_handle);
+				ufclose(map_handle);
 			}
 			else
 			{

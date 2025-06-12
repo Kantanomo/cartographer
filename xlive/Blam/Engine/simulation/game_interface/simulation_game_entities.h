@@ -51,8 +51,8 @@ class c_simulation_entity_definition
 public:
 	virtual e_simulation_entity_type entity_type(void) = 0;
 	virtual const char* entity_type_name(void) = 0;
-	virtual uint32 state_data_size(void) = 0;
-	virtual uint32 creation_data_size(void) = 0;
+	virtual uint32 state_data_size(void) const = 0;
+	virtual uint32 creation_data_size(void) const = 0;
 	virtual int32 update_flag_count(void) = 0;
 	virtual uint32 initial_update_mask(void) = 0;
 	virtual int8 entity_replication_required_for_view_activation(s_simulation_game_entity* entity) = 0;
