@@ -47,7 +47,7 @@
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
 #include "networking/network_utilities.h"
-#include "networking/memory/networking_memory.h"
+#include "networking/network_memory.h"
 #include "networking/network_configuration.h"
 #include "networking/transport/transport.h"
 #include "units/bipeds.h"

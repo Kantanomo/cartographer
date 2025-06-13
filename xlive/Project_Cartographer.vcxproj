@@ -1016,7 +1016,7 @@
     <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\locator\network_locator.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\life_cycle_manager.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
+    <ClCompile Include="Blam\Engine\networking\logic\network_bandwidth.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\network_broadcast_search.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\network_life_cycle.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\network_search.cpp" />
@@ -1035,6 +1035,7 @@
     <ClCompile Include="Blam\Engine\networking\messages\network_message_handler.cpp" />
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
     <ClCompile Include="Blam\Engine\networking\delivery\network_link.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_memory.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_utilities.cpp" />
     <ClCompile Include="Blam\Engine\Networking\online\online_account_xbox.cpp" />
@@ -1453,7 +1454,7 @@
     <ClInclude Include="Blam\Engine\networking\logic\network_life_cycle.h" />
     <ClInclude Include="Blam\Engine\networking\logic\network_search.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\network_session_interface.h" />
-    <ClInclude Include="Blam\Engine\Networking\memory\networking_memory.h" />
+    <ClInclude Include="Blam\Engine\networking\logic\storage\network_storage.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages_connect.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages_out_of_band.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages_session_membership.h" />
@@ -1730,6 +1731,7 @@
     <ClInclude Include="Blam\Engine\networking\messages\network_message_gateway.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_message_handler.h" />
     <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
+    <ClInclude Include="Blam\Engine\networking\network_memory.h" />
     <ClInclude Include="Blam\Engine\networking\network_statistics.h" />
     <ClInclude Include="Blam\Engine\networking\network_utilities.h" />
     <ClInclude Include="Blam\Engine\Networking\online\online_account_xbox.h" />

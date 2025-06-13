@@ -227,7 +227,7 @@
     <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
     <ClCompile Include="Blam\Engine\input\controllers.cpp" />
     <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_memory.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_action.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_entities.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_events.cpp" />
@@ -891,7 +891,7 @@
     <ClInclude Include="Blam\Engine\input\input_windows.h" />
     <ClInclude Include="Blam\Engine\input\input_xinput.h" />
     <ClInclude Include="Blam\Engine\math\random_direction_table.h" />
-    <ClInclude Include="Blam\Engine\Networking\memory\networking_memory.h" />
+    <ClInclude Include="Blam\Engine\networking\network_memory.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_action.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_damage.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_device_machines.h" />

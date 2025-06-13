@@ -4,7 +4,7 @@
 #include "simulation_queue_events.h"
 #include "simulation/game_interface/simulation_game_events.h"
 
-#include "networking/memory/networking_memory.h"
+#include "networking/network_memory.h"
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 
 
