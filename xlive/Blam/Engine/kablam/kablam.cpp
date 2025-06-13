@@ -8,7 +8,9 @@
 #include "shell/shell_windows.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#ifdef TERMINAL_ENABLED
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
+#endif
 #include "H2MOD/Modules/Shell/Config.h"
 
 /* constants */
@@ -61,7 +63,9 @@ static void server_console_send_command(wchar_t** command, int32 split_commands_
 
 static void server_console_send_msg(const wchar_t* message, bool timeout);
 
+#ifdef TERMINAL_ENABLED
 static int __cdecl server_console_output_cb(StringHeaderFlags flags, const char* fmt, ...);
+#endif
 
 /* public code */
 
@@ -215,7 +219,9 @@ static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wi
 			command_line.append(" ");
 		}
 
+#ifdef TERMINAL_ENABLED
 		ConsoleCommand::HandleCommandLine(command_line.get_string(), command_line.length(), server_console_output_cb);
+#endif
 		return 0;
 	}
 
@@ -392,6 +398,7 @@ static void server_console_send_msg(const wchar_t* message, bool timeout)
 	return;
 }
 
+#ifdef TERMINAL_ENABLED
 static int __cdecl server_console_output_cb(StringHeaderFlags flags, const char* fmt, ...)
 {
 	va_list ap;
@@ -401,4 +408,4 @@ static int __cdecl server_console_output_cb(StringHeaderFlags flags, const char*
 	va_end(ap);
 	return 0;
 }
-
+#endif

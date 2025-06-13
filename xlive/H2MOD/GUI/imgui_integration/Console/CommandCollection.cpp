@@ -1,6 +1,8 @@
 #include "stdafx.h"
-
 #include "CommandCollection.h"
+
+#ifdef TERMINAL_ENABLED
+
 #include "CommandsUtil.h"
 #include "ComVar.h"
 
@@ -761,8 +763,6 @@ static int CommandCollection::InjectTagCmd(const std::vector<std::string>& token
 	tag_injection_inject();
 
 	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_datum);
-
-	LOG_INFO_GAME("{} - {} {}", tagName, tag_type.string);
 	return 0;
 }
 
@@ -1002,3 +1002,5 @@ static int CommandCollection::_objects_dump_memory(const std::vector<std::string
 #endif
 
 TEST_N_DEF(CC4);
+
+#endif

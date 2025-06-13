@@ -95,11 +95,13 @@ void hotkeyFuncHelp() {
 
 	addDebugText("------------------------------");
 
+#ifdef TERMINAL_ENABLED
 	if (!ImGuiHandler::IsWindowActive(k_cartographer_console_window_name))
 	{
 		ImGuiHandler::ToggleWindow(k_cartographer_console_window_name);
 	}
 	GetMainConsoleInstance()->SwitchToTab(_console_tab_logs);
+#endif
 }
 
 void hotkeyFuncToggleHideIngameChat() {
@@ -117,7 +119,9 @@ void hotkeyFuncGuide() {
 }
 
 void hotkeyFuncConsole() {
+#ifdef TERMINAL_ENABLED
 	ImGuiHandler::ToggleWindow(k_cartographer_console_window_name);
+#endif
 }
 
 void KeyboardInput::Initialize()

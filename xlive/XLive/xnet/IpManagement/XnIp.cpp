@@ -72,6 +72,7 @@ void XnIpManager::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned in
 	}
 }
 
+#ifdef TERMINAL_ENABLED
 void XnIpManager::LogConnectionsToConsole(TextOutputCb* outputCb) const
 {
 	if (!(GetRegisteredKeyCount() > 0))
@@ -118,6 +119,7 @@ void XnIpManager::LogConnectionsToConsole(TextOutputCb* outputCb) const
 	if (outputCb)
 		outputCb(StringFlag_None, "# available XnIp connection slots: %d", GetMaxXnConnections());
 }
+#endif
 
 void XnIpManager::LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey) const
 {

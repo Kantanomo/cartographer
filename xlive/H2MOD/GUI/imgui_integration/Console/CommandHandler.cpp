@@ -1,6 +1,8 @@
 #include "stdafx.h"
-
 #include "CommandHandler.h"
+
+#ifdef TERMINAL_ENABLED
+
 #include "CommandCollection.h"
 
 const char command_error_invalid_parameter_count[] = "# %s command error: invalid parameter count";
@@ -100,3 +102,5 @@ bool ConsoleCommand::HandleCommandLine(const char* commandLine, size_t commandLi
 
 	return result;
 }
+
+#endif

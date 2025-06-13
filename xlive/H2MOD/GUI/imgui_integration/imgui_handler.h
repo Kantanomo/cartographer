@@ -25,7 +25,9 @@ enum e_imgui_window_type
 	_imgui_window_motd = 1,
 	_imgui_window_message_box = 2,
 	_imgui_window_advanced_settings = 3,
+#ifdef TERMINAL_ENABLED
 	_imgui_window_console,
+#endif
 	k_imgui_window_type_count
 };
 

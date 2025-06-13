@@ -509,7 +509,9 @@ public:
 	XnKeyPair* KeyPairLookup(const XNKID* xnkid) const;
 	
 	// Logging 
+#ifdef TERMINAL_ENABLED
 	void LogConnectionsToConsole(TextOutputCb* outputCb) const;
+#endif
 	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey) const;
 
 	// XNet startup parameters
