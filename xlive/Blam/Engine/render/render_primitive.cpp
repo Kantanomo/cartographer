@@ -7,10 +7,25 @@ c_render_primitive_list g_render_primitives_by_primitive_list_type[3];	// Only u
 
 /* public code */
 
-bool c_render_primitive_list::is_layer_different(e_render_layer layer_index) const
+void c_render_primitive_list::backup_settings(void)
+{
+	m_render_layer_flags_backup = m_render_layer_flags;
+	m_render_layer_flags = 0;
+	m_field_C = m_primitive_count;
+	return;
+}
+
+void c_render_primitive_list::restore_backup(void)
+{
+	m_render_layer_flags = m_render_layer_flags_backup;
+	m_field_C = 0;
+	return;
+}
+
+bool c_render_primitive_list::test_layer(e_render_layer layer_index) const
 {
 	ASSERT(VALID_INDEX(layer_index, k_number_of_render_layers));
-	return !this->m_render_layer_flags.test(layer_index);
+	return !TEST_BIT(m_render_layer_flags, layer_index);
 }
 
 void __cdecl create_visible_render_primitives(int32 hologram_flag)

@@ -1,6 +1,6 @@
 #pragma once
 #include "object_definition.h"
-
+#include "objects.h"
 
 /* enums */
 
@@ -22,7 +22,8 @@ enum e_scenery_lightmapping_policy : int16
 {
 	_scenery_lightmapping_policy_per_vertex = 0,
 	_scenery_lightmapping_policy_per_pixel = 1,		// not implemented
-	_scenery_lightmapping_policy_dynamic = 2
+	_scenery_lightmapping_policy_dynamic = 2,
+	_scenery_lightmapping_policy_none = NONE
 };
 
 /* structures */
@@ -47,3 +48,21 @@ struct scenery_definition
 	_scenery_definition scenery;
 };
 ASSERT_STRUCT_SIZE(scenery_definition, 196);
+
+
+struct _scenery_datum
+{
+	uint32 flags;
+	int16 field_4;
+	e_scenery_pathfinding_policy pathfinding_policy;
+	int32 lightmapping_policy;	// e_scenery_lightmapping_policy
+	int32 field_C;
+};
+
+struct scenery_datum
+{
+	datum definition_index;
+	_object_datum object;
+	_scenery_datum scenery;
+};
+ASSERT_STRUCT_SIZE(scenery_datum, 316)

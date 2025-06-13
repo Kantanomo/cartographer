@@ -21,13 +21,16 @@ class c_render_primitive_list
 {	
 public:
 	int32 m_max_primitive_count;
-	int32 m_field_4;
-	c_flags_no_init<e_render_layer, uint32, k_number_of_render_layers> m_render_layer_flags;
+	int32 m_primitive_count;
+	uint32 m_render_layer_flags;
 	int32 m_field_C;
-	c_flags_no_init<e_render_layer, uint32, k_number_of_render_layers> m_render_layer_flags_backup;
+	uint32 m_render_layer_flags_backup;
 	c_render_primitive* m_primitives;
 
-	bool is_layer_different(e_render_layer layer_index) const;
+	void backup_settings(void);
+	void restore_backup(void);
+
+	bool test_layer(e_render_layer layer_index) const;
 };
 ASSERT_STRUCT_SIZE(c_render_primitive_list, 24);
 
@@ -44,5 +47,6 @@ void __cdecl create_visible_render_primitives(int32 hologram_flag);
 inline c_render_primitive_list* render_primitive_get_by_primitive_list_type(uint8 primitive_list_type)
 {
 	ASSERT(VALID_INDEX(primitive_list_type, NUMBEROF(g_render_primitives_by_primitive_list_type)));
-	return &Memory::GetAddress<c_render_primitive_list*>(0x4F4EC0)[primitive_list_type];
+	c_render_primitive_list* lists = Memory::GetAddress<c_render_primitive_list*>(0x4F4EC0);
+	return &lists[primitive_list_type];
 }

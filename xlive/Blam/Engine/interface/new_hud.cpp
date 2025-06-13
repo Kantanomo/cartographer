@@ -67,7 +67,7 @@ s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_use
 	return &Memory::GetAddress<s_new_hud_temporary_user_state*>(0x9766D0, 0)[local_user_index];
 }
 
-void __cdecl new_hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_point)
+void __cdecl new_hud_widget_anchor_calculate_point(int32 anchor, real_point2d* out_point)
 {
 	INVOKE(0x223969, 0, new_hud_widget_anchor_calculate_point, anchor, out_point);
 	return;

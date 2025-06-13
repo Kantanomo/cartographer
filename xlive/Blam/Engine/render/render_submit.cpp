@@ -34,7 +34,7 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 	uint32 v1 = 0x40000;
 
 	s_scenario_fog_result* g_fog_result = global_fog_result_get();
-	if (g_fog_result->patchy_fog_tag_index != NONE && !g_fog_result->sort_behind_transparents)
+	if (g_fog_result->patchy_fog_tag_index != NONE && !g_fog_result->field_96)
 	{
 		real32 result = (g_fog_result->field_88.lower > g_fog_result->field_88.upper ? g_fog_result->field_88.lower : g_fog_result->field_88.upper);
 
@@ -45,9 +45,7 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 	render_layer_globals->transparent_submit_in_progress = true;
 
 	c_render_primitive_list* primitive_list = render_primitive_get_by_primitive_list_type(0);
-	primitive_list->m_render_layer_flags_backup = primitive_list->m_render_layer_flags;
-	primitive_list->m_render_layer_flags.clear();
-	primitive_list->m_field_C = primitive_list->m_field_4;
+	primitive_list->backup_settings();
 
 	// Copy render primary viewport to active camo
 	// Make sure to create a rect so that only the content in the viewport is copied over rather than the whole screen
@@ -64,9 +62,9 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 	}
 
 
-	for (uint8 i = 0; i < model_data->count; i++)
+	for (int8 i = 0; i < model_data->count; ++i)
 	{
-		render_section_visibility_compute(0, NONE, model_data->model_group_index[i], 0x11818E, v1, INT16_MAX+1, 0x40000, 0);
+		render_section_visibility_compute(0, NONE, model_data->model_group_index[i], 0x11818E, v1, INT16_MAX+1, 0x40000, false);
 	}
 
 	bool* g_rasterizer_dx9_disable_stencil = rasterizer_dx9_disable_stencil_get();
@@ -104,8 +102,7 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 	}
 
 	render_scene_geometry(_collection_type_0, _render_layer_transparent);
-	primitive_list->m_render_layer_flags = primitive_list->m_render_layer_flags_backup;
-	primitive_list->m_field_C = 0;
+	primitive_list->restore_backup();
 
 	render_layer_globals->transparent_submit_in_progress = false;
 	return;
@@ -116,9 +113,7 @@ void __cdecl render_submit_transparent_hologram_geometry(uint32* a1)
 	const uint32 model_group_index = a1[0];
 	const uint32 flags = a1[1];
 	c_render_primitive_list* primitive_list = render_primitive_get_by_primitive_list_type(0);
-	primitive_list->m_render_layer_flags_backup = primitive_list->m_render_layer_flags;
-	primitive_list->m_render_layer_flags.clear();
-	primitive_list->m_field_C = primitive_list->m_field_4;
+	primitive_list->backup_settings();
 
 	// Copy render primary viewport to active camo
 	// Make sure to create a rect so that only the content in the viewport is copied over rather than the whole screen
@@ -148,7 +143,6 @@ void __cdecl render_submit_transparent_hologram_geometry(uint32* a1)
 	render_scene_geometry(_collection_type_0, _render_layer_transparent);
 	render_scene_geometry(_collection_type_0, _render_layer_hologram);
 
-	primitive_list->m_render_layer_flags = primitive_list->m_render_layer_flags_backup;
-	primitive_list->m_field_C = 0;
+	primitive_list->restore_backup();
 	return;
 }

@@ -13,6 +13,10 @@
 
 #include "H2MOD/Modules/Shell/Config.h"
 
+
+static e_scenery_lightmapping_policy render_lod_new_get_scenery_lightmapping_policy(datum object_index);
+
+
 uint32 render_object_cache_create_index()
 {
 	uint32 result = (*get_global_window_bound_index() << 30) | (*global_frame_num_get() & 0x3FFFFFFF);
@@ -21,7 +25,7 @@ uint32 render_object_cache_create_index()
 
 data_array* get_cached_object_render_states_array()
 {
-    return *Memory::GetAddress<data_array**>(0x4EC384, 0x0);
+    return *Memory::GetAddress<data_array**>(0x4EC384);
 }
 
 int8 render_object_cache_get_level_of_detail(datum object_index)
@@ -64,10 +68,6 @@ void __cdecl render_object_update_change_colors(datum object_index, bool a2)
     return;
 }
 
-// Disable illegal instruction size warnings,
-// It generates the correct code...
-#pragma warning( push )
-#pragma warning( disable : 4409)
 int16 __cdecl sub_59CC02_to_usercall(
     datum object_index,
     real32 a2,
@@ -82,9 +82,15 @@ int16 __cdecl sub_59CC02_to_usercall(
     void* sub_59CC02 = Memory::GetAddress<void*>(0x19CC02);
     __asm
     {
-        push a6
-        push a5
-        push first_person
+        mov esi, a6
+        push esi
+
+        mov al, a5
+        push eax
+        
+        mov esi, first_person
+        push esi
+        
         push a3
         push a2
         push object_index
@@ -106,13 +112,18 @@ bool __cdecl sub_59D024_to_usercall(
     int8 current_lod,
     bool* a8)
 {
-    bool result = false;
+    bool result;
     void* sub_59D024 = Memory::GetAddress<void*>(0x19D024);
     __asm
     {
         push a8
-        push current_lod
-        push first_person
+
+        mov dl, current_lod
+        push edx
+        
+        mov dl, first_person
+        push edx
+
         push object_index
         mov esi, render_model_index
         mov edi, section_indices
@@ -124,7 +135,6 @@ bool __cdecl sub_59D024_to_usercall(
     }
     return result;
 }
-#pragma warning( pop ) 
 
 int32 __cdecl sub_77DCF6_get_unk_count(datum model_index, int32 level_of_detail, uint8* region_section_indices)
 {
@@ -174,18 +184,6 @@ render_lighting* __cdecl sub_597370(datum object_index, real32 a2)
     return INVOKE(0x197370, 0x0, sub_597370, object_index, a2);
 }
 
-typedef void(__cdecl* t_object_build_render_cache_and_info)(
-    datum object_index,
-    int32 a2,
-    real32 a3,
-    real32 a4,
-    s_render_object_info* info,
-    int32 a6,
-    bool force_no_fp_object,
-    bool skinning_matrices);
-
-t_object_build_render_cache_and_info p_object_build_render_cache_and_info;
-
 void __cdecl object_build_render_cache_and_info(
     datum object_index,
     int32 a2,
@@ -198,7 +196,6 @@ void __cdecl object_build_render_cache_and_info(
 {
     int8 desired_object_lod = NONE;
     int32 skipped_object_count = 0;
-    info->object_count = 0;
 
     int16 render_model_count = sub_59CC02_to_usercall(
         object_index,
@@ -211,7 +208,7 @@ void __cdecl object_build_render_cache_and_info(
 
     info->level_of_detail = desired_object_lod;
 
-    ASSERT(render_model_count <= MAXIMUM_RENDER_MODELS_PER_OBJECT);
+    ASSERT(VALID_INDEX(render_model_count, MAXIMUM_RENDER_MODELS_PER_OBJECT));
 
     if (info->first_person 
         && *global_user_render_index_get() != NONE 
@@ -220,19 +217,10 @@ void __cdecl object_build_render_cache_and_info(
         render_model_count = 0;
     }
 
-    const object_header_datum* object = (object_header_datum*)datum_get(object_header_data_get(), object_index);
-
-    if (object->type == _object_type_scenery)
-    {
-        uint8* object_data = (uint8*)object_try_and_get_and_verify_type(object_index, _object_mask_scenery);
-        info->field_16A = *(int16*)(object_data + 308);
-    }
-    else
-    {
-        info->field_16A = NONE;
-    }
-
-    for (int32 i = 0; i < render_model_count; i++)
+    info->object_count = 0;
+    info->scenery_lightmapping_policy = render_lod_new_get_scenery_lightmapping_policy(object_index);
+   
+    for (int32 i = 0; i < render_model_count; ++i)
     {
         int32 render_model_storage_index = i - skipped_object_count;
 
@@ -264,8 +252,7 @@ void __cdecl object_build_render_cache_and_info(
         info->render_info[render_model_storage_index] = render_object_cache_get_render_state(info->object_index[render_model_storage_index]);
         info->field_70[render_model_storage_index] = TEST_BIT(flags, 0);
 
-        ASSERT(!info->render_info[render_model_storage_index] 
-            || info->render_info[render_model_storage_index]->context == info->object_index[render_model_storage_index]);
+        ASSERT(!info->render_info[render_model_storage_index] || info->render_info[render_model_storage_index]->context == info->object_index[render_model_storage_index]);
 
         // partial missing code from Halo 2 Vista
         object_is_cached = render_object_cache_storage_is_object_cached(info->render_info[render_model_storage_index]) && cached_lod != NONE;
@@ -446,9 +433,22 @@ __declspec(naked) void object_render_calculate_lod_nak_to_usercall()
     }
 }
 
+static e_scenery_lightmapping_policy render_lod_new_get_scenery_lightmapping_policy(datum object_index)
+{
+    e_scenery_lightmapping_policy result = _scenery_lightmapping_policy_none;
+    if (object_get_type(object_index) == _object_type_scenery)
+    {
+        const scenery_datum* scenery = (scenery_datum*)object_try_and_get_and_verify_type(object_index, _object_mask_scenery);
+        result = (e_scenery_lightmapping_policy)scenery->scenery.lightmapping_policy;
+    }
+
+    return result;
+}
+
 void render_lod_new_apply_patches()
 {
-    DETOUR_ATTACH(p_object_build_render_cache_and_info, Memory::GetAddress<t_object_build_render_cache_and_info>(0x19D165, 0x0), object_build_render_cache_and_info);
+    PatchCall(Memory::GetAddress(0xBCC69), object_build_render_cache_and_info);
+    PatchCall(Memory::GetAddress(0xBCFC3), object_build_render_cache_and_info);
 
     object_render_calculate_lod_usercall = Memory::GetAddress<void*>(0x19CA3E);
     PatchCall(Memory::GetAddress<void*>(0x19CDA3), object_render_calculate_lod_nak_to_usercall);

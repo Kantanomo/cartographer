@@ -674,7 +674,7 @@ static void h2mod_apply_hooks(void)
 		}
 
 		// ### TODO dedi offset
-		Codecave(Memory::GetAddress(0x15E8DC, 0x0), object_function_value_adjust_primary_firing, 4);
+		Codecave(Memory::GetAddress(0x15E8DC), object_function_value_adjust_primary_firing, 4);
 
 		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
 		DETOUR_ATTACH(p_user_interface_controller_set_desired_team_index, Memory::GetAddress<user_interface_controller_set_desired_team_index_t>(0x2068F2), user_interface_controller_set_desired_team_index_hook);

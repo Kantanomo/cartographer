@@ -120,11 +120,6 @@ int32 get_global_render_window_count()
 	return *Memory::GetAddress<int32*>(0x4E6974);
 }
 
-bool get_global_render_split_horizontally()
-{
-	return (*Memory::GetAddress<int32*>(0x4E6970) == 1);
-}
-
 e_controller_index global_render_current_controller_index()
 {
 	return g_render_current_controller_index;
@@ -384,26 +379,26 @@ void __cdecl render_scene(
 			* DO NOT ENABLE THIS (for now)
 			* Causes graphical issues on the start of outskirts with black geo being rendered
 			rasterizer_dx9_perf_event_begin("texaccum", NULL);
-			DRAW_RENDER_LAYER(_render_layer_texture_accumulate);
+			render_scene_geometry(_collection_type_0, _render_layer_texture_accumulate);
 			rasterizer_dx9_perf_event_end("texaccum");
 			*/
 
 			rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
-			DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
+			render_scene_geometry(_collection_type_0, _render_layer_lightmap_indirect);
 			rasterizer_dx9_perf_event_end("lightmap_indirect");
 
 			rasterizer_dx9_perf_event_begin("sh_prt", NULL);
-			DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
+			render_scene_geometry(_collection_type_0, _render_layer_spherical_harmonics_prt);
 			rasterizer_dx9_perf_event_end("sh_prt");
 
 			g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
 
 			rasterizer_dx9_perf_event_begin("environment_map", NULL);
-			DRAW_RENDER_LAYER(_render_layer_enviroment_map);
+			render_scene_geometry(_collection_type_0, _render_layer_enviroment_map);
 			rasterizer_dx9_perf_event_end("environment_map");
 
 			rasterizer_dx9_perf_event_begin("decal", NULL);
-			DRAW_RENDER_LAYER(_render_layer_decal);
+			render_scene_geometry(_collection_type_0, _render_layer_decal);
 			rasterizer_dx9_perf_event_end("decal");
 
 
@@ -421,7 +416,7 @@ void __cdecl render_scene(
 			rasterizer_dx9_perf_event_end("render_cinematic_lightmap_shadows");
 
 			rasterizer_dx9_perf_event_begin("selfillumination", NULL);
-			DRAW_RENDER_LAYER(_render_layer_selfillumination);
+			render_scene_geometry(_collection_type_0, _render_layer_selfillumination);
 			rasterizer_dx9_perf_event_end("selfillumination");
 
 			rasterizer_dx9_perf_event_begin("render_lights_new", NULL);
@@ -438,7 +433,7 @@ void __cdecl render_scene(
 			rasterizer_dx9_perf_event_end("decals_alpha_blend");
 
 			rasterizer_dx9_perf_event_begin("overlay", NULL);
-			DRAW_RENDER_LAYER(_render_layer_overlay);
+			render_scene_geometry(_collection_type_0, _render_layer_overlay);
 			rasterizer_dx9_perf_event_end("overlay");
 
 			rasterizer_dx9_perf_event_begin("decals", NULL);
@@ -474,20 +469,20 @@ void __cdecl render_scene(
 			* DO NOT ENABLE THIS (for now)
 			* Causes graphical issues on the start of outskirts with black geo being rendered
 			rasterizer_dx9_perf_event_begin("texaccum", NULL);
-			DRAW_RENDER_LAYER(_render_layer_texture_accumulate);
+			render_scene_geometry(_collection_type_0, _render_layer_texture_accumulate);
 			rasterizer_dx9_perf_event_end("texaccum");
 			*/
 
 			rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
-			DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
+			render_scene_geometry(_collection_type_0, _render_layer_lightmap_indirect);
 			rasterizer_dx9_perf_event_end("lightmap_indirect");
 
 			rasterizer_dx9_perf_event_begin("sh_prt", NULL);
-			DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
+			render_scene_geometry(_collection_type_0, _render_layer_spherical_harmonics_prt);
 			rasterizer_dx9_perf_event_end("sh_prt");
 
 			rasterizer_dx9_perf_event_begin("overlay", NULL);
-			DRAW_RENDER_LAYER(_render_layer_overlay);
+			render_scene_geometry(_collection_type_0, _render_layer_overlay);
 			rasterizer_dx9_perf_event_end("overlay");
 		}
 
@@ -495,7 +490,7 @@ void __cdecl render_scene(
 		if (render_layer_debug_view == 2)
 		{
 render_layer_2:
-			DRAW_RENDER_LAYER(_render_layer_transparent);
+			render_scene_geometry(_collection_type_0, _render_layer_transparent);
 			
 			if (render_layer_debug_view != 2)
 			{
@@ -526,7 +521,7 @@ render_layer_2:
 				!g_fog_result->field_96)
 			{
 				rasterizer_dx9_perf_event_begin("patchy_fog", NULL);
-				render_patchy_fog(*visible_geometry_group_count_get() <= 0, true);
+				render_patchy_fog(render_section_visibility_get_model_group_count() <= 0, true);
 				rasterizer_dx9_perf_event_end("patchy_fog");
 			}
 
@@ -549,9 +544,9 @@ render_postprocess:
 					else
 					{
 						c_render_primitive_list* list_type = render_primitive_get_by_primitive_list_type(0);
-						list_type->m_field_4 = 0;
+						list_type->m_primitive_count = 0;
 						list_type->m_field_C = 0;
-						list_type->m_render_layer_flags.clear();
+						list_type->m_render_layer_flags = 0;
 						rasterizer_transparent_geometry_reset_counts();
 						render_camera_scene(
 							render_layer_debug_view,
@@ -573,7 +568,7 @@ render_postprocess:
 					goto render_scene_end;
 				}
 
-				DRAW_RENDER_LAYER(_render_layer_selfibloomination);
+				render_scene_geometry(_collection_type_0, _render_layer_selfibloomination);
 			}
 
 			if (effect_flag != 2)
@@ -620,8 +615,8 @@ render_postprocess:
 
 					*global_rasterizer_pixel_shader_index_get() = 1;
 
-					DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
-					DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
+					render_scene_geometry(_collection_type_0, _render_layer_lightmap_indirect);
+					render_scene_geometry(_collection_type_0, _render_layer_spherical_harmonics_prt);
 
 					rasterizer_dx9_perf_event_end("render depth to backbuffer");
 				}
@@ -636,7 +631,7 @@ render_postprocess:
 				}
 
 				render_atmospheric_fog();
-				DRAW_RENDER_LAYER(_render_layer_fog);
+				render_scene_geometry(_collection_type_0, _render_layer_fog);
 			}
 		}
 
@@ -652,8 +647,8 @@ render_postprocess:
 			if (water_enabled)
 			{
 				const c_render_primitive_list* list_type = render_primitive_get_by_primitive_list_type(0);
-				clear_target = list_type->is_layer_different(_render_layer_water_alpha_masks);
-				DRAW_RENDER_LAYER(_render_layer_water_alpha_masks);
+				clear_target = list_type->test_layer(_render_layer_water_alpha_masks);
+				render_scene_geometry(_collection_type_0, _render_layer_water_alpha_masks);
 			}
 
 			render_water(water_enabled, clear_target);
@@ -679,7 +674,7 @@ render_widgets:
 			{
 				render_patchy_fog(1, 1);
 			}
-			else if (*visible_geometry_group_count_get() > 0)
+			else if (render_section_visibility_get_model_group_count() > 0)
 			{
 				render_patchy_fog(1, 0);
 			}
