@@ -13,6 +13,15 @@
 
 c_network_message_type_collection g_network_message_type_collection[k_network_message_type_collection_count];
 
+void c_network_message_type_collection::check_message_types(void) const
+{
+	for (size_t message_type_index = 0; message_type_index < k_network_message_type_collection_count; ++message_type_index)
+	{
+		ASSERT(m_message_types[message_type_index].initialized);
+	}
+	return;
+}
+
 const char* get_network_message_description(int32 type)
 {
 	return k_network_message_type_collection_description[type];

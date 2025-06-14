@@ -2,19 +2,34 @@
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
+struct s_network_message_type
+{
+	bool initialized;
+	uint8 pad[3];
+	const char* name;
+	uint32 flags;
+	int32 message_size;
+	int32 message_size_maximum;
+	void* encode_function;
+	void* decode_function;
+	void* unknown_function;
+};
+
 class c_network_message_type_collection
 {
-	uint8 gap_0[32];
-
 public:
 
-	void register_message_type(int32 type, const char* name, int32 a4, int32 size1, int32 size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
+	void clear_message_types(void);
+	void check_message_types(void) const;
+
+	void register_message_type(int32 type, const char* message_type_name, uint32 flags, int32 message_size, int32 message_size_maximum, void* encode_function, void* decode_function, void* unk_callback)
 	{
-		INVOKE_TYPE(0x1E81D6, 0x1CA199, void(__thiscall*)(void*, int32, const char*, int32, int32, int32, void*, void*, void*), 
-			this, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
+		INVOKE_TYPE(0x1E81D6, 0x1CA199, void(__thiscall*)(void*, int32, const char*, int32, int32, int32, void*, void*, void*),
+			this, type, message_type_name, flags, message_size, message_size_maximum, encode_function, decode_function, unk_callback);
 	}
+private:
+	s_network_message_type m_message_types[32];
 };
-ASSERT_STRUCT_SIZE(c_network_message_type_collection, 32);
 
 enum e_network_message_type_collection : int32
 {
