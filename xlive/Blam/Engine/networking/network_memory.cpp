@@ -1,19 +1,39 @@
 #include "stdafx.h"
-
 #include "network_memory.h"
 
+/* typedefs */
 
+typedef uint8* (__cdecl* t_network_heap_allocate_block)(uint32 size);
+typedef void(__cdecl* t_network_heap_free_block)(uint8* block);
+
+/* globals */
+
+t_network_heap_allocate_block p_network_heap_allocate_block;
+t_network_heap_free_block p_network_heap_free_block;
 
 static s_network_heap_stats g_network_heap_allocations;
 
-c_network_heap* network_get_heap()
+/* prototypes */
+
+static __declspec(naked) void jmp_c_network_heap__discard(void)
 {
-	return *Memory::GetAddress<c_network_heap**>(0x4FADE0, 0x525298);
+	CLASS_HOOK_JMP(c_network_heap__dispose, c_network_heap::dispose);
 }
 
-s_network_heap_stats* network_heap_get_description()
+/* public code */
+
+void network_memory_apply_patches(void)
 {
-	return &g_network_heap_allocations;
+	// hook the heap allocator globally, to get a picture of the network heap usage
+	DETOUR_ATTACH(p_network_heap_allocate_block, Memory::GetAddress<t_network_heap_allocate_block>(0x1AC939, 0x1ACB07), network_heap_allocate_block);
+	DETOUR_ATTACH(p_network_heap_free_block, Memory::GetAddress<t_network_heap_free_block>(0x1AC94A, 0x1ACB18), network_heap_free_block);
+	PatchCall(Memory::GetAddress(0x1AD292, 0x1AD460), jmp_c_network_heap__discard);
+	return;
+}
+
+c_network_heap* network_get_heap(void)
+{
+	return *Memory::GetAddress<c_network_heap**>(0x4FADE0, 0x525298);
 }
 
 int32 c_network_heap::get_block_size(const uint8* block) const
@@ -27,8 +47,40 @@ int32 c_network_heap::get_block_size(const uint8* block) const
 	return size;
 }
 
-typedef uint8* (__cdecl* t_network_heap_allocate_block)(uint32 size);
-t_network_heap_allocate_block p_network_heap_allocate_block;
+CLASS_HOOK_DECLARE_LABEL(c_network_heap__dispose, c_network_heap::dispose);
+void c_network_heap::dispose(void)
+{
+	g_network_heap_allocations.allocations = 0;
+	g_network_heap_allocations.allocations_in_bytes = 0;
+	return INVOKE_TYPE(0x381574, 0x32CCAE, void(__thiscall*)(c_network_heap*), this);
+}
+
+s_network_heap_stats* network_heap_get_description(void)
+{
+	return &g_network_heap_allocations;
+}
+
+bool __cdecl network_memory_base_initialize(
+	c_network_link** link,
+	c_network_message_type_collection** message_types,
+	c_network_message_gateway** message_gateway,
+	c_network_message_handler** message_handler,
+	c_network_observer** observer,
+	c_network_session** sessions,
+	c_network_session_manager** session_manager,
+	c_network_text_chat_manager** text_chat_manager)
+{
+	INVOKE(0x1AC71B, 0x1AC8E9, network_memory_base_initialize,
+		link,
+		message_types,
+		message_gateway,
+		message_handler,
+		observer,
+		sessions,
+		session_manager,
+		text_chat_manager);
+	return true;
+}
 
 uint8* __cdecl network_heap_allocate_block(uint32 size)
 {
@@ -44,8 +96,6 @@ uint8* __cdecl network_heap_allocate_block(uint32 size)
 	return block;
 }
 
-typedef void(__cdecl* t_network_heap_free_block)(uint8* block);
-t_network_heap_free_block p_network_heap_free_block;
 
 void __cdecl network_heap_free_block(uint8* block)
 {
@@ -61,24 +111,4 @@ void __cdecl network_heap_free_block(uint8* block)
 	// return INVOKE(0x1AC94A, 0x1ACB18, network_heap_free_block, block);
 }
 
-CLASS_HOOK_DECLARE_LABEL(c_network_heap__dispose, c_network_heap::dispose);
-void c_network_heap::dispose()
-{
-	g_network_heap_allocations.allocations = 0;
-	g_network_heap_allocations.allocations_in_bytes = 0;
-	return INVOKE_TYPE(0x381574, 0x32CCAE, void(__thiscall*)(c_network_heap*), this);
-}
-
-__declspec(naked) void jmp_c_network_heap__discard()
-{
-	CLASS_HOOK_JMP(c_network_heap__dispose, c_network_heap::dispose);
-}
-
-void network_memory_apply_patches(void)
-{
-	// hook the heap allocator globally, to get a picture of the network heap usage
-	DETOUR_ATTACH(p_network_heap_allocate_block, Memory::GetAddress<t_network_heap_allocate_block>(0x1AC939, 0x1ACB07), network_heap_allocate_block);
-	DETOUR_ATTACH(p_network_heap_free_block, Memory::GetAddress<t_network_heap_free_block>(0x1AC94A, 0x1ACB18), network_heap_free_block);
-	PatchCall(Memory::GetAddress(0x1AD292, 0x1AD460), jmp_c_network_heap__discard);
-	return;
-}
+/* private code */
