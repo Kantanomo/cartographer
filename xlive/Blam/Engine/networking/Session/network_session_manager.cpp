@@ -16,7 +16,19 @@
 
 /* public code */
 
-c_network_session* c_network_session_manager::get_network_session_by_id(const XNKID* target_session_id) const
+bool c_network_session_manager::initialize_session_manager(void)
+{
+	csmemset(m_sessions, 0, sizeof(m_sessions));
+	return true;
+}
+
+c_network_session* c_network_session_manager::get_session(uint32 session_index) const
+{
+	ASSERT(VALID_INDEX(session_index, NUMBEROF(m_sessions)));
+	return this->m_sessions[session_index];
+}
+
+c_network_session* c_network_session_manager::get_session(const XNKID* target_session_id) const
 {
 	XNKID session_id;
 
@@ -26,7 +38,7 @@ c_network_session* c_network_session_manager::get_network_session_by_id(const XN
 		session = m_sessions[i];
 		if (session && session->get_secure_key(&session_id, NULL, NULL, NULL))
 		{
-			if (csmemcmp(session_id.ab, target_session_id->ab, sizeof(session_id.ab)) == 0)
+			if (csmemcmp(session_id.ab, target_session_id->ab, sizeof(session_id)) == 0)
 				break;
 		}
 	}
