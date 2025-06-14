@@ -4,6 +4,7 @@
 #include "game/game.h"
 #include "interface/user_interface_controller.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "networking/network_time.h"
 #include "shell/shell.h"
 
 /* constants */
@@ -320,13 +321,34 @@ void network_session_set_player_team(datum player_index, e_game_team team)
 	}
 }
 
+bool c_network_session::initialize_session(
+	int32 session_index,
+	e_network_session_type session_type,
+	int32 session_transport_index,
+	c_network_message_gateway* message_gateway,
+	c_network_observer* observer,
+	c_network_session_manager* session_manager,
+	c_network_text_chat_manager* text_chat_manager)
+{
+	return INVOKE_TYPE(0x1C1E65, 0x199578, bool(__thiscall*)(c_network_session*, int32, e_network_session_type, int32, c_network_message_gateway*, c_network_observer*, c_network_session_manager*, c_network_text_chat_manager*),
+		this,
+		session_index,
+		session_type,
+		session_transport_index,
+		message_gateway,
+		observer,
+		session_manager,
+		text_chat_manager);
+}
+
 void c_network_session::switch_players_to_teams(datum* player_indexes, int32 player_count, e_game_team* team_indexes)
 {
 	if (is_host())
 	{
 		for (int32 i = 0; i < player_count; i++)
 		{
-			get_player_membership(player_indexes[i])->properties[0].team_index = (int8)team_indexes[i];
+			s_membership_player* player_membership = get_player_membership(player_indexes[i]);
+			player_membership->properties[0].team_index = (int8)team_indexes[i];
 		}
 		request_membership_update();
 		network_session_membership_update_local_players_teams();
@@ -368,4 +390,10 @@ bool c_network_session::get_secure_key(XNKID* out_session_id, XNKEY* out_session
 bool c_network_session::get_transport_session_id(XNKID* out_session_id) const
 {
 	return get_secure_key(out_session_id, NULL, NULL, NULL);
+}
+
+uint32 c_network_session::time_get(void) const
+{
+	ASSERT(m_time_exists);
+	return m_time + network_time_get_exact();
 }

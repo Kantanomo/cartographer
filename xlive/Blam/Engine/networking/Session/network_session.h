@@ -4,10 +4,10 @@
 #include "game/player_constants.h"
 #include "input/controllers.h"
 #include "networking/network_game_definitions.h"
+#include "networking/messages/network_message_gateway.h"
+#include "networking/Session/network_text_chat_manager.h"
 #include "networking/transport/transport.h"
 #include "saved_games/game_variant.h"
-
-extern const char* const k_network_protocols_text[];
 
 /* enums */
 
@@ -71,10 +71,22 @@ enum e_network_game_privacy : int32
 	k_network_game_privacy_count
 };
 
+enum e_network_session_type : uint32
+{
+	_network_session_type_none = 0,
+	_network_session_type_one = 1,
+	k_network_session_type_count,
+};
+
 /* constants */
 
-#define k_network_maximum_sessions 2
-#define k_network_maximum_machines_per_session (k_maximum_players + 1)
+enum
+{
+	k_network_maximum_sessions = 2,
+	k_network_maximum_machines_per_session = k_maximum_players + 1
+};
+
+extern const char* const k_network_protocols_text[];
 
 /* forward declarations */ 
 
@@ -428,6 +440,15 @@ public:
 	uint32 m_time;
 	char field_7B7D[4];
 
+	bool initialize_session(
+		int32 session_index,
+		e_network_session_type session_type,
+		int32 session_transport_index,
+		c_network_message_gateway* message_gateway,
+		c_network_observer* observer,
+		c_network_session_manager* session_manager,
+		c_network_text_chat_manager* text_chat_manager);
+
 	e_network_session_state get_session_local_state() const
 	{
 		ASSERT(VALID_INDEX(m_local_state, k_network_session_state_count));
@@ -662,7 +683,8 @@ public:
 
 	bool get_secure_key(XNKID* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, e_transport_platform* transport_platform) const;
 	bool get_transport_session_id(XNKID* out_session_id) const;
-
+	uint32 time_get(void) const;
+	
 	const char* describe_network_protocol_type() const
 	{
 		return VALID_INDEX(this->m_session_class, k_network_session_class_count) ? k_network_protocols_text[this->m_session_class] : "<unknown>";
