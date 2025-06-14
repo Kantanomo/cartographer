@@ -79,6 +79,8 @@ bool __cdecl network_memory_base_initialize(
 		sessions,
 		session_manager,
 		text_chat_manager);
+
+	*message_types = &g_network_message_types_mem;
 	return true;
 }
 

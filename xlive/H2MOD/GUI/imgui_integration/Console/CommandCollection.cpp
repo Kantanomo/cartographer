@@ -379,7 +379,7 @@ static int CommandCollection::RequestFileNameCmd(const std::vector<std::string>&
 		return 0;
 	}
 
-	NetworkMessage::SendRequestMapFilename(NONE);
+	network_message_cartographer_send_request_map_filename(NONE);
 	return 0;
 }
 

@@ -46,6 +46,7 @@
 #include "main/main_game_time.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
+#include "networking/network_globals.h"
 #include "networking/network_utilities.h"
 #include "networking/network_memory.h"
 #include "networking/network_configuration.h"
@@ -614,8 +615,6 @@ __declspec(naked) static void object_function_value_adjust_primary_firing(void)
 
 static void h2mod_apply_hooks(void)
 {
-	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
-	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
 	LOG_INFO_GAME("{} - applying hooks", __FUNCTION__);
 
 	MapManager::ApplyPatches();
@@ -637,6 +636,8 @@ static void h2mod_apply_hooks(void)
 	bipeds_physics_apply_patches();
 	weapon_definitions_apply_patches();
 	observer_apply_patches();
+
+	network_globals_apply_patches();
 	network_transport_apply_patches();
 	network_session_apply_patches();
 	bitstream_serialization_apply_patches();

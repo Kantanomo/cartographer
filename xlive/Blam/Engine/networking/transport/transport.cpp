@@ -36,7 +36,7 @@ void network_transport_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x1BFEA7, 0x1B9D87), transport_address_populate_from_network_channel_and_compare_to_cdecl);
 
 	machine_id_update_patch();
-	NetworkMessage::ApplyGamePatches();
+	network_message_type_collection_apply_patches();
 
 	// LIVE network protocol research
 	c_network_observer::apply_patches();

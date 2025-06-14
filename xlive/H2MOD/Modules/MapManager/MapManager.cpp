@@ -200,7 +200,7 @@ char __cdecl handle_map_download_callback() {
 	mapManager->AddDownloadQuery(L"");
 	auto query = mapManager->GetLastDownloadQueryAdded();
 	// request the filename
-	NetworkMessage::SendRequestMapFilename(query->id);
+	network_message_cartographer_send_request_map_filename(query->id);
 	// then start download thread
 	query->StartMapDownload();
 

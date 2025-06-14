@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "network_message_handler.h"
 
 #include "cartographer/twizzler/twizzler.h"
@@ -18,15 +17,14 @@
 
 /* typedefs */
 
-typedef void(__stdcall* t_read_channel_message)(c_network_message_handler* thisx, int32 network_channel_index, e_network_message_type_collection message_type, int32 message_storage_size, uint8* packet);
+typedef void(__stdcall* t_read_channel_message)(c_network_message_handler* thisx, int32 network_channel_index, e_network_message_type message_type, int32 message_storage_size, uint8* packet);
 
-typedef void(__stdcall* t_handle_out_of_band_message)(c_network_message_handler* thisx, transport_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet);
+typedef void(__stdcall* t_handle_out_of_band_message)(c_network_message_handler* thisx, transport_address* address, e_network_message_type message_type, int32 a4, uint8* packet);
 
 /* prototypes */
-void network_message_handler_apply_patches();
 
-static void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx, transport_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet);
-static void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32 network_channel_index, e_network_message_type_collection message_type, int32 message_storage_size, uint8* packet);
+static void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx, transport_address* address, e_network_message_type message_type, int32 a4, uint8* packet);
+static void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32 network_channel_index, e_network_message_type message_type, int32 message_storage_size, uint8* packet);
 
 /* globals */
 
@@ -35,7 +33,7 @@ t_handle_out_of_band_message p_handle_out_of_band_message;
 
 /* public code */
 
-void network_message_handler_apply_patches()
+void network_message_handler_apply_patches(void)
 {
 	p_read_channel_message = (t_read_channel_message)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)read_channel_message_hook, 8);
 	p_handle_out_of_band_message = (t_handle_out_of_band_message)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)handle_out_of_band_message_hook, 8);
@@ -43,7 +41,7 @@ void network_message_handler_apply_patches()
 
 /* private code */
 
-void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx, transport_address* address, e_network_message_type_collection message_type, int32 a4, uint8* packet)
+void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx, transport_address* address, e_network_message_type message_type, int32 a4, uint8* packet)
 {
 	c_network_session* session;
 	if (network_life_cycle_in_squad_session(&session))
@@ -57,7 +55,7 @@ void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx,
 		p_handle_out_of_band_message(thisx, address, message_type, a4, packet);
 }
 
-void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32 network_channel_index, e_network_message_type_collection message_type, int32 message_storage_size, uint8* packet)
+void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32 network_channel_index, e_network_message_type message_type, int32 message_storage_size, uint8* packet)
 {
 	/*
 		This handles received in-band data
@@ -68,7 +66,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 
 	switch (message_type)
 	{
-	case _request_map_filename:
+	case _network_message_type_request_map_filename:
 	{
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
@@ -78,7 +76,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 		break;
 	}
 
-	case _custom_map_filename:
+	case _network_message_type_custom_map_filename:
 	{
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
@@ -88,7 +86,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 		break;
 	}
 
-	case _rank_change:
+	case _network_message_type_rank_change:
 	{
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
@@ -98,7 +96,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 		break;
 	}
 
-	case _anti_cheat:
+	case _network_message_type_anti_cheat:
 	{
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
@@ -108,7 +106,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 		break;
 	}
 
-	case _custom_variant_settings:
+	case _network_message_type_custom_variant_settings:
 	{
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
@@ -119,7 +117,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 	}
 
 	// default packet
-	case _leave_session:
+	case _network_message_type_leave_session:
 	{
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
@@ -149,14 +147,14 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 
 	switch (message_type)
 	{
-	case _membership_update:
+	case _network_message_type_membership_update:
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
 		{
 			thisx->handle_membership_update(&addr, network_channel_index, (s_network_message_session_data*)packet);
 		}
 		break;
-	case _player_add:
+	case _network_message_type_player_add:
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
 		{
@@ -166,6 +164,41 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 	default:
 		break;
 	}
+}
+
+bool c_network_message_handler::initialize_handler(c_network_link* link, const c_network_message_type_collection* message_types, c_network_message_gateway* message_gateway)
+{
+	ASSERT(!m_initialized);
+	ASSERT(link);
+	ASSERT(message_types);
+	ASSERT(message_gateway);
+
+	m_link = link;
+	m_message_types = message_types;
+	m_message_gateway = message_gateway;
+	m_message_gateway->attach_handler(this);
+	m_observer = NULL;
+	m_session_manager = NULL;
+	m_initialized = true;
+	return true;
+}
+
+void c_network_message_handler::register_session_manager(c_network_session_manager* session_manager)
+{
+	ASSERT(m_initialized);
+	ASSERT(session_manager);
+	ASSERT(m_session_manager == NULL);
+	m_session_manager = session_manager;
+	return;
+}
+
+void c_network_message_handler::register_observer(c_network_observer* observer)
+{
+	ASSERT(m_initialized);
+	ASSERT(observer);
+	ASSERT(m_observer == NULL);
+	m_observer = observer;
+	return;
 }
 
 /* ### TODO move these handlers to separate files */
@@ -201,7 +234,7 @@ void c_network_message_handler::handle_request_map_filename(const transport_addr
 				s_session_peer* peer = session->get_session_peer(sender_peer_index);
 
 				if (peer->is_remote_peer)
-					observer->send_message(session->m_session_index, peer->observer_channel_index, false, _custom_map_filename, sizeof(s_network_message_custom_map_filename), &data);
+					observer->send_message(session->m_session_index, peer->observer_channel_index, false, _network_message_type_custom_map_filename, sizeof(s_network_message_custom_map_filename), &data);
 			}
 			else
 			{
@@ -317,7 +350,7 @@ void c_network_message_handler::handle_player_add(const transport_address* addre
 
 			if (session->is_host())
 			{
-				NetworkMessage::SendAntiCheat(sender_peer_index);
+				network_message_cartographer_send_anti_cheat(sender_peer_index);
 			}
 		}
 	}

@@ -690,9 +690,9 @@ namespace ImGuiHandler {
 						if (ImGui::Checkbox("##Anti-Cheat", &g_twizzler_checkbox))
 						{
 							twizzler_set_status(g_twizzler_checkbox);
-							for (int i = 0; i < NetworkSession::GetPeerCount(); i++)
+							for (int32 i = 0; i < NetworkSession::GetPeerCount(); i++)
 							{
-								NetworkMessage::SendAntiCheat(i);
+								network_message_cartographer_send_anti_cheat(i);
 							}
 						}
 						if (ImGui::IsItemHovered())
