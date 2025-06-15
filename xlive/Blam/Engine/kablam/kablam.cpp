@@ -4,6 +4,7 @@
 #include "kablam_config.h"
 #include "kablam_log.h"
 
+#include "networking/network_event.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
@@ -133,7 +134,7 @@ static bool __cdecl should_start_pregame_countdown_hook(void)
 	{
 		if (session->get_player_count() >= H2Config_minimum_player_start)
 		{
-			LOG_INFO_GAME(L"{} - minimum Player count met", __FUNCTIONW__);
+			event(_event_status, "%s - minimum Player count met", __FUNCTION__);
 			minimumPlayersConditionMet = true;
 		}
 		else
@@ -281,7 +282,6 @@ static void* __cdecl kablam_command_handler_hook(wchar_t** command_line_split_wi
 
 static bool __cdecl kablam_command_play(const wchar_t* playlist_file_path, int32 a2)
 {
-	LOG_INFO_GAME("[{}]: {}", __FUNCTION__, "");
 	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, _kablam_command_play);
 	bool result = INVOKE(0x0, 0xE7FA, kablam_command_play, playlist_file_path, a2);
 	EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, _kablam_command_play);

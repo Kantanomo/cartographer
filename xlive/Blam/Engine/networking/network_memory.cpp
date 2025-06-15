@@ -4,7 +4,7 @@
 /* typedefs */
 
 typedef uint8* (__cdecl* t_network_heap_allocate_block)(uint32 size);
-typedef void(__cdecl* t_network_heap_free_block)(uint8* block);
+typedef void(__cdecl* t_network_heap_free_block)(void* block);
 
 /* globals */
 
@@ -36,7 +36,7 @@ c_network_heap* network_get_heap(void)
 	return *Memory::GetAddress<c_network_heap**>(0x4FADE0, 0x525298);
 }
 
-int32 c_network_heap::get_block_size(const uint8* block) const
+int32 c_network_heap::get_block_size(const void* block) const
 {
 	int32 size;
 	if (!rockall_frontend->Details(block, &size))
@@ -99,7 +99,7 @@ uint8* __cdecl network_heap_allocate_block(uint32 size)
 }
 
 
-void __cdecl network_heap_free_block(uint8* block)
+void __cdecl network_heap_free_block(void* block)
 {
 	int32 block_size = network_get_heap()->get_block_size(block);
 
@@ -111,6 +111,11 @@ void __cdecl network_heap_free_block(uint8* block)
 
 	return p_network_heap_free_block(block);
 	// return INVOKE(0x1AC94A, 0x1ACB18, network_heap_free_block, block);
+}
+
+char* network_heap_describe(char* buffer, int32 size)
+{
+	return "TODO: implement network_heap_describe";
 }
 
 /* private code */

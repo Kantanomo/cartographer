@@ -7,7 +7,7 @@
 #include "cartographer/config/endpoints.h"
 #include "main/map_repository.h"
 #include "main/game_preferences.h"
-#include "networking/messages/network_message_type_collection.h"
+#include "networking/network_event.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "shell/shell.h"
 #include "text/unicode.h"
@@ -412,7 +412,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 		}
 		else
 		{
-			LOG_ERROR_GAME("{} - {} failed with error: {}", __FUNCTION__, STRINGIFY(curl_easy_perform()), (uint32)res);
+			event(_event_error, "h2mod:map_manager: %s - %s failed with error: %u", __FUNCTION__, STRINGIFY(curl_easy_perform()), (uint32)res);
 			if (res == CURLE_ABORTED_BY_CALLBACK)
 				addDebugText("Map downloading aborted because of user input!");
 
@@ -441,14 +441,14 @@ void MapDownloadQuery::StartMapDownload()
 		*mapDownloadStatus = NONE;
 
 		if (m_readyToDownload) {
-			LOG_TRACE_GAME(L"[h2mod-mapmanager] map file to download: {}", m_clientMapFilenameWide.c_str());
+			event(_event_status, "h2mod:map_manager: map file to download: %ws", m_clientMapFilenameWide.c_str());
 
 			//TODO: set map filesize
 			//TODO: if downloading from repo files, try p2p
 			if (!DownloadFromRepo()
 				&& !NetworkSession::LocalPeerIsSessionHost())
 			{
-				LOG_TRACE_GAME("[h2mod-mapmanager] {}() - {}() failed, leaving session!",
+				event(_event_error, "h2mod:map_manager: %ws() - %ws() failed, leaving session!",
 					STRINGIFY(handle_map_download_callback),
 					STRINGIFY(DownloadFromRepo));
 
@@ -459,7 +459,7 @@ void MapDownloadQuery::StartMapDownload()
 		else {
 			// no map filename (probably packet hasn't been received)
 			addDebugText("Failed to download custom map, no filename to download.");
-			LOG_TRACE_GAME("[h2mod-mapmanager] no map filename received from host!");
+			event(_event_error, "h2mod:map_manager: no map filename received from host!");
 			NetworkSession::LeaveSession();
 		}
 

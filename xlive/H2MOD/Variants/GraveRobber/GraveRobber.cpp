@@ -8,6 +8,7 @@
 #include "game/game_statborg.h"
 #include "game/players.h"
 #include "items/weapons.h"
+#include "networking/network_event.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "shell/shell.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
@@ -35,7 +36,7 @@ void GraveRobber::TriggerSound(e_graverobber_sounds sound, int sleep)
 
 	if (headhunterSoundTable[language_id][sound] != nullptr)
 	{
-		LOG_TRACE_GAME(L"[h2mod-graverobber] Triggering sound {}", headhunterSoundTable[language_id][sound]);
+		event(_event_verbose, "h2mod:graverobber: Triggering sound %ws", headhunterSoundTable[language_id][sound]);
 		H2MOD::custom_sound_play(headhunterSoundTable[language_id][sound], sleep);
 	}
 }
@@ -159,7 +160,7 @@ void GraveRobber::OnMapLoad(ExecTime execTime, s_game_options* options)
 		break;
 
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:graverobber: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 }
@@ -178,7 +179,7 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 			GraveRobber::SpawnPlayerClientSetup();
 		break;
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:graverobber: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 }
@@ -198,7 +199,7 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 	case ExecTime::_postEventExec:
 		break;
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:graverobber: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 }
@@ -231,7 +232,7 @@ bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum 
 		break;
 
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:graverobber: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 

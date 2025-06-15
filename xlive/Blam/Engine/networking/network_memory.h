@@ -23,7 +23,7 @@ class c_network_heap
 {
 public:
 	c_fixed_memory_rockall_frontend* rockall_frontend;
-	int32 get_block_size(const uint8* block) const;
+	int32 get_block_size(const void* block) const;
 
 	void dispose();
 };
@@ -48,4 +48,6 @@ bool __cdecl network_memory_base_initialize(
 
 uint8* __cdecl network_heap_allocate_block(uint32 size);
 
-void __cdecl network_heap_free_block(uint8* block);
+void __cdecl network_heap_free_block(void* block);
+
+char* network_heap_describe(char* buffer, int32 size);

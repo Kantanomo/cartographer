@@ -4,6 +4,7 @@
 #include "game/game.h"
 #include "interface/user_interface_controller.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "networking/network_event.h"
 #include "networking/network_time.h"
 #include "shell/shell.h"
 
@@ -164,7 +165,7 @@ void NetworkSession::KickPeer(int32 peer_index)
 
 	if (peer_index < GetPeerCount())
 	{
-		LOG_TRACE_GAME("{} - about to kick peer index = {}", __FUNCTION__, peer_index);
+		event(_event_message, "h2mod:network_session: %s - about to kick peer index = %d", __FUNCTION__, peer_index);
 		p_game_session_boot(NetworkSession::GetActiveNetworkSession(), peer_index, true);
 	}
 }

@@ -5,6 +5,7 @@
 #include "filesys/pc_file_system.h"
 #include "game/game_globals.h"
 #include "main/level_definitions.h"
+#include "networking/network_event.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
 #include "tag_files/tag_loader/tag_injection.h"
@@ -54,7 +55,7 @@ namespace MapSlots
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
 		//And using that to construct a new s_multiplayer_levels_block and grab the bitmap datum for tag loading
-		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
+		event(_event_status, "h2mod:map_slots: Startup - Caching map data");
 
 		for (uint32 i = 0; i < k_default_map_to_add_count; ++i)
 		{
@@ -71,7 +72,7 @@ namespace MapSlots
 			}
 			else
 			{
-				LOG_TRACE_GAME(L"[Map Slots]: Startup - Map File Missing {}", map_location.get_string());
+				event(_event_error, "h2mod:map_slots: Startup - Map File Missing %ws", map_location.get_string());
 			}
 		}
 
@@ -89,7 +90,7 @@ namespace MapSlots
 			{
 				if (added_maps + k_multiplayer_first_unused_slot < k_max_map_slots)
 				{
-					LOG_TRACE_FUNCW(L"Adding {}", newSlot.level_descriptions.name[_language_english]);
+					event(_event_verbose, "h2mod:map_slots: Adding %ws", newSlot.level_descriptions.name[_language_english]);
 					s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[added_maps + k_multiplayer_first_unused_slot];
 
 					//Write the data loaded from the maps into the unused slot
@@ -106,7 +107,7 @@ namespace MapSlots
 				}
 				else
 				{
-					LOG_TRACE_FUNC("Max Multiplayer added slots reached");
+					event(_event_error, "h2mod:map_slots: Max Multiplayer added slots reached");
 					break;
 				}
 			}
@@ -124,7 +125,7 @@ namespace MapSlots
 			if (k_multiplayer_first_unused_slot + added_map_count < k_max_map_slots)
 			{
 				s_multiplayer_ui_level_definition* slot = &multiplayer_levels[k_multiplayer_first_unused_slot + added_map_count];
-				LOG_TRACE_FUNCW("Adding {}", newSlot.level_descriptions.name[_language_english]);
+				event(_event_verbose, "h2mod:map_slots: Adding %ws", newSlot.level_descriptions.name[_language_english]);
 				DWORD dwBack[2];
 				VirtualProtect(slot, sizeof(s_multiplayer_ui_level_definition), PAGE_EXECUTE_READWRITE, &dwBack[0]);
 
@@ -141,7 +142,7 @@ namespace MapSlots
 			}
 			else
 			{
-				LOG_TRACE_FUNC("Max Multiplayer added slots reached");
+				event(_event_error, "h2mod:map_slots: Max Multiplayer added slots reached");
 				break;
 			}
 		}
@@ -177,7 +178,7 @@ namespace MapSlots
 	void OnMapLoad(void)
 	{
 		// Load all the added maps bitmaps
-		LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
+		event(_event_status, "h2mod:map_slots: OnMapLoad - Tag Loading Bitmaps");
 		for (uint32 i = 0; i < k_default_map_to_add_count; ++i)
 		{
 			tag_injection_set_active_map(k_default_maps_to_add[i]);

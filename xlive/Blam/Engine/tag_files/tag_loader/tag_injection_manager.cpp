@@ -9,6 +9,7 @@
 #include "creatures/creature_definitions.h"
 #include "filesys/pc_file_system.h"
 #include "models/render_model_definitions.h"
+#include "networking/network_event.h"
 #include "physics/collision_model_definitions.h"
 #include "physics/physics_model_definitions.h"
 #include "render/weather_definitions.h"
@@ -99,11 +100,7 @@ bool c_tag_injecting_manager::find_map(const wchar_t* map_name, c_static_wchar_s
 		// Exit and create a popup if a map is missing
 		else
 		{
-			const wchar_t format[] = L"[c_tag_injecting_manager::find_map] could not locate %s.map in any valid content location";
-			wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
-			
-			usnprintf(output_wide, NUMBEROF(output_wide), format, map_name);
-			LOG_ERROR_GAME(output_wide);
+			event(_event_error, "tags:injection: [%s] could not locate %ws.map in any valid content location", __FUNCTION__, map_name);
 			g_force_cartographer_update = true;
 			return false;
 		}
@@ -225,13 +222,13 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 	//fail safe
 	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->tag_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index))
 	{
-		LOG_ERROR_GAME("[tag_loader] failed to resolve datum to correct instance, game will crash");
+		error(_error_immediate, "[tag_loader] failed to resolve datum to correct instance, game will crash");
 	}
 
 #if TAG_INJECTION_DEBUG
 	c_static_string<MAX_PATH> str;
 	this->get_name_by_tag_datum(tag_info->group_tag.group, this->m_table.get_entry_by_injected_index(injected_index)->cache_index, str.get_buffer());
-	LOG_DEBUG_GAME("[c_tag_injecting_mananger::load_raw] loading {} index {:x}", str.get_string(), injected_index);
+	event(_event_verbose, "tags:injection: [%s] loading %s index %x", __FUNCTION__, str.get_string(), injected_index);
 #endif
 
 	//supposing full length
@@ -348,7 +345,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 {
 	if(!this->m_active_map_verified)
 	{
-		LOG_ERROR_GAME("[c_tag_injecting_mananger::get_tag_datum_by_name] active map has not be set for tag: {}", tag_name);
+		error(_error_immediate, "[%s] active map has not be set for tag: %s", __FUNCTION__, tag_name);
 		return NONE;
 	}
 	
@@ -422,7 +419,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 {
 	if (!this->m_active_map_verified)
 	{
-		LOG_ERROR_GAME("[c_tag_injecting_mananger::get_name_by_tag_datum] active map has not be set for tag: {:x}", cache_datum);
+		error(_error_immediate, "[%s] active map has not be set for tag: %x", __FUNCTION__, cache_datum);
 		out_name[0] = '\0';
 		return;
 	}
@@ -521,11 +518,7 @@ bool c_tag_injecting_manager::initialize_agent(tag_group group)
 	// Exit and create a popup if a plugin is missing
 	if (!PathFileExists(plugin_path.get_string()))
 	{
-		const wchar_t format[] = L"[c_tag_injecting_manager::initialize_agent] Plugin file could not be located %s";
-		wchar_t output_wide[NUMBEROF(format) + MAX_PATH];
-
-		usnprintf(output_wide, NUMBEROF(output_wide), format, plugin_path.get_string());
-		LOG_ERROR_GAME(output_wide);
+		event(_event_error, "tags:injection: [%s] Plugin file could not be located %ws", __FUNCTION__, plugin_path.get_string());
 		g_force_cartographer_update = true;
 		return false;
 	}
@@ -562,7 +555,7 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, const char* tag_name,
 	if (cache_datum != NONE)
 	{
 #if TAG_INJECTION_DEBUG
-		LOG_DEBUG_GAME("[c_tag_injecting_mananger::load_tag] loading {} with depencies {} datum {}", tag_name, load_dependencies, cache_datum);
+		event(_event_verbose, "tags:injection: [%s] loading %s with depencies %d datum %x", __FUNCTION__, tag_name, load_dependencies, cache_datum);
 #endif
 
 		return this->load_tag(group, cache_datum, load_dependencies);
@@ -634,7 +627,7 @@ void c_tag_injecting_manager::load_tag_internal(
 	tag_class[3] = group.string[0];
 	tag_class[4] = '\0';
 
-	LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependency {} {}", name.get_string(), tag_class);
+	event(_event_verbose, "tags:injection: [%s] loading dependency %s %s", __FUNCTION__, name.get_string(), tag_class);
 #endif
 
 	s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group.group);
@@ -653,7 +646,7 @@ void c_tag_injecting_manager::load_tag_internal(
 	if (load_dependencies)
 	{
 #if TAG_INJECTION_DEBUG
-		LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependencies for {} {}", name.get_string(), tag_class);
+		event(_event_verbose, "tags:injection: [%s] loading dependencies for %s %s", __FUNCTION__, name.get_string(), tag_class);
 #endif
 
 		c_tag_injecting_manager::load_dependencies(manager, new_entry);
@@ -689,7 +682,7 @@ void c_tag_injecting_manager::inject_tags()
 		tag_class[4] = '\0';
 		c_static_string<MAX_PATH> tag_name;
 		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
-		LOG_DEBUG_GAME("[table_dump]: cache_index: {:x} injected_index: {:x} type: {} tag_name: {}", entry->cache_index, entry->injected_index, tag_class, tag_name.get_string());
+		event(_event_verbose, "tags:injection: [%s]: cache_index: %x injected_index: %x type: %s tag_name: %s", __FUNCTION__, entry->cache_index, entry->injected_index, tag_class, tag_name.get_string());
 	}
 #endif
 	for(uint16 i = 0; i < this->m_table.get_entry_count(); i++)
@@ -708,8 +701,7 @@ void c_tag_injecting_manager::inject_tags()
 		const uint32 end = start + this->get_base_map_tag_data_size() + k_injectable_allocation_size;
 		bool in_range = ((uint32)cache_get_tag_data() + injection_offset) >= start && ((uint32)cache_get_tag_data() + injection_offset) < end;
 
-		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] injection_offset: {:x} is valid: {} start: {:x} end: {:x}",
-			(uint32)cache_get_tag_data() + injection_offset, in_range, start, end);
+		event(_event_verbose, "tags:injection: [%s] injection_offset: %x is valid: %d start: %x end: %x", __FUNCTION__, (uint32)cache_get_tag_data() + injection_offset, in_range, start, end);
 #endif
 
 
@@ -721,17 +713,19 @@ void c_tag_injecting_manager::inject_tags()
 		injection_instance->tag_index = entry->injected_index;
 
 #if TAG_INJECTION_DEBUG
-		char tag_class[5];
-		tag_class[0] = entry->type.string[3];
-		tag_class[1] = entry->type.string[2];
-		tag_class[2] = entry->type.string[1];
-		tag_class[3] = entry->type.string[0];
-		tag_class[4] = '\0';
+		{
+			char tag_class[5];
+			tag_class[0] = entry->type.string[3];
+			tag_class[1] = entry->type.string[2];
+			tag_class[2] = entry->type.string[1];
+			tag_class[3] = entry->type.string[0];
+			tag_class[4] = '\0';
 
-		c_static_string<MAX_PATH> tag_name;
-		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
+			c_static_string<MAX_PATH> tag_name;
+			this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
 
-		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {} datum: {:x}", tag_class, injection_offset, injection_instance->size, tag_name.get_string(), entry->injected_index);
+			event(_event_verbose, "tags:injection: [%s] type: %d injection_offset: %x data_size: %x tag_name: %s datum: %x", __FUNCTION__, tag_class, injection_offset, injection_instance->size, tag_name.get_string(), entry->injected_index);
+		}
 #endif
 
 		entry->loaded_data->copy_tag_data((int8*)(cache_get_tag_data() + injection_offset), injection_offset);
@@ -752,7 +746,7 @@ void c_tag_injecting_manager::inject_tags()
 		this->m_injectable_used_size += entry->loaded_data->get_total_size();
 	}
 #if TAG_INJECTION_DEBUG
-	LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] Injection Complete");
+	event(_event_verbose, "tags:injection: [%s] Injection Complete", __FUNCTION__);
 #endif
 }
 

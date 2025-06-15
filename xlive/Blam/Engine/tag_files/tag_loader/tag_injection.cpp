@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "tag_injection.h"
 
+#include "networking/network_event.h"
 #include "shell/shell.h"
 
 /* globals */
@@ -92,7 +93,7 @@ datum tag_injection_resolve_cache_datum(datum cache_datum)
 
 void tag_injection_scenario_load_setup(uint32 allocation_size)
 {
-	LOG_DEBUG_GAME("[tag_injection_scenario_load_setup]: Setting up for injection - Alloc Size: {:x}", allocation_size);
+	event(_event_verbose, "tags:injection: [%s]: Setting up for injection - Alloc Size: %x", __FUNCTION__, allocation_size);
 
 	g_tag_injection_manager->set_base_map_tag_data_size(allocation_size + 32);
 

@@ -2,6 +2,8 @@
 #include "Achievements.h"
 
 #include "cartographer/config/endpoints.h"
+#include "networking/network_event.h"
+
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -26,7 +28,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 
 void AchievementUnlock(unsigned long long xuid, int achievement_id, XOVERLAPPED* pOverlapped)
 {
-	LOG_TRACE_GAME("[H2Mod-Achievement] - Unlocking achievement ID: {:d}", achievement_id);
+	event(_event_status, "h2mod:achievements: - Unlocking achievement ID: %d", achievement_id);
 
 	CURL *curl;
 	CURLcode res;

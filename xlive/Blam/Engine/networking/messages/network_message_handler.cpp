@@ -3,6 +3,7 @@
 
 #include "cartographer/twizzler/twizzler.h"
 
+#include "networking/network_event.h"
 #include "networking/delivery/network_channel.h"
 #include "networking/session/network_session.h"
 #include "networking/Session/network_session_manager.h"
@@ -47,7 +48,7 @@ void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx,
 	if (network_life_cycle_in_squad_session(&session))
 	{
 		/* surprisingly the game doesn't use this too much, pretty much for request-join and time-sync packets */
-		LOG_TRACE_NETWORK("{} - Received message: {} from peer index: {}",
+		event(_event_message, "h2mod:custom_message: %s - Received message: %s from peer index: %d",
 			__FUNCTION__, get_network_message_description(message_type), session->get_peer_index_from_address(address));
 	}
 
@@ -133,12 +134,12 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 
 	if (peer_network_channel->get_network_address(&addr))
 	{
-		LOG_TRACE_NETWORK("{} - Received message: {} from network channel: {}, address: {:x}",
+		event(_event_verbose, "h2mod:custom_message: %s - Received message: %s from network channel: %d, address: %x",
 			__FUNCTION__, get_network_message_description(message_type), network_channel_index, ntohl(addr.address.ipv4));
 	}
 	else
 	{
-		LOG_ERROR_NETWORK("{} - Received message: {} from an unestablished network channel: {}",
+		event(_event_error, "h2mod:custom_message: %s - Received message: %s from an unestablished network channel: %d",
 			__FUNCTION__, get_network_message_description(message_type), network_channel_index);
 	}
 
@@ -209,8 +210,7 @@ void c_network_message_handler::handle_request_map_filename(const transport_addr
 	c_network_session* session = m_session_manager->get_session(&received_data->session_data.session_id);
 	if (session)
 	{
-		LOG_TRACE_NETWORK("[H2MOD-CustomMessage] received on read_channel_message_hook request-map-filename from XUID: {}",
-			received_data->player_id);
+		event(_event_message, "h2mod:custom_message: received on read_channel_message_hook request-map-filename from XUID: %llu", received_data->player_id);
 
 		int32 sender_peer_index = session->get_peer_index_from_address(address);
 
@@ -226,7 +226,7 @@ void c_network_message_handler::handle_request_map_filename(const transport_addr
 				wcsncpy_s(data.file_name, map_filename.c_str(), map_filename.length());
 				data.map_download_id = received_data->map_download_id;
 
-				LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] sending map file name packet to player id: {}, peer index: {}, map name: {}, download id {}",
+				event(_event_message, "h2mod:custom_message: sending map file name packet to player id: %llu, peer index: %d, map name: %ws, download id %d",
 					received_data->player_id,
 					sender_peer_index, map_filename.c_str(), received_data->map_download_id);
 
@@ -238,7 +238,7 @@ void c_network_message_handler::handle_request_map_filename(const transport_addr
 			}
 			else
 			{
-				LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] no map file name found, abort sending packet! player id: {}, peer idx: {} map filename: {}",
+				event(_event_message, "h2mod:custom_message: no map file name found, abort sending packet! player id: %llu, peer idx: %d map filename: %ws",
 					received_data->player_id, sender_peer_index, map_filename.c_str());
 			}
 		}
@@ -258,13 +258,11 @@ void c_network_message_handler::handle_map_filename_response(const transport_add
 				if (map_download_query != nullptr)
 				{
 					map_download_query->SetMapNameToDownload(received_data->file_name);
-					LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] received on read_channel_message_hook custom_map_filename: {}",
-						received_data->file_name);
+					event(_event_message, "h2mod:custom_message: received on read_channel_message_hook custom_map_filename: %ws", received_data->file_name);
 				}
 				else
 				{
-					LOG_TRACE_NETWORK("[H2MOD-CustomMessage] - query with id {:X} hasn't been found!",
-						received_data->map_download_id);
+					event(_event_message, "h2mod:custom_message: query with id %X hasn't been found!", received_data->map_download_id);
 				}
 			}
 		}
@@ -278,8 +276,7 @@ void c_network_message_handler::handle_player_property_rank(const transport_addr
 	{
 		if (session->channel_is_authoritative(channel_index))
 		{
-			LOG_TRACE_NETWORK(L"H2MOD-CustomMessage] recieved on read_channel_message_hook rank_change: {}",
-				received_data->rank);
+			event(_event_message, "h2mod:custom_message: recieved on read_channel_message_hook rank_change: %d", received_data->rank);
 			network_session_interface_set_local_user_rank(0, received_data->rank);
 		}
 	}

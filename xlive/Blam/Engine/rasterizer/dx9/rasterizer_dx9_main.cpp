@@ -26,6 +26,7 @@
 #include "game/game.h"
 #include "main/main.h"
 #include "networking/network_configuration.h"
+#include "networking/network_event.h"
 #include "rasterizer/rasterizer_cinematics.h"
 #include "rasterizer/rasterizer_dynamic_reflect.h"
 #include "rasterizer/rasterizer_globals.h"
@@ -1308,7 +1309,7 @@ static bool rasterizer_dx9_is_amd_or_ati_card(void)
 		StrStrIA(identifier.Description, "ati") != NULL ||
 		StrStrIA(identifier.Description, "radeon") != NULL)
 	{
-		LOG_INFO_GAME("AMD or ATI card in use.");
+		event(_event_status, "rasterizer:dx9: AMD or ATI card in use.");
 		result = true;
 	}
 

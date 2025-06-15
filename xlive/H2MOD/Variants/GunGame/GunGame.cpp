@@ -3,7 +3,9 @@
 
 #include "game/game.h"
 #include "game/players.h"
+#include "networking/network_event.h"
 #include "units/units.h"
+
 #include "H2MOD.h"
 
 // TODO(PermaNull): Add additional levels with dual weilding
@@ -39,6 +41,7 @@ void GunGame::ResetPlayerLevels() {
 
 void GunGame::Initialize()
 {
+	event(_event_status, "h2mod:gungame: Peer host init");
 	if (NetworkSession::LocalPeerIsSessionHost())
 	{
 		GunGame::ResetPlayerLevels();
@@ -63,8 +66,6 @@ void GunGame::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 		break;
 
 	case ExecTime::_postEventExec:
-		LOG_TRACE_GAME("[h2mod-infection] Peer host init");
-
 		switch (gameOptions->game_mode)
 		{
 			// cleanup when loading main menu
@@ -82,7 +83,7 @@ void GunGame::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 
 	case ExecTime::_ExecTimeUnknown:
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:gungame: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 }
@@ -105,7 +106,7 @@ void GunGame::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 
 	case ExecTime::_ExecTimeUnknown:
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:gungame: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 }
@@ -127,7 +128,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		// host only (dedicated server and client)
 		if (!game_is_predicted())
 		{
-			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} player index: {}, player name: {1}", __FUNCTIONW__, absPlayerIdx, s_player::get_name(playerIdx));
+			event(_event_verbose, "h2mod:gungame: %s player index: %d, player name: %ws", __FUNCTION__, absPlayerIdx, s_player::get_name(playerIdx));
 
 			void* unit_object = object_try_and_get_and_verify_type(playerUnitDatum, _object_mask_biped);
 			if (unit_object) {
@@ -143,17 +144,17 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 					gungamePlayers.insert(std::make_pair(NetworkSession::GetPlayerId(absPlayerIdx), level));
 				}
 
-				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {1} - Level: {2}", __FUNCTIONW__, absPlayerIdx, s_player::get_name(playerIdx), level);
+				event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws - Level: %d", __FUNCTIONW__, absPlayerIdx, s_player::get_name(playerIdx), level);
 
 
 				if (level == 15)
 				{
-					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on frag grenade level!", __FUNCTIONW__, s_player::get_name(playerIdx));
+					event(_event_verbose, "h2mod:gungame: %s - %ws on frag grenade level!", __FUNCTION__, s_player::get_name(playerIdx));
 					s_player::set_player_unit_grenade_count(playerIdx, _unit_grenade_human_fragmentation, 99, true);
 				}
 				else if (level == 16)
 				{
-					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on plasma grenade level!", __FUNCTIONW__, s_player::get_name(playerIdx));
+					event(_event_verbose, "h2mod:gungame: %s - %ws on plasma grenade level!", __FUNCTION__, s_player::get_name(playerIdx));
 					s_player::set_player_unit_grenade_count(playerIdx, _unit_grenade_covenant_plasma, 99, true);
 				}
 				else
@@ -167,7 +168,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 	case ExecTime::_ExecTimeUnknown:
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:gungame: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 }
@@ -189,7 +190,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 		if (game_results_statistic == 7
 			&& !game_is_predicted())
 		{
-			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {}", __FUNCTIONW__, absPlayerIdx, s_player::get_name(player_datum));
+			event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws", __FUNCTION__, absPlayerIdx, s_player::get_name(player_datum));
 
 			int32 level = GunGame::gungamePlayers[playerId];
 			++level;
@@ -201,22 +202,22 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 
 			GunGame::gungamePlayers[playerId] = level;
 
-			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {} - new level: {} ", __FUNCTIONW__, absPlayerIdx, level);
+			event(_event_verbose, "h2mod:gungame: %s - player index: %d - new level: %d ", __FUNCTION__, absPlayerIdx, level);
 
 			if (level == 15)
 			{
-				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} Level 15 - Frag Grenades!", __FUNCTIONW__, s_player::get_name(player_datum));
+				event(_event_verbose, "h2mod:gungame: %s - %ws Level 15 - Frag Grenades!", __FUNCTION__, s_player::get_name(player_datum));
 				s_player::set_player_unit_grenade_count(player_datum, _unit_grenade_human_fragmentation, 99, true);
 			}
 			else if (level == 16)
 			{
-				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} Level 16 - Plasma Grenades!", __FUNCTIONW__, s_player::get_name(player_datum));
+				event(_event_verbose, "h2mod:gungame: %s - %ws Level 16 - Plasma Grenades!", __FUNCTION__, s_player::get_name(player_datum));
 				s_player::set_player_unit_grenade_count(player_datum, _unit_grenade_human_fragmentation, 0, true);
 				s_player::set_player_unit_grenade_count(player_datum, _unit_grenade_covenant_plasma, 99, true);
 			}
 			else
 			{
-				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on level {} giving them weapon...", __FUNCTIONW__, s_player::get_name(player_datum), level);
+				event(_event_verbose, "h2mod:gungame: %s - %ws on level %d giving them weapon...", __FUNCTION__, s_player::get_name(player_datum), level);
 				s_player::set_player_unit_grenade_count(player_datum, _unit_grenade_human_fragmentation, 0, true);
 				s_player::set_player_unit_grenade_count(player_datum, _unit_grenade_covenant_plasma, 0, true);
 				call_give_player_weapon(absPlayerIdx, (datum)k_level_weapons[level], 1);
@@ -227,7 +228,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 
 	case ExecTime::_ExecTimeUnknown:
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:gungame: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 

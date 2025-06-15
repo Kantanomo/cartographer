@@ -6,6 +6,7 @@
 #include "game/game_time.h"
 #include "interface/user_interface_controller.h"
 #include "items/item_collection_definition.h"
+#include "networking/network_event.h"
 #include "scenario/scenario.h"
 #include "shell/shell.h"
 #include "units/units.h"
@@ -53,7 +54,7 @@ int Infection::calculateZombiePlayerIndex()
 			return NONE;
 
 		int32 infectedPlayerIndex = activePlayersIndices[dist(mt_rand)];
-		LOG_TRACE_GAME(L"[h2mod-infection] random infection player index: {}, with name: {}", infectedPlayerIndex, session->get_player_name(infectedPlayerIndex));
+		event(_event_verbose, "h2mod:infection: random infection player index: %d, with name: %ws", infectedPlayerIndex, session->get_player_name(infectedPlayerIndex));
 
 		return infectedPlayerIndex;
 	}
@@ -86,7 +87,7 @@ void Infection::sendTeamChange()
 						player_indexes[player_array_index] = i;
 						player_teams[player_array_index++] = team;
 
-						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}",
+						event(_event_verbose, "h2mod:infection: sent team change packet to player index: %d, with name: %ws, infected?: %d",
 							i,
 							session->get_player_name(i),
 							is_current_player_zombie
@@ -106,14 +107,14 @@ void Infection::triggerSound(e_infection_sounds sound, int sleep)
 
 	if (infectionSoundTable[language_id][sound] != nullptr)
 	{
-		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", infectionSoundTable[language_id][sound]);
+		event(_event_verbose, "h2mod:infection: Triggering sound %ws", infectionSoundTable[language_id][sound]);
 		H2MOD::custom_sound_play(infectionSoundTable[language_id][sound], sleep);
 	}
 }
 
 void Infection::InitClient()
 {
-	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
+	event(_event_status, "h2mod:infection: Disabling slayer sounds");
 	H2MOD::disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 
 	for (int16 i = 0; i < k_number_of_users; i++)
@@ -148,11 +149,11 @@ void Infection::setZombiePlayerStatus(uint64 identifier)
 }
 
 void Infection::InitHost() {
-	LOG_TRACE_GAME("[h2mod-infection] Host init setting unit speed patch");
+	event(_event_status, "h2mod:infection: Host init setting unit speed patch");
 	//Applying SpeedCheck fix
 	H2MOD::set_unit_speed_patch(true);
 
-	LOG_TRACE_GAME("[h2mod-infection] Host init resetting zombie player data status");
+	event(_event_status, "h2mod:infection: Host init resetting zombie player data status");
 	Infection::resetZombiePlayerStatus();
 }
 
@@ -177,7 +178,7 @@ bool Infection::shouldEndGame()
 }
 
 void Infection::resetWeaponInteractionAndEmblems() {
-	LOG_TRACE_GAME("[h2mod-infection] Resetting weapons interactions and emblem visibility");
+	event(_event_verbose, "h2mod:infection: Resetting weapons interactions and emblem visibility");
 	player_user_weapon_interaction_reset();
 	hud_player_indicators_draw_reset();
 }
@@ -205,7 +206,7 @@ void Infection::preSpawnServerSetup() {
 			isZombie = true;
 		}
 
-		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", currentPlayerIndex, isZombie, playerIdentifier, s_player::get_name(currentPlayerIndex));
+		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", currentPlayerIndex, isZombie, playerIdentifier, s_player::get_name(currentPlayerIndex));
 		if (isZombie) 
 		{
 			s_player::set_unit_character_type(currentPlayerIndex, _character_type_flood);
@@ -305,25 +306,30 @@ void Infection::removeUnwantedItems()
 
 void Infection::Initialize()
 {
-	LOG_TRACE_GAME("{} - infection initialization!");
+	event(_event_status, "h2mod:infection: infection initialization!");
 	removeUnwantedItems();
 
 	if (!shell_is_dedicated_server())
+	{
 		Infection::InitClient();
+	}
 
-	if (NetworkSession::LocalPeerIsSessionHost()) {
+	if (NetworkSession::LocalPeerIsSessionHost())
+	{
 		Infection::InitHost();
 
 		last_time_at_game_should_not_end = 0;
 		zombiePlayerIndex = Infection::calculateZombiePlayerIndex();
 		EventHandler::register_callback(onGameTick, EventType::game_loop, EventExecutionType::execute_after);
 
-		LOG_TRACE_GAME("[h2mod-infection] Peer host calculated zombie index {}", zombiePlayerIndex);
-		if (zombiePlayerIndex == NONE) {
-			LOG_TRACE_GAME("[h2mod-infection] Failed selecting a zombie!");
+		event(_event_verbose, "h2mod:infection: Peer host calculated zombie index %d", zombiePlayerIndex);
+		if (zombiePlayerIndex == NONE)
+		{
+			event(_event_verbose, "h2mod:infection: Failed selecting a zombie!");
 		}
-		else {
-			LOG_TRACE_GAME("[h2mod-infection] Peer host setting player as human");
+		else 
+		{
+			event(_event_verbose, "h2mod:infection:  Peer host setting player as human");
 			//send out the team change packets to peers
 			Infection::sendTeamChange();
 			Infection::setZombiePlayerStatus(NetworkSession::GetPlayerId(zombiePlayerIndex));
@@ -333,7 +339,7 @@ void Infection::Initialize()
 
 void Infection::Dispose()
 {
-	LOG_TRACE_GAME("{} - infection dispose!");
+	event(_event_status, "h2mod:infection: infection dispose!");
 
 	if(NetworkSession::LocalPeerIsSessionHost())
 	{
@@ -378,7 +384,7 @@ void Infection::OnMapLoad(ExecTime execTime, s_game_options* options)
 
 	case ExecTime::_ExecTimeUnknown:
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:infection: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 }
@@ -401,7 +407,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 
 					if (player->user_index != NONE)
 					{
-						LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", s_player::get_name(player_index), player->identifier);
+						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", s_player::get_name(player_index), player->identifier);
 						user_interface_controller_set_desired_team_index(player->controller_index, k_zombie_team);
 						user_interface_controller_update_network_properties(player->controller_index);
 						s_player::set_unit_character_type(player_index, _character_type_flood);
@@ -409,7 +415,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 					else
 					{
 						//if not, then this is a new zombie
-						LOG_TRACE_GAME(L"[h2mod-infection] Player died, name={}, identifer={}", s_player::get_name(player_index), player->identifier);
+						event(_event_verbose, "h2mod:infection: Player died, name=%ws, identifer=%llu", s_player::get_name(player_index), player->identifier);
 						Infection::triggerSound(_snd_new_zombie, 1000);
 					}
 				}
@@ -437,7 +443,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 
 	case ExecTime::_ExecTimeUnknown:
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:infection: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 }
@@ -456,7 +462,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		if (!shell_is_dedicated_server())
 		{
 			s_player* player = (s_player*)datum_get(s_player::get_data(), playerIdx);
-			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}", absPlayerIdx, player->identifier);
+			event(_event_verbose, "h2mod:infection: Client pre spawn, playerIndex=%d, playerIdentifier=%llu", absPlayerIdx, player->identifier);
 
 			if(player->user_index != NONE)
 			{
@@ -466,7 +472,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 				if(team == k_zombie_team)
 				{
-					LOG_TRACE_GAME("[h2mod-infection] Client is infected! switching bipeds: {}", absPlayerIdx);
+					event(_event_verbose, "h2mod:infection: Client is infected! switching bipeds: %d", absPlayerIdx);
 					s_player::set_unit_character_type(playerIdx, _character_type_flood);
 				}
 			}
@@ -516,12 +522,12 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		// host only (both client/dedicated server)
 		if (!game_is_predicted())
 		{
-			LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", absPlayerIdx);
+			event(_event_verbose, "h2mod:infection: Spawn player server index=%d", absPlayerIdx);
 			void* unit_object = object_try_and_get_and_verify_type(playerUnitDatum, _object_mask_biped);
 			if (unit_object) {
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 				e_game_team team = unit_get_team_index(playerUnitDatum);
-				LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}, unit team index={}", absPlayerIdx, (int16)team);
+				event(_event_verbose, "h2mod:infection: Spawn player server index=%d, unit team index=%d", absPlayerIdx, (int16)team);
 				if (team == k_humans_team) {
 					Infection::setPlayerAsHuman(absPlayerIdx);
 				}
@@ -536,7 +542,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 	case ExecTime::_ExecTimeUnknown:
 	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		event(_event_verbose, "h2mod:infection: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
 }

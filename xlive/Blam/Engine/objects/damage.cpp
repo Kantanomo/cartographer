@@ -2,6 +2,7 @@
 #include "damage.h"
 
 #include "game/game.h"
+#include "networking/network_event.h"
 #include "units/units.h"
 
 /* public code */
@@ -37,7 +38,7 @@ void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index,
 		// 2. Does not have a valid player index or team
 		if (actor_index == NONE && (damage_data->owner.owner_player_index == NONE || damage_data->owner.owner_team_index == _game_team_observer))
 		{
-			LOG_TRACE_GAME("GUARDIAN GLITCH PREVENTED");
+			event(_event_verbose, "objects:damage: GUARDIAN GLITCH PREVENTED");
 			prevent_guardian_glitch = true;
 		}
 	}

@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "PlaylistLoader.h"
+
+#include "networking/network_event.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Utils/Utils.h"
@@ -163,7 +164,7 @@ namespace playlist_loader
 				std::wstring t;
 				byte cIndex = 0;
 
-				LOG_TRACE_GAME(L"[PlaylistLoader::ProcessCustomSetting] Variant: {} Custom Setting Detected: {} = {}", variant_string, property_name, property_value);
+				event(_event_verbose, "h2mod:playlistloader: Variant: %ws Custom Setting Detected: %ws = %ws", variant_string.c_str(), property_name, property_value);
 				switch (custom_setting_type)
 				{
 				case gravity:

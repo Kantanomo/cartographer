@@ -7,6 +7,7 @@
 
 #include "simulation.h"
 
+#include "networking/network_event.h"
 #include "saved_games/game_state_procs.h"
 
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
@@ -326,6 +327,7 @@ void c_simulation_world::queues_dispose(void)
 
 void c_simulation_world::create_player(datum player_index)
 {
+	event(_event_verbose, "simulation:players: create player 0x%08X", player_index);
 	typedef void(__thiscall* create_player_t)(c_simulation_world*, datum);
 	INVOKE_TYPE(0x1DC05C, 0x1C3511, create_player_t, this, player_index);
 	return;
