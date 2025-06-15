@@ -36,6 +36,9 @@ public:
 	virtual ~c_variant_parameter_setting_list() = default;
 
 	virtual int32 link_item_widgets() override;
+	void link_item_widgets_default();
+	void link_item_widgets_custom(s_game_variant* variant);
+	void link_item_widgets_cartographer();
 
 	virtual c_list_item_widget* get_list_items() override;
 
@@ -68,6 +71,9 @@ public:
 	virtual ~c_screen_variant_parameter_setting() = default;
 
 	virtual void post_initialize() override;
+	void post_initialize_default();
+	void post_initialize_custom(s_game_variant* variant);
+	void post_initialize_cartographer();
 
 	const void* load_proc() const override;
 

@@ -340,7 +340,7 @@ enum e_oddball_engine_waypoint_type
 	_oddball_waypoint_type_off = 3,
 
 	k_oddball_waypoint_type_count,
-	k_oddball_waypoint_type_bits_required = bits_required_for(k_oddball_waypoint_type_count - 1)
+	k_oddball_waypoint_type_bits_required = bits_required_for(FLAG(k_oddball_waypoint_type_count - 1))
 };
 
 enum e_king_engine_flags : uint32
@@ -410,14 +410,61 @@ enum e_headhunter_engine_flags : uint32
 	k_headhunter_engine_flags_count
 };
 
-enum e_cartographer_match_settings_flags : uint32
+enum e_cartographer_variant_settings_version : uint32
 {
-	_cartographer_match_settings_thirty_tick_rate = 0,
-	_cartographer_match_settings_infinite_ammo = 1,
-	_cartographer_match_settings_infinite_grenades = 2,
-	_cartographer_match_settings_explosion_physics = 3,
+	_cartographer_variant_settings_version_none,
+	_cartographer_variant_settings_version_one
+};
 
-	k_cartographer_match_settings_flags_count
+enum e_cartographer_variant_flags : uint32
+{
+	_cartographer_variant_thirty_tick_rate,
+	_cartographer_variant_infinite_ammo,
+	_cartographer_variant_infinite_grenades,
+	_cartographer_variant_explosion_physics,
+	_cartographer_variant_force_default_fov,
+
+	k_cartographer_variant_flags_count,
+	k_cartographer_variant_flags_bits_required = bits_required_for(FLAG(k_cartographer_variant_flags_count - 1)),
+};
+
+enum e_game_speed_modifier : uint8
+{
+	_game_speed_modifier_none,
+	_game_speed_modifier_half,
+	_game_speed_modifier_hundred_fifty,
+	_game_speed_modifier_double,
+	_game_speed_modifier_ludicrous,
+
+	k_game_speed_modifier_count,
+	k_game_speed_modifier_bits_required = bits_required_for(FLAG(k_game_speed_modifier_count - 1))
+};
+
+enum e_game_gravity_modifier : uint8
+{
+	_game_gravity_modifier_none,
+	_game_gravity_modifier_twenty_five_percent,
+	_game_gravity_modifier_fifty_percent,
+	_game_gravity_modifier_seventy_five_percent,
+	_game_gravity_modifier_hundred_twenty_five_percent,
+	_game_gravity_modifier_hundred_fifty_percent,
+	_game_gravity_modifier_hundred_seventy_five_percent,
+	_game_gravity_modifier_two_hundred,
+
+	k_game_gravity_modifier_count,
+	k_game_gravity_modifier_bits_required = bits_required_for(FLAG(k_game_gravity_modifier_count - 1))
+};
+
+enum e_player_spawn_protection_timer : uint8
+{
+	_player_spawn_protection_timer_none,
+	_player_spawn_protection_timer_one_second,
+	_player_spawn_protection_timer_three_seconds,
+	_player_spawn_protection_timer_five_seconds,
+	_player_spawn_protection_timer_ten_seconds,
+
+	k_player_spawn_protection_timer_count,
+	k_player_spawn_protection_timer_bits_required = bits_required_for(FLAG(k_player_spawn_protection_timer_count - 1))
 };
 
 struct s_variant_description_map
@@ -495,22 +542,107 @@ union s_game_engine_variant
 };
 ASSERT_STRUCT_SIZE(s_game_engine_variant, 64);
 
+// this structure is specially built to use the unused data inside s_game_variant.
+// using padding to align our project settings to the empty spaces
+struct s_cartographer_variant_settings
+{
+	private:
+		int8 pad1[16];
 
+	public:
+		e_cartographer_variant_settings_version version;
+		c_flags_no_init<e_cartographer_variant_flags, uint32, k_cartographer_variant_flags_count> flags;
+		e_game_speed_modifier game_speed;
+		e_game_gravity_modifier gravity;
+		e_player_spawn_protection_timer spawn_protection;
+		int8 usable_space[6];
 
-union s_cartographer_match_settings
+	private:
+		int8 pad2[24];
+
+	public:
+		int32 setting_storage2[6];
+
+	private:
+		int8 pad3[20];
+
+	public:
+		int32 setting_storage3[5];
+
+	private:
+		int8 pad4[11];
+
+	public:
+		int32 setting_storage4[6];
+};
+
+union s_game_variant
 {
 	struct
 	{
-		c_flags_no_init<e_cartographer_match_settings_flags, uint32, k_cartographer_match_settings_flags_count> flags;
-		real32 game_speed;
-		real32 gravity;
+		int16 flags;
+		int8 pad;
+		e_game_variant_description_index description_index;
+		wchar_t variant_name[32];
+		e_game_engine_type variant_game_engine_index;
+		c_flags_no_init<e_game_engine_flags, uint32, k_game_engine_flags_count> game_engine_flags;
+
+		union
+		{
+			struct
+			{
+				e_game_engine_round_setting round_setting;
+				int32 score_to_win_round;
+				int32 round_time_limit;
+				e_game_engine_join_in_progress join_in_progress_setting;
+				int32 unused_match_settings[6];
+
+				int32 max_players;
+				int32 max_living_players;
+				int32 lives_per_round;
+				int32 respawn_time;
+				int32 suicide_penalty;
+				e_game_engine_shield_setting shield_setting;
+				int32 unused_player_settings[6];
+
+				e_game_engine_team_score team_score_setting;
+				e_game_engine_team_respawn team_respawn_setting;
+				int32 betrayal_penalty;
+				int32 unk;
+				int32 maximum_allowable_teams;
+				int32 unused_team_settings[5];
+
+				e_game_engine_respawn_setting vehicle_respawn_setting; 
+				e_game_engine_light_land_vehicle primary_light_land_vehicle;
+				e_game_engine_light_land_vehicle secondary_light_land_vehicle;
+				e_game_engine_heavy_land_vehicle primary_heavy_land_vehicle;
+				e_game_engine_flying_vehicle primary_flying_vehicle;
+				e_game_engine_heavy_land_vehicle secondary_heavy_land_vehicle;
+				e_game_engine_turret_vehicle primary_turret_vehicle;
+				e_game_engine_turret_vehicle secondary_turret_vehicle;
+
+				e_game_engine_weapon_set weapon_set;
+				e_game_engine_respawn_setting weapon_respawn_setting;
+				e_game_engine_starting_weapon starting_equipment_primary;
+				e_game_engine_starting_weapon starting_equipment_secondary;
+
+				/* Maybe make use of these? */
+				int32 unused_settings[6];
+			};
+
+			s_cartographer_variant_settings cartographer_settings;
+
+			int8 variant_settings_buffer[164];
+		};
+
+		s_game_engine_variant game_engine_variant;
 	};
 private:
-	int32 unused_match_settings[6];
+	int8 max_struct_data[304];
 };
-ASSERT_STRUCT_SIZE(s_cartographer_match_settings, 24);
+ASSERT_STRUCT_SIZE(s_game_variant, 304);
 
-struct s_game_variant
+struct s_game_variant_old
 {
 	int16 flags;
 	int8 pad;
@@ -524,8 +656,7 @@ struct s_game_variant
 	int32 score_to_win_round;
 	int32 round_time_limit;
 	e_game_engine_join_in_progress join_in_progress_setting;
-	s_cartographer_match_settings cartographer_match_settings;
-	//int32 unused_match_settings[6];
+	int32 unused_match_settings[6];
 
 	/* player settings */
 	int32 max_players;
@@ -578,3 +709,7 @@ void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_var
 bool __cdecl game_variant_cleanup(s_game_variant* variant);
 
 bool __cdecl game_variant_is_valid(s_game_variant* variant);
+
+void game_variant_cartographer_settings_default_new(s_game_variant* variant);
+
+bool game_variant_cartographer_settings_validate(s_game_variant* variant);

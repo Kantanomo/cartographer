@@ -674,6 +674,7 @@ static void h2mod_apply_hooks(void)
 	unit_action_system_apply_patches();
 	weapons_apply_patches();
 	physics_constants_apply_patches();
+	game_time_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -751,7 +752,6 @@ static void h2mod_apply_hooks(void)
 		render_weather_apply_patches();
 
 		cinematics_apply_patches();
-		game_time_apply_patches();
 		game_state_procs_apply_patches();
 		apply_particle_update_patches();
 		apply_dead_camera_patches();

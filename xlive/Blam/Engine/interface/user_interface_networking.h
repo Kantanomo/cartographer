@@ -16,7 +16,7 @@ enum e_session_protocol
 
 /* forward declations*/
 
-struct s_game_variant;
+union s_game_variant;
 
 /* public methods */
 

@@ -45,9 +45,9 @@ void unit_throw_grenade_move_to_hand(datum unit_index)
 		{
 			s_game_variant* variant = get_game_variant();
 
-			if (variant)
+			if (game_is_multiplayer() && variant)
 			{
-				if (!variant->cartographer_match_settings.flags.test(_cartographer_match_settings_infinite_grenades))
+				if (!variant->cartographer_settings.flags.test(_cartographer_variant_infinite_grenades))
 				{
 					--unit->unit.grenade_counts[unit->unit.current_grenade_index];
 					simulation_action_object_update(unit_index, 0x400000);

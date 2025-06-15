@@ -4,7 +4,9 @@
 #include "saved_game_files.h"
 #include "game/game.h"
 #include "game/game_engine_territories.h"
+#include "game/game_time.h"
 #include "networking/logic/network_session_interface.h"
+#include "physics/physics_constants.h"
 #include "text/text_group.h"
 #include "text/unicode.h"
 
@@ -90,17 +92,19 @@ void __cdecl game_variant_create_default_new(s_game_variant* variant, e_game_var
 		}
     }
 
-	//variant->cartographer_match_settings.flags.set(_cartographer_match_settings_infinite_grenades, true);
-	//variant->cartographer_match_settings.flags.set(_cartographer_match_settings_infinite_ammo, true);
-	variant->cartographer_match_settings.gravity = 0.5f;
+	game_variant_cartographer_settings_default_new(variant);
 }
 bool __cdecl game_variant_cleanup(s_game_variant* variant)
 {
 	// todo: fix this, so it can just be the rewritten function its 1-1 rewrite but for some reason doesn't work.
 	// all default saves just end up going under slayer??
 
-	if(variant->variant_game_engine_index != _game_engine_type_headhunter)
-		return p_game_variant_validate(variant);
+	if (variant->variant_game_engine_index != _game_engine_type_headhunter)
+	{
+		bool result = p_game_variant_validate(variant);
+		game_variant_cartographer_settings_validate(variant);
+		return result;
+	}
 
 	s_game_variant base_variant{};
 
@@ -215,8 +219,11 @@ bool __cdecl game_variant_cleanup(s_game_variant* variant)
 	variant->unk = 0;
 
 	bool k = validate_wchar_characters(variant->variant_name);
-	if (!memcmp(&base_variant, variant, sizeof(s_game_variant)) )
+	if (!memcmp(&base_variant, variant, sizeof(s_game_variant)))
+	{
+		game_variant_cartographer_settings_validate(variant);
 		return k;
+	}
 
 	memset(&base_variant, 0, sizeof(s_game_variant));
 
@@ -259,4 +266,31 @@ bool game_variant_is_valid(s_game_variant* variant)
 	return game_variant_cleanup(variant);
 }
 
+void game_variant_cartographer_settings_default_new(s_game_variant* variant)
+{
+	variant->cartographer_settings.version = _cartographer_variant_settings_version_one;
+	variant->cartographer_settings.flags.set_unsafe(0);
+	variant->cartographer_settings.gravity = _game_gravity_modifier_none;
+	variant->cartographer_settings.game_speed = _game_speed_modifier_none;
+	variant->cartographer_settings.spawn_protection = _player_spawn_protection_timer_one_second;
+
+
+	variant->cartographer_settings.flags.set(_cartographer_variant_explosion_physics, true);
+}
+
+bool game_variant_cartographer_settings_validate(s_game_variant* variant)
+{
+	if (variant->cartographer_settings.version == _cartographer_variant_settings_version_none)
+	{
+		game_variant_cartographer_settings_default_new(variant);
+	}
+
+	// in the future this functionality needs to be expanded for upgrading between versions and verification.
+	return true;
+}
+
+void asdf()
+{
+	//t.cartographer_settings.
+}
 #undef variant_setting_pin

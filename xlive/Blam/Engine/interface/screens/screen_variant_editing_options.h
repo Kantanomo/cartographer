@@ -13,6 +13,7 @@ enum e_variant_editing_options_item : uint8
 	_variant_editing_options_item_game_type,
 	_variant_editing_options_item_vehicle,
 	_variant_editing_options_item_equipment,
+	_variant_editing_options_item_cartographer,
 	k_variant_editing_options_item_count
 };
 
@@ -34,7 +35,7 @@ public:
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
 };
-ASSERT_STRUCT_SIZE(c_variant_editing_options_list, 992);
+ASSERT_STRUCT_SIZE(c_variant_editing_options_list, 1124);
 
 struct c_screen_variant_editing_options : public c_screen_with_menu
 {
@@ -49,7 +50,8 @@ public:
 
 	const void* load_proc() const override;
 
+	static void apply_patches_on_map_load();
 	static void apply_patches();
 	static void* __cdecl load_editor(s_screen_parameters* parameters);
 };
-ASSERT_STRUCT_SIZE(c_screen_variant_editing_options, 3648);
+ASSERT_STRUCT_SIZE(c_screen_variant_editing_options, 3780);

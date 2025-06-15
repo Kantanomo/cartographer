@@ -551,7 +551,7 @@ void c_screen_game_engine_category::apply_on_map_load()
 			s_window_pane_reference* slayer_pane = screen_definition->panes[0];
 
 			s_window_pane_reference* headhunter_pane = (s_window_pane_reference*)tag_injection_extend_block(&screen_definition->panes, sizeof(s_window_pane_reference), 1);
-			memcpy(headhunter_pane, slayer_pane, sizeof(s_window_pane_reference));
+			csmemcpy(headhunter_pane, slayer_pane, sizeof(s_window_pane_reference));
 
 			// storage variable
 			uint32 out_data_offset = 0;

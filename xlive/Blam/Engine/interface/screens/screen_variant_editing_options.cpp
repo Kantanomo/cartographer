@@ -3,9 +3,12 @@
 
 #include "screen_game_engine_category.h"
 #include "screen_variant_options.h"
+#include "cache/cache_files.h"
 #include "interface/multiplayer_variant_settings_interface_definition.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
+#include "interface/user_interface_screen_widget_definition.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 /* typedefs */
 proc_ui_screen_load_cb_t p_c_screen_variant_options_new;
@@ -43,6 +46,9 @@ void c_variant_editing_options_list::handle_item_pressed_event(s_event_record** 
 				break;
 			case _variant_editing_options_item_equipment:
 				menu_type = _variant_setting_category_type_equipment;
+				break;
+			case _variant_editing_options_item_cartographer:
+				menu_type = _variant_setting_category_type_cartographer_settings;
 				break;
 			default:
 				return;
@@ -92,23 +98,28 @@ void c_variant_editing_options_list::update_list_items(c_list_item_widget* item,
 		s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item->get_last_data_index());
 		switch((e_screen_game_engine_items)item_datum->item_id)
 		{
-		case _variant_editing_options_item_game_type:
-			{
-				//s_game_variant* ui_variant = user_interface_get_variant();
-				//// TODO: REVERSE STRING_ID PARSING TO ADD THE ABILITY TO ADD NEW SLUGS
-				//// SO WE DO NOT HAVE TO DO THIS
-				//if(ui_variant->variant_game_engine_index == _game_engine_type_headhunter)
-				//{
-				//	const e_language language = get_current_language();
-				//	item_text->set_text(head_hunter_strings[language]);
-				//}
-				//else
-					item_text->set_text_from_string_id(items_map[item_datum->item_id].item_text);
+			case _variant_editing_options_item_game_type:
+				{
+					//s_game_variant* ui_variant = user_interface_get_variant();
+					//// TODO: REVERSE STRING_ID PARSING TO ADD THE ABILITY TO ADD NEW SLUGS
+					//// SO WE DO NOT HAVE TO DO THIS
+					//if(ui_variant->variant_game_engine_index == _game_engine_type_headhunter)
+					//{
+					//	const e_language language = get_current_language();
+					//	item_text->set_text(head_hunter_strings[language]);
+					//}
+					//else
+						item_text->set_text_from_string_id(items_map[item_datum->item_id].item_text);
+					break;
+				}
+			case _variant_editing_options_item_cartographer:
+				{
+					item_text->set_text(L"Extra settings");
+					break;
+				}
+			default:
+				item_text->set_text_from_string_id(items_map[item_datum->item_id].item_text);
 				break;
-			}
-		default:
-			item_text->set_text_from_string_id(items_map[item_datum->item_id].item_text);
-			break;
 		}
 	}
 }
@@ -163,6 +174,55 @@ void* c_screen_variant_editing_options::load_editor(s_screen_parameters* paramet
 const void* c_screen_variant_editing_options::load_proc() const
 {
 	return &c_screen_variant_editing_options::load_editor;
+}
+
+void c_screen_variant_editing_options::apply_patches_on_map_load()
+{
+	constexpr char* tag_path = "ui\\screens\\game_shell\\settings_screen\\variant_settings\\variant_editing_options";
+	datum variant_editing_options_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, tag_path);
+
+	if (variant_editing_options_index == NONE)
+	{
+		error(0, "screen variant editing options tag not found");
+		return;
+	}
+
+	s_user_interface_screen_widget_definition* screen_definition = (s_user_interface_screen_widget_definition*)tag_get_fast(variant_editing_options_index);
+
+	if (screen_definition)
+	{
+		s_window_pane_reference* match_pane = screen_definition->panes[0];
+
+		s_window_pane_reference* cartographer_pane = (s_window_pane_reference*)tag_injection_extend_block(&screen_definition->panes, sizeof(s_window_pane_reference), 1);
+		csmemcpy(cartographer_pane, match_pane, sizeof(s_window_pane_reference));
+
+		uint32 out_data_offset = 0;
+
+		if (match_pane->list_block.count)
+		{
+			s_list_reference* cartographer_list_references = (s_list_reference*)tag_injection_reserve_cache_memory(sizeof(s_list_reference) * match_pane->list_block.count, &out_data_offset );
+			cartographer_pane->list_block.data = out_data_offset;
+			csmemcpy(cartographer_list_references, match_pane->list_block[0], sizeof(s_list_reference) * match_pane->list_block.count);
+		}
+
+		if (match_pane->text_blocks.count)
+		{
+			s_text_block_reference* cartographer_text_references = (s_text_block_reference*)tag_injection_reserve_cache_memory(sizeof(s_text_block_reference) * match_pane->text_blocks.count, &out_data_offset);
+			cartographer_pane->text_blocks.data = out_data_offset;
+			csmemcpy(cartographer_text_references, match_pane->text_blocks[0], sizeof(s_text_block_reference) * match_pane->text_blocks.count);
+		}
+
+		if (match_pane->bitmap_blocks.count)
+		{
+			s_bitmap_block_reference* cartographer_bitmap_references = (s_bitmap_block_reference*)tag_injection_reserve_cache_memory(sizeof(s_bitmap_block_reference) * match_pane->bitmap_blocks.count, &out_data_offset);
+			cartographer_pane->bitmap_blocks.data = out_data_offset;
+			csmemcpy(cartographer_bitmap_references, match_pane->bitmap_blocks[0], sizeof(s_bitmap_block_reference) * match_pane->bitmap_blocks.count);
+		}
+
+		cartographer_pane->text_blocks[0]->string = _string_id_filter_custom_help;
+
+		cartographer_pane->bitmap_blocks[4]->initial_sprite_frame = 3;
+	}
 }
 
 void c_screen_variant_editing_options::apply_patches()

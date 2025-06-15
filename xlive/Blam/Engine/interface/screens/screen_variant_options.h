@@ -39,6 +39,14 @@ public:
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
 
+	void update_list_items_cartographer(c_list_item_widget* item, int32 skin_index) const;
+	void update_list_items_custom(c_list_item_widget* item, int32 skin_index) const;
+	void update_list_items_default(c_list_item_widget* item, int32 skin_index) const;
+
+	void link_item_widgets_cartographer();
+	void link_item_widgets_headhunter();
+	void link_item_widgets_default();
+
 	void set_quick_options(bool state);
 	void set_variant_setting_category_type(e_variant_setting_category_type category);
 };

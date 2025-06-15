@@ -6,6 +6,8 @@
 
 #define k_default_profiles_count 1
 
+
+
 struct s_saved_game_profile_variant_info
 {
 	int8 data[192];

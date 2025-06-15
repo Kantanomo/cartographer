@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "players.h"
 
+#include "game_time.h"
 #include "game/game.h"
 #include "game/game_engine.h"
 #include "game/game_globals.h"
@@ -655,10 +656,37 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
 	}
 }
 
-
 int16 local_player_count(void)
 {
 	return get_players_globals()->local_player_count;
+}
+
+// this is just c_time_globals::get_seconds_to_ticks_imprecise being patch called
+// remove this patch call when the player_spawn function is rewritten
+int32 __cdecl player_get_spawn_protection_time(real32 timer)
+{
+	s_game_variant* variant = get_game_variant();
+
+	if (variant)
+	{
+		switch (variant->cartographer_settings.spawn_protection)
+		{
+			case _player_spawn_protection_timer_none:
+				return 0;
+			case _player_spawn_protection_timer_one_second:
+				return time_globals::seconds_to_ticks_round(1);
+			case _player_spawn_protection_timer_three_seconds:
+				return time_globals::seconds_to_ticks_round(3);
+			case _player_spawn_protection_timer_five_seconds:
+				return time_globals::seconds_to_ticks_round(5);
+			case _player_spawn_protection_timer_ten_seconds:
+				return time_globals::seconds_to_ticks_round(10);
+			default:
+				return time_globals::seconds_to_ticks_round(timer);
+		}
+	}
+
+	return time_globals::seconds_to_ticks_round(timer);
 }
 
 void players_apply_patches(void)
@@ -673,6 +701,8 @@ void players_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x58182, 0x6067A), players_update_activation);
 
 	PatchCall(Memory::GetAddress(0x936F2, 0x4B9F2), player_find_action_context);
+
+	PatchCall(Memory::GetAddress(0x55D02, 0x4BD66), player_get_spawn_protection_time);
 	return;
 }
 

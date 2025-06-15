@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "weapons.h"
 
+#include "game/game.h"
 #include "saved_games/game_variant.h"
 #include "units/units.h"
 
@@ -29,8 +30,8 @@ void weapon_take_inventory_rounds(datum weapon_index, int32 magazine_index, int3
 
 	s_game_variant* variant = get_game_variant();
 
-	if (variant)
-		if (variant->cartographer_match_settings.flags.test(_cartographer_match_settings_infinite_ammo))
+	if (game_is_multiplayer() && variant)
+		if (variant->cartographer_settings.flags.test(_cartographer_variant_infinite_ammo))
 			return;
 
 	if (available_rounds >= round_count)

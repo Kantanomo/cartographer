@@ -1,12 +1,69 @@
 #include "stdafx.h"
 #include "multiplayer_variant_settings_interface_definition.h"
 
+#include "multiplayer_variant_interface_cartographer_strings.h"
 #include "multiplayer_variant_interface_headhunter_strings.h"
 #include "cache/cache_files.h"
 #include "text/text_group.h"
 #include "text/unicode.h"
 
 /* private code */
+
+static void multiplayer_variant_settings_interface_parse_cartographer_engine_mode(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_flags_32;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.flags);
+	*(e_cartographer_variant_flags*)out_variable = _cartographer_variant_thirty_tick_rate;
+}
+
+static void multiplayer_variant_settings_interface_parse_cartographer_infinite_ammo(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_flags_32;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.flags);
+	*(e_cartographer_variant_flags*)out_variable = _cartographer_variant_infinite_ammo;
+}
+
+static void multiplayer_variant_settings_interface_parse_cartographer_infinite_grenades(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_flags_32;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.flags);
+	*(e_cartographer_variant_flags*)out_variable = _cartographer_variant_infinite_grenades;
+}
+
+static void multiplayer_variant_settings_interface_parse_cartographer_explosion_physics(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_flags_32;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.flags);
+	*(e_cartographer_variant_flags*)out_variable = _cartographer_variant_explosion_physics;
+}
+
+static void multiplayer_variant_settings_interface_parse_cartographer_force_default_fov(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_flags_32;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.flags);
+	*(e_cartographer_variant_flags*)out_variable = _cartographer_variant_force_default_fov;
+}
+
+static void multiplayer_variant_settings_interface_parse_cartographer_game_speed(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_int8;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.game_speed);
+	*(real32*)out_variable = 1.f;
+}
+
+static void multiplayer_variant_settings_interface_parse_cartographer_gravity(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_int8;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.gravity);
+	*(real32*)out_variable = 1.f;
+}
+
+static void multiplayer_variant_settings_interface_parse_cartographer_spawn_protection(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_int8;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.spawn_protection);
+	*(real32*)out_variable = 1.f;
+}
 
 static void multiplayer_variant_settings_interface_parse_headhunter_moving_bin(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
 {
@@ -125,6 +182,109 @@ static int32 multiplayer_variant_settings_interface_get_variant_parameter_value_
 	return NONE;
 }
 
+static void multiplayer_variant_settings_interface_get_variant_parameter_label_cartographer(int32 value, e_variant_setting_parameter_type type, wchar_t* out_string)
+{
+	const wchar_t* string = L"";
+
+	switch (type)
+	{
+		case _variant_setting_parameter_type_cartographer_infinite_ammo:
+		case _variant_setting_parameter_type_cartographer_infinite_grenades:
+		case _variant_setting_parameter_type_cartographer_explosion_physics:
+		case _variant_setting_parameter_type_cartographer_force_default_fov:
+			string = g_multiplayer_variant_interface_bool_value_strings[get_current_language()][value];
+			break;
+
+		case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+		{
+			string = g_multiplayer_variant_interface_cartographer_engine_mode[get_current_language()][value];
+			break;
+		}
+
+
+		case _variant_setting_parameter_type_cartographer_game_speed:
+		{
+			switch ((e_game_speed_modifier)value)
+			{
+				case _game_speed_modifier_none:
+				case _game_speed_modifier_half:
+				case _game_speed_modifier_hundred_fifty:
+				case _game_speed_modifier_double:
+				case _game_speed_modifier_ludicrous:
+				{
+					string = g_multiplayer_variant_interface_cartographer_game_speed_strings[get_current_language()][value];
+					break;
+				}
+			}
+			break;
+		}
+
+		case _variant_setting_parameter_type_cartographer_gravity:
+		{
+			switch ((e_game_gravity_modifier)value)
+			{
+				case _game_gravity_modifier_none:
+				case _game_gravity_modifier_twenty_five_percent:
+				case _game_gravity_modifier_fifty_percent:
+				case _game_gravity_modifier_seventy_five_percent:
+				case _game_gravity_modifier_hundred_twenty_five_percent:
+				case _game_gravity_modifier_hundred_fifty_percent:
+				case _game_gravity_modifier_hundred_seventy_five_percent:
+				case _game_gravity_modifier_two_hundred:
+				{
+					string = g_multiplayer_variant_interface_cartographer_gravity_strings[get_current_language()][value];
+					break;
+				}
+			}
+			break;
+		}
+
+		case _variant_setting_parameter_type_cartographer_spawn_protection:
+		{
+			switch ((e_player_spawn_protection_timer)value)
+			{
+				case _player_spawn_protection_timer_none:
+				case _player_spawn_protection_timer_one_second:
+				case _player_spawn_protection_timer_three_seconds:
+				case _player_spawn_protection_timer_five_seconds:
+				case _player_spawn_protection_timer_ten_seconds:
+				{
+					string = g_multiplayer_variant_interface_cartographer_spawn_protection_strings[get_current_language()][value];
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	usnzprintf(out_string, 512, string);
+}
+
+static int32 multiplayer_variant_settings_interface_get_variant_parameter_value_count_cartographer(e_variant_setting_parameter_type type)
+{
+	switch (type)
+	{
+		case _variant_setting_parameter_type_cartographer_infinite_ammo:
+		case _variant_setting_parameter_type_cartographer_infinite_grenades:
+		case _variant_setting_parameter_type_cartographer_explosion_physics:
+		case _variant_setting_parameter_type_cartographer_force_default_fov:
+		case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+			return 2;
+
+		case _variant_setting_parameter_type_cartographer_game_speed:
+			return k_game_speed_modifier_count;
+
+		case _variant_setting_parameter_type_cartographer_gravity:
+			return k_game_gravity_modifier_count;
+
+		case _variant_setting_parameter_type_cartographer_spawn_protection:
+			return k_player_spawn_protection_timer_count;
+	}
+
+	return NONE;
+}
+
+
 /* public code */
 
 void multiplayer_variant_settings_interface_apply_patches()
@@ -164,12 +324,72 @@ s_text_value_pair_definition* multiplayer_variant_settings_interface_get_text_va
 
 int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value(s_game_variant* variant, e_variant_setting_parameter_type type)
 {
-	return INVOKE(0x23AA54, 0, multiplayer_variant_settings_interface_get_variant_parameter_value, variant, type);
+	if (IN_RANGE(type, 0, k_variant_setting_parameter_type_base_count))
+	{
+		return INVOKE(0x23AA54, 0, multiplayer_variant_settings_interface_get_variant_parameter_value, variant, type);
+	}
+	else
+	{
+		switch (type)
+		{
+			case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+				return variant->cartographer_settings.flags.test(_cartographer_variant_thirty_tick_rate);
+			case _variant_setting_parameter_type_cartographer_infinite_ammo:
+				return variant->cartographer_settings.flags.test(_cartographer_variant_infinite_ammo);
+			case _variant_setting_parameter_type_cartographer_infinite_grenades:
+				return variant->cartographer_settings.flags.test(_cartographer_variant_infinite_grenades);
+			case _variant_setting_parameter_type_cartographer_explosion_physics:
+				return variant->cartographer_settings.flags.test(_cartographer_variant_explosion_physics);
+			case _variant_setting_parameter_type_cartographer_force_default_fov:
+				return variant->cartographer_settings.flags.test(_cartographer_variant_force_default_fov);
+			case _variant_setting_parameter_type_cartographer_game_speed:
+				return variant->cartographer_settings.game_speed;
+			case _variant_setting_parameter_type_cartographer_gravity:
+				return variant->cartographer_settings.gravity;
+			case _variant_setting_parameter_type_cartographer_spawn_protection:
+				return variant->cartographer_settings.spawn_protection;
+		}
+	}
+
+	return 0;
 }
 
 void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(s_game_variant* variant, e_variant_setting_parameter_type parameter_type, int32 value)
 {
-	INVOKE(0x23A8C2, 0, multiplayer_variant_settings_interface_set_variant_parameter_value, variant, parameter_type, value);
+	if (!IN_RANGE(parameter_type, k_variant_setting_parameter_type_base_count, k_variant_setting_parameter_type_base_count + k_variant_setting_parameter_type_cartographer_count))
+	{
+		INVOKE(0x23A8C2, 0, multiplayer_variant_settings_interface_set_variant_parameter_value, variant, parameter_type, value);
+	}
+	else
+	{
+		switch (parameter_type)
+		{
+			case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+				variant->cartographer_settings.flags.set(_cartographer_variant_thirty_tick_rate, value);
+				break;
+			case _variant_setting_parameter_type_cartographer_infinite_ammo:
+				variant->cartographer_settings.flags.set(_cartographer_variant_infinite_ammo, value);
+				break;
+			case _variant_setting_parameter_type_cartographer_infinite_grenades:
+				variant->cartographer_settings.flags.set(_cartographer_variant_infinite_grenades, value);
+				break;
+			case _variant_setting_parameter_type_cartographer_explosion_physics:
+				variant->cartographer_settings.flags.set(_cartographer_variant_explosion_physics, value);
+				break;
+			case _variant_setting_parameter_type_cartographer_force_default_fov:
+				variant->cartographer_settings.flags.set(_cartographer_variant_force_default_fov, value);
+				break;
+			case _variant_setting_parameter_type_cartographer_game_speed:
+				variant->cartographer_settings.game_speed = (e_game_speed_modifier)value;
+				break;
+			case _variant_setting_parameter_type_cartographer_gravity:
+				variant->cartographer_settings.gravity = (e_game_gravity_modifier)value;
+				break;
+			case _variant_setting_parameter_type_cartographer_spawn_protection:
+				variant->cartographer_settings.spawn_protection = (e_player_spawn_protection_timer)value;
+				break;
+		}
+	}
 }
 
 s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_parameter_label(s_text_value_pair_definition* text_value_pair, int32 value)
@@ -305,46 +525,94 @@ void multiplayer_variant_settings_interface_get_variant_setting_string(s_game_va
 
 void multiplayer_variant_settings_interface_get_custom_variant_parameter_label(s_game_variant* variant, e_variant_setting_parameter_type type, int32 value, wchar_t* out_string)
 {
-	switch(variant->variant_game_engine_index)
+	if (variant)
 	{
-		case _game_engine_type_headhunter:
+		switch (variant->variant_game_engine_index)
 		{
-			multiplayer_variant_settings_interface_get_variant_parameter_label_headhunter(value, type, out_string);
-			return;
+			case _game_engine_type_headhunter:
+			{
+				multiplayer_variant_settings_interface_get_variant_parameter_label_headhunter(value, type, out_string);
+				return;
+			}
 		}
+	}
+
+	if (IN_RANGE(type, k_variant_setting_parameter_type_base_count, k_variant_setting_parameter_type_base_count + k_variant_setting_parameter_type_cartographer_count))
+	{
+		multiplayer_variant_settings_interface_get_variant_parameter_label_cartographer(value, type, out_string);
+		return;
 	}
 
 	usnzprintf(out_string, 512, L"");
 }
 void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s_game_variant* variant, int32 index, wchar_t* out_string)
 {
-	switch (variant->variant_game_engine_index)
-	{
-		case _game_engine_type_headhunter:
+
+		switch (variant->variant_game_engine_index)
 		{
-			usnzprintf(out_string, 512, g_multiplayer_variant_interface_headhunter_parameter_title_strings[get_current_language()][index]);
-			return;
+			case _game_engine_type_headhunter:
+			{
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_headhunter_parameter_title_strings[get_current_language()][index]);
+				return;
+			}
 		}
-	}
+
 
 	usnzprintf(out_string, 512, L"");
 }
 
 void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string)
 {
-	switch (variant->variant_game_engine_index)
+	if (variant)
 	{
-		case _game_engine_type_headhunter:
+		switch (variant->variant_game_engine_index)
 		{
-			for (int32 i = 0; i < k_multiplayer_variant_headhunter_parameter_count; ++i)
+			case _game_engine_type_headhunter:
 			{
-				if (g_multiplayer_variant_interface_headhunter_parameter_types[i] == type)
+				for (int32 i = 0; i < k_multiplayer_variant_headhunter_parameter_count; ++i)
 				{
-					usnzprintf(out_string, 512, g_multiplayer_variant_interface_headhunter_parameter_title_strings[get_current_language()][i]);
-					return;
+					if (g_multiplayer_variant_interface_headhunter_parameter_types[i] == type)
+					{
+						usnzprintf(out_string, 512, g_multiplayer_variant_interface_headhunter_parameter_title_strings[get_current_language()][i]);
+						return;
+					}
 				}
 			}
 		}
+	}
+
+
+	if (IN_RANGE(type, k_variant_setting_parameter_type_base_count, k_variant_setting_parameter_type_base_count + k_variant_setting_parameter_type_cartographer_count))
+	{
+		switch (type)
+		{
+			case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][0]);
+				break;
+			case _variant_setting_parameter_type_cartographer_infinite_ammo:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][1]);
+				break;
+			case _variant_setting_parameter_type_cartographer_infinite_grenades:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][2]);
+				break;
+			case _variant_setting_parameter_type_cartographer_explosion_physics:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][3]);
+				break;
+			case _variant_setting_parameter_type_cartographer_force_default_fov:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][4]);
+				break;
+			case _variant_setting_parameter_type_cartographer_game_speed:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][5]);
+				break;
+			case _variant_setting_parameter_type_cartographer_gravity:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][6]);
+				break;
+			case _variant_setting_parameter_type_cartographer_spawn_protection:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][7]);
+				break;
+		}
+
+		return;
 	}
 
 	usnzprintf(out_string, 512, L"");
@@ -352,19 +620,55 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s
 
 void multiplayer_variant_settings_interface_get_custom_variant_parameter_description(s_game_variant* variant,e_variant_setting_parameter_type type, wchar_t* out_string)
 {
-	switch (variant->variant_game_engine_index)
+	if (variant)
 	{
-		case _game_engine_type_headhunter:
+		switch (variant->variant_game_engine_index)
 		{
-			for (int32 i = 0; i < k_multiplayer_variant_headhunter_parameter_count; ++i)
+			case _game_engine_type_headhunter:
 			{
-				if (g_multiplayer_variant_interface_headhunter_parameter_types[i] == type)
+				for (int32 i = 0; i < k_multiplayer_variant_headhunter_parameter_count; ++i)
 				{
-					usnzprintf(out_string, 512, g_multiplayer_variant_interface_headhunter_parameter_description_strings[get_current_language()][i]);
-					return;
+					if (g_multiplayer_variant_interface_headhunter_parameter_types[i] == type)
+					{
+						usnzprintf(out_string, 512, g_multiplayer_variant_interface_headhunter_parameter_description_strings[get_current_language()][i]);
+						return;
+					}
 				}
 			}
 		}
+	}
+
+	if (IN_RANGE(type, k_variant_setting_parameter_type_base_count, k_variant_setting_parameter_type_base_count + k_variant_setting_parameter_type_cartographer_count))
+	{
+		switch (type)
+		{
+			case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][0]);
+				break;
+			case _variant_setting_parameter_type_cartographer_infinite_ammo:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][1]);
+				break;
+			case _variant_setting_parameter_type_cartographer_infinite_grenades:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][2]);
+				break;
+			case _variant_setting_parameter_type_cartographer_explosion_physics:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][3]);
+				break;
+			case _variant_setting_parameter_type_cartographer_force_default_fov:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][4]);
+				break;
+			case _variant_setting_parameter_type_cartographer_game_speed:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][5]);
+				break;
+			case _variant_setting_parameter_type_cartographer_gravity:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][6]);
+				break;
+			case _variant_setting_parameter_type_cartographer_spawn_protection:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][7]);
+				break;
+		}
+
+		return;
 	}
 
 	usnzprintf(out_string, 512, L"");
@@ -372,10 +676,18 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_descrip
 
 int32 multiplayer_variant_settings_interface_get_custom_variant_parameter_value_count(s_game_variant* variant, e_variant_setting_parameter_type type)
 {
-	switch (variant->variant_game_engine_index)
+	if (variant)
 	{
-		case _game_engine_type_headhunter:
-			return multiplayer_variant_settings_interface_get_variant_parameter_value_count_headhnter(type);
+		switch (variant->variant_game_engine_index)
+		{
+			case _game_engine_type_headhunter:
+				return multiplayer_variant_settings_interface_get_variant_parameter_value_count_headhnter(type);
+		}
+	}
+
+	if (IN_RANGE(type, k_variant_setting_parameter_type_base_count, k_variant_setting_parameter_type_base_count + k_variant_setting_parameter_type_cartographer_count))
+	{
+		return multiplayer_variant_settings_interface_get_variant_parameter_value_count_cartographer(type);
 	}
 
 	return 1;
@@ -396,5 +708,11 @@ bool multiplayer_variant_settings_interface_parameter_is_custom(s_game_variant* 
 				}
 		}
 	}
+
+	if (IN_RANGE(type, k_variant_setting_parameter_type_base_count, k_variant_setting_parameter_type_base_count + k_variant_setting_parameter_type_cartographer_count))
+	{
+		return true;
+	}
+
 	return false;
 }

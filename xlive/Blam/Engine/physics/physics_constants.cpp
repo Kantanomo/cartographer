@@ -2,6 +2,7 @@
 
 #include "physics_constants.h"
 
+#include "game/game.h"
 #include "saved_games/game_state.h"
 
 s_physics_constants* physics_constants_get()
@@ -28,8 +29,37 @@ void physics_constants_reset()
 
 	s_game_variant* variant = get_game_variant();
 
-	if (variant)
-		physics_constants->gravity = k_physics_constants_default_gravity * variant->cartographer_match_settings.gravity;
+	if (game_is_multiplayer() && variant)
+	{
+		switch (variant->cartographer_settings.gravity)
+		{
+			case _game_gravity_modifier_twenty_five_percent:
+				physics_constants->gravity = k_physics_constants_default_gravity * 0.25f;
+				break;
+			case _game_gravity_modifier_fifty_percent:
+				physics_constants->gravity = k_physics_constants_default_gravity * 0.5f;
+				break;
+			case _game_gravity_modifier_seventy_five_percent:
+				physics_constants->gravity = k_physics_constants_default_gravity * 0.75f;
+				break;
+			case _game_gravity_modifier_hundred_twenty_five_percent:
+				physics_constants->gravity = k_physics_constants_default_gravity * 1.25f;
+				break;
+			case _game_gravity_modifier_hundred_fifty_percent:
+				physics_constants->gravity = k_physics_constants_default_gravity * 1.50f;
+				break;
+			case _game_gravity_modifier_hundred_seventy_five_percent:
+				physics_constants->gravity = k_physics_constants_default_gravity * 1.75f;
+				break;
+			case _game_gravity_modifier_two_hundred:
+				physics_constants->gravity = k_physics_constants_default_gravity * 2.f;
+				break;
+			case _game_gravity_modifier_none:
+			default:
+				physics_constants->gravity = k_physics_constants_default_gravity;
+				break;
+		}
+	}
 	else
 		physics_constants->gravity = k_physics_constants_default_gravity;
 
@@ -50,5 +80,3 @@ void physics_constants_apply_patches()
 	PatchCall(Memory::GetAddress(0xEB2D5, 0xEA4DF), physics_constants_reset);
 	WritePointer(Memory::GetAddress(0x3A0818, 0x35D548), physics_constants_setup_scenario);
 }
-
-

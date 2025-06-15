@@ -94,7 +94,7 @@ enum e_variant_setting_category_type : uint32
 	_variant_setting_category_type_match_territories,
 	_variant_setting_category_type_match_assault,
 	_variant_setting_category_type_players,
-	_variant_setting_category_type_OBSOLETE,
+	_variant_setting_category_type_cartographer_settings,
 	_variant_setting_category_type_vehicles,
 	_variant_setting_category_type_equipment,
 	_variant_setting_category_type_game_ctf,
@@ -309,7 +309,20 @@ enum e_variant_setting_parameter_type : uint32
 	_variant_setting_parameter_type_uns_bomb_carr_invis,
 	_variant_setting_parameter_type_uns_force_even_teams,
 
+	// cartographer settings
+	_variant_setting_parameter_type_cartographer_thirty_tick_rate,
+	_variant_setting_parameter_type_cartographer_infinite_ammo,
+	_variant_setting_parameter_type_cartographer_infinite_grenades,
+	_variant_setting_parameter_type_cartographer_explosion_physics,
+	_variant_setting_parameter_type_cartographer_force_default_fov,
+	_variant_setting_parameter_type_cartographer_game_speed,
+	_variant_setting_parameter_type_cartographer_gravity,
+	_variant_setting_parameter_type_cartographer_spawn_protection,
+
 	k_variant_setting_parameter_type_count,
+	k_variant_setting_parameter_type_base_count = 112,
+	k_variant_setting_parameter_type_cartographer_count = (k_variant_setting_parameter_type_count - k_variant_setting_parameter_type_base_count),
+
 	_variant_setting_parameter_type_invalid = (uint32)NONE
 };
 

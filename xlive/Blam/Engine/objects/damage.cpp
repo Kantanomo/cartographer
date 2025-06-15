@@ -4,6 +4,10 @@
 #include "game/game.h"
 #include "units/units.h"
 
+/* typedef */
+typedef void(__cdecl* t_object_apply_damage_aftermath)(datum object_index, s_damage_data* damage_data);
+t_object_apply_damage_aftermath p_object_apply_damage_aftermath;
+
 /* public code */
 
 void damage_apply_patches(void)
@@ -11,6 +15,8 @@ void damage_apply_patches(void)
 	// Hook on call to prevent guardian glitching
 	// Used to disable it in Infection only, became a bigger problem so now we have to disable it globally.....
 	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), object_cause_damage);
+	//PatchCall(Memory::GetAddress(0x17B50C, 0x152D6C), object_apply_damage_aftermath);
+	DETOUR_ATTACH(p_object_apply_damage_aftermath, Memory::GetAddress<t_object_apply_damage_aftermath>(0x17A25D, 0x151ABD), object_apply_damage_aftermath);
 	return;
 }
 
@@ -47,4 +53,18 @@ void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index,
 		INVOKE(0x17AD81, 0x1525E1, object_cause_damage, damage_data, object_index, node_index, region_index, material_index, object_normal);
 	}
 	return;
+}
+
+void __cdecl object_apply_damage_aftermath(datum object_index, s_damage_data* damage_data)
+{
+	s_game_variant* variant = get_game_variant();
+	if (game_is_multiplayer() && variant)
+	{
+		if (variant->cartographer_settings.flags.test(_cartographer_variant_explosion_physics))
+		{
+			damage_data->flags.set(_damage_can_affect_physics, true);
+		}
+	}
+
+	p_object_apply_damage_aftermath(object_index, damage_data);
 }
