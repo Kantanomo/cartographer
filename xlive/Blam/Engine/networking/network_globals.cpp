@@ -2,7 +2,7 @@
 #include "network_globals.h"
 
 #include "network_configuration.h"
-//#include "network_event.h"
+#include "network_event.h"
 #include "network_memory.h"
 #include "network_time.h"
 
@@ -44,7 +44,7 @@ static void network_globals_unknown_transition_dispose(void);
 void network_globals_apply_patches(void)
 {
 #ifdef EVENTS_ENABLED
-	//PatchCall(Memory::GetAddress(0x1B502A, 0x1A8D88), network_event_dispose);	// network_globals_dispose
+	PatchCall(Memory::GetAddress(0x1B502A, 0x1A8D88), network_event_dispose);	// network_globals_dispose
 #endif
 	WritePointer((uintptr_t)&get_game_systems()[4], network_globals_initialize);
 	return;
@@ -108,7 +108,7 @@ void network_globals_initialize(void)
 		
 		network_configuration_initialize();
 #ifdef EVENTS_ENABLED
-		//network_event_initialize();
+		network_event_initialize();
 #endif
 		if (network_memory_base_initialize(
 			global_network_link_get(),

@@ -1037,6 +1037,7 @@
     <ClCompile Include="Blam\Engine\networking\messages\network_message_handler.cpp" />
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
     <ClCompile Include="Blam\Engine\networking\delivery\network_link.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_event.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_globals.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_memory.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_statistics.cpp" />
@@ -1739,6 +1740,7 @@
     <ClInclude Include="Blam\Engine\networking\messages\network_message_gateway.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_message_handler.h" />
     <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
+    <ClInclude Include="Blam\Engine\networking\network_event.h" />
     <ClInclude Include="Blam\Engine\networking\network_game_definitions.h" />
     <ClInclude Include="Blam\Engine\networking\network_globals.h" />
     <ClInclude Include="Blam\Engine\networking\network_memory.h" />
