@@ -99,7 +99,7 @@ bool __cdecl cinematic_is_running_hook()
 	}
 	else
 	{
-		result = cinematic_is_running() || xbox_tickrate_is_enabled() || game_is_minimized();
+		result = cinematic_is_running() || xbox_tickrate_is_enabled() || game_is_minimized() || g_main_game_time_frame_limiter_enabled;
 	}
 	
 	return result;
@@ -107,18 +107,10 @@ bool __cdecl cinematic_is_running_hook()
 
 bool __cdecl should_limit_framerate_hook()
 {
-	bool result;
-	if (!g_main_game_time_frame_limiter_enabled)
+	bool result = game_is_minimized() || g_main_game_time_frame_limiter_enabled;
+	if (!halo_frame_interpolator_enabled())
 	{
-		result = false; // e_render_original_game_frame_limit handles frame limit in main_game_time.cpp
-	}
-	else
-	{
-		result = game_is_minimized();
-		if (!halo_frame_interpolator_enabled())
-		{
-			result |= xbox_tickrate_is_enabled();
-		}
+		result |= xbox_tickrate_is_enabled();
 	}
 
 	return result;
