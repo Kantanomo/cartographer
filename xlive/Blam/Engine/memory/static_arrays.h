@@ -90,7 +90,7 @@ public:
 	bool test(t_type bit) const
 	{
 		ASSERT(valid_bit(bit));
-		return TEST_BIT(m_storage, (t_storage_type)(bit));
+		return TEST_BIT(m_storage, bit);
 	}
 
 	// Untested
