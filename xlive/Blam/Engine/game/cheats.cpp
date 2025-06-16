@@ -310,7 +310,7 @@ static bool cheat_drop_effect(datum tag_index, const real_vector3d* forward, con
 			real_point3d collision_position;
 			collision_position.x = collision_res.point.x - (forward->i * 0.25f);
 			collision_position.y = collision_res.point.y - (forward->j * 0.25f);
-			collision_position.z = collision_res.point.z - (forward->k * 0.25f);;
+			collision_position.z = collision_res.point.z - (forward->k * 0.25f);
 			effect_new_from_point_vector(tag_index, &collision_position, forward, &collision_res.fog_plane, _match_all_markers_true, _effect_deterministic_true);
 		}
 		else

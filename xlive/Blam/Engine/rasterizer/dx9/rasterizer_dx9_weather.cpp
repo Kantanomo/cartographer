@@ -192,7 +192,7 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 
 		rasterizer_dx9_reset_depth_buffer();
 		rasterizer_dx9_set_vertex_shader_permutation(_global_vertex_shader_weather_particle, 0, 0);
-		rasterizer_dx9_initialize_camera_projection(false, &global_window_parameters->camera, &global_window_parameters->projection, *rasterizer_dx9_main_render_target_get());
+		rasterizer_dx9_initialize_camera_projection(false, &global_window_parameters->camera, &global_window_parameters->projection, (e_rasterizer_target)*rasterizer_dx9_main_render_target_get());
 
 		real_vector2d rain_vector = {};
 		pixel32 lower_rain_alpha = 0;

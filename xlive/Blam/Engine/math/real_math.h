@@ -244,7 +244,7 @@ inline bool valid_real(real32 value)
 inline bool valid_realcmp(real32 a, real32 b)
 {
 	real32 result = a - b;
-	return valid_real(result) && fabs(result) < 0.01f;
+	return valid_real(result) && abs(result) < 0.01f;
 }
 
 inline bool valid_real_normal3d(const real_vector3d* normal)

@@ -46,7 +46,7 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_pipeline_setup(void* data)
 {
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 
-	rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
+	rasterizer_dx9_set_target((e_rasterizer_target)*rasterizer_dx9_main_render_target_get(), 0, true);
 	rasterizer_dx9_set_target_as_texture(0, rasterizer_globals->d3d9_sm3_supported ? _rasterizer_target_z_a8b8g8r8 : _rasterizer_target_backbuffer);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
@@ -129,7 +129,7 @@ bool rasterizer_dx9_patchy_fog_apply_separate_layers_pipeline_setup(void* data)
 {
 	const s_patchy_fog_globals* patchy_fog_globals = patchy_fog_globals_get();
 
-	const e_rasterizer_target target = patchy_fog_globals->render_patchy_fog_parameters[1] ? *rasterizer_dx9_main_render_target_get() : _rasterizer_target_texaccum;
+	const e_rasterizer_target target = patchy_fog_globals->render_patchy_fog_parameters[1] ? (e_rasterizer_target)*rasterizer_dx9_main_render_target_get() : _rasterizer_target_texaccum;
 	rasterizer_dx9_set_target(target, 0, false);
 
 	rasterizer_dx9_set_target_as_texture(0, rasterizer_globals_get()->d3d9_sm3_supported ? _rasterizer_target_z_a8b8g8r8 : _rasterizer_target_backbuffer);

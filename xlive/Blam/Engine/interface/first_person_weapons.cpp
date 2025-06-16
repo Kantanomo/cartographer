@@ -906,7 +906,7 @@ static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_
 			if (interpolator_controls[0].enabled())
 			{
 				real32 ratio = interpolator_controls[0].get_ratio();
-				if (fabs(ratio) >= k_real_epsilon)
+				if (abs(ratio) >= k_real_epsilon)
 				{
 					s_game_globals* globals = scenario_get_game_globals();
 					ik_point_iterator iterator;

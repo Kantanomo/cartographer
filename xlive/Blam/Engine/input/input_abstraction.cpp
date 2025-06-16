@@ -695,13 +695,13 @@ static void input_abstraction_post_update_throttle(real_euler_angles2d* stick, r
 	real_vector2d vec = { stick->yaw,stick->pitch };
 	real32 magnitude = magnitude2d(&vec);
 
-	real32 delta = fabs(angle - k_gamepad_stick_angles[index]);
+	real32 delta = abs(angle - k_gamepad_stick_angles[index]);
 	real_angle min_delta = stick_index == _abstract_gamepad_stick_right ? DEGREES_TO_RADIANS(10.0f) : DEGREES_TO_RADIANS(35.0f);
 
 	if (delta >= min_delta)
 	{
 		real32 sign = 0.0f;
-		if (fabs(stick->yaw) <= fabs(stick->pitch))
+		if (abs(stick->yaw) <= abs(stick->pitch))
 		{
 			sign = (stick->pitch >= 0.0f) ? 1.0f : -1.0f;
 
@@ -720,7 +720,7 @@ static void input_abstraction_post_update_throttle(real_euler_angles2d* stick, r
 	{
 		constexpr real32 normalize_scale = 1.0f / DEGREES_TO_RADIANS(35.0f);
 
-		real_angle angle_abs = fabs(angle);
+		real_angle angle_abs = abs(angle);
 		real32 sign = 0.f;
 		if (angle_abs < DEGREES_TO_RADIANS(45.0f) || (angle_abs > DEGREES_TO_RADIANS(135.0f)))
 		{

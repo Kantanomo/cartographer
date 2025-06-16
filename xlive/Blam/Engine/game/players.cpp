@@ -57,9 +57,9 @@ s_player* s_player::get_from_unit_index(datum unit_index)
 	s_player* result = NULL;
 	c_player_in_game_iterator iterator;
 	
-	while (iterator.get_datum())
+	while (iterator.next())
 	{
-		s_player* player = iterator.get_datum();;
+		s_player* player = iterator.get_datum();
 		if (unit_index == player->unit_index)
 		{
 			result = player;

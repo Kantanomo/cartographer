@@ -280,7 +280,7 @@ inline light_definition* current_light_definition_get(void)
 	return *Memory::GetAddress<light_definition**>(0xA3E234);
 }
 
-inline e_light_type current_lght_type_get(void)
+inline e_light_type current_light_type_get(void)
 {
 	return *Memory::GetAddress<e_light_type*>(0xA3E238);
 }

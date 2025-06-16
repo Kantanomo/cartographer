@@ -122,7 +122,7 @@ void __cdecl render_submit_transparent_hologram_geometry(uint32* a1)
 		rectangle2d_to_rect(&global_window_parameters_get()->camera.viewport_bounds, &rect);
 
 		IDirect3DSurface9* main_mip_surface = rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_active_camo);
-		IDirect3DSurface9* render_target_surface = rasterizer_dx9_get_render_target_surface(*rasterizer_dx9_main_render_target_get(), 0);
+		IDirect3DSurface9* render_target_surface = rasterizer_dx9_get_render_target_surface((e_rasterizer_target)*rasterizer_dx9_main_render_target_get(), 0);
 
 		rasterizer_dx9_device_get_interface()->StretchRect(
 			render_target_surface,

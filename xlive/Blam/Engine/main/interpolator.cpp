@@ -33,6 +33,11 @@ static void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolat
 
 /* public code */
 
+bool halo_frame_interpolator_enabled()
+{
+	return g_interpolation_enabled;
+}
+
 void halo_interpolator_initialize(void)
 {
 	g_frame_data_storage = (s_frame_data_storage*)CSERIES_MALLOC(sizeof(s_frame_data_storage));
@@ -44,18 +49,21 @@ void halo_interpolator_initialize(void)
 
 void halo_interpolator_dispose(void)
 {
-	if (g_frame_data_storage)
+	if (halo_frame_interpolator_enabled())
 	{
-		CSERIES_FREE(g_frame_data_storage);
-	}
+		if (g_frame_data_storage)
+		{
+			CSERIES_FREE(g_frame_data_storage);
+		}
 
-	if (g_frame_data_intermediate)
-	{
-		CSERIES_FREE(g_frame_data_intermediate);
-	}
+		if (g_frame_data_intermediate)
+		{
+			CSERIES_FREE(g_frame_data_intermediate);
+		}
 
-	g_frame_data_storage = NULL;
-	g_frame_data_intermediate = NULL;
+		g_frame_data_storage = NULL;
+		g_frame_data_intermediate = NULL;
+	}
 	return;
 }
 
@@ -84,7 +92,7 @@ real32 halo_interpolator_get_interpolation_time(void)
 
 void halo_interpolator_clear_buffers(void)
 {
-	if (g_interpolation_enabled)
+	if (halo_frame_interpolator_enabled())
 	{
 		g_interpolation_update_in_progress = false;
 		g_interpolator_delta = 0.f;
@@ -101,7 +109,7 @@ void halo_interpolator_clear_buffers(void)
 
 void halo_interpolator_update_begin(void)
 {
-	if (g_interpolation_enabled)
+	if (halo_frame_interpolator_enabled())
 	{
 		ASSERT(!g_interpolation_update_in_progress);
 		g_interpolation_update_in_progress = true;
@@ -212,7 +220,7 @@ void halo_interpolator_setup_new_object(datum object_index)
 {
 	const uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
 
-	if (g_interpolation_enabled && g_interpolation_update_in_progress && abs_object_index < k_maximum_objects_per_map)
+	if (halo_frame_interpolator_enabled() && g_interpolation_update_in_progress && abs_object_index < k_maximum_objects_per_map)
 	{
 		if (g_previous_interpolation_frame_data->object_data[abs_object_index].object_index == object_index)
 		{
@@ -332,7 +340,7 @@ bool halo_interpolator_get_interpolated_matrix_from_user_index(int32 user_index,
 		bool target_initialized = target->position_data[user_index][position_index].initialized;
 		if (previous->position_data[user_index][position_index].initialized == target_initialized
 			&& target_initialized
-			&& g_interpolation_enabled
+			&& halo_frame_interpolator_enabled()
 			&& !cinematic_in_progress()
 			&& !g_interpolation_update_in_progress)
 		{
@@ -350,7 +358,7 @@ bool halo_interpolator_get_interpolated_matrix_from_user_index(int32 user_index,
 bool halo_interpolator_interpolate_weapon_node(int32 user_index, datum animation_index, int32 node_index, int32 weapon_slot, real_matrix4x3* out_node)
 {
 	bool result = false;
-	if (g_interpolation_enabled && !cinematic_in_progress())
+	if (halo_frame_interpolator_enabled() && !cinematic_in_progress())
 	{
 		if (g_target_interpolation_frame_data->initialized
 			&& g_previous_interpolation_frame_data->initialized
@@ -384,9 +392,8 @@ bool halo_interpolator_interpolate_weapon_node(int32 user_index, datum animation
 bool halo_interpolator_interpolate_weapon(int32 user_index, datum animation_index, int32 weapon_slot, real_matrix4x3** nodes, int32* node_matrices_count)
 {
 	bool result = false;
-	if (g_interpolation_enabled && !cinematic_in_progress())
+	if (halo_frame_interpolator_enabled() && !cinematic_in_progress())
 	{
-
 		ASSERT(!g_interpolation_update_in_progress);
 
 		if (g_target_interpolation_frame_data->initialized
@@ -511,7 +518,7 @@ bool halo_interpolator_interpolate_position_backwards(int32 user_index, uint32 p
 		bool initialized = g_target_interpolation_frame_data->position_data[user_index][position_index].initialized
 			&& g_previous_interpolation_frame_data->position_data[user_index][position_index].initialized;
 		if (initialized
-			&& g_interpolation_enabled
+			&& halo_frame_interpolator_enabled()
 			&& !cinematic_in_progress()
 			&& !g_interpolation_update_in_progress)
 		{
@@ -545,7 +552,7 @@ static object_datum* halo_interpolator_object_can_interpolate(datum object_index
 {
 	*out_abs_object_index = NONE;
 	uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
-	if (!g_interpolation_enabled || cinematic_in_progress())
+	if (!halo_frame_interpolator_enabled() || cinematic_in_progress())
 		return NULL;
 
 	ASSERT(object_index != NONE);

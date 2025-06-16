@@ -123,7 +123,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
 			// draw the alpha clear on the primary render surface
 			rasterizer_globals->rasterizer_draw_on_main_back_buffer = false;
-			rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
+			rasterizer_dx9_set_target((e_rasterizer_target)*rasterizer_dx9_main_render_target_get(), 0, true);
 			rasterizer_globals->rasterizer_draw_on_main_back_buffer = true;
 
 			rasterizer_dx9_perf_event_begin("clear_alpha", NULL);
