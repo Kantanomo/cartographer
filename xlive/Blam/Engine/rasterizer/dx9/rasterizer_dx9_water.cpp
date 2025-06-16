@@ -36,7 +36,7 @@ bool __cdecl rasterizer_dx9_update_water_refraction_surface(void)
 		{
 			IDirect3DSurface9* surface = rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_water_refraction);
 
-			e_rasterizer_target render_target = *rasterizer_dx9_main_render_target_get();
+			e_rasterizer_target render_target = (e_rasterizer_target)*rasterizer_dx9_main_render_target_get();
 			IDirect3DSurface9* render_surface = rasterizer_dx9_get_render_target_surface(render_target, 0);
 
 			RECT rect;

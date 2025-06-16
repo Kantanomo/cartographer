@@ -149,7 +149,7 @@ enum e_shader_pass_implementation_flags : uint16
 	k_shader_pass_implementation_flag_count
 };
 
-enum e_shader_pass_texture_source_extern : int16
+enum e_shader_pass_texture_source_extern : int8
 {
 	_shader_pass_texture_source_extern_none = 0,
 	_shader_pass_texture_source_extern_global_vector_normalization = 1,

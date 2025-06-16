@@ -85,9 +85,9 @@ uint32* cubemap_target_size_get(void)
 	return Memory::GetAddress<uint32*>(0x41F674);
 }
 
-e_rasterizer_target* rasterizer_dx9_main_render_target_get(void)
+int32* rasterizer_dx9_main_render_target_get(void)
 {
-	return Memory::GetAddress<e_rasterizer_target*>(0xA3E228);
+	return Memory::GetAddress<int32*>(0xA3E228);
 }
 
 s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target texture_target)
@@ -921,7 +921,7 @@ IDirect3DSurface9* __cdecl rasterizer_dx9_get_target_mip_surface(e_rasterizer_ta
 
 void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
 {
-	rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
+	rasterizer_dx9_set_target((e_rasterizer_target)*rasterizer_dx9_main_render_target_get(), 0, true);
 	return;
 }
 

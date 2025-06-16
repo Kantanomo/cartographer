@@ -28,7 +28,7 @@ void __fastcall c_shader_submission_interface_new__stage_texture(
 	c_shader_submission_interface_new* _this,
 	uint32 _edx,
 	int16 stage,
-	e_shader_pass_texture_source_extern bitmap_extern_index,
+	int32 bitmap_extern_index,
 	uint32* res_x,
 	uint32* res_y
 );
@@ -43,7 +43,7 @@ void rasterizer_dx9_shader_submit_new_apply_patches(void)
 
 void c_shader_submission_interface_new::stage_texture(
 	int16 stage,
-	e_shader_pass_texture_source_extern bitmap_extern_index,
+	int32 bitmap_extern_index,
 	uint32* res_x,
 	uint32* res_y) const
 {
@@ -86,7 +86,7 @@ void c_shader_submission_interface_new::stage_texture(
 			continue_staging = false;
 			break;
 		case _shader_pass_texture_source_extern_global_target_frame_buffer:
-			rasterizer_dx9_set_target_as_texture(stage, *rasterizer_dx9_main_render_target_get());
+			rasterizer_dx9_set_target_as_texture(stage, (e_rasterizer_target)*rasterizer_dx9_main_render_target_get());
 			rasterizer_target_get_resolution(*rasterizer_dx9_main_render_target_get(), res_x, res_y);
 			continue_staging = false;
 			break;
@@ -107,11 +107,11 @@ void c_shader_submission_interface_new::stage_texture(
 			break;
 		case _shader_pass_texture_source_extern_light_gel:
 			light_def = current_light_definition_get();
-			if (!light_type_is_spherical(current_lght_type_get()) && light_def)
+			if (!light_type_is_spherical(current_light_type_get()) && light_def)
 			{
 				if (!light_def->flags.test(_light_definition_texture_camera_gel))
 				{
-					if (light_def->shader.index == NONE|| rasterizer_rendering_light_get())
+					if (light_def->shader.index == NONE || rasterizer_rendering_light_get())
 					{
 						rasterizer_dx9_set_texture(
 							stage,
@@ -148,7 +148,7 @@ void c_shader_submission_interface_new::stage_texture(
 			continue_staging = false;
 			break;
 		case _shader_pass_texture_source_extern_unused_12:
-			if (light_type_is_spherical(current_lght_type_get()))
+			if (light_type_is_spherical(current_light_type_get()))
 			{
 				rasterizer_dx9_set_texture_direct(stage, rasterizer_globals_get_data()->distance_attenuation.index, 0, 0.f);
 			}
@@ -343,7 +343,7 @@ void __fastcall c_shader_submission_interface_new__stage_texture(
 	c_shader_submission_interface_new* _this,
 	uint32 _edx,
 	int16 stage,
-	e_shader_pass_texture_source_extern bitmap_extern_index,
+	int32 bitmap_extern_index,
 	uint32* res_x,
 	uint32* res_y
 )
