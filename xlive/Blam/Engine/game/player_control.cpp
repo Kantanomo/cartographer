@@ -129,7 +129,7 @@ int16 __cdecl unit_rotate_zoom_level_hook(datum object_index, __int16 a2)
 		if (player)
 		{
 			int16 user_index = player->user_index;
-			if(user_index != NONE)
+			if (user_index != NONE)
 				local_player_held_zoom_delta_time[user_index] = 0.f;
 		}
 	}
