@@ -64,6 +64,8 @@ extern s_interpolation_data* g_frame_data_intermediate;
 
 /* prototypes */
 
+bool halo_frame_interpolator_enabled();
+
 void halo_interpolator_initialize(void);
 
 void halo_interpolator_dispose(void);

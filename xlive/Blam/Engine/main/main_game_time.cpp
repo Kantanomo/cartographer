@@ -88,7 +88,7 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
 		// in case of fixed time step, frame limiter should be handled by the other frame limiter
-		if (g_main_game_time_frame_limiter_enabled || game_is_minimized())
+		if (should_limit_framerate())
 		{
 			if (time_globals::available())
 			{
