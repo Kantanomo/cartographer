@@ -3,12 +3,12 @@
 
 /* constants */
 
-#define k_maximum_enumerated_saved_game_files_any_type_per_memory_unit 4096
-#define k_maximum_enumerated_default_save_game_files 101
-#define k_maximum_enumerated_cached_save_game_files 4
-
-#define ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_file_index) \
-	(((enumerated_file_index) & 0x200000) != 0)
+enum
+{
+	k_maximum_enumerated_saved_game_files_any_type_per_memory_unit = 4096,
+	k_maximum_enumerated_default_save_game_files = 101,
+	k_maximum_enumerated_cached_save_game_files = 4,
+};
 
 /* enums */
 
@@ -93,6 +93,10 @@ struct s_saved_game_files_globals
 	int32 unk_8;
 };
 ASSERT_STRUCT_SIZE(s_saved_game_files_globals, 2312);
+
+/* macros */
+
+#define ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_file_index) (((enumerated_file_index) & 0x200000) != 0)
 
 /* prototypes */
 

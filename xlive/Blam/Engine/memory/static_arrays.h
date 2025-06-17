@@ -33,6 +33,58 @@ protected:
 	t_storage_type m_storage[k_count];
 };
 
+template<typename t_type, size_t k_maximum_count>
+class c_static_array_tracked
+{
+public:
+	void clear(void)
+	{
+		m_count = 0;
+		csmemset(m_data, 0, sizeof(t_type) * k_maximum_count);
+		return;
+	}
+	
+	bool valid(void) const
+	{
+		return m_count <= k_count;
+	}
+
+	bool full(void)
+	{
+		ASSERT(valid());
+		return m_count == k_maximum_count;
+	}
+	
+	bool empty(void)
+	{
+		return m_count == 0;
+	}
+
+	uint32 get_total_size(void)
+	{
+		return k_maximum_count * sizeof(t_type);
+	}
+	
+	uint32 get_type_size(void)
+	{
+		return sizeof(t_type);
+	}
+	
+	uint32 get_count(void)
+	{
+		return m_count;
+	}
+	
+	t_type* operator[](uint32 index)
+	{
+		ASSERT(index < k_maximum_count);
+		return &m_data[index];
+	}
+protected:
+	uint32 m_count = 0;
+	t_type m_data[k_maximum_count];
+};
+
 template<typename t_type, typename t_storage_type, size_t k_count>
 class c_flags_no_init 
 {
@@ -228,45 +280,6 @@ public:
 		return;
 	}
 	~c_static_flags(void) = default;
-};
-
-template<typename t_type, size_t k_maximum_count>
-class c_static_array_tracked
-{
-public:
-	void clear()
-	{
-		m_count = 0;
-		csmemset((int8*)m_data, 0, sizeof(t_type) * k_maximum_count);
-	}
-	bool empty()
-	{
-		return m_count == 0;
-	}
-	bool full()
-	{
-		return m_count == k_maximum_count;
-	}
-	uint32 get_total_size()
-	{
-		return k_maximum_count * sizeof(t_type);
-	}
-	uint32 get_type_size()
-	{
-		return sizeof(t_type);
-	}
-	uint32 get_count()
-	{
-		return m_count;
-	}
-	t_type* operator[](uint32 index)
-	{
-		ASSERT(index < k_maximum_count);
-		return &this->m_data[index];
-	}
-protected:
-	uint32 m_count = 0;
-	t_type m_data[k_maximum_count];
 };
 
 template<size_t string_length>
