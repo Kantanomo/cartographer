@@ -392,7 +392,7 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protect
     // English
     {
         L"Default",
-        L"1 Second",
+        L"None",
         L"3 Seconds",
         L"5 Seconds",
         L"10 Seconds"
@@ -400,7 +400,7 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protect
     // Japanese
     {
         L"デフォルト",
-        L"1秒",
+        L"0秒",
         L"3秒",
         L"5秒",
         L"10秒"
@@ -408,7 +408,7 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protect
     // German
     {
         L"Standard",
-        L"1 Sekunde",
+        L"0 Sekunde",
         L"3 Sekunden",
         L"5 Sekunden",
         L"10 Sekunden"
@@ -416,7 +416,7 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protect
     // French
     {
         L"Par défaut",
-        L"1 seconde",
+        L"0 seconde",
         L"3 secondes",
         L"5 secondes",
         L"10 secondes"
@@ -424,7 +424,7 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protect
     // Spanish
     {
         L"Predeterminado",
-        L"1 segundo",
+        L"0 segundo",
         L"3 segundos",
         L"5 segundos",
         L"10 segundos"
@@ -432,7 +432,7 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protect
     // Italian
     {
         L"Predefinito",
-        L"1 secondo",
+        L"0 secondo",
         L"3 secondi",
         L"5 secondi",
         L"10 secondi"
@@ -440,7 +440,7 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protect
     // Korean
     {
         L"기본",
-        L"1초",
+        L"0초",
         L"3초",
         L"5초",
         L"10초"
@@ -448,7 +448,7 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protect
     // Chinese
     {
         L"默认",
-        L"1秒",
+        L"0秒",
         L"3秒",
         L"5秒",
         L"10秒"
@@ -456,7 +456,7 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protect
     // Portuguese
     {
         L"Padrão",
-        L"1 segundo",
+        L"0 segundo",
         L"3 segundos",
         L"5 segundos",
         L"10 segundos"

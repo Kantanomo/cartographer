@@ -457,8 +457,8 @@ enum e_game_gravity_modifier : uint8
 
 enum e_player_spawn_protection_timer : uint8
 {
-	_player_spawn_protection_timer_none,
 	_player_spawn_protection_timer_one_second,
+	_player_spawn_protection_timer_none,
 	_player_spawn_protection_timer_three_seconds,
 	_player_spawn_protection_timer_five_seconds,
 	_player_spawn_protection_timer_ten_seconds,

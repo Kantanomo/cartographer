@@ -661,8 +661,6 @@ int16 local_player_count(void)
 	return get_players_globals()->local_player_count;
 }
 
-// this is just c_time_globals::get_seconds_to_ticks_imprecise being patch called
-// remove this patch call when the player_spawn function is rewritten
 int32 __cdecl player_get_spawn_protection_time(real32 timer)
 {
 	s_game_variant* variant = get_game_variant();
@@ -702,6 +700,9 @@ void players_apply_patches(void)
 
 	PatchCall(Memory::GetAddress(0x936F2, 0x4B9F2), player_find_action_context);
 
+
+	// this is just c_time_globals::get_seconds_to_ticks_imprecise being patch called
+	// remove this patch call when the player_spawn function is rewritten
 	PatchCall(Memory::GetAddress(0x55D02, 0x4BD66), player_get_spawn_protection_time);
 	return;
 }

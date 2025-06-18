@@ -356,7 +356,7 @@ int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value
 
 void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(s_game_variant* variant, e_variant_setting_parameter_type parameter_type, int32 value)
 {
-	if (!IN_RANGE(parameter_type, k_variant_setting_parameter_type_base_count, k_variant_setting_parameter_type_base_count + k_variant_setting_parameter_type_cartographer_count))
+	if (IN_RANGE(parameter_type, 0, k_variant_setting_parameter_type_base_count))
 	{
 		INVOKE(0x23A8C2, 0, multiplayer_variant_settings_interface_set_variant_parameter_value, variant, parameter_type, value);
 	}
