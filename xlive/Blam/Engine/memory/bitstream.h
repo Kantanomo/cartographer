@@ -1,7 +1,9 @@
 #pragma once
 
-
-#define k_bitstream_default_alignment 1
+enum
+{
+	k_bitstream_default_alignment = 1
+};
 
 enum e_bitstream_state : uint32
 {

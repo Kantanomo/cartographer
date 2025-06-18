@@ -175,6 +175,20 @@ size_t csstrnlen(const char* s, size_t size)
 	return length;
 }
 
+char* csnappendf(char* s, size_t size, const char* format)
+{
+	va_list va_args;
+	va_start(va_args, format);
+
+	size_t current_length = cstrlen(s);
+	ASSERT(current_length >= 0 && current_length < size);
+	vsprintf(&s[current_length], size - current_length, format, va_args);
+
+	va_end(va_args);
+	return s;
+
+}
+
 char* csstrncpy(char* s1, const char* s2, size_t size)
 {
 	ASSERT(s1 && s2);
@@ -189,6 +203,14 @@ char* csstrncat(char* s1, char const* s2, size_t size)
 	ASSERT(size > 0 && size <= MAXIMUM_STRING_SIZE);
 	strncat_s(s1, size, s2, UINT_MAX);
 	return s1;
+}
+
+size_t cstrlen(const char* s)
+{
+	ASSERT(s);
+	const size_t length = strlen(s);
+	ASSERT(length >= 0 && length < MAXIMUM_STRING_SIZE);
+	return length;
 }
 
 char* csstrnupr(char* s, size_t size)
