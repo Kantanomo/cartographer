@@ -11,12 +11,15 @@
 
 /* constants */
 
-#define k_number_of_render_states k_kilo
-#define k_number_of_render_state_parameters k_kilo
-#define k_number_of_extern_references k_kilo
-#define k_number_of_texture_stage_states k_kilo
-#define k_number_of_texture_stage_state_parameters k_kilo
-#define k_number_of_textures k_kilo
+enum
+{
+	k_number_of_render_states = k_kilo,
+	k_number_of_render_state_parameters = k_kilo,
+	k_number_of_extern_references = k_kilo,
+	k_number_of_texture_stage_states = k_kilo,
+	k_number_of_texture_stage_state_parameters = k_kilo,
+	k_number_of_textures = k_kilo,
+};
 
 /* structures */
 

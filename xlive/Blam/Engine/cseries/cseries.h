@@ -161,19 +161,19 @@ static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") e
 static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET ") for " #FIELD " is invalid");
 
 #ifdef ASSERTS_ENABLED
-#define ASSERT_TRIGGER_EXCEPTION(IS_EXCEPTION)			\
-if (IS_EXCEPTION)										\
-{														\
-	if (!is_debugger_present() && g_catch_exceptions)	\
-		exit(-1);                                       \
-	else                                                \
-		__debugbreak();                                 \
-}														\
-else													\
-{														\
-	if (is_debugger_present() || !g_catch_exceptions)	\
-		__debugbreak();									\
-}														\
+#define ASSERT_TRIGGER_EXCEPTION(IS_EXCEPTION)	\
+if (IS_EXCEPTION)								\
+{												\
+	if (is_debugger_present())					\
+		__debugbreak();							\
+	else if (!g_catch_exceptions)				\
+		exit(-1);								\
+}												\
+else											\
+{												\
+	if (is_debugger_present())					\
+		__debugbreak();							\
+}												\
 (void)0
 
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)		\
@@ -248,9 +248,13 @@ const char* csnprintf(char* buffer, size_t size, size_t max_count, const char* f
 
 size_t csstrnlen(const char* s, size_t size);
 
+char* csnappendf(char* s, size_t size, const char* format);
+
 char* csstrncpy(char* s1, const char* s2, size_t size);
 
 char* csstrncat(char* s1, char const* s2, size_t size);
+
+size_t cstrlen(const char* s);
 
 char* csstrnupr(char* s, size_t size);
 
