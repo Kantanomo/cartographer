@@ -110,6 +110,8 @@ void __cdecl effect_update(datum effect_index, real32 dt);
 void __cdecl effect_update_time(datum effect_index, real32 dt);
 effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum* effect_datum, int32* out_index, int16 a3);
 
+void __cdecl effects_update(void);
+
 int32 __cdecl effect_new_from_point_vector(
     datum tag_index,
     const real_point3d* position,

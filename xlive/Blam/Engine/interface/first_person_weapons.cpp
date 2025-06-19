@@ -89,6 +89,12 @@ void first_person_weapons_toggle(bool state)
 	return;
 }
 
+void __cdecl first_person_weapons_update(void)
+{
+	INVOKE(0x22B371, 0x20FA21, first_person_weapons_update);
+	return;
+}
+
 int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_index, int32 maximum_model_count, s_first_person_model_data* fp_model_data)
 {
 	int32 model_count = 0;

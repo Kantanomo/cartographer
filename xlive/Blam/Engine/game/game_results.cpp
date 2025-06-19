@@ -41,6 +41,12 @@ void game_results_stop_updating(void)
 	return;
 }
 
+void __cdecl game_results_update(void)
+{
+	INVOKE(0x692CC, 0x68CE4, game_results_update);
+	return;
+}
+
 /* private code */
 
 s_game_results_globals* game_results_globals_get(void)

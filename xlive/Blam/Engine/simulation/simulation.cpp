@@ -139,7 +139,7 @@ c_simulation_type_collection* simulation_get_type_collection()
 	return c_simulation_type_collection::get();
 }
 
-void __cdecl simulation_apply_before_game(simulation_update* update)
+void __cdecl simulation_apply_before_game(const simulation_update* update)
 {
 	ASSERT(update != NULL);
 	ASSERT(simulation_get_globals()->initialized);
@@ -234,13 +234,34 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
 	return;
 }
 
+void simulation_apply_after_game(const simulation_update* update)
+{
+	// This never did anything
+	return;
+}
+
 void __cdecl simulation_build_update(simulation_update* update)
 {
+	s_simulation_globals* simulation_globals = simulation_get_globals();
+
+	ASSERT(simulation_globals->initialized);
+	ASSERT(simulation_globals->world);
+
+	if (simulation_globals->engine_paused)
+	{
+		DISPLAY_ASSERT("simulation aborted inside game update");
+	}
+
+	ASSERT(simulation_globals->world->exists());
+	ASSERT(game_in_progress());
+	ASSERT(update);
+
+
 	INVOKE(0x1ADDF3, 0x1A81AA, simulation_build_update, update);
 	return;
 }
 
-void __cdecl simulation_update_aftermath(simulation_update* update)
+void __cdecl simulation_update_aftermath(const simulation_update* update)
 {
 	INVOKE(0x1ADEA9, 0x1A8260, simulation_update_aftermath, update);
 	return;
@@ -306,9 +327,8 @@ void simulation_apply_patches(void)
 	simulation_entity_database_apply_patches();
 	simulation_game_action_apply_patches();
 
-	PatchCall(Memory::GetAddress(0x39D73, 0xC0F8), simulation_update_pregame);
-	PatchCall(Memory::GetAddress(0x4A4DF, 0x4375D), simulation_apply_before_game);
-	PatchCall(Memory::GetAddress(0x1DD22F, 0x1C46E3), simulation_build_player_updates);
+	PatchCall(Memory::GetAddress(0x39D73, 0xC0F8), simulation_update_pregame);			// main_loop_body
+	PatchCall(Memory::GetAddress(0x1DD22F, 0x1C46E3), simulation_build_player_updates);	// c_simulation_world::build_update
 
 	WriteJmpTo(Memory::GetAddress(0x1AE6D8, 0x1A8932), simulation_reset);
 	return;

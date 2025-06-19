@@ -62,7 +62,10 @@ uint32 random_math_get_random_number()
 
 uint32* get_local_random_seed_address()
 {
-	return &random_math_get_globals()->random_number;
+	s_random_math* random_globals = random_math_get_globals();
+	ASSERT(random_globals);
+
+	return &random_globals->random_number;
 }
 
 void random_math_set_seed(uint32 seed)

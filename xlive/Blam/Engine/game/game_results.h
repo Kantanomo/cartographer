@@ -17,3 +17,5 @@ bool game_results_get_game_recording(void);
 bool game_results_get_game_updating(void);
 void game_results_start_updating(void);
 void game_results_stop_updating(void);
+
+void __cdecl game_results_update(void);

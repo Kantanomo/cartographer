@@ -701,6 +701,18 @@ int16 local_player_count(void)
 	return get_players_globals()->local_player_count;
 }
 
+void __cdecl players_update_before_game(const simulation_update* update)
+{
+	INVOKE(0x5815E, 0x60656, players_update_before_game, update);
+	return;
+}
+
+void __cdecl players_update_after_game(const simulation_update* update)
+{
+	INVOKE(0x58C22, 0x6111A, players_update_after_game, update);
+	return;
+}
+
 void players_apply_patches(void)
 {
 	// Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant

@@ -834,6 +834,7 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">4131</DisableSpecificWarnings>
     </ClCompile>
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
+    <ClCompile Include="Blam\Engine\ai\ai.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_definitions.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_id.cpp" />
@@ -875,6 +876,7 @@
     <ClCompile Include="Blam\Engine\cseries\debug_memory.cpp" />
     <ClCompile Include="Blam\Engine\cseries\runtime_state.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
+    <ClCompile Include="Blam\Engine\cutscene\recorded_animations.cpp" />
     <ClCompile Include="Blam\Engine\effects\beam.cpp" />
     <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
     <ClCompile Include="Blam\Engine\effects\effects.cpp" />
@@ -892,7 +894,9 @@
     <ClCompile Include="Blam\Engine\effects\particle_update.cpp" />
     <ClCompile Include="Blam\Engine\filesys\pc_file_system.cpp" />
     <ClCompile Include="Blam\Engine\game\game.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_allegiance.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_grief.cpp" />
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
     <ClCompile Include="Blam\Engine\game\game_results.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
@@ -1073,6 +1077,7 @@
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_model_definitions.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok.cpp" />
+    <ClCompile Include="Blam\Engine\physics\impacts.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClInclude Include="3rdparty\discord\include\discord_game_sdk.h" />
     <ClInclude Include="3rdparty\havok\common\base\container\array\hkArray.h" />
@@ -1282,6 +1287,7 @@
     <ClInclude Include="Blam\Engine\cseries\cseries.h" />
     <ClInclude Include="Blam\Engine\cseries\debug_memory.h" />
     <ClInclude Include="Blam\Engine\cseries\runtime_state.h" />
+    <ClInclude Include="Blam\Engine\cutscene\recorded_animations.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
@@ -1323,6 +1329,7 @@
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_territories.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
+    <ClInclude Include="Blam\Engine\game\game_grief.h" />
     <ClInclude Include="Blam\Engine\game\game_portals.h" />
     <ClInclude Include="Blam\Engine\game\game_results.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
@@ -1536,6 +1543,7 @@
     <ClCompile Include="Blam\Engine\render\render_visible_geometry.cpp" />
     <ClCompile Include="Blam\Engine\render\render_water.cpp" />
     <ClCompile Include="Blam\Engine\render\render_weather.cpp" />
+    <ClCompile Include="Blam\Engine\sapien\editor.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\cartographer_player_profile\cartographer_player_profile.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\cartographer_player_profile\cartographer_player_profile_weapon_offsets.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_state.cpp" />
@@ -1575,6 +1583,7 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_type_collection.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_world.cpp" />
     <ClCompile Include="Blam\Engine\sound\game_sound.cpp" />
+    <ClCompile Include="Blam\Engine\sound\game_sound_deterministic.cpp" />
     <ClCompile Include="Blam\Engine\sound\sound_cache_file_definitions.cpp" />
     <ClCompile Include="Blam\Engine\sound\sound_manager.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
@@ -1793,6 +1802,7 @@
     <ClInclude Include="Blam\Engine\physics\havok.h" />
     <ClInclude Include="Blam\Engine\physics\havok_component.h" />
     <ClInclude Include="Blam\Engine\physics\havok_memory.h" />
+    <ClInclude Include="Blam\Engine\physics\impacts.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
     <ClInclude Include="Blam\Engine\physics\physics_model_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\structure_physics.h" />
@@ -2600,6 +2610,7 @@
     <ClInclude Include="Blam\Engine\render\render_water.h" />
     <ClInclude Include="Blam\Engine\render\render_weather.h" />
     <ClInclude Include="Blam\Engine\render\weather_definitions.h" />
+    <ClInclude Include="Blam\Engine\sapien\editor.h" />
     <ClInclude Include="Blam\Engine\saved_games\cartographer_player_profile\cartographer_player_profile.h" />
     <ClInclude Include="Blam\Engine\saved_games\cartographer_player_profile\cartographer_player_profile_weapon_offsets.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_game_files_async_windows.h" />
@@ -2664,6 +2675,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
     <ClInclude Include="Blam\Engine\sound\game_sound.h" />
+    <ClInclude Include="Blam\Engine\sound\game_sound_deterministic.h" />
     <ClInclude Include="Blam\Engine\sound\sound_cache_file_definitions.h" />
     <ClInclude Include="Blam\Engine\sound\sound_classes.h" />
     <ClInclude Include="Blam\Engine\sound\sound_clusters.h" />

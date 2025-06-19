@@ -156,6 +156,15 @@ int32 game_seconds_integer_to_ticks(int32 seconds)
 	return seconds * game_time_globals->ticks_per_second;
 }
 
+void game_time_advance(void)
+{
+	time_globals* game_time_globals = time_globals::get();
+	ASSERT(game_time_globals);
+	ASSERT(game_time_globals->initialized);
+	++game_time_globals->passed_ticks_count;
+	return;
+}
+
 void game_time_apply_patches()
 {
 	// apply framerate throttle patches for when the game is minimized

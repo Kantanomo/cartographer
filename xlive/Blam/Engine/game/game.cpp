@@ -2,9 +2,17 @@
 #include "game.h"
 
 #include "game_engine.h"
+#include "game_grief.h"
+#include "game_results.h"
 #include "game_time.h"
+#include "players.h"
 
-#include "cseries/cseries.h"
+#include "camera/director.h"
+#include "cutscene/cinematics.h"
+#include "cutscene/recorded_animations.h"
+#include "effects/effects.h"
+#include "hs/hs.h"
+#include "interface/hud.h"
 #include "interface/motion_sensor.h"
 #include "interface/user_interface_networking.h"
 #include "math/random_math.h"
@@ -12,9 +20,14 @@
 #include "main/main.h"
 #include "main/main_game_time.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "objects/lights.h"
+#include "physics/havok.h"
+#include "physics/impacts.h"
+#include "sapien/editor.h"
 #include "saved_games/game_state.h"
 #include "shell/shell.h"
 #include "simulation/simulation.h"
+#include "sound/game_sound_deterministic.h"
 #include "text/unicode.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
@@ -41,6 +54,16 @@ static void __cdecl main_loop_process_global_state_changes_hook(void);
 
 static void game_info_initialize_for_new_map(const s_game_options* options);
 
+static void __cdecl game_tick_pulse_random_seed_deterministic(const simulation_update* update);
+
+static void __cdecl game_update_pvs(void);
+
+static void __cdecl game_loss_update(void);
+
+static void __cdecl game_finished_update(void);
+
+static void __cdecl game_save_update(void);
+
 /* globals */
 
 game_frame_t p_game_frame;
@@ -53,6 +76,9 @@ void game_apply_pre_winmain_patches(void)
 	PatchCall(Memory::GetAddress(0x9802, 0x1FAED), game_initialize_for_new_map);
 	PatchCall(Memory::GetAddress(0x39D2A, 0xC0C0), game_update);
 	PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), game_initialize);
+
+	PatchCall(Memory::GetAddress(0x1DD394, 0x1C4848), game_tick);	// c_simulation_world::time_set_immediate_update
+	PatchCall(Memory::GetAddress(0x1DD49A, 0x1C495A), game_tick);	// c_simulation_world::handle_synchronous_update
 
 	// inscrease the max player count to allow ragdolls and the ragdoll count
 	WriteValue<int8>(Memory::GetAddress(0x49CCC, 0x42F4A) + 2, k_game_maximum_players_to_allow_ragdolls_new);
@@ -317,7 +343,70 @@ bool __cdecl main_events_pending(void)
 
 void __cdecl game_tick(void)
 {
-	INVOKE(0x4A4AF, 0x4372D, game_tick);
+	//INVOKE(0x4A4AF, 0x4372D, game_tick);
+
+	s_main_game_globals* game_globals = get_main_game_globals();
+	ASSERT(game_globals && game_globals->map_active && game_globals->active_structure_bsp_index != NONE);
+
+	simulation_update update;
+
+	//main_status("game_tick", "time %d", game_time_get());
+
+	real_math_reset_precision();
+	simulation_build_update(&update);
+	
+	random_seed_allow_use();
+
+	simulation_apply_before_game(&update);
+	if (update.simulation_in_progress)
+	{
+		players_update_before_game(&update);
+		game_tick_pulse_random_seed_deterministic(&update);
+		ai_update();
+		recorded_animations_update();
+		game_sound_deterministic_update_timers();
+		game_engine_update();
+		game_results_update();
+		editor_update();
+		hs_update();
+		game_update_pvs();
+		
+		objects_update();
+		havok_update();
+		objects_move();
+		objects_post_update();
+		impacts_update();
+		effects_update();
+		lights_update();
+		
+		game_engine_update_after_game();
+		simulation_apply_after_game(&update);
+		players_update_after_game(&update);
+		
+		game_allegiance_update();
+		game_loss_update();
+		game_finished_update();
+		game_save_update();
+		cinematic_update();
+		game_grief_update();
+		
+		random_seed_disallow_use();
+
+		first_person_weapons_update();
+		player_effect_update();
+		hud_update();
+		observer_game_tick();
+		director_game_tick();
+	}
+
+	simulation_update_aftermath(&update);
+	if (update.simulation_in_progress)
+	{
+		game_time_advance();
+	}
+
+	//main_status("game_tick", NULL);
+
 	return;
 }
 
@@ -428,5 +517,35 @@ static void game_info_initialize_for_new_map(const s_game_options* options)
 	game_globals->game_is_finished = false;
 	game_globals->pvs_object_is_set = 0;
 	game_globals->game_ragdoll_count = 0;
+	return;
+}
+
+static void __cdecl game_tick_pulse_random_seed_deterministic(const simulation_update* update)
+{
+	INVOKE(0x49B02, 0x42D80, game_tick_pulse_random_seed_deterministic, update);
+	return;
+}
+
+static void __cdecl game_update_pvs(void)
+{
+	INVOKE(0x4A16D, 0x433EB, game_update_pvs);
+	return;
+}
+
+static void __cdecl game_loss_update(void)
+{
+	INVOKE(0x4A3FB, 0x43679, game_loss_update);
+	return;
+}
+
+static void __cdecl game_finished_update(void)
+{
+	INVOKE(0x49B9D, 0x42E1B, game_finished_update);
+	return;
+}
+
+static void __cdecl game_save_update(void)
+{
+	INVOKE(0x9E673, 0x90909, game_save_update);
 	return;
 }

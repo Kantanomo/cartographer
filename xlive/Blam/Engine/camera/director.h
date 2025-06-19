@@ -1,6 +1,8 @@
 #pragma once
 #include "observer.h"
 
+/* enums */
+
 enum e_director_mode : int32
 {
 	_director_mode_game = 0,
@@ -11,6 +13,8 @@ enum e_director_mode : int32
 
 	k_director_game_modes_count 
 };
+
+/* structures */
 
 struct s_director_update
 {
@@ -61,7 +65,11 @@ struct s_camera_director
 	int8 gap_110[48];
 };
 
+/* prototypes */
+
 s_camera_director* get_director(int32 user_index);
+
+void __cdecl director_game_tick(void);
 
 int32 __cdecl director_get_perspective(int32 user_index);
 

@@ -102,6 +102,8 @@ s_first_person_model_data* first_person_model_data_get(uint32 user_index);
 
 void first_person_weapons_toggle(bool state);
 
+void __cdecl first_person_weapons_update(void);
+
 int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_index, int32 maximum_model_count, s_first_person_model_data* fp_model_data);
 
 void first_person_weapon_apply_camera_effect(int32 user_index, real_matrix4x3* effect_matrix);

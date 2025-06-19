@@ -6,7 +6,10 @@
 
 #include "game/player_control.h"
 
-#define k_maximum_simulation_player_updates 64
+enum
+{
+	k_maximum_simulation_player_updates = 64
+};
 
 struct alignas(8) simulation_update
 {
@@ -56,6 +59,14 @@ bool simulation_in_progress(void);
 void simulation_destroy_update(void);
 bool simulation_query_object_is_predicted(datum object_datum);
 c_simulation_type_collection* simulation_get_type_collection();
+
+void __cdecl simulation_apply_before_game(const simulation_update* update);
+
+void simulation_apply_after_game(const simulation_update* update);
+
+void __cdecl simulation_build_update(simulation_update* update);
+
+void __cdecl simulation_update_aftermath(const simulation_update* update);
 
 void __cdecl simulation_process_input(uint32 player_action_mask, const player_action* player_actions);
 

@@ -16,6 +16,12 @@ void hs_apply_patches(void)
 	return;
 }
 
+void __cdecl hs_update(void)
+{
+	INVOKE(0xA37A9, 0x95A09, hs_update);
+	return;
+}
+
 /* private code */
 
 // TODO: properly implement this

@@ -369,6 +369,10 @@ void __cdecl object_compute_node_matrices_with_children(datum object_index);
 
 void __cdecl object_reconnect_to_physics(datum object_index);
 
+void __cdecl objects_update(void);
+
+void __cdecl objects_move(void);
+
 datum __cdecl object_new(object_placement_data* data);
 
 void __cdecl object_delete(datum object_idx);

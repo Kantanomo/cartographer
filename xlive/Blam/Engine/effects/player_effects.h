@@ -144,6 +144,10 @@ struct s_screen_flash
 	real_argb_color color;
 };
 
+/* prototypes */
+
+void __cdecl player_effect_update(void);
+
 void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* matrix);
 
 // Render screen flash
