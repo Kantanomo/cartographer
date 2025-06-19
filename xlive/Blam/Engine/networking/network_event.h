@@ -1,7 +1,6 @@
 #pragma once
 
 #ifdef EVENTS_ENABLED
-// TODO: Finish this
 
 /* enums */
 

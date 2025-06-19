@@ -29,7 +29,7 @@ bool network_session_time_get_id_and_time(int32 session_id, XNKID* id, uint32* t
 
 uint32 __cdecl network_time_get_exact(void)
 {
-	return INVOKE(0x1B3C4E, 0x0, network_time_get_exact);
+	return INVOKE(0x1B3C4E, 0x1AF217, network_time_get_exact);
 }
 
 void network_session_time_register_session_manager(c_network_session_manager* session_manager)
@@ -45,5 +45,5 @@ void network_session_time_register_session_manager(c_network_session_manager* se
 
 static s_network_time_globals* network_time_globals_get(void)
 {
-	return Memory::GetAddress<s_network_time_globals*>(0x51ABC8, 0x0);
+	return Memory::GetAddress<s_network_time_globals*>(0x51ABC8, 0x544A20);
 }

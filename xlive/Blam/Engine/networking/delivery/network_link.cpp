@@ -17,13 +17,13 @@
 
 bool c_network_link::initialize_link(void)
 {
-	this->m_field_248.initialize(2000);
-	this->m_field_320.initialize(2000);
-	this->m_field_3F8.initialize(2000);
-	this->m_field_4D0.initialize(2000);
-	this->create_endpoints();
-	this->m_initialized = true;
-	return true;
+	m_field_248.initialize(2000);
+	m_field_320.initialize(2000);
+	m_field_3F8.initialize(2000);
+	m_field_4D0.initialize(2000);
+	create_endpoints();
+	m_initialized = true;
+	return m_initialized;
 }
 
 void c_network_link::create_endpoints(void)
