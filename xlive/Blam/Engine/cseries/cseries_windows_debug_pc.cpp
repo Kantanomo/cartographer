@@ -2,7 +2,7 @@
 #include "cseries_windows_debug_pc.h"
 
 #include "cseries_windows_minidump.h"
-
+#include "networking/network_event.h"
 #include "shell/shell.h"
 #include "shell/windows/crash_report_window/crash_report_window.h"
 
@@ -45,18 +45,18 @@ uintptr_t devirtualize_address(void* pe_module, uintptr_t virtual_address, uint3
 	PIMAGE_NT_HEADERS nt_headers = get_nt_headers(pe_module);
 	PIMAGE_SECTION_HEADER sections = IMAGE_FIRST_SECTION(nt_headers);
 
-	LOG_INFO_FUNCW(L"Base address: {:x}", base_address);
-	LOG_INFO_FUNCW(L"Virtual address: {:x}", virtual_address);
+	event(_event_verbose, "cseries:windows:debug: Base address: %x", base_address);
+	event(_event_verbose, "cseries:windows:debug: Virtual address: %x", virtual_address);
 
 	virtual_address -= base_address;
-	LOG_INFO_FUNCW(L"Relative virtual address: {:x}", virtual_address);
+	event(_event_verbose, "cseries:windows:debug: Relative virtual address: %x", virtual_address);
 
 	for (size_t i = 0; i < nt_headers->FileHeader.NumberOfSections; i++)
 	{
 		if (virtual_address >= sections[i].VirtualAddress && virtual_address < sections[i].SizeOfRawData)
 		{
 			uintptr_t file_offset = sections[i].PointerToRawData + (virtual_address - sections[i].VirtualAddress);
-			LOG_INFO_FUNCW(L"File offset: {:x}", file_offset);
+			event(_event_verbose, "cseries:windows:debug: File offset: %x", file_offset);
 			return file_offset;
 		}
 	}

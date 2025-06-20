@@ -3,6 +3,7 @@
 
 #include "xml_definition_block.h"
 
+#include "networking/network_event.h"
 #include "tag_files/tag_groups.h"
 #include "tinyxml/tinyxml2.h"
 
@@ -72,10 +73,10 @@ void c_xml_definition_agent::log(const char* function_name, const char* format, 
 	va_list va_args;
 	va_start(va_args, format);
 	
-	c_static_string<512> new_format("[%s] ");
+	c_static_string<512> new_format("tags:injection: [%s] ");
 	new_format.append(format);
 
-	LOG_DEBUG_GAME(new_format.get_string(), function_name, va_args);
+	event(_event_verbose, new_format.get_string(), function_name, va_args);
 	
 	va_end(va_args);
 	return;

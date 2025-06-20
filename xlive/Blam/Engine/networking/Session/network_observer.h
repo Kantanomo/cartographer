@@ -3,6 +3,8 @@
 // Network Observer
 //	- manages network bandwidth based on network conditions
 
+#include "networking/delivery/network_link.h"
+#include "networking/messages/network_message_gateway.h"
 #include "networking/transport/transport.h"
 #include "networking/transport/transport_qos.h"
 
@@ -23,26 +25,26 @@
 #endif
 #endif
 
-#define k_network_channel_count (16)
-
-// network heap size
-#define k_network_preferences_size 108
-
-// default: 1048576
-#define k_network_heap_size 10485760
-
 // defaults
 #define k_online_netcode_client_rate_real 60.0f
 #define k_online_netcode_server_rate_real 60.0f
 
 #define k_online_netcode_rate_real 60.0f
 
-#define k_online_netcode_client_max_packet_size_bytes 1264
-#define k_online_netcode_server_max_packet_size_bytes 1264
+enum
+{
+	k_network_channel_count = 16,
+	k_network_preferences_size = 108,		// network heap size
+	k_network_heap_size = 10485760,			// default: 1048576
 
-// size in bits
-#define k_online_netcode_client_max_bandwidth_per_channel ((int32)k_online_netcode_client_rate_real * k_online_netcode_client_max_packet_size_bytes * 8)
-#define k_online_netcode_server_max_bandwidth_per_channel ((int32)k_online_netcode_server_rate_real * k_online_netcode_server_max_packet_size_bytes * 8)
+
+	k_online_netcode_client_max_packet_size_bytes = 1264,
+	k_online_netcode_server_max_packet_size_bytes = 1264,
+
+	// size in bits
+	k_online_netcode_client_max_bandwidth_per_channel = ((int32)k_online_netcode_client_rate_real * k_online_netcode_client_max_packet_size_bytes * 8),
+	k_online_netcode_server_max_bandwidth_per_channel = ((int32)k_online_netcode_server_rate_real * k_online_netcode_server_max_packet_size_bytes * 8)
+};
 
 struct s_network_observer_configuration;
 
@@ -211,6 +213,7 @@ public:
 	static void apply_patches();
 	static void reset_network_observer_bandwidth_preferences();
 
+	bool initialize_observer(c_network_link* link, c_network_message_type_collection* message_types, c_network_message_gateway* message_gateway, s_network_observer_configuration* configuration);
 	bool __thiscall channel_should_send_packet_hook(
 		int32 network_channel_index,
 		bool a4,
@@ -357,3 +360,7 @@ struct __declspec(align(4)) s_network_observer_configuration
 	int32 field_200;
 };
 ASSERT_STRUCT_SIZE(s_network_observer_configuration, 0x204);
+
+/* globals */
+
+extern s_network_observer_configuration* g_network_observer_configuration;

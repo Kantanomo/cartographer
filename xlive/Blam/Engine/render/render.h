@@ -104,7 +104,7 @@ uint32 global_render_current_user_index();
 
 s_frame* global_window_parameters_get(void);
 
-uint32* global_frame_num_get(void);
+uint32* global_frame_index_get(void);
 
 int32* get_global_window_bound_index(void);
 

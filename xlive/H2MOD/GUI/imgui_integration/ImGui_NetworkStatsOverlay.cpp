@@ -4,7 +4,7 @@
 #include "ImGui_NetworkStatsOverlay.h"
 
 #include "game/game_time.h"
-#include "networking/memory/networking_memory.h"
+#include "networking/network_memory.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "simulation/simulation.h"
 

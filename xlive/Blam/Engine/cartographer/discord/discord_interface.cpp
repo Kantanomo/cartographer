@@ -1,21 +1,25 @@
 #include "stdafx.h"
 #include "discord_interface.h"
 
-#include <discord_game_sdk.h>
-
-#include "main/main_game.h"
-
 #include "game/game.h"
+#include "main/main_game.h"
 #include "networking/logic/life_cycle_manager.h" 
+#include "networking/network_event.h"
+
+#include <discord_game_sdk.h>
 
 /* constants */
 
 #define k_discord_client_id 379371722685808641
-#define k_thread_close_wait_time_ms 2000
 
-const char* k_discord_difficulty_names[k_campaign_difficulty_levels_count] = { "Easy", "Normal", "Heroic", "Legendary" };
-const char* k_discord_gamemode_names[] = { "ctf", "slayer", "oddball", "koth", "juggernaut", "territories", "assault" };
-const char* k_valid_scenario_names[] = {
+enum
+{
+	k_thread_close_wait_time_ms = 2000
+};
+
+static const char* k_discord_difficulty_names[k_campaign_difficulty_levels_count] = { "Easy", "Normal", "Heroic", "Legendary" };
+static const char* k_discord_gamemode_names[] = { "ctf", "slayer", "oddball", "koth", "juggernaut", "territories", "assault" };
+static const char* k_valid_scenario_names[] = {
 	// singleplayer maps
 	"00a_introduction",
 	"01a_tutorial",
@@ -63,8 +67,6 @@ const char* k_valid_scenario_names[] = {
 	// custom maps
 	"salvation"
 };
-
-#define k_valid_scenario_name_count NUMBEROF(k_valid_scenario_names)
 
 /* structures */
 
@@ -299,7 +301,7 @@ static unsigned __stdcall discord_thread_proc(void* pArguments)
 	}
 	else
 	{
-		error(_error_silent, "Failed to create Discord Game SDK instance: %d\n", res);
+		event(_event_error, "cartographer:discord: Failed to create Discord Game SDK instance: %d\n", res);
 		result = 1;
 	}
 
@@ -358,7 +360,7 @@ static void discord_rich_presence_update(s_discord_data* discord)
 static bool discord_interface_scenario_name_vaild(const utf8* scnr_name)
 {
 	bool result = false;
-	for (size_t i = 0; i < k_valid_scenario_name_count; i++)
+	for (size_t i = 0; i < NUMBEROF(k_valid_scenario_names); ++i)
 	{
 		if (!csstrncmp(scnr_name, k_valid_scenario_names[i], 256))
 		{
@@ -375,12 +377,12 @@ static void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
 	uint8* session_bytes = (uint8*)session_info;
 
 	// Encode the data into hex string
-	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
+	for (uint32 i = 0; i < sizeof(XSESSION_INFO); ++i)
 	{
 		csprintf(&g_discord_globals.activity.secrets.join[2 * i], NUMBEROF(g_discord_globals.activity.secrets.join), "%02hhX", session_bytes[i]);
 	}
 
-	error(_error_immediate, "Encoded join secret: %s", g_discord_globals.activity.secrets.join);
+	event(_event_status, "cartographer:discord: Encoded join secret: %s", g_discord_globals.activity.secrets.join);
 	return;
 }
 
@@ -409,7 +411,7 @@ static void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secr
 {
 	XSESSION_INFO session;
 	uint8* session_bytes = (uint8*)&session;
-	error(_error_immediate, "Join secret: %s", secret);
+	event(_event_status, "cartographer:discord: Join secret: %s", secret);
 
 	// Decode the data from hex string
 	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
@@ -423,7 +425,7 @@ static void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secr
 
 static void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message)
 {
-	error(_error_immediate, message);
+	event(_event_status, message);
 	return;
 }
 

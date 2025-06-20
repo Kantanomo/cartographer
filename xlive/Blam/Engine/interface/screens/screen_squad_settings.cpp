@@ -12,6 +12,7 @@
 #include "interface/user_interface_globals.h"
 #include "main/levels.h"
 #include "main/level_definitions.h"
+#include "networking/network_event.h"
 #include "networking/Session/network_session.h"
 #include "saved_games/game_variant.h"
 #include "tag_files/global_string_ids.h"
@@ -708,7 +709,7 @@ void c_screen_squad_settings::apply_patches_on_map_load()
 		{
 			tag_injection_inject();
 			new_xbox_live_bitmap_datum = xbox_live_bitmap_datum;
-			LOG_DEBUG_FUNC("New xbox live bitmap datum : 0x{:08X} ,", new_xbox_live_bitmap_datum);
+			event(_event_verbose, "interface:screens: New xbox live bitmap datum : 0x%08x", new_xbox_live_bitmap_datum);
 		}
 		else
 		{

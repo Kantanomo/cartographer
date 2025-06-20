@@ -17,6 +17,7 @@
 #include "interface/user_interface_globals.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/screens/screen_cartographer_menus.h"
+#include "networking/network_event.h"
 #include "networking/panorama/panorama_presence.h"
 #include "tag_files/global_string_ids.h"
 
@@ -424,7 +425,7 @@ void c_screen_settings::apply_patches_on_map_load()
 		{
 			tag_injection_inject();
 			cartographer_bitmap_datum = cartographer_bitmap_org_datum;
-			LOG_DEBUG_FUNC("cartographer bitmap datum : 0x{:08X} ,", cartographer_bitmap_datum);
+			event(_event_verbose, "interface:screens: cartographer bitmap datum : 0x%08X", cartographer_bitmap_datum);
 		}
 		else
 		{

@@ -8,6 +8,7 @@
 #include "game/players.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/messages/network_message_type_collection.h"
+#include "networking/messages/network_messages_cartographer.h"
 #include "physics/physics_constants.h"
 #include "shell/shell.h"
 #include "units/units.h"
@@ -78,7 +79,7 @@ namespace CustomVariantSettings
 								session->m_session_index, 
 								peer->observer_channel_index, 
 								false, 
-								_custom_variant_settings, 
+								_network_message_type_custom_variant_settings, 
 								k_custom_variant_settings_packet_size, 
 								&data);
 					}

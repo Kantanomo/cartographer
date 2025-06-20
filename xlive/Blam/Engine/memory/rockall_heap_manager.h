@@ -32,7 +32,7 @@ class c_fixed_memory_rockall_frontend
 {
 public:
 	virtual bool Delete(int32 a2, int32 a3) = 0;
-	virtual bool Details(const uint8* memory_block, int32* out_size) = 0;
+	virtual bool Details(const void* memory_block, int32* out_size) = 0;
 };
 
 class c_allocation_base

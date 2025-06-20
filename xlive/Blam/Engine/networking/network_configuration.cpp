@@ -59,7 +59,7 @@ const char* __cdecl network_adapter_name_get(int32 network_adapter_index)
 
 void __cdecl network_configuration_initialize(void)
 {
-	INVOKE(0x1A9DE6, 0x0, network_configuration_initialize);
+	INVOKE(0x1A9DE6, 0x1AA2EB, network_configuration_initialize);
 	return;
 }
 

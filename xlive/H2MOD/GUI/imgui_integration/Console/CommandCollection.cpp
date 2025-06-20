@@ -15,7 +15,7 @@
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
 #include "networking/logic/life_cycle_manager.h"
-#include "networking/messages/network_message_type_collection.h"
+#include "networking/network_event.h"
 #include "objects/objects.h"
 #include "shell/shell.h"
 #include "text/unicode.h"
@@ -83,6 +83,11 @@ namespace CommandCollection
 	static int SetPortNumber(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 #ifdef OBJECT_DEBUG
 	static int _objects_dump_memory(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+#endif
+#ifdef EVENTS_ENABLED
+	static int net_event_display_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int net_event_log_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int net_event_list_categories_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 #endif
 
 	// misc
@@ -163,6 +168,11 @@ void CommandCollection::InitializeCommands()
 #ifdef OBJECT_DEBUG
 	InsertCommand(new ConsoleCommand("objects_dump_memory", "debugs object memory usage", 0, 0, CommandCollection::_objects_dump_memory));
 #endif
+#ifdef EVENTS_ENABLED
+	InsertCommand(new ConsoleCommand("net_event_display_category", "sets the display level for a named category of network events", 2, 2, net_event_display_category_evaluate));
+	InsertCommand(new ConsoleCommand("net_event_log_category", "sets the log level for a named category of network events", 2, 2, net_event_log_category_evaluate));
+	InsertCommand(new ConsoleCommand("net_event_list_categories", "lists all categories that exist under a particular category string", 1, 1, net_event_list_categories_evaluate));
+#endif
 
 	atexit([]() -> void {
 		for (auto command : commandTable)
@@ -171,8 +181,7 @@ void CommandCollection::InitializeCommands()
 		}
 
 		commandTable.clear();
-		}
-	);
+	});
 }
 
 void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
@@ -183,7 +192,7 @@ void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
 	{
 		if (!strcmp(newCommand->GetName(), command->GetName()))
 		{
-			LOG_ERROR_GAME("{} - command {} already present!", __FUNCTION__, newCommand->GetName());
+			event(_event_error, "h2mod:commands: %s - command %s already present!", __FUNCTION__, newCommand->GetName());
 			return;
 		}
 	}
@@ -379,7 +388,7 @@ static int CommandCollection::RequestFileNameCmd(const std::vector<std::string>&
 		return 0;
 	}
 
-	NetworkMessage::SendRequestMapFilename(NONE);
+	network_message_cartographer_send_request_map_filename(NONE);
 	return 0;
 }
 
@@ -997,6 +1006,30 @@ static int CommandCollection::SetPortNumber(const std::vector<std::string>& toke
 static int CommandCollection::_objects_dump_memory(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	objects_dump_memory();
+	return 0;
+}
+#endif
+
+#ifdef EVENTS_ENABLED
+static int CommandCollection::net_event_display_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	int32 level;
+	ComVar(&level).SetFromStr(tokens[2]);
+	network_event_display_category(tokens[1].c_str(), (e_event_level)level);
+	return 0;
+}
+
+static int CommandCollection::net_event_log_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	int32 level;
+	ComVar(&level).SetFromStr(tokens[2]);
+	network_event_log_category(tokens[1].c_str(), (e_event_level)level);
+	return 0;
+}
+
+static int CommandCollection::net_event_list_categories_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	network_event_dump_categories(tokens[1].c_str());
 	return 0;
 }
 #endif

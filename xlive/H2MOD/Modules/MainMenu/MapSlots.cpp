@@ -5,6 +5,7 @@
 #include "filesys/pc_file_system.h"
 #include "game/game_globals.h"
 #include "main/level_definitions.h"
+#include "networking/network_event.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
 #include "tag_files/tag_loader/tag_injection.h"
@@ -25,11 +26,14 @@ enum e_default_maps_to_add
 
 /* constants */
 
-#define k_multiplayer_first_unused_slot 23
-#define k_max_map_slots 49
-#define k_starting_map_index 3000
+enum
+{
+	k_multiplayer_first_unused_slot = 23,
+	k_max_map_slots = 49,
+	k_starting_map_index = 3000
+};
 
-const wchar_t* k_default_maps_to_add[k_default_map_to_add_count] = 
+static const wchar_t* k_default_maps_to_add[k_default_map_to_add_count] = 
 {
 	L"highplains",
 	L"derelict"
@@ -37,7 +41,7 @@ const wchar_t* k_default_maps_to_add[k_default_map_to_add_count] =
 
 /* globals */
 
-s_multiplayer_ui_level_definition g_added_multiplayer_level_data[k_default_map_to_add_count] = {};
+static s_multiplayer_ui_level_definition g_added_multiplayer_level_data[k_default_map_to_add_count] = {};
 
 /* prototypes */
 
@@ -51,7 +55,7 @@ namespace MapSlots
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
 		//And using that to construct a new s_multiplayer_levels_block and grab the bitmap datum for tag loading
-		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
+		event(_event_status, "h2mod:map_slots: Startup - Caching map data");
 
 		for (uint32 i = 0; i < k_default_map_to_add_count; ++i)
 		{
@@ -60,16 +64,15 @@ namespace MapSlots
 			map_location.append(k_default_maps_to_add[i]);
 			map_location.append(L".map");
 
-			FILE* map_handle = NULL;
-			errno_t error = _wfopen_s(&map_handle, map_location.get_string(), L"rb");
-			if (!error && map_handle != NULL)
+			FILE* map_handle = ufopen(map_location.get_string(), L"rb");
+			if (map_handle != NULL)
 			{
 				map_slots_get_multiplayer_level_data(map_handle, &g_added_multiplayer_level_data[i]);
-				fclose(map_handle);
+				ufclose(map_handle);
 			}
 			else
 			{
-				LOG_TRACE_GAME(L"[Map Slots]: Startup - Map File Missing {}", map_location.get_string());
+				event(_event_error, "h2mod:map_slots: Startup - Map File Missing %ws", map_location.get_string());
 			}
 		}
 
@@ -87,7 +90,7 @@ namespace MapSlots
 			{
 				if (added_maps + k_multiplayer_first_unused_slot < k_max_map_slots)
 				{
-					LOG_TRACE_FUNCW(L"Adding {}", newSlot.level_descriptions.name[_language_english]);
+					event(_event_verbose, "h2mod:map_slots: Adding %ws", newSlot.level_descriptions.name[_language_english]);
 					s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[added_maps + k_multiplayer_first_unused_slot];
 
 					//Write the data loaded from the maps into the unused slot
@@ -104,7 +107,7 @@ namespace MapSlots
 				}
 				else
 				{
-					LOG_TRACE_FUNC("Max Multiplayer added slots reached");
+					event(_event_error, "h2mod:map_slots: Max Multiplayer added slots reached");
 					break;
 				}
 			}
@@ -122,7 +125,7 @@ namespace MapSlots
 			if (k_multiplayer_first_unused_slot + added_map_count < k_max_map_slots)
 			{
 				s_multiplayer_ui_level_definition* slot = &multiplayer_levels[k_multiplayer_first_unused_slot + added_map_count];
-				LOG_TRACE_FUNCW("Adding {}", newSlot.level_descriptions.name[_language_english]);
+				event(_event_verbose, "h2mod:map_slots: Adding %ws", newSlot.level_descriptions.name[_language_english]);
 				DWORD dwBack[2];
 				VirtualProtect(slot, sizeof(s_multiplayer_ui_level_definition), PAGE_EXECUTE_READWRITE, &dwBack[0]);
 
@@ -139,7 +142,7 @@ namespace MapSlots
 			}
 			else
 			{
-				LOG_TRACE_FUNC("Max Multiplayer added slots reached");
+				event(_event_error, "h2mod:map_slots: Max Multiplayer added slots reached");
 				break;
 			}
 		}
@@ -175,7 +178,7 @@ namespace MapSlots
 	void OnMapLoad(void)
 	{
 		// Load all the added maps bitmaps
-		LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
+		event(_event_status, "h2mod:map_slots: OnMapLoad - Tag Loading Bitmaps");
 		for (uint32 i = 0; i < k_default_map_to_add_count; ++i)
 		{
 			tag_injection_set_active_map(k_default_maps_to_add[i]);

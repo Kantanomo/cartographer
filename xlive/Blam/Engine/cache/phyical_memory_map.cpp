@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "physical_memory_map.h"
+
 #include "memory/data.h"
+
+/* public code */
 
 void* c_physical_memory::allocate(uint32 size)
 {

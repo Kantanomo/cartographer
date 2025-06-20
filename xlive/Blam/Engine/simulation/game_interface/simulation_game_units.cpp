@@ -6,8 +6,8 @@
 #include "game/game_globals.h"
 #include "game/game_engine.h"
 #include "math/color_math.h"
+#include "networking/network_event.h"
 #include "units/units.h"
-
 
 
 datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
@@ -49,6 +49,7 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
 	if (unit_index != NONE)
 	{
 		unit_delete_all_weapons(unit_index);
+		event(_event_status, "simulation:objects: unit object 0x%08x created with team %d", unit_index, creation_data->team);
 	}
 
 	return unit_index;

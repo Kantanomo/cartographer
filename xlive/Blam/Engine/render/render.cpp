@@ -58,7 +58,6 @@ window_bound g_user_window_bounds[k_number_of_controllers]{};
 
 int32* get_global_window_out_cluster_index(int32 index);
 int32* get_global_window_out_leaf_index(int32 index);
-uint32* global_frame_num_get(void);
 uint32* global_scene_rendered_count_get(void);
 int32* curent_window_bound_index_get(void);
 int32* global_cluster_index_get(void);
@@ -185,7 +184,7 @@ uint32* global_effect_flag_get(void)
 	return Memory::GetAddress<uint32*>(0xA3DA34);
 }
 
-uint32* global_frame_num_get(void)
+uint32* global_frame_index_get(void)
 {
 	return Memory::GetAddress<uint32*>(0x4E695C);
 }

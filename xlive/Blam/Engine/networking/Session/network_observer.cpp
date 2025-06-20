@@ -160,6 +160,11 @@ void __cdecl initialize_network_observer_configuration()
 	g_network_observer_configuration->field_200 = 4096;
 }
 
+bool c_network_observer::initialize_observer(c_network_link* link, c_network_message_type_collection* message_types, c_network_message_gateway* message_gateway, s_network_observer_configuration* configuration)
+{
+	return INVOKE_TYPE(0x1BEC80, 0x1B8B5A, bool(__thiscall*)(c_network_observer*, c_network_link*, c_network_message_type_collection*, c_network_message_gateway*, s_network_observer_configuration*), this, link, message_types, message_gateway, configuration);
+}
+
 void c_network_observer::send_message(int32 session_index, int32 observer_index, bool send_out_of_band, int32 type, int32 size, void* data)
 {
 	typedef void(__thiscall* observer_channel_send_message_t)(c_network_observer*, int32, int32, bool, int32, int32, void*);

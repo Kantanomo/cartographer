@@ -46,8 +46,10 @@
 #include "main/main_game_time.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
+#include "networking/network_event.h"
+#include "networking/network_globals.h"
 #include "networking/network_utilities.h"
-#include "networking/memory/networking_memory.h"
+#include "networking/network_memory.h"
 #include "networking/network_configuration.h"
 #include "networking/transport/transport.h"
 #include "units/bipeds.h"
@@ -314,8 +316,8 @@ void H2MOD::player_position_increase_client_position_margin_of_error(bool enable
 
 void H2MOD::Initialize()
 {
-	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
-	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
+	event(_event_status, "h2mod: Initializing {}", DLL_VERSION_STR);
+	event(_event_status, "h2mod: Image base address: 0x{:X}", Memory::baseAddress);
 
 	DETOUR_BEGIN();
 
@@ -362,7 +364,7 @@ void H2MOD::Initialize()
 
 	DETOUR_COMMIT();
 
-	LOG_INFO_GAME("H2MOD - Initialized");
+	event(_event_status, "h2mod: Initialized");
 	return;
 }
 
@@ -467,7 +469,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 	}
 	else
 	{
-		LOG_INFO_GAME(L"[h2mod] engine type: {}", (int)options->game_mode);
+		event(_event_status, "h2mod: engine type: {}", (int)options->game_mode);
 
 		if (!shell_is_dedicated_server())
 		{
@@ -480,7 +482,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 		if (options->game_mode == _game_mode_multiplayer)
 		{
 			const wchar_t* variant_name = NetworkSession::GetGameVariantName();
-			LOG_INFO_GAME(L"game variant name: {}", variant_name);
+			event(_event_status, "h2mod: game variant name: %ws", variant_name);
 
 			addDebugText("Engine type: Multiplayer");
 			load_special_event();
@@ -488,12 +490,12 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 			// TODO: depreciate variant name shennanagins after Kantanomo finishes custom variant settings
 			if (StrStrIW(variant_name, L"h2x"))
 			{
-				LOG_INFO_GAME(L"H2X turned on!");
+				event(_event_status, "h2mod: H2X turned on!");
 				g_h2x_enabled = true;
 			}
 			else if (StrStrIW(variant_name, L"ogh2"))
 			{
-				LOG_INFO_GAME(L"OGH2 turned on!");
+				event(_event_status, "h2mod: OGH2 turned on!");
 				g_xbox_tickrate_enabled = true;
 			}
 
@@ -614,9 +616,7 @@ __declspec(naked) static void object_function_value_adjust_primary_firing(void)
 
 static void h2mod_apply_hooks(void)
 {
-	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
-	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
-	LOG_INFO_GAME("{} - applying hooks", __FUNCTION__);
+	event(_event_status, "h2mod: applying hooks");
 
 	MapManager::ApplyPatches();
 
@@ -637,6 +637,8 @@ static void h2mod_apply_hooks(void)
 	bipeds_physics_apply_patches();
 	weapon_definitions_apply_patches();
 	observer_apply_patches();
+
+	network_globals_apply_patches();
 	network_transport_apply_patches();
 	network_session_apply_patches();
 	bitstream_serialization_apply_patches();
@@ -665,7 +667,7 @@ static void h2mod_apply_hooks(void)
 	{
 		/* These hooks are only built for the client, don't enable them on the server! */
 
-		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
+		event(_event_status, "h2mod: applying client hooks");
 
 		// TODO: write proper patch for this so it can be toggled mid-game
 		// Disable lightsupressor function

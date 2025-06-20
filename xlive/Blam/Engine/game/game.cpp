@@ -22,16 +22,60 @@
 /* typedefs */
 
 typedef void(__cdecl* game_frame_t)(real32);
+typedef void(__cdecl* t_main_loop_process_global_state_changes)();
+
+typedef void(__cdecl* initialize_proc_t)(void);
+typedef void(__cdecl* dispose_proc_t)(void);
+typedef void(__cdecl* reset_proc_t)(void);
+typedef void(__cdecl* dispose_from_old_map_proc_t)(void);
+typedef void(__cdecl* activation_proc_t)(s_game_cluster_bit_vectors*, s_game_cluster_bit_vectors*);
+
+/* structures */
+
 
 /* prototypes */
 
 static void set_main_game_globals(s_main_game_globals* main);
 
+static void __cdecl main_loop_process_global_state_changes_hook(void);
+
+static void game_info_initialize_for_new_map(const s_game_options* options);
+
 /* globals */
 
 game_frame_t p_game_frame;
+t_main_loop_process_global_state_changes p_main_loop_process_global_state_changes;
 
-s_game_systems* get_game_systems()
+
+void game_apply_pre_winmain_patches(void)
+{
+	PatchCall(Memory::GetAddress(0x86BE, 0x1EB86), game_initialize_for_new_map);
+	PatchCall(Memory::GetAddress(0x9802, 0x1FAED), game_initialize_for_new_map);
+	PatchCall(Memory::GetAddress(0x39D2A, 0xC0C0), game_update);
+	PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), game_initialize);
+
+	// inscrease the max player count to allow ragdolls and the ragdoll count
+	WriteValue<int8>(Memory::GetAddress(0x49CCC, 0x42F4A) + 2, k_game_maximum_players_to_allow_ragdolls_new);
+	WriteValue<int8>(Memory::GetAddress(0x49CDC, 0x42F5A) + 2, k_game_maximum_ragdolls_new);
+
+	// Get original game_frame function
+	if (!shell_is_dedicated_server())
+	{
+		p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC, 0x41F7D);
+
+		PatchCall(Memory::GetAddress(0x39D45, 0xC0D4), game_frame);
+
+		// main_loop_process_global_state
+		// nop cmp
+		NopFill(Memory::GetAddress(0x3978B), 2);
+		// then force jmp
+		WriteValue(Memory::GetAddress(0x3978D), (uint8)0xEB);
+		DETOUR_ATTACH(p_main_loop_process_global_state_changes, Memory::GetAddress<t_main_loop_process_global_state_changes>(0x39783), main_loop_process_global_state_changes_hook);
+	}
+	return;
+}
+
+s_game_systems* get_game_systems(void)
 {
 	return Memory::GetAddress<s_game_systems*>(0x3A0468, 0x35D198);
 }
@@ -86,8 +130,8 @@ bool game_is_ui_shell(void)
 
 bool game_is_distributed(void)
 {
-	return game_options_get()->simulation_type == _game_simulation_distributed_client 
-		|| game_options_get()->simulation_type == _game_simulation_distributed_server;
+	const e_game_simulation simulation_type = game_options_get()->simulation_type;
+	return simulation_type == _game_simulation_distributed_client || simulation_type == _game_simulation_distributed_server;
 }
 
 bool game_is_server(void)
@@ -112,7 +156,7 @@ bool game_is_playback(void)
 void __cdecl game_shell_set_in_progress(void)
 {
 	INVOKE(0x242E5B, 0x22054B, game_shell_set_in_progress);
-    return;
+	return;
 }
 
 bool game_is_predicted(void)
@@ -161,7 +205,9 @@ void __cdecl game_options_setup_default_players(int32 player_count, s_game_optio
 
 void game_time_get_date_and_time(s_date_and_time* date_and_time)
 {
-	_SYSTEMTIME SystemTime;
+	ASSERT(date_and_time);
+
+	_SYSTEMTIME SystemTime = {};
 	GetLocalTime(&SystemTime);
 	date_and_time->year = SystemTime.wYear;
 	date_and_time->month = SystemTime.wMonth;
@@ -186,8 +232,10 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, in
 	{
 		c_game_life_cycle_handler_joining::check_joining_capability();
 		wchar_t local_usernames[k_number_of_users][XUSER_NAME_SIZE] = {};
-		s_player_identifier local_identifiers[k_number_of_users];
-		int valid_local_player_count = 0;
+		s_player_identifier local_identifiers[k_number_of_users] = {};
+		
+		size_t valid_local_player_count = 0;
+		
 		for (int32 i = 0; i < k_number_of_users; i++)
 		{
 			s_player_identifier temp_identifier;
@@ -196,20 +244,21 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, in
 			{
 				ustrncpy(local_usernames[valid_local_player_count], temp_properties.player_name, NUMBEROF(temp_properties.player_name));
 				local_identifiers[valid_local_player_count] = temp_identifier;
-				valid_local_player_count++;
+				++valid_local_player_count;
 			}
 		}
+
 		user_interface_networking_reset_player_counts();
 		network_globals_switch_environment(2, 1);
 		csmemset(&handler->player_identifiers, 0, sizeof(handler->player_identifiers));
-		csmemcpy(&handler->player_identifiers, local_identifiers, sizeof(s_player_identifier) * valid_local_player_count);
-		csmemcpy(&handler->player_names, local_usernames, sizeof(wchar_t) * 16 * valid_local_player_count);
+		csmemcpy(&handler->player_identifiers, local_identifiers, sizeof(local_identifiers));
+		csmemcpy(&handler->player_names, local_usernames, sizeof(local_usernames));
 		handler->field_11 = 0; //Always 0 in the original function
 		handler->field_12 = 0; //Always 0 in the original function
 		handler->field_14 = 1;
 		handler->joining_user_count = valid_local_player_count;
 		handler->field_54 = 2; //Always 2 in original function
-		handler->field_10 = true; //Always 1 in original function
+		handler->field_10 = true; //Always true in original function
 
 		handler->join_attempt_result_code = 0; //Force valid result code, leave the denying the connection up to the host.
 	}
@@ -266,20 +315,6 @@ bool __cdecl main_events_pending(void)
 	return INVOKE(0x396B1, 0x411D0, main_events_pending);
 }
 
-typedef void (__cdecl *t_main_loop_process_global_state_changes)();
-t_main_loop_process_global_state_changes p_main_loop_process_global_state_changes;
-
-void __cdecl main_loop_process_global_state_changes_hook()
-{
-	IDirect3DDevice9* d3d_device = rasterizer_dx9_device_get_interface();
-
-	if (d3d_device && FAILED(d3d_device->TestCooperativeLevel()))
-	{
-		rasterizer_globals_get()->reset_screen = true;
-	}
-	p_main_loop_process_global_state_changes();
-}
-
 void __cdecl game_tick(void)
 {
 	INVOKE(0x4A4AF, 0x4372D, game_tick);
@@ -318,26 +353,7 @@ void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt)
 	return;
 }
 
-void game_info_initialize_for_new_map(s_game_options* options)
-{
-	s_main_game_globals* game_globals = get_main_game_globals();
-
-	game_globals->options = *options;
-	game_globals->options.load_level_only = false;
-
-	if (game_is_multiplayer() || game_globals->options.game_variant.variant_game_engine_index)
-	{
-		game_engine_variant_cleanup(&game_globals->options.game_variant.flags);
-	}
-	random_math_set_seed(game_globals->options.random_seed);
-	game_globals->game_is_lost = false;
-	game_globals->game_is_finished = false;
-	game_globals->pvs_object_is_set = 0;
-	game_globals->game_ragdoll_count = 0;
-	return;
-}
-
-void __cdecl game_initialize_for_new_map(s_game_options* options)
+void __cdecl game_initialize_for_new_map(const s_game_options* options)
 {
 	s_main_game_globals* game_globals = get_main_game_globals();
 
@@ -376,38 +392,41 @@ void __cdecl game_frame(real32 dt)
 	return;
 }
 
-void game_apply_pre_winmain_patches(void)
-{
-	PatchCall(Memory::GetAddress(0x86BE, 0x1EB86), game_initialize_for_new_map);
-	PatchCall(Memory::GetAddress(0x9802, 0x1FAED), game_initialize_for_new_map);
-	PatchCall(Memory::GetAddress(0x39D2A, 0xC0C0), game_update);
-	PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), game_initialize);
-
-	// inscrease the max player count to allow ragdolls and the ragdoll count
-	WriteValue<int8>(Memory::GetAddress(0x49CCC, 0x42F4A) + 2, k_game_maximum_players_to_allow_ragdolls_new);
-	WriteValue<int8>(Memory::GetAddress(0x49CDC, 0x42F5A) + 2, k_game_maximum_ragdolls_new);
-	
-	// Get original game_frame function
-	if (!shell_is_dedicated_server())
-	{
-		p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC, 0x41F7D);
-
-		PatchCall(Memory::GetAddress(0x39D45, 0xC0D4), game_frame);
-
-		// main_loop_process_global_state
-		// nop cmp
-		NopFill(Memory::GetAddress(0x3978B), 2);
-		// then force jmp
-		WriteValue(Memory::GetAddress(0x3978D), (uint8)0xEB);
-		DETOUR_ATTACH(p_main_loop_process_global_state_changes, Memory::GetAddress<t_main_loop_process_global_state_changes>(0x39783), main_loop_process_global_state_changes_hook);
-	}
-	return;
-}
-
 /* private code */
 
 static void set_main_game_globals(s_main_game_globals* main)
 {
-    *Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520) = main;
-    return;
+	*Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520) = main;
+	return;
+}
+
+static void __cdecl main_loop_process_global_state_changes_hook(void)
+{
+	IDirect3DDevice9* d3d_device = rasterizer_dx9_device_get_interface();
+
+	if (d3d_device && FAILED(d3d_device->TestCooperativeLevel()))
+	{
+		rasterizer_globals_get()->reset_screen = true;
+	}
+	p_main_loop_process_global_state_changes();
+	return;
+}
+
+static void game_info_initialize_for_new_map(const s_game_options* options)
+{
+	s_main_game_globals* game_globals = get_main_game_globals();
+
+	game_globals->options = *options;
+	game_globals->options.load_level_only = false;
+
+	if (game_is_multiplayer() || game_globals->options.game_variant.variant_game_engine_index)
+	{
+		game_engine_variant_cleanup(&game_globals->options.game_variant.flags);
+	}
+	random_math_set_seed(game_globals->options.random_seed);
+	game_globals->game_is_lost = false;
+	game_globals->game_is_finished = false;
+	game_globals->pvs_object_is_set = 0;
+	game_globals->game_ragdoll_count = 0;
+	return;
 }

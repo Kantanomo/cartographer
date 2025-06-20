@@ -95,7 +95,7 @@ void data_dispose(data_array* data, const char* filename, int32 line_number)
 void data_dispose(data_array* data)
 #endif
 {
-	csmemset(data, 0, 76u);
+	csmemset(data, 0, sizeof(data_array));
 	if (data->allocator)
 	{
 		data->allocator->free_block(data);
@@ -135,8 +135,7 @@ uint32 __cdecl datum_header_allocate(uint32 total_size, uint32 alignment_bits)
 
 bool __cdecl datum_header_deallocate(void* object)
 {
-	// todo: server offset
-	return INVOKE(0x37EC3, 0, datum_header_deallocate, object);
+	return INVOKE(0x37EC3, 0x2B540, datum_header_deallocate, object);
 }
 
 void _cdecl data_make_valid(data_array* data_array)
@@ -161,7 +160,7 @@ void data_make_invalid(data_array* data)
 
 datum __cdecl datum_absolute_index_to_index(data_array* data, int32 absolute_index)
 {
-	return INVOKE(0x664C3, 0x0, datum_absolute_index_to_index, data, absolute_index);
+	return INVOKE(0x664C3, 0x321AF, datum_absolute_index_to_index, data, absolute_index);
 }
 
 void iterator_new(data_iterator* iterator, data_array* data)
