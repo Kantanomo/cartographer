@@ -2,7 +2,7 @@
 #include "machine_id.h"
 
 #include "game/player_control.h"
-#include "game/players.h"
+#include "networking/network_game_definitions.h"
 
 /* enums */
 
@@ -15,6 +15,16 @@ enum e_simulation_player_type   //TODO: determine actual names for this enum fie
 	simulation_player_type_foreign_no_authority = 0x4,
 	simulation_player_type_foreign_distributed = 0x5,
 	k_simulation_player_type_count = 0x6,
+};
+
+enum e_simulation_player_update_type
+{
+	_simulation_player_update_type_left_game = 0,
+	_simulation_player_update_type_swap,
+	_simulation_player_update_type_remove,
+	_simulation_player_update_type_added,
+	_simulation_player_update_type_configuration,
+	k_simulation_player_update_type_count
 };
 
 /* structures */

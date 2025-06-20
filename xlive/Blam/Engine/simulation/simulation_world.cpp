@@ -105,7 +105,7 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 		SIM_EVENT_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
 			&g_simulation_queues[_simulation_queue_bookkeeping],
 			g_simulation_queues[_simulation_queue_bookkeeping].queued_count(),
-			g_simulation_queues[_simulation_queue_bookkeeping].queued_size());
+			g_simulation_queues[_simulation_queue_bookkeeping].queued_size_in_bytes());
 	}
 	else
 	{
@@ -121,24 +121,22 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 		SIM_EVENT_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
 			&g_simulation_queues[_simulation_queue], 
 			g_simulation_queues[_simulation_queue].queued_count(), 
-			g_simulation_queues[_simulation_queue].queued_size());
+			g_simulation_queues[_simulation_queue].queued_size_in_bytes());
 	}
 }
 
-void c_simulation_world::apply_simulation_queue(const c_simulation_queue* simulation_queue, simulation_update* update)
+void c_simulation_world::apply_simulation_queue(const c_simulation_queue* simulation_queue, const simulation_update* update)
 {
 	ASSERT(simulation_queue != NULL);
 
 	if (simulation_queue->queued_count() > 0)
 	{
 		const s_simulation_queue_element* element = simulation_queue->get_first_element();
+		int32 update_count = 0;
+		int32 total_size = 0;
 
 		while (element != NULL)
 		{
-			SIM_EVENT_QUEUE_DBG("appying element: %08X, type: %d to gamestate",
-				element,
-				element->type);
-
 			switch (element->type)
 			{
 			case _simulation_queue_element_type_event:
@@ -172,24 +170,53 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* simula
 				ASSERT(false);
 				break;
 			default:
-				ASSERT(false);
+				event(
+					_event_error,
+					"networking:simulation:world: apply_simulation_queue() unknown/invalid element type %d",
+					element->type
+				);
 				break;
 			}
 
+			++update_count;
+			total_size += simulation_queue->get_element_size_in_bytes(element);
 			element = simulation_queue->get_next_element(element);
 		}
+
+		if (update_count != simulation_queue->queued_count())
+		{
+			event(
+				_event_error,
+				"networking:simulation:world: simulation queue from simulation update count mismatch [%d != %d]",
+				update_count,
+				simulation_queue->queued_count()
+			);
+		}
+
+		if (total_size != simulation_queue->queued_size_in_bytes())
+		{
+			event(
+				_event_error,
+				"networking:simulation:world: simulation queue from simulation update size mismatch [%d != %d]",
+				total_size,
+				simulation_queue->queued_size_in_bytes()
+			);
+		}
 	}
+	return;
 }
 
 void c_simulation_world::attach_simulation_queues_to_update(
 	c_simulation_queue* out_bookkeepin_queue,
 	c_simulation_queue* out_game_simulation_queue)
 {
+	// FIXME: return the function to it's original state
 	out_bookkeepin_queue->transfer_elements(queue_get(_simulation_queue_bookkeeping));
 	out_game_simulation_queue->transfer_elements(queue_get(_simulation_queue));
+	return;
 }
 
-void c_simulation_world::queues_clear()
+void c_simulation_world::queues_clear(void)
 {
 	for (int32 i = 0; i < k_simulation_queue_count; i++)
 	{
@@ -197,20 +224,23 @@ void c_simulation_world::queues_clear()
 	}
 }
 
-typedef void(__thiscall* t_c_simulation_world__initialize_world)(c_simulation_world*, int32, int32, int32);
+typedef void(__thiscall* t_c_simulation_world__initialize_world)(c_simulation_world*, c_simulation_type_collection*, c_simulation_watcher*, c_simulation_distributed_world*);
 t_c_simulation_world__initialize_world p_c_simulation_world__initialize_world;
 
 CLASS_HOOK_DECLARE_LABEL(c_simulation_world__initialize_world, c_simulation_world::initialize_world);
-void c_simulation_world::initialize_world(int32 a2, int32 a3, int32 a4)
+void c_simulation_world::initialize_world(c_simulation_type_collection* type_collection, c_simulation_watcher* watcher, c_simulation_distributed_world* distributed_world)
 {
-	p_c_simulation_world__initialize_world(this, a2, a3, a4);
+	ASSERT(type_collection);
+
+	p_c_simulation_world__initialize_world(this, type_collection, watcher, distributed_world);
 	if (!is_playback())
 	{
 		queues_initialize();
 	}
+	return;
 }
 
-void __declspec(naked) jmp_initialize_world()
+void __declspec(naked) jmp_initialize_world(void)
 {
 	CLASS_HOOK_JMP(c_simulation_world__initialize_world, c_simulation_world::initialize_world);
 }
@@ -238,11 +268,15 @@ void c_simulation_world::update_queue_reset(void)
 CLASS_HOOK_DECLARE_LABEL(c_simulation_world__reset_world, c_simulation_world::reset_world);
 void c_simulation_world::reset_world(void)
 {
+	ASSERT(!is_authority());
+
 	m_time_immediate_update = false;
 	m_out_of_sync = false;
 	m_flush_gamestate = false;
 	if (this->is_distributed())
 	{
+		ASSERT(m_distributed_world);
+
 		m_distributed_world->m_entity_manager.reset();
 		m_distributed_world->m_event_manager.reset();
 		m_distributed_world->m_entity_database.reset();
@@ -265,7 +299,7 @@ void c_simulation_world::reset_world(void)
 	return;
 }
 
-__declspec(naked) void jmp_reset_world()
+__declspec(naked) void jmp_reset_world(void)
 {
 	CLASS_HOOK_JMP(c_simulation_world__reset_world, c_simulation_world::reset_world);
 }
@@ -285,7 +319,7 @@ void c_simulation_world::destroy_world(void)
 	}
 }
 
-void __declspec(naked) jmp_destroy_world()
+void __declspec(naked) jmp_destroy_world(void)
 {
 	CLASS_HOOK_JMP(c_simulation_world__destroy_world, c_simulation_world::destroy_world);
 }
@@ -309,7 +343,7 @@ void __declspec(naked) jmp_send_player_acknowledgements_not_during_simulation_re
 	CLASS_HOOK_JMP(c_simulation_world__send_player_acknowledgements_not_during_simulation_reset_in_progress, c_simulation_world::send_player_acknowledgements_not_during_simulation_reset_in_progress);
 }
 
-void c_simulation_world::queues_initialize()
+void c_simulation_world::queues_initialize(void)
 {
 	for (int32 i = 0; i < k_simulation_queue_count; i++)
 	{
@@ -341,7 +375,7 @@ void c_simulation_world::delete_player(datum player_index)
 }
 
 
-void simulation_world_apply_patches()
+void simulation_world_apply_patches(void)
 {
 	DETOUR_ATTACH(p_c_simulation_world__initialize_world, Memory::GetAddress<t_c_simulation_world__initialize_world>(0x1DDB4E, 0x1C500E), jmp_initialize_world);
 	DETOUR_ATTACH(p_c_simulation_world__destroy_world, Memory::GetAddress<t_c_simulation_world__destroy_world>(0x1DE0A9, 0x1C5569), jmp_destroy_world);

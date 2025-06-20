@@ -11,6 +11,12 @@ c_simulation_event_definition* c_simulation_type_collection::get_event_definitio
 	return m_event_definitions[event_type];
 }
 
+int32 c_simulation_type_collection::get_event_definition_count(void) const
+{
+	ASSERT(m_event_type_count >= 0);
+	return m_event_type_count;
+}
+
 void c_simulation_type_collection::register_entity_definition(e_simulation_entity_type entity_type, c_simulation_entity_definition* definition)
 {
 	m_entity_definitions[entity_type] = definition;

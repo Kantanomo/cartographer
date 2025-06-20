@@ -30,7 +30,7 @@ ASSERT_STRUCT_SIZE(simulation_update, 0x3BD8);
 
 struct s_simulation_globals
 {
-	bool engine_initialized;
+	bool initialized;
 	bool fatal_error;
 	bool engine_paused;
 	int32 field_4;
@@ -39,7 +39,7 @@ struct s_simulation_globals
 	bool simulation_reset_in_progress;
 	bool field_B;
 	c_simulation_world* world;
-	c_simulation_watcher* simulation_watcher;
+	c_simulation_watcher* watcher;
 	c_simulation_type_collection* simulation_type_collection;
 };
 ASSERT_STRUCT_SIZE(s_simulation_globals, 24);
@@ -47,12 +47,12 @@ ASSERT_STRUCT_SIZE(s_simulation_globals, 24);
 c_simulation_world* simulation_get_world();
 s_simulation_globals* simulation_get_globals();
 
-void simulation_reset();
+void simulation_reset(void);
 bool simulation_reset_in_progress();
 bool simulation_starting_up(void);
 void simulation_notify_reset_complete();
 
-bool simulation_in_progress();
+bool simulation_in_progress(void);
 void simulation_destroy_update(void);
 bool simulation_query_object_is_predicted(datum object_datum);
 c_simulation_type_collection* simulation_get_type_collection();

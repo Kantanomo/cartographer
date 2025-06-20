@@ -61,7 +61,7 @@ static bool encode_event_to_buffer(
 	int32 reference_count,
 	int32* entity_references,
 	int32 payload_size,
-	uint8* payload
+	void* payload
 )
 {
 	c_bitstream stream(encode_buffer, encode_buffer_size);
@@ -144,7 +144,7 @@ static bool decode_event_from_buffer(int32 encoded_size, uint8* encoded_data, s_
 	return result;
 }
 
-void simulation_queue_event_insert(e_simulation_event_type type, int32 reference_count, int32* entity_references, int32 block_size, uint8* block)
+void simulation_queue_event_insert(e_simulation_event_type type, int32 reference_count, int32* entity_references, int32 block_size, void* block)
 {
 	int32 encoded_size;
 	uint8 encode_buffer[k_simulation_event_maximum_payload_size];

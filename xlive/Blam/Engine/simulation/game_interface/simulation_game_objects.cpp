@@ -88,6 +88,10 @@ bool __stdcall c_simulation_object_entity_definition__object_setup_placement_dat
 	object_placement_data* placement_data)
 {
 	bool result = false;
+	
+	ASSERT(object_creation_data);
+	ASSERT(placement_data);
+
 	if (object_creation_data->object_scenario_datum_index == NONE)
 	{
 		object_placement_data_new(placement_data, object_creation_data->object_definition_index, NONE, 0);

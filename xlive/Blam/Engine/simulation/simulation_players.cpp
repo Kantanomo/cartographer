@@ -30,7 +30,7 @@ void __cdecl simulation_player_joined_game(datum player_index)
 	s_simulation_globals* g_simulation_globals = simulation_get_globals();
 	ASSERT(g_simulation_globals->world);
 
-	if (g_simulation_globals->engine_initialized && !g_simulation_globals->field_B)
+	if (g_simulation_globals->initialized && !g_simulation_globals->field_B)
 	{
 		g_simulation_globals->world->create_player(player_index);
 		if (!shell_is_dedicated_server())
@@ -47,7 +47,7 @@ void __cdecl simulation_player_left_game(datum player_index)
 	s_simulation_globals* g_simulation_globals = simulation_get_globals();
 	ASSERT(g_simulation_globals->world);
 
-	if (g_simulation_globals->engine_initialized && !g_simulation_globals->field_B)
+	if (g_simulation_globals->initialized && !g_simulation_globals->field_B)
 	{
 		g_simulation_globals->world->delete_player(player_index);
 		if (!shell_is_dedicated_server())

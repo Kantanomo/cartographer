@@ -65,7 +65,7 @@ bool simulation_queue_game_global_event_requires_cutoff(const s_simulation_queue
 	return result;
  }
 
-void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, simulation_update* update)
+void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, const simulation_update* update)
 {
 	e_simulation_queue_global_event_type type;
 	if (simulation_queue_game_global_event_decode(element, &type))

@@ -4,6 +4,7 @@
 #include "input/input_windows.h"
 #include "interface/user_interface_controller.h"
 #include "game/game.h"
+#include "game/players.h"
 #include "main/main_time.h"
 #include "objects/damage_effects.h"
 #include "simulation/simulation.h"
