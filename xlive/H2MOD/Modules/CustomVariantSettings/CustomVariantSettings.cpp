@@ -9,6 +9,7 @@
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/messages/network_message_type_collection.h"
 #include "networking/messages/network_messages_cartographer.h"
+#include "networking/session/network_observer.h"
 #include "physics/physics_constants.h"
 #include "shell/shell.h"
 #include "units/units.h"

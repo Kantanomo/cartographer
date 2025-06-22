@@ -3,6 +3,7 @@
 
 #include "unit_definitions.h"
 
+#include "cache/cache_files.h"
 #include "tag_files/global_string_ids.h"
 
 /* prototypes */

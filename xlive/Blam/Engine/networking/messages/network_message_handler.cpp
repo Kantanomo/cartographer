@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "network_message_handler.h"
 
-#include "cartographer/twizzler/twizzler.h"
+#include "network_messages_cartographer.h"
 
+#include "cartographer/twizzler/twizzler.h"
 #include "networking/network_event.h"
 #include "networking/delivery/network_channel.h"
 #include "networking/session/network_session.h"

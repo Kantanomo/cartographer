@@ -22,6 +22,7 @@
 #include "game/multiplayer_globals.h"
 #include "game/player_control.h"
 #include "game/player_vibration.h"
+#include "hs/hs.h"
 #include "input/input_xinput.h"
 #include "input/input_windows.h"
 #include "input/input_abstraction.h"

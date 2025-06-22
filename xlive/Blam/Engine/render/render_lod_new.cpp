@@ -3,6 +3,7 @@
 
 #include "render.h"
 
+#include "cache/cache_files.h"
 #include "game/player_control.h"
 #include "memory/data.h"
 #include "models/render_models.h"

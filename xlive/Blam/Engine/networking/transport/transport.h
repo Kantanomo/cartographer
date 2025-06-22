@@ -2,7 +2,10 @@
 
 /* constants */
 
-#define k_number_of_transition_functions 8
+enum
+{
+	k_number_of_transition_functions = 8
+};
 
 /* enums */
 

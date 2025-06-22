@@ -8,6 +8,7 @@
 #include "user_interface_guide.h"
 
 #include "game/game_time.h"
+#include "input/input_windows.h"
 #include "networking/online/online_account_xbox.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "scenario/scenario_definitions.h"

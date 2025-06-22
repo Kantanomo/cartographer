@@ -318,10 +318,9 @@ enum e_user_interface_render_window
 	k_number_of_render_windows = 4
 };
 
-/* forward declations*/
+/* typedefs */
 
-struct s_screen_parameters;
-enum e_user_interface_screen_id : uint32;
+typedef void* (__cdecl* proc_ui_screen_load_cb_t)(struct s_screen_parameters*);
 
 /* structures */
 
@@ -331,8 +330,6 @@ struct s_screen_state
 	int32 m_last_focused_item_order;
 	int32 m_last_focused_item_index;
 };
-
-typedef void* (__cdecl* proc_ui_screen_load_cb_t)(s_screen_parameters*);
 
 struct s_screen_parameters
 {
@@ -363,6 +360,8 @@ struct s_screen_parameters
 };
 ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
 
+/* forward declations*/
+enum e_user_interface_screen_id : uint32;
 
 /* prototypes */
 

@@ -8,6 +8,7 @@
 #include "game/game_statborg.h"
 #include "game/players.h"
 #include "items/weapons.h"
+#include "main/game_preferences.h"
 #include "networking/network_event.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "shell/shell.h"
@@ -202,13 +203,6 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 		event(_event_verbose, "h2mod:graverobber: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
-}
-
-// Just return true since the player shouldn't be able to score normally
-// Only way to score is picking up skulls which is triggered in GraveRobber::PickupSkull
-bool GraveRobber::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
-{
-	return true;
 }
 
 bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx)

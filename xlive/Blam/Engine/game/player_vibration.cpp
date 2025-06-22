@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "player_vibration.h"
 
+#include "cache/cache_files.h"
 #include "input/input_windows.h"
 #include "interface/user_interface_controller.h"
 #include "game/game.h"

@@ -1,7 +1,8 @@
 #pragma once
+#include "game/player_constants.h"
+#include "networking/network_game_definitions.h"
 
-#include "networking/session/network_session.h"
-#include "networking/session/network_observer.h"
+/* enums */
 
 enum e_game_life_cycle : int32
 {
@@ -15,12 +16,14 @@ enum e_game_life_cycle : int32
 	k_life_cycle_count
 };
 
+/* typedefs */
+
 e_game_life_cycle get_game_life_cycle(void);
 typedef bool (*life_cycle_update)(void* life_cycle_handler);
 typedef void (*life_cycle_initialize)(void* life_cycle_handler_requested, void* life_cycle_handler_current, int32 unk_1, void* unk_2);
 typedef void (*life_cycle_dispose)(void* life_cycle_handler_current, void* life_cycle_handler_requested);
 
-class c_game_life_cycle_manager;
+/* classes */
 
 class c_game_life_cycle_handler_functions
 {
@@ -35,18 +38,18 @@ class c_game_life_cycle_handler
 public:
 	c_game_life_cycle_handler_functions* functions;
 	e_game_life_cycle m_life_cycle;
-	c_game_life_cycle_manager* m_life_cycle_manager;
+	class c_game_life_cycle_manager* m_life_cycle_manager;
 	bool field_C;
-	void initialize(c_game_life_cycle_manager* life_cycle_manager, e_game_life_cycle life_cycle, bool a3);
+	void initialize(class c_game_life_cycle_manager* life_cycle_manager, e_game_life_cycle life_cycle, bool a3);
 };
 
-struct c_game_life_cycle_handler_none : c_game_life_cycle_handler
+class c_game_life_cycle_handler_none : c_game_life_cycle_handler
 {
 	int8 gap[15];
 };
 ASSERT_STRUCT_SIZE(c_game_life_cycle_handler_none, 0x20);
 
-struct c_game_life_cycle_handler_pre_game : c_game_life_cycle_handler
+class c_game_life_cycle_handler_pre_game : c_game_life_cycle_handler
 {
 	int32 count_down_network_time;
 	int32 count_down_network_session;
@@ -55,7 +58,7 @@ struct c_game_life_cycle_handler_pre_game : c_game_life_cycle_handler
 };
 ASSERT_STRUCT_SIZE(c_game_life_cycle_handler_pre_game, 0x2C);
 
-struct c_game_life_cycle_handler_start_game : c_game_life_cycle_handler
+class c_game_life_cycle_handler_start_game : c_game_life_cycle_handler
 {
 	int8 field_10;
 	int8 field_11;
@@ -124,10 +127,10 @@ public:
 	e_game_life_cycle m_state;
 	c_game_life_cycle_handler* m_life_cycle_handlers[k_life_cycle_count];
 	void* m_network_session_manager;
-	c_network_session* m_active_squad_session;
-	c_network_session* m_secondary_squad_session;
+	class c_network_session* m_active_squad_session;
+	class c_network_session* m_secondary_squad_session;
 	void* m_network_message_gateway;
-	c_network_observer* m_network_observer;
+	class c_network_observer* m_network_observer;
 	bool m_state_change_active;
 	bool m_update_active;
 	bool m_update_requested;
@@ -138,10 +141,10 @@ public:
 
 	c_game_life_cycle_manager(
 		void* network_message_gateway, 
-		c_network_observer* network_observer, 
+		class c_network_observer* network_observer, 
 		void* network_session_manager, 
-		c_network_session* squad_session_one,
-		c_network_session* squad_session_two)
+		class c_network_session* squad_session_one,
+		class c_network_session* squad_session_two)
 	{
 		csmemset(m_life_cycle_handlers, 0, sizeof(m_life_cycle_handlers));
 		this->m_state = _life_cycle_none;
@@ -165,7 +168,7 @@ public:
 	}
 
 	e_game_life_cycle get_life_cycle() const;
-	bool get_active_session(c_network_session** out_session) const;
+	bool get_active_session(class c_network_session** out_session) const;
 	
 	bool state_is_joining() const;
 	bool state_is_in_game() const;
@@ -174,6 +177,6 @@ public:
 ASSERT_STRUCT_SIZE(c_game_life_cycle_manager, 68);
 
 bool game_life_cycle_initialized();
-bool network_life_cycle_in_squad_session(c_network_session** out_network_session);
+bool network_life_cycle_in_squad_session(class c_network_session** out_network_session);
 
 void game_life_cycle_apply_patches();

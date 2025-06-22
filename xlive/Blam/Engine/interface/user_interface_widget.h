@@ -5,6 +5,13 @@
 #include "math/color_math.h"
 #include "tag_files/tag_reference.h"
 
+/* constants */
+
+enum
+{
+	k_maximum_number_of_screen_widgets = 256
+};
+
 /* enums */
 
 enum e_user_interface_widget_type : int32
@@ -22,22 +29,6 @@ enum e_user_interface_widget_type : int32
 	_widget_type_player = 0xA,
 	k_number_of_user_interface_widget_types
 };
-
-/* constants */
-
-#define k_maximum_number_of_screen_widgets 256
-
-/* forward declarations */
-
-struct s_event_record;
-
-class c_user_interface_text;
-class c_bitmap_widget;
-class c_hud_widget;
-class c_text_widget;
-class c_player_widget;
-class c_model_widget;
-class c_screen_widget;
 
 /* structures */
 
@@ -106,12 +97,12 @@ public:
 	c_user_interface_widget* get_parent() const;
 	c_user_interface_widget* get_children() const;
 	c_user_interface_widget* try_find_child(e_user_interface_widget_type type, uint32 idx, bool recursive_search);
-	c_text_widget* try_find_text_widget(uint32 idx);
-	c_hud_widget* try_find_hud_widget(uint32 idx);
-	c_bitmap_widget* try_find_bitmap_widget(uint32 idx);
-	c_player_widget* try_find_player_widget(uint32 idx);
-	c_model_widget* try_find_model_widget(uint32 idx);
-	c_screen_widget* get_parent_screen();
+	class c_text_widget* try_find_text_widget(uint32 idx);
+	class c_hud_widget* try_find_hud_widget(uint32 idx);
+	class c_bitmap_widget* try_find_bitmap_widget(uint32 idx);
+	class c_player_widget* try_find_player_widget(uint32 idx);
+	class c_model_widget* try_find_model_widget(uint32 idx);
+	class c_screen_widget* get_parent_screen();
 
 	void set_visible(bool visible);
 	void set_child_visible(e_user_interface_widget_type type, uint32 idx,  bool visible);
@@ -139,14 +130,14 @@ public:
 	virtual void sub_612A7C(c_user_interface_widget* child);
 	virtual c_user_interface_widget* sub_612ABC();
 	virtual c_user_interface_widget* sub_612BCA();
-	virtual bool handle_event(s_event_record* event);
+	virtual bool handle_event(struct s_event_record* event);
 	virtual e_user_interface_channel_type get_parent_channel();
 	virtual e_user_interface_render_window get_parent_render_window();
 	virtual void construct_animation_on_region_enter(int32 a1);
 	virtual void construct_animation_on_region_leave(int32 a1);
 	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point);
 	virtual bool can_interact();
-	virtual c_user_interface_text* get_interface() = 0;
+	virtual class c_user_interface_text* get_interface() = 0;
 	virtual bool sub_6114B9();
 };
 ASSERT_STRUCT_SIZE(c_user_interface_widget, 0x70);

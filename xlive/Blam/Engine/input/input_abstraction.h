@@ -1,15 +1,10 @@
 #pragma once
 #include "controllers.h"
-#include "input_windows.h"
 
 /* macros */
 
 #define THUMBSTICK_PERCENTAGE_TO_POINT(_percentage) ((real32)INT16_MAX * ((_percentage) / 100.f))
 #define THUMBSTICK_POINT_TO_PERCENTAGE(_point) (((real32)_point / (real32)INT16_MAX) * 100.f)
-
-/* forward declarations */
-
-struct s_saved_game_profile_input_preferences;
 
 /* constants */
 
@@ -308,8 +303,8 @@ void __cdecl input_abstraction_get_input_state(e_controller_index controller_ind
 void __cdecl input_abstraction_get_player_look_angular_velocity(e_controller_index controller_index, real_euler_angles2d* angular_velocity);
 void __cdecl input_abstraction_get_player_look_angular_velocity_for_mouse(e_controller_index controller_index, real_euler_angles2d* angular_velocity);
 void __cdecl input_abstraction_get_default_preferences(s_gamepad_input_preferences* out_preference, e_joystick_preset_types thumbstick_layout, e_button_preset_types button_preset_type, e_custom_keyboard_preset_types kb_layout, bool caller_handles_failures);
-void __cdecl input_abstraction_set_controller_settings_from_preferences(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings);
-void __cdecl input_abstraction_set_preferences_from_controller_settings(s_gamepad_input_preferences* preferences, s_saved_game_profile_input_preferences* controller_settings);
+void __cdecl input_abstraction_set_controller_settings_from_preferences(s_gamepad_input_preferences* preferences, struct s_saved_game_profile_input_preferences* controller_settings);
+void __cdecl input_abstraction_set_preferences_from_controller_settings(s_gamepad_input_preferences* preferences, struct s_saved_game_profile_input_preferences* controller_settings);
 void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller, real32 value);
 void input_abstraction_set_controller_look_sensitivity(e_controller_index controller, real32 value);
 void input_abstraction_set_controller_right_thumb_deadzone(e_controller_index controller);
@@ -317,6 +312,6 @@ bool __cdecl input_abstraction_controller_button_test(e_controller_index control
 e_button_action __cdecl input_abstraction_get_primary_fire_button(datum unit);
 e_button_action __cdecl input_abstraction_get_secondary_fire_button(datum unit);
 void __cdecl input_abstraction_update(void);
-void __cdecl input_abstraction_update_input_state(e_controller_index controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state);
+void __cdecl input_abstraction_update_input_state(e_controller_index controller_index, s_gamepad_input_preferences* preference, struct s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state);
 uint32 s_input_abstraction_globals_sub_45E501(e_button_action button, void* a3);
 int32 __cdecl input_abstraction_get_last_used_device(e_controller_index controller);

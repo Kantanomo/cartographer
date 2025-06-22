@@ -1,5 +1,4 @@
 #pragma once
-#include "game_engine.h"
 #include "materials.h"
 
 #include "bitmaps/bitmap_group.h"
@@ -8,15 +7,18 @@
 #include "main/game_preferences.h"
 #include "main/level_definitions.h"
 #include "objects/damage.h"
+#include "saved_games/player_profile.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 #include "text/text_group.h"
 
-
-#define NUMBER_OF_GLOBAL_SOUNDS 2
-#define k_maximum_material_types 256
-#define k_game_globals_maximum_multiplayer_colors 32
+enum
+{
+	NUMBER_OF_GLOBAL_SOUNDS = 2,
+	k_maximum_material_types = 256,
+	k_game_globals_maximum_multiplayer_colors = 32
+};
 
 enum e_game_globals_rasterizer_flags : int16
 {
@@ -440,12 +442,12 @@ struct s_game_globals_multiplayer_information
 
 	tag_reference in_game_text; // unic
 	int32 pad[10];
-	tag_block<s_multiplayer_event_response_definition> general_events;
-	tag_block<s_multiplayer_event_response_definition> slayer_events;
-	tag_block<s_multiplayer_event_response_definition> ctf_events;
-	tag_block<s_multiplayer_event_response_definition> oddball_events;
+	tag_block<struct s_multiplayer_event_response_definition> general_events;
+	tag_block<struct s_multiplayer_event_response_definition> slayer_events;
+	tag_block<struct s_multiplayer_event_response_definition> ctf_events;
+	tag_block<struct s_multiplayer_event_response_definition> oddball_events;
 	tag_block<> unk_block;
-	tag_block<s_multiplayer_event_response_definition> king_events;
+	tag_block<struct s_multiplayer_event_response_definition> king_events;
 };
 ASSERT_STRUCT_SIZE(s_game_globals_multiplayer_information, 152);
 

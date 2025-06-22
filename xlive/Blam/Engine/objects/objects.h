@@ -2,10 +2,8 @@
 #include "emblems.h"
 #include "object_placement.h"
 
-#include "animations/animation_manager.h"
 #include "memory/data.h"
 #include "math/real_math.h"
-#include "models/render_model_definitions.h"
 
 /* constants */
 enum
@@ -396,8 +394,8 @@ datum object_get_damage_owner(datum damaged_unit_index);
 int32 object_get_entity_index(datum object_idx);
 
 void __cdecl object_apply_function_overlay_node_orientations(datum object_index,
-	render_model_definition* render_model,
-	c_animation_manager* animation_manager,
+	struct render_model_definition* render_model,
+	class c_animation_manager* animation_manager,
 	int32 a4,
 	int32 orientation_count,
 	real_orientation* orientations);

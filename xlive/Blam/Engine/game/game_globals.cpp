@@ -6,6 +6,7 @@
 #include "cache/cache_files.h"
 #include "models/models.h"
 #include "scenario/scenario.h"
+#include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
 #include "tag_files/global_string_ids.h"
 

@@ -2,16 +2,18 @@
 
 #include "screen_button_settings.h"
 #include "cache/cache_files.h"
+#include "input/input_abstraction.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_globals.h"
 #include "interface/user_interface_bitmap_block.h"
+#include "saved_games/player_profile.h"
 #include "tag_files/global_string_ids.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/text_group.h"
 
-/* macro defines */
+/* constants */
 
-#define k_button_setting_list_name "button settings edit list"
+static const char k_button_setting_list_name[] = "button settings edit list";
 
 /* enums */
 

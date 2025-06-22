@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "screen_error_dialog.h"
+
+#include "input/input_windows.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 

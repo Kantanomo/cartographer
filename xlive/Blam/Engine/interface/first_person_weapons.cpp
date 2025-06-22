@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "first_person_weapons.h"
 
+#include "animations/animation_definitions.h"
 #include "cache/cache_files.h"
 #include "camera/camera.h"
 #include "game/cheats.h"

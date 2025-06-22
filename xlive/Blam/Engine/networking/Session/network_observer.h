@@ -230,7 +230,7 @@ public:
 	int32 get_observer_channel_state(int32 observer_index) { return m_observer_channels[observer_index].state; };
 	void send_message(int32 session_index, int32 observer_index, bool send_out_of_band, int32 type, int32 size, void* data);
 
-	int32 get_observer_index_by_channel_index(
+	int32 observer_channel_find_by_network_channel(
 		int32 session_index,
 		int32 network_channel_index)
 	{

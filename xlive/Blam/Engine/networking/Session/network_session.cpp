@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "network_session.h"
 
+#include "network_observer.h"
+
 #include "game/game.h"
 #include "interface/user_interface_controller.h"
 #include "networking/logic/life_cycle_manager.h"
@@ -284,7 +286,7 @@ void network_session_membership_update_local_players_teams()
 	c_network_session* session = NULL;
 	if (network_life_cycle_in_squad_session(&session))
 	{
-		if (session->established() || session->local_state_joining_session())
+		if (session->established() || session->peer_joining())
 		{
 			int32 local_peer_index = session->get_local_peer_index();
 
@@ -340,6 +342,24 @@ bool c_network_session::initialize_session(
 		observer,
 		session_manager,
 		text_chat_manager);
+}
+
+bool c_network_session::channel_is_authoritative(int32 network_channel_index) const
+{
+	bool result = false;
+
+	if ((established() || peer_joining()) && !is_host())
+	{
+		int32 observer_index = m_network_observer->observer_channel_find_by_network_channel(m_session_index, network_channel_index);
+		int32 peer_index = get_peer_index_by_observer_index(observer_index);
+
+		if (peer_index != NONE && is_peer_session_host(peer_index))
+		{
+			result = true;
+		}
+	}
+
+	return result;
 }
 
 void c_network_session::switch_players_to_teams(datum* player_indexes, int32 player_count, e_game_team* team_indexes)

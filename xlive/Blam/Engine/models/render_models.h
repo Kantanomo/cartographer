@@ -1,10 +1,6 @@
 #pragma once
 #include "tag_files/string_id.h"
 
-/* forward declarations */
-
-struct object_marker;
-
 /* constants */
 
 enum
@@ -42,5 +38,5 @@ int32 __cdecl render_model_get_markers_by_name(
 	int32 node_count,
 	const real_matrix4x3* node_matrices,
 	bool object_is_mirrored,
-	object_marker* markers,
+	struct object_marker* markers,
 	int32 count);

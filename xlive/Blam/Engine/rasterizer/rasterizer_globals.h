@@ -1,5 +1,4 @@
 #pragma once
-#include "bitmaps/bitmap_group.h"
 
 /* constants */
 
@@ -111,7 +110,7 @@ struct s_rasterizer_globals
 	bool field_E0;
 	bool d3d9_sm3_supported;
 	int16 pad_4;
-	bitmap_data* bitmap_data_array[1024];
+	struct bitmap_data* bitmap_data_array[1024];
 	uint32 next_bitmap_index;
 	uint32 bitmap_data_count;
 	bool display_settings_retrieved;

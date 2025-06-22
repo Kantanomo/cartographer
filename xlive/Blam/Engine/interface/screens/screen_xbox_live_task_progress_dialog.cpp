@@ -109,7 +109,7 @@ void c_screen_xbox_live_task_progress_dialog::close_task_internal()
 		if (task)
 			m_online_task_result = online_task_continue(task);
 		else
-			m_online_task_result = K_ONLINE_TASK_STATUS_COMPLETED;
+			m_online_task_result = k_online_task_status_completed;
 
 		online_task_close(m_online_task_datum);
 		m_online_task_datum = NONE;

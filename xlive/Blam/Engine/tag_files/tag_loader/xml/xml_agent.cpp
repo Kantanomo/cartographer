@@ -5,8 +5,8 @@
 
 #include "networking/network_event.h"
 #include "tag_files/tag_groups.h"
-#include "tinyxml/tinyxml2.h"
 
+#include <tinyxml/tinyxml2.h>
 
 /* public code */
 

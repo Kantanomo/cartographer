@@ -20,7 +20,7 @@ public:
 	void initialize(void);
 
 	bool find_next_weapon_ik_point(ik_point_iterator* iterator);
-	const c_model_animation_graph* get_graph(void) const;
+	const class c_model_animation_graph* get_graph(void) const;
 	int16 get_node_count(void) const;
 	void get_node_orientations(real32 a2, real32 a3, const c_static_flags<255>* flags, int32 node_orientations_count, real_orientation* orientation_list, void* func, datum object_index);
 	string_id get_state_name(void) const;

@@ -19,7 +19,7 @@ string_id __cdecl online_task_get_display_text(datum task_datum)
 int32 __cdecl online_task_continue(s_online_task_datum* task)
 {
 	//return INVOKE(0x1AC4EC, 0x0, ,online_task_continue,task);
-	return K_ONLINE_TASK_STATUS_COMPLETED;
+	return k_online_task_status_completed;
 }
 
 s_online_task_datum* __cdecl online_try_and_get_task(datum task_datum)

@@ -10,9 +10,10 @@
 #include "game/cheats.h"
 #include "game/game.h"
 #include "input/input_abstraction.h"
+#include "input/input_windows.h"
 #include "interface/new_hud.h"
 #include "interface/first_person_weapons.h"
-#include "networking/messages/network_message_type_collection.h"
+#include "networking/messages/network_messages_cartographer.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "rasterizer/rasterizer_globals.h"
 

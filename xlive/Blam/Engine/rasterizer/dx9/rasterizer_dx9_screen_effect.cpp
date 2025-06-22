@@ -13,6 +13,7 @@
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/rasterizer_screen_effects.h"
 #include "scenario/scenario.h"
+#include "scenario/scenario_definitions.h"
 
 /* constants */
 

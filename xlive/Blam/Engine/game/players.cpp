@@ -7,6 +7,7 @@
 #include "interface/user_interface_controller.h"
 #include "saved_games/game_variant.h"
 #include "scenario/scenario.h"
+#include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "simulation/simulation.h"

@@ -10,6 +10,7 @@
 #include "camera/director.h"
 #include "cutscene/cinematics.h"
 #include "game/game.h"
+#include "game/game_engine.h"
 #include "game/game_engine_util.h"
 #include "game/game_globals.h"
 #include "main/main_screenshot.h"

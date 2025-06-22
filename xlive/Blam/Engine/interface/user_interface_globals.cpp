@@ -1,8 +1,7 @@
 #include "stdafx.h"
-
 #include "user_interface_globals.h"
-#include "scenario/scenario_definitions.h"
 
+#include "scenario/scenario_definitions.h"
 
 bool __cdecl user_interface_globals_is_beta_build()
 {

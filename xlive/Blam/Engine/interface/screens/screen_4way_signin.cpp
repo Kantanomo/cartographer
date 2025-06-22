@@ -8,6 +8,7 @@
 
 #include "cache/cache_files.h"
 #include "input/input_process.h"
+#include "input/input_windows.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_controller.h"
@@ -179,10 +180,13 @@ uint32 ui_recover_from_disconnection_return_address = NULL;
 bool g_show_split_inputs_option = false;
 datum edit_profile_bitmap_datum = NONE;
 
-/* forward declarations*/
+/* prototypes */
 
-void add_button_key_split_input(c_text_widget* button_key_text);
-void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text);
+static void add_button_key_split_input(c_text_widget* button_key_text);
+
+static void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text);
+
+static void user_interface_recover_4way_screen(e_session_protocol protocol);
 
 /* public code */
 
@@ -831,7 +835,7 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	edit_profile_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\player_profile\\edit_profile");
 }
 
-void add_button_key_split_input(c_text_widget* button_key_text)
+static void add_button_key_split_input(c_text_widget* button_key_text)
 {
 	ASSERT(button_key_text);
 
@@ -843,9 +847,10 @@ void add_button_key_split_input(c_text_widget* button_key_text)
 
 	button_key_text->set_text(temp);
 	button_key_text->append_text(old);
+	return;
 }
 
-void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text)
+static void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text)
 {
 	ASSERT(signin_bitmap);
 	ASSERT(join_text);
@@ -880,9 +885,11 @@ void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_w
 		signin_bitmap->assign_new_bitmap_block(nullptr);
 		signin_bitmap->assign_new_bitmap_block(signin_bitmap->get_current_bitmap_data());
 	}
+
+	return;
 }
 
-void user_interface_recover_4way_screen(e_session_protocol protocol)
+static void user_interface_recover_4way_screen(e_session_protocol protocol)
 {
 	s_screen_parameters params;
 	params.m_flags = 7; //retreating or recovering?

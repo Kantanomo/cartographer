@@ -91,7 +91,7 @@ const wchar_t* saved_games_get_file_type_as_string(e_saved_game_file_type file_t
 	return file_type < k_number_of_saved_game_file_types ? k_saved_game_file_type_strings[file_type] : L"unknown";
 }
 
-bool saved_games_append_file_type_to_path(wchar_t* in_path, e_saved_game_file_type file_type, wchar_t* out_path)
+bool saved_games_append_file_type_to_path(const wchar_t* in_path, e_saved_game_file_type file_type, wchar_t* out_path)
 {
 	ustrncpy(out_path, in_path, 256);
 	wchar_t* cat_path = ustrncat(out_path, saved_games_get_file_type_as_string(file_type), 256);
