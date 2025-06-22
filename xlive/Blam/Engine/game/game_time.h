@@ -41,6 +41,8 @@ void __cdecl game_time_update(real32 dt, real32* out_time_delta, int32* out_targ
 
 int32 game_seconds_integer_to_ticks(int32 seconds);
 
+void game_time_advance(void);
+
 void game_time_apply_patches();
 
 bool should_limit_framerate();

@@ -174,4 +174,8 @@ void player_user_weapon_interaction_reset(void);
 
 int16 local_player_count(void);
 
+void __cdecl players_update_before_game(const struct simulation_update* update);
+
+void __cdecl players_update_after_game(const struct simulation_update* update);
+
 void players_apply_patches(void);

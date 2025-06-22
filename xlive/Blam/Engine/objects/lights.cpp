@@ -14,3 +14,9 @@ void __cdecl lights_initialize_for_new_map(void)
 	INVOKE(0x14C74D, 0x1494E5, lights_initialize_for_new_map);
 	return;
 }
+
+void __cdecl lights_update(void)
+{
+	INVOKE(0x14F455, 0x14C1ED, lights_update);
+	return;
+}

@@ -18,3 +18,7 @@ enum e_ai_seat_type : uint16
 	_ai_seat_type_large_cargo = 4,
 	_ai_seat_type_driver = 5
 };
+
+/* prototypes */
+
+void __cdecl ai_update(void);

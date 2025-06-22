@@ -42,3 +42,7 @@ enum e_game_team : int16
 	// Shared
 	_game_team_observer = NONE
 };
+
+/* prototypes */
+
+void __cdecl game_allegiance_update(void);

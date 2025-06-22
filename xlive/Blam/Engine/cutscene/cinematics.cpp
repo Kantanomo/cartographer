@@ -55,6 +55,12 @@ bool cinematic_in_progress(void)
 	return result;
 }
 
+void __cdecl cinematic_update(void)
+{
+	INVOKE(0x3AB6D, 0x8DD23, cinematic_update);
+	return;
+}
+
 void __cdecl cinematics_draw_line(rectangle2d* points, pixel32 rect_color)
 {
 	INVOKE(0x3B101, 0x0, cinematics_draw_line, points, rect_color);

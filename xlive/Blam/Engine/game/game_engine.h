@@ -425,4 +425,8 @@ void __cdecl game_engine_player_activated(datum player_index);
 
 bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b);
 
+void __cdecl game_engine_update_after_game(void);
+
+void __cdecl game_engine_update(void);
+
 void __cdecl game_engine_render(void);

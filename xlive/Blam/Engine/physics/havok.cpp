@@ -59,6 +59,12 @@ bool havok_can_allocate_space_for_instance_of_object_definition(datum tag_index)
 	return result;
 }
 
+void __cdecl havok_update(void)
+{
+	INVOKE(0xA27EB, 0x94A4B, havok_update);
+	return;
+}
+
 /* private code */
 
 static s_havok_globals* havok_globals_get(void)

@@ -56,6 +56,12 @@ s_observer* observer_get_from_user(int32 user_index)
 	return &observer_user_globals_get()[user_index];
 }
 
+void __cdecl observer_game_tick(void)
+{
+	INVOKE(0x81872, 0x45640, observer_game_tick);
+	return;
+}
+
 void __cdecl observer_update(real32 dt)
 {
 	bool* g_observer_intitial_update = observer_get_initial_update();

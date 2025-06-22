@@ -130,3 +130,5 @@ struct HaloScriptCommand
 /* prototypes */
 
 void hs_apply_patches(void);
+
+void __cdecl hs_update(void);

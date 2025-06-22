@@ -1,9 +1,17 @@
 #include "stdafx.h"
 #include "director.h"
 
+/* public code */
+
 s_camera_director* get_director(int32 user_index)
 {
 	return &Memory::GetAddress<s_camera_director*>(0x4A84A4)[user_index];
+}
+
+void __cdecl director_game_tick(void)
+{
+	INVOKE(0x59DF2, 0x47E1F, director_game_tick);
+	return;
 }
 
 int32 __cdecl director_get_perspective(int32 user_index)

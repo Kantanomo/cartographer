@@ -38,9 +38,10 @@ effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum
 	return INVOKE(0xA68DD, 0x9895D, effect_location_get_next_valid_index, effect_index, out_index, a3);
 }
 
-void __cdecl effects_frame_advance(real32 dt)
+void __cdecl effects_update(void)
 {
-
+	INVOKE(0xAB24A, 0x9D2CA, effects_update);
+	return;
 }
 
 void __cdecl effect_update(datum effect_index, real32 dt)

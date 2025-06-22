@@ -19,6 +19,12 @@ static real32 player_effect_transition_function_evaluate(e_transition_function_t
 
 /* public code */
 
+void __cdecl player_effect_update(void)
+{
+    INVOKE(0xA39E1, 0x95C41, player_effect_update);
+    return;
+}
+
 void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* matrix)
 {
     // INVOKE(0xA432D, 0x963AA, player_effect_apply_camera_effect_matrix, user_index, matrix);

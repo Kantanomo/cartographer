@@ -339,6 +339,18 @@ void __cdecl object_reconnect_to_physics(datum object_index)
 	return;
 }
 
+void __cdecl objects_update(void)
+{
+	INVOKE(0x135EBF, 0x124D8F, objects_update);
+	return;
+}
+
+void __cdecl objects_move(void)
+{
+	INVOKE(0x1380F6, 0x126FC6, objects_move);
+	return;
+}
+
 datum __cdecl object_new(object_placement_data* data)
 {
 	datum object_index = NONE;
@@ -1206,7 +1218,6 @@ static void objects_apply_interpolation_patches(void)
 		object_move_replace_calls();
 		object_get_markers_by_string_id_replace_calls();
 
-		PatchCall(Memory::GetAddress(0x4A53C, 0x437BA), objects_post_update);
 		PatchCall(Memory::GetAddress(0xCD744, 0xB8ABD), object_get_origin_interpolated);
 		PatchCall(Memory::GetAddress(0x1549AE), object_get_origin_interpolated);
 		PatchCall(Memory::GetAddress(0x13D406, 0x12C255), object_get_center_of_mass_interpolated);

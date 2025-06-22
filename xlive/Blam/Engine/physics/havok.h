@@ -44,3 +44,5 @@ bool is_havok_update_memory_initialized(void);
 bool havok_can_modify_state(void);
 
 bool havok_can_allocate_space_for_instance_of_object_definition(datum tag_index);
+
+void __cdecl havok_update(void);
