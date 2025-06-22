@@ -4,6 +4,7 @@
 struct c_simulation_actor
 {
 public:
+	bool exists(void) const;
 	void destroy(void);
 
 	int32 m_actor_index;	//index in actor data array

@@ -7,7 +7,12 @@
 #include "simulation_view.h"
 
 #include "networking/replication/replication_event_manager.h"
-#define k_simulation_world_maximum_views (k_maximum_players + 1)
+
+enum
+{
+	k_simulation_world_maximum_views = (k_maximum_players + 1)
+};
+
 
 enum e_simulation_queue_type
 {
@@ -97,8 +102,8 @@ public:
 	void simulation_queue_free(s_simulation_queue_element* element);
 	void simulation_queue_enqueue(s_simulation_queue_element* element);
 
-	void queues_initialize();
-	void apply_simulation_queue(const c_simulation_queue* queue, struct simulation_update* update);
+	void queues_initialize(void);
+	void apply_simulation_queue(const c_simulation_queue* queue, const struct simulation_update* update);
 
 	void attach_simulation_queues_to_update(c_simulation_queue* out_bookkeepin_queue, c_simulation_queue* out_game_simulation_queue);
 
@@ -106,7 +111,7 @@ public:
 
 	c_simulation_distributed_world* get_distributed_world(void) const { return m_distributed_world; }
 
-	void initialize_world(int32 a2, int32 a3, int32 a4);
+	void initialize_world(c_simulation_type_collection* type_collection, class c_simulation_watcher* watcher, c_simulation_distributed_world* distributed_world);
 	
 	void delete_all_actors(void);
 
@@ -115,7 +120,7 @@ public:
 	// discard resources
 	void reset_world(void);
 
-	void destroy_world();
+	void destroy_world(void);
 	void disconnect(void);
 
 	void queues_dispose(void);
@@ -123,7 +128,7 @@ public:
 	void create_player(datum player_index);
 	void delete_player(datum player_index);
 
-	void queues_update_statistics()
+	void queues_update_statistics(void)
 	{
 		for (int32 i = 0; i < k_simulation_queue_count; i++)
 		{
@@ -136,45 +141,45 @@ public:
 		return queue_get(type)->get_statistics(out_stats);
 	}
 
-	void queues_clear();
+	void queues_clear(void);
 
-	bool is_playback() const
+	bool is_playback(void) const
 	{
 		// todo: re-add once destroy_world function is re-written
 		//ASSERT(exists());
 		return false;
 	}
 
-	bool is_distributed(void)
+	bool is_distributed(void) const
 	{
 		return m_world_type == _simulation_world_type_distributed_authority
 			|| m_world_type == _simulation_world_type_distributed_client;
 	}
 
-	bool exists() const
+	bool exists(void) const
 	{
 		return m_world_type != _simulation_world_type_none;
 	}
 
-	bool runs_simulation() const
+	bool runs_simulation(void) const
 	{
 		ASSERT(exists());
 		return m_world_type != _simulation_world_type_synchronous_client;
 	}
 
-	bool is_authority() const
+	bool is_authority(void) const
 	{
 		ASSERT(exists());
 		return m_world_type != _simulation_world_type_distributed_client && m_world_type != _simulation_world_type_synchronous_client;
 	}
 
-	bool is_active() const
+	bool is_active(void) const
 	{
 		ASSERT(exists());
 		return m_world_state == _simulation_world_state_active;
 	}
 
-	bool simulation_queues_empty()
+	bool simulation_queues_empty(void) const
 	{
 		return queue_get(_simulation_queue_bookkeeping)->queued_count() == 0 && queue_get(_simulation_queue)->queued_count() == 0;
 	}
@@ -184,9 +189,10 @@ public:
 	void send_player_acknowledgements(bool a1)
 	{
 		INVOKE_TYPE(0x1DD777, 0x1C4C37, void(__thiscall*)(c_simulation_world*, bool), this, a1);
+		return;
 	}
 
-	bool time_running(void)
+	bool time_running(void) const
 	{
 		ASSERT(exists());
 		return m_time_running;
@@ -194,4 +200,4 @@ public:
 };
 ASSERT_STRUCT_SIZE(c_simulation_world, 0x12B0);
 
-void simulation_world_apply_patches();
+void simulation_world_apply_patches(void);

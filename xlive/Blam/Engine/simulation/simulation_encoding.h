@@ -15,6 +15,6 @@ struct simulation_machine_update
 
 /* prototypes */
 
-void __cdecl simulation_player_update_encode(c_bitstream* stream, const simulation_player_update* player_update);
+void __cdecl simulation_player_update_encode(c_bitstream* packet, const simulation_player_update* player_update);
 
-bool __cdecl simulation_player_update_decode(c_bitstream* stream, simulation_player_update* player_update);
+bool __cdecl simulation_player_update_decode(c_bitstream* packet, simulation_player_update* player_update);

@@ -1,15 +1,18 @@
 #pragma once
 
-#define k_simulation_queue_count_max 4096
-#define k_simulation_queue_element_data_size_max 1024
-#define k_simulation_queue_avg_payload_size 32
-#define k_simulation_queue_size_max (k_simulation_queue_count_max * k_simulation_queue_avg_payload_size)
+enum
+{
+	k_simulation_queue_count_max = 4096,
+	k_simulation_queue_element_data_size_max = 1024,
+	k_simulation_queue_avg_payload_size = 32,
+	k_simulation_queue_size_max = (k_simulation_queue_count_max * k_simulation_queue_avg_payload_size),
 
-#define k_simulation_queue_type_encoded_size_in_bits 4
-#define k_simulation_queue_payload_encoded_size_in_bits 10
-#define k_simulation_queue_header_encoded_size_in_bits (k_simulation_queue_type_encoded_size_in_bits + k_simulation_queue_payload_encoded_size_in_bits)
+	k_simulation_queue_type_encoded_size_in_bits = 4,
+	k_simulation_queue_payload_encoded_size_in_bits = 10,
+	k_simulation_queue_header_encoded_size_in_bits = (k_simulation_queue_type_encoded_size_in_bits + k_simulation_queue_payload_encoded_size_in_bits),
 
-#define k_simulation_queue_max_encoded_size 59392
+	k_simulation_queue_max_encoded_size = 59392,
+};
 
 enum e_event_queue_type : int16
 {
@@ -59,14 +62,14 @@ class c_simulation_queue
 	int32	m_allocated_size_in_bytes;
 
 	int32	m_queued_count;
-	int32	m_queued_size;
+	int32	m_size;
 
 	s_simulation_queue_element* m_head;
 	s_simulation_queue_element* m_tail;
 
 	s_simulation_queue_stats m_stats;
 
-	void dequeue(s_simulation_queue_element** out_deq_elem);
+	void deque(s_simulation_queue_element** element_out);
 
 public:
 	c_simulation_queue()
@@ -84,7 +87,7 @@ public:
 		m_allocated_count = 0;
 		m_allocated_size_in_bytes = 0;
 		m_queued_count = 0;
-		m_queued_size = 0;
+		m_size = 0;
 		m_head = NULL;
 		m_tail = NULL;
 		m_initialized = true;
@@ -151,7 +154,7 @@ public:
 	int32 allocated_encoded_size_bytes() const
 	{
 		// ### FIXME figure out + 36 in bits
-		int32 size = (k_simulation_queue_header_encoded_size_in_bits * allocated_count() + 36) / 8;
+		const int32 size = (k_simulation_queue_header_encoded_size_in_bits * allocated_count() + 36) / 8;
 		return size + allocated_size_in_bytes() - (sizeof(s_simulation_queue_element) * allocated_count());
 	}
 
@@ -160,24 +163,21 @@ public:
 		return size + 2 + allocated_encoded_size_bytes();
 	}
 
-	int32 queued_count() const
+	int32 queued_count(void) const
 	{
-		if (initialized())
-		{
-			return m_queued_count;
-		}
-
-		return 0;
+		return initialized() ? m_queued_count : 0;
 	}
 	
-	int32 queued_size() const
+	int32 queued_size_in_bytes(void) const
 	{
-		if (initialized())
-		{
-			return m_queued_size;
-		}
+		return initialized() ? m_size : 0;
+	}
 
-		return 0;
+	int32 queued_encoded_size_in_bytes(void) const
+	{
+		// ### FIXME figure out + 36 in bits
+		const int32 size = (k_simulation_queue_header_encoded_size_in_bits * queued_count() + 36) / 8;
+		return size + queued_size_in_bytes() - (sizeof(s_simulation_queue_element) * queued_count());
 	}
 
 	void get_allocation_status(real32* allocation_percentage, real32* allocated_count_percentage) const
@@ -192,7 +192,7 @@ public:
 		m_stats.allocated = allocated_count();
 		m_stats.allocated_in_bytes = allocated_size_in_bytes();
 		m_stats.queued = queued_count();
-		m_stats.queued_in_bytes = queued_size();
+		m_stats.queued_in_bytes = queued_size_in_bytes();
 		get_allocation_status(&m_stats.allocated_percentage, &m_stats.allocated_bytes_percentage);
 	}
 
@@ -205,8 +205,8 @@ public:
 		return m_stats.valid;
 	}
 
-	void allocate(int32 size, s_simulation_queue_element** out_allocated_elem);
-	void transfer_elements(c_simulation_queue* source_queue);
+	void allocate(int32 size, s_simulation_queue_element** element_out);
+	void transfer_elements(c_simulation_queue* simulation_queue);
 	void deallocate(s_simulation_queue_element* element);
 	void enqueue(s_simulation_queue_element* element);
 

@@ -104,7 +104,7 @@ void network_message_cartographer_send_request_map_filename(int32 map_download_i
 		{
 			observer->send_message(session->m_session_index, peer->observer_channel_index, false, _network_message_type_request_map_filename, sizeof(s_network_message_request_map_filename), &data);
 
-			event(_event_message, "online:messages: %s session host peer index: %d, observer index %d, observer is remote peer: %d, session index: %d",
+			event(_event_status, "online:messages: %s session host peer index: %d, observer index %d, observer is remote peer: %d, session index: %d",
 				__FUNCTION__,
 				session->m_session_host_peer_index,
 				peer->observer_channel_index,

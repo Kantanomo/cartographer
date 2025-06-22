@@ -3,14 +3,15 @@
 
 #include "simulation_queue_global_events.h"
 
+#include "networking/network_event.h"
 #include "networking/network_memory.h"
 
-void c_simulation_queue::allocate(int32 size, s_simulation_queue_element** out_allocated_elem)
+void c_simulation_queue::allocate(int32 size, s_simulation_queue_element** element_out)
 {
 	ASSERT(size > 0);
-	ASSERT(out_allocated_elem != NULL);
+	ASSERT(element_out != NULL);
 
-	*out_allocated_elem = NULL;
+	*element_out = NULL;
 	if (initialized())
 	{
 		uint32 required_data_size = sizeof(s_simulation_queue_element) + size;
@@ -33,93 +34,209 @@ void c_simulation_queue::allocate(int32 size, s_simulation_queue_element** out_a
 							allocated_elem->data_size = size;
 							allocated_elem->next = NULL;
 
-							m_allocated_count++;
+							++m_allocated_count;
 							m_allocated_size_in_bytes += required_data_size;
-							*out_allocated_elem = allocated_elem;
+							*element_out = allocated_elem;
 						}
 						else
 						{
-							// DEBUG
+#ifdef EVENTS_ENABLED
+							char description[1024];
+							csstrncpy(description, "UNKNOWN", NUMBEROF(description));
+							network_heap_describe(description, NUMBEROF(description));
+							event(
+								_event_fatal,
+								"networking:simulation_queue: OUT OF MEMORY requesting allocation for %d bytes [%s]",
+								size,
+								description
+							);
+#endif
 						}
 					}
+					else
+					{
+						event(
+							_event_fatal,
+							"networking:simulation_queue: can't allocate element, would exceed encoded size maximum [0x%08X/0x%8X]",
+							allocated_new_encoded_size_bytes(size),
+							k_simulation_queue_max_encoded_size
+						);
+					}
+				}
+				else
+				{
+					event(
+						_event_fatal,
+						"networking:simulation_queue: can't allocate element, would exceed element size maximum [0x%08X/0x%8X]",
+						size,
+						k_simulation_queue_element_data_size_max
+					);
 				}
 			}
+			else
+			{
+				event(
+					_event_fatal,
+					"networking:simulation_queue: can't allocate element, would exceed size maximum [0x%08X/0x%8X]",
+					size,
+					131072
+				);
+			}
+		}
+		else
+		{
+			event(
+				_event_fatal,
+				"networking:simulation_queue: can't allocate element, would exceed count maximum [max 0x%8X]",
+				k_simulation_queue_count_max
+			);
 		}
 	}
 }
 
-void c_simulation_queue::transfer_elements(c_simulation_queue* source_queue)
+// transefrs data from the source into ours
+void c_simulation_queue::transfer_elements(c_simulation_queue* simulation_queue)
 {
-	// transefrs data from the source into ours
+	bool cutoff = false;
 
-	int32 queued_count = source_queue->queued_count();
-	for (int32 i = 0; i < queued_count; i++)
+	ASSERT(simulation_queue);
+	ASSERT(queued_count() == 0);
+	ASSERT(queued_size_in_bytes() == 0);
+	//ASSERT(simulation_queue->queued_count() > 0);
+	//ASSERT(simulation_queue->queued_size_in_bytes() > 0);
+
+	const int32 count = simulation_queue->queued_count();
+	for (int32 i = 0; i < count; i++)
 	{
 		s_simulation_queue_element* element = NULL;
-		source_queue->dequeue(&element);
-		source_queue->m_allocated_count--;
-		source_queue->m_allocated_size_in_bytes -= get_element_size_in_bytes(element);
-		this->m_allocated_count++;
-		this->m_allocated_size_in_bytes += get_element_size_in_bytes(element);
-		this->enqueue(element);
+		simulation_queue->deque(&element);
+		--simulation_queue->m_allocated_count;
+		simulation_queue->m_allocated_size_in_bytes -= get_element_size_in_bytes(element);
+		++m_allocated_count;
+		m_allocated_size_in_bytes += get_element_size_in_bytes(element);
+		enqueue(element);
+
 		// if the element type is a global event
 		// check if we need to cut the update here
 		if (element->type == _simulation_queue_element_type_game_global_event
 			&& simulation_queue_game_global_event_requires_cutoff(element))
 		{
 			// cut the queue here, keep the rest for the next update
+			cutoff = true;
 			break;
 		}
 	}
+
+	if (!cutoff)
+	{
+		ASSERT(simulation_queue->queued_count() == 0);
+		ASSERT(simulation_queue->queued_size_in_bytes() == 0);
+	}
+
+	//ASSERT(queued_count() > 0);
+	//ASSERT(queued_size_in_bytes() > 0);
+	ASSERT(simulation_queue->queued_count() >= 0);
+	ASSERT(simulation_queue->queued_size_in_bytes() >= 0);
+	ASSERT(simulation_queue->allocated_count() >= 0);
+	ASSERT(simulation_queue->allocated_size_in_bytes() >= 0);
+
+	if (simulation_queue->queued_count() == 0)
+	{
+		ASSERT(simulation_queue->queued_size_in_bytes() == 0);
+	}
+
+	m_initialized = true;
+
+	return;
 }
 
 void c_simulation_queue::deallocate(s_simulation_queue_element* element)
 {
+	ASSERT(element);
+
 	if (initialized())
 	{
+		ASSERT(element->data);
+		ASSERT(element->data_size > 0 && element->data_size < k_simulation_queue_element_data_size_max);
+		ASSERT(element->next == NULL);
+
 		m_allocated_size_in_bytes -= get_element_size_in_bytes(element);
-		m_allocated_count--;
-		network_heap_free_block((uint8*)element);
+		--m_allocated_count;
+
+		ASSERT(allocated_size_in_bytes() >= 0);
+		ASSERT(allocated_count() >= 0);
+
+		//network_heap_verify_block(element);
+		network_heap_free_block(element);
 	}
+
+	return;
 }
 
 void c_simulation_queue::enqueue(s_simulation_queue_element* element)
 {
+	ASSERT(element);
+	ASSERT(element->data);
+	ASSERT(element->data_size > 0);
+	ASSERT(element->next == NULL);
+	ASSERT(m_queued_count >= 0);
+	ASSERT(queued_count() < k_simulation_queue_count_max);
+	ASSERT(queued_size_in_bytes() < k_simulation_queue_size_max);
+
 	if (initialized())
 	{
+
 		if (m_tail)
 		{
+			//network_heap_verify_block(element);
 			m_tail->next = element;
 		}
 		else
 		{
+			ASSERT(m_head == NULL);
+			ASSERT(m_queued_count == 0);
+
 			m_head = element;
 		}
 
 		m_tail = element;
-		m_queued_count++;
-		m_queued_size += get_element_size_in_bytes(element);
+		++m_queued_count;
+		m_size += get_element_size_in_bytes(element);
+
+		ASSERT(queued_count() < k_simulation_queue_count_max);
+		ASSERT(queued_size_in_bytes() < k_simulation_queue_size_max);
+		ASSERT(queued_encoded_size_in_bytes() < k_simulation_queue_max_encoded_size);
 	}
+	return;
 }
 
-void c_simulation_queue::dequeue(s_simulation_queue_element** out_deq_elem)
+void c_simulation_queue::deque(s_simulation_queue_element** element_out)
 {
-	*out_deq_elem = NULL;
+	ASSERT(element_out);
+
+	*element_out = NULL;
 	if (initialized())
 	{
 		if (m_head)
 		{
-			m_queued_count--;
-			m_queued_size -= get_element_size_in_bytes(m_head);
-			*out_deq_elem = m_head;
+			ASSERT(m_queued_count > 0);
+			ASSERT(m_size > 0);
+
+			*element_out = m_head;
 			m_head = m_head->next;
-			(*out_deq_elem)->next = NULL;
+
+			--m_queued_count;
+			m_size -= get_element_size_in_bytes(*element_out);
+			
+			(*element_out)->next = NULL;
 		}
+
 		if (m_head == NULL)
 		{
 			m_tail = NULL;
 		}
 	}
+	return;
 }
 
 void c_simulation_queue::clear()
@@ -128,12 +245,18 @@ void c_simulation_queue::clear()
 	{
 		while (get_head() != NULL)
 		{
-			s_simulation_queue_element* element_to_deque = NULL;
-			dequeue(&element_to_deque);
-			deallocate(element_to_deque);
+			s_simulation_queue_element* element_to_dequeue = NULL;
+			deque(&element_to_dequeue);
+			ASSERT(element_to_dequeue);
+			deallocate(element_to_dequeue);
 			// ### TODO clear allocated but not queued too??
 		}
+
+		ASSERT(m_queued_count == 0);
+		ASSERT(m_allocated_count == 0);
+		ASSERT(m_size == 0);
 	}
+	return;
 }
 
 void c_simulation_queue::dispose()

@@ -7,6 +7,7 @@
 #include "simulation_watcher.h"
 
 #include "game/game.h"
+#include "game/players.h"
 #include "objects/objects.h"
 #include "simulation/game_interface/simulation_game_action.h"
 
@@ -22,7 +23,7 @@ c_simulation_world* simulation_get_world()
 
 bool simulation_engine_initialized()
 {
-	return simulation_get_globals()->engine_initialized;
+	return simulation_get_globals()->initialized;
 }
 
 bool simulation_is_paused()
@@ -37,9 +38,10 @@ bool simulation_reset_in_progress()
 
 bool simulation_starting_up(void)
 {
+	const s_simulation_globals* simulation_globals = simulation_get_globals();
+
 	bool result = false;
-	s_simulation_globals* simulation_globals = simulation_get_globals();
-	if (simulation_globals->engine_initialized)
+	if (simulation_globals->initialized)
 	{
 		ASSERT(simulation_globals->world);
 		if (!simulation_globals->engine_paused && simulation_globals->world->exists())
@@ -76,27 +78,33 @@ void simulation_reset_immediate()
 	// simulation_gamestate_entities_build_clear_flags();
 	// simulation_queue_gamestates_delete_insert();
 	simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_notify_reset_complete);
+	return;
 }
 
-void __cdecl simulation_reset()
+// FIXME: figure out why this function is being called on clients...
+void __cdecl simulation_reset(void)
 {
-	s_simulation_globals* sim_globals = simulation_get_globals();
-	if (sim_globals->simulation_invalidate)
+	s_simulation_globals* simulation_globals = simulation_get_globals();
+	ASSERT(simulation_globals->world);
+	//ASSERT(simulation_globals->world->is_authority());
+
+	if (simulation_globals->simulation_invalidate)
 	{
-		sim_globals->simulation_invalidate = false;
+		simulation_globals->simulation_invalidate = false;
 	}
 	else
 	{
 		// this will use the main game simulation reset code
 		// but we don't need it
-		//sim_globals->simulation_reset_pending = true;
+		//simulation_globals->simulation_reset_pending = true;
 
 		// instead, call reset directly
 		simulation_reset_immediate();
 	}
+	return;
 }
 
-bool simulation_in_progress()
+bool simulation_in_progress(void)
 {
 	bool result = false;
 
@@ -134,7 +142,7 @@ c_simulation_type_collection* simulation_get_type_collection()
 void __cdecl simulation_apply_before_game(simulation_update* update)
 {
 	ASSERT(update != NULL);
-	ASSERT(simulation_get_globals()->engine_initialized);
+	ASSERT(simulation_get_globals()->initialized);
 	ASSERT(simulation_get_globals()->world);
 	ASSERT(game_in_progress());
 
@@ -240,12 +248,14 @@ void __cdecl simulation_update_aftermath(simulation_update* update)
 
 void __cdecl simulation_update_pregame(void)
 {
-	simulation_update update;
-	s_simulation_globals* globals = simulation_get_globals();
+	ASSERT(!simulation_in_progress());
 
-	if (globals->engine_initialized && game_in_progress() && !simulation_is_paused())
+	simulation_update update;
+	s_simulation_globals* simulation_globals = simulation_get_globals();
+
+	if (simulation_globals->initialized && game_in_progress() && !simulation_is_paused())
 	{
-		if (globals->simulation_watcher->need_to_generate_updates())
+		if (simulation_globals->watcher->need_to_generate_updates())
 		{
 			simulation_build_update(&update);
 			simulation_apply_before_game(&update);
@@ -253,13 +263,16 @@ void __cdecl simulation_update_pregame(void)
 		}
 		else
 		{
-			globals->world->queues_update_statistics();
+			simulation_globals->world->queues_update_statistics();
 		}
 	}
 }
 
-void simulation_destroy_update()
+void simulation_destroy_update(simulation_update* update)
 {
+	ASSERT(update);
+	s_simulation_globals* simulation_globals = simulation_get_globals();
+	simulation_globals->world->destroy_world();
 	return;
 }
 
@@ -270,7 +283,15 @@ bool __cdecl simulation_get_machine_active_in_game(s_machine_identifier* machine
 
 void __cdecl simulation_build_player_updates(int32* player_update_count, int32 maximum_player_update_count, simulation_player_update* player_updates)
 {
-	simulation_get_globals()->simulation_watcher->generate_player_updates(player_update_count, maximum_player_update_count, player_updates);
+	s_simulation_globals* simulation_globals = simulation_get_globals();
+
+	ASSERT(simulation_globals->initialized);
+	ASSERT(simulation_globals->world);
+	ASSERT(simulation_globals->world->runs_simulation());
+	ASSERT(simulation_globals->watcher);
+	ASSERT(game_in_progress());
+
+	simulation_globals->watcher->generate_player_updates(player_update_count, maximum_player_update_count, player_updates);
 	for (int32 i = 0; i < *player_update_count; i++)
 	{
 		simulation_queue_player_update_insert(&player_updates[i]);
