@@ -423,12 +423,14 @@ enum e_cartographer_variant_flags : uint32
 	_cartographer_variant_infinite_grenades,
 	_cartographer_variant_explosion_physics,
 	_cartographer_variant_force_default_fov,
+	_cartographer_variant_force_default_weapon_offsets,
+	_cartographer_variant_force_default_cross_hair_offset,
 
 	k_cartographer_variant_flags_count,
 	k_cartographer_variant_flags_bits_required = bits_required_for(FLAG(k_cartographer_variant_flags_count - 1)),
 };
 
-enum e_game_speed_modifier : uint8
+enum e_game_speed_modifier : int8
 {
 	_game_speed_modifier_none,
 	_game_speed_modifier_half,
@@ -437,10 +439,11 @@ enum e_game_speed_modifier : uint8
 	_game_speed_modifier_ludicrous,
 
 	k_game_speed_modifier_count,
-	k_game_speed_modifier_bits_required = bits_required_for(FLAG(k_game_speed_modifier_count - 1))
+	k_game_speed_modifier_bits_required = bits_required_for(FLAG(k_game_speed_modifier_count - 1)),
+	k_game_speed_modifier_invalid = NONE
 };
 
-enum e_game_gravity_modifier : uint8
+enum e_game_gravity_modifier : int8
 {
 	_game_gravity_modifier_none,
 	_game_gravity_modifier_twenty_five_percent,
@@ -452,10 +455,11 @@ enum e_game_gravity_modifier : uint8
 	_game_gravity_modifier_two_hundred,
 
 	k_game_gravity_modifier_count,
-	k_game_gravity_modifier_bits_required = bits_required_for(FLAG(k_game_gravity_modifier_count - 1))
+	k_game_gravity_modifier_bits_required = bits_required_for(FLAG(k_game_gravity_modifier_count - 1)),
+	k_game_gravity_modifier_invalid = NONE
 };
 
-enum e_player_spawn_protection_timer : uint8
+enum e_player_spawn_protection_timer : int8
 {
 	_player_spawn_protection_timer_one_second,
 	_player_spawn_protection_timer_none,
@@ -464,7 +468,8 @@ enum e_player_spawn_protection_timer : uint8
 	_player_spawn_protection_timer_ten_seconds,
 
 	k_player_spawn_protection_timer_count,
-	k_player_spawn_protection_timer_bits_required = bits_required_for(FLAG(k_player_spawn_protection_timer_count - 1))
+	k_player_spawn_protection_timer_bits_required = bits_required_for(FLAG(k_player_spawn_protection_timer_count - 1)),
+	k_player_spawn_protection_timer_invalid = NONE
 };
 
 struct s_variant_description_map

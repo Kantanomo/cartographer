@@ -19,6 +19,8 @@ enum e_observer_command_flags : uint8
 	_observer_command_bit_3 = 3
 };
 
+constexpr real_point2d k_observer_default_cross_hair_position{{0.f, 0.138f}};
+
 /* structures */
 
 struct s_observer_result

@@ -192,10 +192,12 @@ static void multiplayer_variant_settings_interface_get_variant_parameter_label_c
 		case _variant_setting_parameter_type_cartographer_infinite_grenades:
 		case _variant_setting_parameter_type_cartographer_explosion_physics:
 		case _variant_setting_parameter_type_cartographer_force_default_fov:
+		case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
+		case _variant_setting_parameter_type_cartographer_force_default_weapon_offsets:
 			string = g_multiplayer_variant_interface_bool_value_strings[get_current_language()][value];
 			break;
 
-		case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+		case _variant_setting_parameter_type_cartographer_engine_mode:
 		{
 			string = g_multiplayer_variant_interface_cartographer_engine_mode[get_current_language()][value];
 			break;
@@ -268,7 +270,9 @@ static int32 multiplayer_variant_settings_interface_get_variant_parameter_value_
 		case _variant_setting_parameter_type_cartographer_infinite_grenades:
 		case _variant_setting_parameter_type_cartographer_explosion_physics:
 		case _variant_setting_parameter_type_cartographer_force_default_fov:
-		case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+		case _variant_setting_parameter_type_cartographer_engine_mode:
+		case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
+		case _variant_setting_parameter_type_cartographer_force_default_weapon_offsets:
 			return 2;
 
 		case _variant_setting_parameter_type_cartographer_game_speed:
@@ -332,7 +336,7 @@ int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value
 	{
 		switch (type)
 		{
-			case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+			case _variant_setting_parameter_type_cartographer_engine_mode:
 				return variant->cartographer_settings.flags.test(_cartographer_variant_thirty_tick_rate);
 			case _variant_setting_parameter_type_cartographer_infinite_ammo:
 				return variant->cartographer_settings.flags.test(_cartographer_variant_infinite_ammo);
@@ -342,6 +346,10 @@ int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value
 				return variant->cartographer_settings.flags.test(_cartographer_variant_explosion_physics);
 			case _variant_setting_parameter_type_cartographer_force_default_fov:
 				return variant->cartographer_settings.flags.test(_cartographer_variant_force_default_fov);
+			case _variant_setting_parameter_type_cartographer_force_default_weapon_offsets:
+				return variant->cartographer_settings.flags.test(_cartographer_variant_force_default_weapon_offsets);
+			case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
+				return variant->cartographer_settings.flags.test(_cartographer_variant_force_default_cross_hair_offset);
 			case _variant_setting_parameter_type_cartographer_game_speed:
 				return variant->cartographer_settings.game_speed;
 			case _variant_setting_parameter_type_cartographer_gravity:
@@ -364,7 +372,7 @@ void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(
 	{
 		switch (parameter_type)
 		{
-			case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+			case _variant_setting_parameter_type_cartographer_engine_mode:
 				variant->cartographer_settings.flags.set(_cartographer_variant_thirty_tick_rate, value);
 				break;
 			case _variant_setting_parameter_type_cartographer_infinite_ammo:
@@ -379,6 +387,11 @@ void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(
 			case _variant_setting_parameter_type_cartographer_force_default_fov:
 				variant->cartographer_settings.flags.set(_cartographer_variant_force_default_fov, value);
 				break;
+			case _variant_setting_parameter_type_cartographer_force_default_weapon_offsets:
+				variant->cartographer_settings.flags.set(_cartographer_variant_force_default_weapon_offsets, value);
+				break;
+			case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
+				variant->cartographer_settings.flags.set(_cartographer_variant_force_default_cross_hair_offset, value);
 			case _variant_setting_parameter_type_cartographer_game_speed:
 				variant->cartographer_settings.game_speed = (e_game_speed_modifier)value;
 				break;
@@ -586,7 +599,7 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s
 	{
 		switch (type)
 		{
-			case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+			case _variant_setting_parameter_type_cartographer_engine_mode:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][0]);
 				break;
 			case _variant_setting_parameter_type_cartographer_infinite_ammo:
@@ -601,14 +614,20 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s
 			case _variant_setting_parameter_type_cartographer_force_default_fov:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][4]);
 				break;
-			case _variant_setting_parameter_type_cartographer_game_speed:
+			case _variant_setting_parameter_type_cartographer_force_default_weapon_offsets:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][5]);
 				break;
-			case _variant_setting_parameter_type_cartographer_gravity:
+			case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][6]);
 				break;
-			case _variant_setting_parameter_type_cartographer_spawn_protection:
+			case _variant_setting_parameter_type_cartographer_game_speed:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][7]);
+				break;
+			case _variant_setting_parameter_type_cartographer_gravity:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][8]);
+				break;
+			case _variant_setting_parameter_type_cartographer_spawn_protection:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][9]);
 				break;
 		}
 
@@ -642,7 +661,7 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_descrip
 	{
 		switch (type)
 		{
-			case _variant_setting_parameter_type_cartographer_thirty_tick_rate:
+			case _variant_setting_parameter_type_cartographer_engine_mode:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][0]);
 				break;
 			case _variant_setting_parameter_type_cartographer_infinite_ammo:
@@ -657,14 +676,20 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_descrip
 			case _variant_setting_parameter_type_cartographer_force_default_fov:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][4]);
 				break;
-			case _variant_setting_parameter_type_cartographer_game_speed:
+			case _variant_setting_parameter_type_cartographer_force_default_weapon_offsets:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][5]);
 				break;
-			case _variant_setting_parameter_type_cartographer_gravity:
+			case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][6]);
 				break;
-			case _variant_setting_parameter_type_cartographer_spawn_protection:
+			case _variant_setting_parameter_type_cartographer_game_speed:
 				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][7]);
+				break;
+			case _variant_setting_parameter_type_cartographer_gravity:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][8]);
+				break;
+			case _variant_setting_parameter_type_cartographer_spawn_protection:
+				usnzprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][9]);
 				break;
 		}
 

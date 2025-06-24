@@ -2,6 +2,7 @@
 #include "halo_playlist.h"
 
 #include "definitions/halo_playlist_assault_property.h"
+#include "definitions/halo_playlist_cartographer_setting.h"
 #include "definitions/halo_playlist_ctf_property.h"
 #include "definitions/halo_playlist_equipment_property.h"
 #include "definitions/halo_playlist_game_engine_flags.h"
@@ -115,7 +116,7 @@ void c_halo_playlist_reader::parse_file_section(const wchar_t* file_buffer)
                 }
                 else
                 {
-                    this->m_section_items[this->m_section_items_count].processed = false;
+                    csmemset(&this->m_section_items[this->m_section_items_count], 0, sizeof(s_halo_playlist_section_item));
                     this->m_current_reader_char_index = 0;
                     this->m_current_reader_mode = _halo_playlist_reader_seek_mode_property_name_read;
                 }
@@ -531,12 +532,12 @@ void c_halo_playlist_reader::process_variant_section()
                 file_section->processed = true;
 
                 bool base_settings_check =
-                    this->process_variant_match_setting(file_section, &new_variant)   ||
-                    this->process_variant_player_setting(file_section, &new_variant)  ||
-                    this->process_variant_team_setting(file_section, &new_variant)	  ||
-                    this->process_variant_vehicle_setting(file_section, &new_variant) ||
-                    this->process_variant_equipment_setting(file_section, &new_variant);
-
+                    this->process_variant_match_setting(file_section, &new_variant)         ||
+                    this->process_variant_player_setting(file_section, &new_variant)        ||
+                    this->process_variant_team_setting(file_section, &new_variant)          ||
+                    this->process_variant_vehicle_setting(file_section, &new_variant)       ||
+                    this->process_variant_equipment_setting(file_section, &new_variant)     ||
+                    this->process_variant_cartographer_setting(file_section, &new_variant);
 
                 if(!base_settings_check)
                 {
@@ -614,6 +615,57 @@ bool c_halo_playlist_reader::process_variant_equipment_setting(s_halo_playlist_s
 {
     return INVOKE_TYPE(0, 0x1190c, bool(__thiscall*)(c_halo_playlist_reader*, wchar_t*, wchar_t*, uint32, s_game_variant*),
         this, section_item->name_buffer, section_item->value_buffer, section_item->file_line, variant);
+}
+
+bool c_halo_playlist_reader::process_variant_cartographer_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant)
+{
+    const e_halo_playlist_cartographer_setting_property_type cartographer_property = halo_playlist_item_collection_cartographer_setting_get_value(section_item->name_buffer);
+
+    if (cartographer_property == k_halo_playlist_cartographer_setting_invalid)
+        return false;
+
+    variant->cartographer_settings.version = _cartographer_variant_settings_version_one;
+
+    bool property_result = false;
+
+    switch (cartographer_property)
+    {
+	    case _halo_playlist_cartographer_setting_thirty_tick_rate:
+            property_result = halo_playlist_item_collection_cartographer_engine_mode_write_to_variant(section_item->value_buffer, variant);
+		    break;
+	    case _halo_playlist_cartographer_setting_infinite_ammo:
+            property_result = halo_playlist_item_collection_cartographer_infinite_ammo_write_to_variant(section_item->value_buffer, variant);
+		    break;
+	    case _halo_playlist_cartographer_setting_infinite_grenades:
+            property_result = halo_playlist_item_collection_cartographer_infinite_grenades_write_to_variant(section_item->value_buffer, variant);
+		    break;
+	    case _halo_playlist_cartographer_setting_explosion_physics:
+            property_result = halo_playlist_item_collection_cartographer_explosion_physics_write_to_variant(section_item->value_buffer, variant);
+		    break;
+	    case _halo_playlist_cartographer_setting_default_fov:
+            property_result = halo_playlist_item_collection_cartographer_default_fov_write_to_variant(section_item->value_buffer, variant);
+		    break;
+	    case _halo_playlist_cartographer_setting_default_weapon_offsets:
+            property_result = halo_playlist_item_collection_cartographer_default_weapon_offsets_write_to_variant(section_item->value_buffer, variant);
+		    break;
+	    case _halo_playlist_cartographer_setting_default_cross_hair_offset:
+            property_result = halo_playlist_item_collection_cartographer_default_crosshair_position_write_to_variant(section_item->value_buffer, variant);
+		    break;
+	    case _halo_playlist_cartographer_setting_game_speed:
+            property_result = halo_playlist_item_collection_cartographer_game_speed_write_to_variant(section_item->value_buffer, variant);
+		    break;
+	    case _halo_playlist_cartographer_setting_gravity:
+            property_result = halo_playlist_item_collection_cartographer_gravity_write_to_variant(section_item->value_buffer, variant);
+		    break;
+	    case _halo_playlist_cartographer_setting_spawn_protection:
+            property_result = halo_playlist_item_collection_cartographer_spawn_protection_write_to_variant(section_item->value_buffer, variant);
+		    break;
+    }
+
+    if (!property_result)
+        this->error(_halo_playlist_error_property_value_invalid, section_item->file_line, section_item->name_buffer, section_item->value_buffer);
+
+    return property_result;
 }
 
 bool c_halo_playlist_reader::process_variant_slayer_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant)
@@ -741,7 +793,7 @@ void c_halo_playlist_reader::process_match_section()
     }
 }
 
-void c_halo_playlist_reader::process_current_property()
+void __declspec(noinline) c_halo_playlist_reader::process_current_property()
 {
     s_halo_playlist_section_item* section = &this->m_section_items[this->m_section_items_count];
 
@@ -753,7 +805,6 @@ void c_halo_playlist_reader::process_current_property()
         else
             break;
     }
-
     switch(this->m_current_section_type)
     {
         case _halo_playlist_header_playlist:
@@ -844,10 +895,10 @@ void c_halo_playlist_reader::process_current_property()
             break;
         }
         case _halo_playlist_header_match:
-
+        {
             e_halo_playlist_match_property_type property = halo_playlist_item_collection_get_match_property_get_value(section->name_buffer);
 
-            if(property == k_halo_playlist_match_property_invalid)
+            if (property == k_halo_playlist_match_property_invalid)
             {
                 this->error(_halo_playlist_error_property_name_invalid, this->m_current_reader_line, section->name_buffer);
                 return;
@@ -855,114 +906,115 @@ void c_halo_playlist_reader::process_current_property()
 
             s_halo_playlist_match* match = &this->m_matches[this->m_match_count];
 
-            switch(property)
+            switch (property)
             {
-                case _halo_playlist_match_property_type_variant:
-                {
-                    if(!wcscmp(match->variant, L""))
-                    {
-                        if(!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->variant, NUMBEROF(match->variant), section->value_buffer, UINT_MAX))
-                        {
-                            match->variant_line_in_file = this->m_current_reader_line;
-                        }
-                        else
-                        {
-                            this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                        }
-                    }
-                    else
-                    {
-                        this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
-                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                    }
-                    break;
-                }
-                case _halo_playlist_match_property_type_map:
-                {
-                    if(!wcscmp(match->map, L""))
-                    {
-                        if(!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->map, NUMBEROF(match->map), section->value_buffer, UINT_MAX))
-                        {
-                            match->map_line_in_file = this->m_current_reader_line;
-                        }
-                        else
-                        {
-                            this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                        }
-                    }
-                    else
-                    {
-                        this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
-                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                    }
-                    break;
-                }
-                case _halo_playlist_match_property_type_weight:
-                {
-                    if(match->weight == 0)
-                    {
-                        int32 value = halo_playlist_item_collection_get_int_value(section->value_buffer);
-                        if(value != NONE)
-                        {
-                            match->weight = value;
-                        }
-                        else
-                        {
-                            this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                        }
-                    }
-                    else
-                    {
-                        this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
-                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                    }
-                    break;
-                }
-                case _halo_playlist_match_property_type_minimum_players:
-                {
-                    if (match->minimum_players == 0)
-                    {
-                        int16 value = halo_playlist_item_collection_player_count_get_value(section->value_buffer);
-                        if (value != NONE)
-                        {
-                            match->minimum_players = value;
-                        }
-                        else
-                        {
-                            this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                        }
-                    }
-                    else
-                    {
-                        this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
-                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                    }
-                    break;
-                }
-                case _halo_playlist_match_property_type_maximum_players:
-                {
-                    if (match->maximum_players == 0)
-                    {
-                        int16 value = halo_playlist_item_collection_player_count_get_value(section->value_buffer);
-                        if (value != NONE)
-                        {
-                            match->maximum_players = value;
-                        }
-                        else
-                        {
-                            this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                        }
-                    }
-                    else
-                    {
-                        this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
-                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
-                    }
-                    break;
-                }
+	            case _halo_playlist_match_property_type_variant:
+	            {
+	                if (!wcscmp(match->variant, L""))
+	                {
+	                    if (!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->variant, NUMBEROF(match->variant), section->value_buffer, UINT_MAX))
+	                    {
+	                        match->variant_line_in_file = this->m_current_reader_line;
+	                    }
+	                    else
+	                    {
+	                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                    }
+	                }
+	                else
+	                {
+	                    this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
+	                    this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                }
+	                break;
+	            }
+	            case _halo_playlist_match_property_type_map:
+	            {
+	                if (!wcscmp(match->map, L""))
+	                {
+	                    if (!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->map, NUMBEROF(match->map), section->value_buffer, UINT_MAX))
+	                    {
+	                        match->map_line_in_file = this->m_current_reader_line;
+	                    }
+	                    else
+	                    {
+	                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                    }
+	                }
+	                else
+	                {
+	                    this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
+	                    this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                }
+	                break;
+	            }
+	            case _halo_playlist_match_property_type_weight:
+	            {
+	                if (match->weight == 0)
+	                {
+	                    int32 value = halo_playlist_item_collection_get_int_value(section->value_buffer);
+	                    if (value != NONE)
+	                    {
+	                        match->weight = value;
+	                    }
+	                    else
+	                    {
+	                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                    }
+	                }
+	                else
+	                {
+	                    this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
+	                    this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                }
+	                break;
+	            }
+	            case _halo_playlist_match_property_type_minimum_players:
+	            {
+	                if (match->minimum_players == 0)
+	                {
+	                    int16 value = halo_playlist_item_collection_player_count_get_value(section->value_buffer);
+	                    if (value != NONE)
+	                    {
+	                        match->minimum_players = value;
+	                    }
+	                    else
+	                    {
+	                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                    }
+	                }
+	                else
+	                {
+	                    this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
+	                    this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                }
+	                break;
+	            }
+	            case _halo_playlist_match_property_type_maximum_players:
+	            {
+	                if (match->maximum_players == 0)
+	                {
+	                    int16 value = halo_playlist_item_collection_player_count_get_value(section->value_buffer);
+	                    if (value != NONE)
+	                    {
+	                        match->maximum_players = value;
+	                    }
+	                    else
+	                    {
+	                        this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                    }
+	                }
+	                else
+	                {
+	                    this->error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
+	                    this->error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+	                }
+	                break;
+	            }
             }
 
             break;
+        }
     }
 
     //INVOKE_TYPE(0, 0x10FBE, void(__thiscall*)(c_halo_playlist_reader*), this);
@@ -988,7 +1040,10 @@ bool c_halo_playlist_reader::property_name_is_valid(wchar_t* property_name)
     if (halo_playlist_item_collection_equipment_property_get_value(property_name) != k_halo_playlist_equipment_property_invalid)
         return true;
 
-    if (halo_playlist_item_collection_slayer_property_get_value(property_name) != k_halo_playlist_slayer_property_invalid)
+    if (halo_playlist_item_collection_cartographer_setting_get_value(property_name) != k_halo_playlist_cartographer_setting_invalid)
+        return true;
+
+	if (halo_playlist_item_collection_slayer_property_get_value(property_name) != k_halo_playlist_slayer_property_invalid)
         return true;
 
     if (halo_playlist_item_collection_king_property_get_value(property_name) != k_halo_playlist_king_property_invalid)

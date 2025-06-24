@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "cartographer_player_profile.h"
 
+#include "camera/observer.h"
 #include "saved_games/saved_game_files.h"
 #include "saved_games/saved_game_files_async_windows.h"
 
@@ -232,7 +233,7 @@ static void cartographer_player_profile_new(s_saved_game_cartographer_player_pro
 	settings->deadzone_axial = k_default_right_thumbstick_deadzone_axial_percentage;
 	// set this default to 8 percent
 	settings->deadzone_radial = k_default_right_thumbstick_deadzone_radial_percentage;
-	settings->crosshair_offset = 0.138f;
+	settings->crosshair_offset = k_observer_default_cross_hair_position.y;
 	settings->crosshair_scale = 1.f;
 	return;
 }
@@ -256,7 +257,7 @@ static void cartographer_player_profile_new(s_saved_game_cartographer_player_pro
 
 	// set this default to 8 percent
 	settings->deadzone_radial = k_default_right_thumbstick_deadzone_radial_percentage;
-	settings->crosshair_offset = 0.138f;
+	settings->crosshair_offset = k_observer_default_cross_hair_position.y;
 	settings->crosshair_scale = 1.f;
 
 	for (size_t i = 0; i < k_weapon_offset_weapon_count; ++i)

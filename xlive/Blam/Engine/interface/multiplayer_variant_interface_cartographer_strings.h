@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// ReSharper disable StringLiteralTypo
+
+#pragma once
 #include "multiplayer_variant_settings_interface_definition.h"
 #include "main/game_preferences.h"
 
@@ -11,6 +13,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_title_strings
         L"Infinite Grenades",
         L"Explosion Physics",
         L"Force Default FoV",
+        L"Force Default Weapon Offset",
+        L"Force Default Crosshair Offset",
         L"Game Speed",
         L"Gravity",
         L"Spawn Protection"
@@ -22,6 +26,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_title_strings
         L"無限手榴弾",
         L"爆発物理",
         L"デフォルト視野を強制",
+        L"デフォルトの武器オフセットを強制",
+        L"デフォルトの照準オフセットを強制",
         L"ゲーム速度",
         L"重力",
         L"スポーン保護"
@@ -33,6 +39,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_title_strings
         L"Unendliche Granaten",
         L"Explosionsphysik",
         L"Standard-Sichtfeld erzwingen",
+        L"Standard-Waffenversatz erzwingen",
+        L"Standard-Zielkreuzversatz erzwingen",
         L"Spielgeschwindigkeit",
         L"Schwerkraft",
         L"Spawn-Schutz"
@@ -44,6 +52,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_title_strings
         L"Grenades infinies",
         L"Physique des explosions",
         L"Forcer le FOV par défaut",
+        L"Forcer le décalage d'arme par défaut",
+        L"Forcer le décalage du réticule par défaut",
         L"Vitesse du jeu",
         L"Gravité",
         L"Protection de réapparition"
@@ -55,6 +65,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_title_strings
         L"Granadas infinitas",
         L"Física de explosiones",
         L"Forzar FOV predeterminado",
+        L"Forzar compensación de arma predeterminada",
+        L"Forzar compensación de mira predeterminada",
         L"Velocidad del juego",
         L"Gravedad",
         L"Protección de aparición"
@@ -66,6 +78,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_title_strings
         L"Granate infinite",
         L"Fisica delle esplosioni",
         L"Forzare FOV predefinito",
+        L"Forzare offset arma predefinito",
+        L"Forzare offset mirino predefinito",
         L"Velocità di gioco",
         L"Gravità",
         L"Protezione allo spawn"
@@ -77,6 +91,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_title_strings
         L"무한 수류탄",
         L"폭발 물리",
         L"기본 시야각 강제",
+        L"기본 무기 오프셋 강제",
+        L"기본 조준선 오프셋 강제",
         L"게임 속도",
         L"중력",
         L"스폰 보호"
@@ -88,6 +104,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_title_strings
         L"无限手榴弹",
         L"爆炸物理",
         L"强制默认视野",
+        L"强制默认武器偏移",
+        L"强制默认准星偏移",
         L"游戏速度",
         L"重力",
         L"出生保护"
@@ -99,11 +117,14 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_title_strings
         L"Granadas infinitas",
         L"Física de explosões",
         L"Forçar o FOV padrão",
+        L"Forçar o deslocamento de arma padrão",
+        L"Forçar o deslocamento de mira padrão",
         L"Velocidade do jogo",
         L"Gravidade",
         L"Proteção de spawn"
     }
 };
+
 
 const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_description_strings[k_language_count][k_variant_setting_parameter_type_cartographer_count] =
 {
@@ -114,6 +135,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_des
         L"Grants players infinite grenades",
         L"Makes explosion physics affect all players in the lobby",
         L"Forces all players to use the games default Field of View",
+        L"Forces all players to use the games default weapon positions",
+        L"Forces all players to use the games default crosshair position",
         L"Changes the speed of game play",
         L"Makes things heavy or light, or weightless?",
         L"Determines how long a player has extreme damage resistance after spawning"
@@ -125,8 +148,10 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_des
         L"プレイヤーに無限の手榴弾を付与します",
         L"ロビー内の全プレイヤーに爆発物理を影響させます",
         L"全プレイヤーにゲームのデフォルト視野を使用させます",
+        L"全プレイヤーにゲームのデフォルト武器位置を使用させます",
+        L"全プレイヤーにゲームのデフォルト照準位置を使用させます",
         L"ゲームプレイの速度を変更します",
-        L"物体を重くしたり軽くしたり、無重量にしますか？",
+        L"物体を重くしたり軽くしたり、無重力にしますか？",
         L"スポーン後にプレイヤーが極端なダメージ耐性を持つ時間を決定します"
     },
     // German
@@ -136,6 +161,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_des
         L"Ermöglicht Spielern unendliche Granaten",
         L"Lässt die Explosionsphysik alle Spieler in der Lobby beeinflussen",
         L"Erzwingt, dass alle Spieler das standardmäßige Sichtfeld des Spiels verwenden",
+        L"Erzwingt, dass alle Spieler die Standard-Waffenpositionen des Spiels verwenden",
+        L"Erzwingt, dass alle Spieler die Standard-Zielkreuzposition des Spiels verwenden",
         L"Ändert die Spielgeschwindigkeit",
         L"Macht Dinge schwer oder leicht oder schwerelos?",
         L"Bestimmt, wie lange ein Spieler nach dem Spawnen extremen Schadenswiderstand hat"
@@ -147,9 +174,11 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_des
         L"Accorde aux joueurs des grenades infinies",
         L"Fait en sorte que la physique des explosions affecte tous les joueurs dans le lobby",
         L"Force tous les joueurs à utiliser le champ de vision par défaut du jeu",
+        L"Force tous les joueurs à utiliser les positions d'arme par défaut du jeu",
+        L"Force tous les joueurs à utiliser la position de réticule par défaut du jeu",
         L"Modifie la vitesse de jeu",
         L"Rend les objets lourds ou légers, ou en apesanteur ?",
-        L"Détermine la durée de la résistance aux dégâts extrêmes d'un joueur après l'apparition"
+        L"Détermine la durée de la résistance aux dégâts extrêmes d'un joueur après son apparition"
     },
     // Spanish
     {
@@ -158,7 +187,9 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_des
         L"Otorga a los jugadores granadas infinitas",
         L"Hace que la física de explosiones afecte a todos los jugadores en el lobby",
         L"Fuerza a todos los jugadores a usar el campo de visión predeterminado del juego",
-        L"Cambia la velocidad del juego",
+        L"Fuerza a todos los jugadores a usar las posiciones de arma predeterminadas del juego",
+        L"Fuerza a todos los jugadores a usar la posición de retícula predeterminada del juego",
+        L"Cambia la velocidad del video juego",
         L"¿Hace que las cosas sean pesadas o ligeras, o ingrávidas?",
         L"Determina cuánto tiempo tiene un jugador resistencia extrema al daño después de aparecer"
     },
@@ -169,6 +200,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_des
         L"Concede ai giocatori granate infinite",
         L"Fa sì che la fisica delle esplosioni influenzi tutti i giocatori nella lobby",
         L"Costringe tutti i giocatori a usare il campo visivo predefinito del gioco",
+        L"Costringe tutti i giocatori a usare le posizioni delle armi predefinite del gioco",
+        L"Costringe tutti i giocatori a usare la posizione del mirino predefinita del gioco",
         L"Modifica la velocità di gioco",
         L"Rende gli oggetti pesanti o leggeri, o senza peso?",
         L"Determina per quanto tempo un giocatore ha resistenza estrema ai danni dopo lo spawn"
@@ -180,6 +213,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_des
         L"플레이어에게 무한 수류탄을 부여합니다",
         L"로비의 모든 플레이어에게 폭발 물리 효과를 적용합니다",
         L"모든 플레이어가 게임의 기본 시야를 사용하도록 강제합니다",
+        L"모든 플레이어가 게임의 기본 무기 위치를 사용하도록 강제합니다",
+        L"모든 플레이어가 게임의 기본 조준선 위치를 사용하도록 강제합니다",
         L"게임 플레이 속도를 변경합니다",
         L"무거움, 가벼움 또는 무중력을 적용합니까?",
         L"스폰 후 플레이어가 극심한 피해 저항을 가지는 시간을 결정합니다"
@@ -191,6 +226,8 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_des
         L"给予玩家无限的手榴弹",
         L"让爆炸物理效果影响大厅中的所有玩家",
         L"强制所有玩家使用游戏的默认视野",
+        L"强制所有玩家使用游戏的默认武器位置",
+        L"强制所有玩家使用游戏的默认准星位置",
         L"更改游戏速度",
         L"使物体变重或变轻，或失重？",
         L"确定玩家出生后获得极高伤害抗性的持续时间"
@@ -202,11 +239,14 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_parameter_des
         L"Concede aos jogadores granadas infinitas",
         L"Faz com que a física de explosão afete todos os jogadores no lobby",
         L"Força todos os jogadores a usarem o campo de visão padrão do jogo",
+        L"Força todos os jogadores a usarem as posições de arma padrão do jogo",
+        L"Força todos os jogadores a usarem a posição de mira padrão do jogo",
         L"Altera a velocidade do jogo",
         L"Torna as coisas pesadas ou leves, ou sem peso?",
         L"Determina quanto tempo um jogador tem resistência extrema a danos após o aparecimento"
     }
 };
+
 
 const static wchar_t* g_multiplayer_variant_interface_cartographer_game_speed_strings[k_language_count][k_game_speed_modifier_count] =
 {
@@ -322,46 +362,46 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_gravity_strin
     // French
     {
         L"Par défaut",
-        L"Gravité 25%",
-        L"Gravité 50%",
-        L"Gravité 75%",
-        L"Gravité 125%",
-        L"Gravité 150%",
-        L"Gravité 175%",
-        L"Gravité 200%"
+        L"Gravité 25%%",
+        L"Gravité 50%%",
+        L"Gravité 75%%",
+        L"Gravité 125%%",
+        L"Gravité 150%%",
+        L"Gravité 175%%",
+        L"Gravité 200%%"
     },
     // Spanish
     {
         L"Predeterminado",
-        L"Gravedad 25%",
-        L"Gravedad 50%",
-        L"Gravedad 75%",
-        L"Gravedad 125%",
-        L"Gravedad 150%",
-        L"Gravedad 175%",
-        L"Gravedad 200%"
+        L"Gravedad 25%%",
+        L"Gravedad 50%%",
+        L"Gravedad 75%%",
+        L"Gravedad 125%%",
+        L"Gravedad 150%%",
+        L"Gravedad 175%%",
+        L"Gravedad 200%%"
     },
     // Italian
     {
         L"Predefinito",
-        L"Gravità 25%",
-        L"Gravità 50%",
-        L"Gravità 75%",
-        L"Gravità 125%",
-        L"Gravità 150%",
-        L"Gravità 175%",
-        L"Gravità 200%"
+        L"Gravità 25%%",
+        L"Gravità 50%%",
+        L"Gravità 75%%",
+        L"Gravità 125%%",
+        L"Gravità 150%%",
+        L"Gravità 175%%",
+        L"Gravità 200%%"
     },
     // Korean
     {
         L"기본",
-        L"중력 25%",
-        L"중력 50%",
-        L"중력 75%",
-        L"중력 125%",
-        L"중력 150%",
-        L"중력 175%",
-        L"중력 200%"
+        L"중력 25%%",
+        L"중력 50%%",
+        L"중력 75%%",
+        L"중력 125%%",
+        L"중력 150%%",
+        L"중력 175%%",
+        L"중력 200%%"
     },
     // Chinese
     {
@@ -377,13 +417,13 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_gravity_strin
     // Portuguese
     {
         L"Padrão",
-        L"Gravidade 25%",
-        L"Gravidade 50%",
-        L"Gravidade 75%",
-        L"Gravidade 125%",
-        L"Gravidade 150%",
-        L"Gravidade 175%",
-        L"Gravidade 200%"
+        L"Gravidade 25%%",
+        L"Gravidade 50%%",
+        L"Gravidade 75%%",
+        L"Gravidade 125%%",
+        L"Gravidade 150%%",
+        L"Gravidade 175%%",
+        L"Gravidade 200%%"
     }
 };
 
