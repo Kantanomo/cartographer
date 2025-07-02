@@ -43,6 +43,8 @@ static uint64 __cdecl main_time_get_absolute_milliseconds(void);
 
 static void __cdecl main_game_time_initialize_hook(void);
 
+static bool __cdecl should_limit_framerate_hook();
+
 /* public code */
 
 void main_game_time_apply_patches(void)
@@ -55,6 +57,7 @@ void main_game_time_apply_patches(void)
 	if (!shell_is_dedicated_server())
 	{
 		PatchCall(Memory::GetAddress(0x39C0D), main_time_update);
+		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate_hook);
 	}
 	return;
 }
@@ -66,17 +69,6 @@ void __cdecl main_time_reset(void)
 	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
 	// main_time_globals->should_reset = true;
 	return;
-}
-
-bool __cdecl should_limit_framerate_hook()
-{
-	bool result = game_is_minimized() || g_main_game_time_frame_limiter_enabled;
-	if (!halo_frame_interpolator_enabled())
-	{
-		result |= xbox_tickrate_is_enabled();
-	}
-
-	return result;
 }
 
 bool should_limit_framerate()
@@ -169,6 +161,17 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 }
 
 /* private code */
+
+static bool __cdecl should_limit_framerate_hook()
+{
+	bool result = game_is_minimized() || g_main_game_time_frame_limiter_enabled;
+	if (!halo_frame_interpolator_enabled())
+	{
+		result |= xbox_tickrate_is_enabled();
+	}
+
+	return result;
+}
 
 static real32 main_time_get_max_frame_time(void)
 {

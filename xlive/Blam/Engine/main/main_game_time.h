@@ -61,3 +61,5 @@ void __cdecl main_time_reset(void);
 
 real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta);
 
+bool should_limit_framerate();
+
