@@ -44,6 +44,3 @@ int32 game_seconds_integer_to_ticks(int32 seconds);
 void game_time_advance(void);
 
 void game_time_apply_patches();
-
-bool should_limit_framerate();
-

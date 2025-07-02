@@ -105,22 +105,6 @@ bool __cdecl cinematic_is_running_hook()
 	return result;
 }
 
-bool __cdecl should_limit_framerate_hook()
-{
-	bool result = game_is_minimized() || g_main_game_time_frame_limiter_enabled;
-	if (!halo_frame_interpolator_enabled())
-	{
-		result |= xbox_tickrate_is_enabled();
-	}
-
-	return result;
-}
-
-bool should_limit_framerate()
-{
-	return should_limit_framerate_hook();
-}
-
 void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_game_dt)
 {
 	if (actual_ticks > 0)
@@ -169,5 +153,4 @@ void game_time_apply_patches()
 {
 	// apply framerate throttle patches for when the game is minimized
 	PatchCall(Memory::GetAddress(0x39A2A), cinematic_is_running_hook);
-	PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate_hook);
 }

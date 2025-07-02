@@ -15,6 +15,7 @@ static s_interpolation_data* g_target_interpolation_frame_data = NULL;
 
 static real32 g_interpolator_delta = 0.f;
 static bool g_interpolation_update_in_progress = false;
+static bool g_interpolation_initialized = false;
 static bool g_interpolation_enabled = false;
 static c_static_flags_no_init<k_maximum_objects_per_map> g_interpolator_object_updated;
 static c_static_flags_no_init<k_maximum_objects_per_map> g_interpolator_object_interpolation_updated;
@@ -35,7 +36,7 @@ static void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolat
 
 bool halo_frame_interpolator_enabled()
 {
-	return g_interpolation_enabled;
+	return g_interpolation_initialized && g_interpolation_enabled;
 }
 
 void halo_interpolator_initialize(void)
@@ -44,12 +45,14 @@ void halo_interpolator_initialize(void)
 	g_frame_data_intermediate = (s_interpolation_data*)CSERIES_MALLOC(sizeof(s_interpolation_data));
 	g_previous_interpolation_frame_data = &g_frame_data_storage->previous_data;
 	g_target_interpolation_frame_data = &g_frame_data_storage->target_data;
+	g_interpolation_initialized = true;
+	halo_interpolator_set_state(true);
 	return;
 }
 
 void halo_interpolator_dispose(void)
 {
-	if (halo_frame_interpolator_enabled())
+	if (g_interpolation_initialized)
 	{
 		if (g_frame_data_storage)
 		{
@@ -63,6 +66,7 @@ void halo_interpolator_dispose(void)
 
 		g_frame_data_storage = NULL;
 		g_frame_data_intermediate = NULL;
+		g_interpolation_initialized = false;
 	}
 	return;
 }
@@ -72,10 +76,10 @@ bool halo_interpolator_update_in_progress(void)
 	return g_interpolation_update_in_progress;
 }
 
-void halo_interpolator_set_interpolation_enabled(bool enabled)
+void halo_interpolator_set_state(bool enabled)
 {
 	g_interpolation_enabled = enabled;
-	halo_interpolator_clear_buffers();
+	halo_interpolator_reset();
 	return;
 }
 
@@ -90,7 +94,7 @@ real32 halo_interpolator_get_interpolation_time(void)
 	return (g_interpolation_update_in_progress ? 0.f : halo_interpolator_get_interpolation_time_internal());
 }
 
-void halo_interpolator_clear_buffers(void)
+void halo_interpolator_reset(void)
 {
 	if (halo_frame_interpolator_enabled())
 	{

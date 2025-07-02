@@ -276,7 +276,6 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, in
 
 		user_interface_networking_reset_player_counts();
 		network_globals_switch_environment(2, 1);
-		csmemset(&handler->player_identifiers, 0, sizeof(handler->player_identifiers));
 		csmemcpy(&handler->player_identifiers, local_identifiers, sizeof(local_identifiers));
 		csmemcpy(&handler->player_names, local_usernames, sizeof(local_usernames));
 		handler->field_11 = 0; //Always 0 in the original function
@@ -315,7 +314,6 @@ void __cdecl game_initialize(void)
 	{
 		halo_interpolator_initialize();
 	}
-	halo_interpolator_set_interpolation_enabled(initialize_interpolation);
 	return;
 }
 
@@ -455,7 +453,7 @@ void __cdecl game_initialize_for_new_map(const s_game_options* options)
 	ASSERT(!game_globals->game_in_progress);
 	ASSERT(game_globals->active_structure_bsp_index == NONE);
 
-	halo_interpolator_clear_buffers();
+	halo_interpolator_reset();
 	real_math_reset_precision();
 	game_globals->initializing = true;
 	game_info_initialize_for_new_map(options);

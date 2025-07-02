@@ -72,13 +72,13 @@ void halo_interpolator_dispose(void);
 
 bool halo_interpolator_update_in_progress(void);
 
-void halo_interpolator_set_interpolation_enabled(bool enabled);
+void halo_interpolator_set_state(bool enabled);
 
 void halo_interpolator_update_delta(void);
 
 real32 halo_interpolator_get_interpolation_time(void);
 
-void halo_interpolator_clear_buffers(void);
+void halo_interpolator_reset(void);
 
 void halo_interpolator_update_begin(void);
 

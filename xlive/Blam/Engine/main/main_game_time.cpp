@@ -1,10 +1,13 @@
 #include "stdafx.h"
 #include "main_game_time.h"
 
+#include "H2MOD.h"
+
 #include "game/game.h"
 #include "game/game_time.h"
 #include "game/player_control.h"
 #include "math/math.h"
+#include "main/interpolator.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
@@ -63,6 +66,22 @@ void __cdecl main_time_reset(void)
 	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
 	// main_time_globals->should_reset = true;
 	return;
+}
+
+bool __cdecl should_limit_framerate_hook()
+{
+	bool result = game_is_minimized() || g_main_game_time_frame_limiter_enabled;
+	if (!halo_frame_interpolator_enabled())
+	{
+		result |= xbox_tickrate_is_enabled();
+	}
+
+	return result;
+}
+
+bool should_limit_framerate()
+{
+	return should_limit_framerate_hook();
 }
 
 real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)

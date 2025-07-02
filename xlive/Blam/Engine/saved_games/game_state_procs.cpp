@@ -20,7 +20,7 @@ game_state_call_after_load_procs_t p_game_state_call_after_load_procs;
 void __cdecl game_state_call_after_load_procs_hook(int32 a1)
 {
 	p_game_state_call_after_load_procs(a1);
-	halo_interpolator_clear_buffers();
+	halo_interpolator_reset();
 }
 
 void game_state_procs_apply_patches(void)
