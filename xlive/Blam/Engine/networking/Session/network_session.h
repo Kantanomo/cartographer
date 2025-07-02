@@ -1,11 +1,8 @@
 #pragma once
-#include "network_observer.h"
 #include "game/game_allegiance.h"
 #include "game/player_constants.h"
 #include "input/controllers.h"
 #include "networking/network_game_definitions.h"
-#include "networking/messages/network_message_gateway.h"
-#include "networking/Session/network_text_chat_manager.h"
 #include "networking/transport/transport.h"
 #include "saved_games/game_variant.h"
 
@@ -87,15 +84,6 @@ enum
 };
 
 extern const char* const k_network_protocols_text[];
-
-/* forward declarations */ 
-
-class c_network_session;
-
-struct s_session_membership;
-struct s_membership_player;
-struct s_membership_peer;
-struct s_session_peer;
 
 // THE FOLLOWING FUNCTIONS ARE NOW DEPRECATED, AND WILL BE REMOVED EVENTUALLY
 // WHEN PORTING IS FINISHED
@@ -347,7 +335,7 @@ class c_network_session
 public:
 	void* vtbl;
 	void* m_network_message_gateway;
-	c_network_observer* m_network_observer;
+	class c_network_observer* m_network_observer;
 	void* m_session_manager;
 	uint32 field_10;
 	int32 m_session_index;
@@ -444,10 +432,12 @@ public:
 		int32 session_index,
 		e_network_session_type session_type,
 		int32 session_transport_index,
-		c_network_message_gateway* message_gateway,
-		c_network_observer* observer,
-		c_network_session_manager* session_manager,
-		c_network_text_chat_manager* text_chat_manager);
+		class c_network_message_gateway* message_gateway,
+		class c_network_observer* observer,
+		class c_network_session_manager* session_manager,
+		class c_network_text_chat_manager* text_chat_manager);
+
+	bool channel_is_authoritative(int32 network_channel_index) const;
 
 	e_network_session_state get_session_local_state() const
 	{
@@ -566,7 +556,7 @@ public:
 		return get_session_host_peer_index() == peer_index;
 	}
 
-	bool local_state_joining_session() const
+	bool peer_joining() const
 	{
 		return get_session_local_state() == _network_session_state_peer_joining;
 	}
@@ -655,25 +645,6 @@ public:
 		}
 
 		return peer_index;
-	}
-
-	bool channel_is_authoritative(int32 network_channel_index) const
-	{
-		bool result = false;
-
-		if ((established() || local_state_joining_session()) && !is_host())
-		{
-			int32 observer_index = m_network_observer->get_observer_index_by_channel_index(m_session_index, network_channel_index);
-			int32 peer_index = get_peer_index_by_observer_index(observer_index);
-
-			if (peer_index != NONE
-				&& is_peer_session_host(peer_index))
-			{
-				result = true;
-			}
-		}
-
-		return result;
 	}
 
 	bool is_session_class_online() const

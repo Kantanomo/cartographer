@@ -1,13 +1,16 @@
 #include "stdafx.h"
 #include "Infection.h"
 
+#include "cache/cache_files.h"
 #include "game/game.h"
 #include "game/game_engine_util.h"
 #include "game/game_time.h"
+#include "game/players.h"
 #include "interface/user_interface_controller.h"
 #include "items/item_collection_definition.h"
 #include "networking/network_event.h"
 #include "scenario/scenario.h"
+#include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
 #include "units/units.h"
 

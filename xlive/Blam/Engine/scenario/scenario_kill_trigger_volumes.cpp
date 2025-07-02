@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "scenario_kill_trigger_volumes.h"
+
 #include "scenario.h"
+#include "scenario_definitions.h"
 
 int32 get_scenario_volume_count() 
 {

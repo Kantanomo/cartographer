@@ -3,7 +3,6 @@
 /* forward declarations */
 
 enum e_user_interface_screen_id : uint32;
-enum e_user_interface_global_sound;
 
 /* prototypes */
 
@@ -21,4 +20,4 @@ void __cdecl user_interface_get_cursor_position(point2d* out_position);
 
 void __cdecl user_interface_get_cursor_position_scaled(point2d* out_position);
 
-void __cdecl user_interface_utilities_play_sound(e_user_interface_global_sound sound_type);
+void __cdecl user_interface_utilities_play_sound(enum e_user_interface_global_sound sound_type);

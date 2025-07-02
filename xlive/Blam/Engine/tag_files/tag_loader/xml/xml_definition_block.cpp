@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "xml_definition_block.h"
 
+#include <tinyxml/tinyxml2.h>
 
+/* public code */
 
 c_xml_definition_block::c_xml_definition_block(tinyxml2::XMLElement* base_element, uint32 offset, uint32 size)
 {

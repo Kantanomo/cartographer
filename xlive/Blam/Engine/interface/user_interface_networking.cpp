@@ -6,6 +6,7 @@
 
 #include "game/player_constants.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "networking/session/network_session.h"
 
 bool* byte_D6840E_get(void)
 {

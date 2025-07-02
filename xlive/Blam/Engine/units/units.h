@@ -5,10 +5,13 @@
 
 /* constants */
 
-#define MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS 2
-#define NUMBER_OF_UNIT_HUD_TYPES 2
-#define k_powered_seats_count 2
-#define MAXIMUM_INITIAL_WEAPONS_PER_UNIT 4
+enum
+{
+	MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS = 2,
+	NUMBER_OF_UNIT_HUD_TYPES = 2,
+	k_powered_seats_count = 2,
+	MAXIMUM_INITIAL_WEAPONS_PER_UNIT = 4
+};
 
 /* enums */
 

@@ -26,6 +26,7 @@
 #include "shell/shell.h"
 #include "simulation/simulation.h"
 #include "structures/cluster_partitions.h"
+#include "structures/structure_bsp_definitions.h"
 #include "tag_files/tag_files.h"
 
 /* constants */

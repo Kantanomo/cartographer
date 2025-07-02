@@ -7,6 +7,7 @@
 #include "models/models.h"
 #include "models/render_model_definitions.h"
 #include "scenario/scenario.h"
+#include "scenario/scenario_definitions.h"
 #include "shaders/shader_definitions.h"
 #include "sound/sound_classes.h"
 #include "structures/structure_bsp_definitions.h"

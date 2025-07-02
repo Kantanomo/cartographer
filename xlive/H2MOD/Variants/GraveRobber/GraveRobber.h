@@ -37,7 +37,13 @@ public:
 	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) override;
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) override;
 	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) override;
-	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat) override;
+
+	// Just return true since the player shouldn't be able to score normally
+	// Only way to score is picking up skulls which is triggered in GraveRobber::PickupSkull
+	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, class c_game_statborg* statborg, datum player_datum, enum e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat) override
+	{
+		return true;
+	}
 
 	GraveRobber() = default;
 	virtual ~GraveRobber() = default;

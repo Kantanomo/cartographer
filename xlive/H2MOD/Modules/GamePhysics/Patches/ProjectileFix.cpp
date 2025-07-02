@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ProjectileFix.h"
 
+#include "cache/cache_files.h"
 #include "game/game_time.h"
 #include "objects/objects.h"
 

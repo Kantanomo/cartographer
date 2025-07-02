@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "render_objects.h"
 
+#include "cache/cache_files.h"
 #include "interface/first_person_weapons.h"
 #include "main/interpolator.h"
 #include "models/models.h"
+#include "models/render_model_definitions.h"
 #include "objects/objects.h"
 #include "objects/object_definition.h"
 

@@ -2,6 +2,7 @@
 #include "GunGame.h"
 
 #include "game/game.h"
+#include "game/game_options.h"
 #include "game/players.h"
 #include "networking/network_event.h"
 #include "units/units.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "animation_definitions.h"
+#include "animation_id.h"
 
 #include "tag_files/string_id.h"
 
@@ -45,7 +45,7 @@ public:
 		void* func,
 		datum object_index);
 	void apply_weighted_node_orientations(real32 a2, real32 ratio, real32 a3, int32 orientation_count, real_orientation* orientation_list, void* func, datum object_index);
-	const c_model_animation* get_state_animation(void);
+	const class c_model_animation* get_state_animation(void);
 	void initialize(void);
 	void reset(void);
 	void set_frame_position(real32 position);

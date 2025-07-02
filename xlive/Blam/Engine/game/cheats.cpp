@@ -7,6 +7,7 @@
 #include "effects/player_effects.h"
 #include "game/game.h"
 #include "game/game_globals.h"
+#include "game/players.h"
 #include "interface/hud_messaging.h"
 #include "math/random_math.h"
 #include "main/console.h"

@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "VariantSystem.h"
 
 #include "GraveRobber/GraveRobber.h"
@@ -98,7 +97,7 @@ bool CustomVariantHandler::VariantEnabled(CustomVariantId variantId)
 	return false;
 }
 
-void CustomVariantHandler::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
+void CustomVariantHandler::OnMapLoad(ExecTime execTime, struct s_game_options* gameOptions)
 {
 	if (GetCurrentGameVariant() != nullptr)
 		GetCurrentGameVariant()->OnMapLoad(execTime, gameOptions);
@@ -124,7 +123,7 @@ bool CustomVariantHandler::OnAutoPickupHandler(ExecTime execTime, datum playerId
 	return false;
 }
 
-bool CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
+bool CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime execTime, class c_game_statborg* statborg, datum player_datum, enum e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
 {
 	if (GetCurrentGameVariant() != nullptr)
 		return GetCurrentGameVariant()->c_game_statborg__adjust_player_stat(execTime, statborg, player_datum, statistic, count, game_results_statistic, adjust_team_stat);

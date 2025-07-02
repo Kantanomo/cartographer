@@ -6,8 +6,6 @@
 #include "interface/user_interface_widget_text_entry.h"
 #include "interface/signal_slot.h"
 
-/* macro defines */
-
 /* enums */
 
 enum e_pregame_pane_type : uint16
@@ -17,8 +15,6 @@ enum e_pregame_pane_type : uint16
 	_pregame_pane_optimatch,
 	k_total_number_of_pregame_pane_types,
 };
-
-/* forward declarations */
 
 /* structures */
 

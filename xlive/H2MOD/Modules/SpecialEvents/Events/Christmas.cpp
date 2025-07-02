@@ -8,6 +8,7 @@
 #include "items/weapon_definitions.h"
 #include "models/models.h"
 #include "scenario/scenario.h"
+#include "scenario/scenario_definitions.h"
 #include "structures/structure_bsp_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "units/biped_definitions.h"

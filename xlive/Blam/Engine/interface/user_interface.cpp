@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "user_interface.h"
 
+#include "user_interface_widget_window.h"
+
 #include "cutscene/cinematics.h"
 #include "game/game.h"
 

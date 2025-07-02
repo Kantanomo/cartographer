@@ -4,6 +4,8 @@
 #include "cartographer/twizzler/twizzler.h"
 #include "memory/bitstream.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "networking/session/network_observer.h"
+#include "networking/session/network_session.h"
 #include "networking/network_event.h"
 
 /* prototypes */

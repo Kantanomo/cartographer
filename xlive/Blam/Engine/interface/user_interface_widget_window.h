@@ -347,19 +347,12 @@ enum e_special_widgets_type
 	k_maximum_number_of_special_widgets = 16
 };
 
-/* forward declarations */
-enum e_user_interface_controller_component : uint32;
-class c_button_widget;
-class c_tab_view_widget;
-class c_player_widget_representation;
-
-
 /* structures */
 
 // todo : need to verify
 struct s_interface_expected_pane
 {
-	c_button_widget** expected_buttons;
+	class c_button_widget** expected_buttons;
 	c_list_widget* expected_list;
 	uint32 buttons_count;
 	bool list_exists;
@@ -369,7 +362,7 @@ ASSERT_STRUCT_SIZE(s_interface_expected_pane, 0x10);
 // todo : need to verify
 struct s_interface_expected_screen_layout
 {
-	c_tab_view_widget* tab_view;
+	class c_tab_view_widget* tab_view;
 	int32 panes_count;
 	int32 field_8;
 	s_interface_expected_pane panes[6];
@@ -412,7 +405,7 @@ public:
 	c_text_widget* get_screen_button_key_text();
 	c_text_widget* try_find_screen_text(uint32 idx);
 	void verify_and_load_from_layout(datum widget_tag, s_interface_expected_screen_layout* expected_layout);
-	void apply_new_representations_to_players(c_player_widget_representation* representations, int32 player_count);
+	void apply_new_representations_to_players(class c_player_widget_representation* representations, int32 player_count);
 	void initialize_button_keys_text(bool add_new_child);
 	void set_list_arrows_widget(c_bitmap_widget* up_arrow, c_bitmap_widget* down_arrow);
 	void* get_screen_definition();
@@ -436,7 +429,7 @@ public:
 	virtual int32 sub_60F1F4(s_event_record* a2);
 	virtual uint8 sub_60EFC1(s_event_record* event);
 	virtual int32 sub_60F081(s_event_record* a2);
-	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
+	virtual enum e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
 	virtual bool sub_40AD53(int32 a2);
 	virtual e_user_interface_channel_type get_channel();
 	virtual e_user_interface_render_window get_render_window();

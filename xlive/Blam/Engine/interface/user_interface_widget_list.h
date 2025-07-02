@@ -4,10 +4,6 @@
 #include "memory/data.h"
 #include "tag_files/string_id.h"
 
-/* forward declarations */
-
-class c_list_item_widget;
-
 /* enums */
 
 enum e_default_list_skin_texts
@@ -86,13 +82,13 @@ protected:
 public:
 	c_list_widget(uint16 user_flags);
 
-	c_list_item_widget* try_find_item_widget(uint32 idx);
+	class c_list_item_widget* try_find_item_widget(uint32 idx);
 	datum get_old_data_index();
-	void update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, const s_item_text_mapping* mapping, int32 total_mappings) const;
-	void update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, const s_custom_item_text_mapping* mapping, int32 total_mappings) const;
+	void update_list_items_from_mapping(class c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, const s_item_text_mapping* mapping, int32 total_mappings) const;
+	void update_list_items_from_mapping(class c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, const s_custom_item_text_mapping* mapping, int32 total_mappings) const;
 	void set_focused_item_index(datum item_index);
 	void remove_focused_item_datum_from_data_array();
-	void remove_item_from_list(c_list_item_widget* item);
+	void remove_item_from_list(class c_list_item_widget* item);
 	void setup_item_indices();
 
 
@@ -111,10 +107,10 @@ public:
 	// c_list_widget additions
 
 	virtual int32 link_item_widgets();
-	virtual c_list_item_widget* get_list_items() = 0;
+	virtual class c_list_item_widget* get_list_items() = 0;
 	virtual int32 get_list_items_count() = 0;
-	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) = 0;
-	virtual bool verify_item_in_focus(c_list_item_widget* item);
+	virtual void update_list_items(class c_list_item_widget* item, int32 skin_index) = 0;
+	virtual bool verify_item_in_focus(class c_list_item_widget* item);
 
 private:
 	template<typename T>

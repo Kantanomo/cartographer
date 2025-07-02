@@ -75,7 +75,7 @@ enum
 	k_maximum_simulation_definition_table_elements_per_scenario = 512,
 };
 
-enum e_scenario_type : short
+enum e_scenario_type : int16
 {
 	scenario_type_singleplayer = 0,
 	scenario_type_multiplayer = 1,

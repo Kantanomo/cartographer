@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "scenario.h"
 
+#include "scenario_definitions.h"
+
 #include "cache/cache_files.h"
 #include "creatures/creature_definitions.h"
 #include "physics/collision_model_definitions.h"

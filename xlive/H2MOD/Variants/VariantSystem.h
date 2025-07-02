@@ -1,6 +1,4 @@
 #pragma once
-#include "game/game_options.h"
-#include "game/game_statborg.h"
 
 enum CustomVariantId
 {
@@ -25,13 +23,13 @@ class IGameEngineEvent
 {
 public:
 	// on map load can be used as Initialize
-	virtual void OnMapLoad(ExecTime execTime, s_game_options* gameOptions) = 0;
+	virtual void OnMapLoad(ExecTime execTime, struct s_game_options* gameOptions) = 0;
 
 	virtual ~IGameEngineEvent() = default;
 	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) = 0;
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) = 0;
 	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) = 0;
-	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat) = 0;
+	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, class c_game_statborg* statborg, datum player_datum, enum e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat) = 0;
 };
 
 class ICustomGameVariant : public IGameEngineEvent
@@ -50,11 +48,11 @@ namespace CustomVariantHandler
 	void GameVarianEnable(const wchar_t* variant);
 	bool ContainsGameVariant(const wchar_t* variant, CustomVariantId variantId);
 
-	void OnMapLoad(ExecTime execTime, s_game_options* gameOptions);
+	void OnMapLoad(ExecTime execTime, struct s_game_options* gameOptions);
 	void OnPlayerSpawn(ExecTime execTime, datum playerIdx);
 	void OnPlayerDeath(ExecTime execTime, datum playerIdx);
 	bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx);
-	bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat);
+	bool c_game_statborg__adjust_player_stat(ExecTime execTime, class c_game_statborg* statborg, datum player_datum, enum e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat);
 	void DisposeGameVariant();
 	bool VariantEnabled(CustomVariantId variantId);
 

@@ -1,10 +1,9 @@
 #pragma once
 #include "interface/user_interface_widget_window.h"
 
-/* forward defines */
-class c_screen_xbox_live_task_progress_dialog;
+/* typedefs */
 
-typedef void (__cdecl* proc_task_cb_t)(c_screen_xbox_live_task_progress_dialog*);
+typedef void (__cdecl* proc_task_cb_t)(class c_screen_xbox_live_task_progress_dialog*);
 
 /* classes */
 
