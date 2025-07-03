@@ -146,5 +146,7 @@ private:
 #pragma pack(pop)
 static_assert(sizeof(c_custom_map_manager) == 0x24444);
 
+void map_repository_apply_sapien_patches(void);
+
 c_custom_map_manager* get_custom_map_manager();
 const wchar_t* get_custom_map_folder_path();

@@ -1,75 +1,37 @@
 #include "stdafx.h"
 #include "Memory.h"
 
-enum H2Type : int
-{
-	Invalid = -1,
-	UnsupportedVersion,
-	H2Game,
-	H2Server,
-};
+/* structures */
 
 struct ProcessInfo
 {
 	HMODULE base;
-	H2Type process_type;
+	e_h2_type process_type;
 };
+
+/* constants */
+
+static const wchar_t k_supported_h2_game_version[] = L"1.00.00.11122";
+static const wchar_t k_supported_h2_tool_version[] = L"1, 0, 0, 1";
+
+/* globals */
 
 uintptr_t Memory::baseAddress;
 bool Memory::g_memory_is_dedicated_server;
 
 ProcessInfo game_info;
 
-H2Type DetectProcessType()
-{
-	H2Type h2TypeResult = H2Type::Invalid;
+/* prototypes */
 
-	// update 5/3/2022:
-	// this now verifies game version as well, therefore the code below had to be commented out
+static e_h2_type detect_process_type(void);
 
-	// try and detect type based on module name.
-	/*if (GetModuleHandleW(L"halo2.exe"))
-		return H2Type::H2Game;
-	else if (GetModuleHandleW(L"h2server.exe"))
-		return H2Type::H2Server;*/
-
-	// fallback to checking file information in case the file was renamed.
-	wchar_t exe_file_path[_MAX_PATH + 1];
-	int result = GetModuleFileNameW(NULL, exe_file_path, ARRAYSIZE(exe_file_path));
-	if (result <= _MAX_PATH && GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
-		DWORD version_info_size = GetFileVersionInfoSizeW(exe_file_path, NULL);
-		if (version_info_size != 0) {
-			BYTE* version_info = new BYTE[version_info_size];
-			if (GetFileVersionInfoW(exe_file_path, NULL, version_info_size, version_info)) {
-				const wchar_t* orginal_filename;
-				const wchar_t* original_product_version;
-				size_t filename_len, product_version_len;
-				// shouldn't be hardcoded but who cares
-				VerQueryValueW(version_info, L"\\StringFileInfo\\040904b0\\OriginalFilename", (LPVOID*)&orginal_filename, &filename_len);
-				VerQueryValueW(version_info, L"\\StringFileInfo\\040904b0\\ProductVersion", (LPVOID*)&original_product_version, &product_version_len);
-
-				std::wstring exe_orginal_filename = orginal_filename;
-				std::wstring exe_product_version = original_product_version;
-				delete[] version_info;
-
-				if (exe_orginal_filename == L"Halo2.exe")
-					h2TypeResult = H2Type::H2Game;
-				else if (exe_orginal_filename == L"h2server.exe")
-					h2TypeResult = H2Type::H2Server;
-
-				if (exe_product_version != L"1.00.00.11122")
-					h2TypeResult = H2Type::UnsupportedVersion;
-			}
-		}
-	}
-	return h2TypeResult;
-}
+/* public code */
 
 // TODO maybe this is not the best place to keep this
-void Memory::Initialize()
+e_h2_type Memory::Initialize(void)
 {
 	game_info.base = GetModuleHandle(NULL);
-	game_info.process_type = DetectProcessType();
+	game_info.process_type = detect_process_type();
 
 	static const char* unsupported_game_version_error =
 		"Project Cartographer loaded into unsupported game version, will now exit!";
@@ -79,23 +41,92 @@ void Memory::Initialize()
 
 	switch (game_info.process_type)
 	{
-	case H2Type::Invalid:
+	case _h2_type_none:
 		MessageBoxA(NULL, "Project Cartographer loaded into unsupported process, will now exit!", "ERROR!", MB_ICONERROR);
 		TerminateProcess(GetCurrentProcess(), 1);
 		break;
-	case H2Type::UnsupportedVersion:
+	case _h2_type_unsupported:
 		MessageBoxA(NULL, unsupported_game_version_error, "ERROR!", MB_ICONERROR);
 		MessageBoxA(NULL, unsupported_game_version_error_help, "", MB_ICONINFORMATION);
 		TerminateProcess(GetCurrentProcess(), 1);
 		break;
-	case H2Type::H2Game:
+	case _h2_type_game:
 		Memory::SetBaseAddress((DWORD)game_info.base, false);
 		break;
-	case H2Type::H2Server:
+	case _h2_type_server:
 		Memory::SetBaseAddress((DWORD)game_info.base, true);
+		break;
+	case _h2_type_ek_sapien:
+	case _h2_type_ek_tool:
+	case _h2_type_ek_guerilla:
+		Memory::SetBaseAddress((DWORD)game_info.base, false);
 		break;
 	default:
 		unreachable();
 		break;
 	}
+
+	return game_info.process_type;
+}
+
+static e_h2_type detect_process_type(void)
+{
+	e_h2_type result = _h2_type_none;
+
+	// fallback to checking file information in case the file was renamed.
+	wchar_t exe_file_path[_MAX_PATH + 1];
+	int filename_result = GetModuleFileNameW(NULL, exe_file_path, ARRAYSIZE(exe_file_path));
+
+	if (filename_result <= _MAX_PATH && GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+	{
+		DWORD version_info_size = GetFileVersionInfoSizeW(exe_file_path, NULL);
+		if (version_info_size != 0)
+		{
+			BYTE* version_info = (BYTE*)malloc(version_info_size);
+			if (version_info != NULL && GetFileVersionInfoW(exe_file_path, NULL, version_info_size, version_info))
+			{
+				const wchar_t* orginal_filename;
+				const wchar_t* original_product_version;
+				size_t filename_len;
+				size_t product_version_len;
+
+				VerQueryValueW(version_info, L"\\StringFileInfo\\040904b0\\OriginalFilename", (LPVOID*)&orginal_filename, &filename_len);
+				VerQueryValueW(version_info, L"\\StringFileInfo\\040904b0\\ProductVersion", (LPVOID*)&original_product_version, &product_version_len);
+
+				// Check filename
+				if (!ustrnicmp(orginal_filename, L"Halo2.exe", filename_len))
+				{
+					result = _h2_type_game;
+				}
+				else if (!ustrnicmp(orginal_filename, L"h2server.exe", filename_len))
+				{
+					result = _h2_type_server;
+				}
+				else if (!ustrnicmp(orginal_filename, L"treelistview.exe", filename_len))
+				{
+					result = _h2_type_ek_sapien;
+				}
+				else if (!ustrnicmp(orginal_filename, L"tool.exe", filename_len))
+				{
+					result = _h2_type_ek_tool;
+				}
+				else if (!ustrnicmp(orginal_filename, L"guerilla.exe", filename_len))
+				{
+					result = _h2_type_ek_guerilla;
+				}
+
+
+				// Check version
+				if (
+					ustrnicmp(original_product_version, k_supported_h2_game_version, product_version_len) &&
+					ustrnicmp(original_product_version, k_supported_h2_tool_version, product_version_len))
+				{
+					result = _h2_type_unsupported;
+				}
+
+				free(version_info);
+			}
+		}
+	}
+	return result;
 }

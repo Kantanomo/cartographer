@@ -22,6 +22,12 @@ static void __cdecl close_cache_header(HANDLE* map_handle);
 static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry);
 
 
+void map_repository_apply_sapien_patches(void)
+{
+	NopFill(Memory::GetAddress(0x31FB3E), 52);	// Prevent "m_map_count < k_maximum_number_of_multiplayer_maps" assert from triggering
+	return;
+}
+
 #pragma region 50 map limit removal
 
 // TODO: consider replacing this implementation with a linked list
