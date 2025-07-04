@@ -69,10 +69,10 @@ protected:
 	int16 m_controllers_mask;
 	int16 m_block_index;
 	int32 m_hierarchy_order;
-	c_user_interface_widget* parent_widget;
+	c_user_interface_widget* m_parent_widget;
 	c_user_interface_widget* m_child_widget;
-	c_user_interface_widget* next_widget;
-	c_user_interface_widget* previous_widget;
+	c_user_interface_widget* m_next_widget;
+	c_user_interface_widget* m_previous_widget;
 	rectangle2d m_bounds;
 	real_rgb_color m_widget_color;
 	s_animation_transform m_current_animation;

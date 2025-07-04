@@ -848,13 +848,14 @@ void sign_in_xbox_task_progress_cb(c_screen_xbox_live_task_progress_dialog* dial
 					SaveH2Config();
 					g_force_cartographer_update = false;
 					ui_load_cartographer_update_notice_menu();
-					return;
 				}
-				ImGuiHandler::ToggleWindow(k_motd_window_name);
-				// extern int notify_xlive_ui;
-				// notify_xlive_ui = 0;
-				// sub_248beb_nak_deconstructor_Login_Warn();
-				// GSCustomMenuCall_Login_Warn();
+				else
+				{
+					ImGuiHandler::ToggleWindow(k_motd_window_name);
+					/*extern int notify_xlive_ui;
+					notify_xlive_ui = 0;
+					XUserSignInSetStatusChanged(0);*/
+				}
 				return;
 			}
 		}

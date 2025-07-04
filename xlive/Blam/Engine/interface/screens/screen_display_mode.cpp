@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "screen_display_mode.h"
 #include "screen_confirm_resolution.h"
 
@@ -132,26 +132,22 @@ void c_display_mode_edit_list::handle_item_pressed_event(s_event_record** pevent
 
 		s_screen_parameters params;
 		params.m_flags = 0;
-		params.m_window_index = _window_4;
+		params.m_window_index = get_parent_render_window();
 		params.m_context = 0;
 		params.m_user_flags = FLAG((*pevent)->controller);
-		params.m_channel_type = _user_interface_channel_type_dialog;
+		params.m_channel_type = get_parent_channel();
 		params.m_screen_state.field_0 = NONE;
 		params.m_screen_state.m_last_focused_item_order = NONE;
 		params.m_screen_state.m_last_focused_item_index = NONE;
-		params.m_load_function = &c_screen_confirm_resolution::load; 
-
+		params.m_load_function = &c_screen_confirm_resolution::load;
 
 		if (params.m_load_function != nullptr)
 			params.m_load_function(&params);
-
 	}
 	else
 	{
 		screen_error_ok_dialog_show(_user_interface_channel_type_game_error, _ui_error_no_fullscreen_res, _window_4, NONE, nullptr, nullptr);
 	}
-
-	user_interface_back_out_from_channel(this->get_parent_channel(), this->get_parent_render_window());
 }
 
 

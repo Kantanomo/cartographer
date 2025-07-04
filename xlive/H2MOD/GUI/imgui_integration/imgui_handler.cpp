@@ -73,22 +73,6 @@ namespace ImGuiHandler
 	{
 		handle_window_input = state;
 	}
-	bool CanDrawImgui()
-	{
-		// TODO add these to some container
-		if (g_network_stats_overlay == _network_stats_display_complete)
-			return true;
-
-		for (int8 i = 0; i < k_imgui_window_type_count; ++i)
-		{
-			if (g_imgui_window_should_render.test(i))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
 	void SetGameInputState(bool enable)
 	{
 		// ### TODO move this function somewhere else
@@ -97,10 +81,6 @@ namespace ImGuiHandler
 
 	void DrawImgui()
 	{
-		if (!ImGuiHandler::CanDrawImgui() && 
-			!last_frame_update)
-			return;
-
 		// clear keyboard/mouse input state if we are about to close the ImGui windows
 		if (last_frame_update)
 		{
