@@ -16,6 +16,13 @@
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 
+#include "imgui.h"
+#include "backends/imgui_impl_dx9.h"
+#include "backends/imgui_impl_win32.h"
+
+/* prototypes */
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 /* constants */
 
 enum
@@ -431,6 +438,11 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	bool* shell_window_proc_game_message_during_map_load = Memory::GetAddress<bool*>(0x46DAD8);
 	WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
 
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+	{
+		return 1;
+	}
+
 	LRESULT result = 1;
 
 	bool exec_base_wndproc = true;
@@ -444,19 +456,29 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		g_custom_mouse_cursor_enabled = true;
 		break;
 	case WM_SETCURSOR:
-		if (GetCursor() == NULL)
+		// check if the cursor is actually in client area
+		if (LOWORD(lParam) == HTCLIENT)
 		{
-			g_custom_mouse_cursor_enabled = false;
-		}
-		exec_base_wndproc = false;
-		if (*window_in_focus && *shell_window_proc_game_message_during_map_load)
-		{
-			shell_disable_cursor();
+			if (GetCursor() == NULL)
+			{
+				g_custom_mouse_cursor_enabled = false;
+			}
+			exec_base_wndproc = false;
+			if (*window_in_focus && *shell_window_proc_game_message_during_map_load)
+			{
+				shell_disable_cursor();
+			}
+			else
+			{
+				shell_enable_cursor();
+			}
 		}
 		else
 		{
-			shell_enable_cursor();
+			exec_base_wndproc = false;
+			g_custom_mouse_cursor_enabled = false;
 		}
+
 		break;
 	}
 
