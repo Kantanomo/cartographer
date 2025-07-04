@@ -309,11 +309,11 @@ enum e_user_interface_channel_type
 
 enum e_user_interface_render_window
 {
-	_window_0 = 0x0,
-	_window_1 = 0x1,
-	_window_2 = 0x2,
-	_window_3 = 0x3,
-	_window_4 = 0x4,
+	_window_0,
+	_window_1,
+	_window_2,
+	_window_3,
+	_window_4,
 
 	k_number_of_render_windows = 4
 };

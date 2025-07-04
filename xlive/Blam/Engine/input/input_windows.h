@@ -171,7 +171,7 @@ void __cdecl input_initialize();
 void __cdecl input_dispose();
 void __cdecl input_update();
 void __cdecl input_update_gamepads(uint32 duration_ms);
-void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms);
+//void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms);
 bool __cdecl input_has_gamepad(uint16 gamepad_index, bool* a2);
 bool __cdecl input_has_gamepad_plugged(uint16 gamepad_index);
 bool __cdecl input_gamepad_just_left(uint16 gamepad_index);

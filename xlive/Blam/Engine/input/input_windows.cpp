@@ -121,10 +121,12 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 	TEST_N_DEF(PC1);
 }
 
-void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms)
-{
-	INVOKE(0x2E60C, 0x0, input_update_mouse, mouse_state, duration_ms);
-}
+// ### passes param through ECX
+// ### THIS IS DEFINITELY NOT CDECL, nor thiscall, as the callee doesn't clear stack 
+//void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms)
+//{
+//	INVOKE(0x2E60C, 0x0, input_update_mouse, mouse_state, duration_ms);
+//}
 
 bool __cdecl input_has_gamepad(uint16 gamepad_index, bool* a2)
 {

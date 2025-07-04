@@ -17,10 +17,10 @@ c_user_interface_widget::c_user_interface_widget(e_user_interface_widget_type wi
 	//this->interface_widget_vtable = &c_user_interface_widget::`vftable';
 	this->m_block_index = NONE;
 	this->m_hierarchy_order = NONE;
-	this->parent_widget = nullptr;
+	this->m_parent_widget = nullptr;
 	this->m_child_widget = nullptr;
-	this->next_widget = nullptr;
-	this->previous_widget = nullptr;
+	this->m_next_widget = nullptr;
+	this->m_previous_widget = nullptr;
 	this->m_animation_index = NONE;
 	this->m_render_dept_bias = 0;
 	this->m_allocated = false;
@@ -78,17 +78,17 @@ e_user_interface_widget_type c_user_interface_widget::get_type() const
 
 c_user_interface_widget* c_user_interface_widget::get_next() const
 {
-	return this->next_widget;
+	return this->m_next_widget;
 }
 
 c_user_interface_widget* c_user_interface_widget::get_previous() const
 {
-	return this->previous_widget;
+	return this->m_previous_widget;
 }
 
 c_user_interface_widget* c_user_interface_widget::get_parent() const
 {
-	return this->parent_widget;
+	return this->m_parent_widget;
 }
 
 c_user_interface_widget* c_user_interface_widget::get_children() const
