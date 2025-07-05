@@ -3,13 +3,32 @@
 #include "cseries/cseries.h"
 #include "cseries/cseries_windows.h"
 
-#define BASE_IMAGE_ADDRESS_HALO2 0x00400000
-#define BASE_IMAGE_ADDRESS_H2SERVER 0x00400000
+/* constants */
+
+enum
+{
+	k_base_image_address_halo2 = 0x00400000,
+	k_base_image_address_h2server = 0x00400000,
+};
+
+/* enums */
+
+enum e_h2_type
+{
+	_h2_type_none = NONE,
+	_h2_type_unsupported,
+	_h2_type_game,
+	_h2_type_server,
+
+	_h2_type_ek_sapien,
+	_h2_type_ek_tool,
+	_h2_type_ek_guerilla
+};
 
 class Memory
 {
 public:
-	static void Initialize();
+	static e_h2_type Initialize(void);
 
 	static uintptr_t GetAddress()
 	{
@@ -45,13 +64,13 @@ public:
 
 	static uintptr_t GetAddressRelative(uintptr_t client, uintptr_t server = 0)
 	{
-		return GetAddress(client - BASE_IMAGE_ADDRESS_HALO2, server - BASE_IMAGE_ADDRESS_H2SERVER);
+		return GetAddress(client - k_base_image_address_halo2, server - k_base_image_address_h2server);
 	}
 
 	template <typename T = void*>
 	static T GetAddressRelative(uintptr_t client, uintptr_t server = 0)
 	{
-		return reinterpret_cast<T>((uintptr_t)GetAddress(client - BASE_IMAGE_ADDRESS_HALO2, server - BASE_IMAGE_ADDRESS_H2SERVER));
+		return reinterpret_cast<T>((uintptr_t)GetAddress(client - k_base_image_address_halo2, server - k_base_image_address_h2server));
 	}
 
 	static void SetBaseAddress(uintptr_t base, bool isDedicatedServer)

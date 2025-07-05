@@ -7,6 +7,7 @@
 
 #include "cseries/cseries_windows_debug_pc.h"
 #include "kablam/kablam.h"
+#include "sapien/patches_initialize.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
@@ -51,6 +52,10 @@ wchar_t g_h2_appdata_local_path[MAX_PATH];
 CRITICAL_SECTION log_section;
 
 static void startup_force_working_directory_to_process_directory(void);
+
+static void startup_init_h2_game(void);
+
+static void startup_init_h2_tools(e_h2_type type);
 
 void PostH2Config() {
 
@@ -151,27 +156,24 @@ void InitH2Startup()
 
 	DETOUR_BEGIN();
 	cseries_windows_debug_initialize();
-	Memory::Initialize();
-
-	shell_windows_initialize();
-	shell_apply_patches();
-	shell_windows_apply_patches();
-
-	startup_force_working_directory_to_process_directory();
-
-	DETOUR_COMMIT();	
 	
-	InitLocalAppData();
+	const e_h2_type type = Memory::Initialize();
 
-	// initialize curl
-	curl_global_init(CURL_GLOBAL_ALL);
-	atexit([] { curl_global_cleanup(); });
+	if (type == _h2_type_game ||
+		type == _h2_type_server)
+	{
+		startup_init_h2_game();
+	}
+	else if (
+		type == _h2_type_ek_sapien ||
+		type == _h2_type_ek_tool ||
+		type == _h2_type_ek_guerilla)
+	{
+		DETOUR_COMMIT();
+		startup_init_h2_tools(type);
+	}
 
-	addDebugText(shell_is_dedicated_server() ? "Process is Dedi-Server" : "Process is Client");
-
-	H2MOD::Initialize();
-
-	addDebugText("ProcessStartup finished.");
+	return;
 }
 
 ///After the game window appears
@@ -234,5 +236,46 @@ static void startup_force_working_directory_to_process_directory(void)
 
 	// Force the current working directory to the one where halo2.exe is located
 	SetCurrentDirectoryW(g_h2_process_file_path);
+	return;
+}
+
+static void startup_init_h2_game(void)
+{
+	shell_windows_initialize();
+	shell_apply_patches();
+	shell_windows_apply_patches();
+
+	startup_force_working_directory_to_process_directory();
+
+	DETOUR_COMMIT();
+
+	InitLocalAppData();
+
+	// initialize curl
+	curl_global_init(CURL_GLOBAL_ALL);
+	atexit([] { curl_global_cleanup(); });
+
+	addDebugText(shell_is_dedicated_server() ? "Process is Dedi-Server" : "Process is Client");
+
+	H2MOD::Initialize();
+
+	addDebugText("ProcessStartup finished.");
+	return;
+}
+
+static void startup_init_h2_tools(e_h2_type type)
+{
+	switch (type)
+	{
+	case _h2_type_ek_sapien:
+		sapien_apply_patches();
+		break;
+	case _h2_type_ek_tool:
+		break;
+	case _h2_type_ek_guerilla:
+		break;
+	default:
+		unreachable();
+	}
 	return;
 }
