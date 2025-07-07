@@ -12,11 +12,11 @@
 #include "simulation/game_interface/simulation_game_action.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_queue_global_events.h"
+#include "units/bipeds.h"
 #include "units/units.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-#include "units/bipeds.h"
 
 
 /* globals */
@@ -31,153 +31,26 @@ uint8 g_user_weapon_interactions_mask = UINT8_MAX;
 	- If you need to do something in the pregame lobby, use the functions available in Network Session (Blam/networking/session)
 */
 
-data_array* s_player::get_data()
+data_array* player_data_get()
 {
 	return *Memory::GetAddress<data_array**>(0x4A8260, 0x4D64C4);
 }
 
-bool s_player::is_index_valid(datum player_index)
-{
-	int32 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
-	return player_abs_index >= 0 && player_abs_index < k_maximum_players;
-}
-
-e_game_team s_player::get_team(datum player_index)
-{
-	if (!is_index_valid(player_index))
-	{
-		return _game_team_observer;
-	}
-
-	const s_player* player = (s_player*)datum_get(get_data(), player_index);
-	return (e_game_team)player->properties[0].team_index;
-}
-
-s_player* s_player::get_from_unit_index(datum unit_index)
-{
-	s_player* result = NULL;
-	c_player_in_game_iterator iterator;
-	
-	while (iterator.next())
-	{
-		s_player* player = iterator.get_datum();
-		if (unit_index == player->unit_index)
-		{
-			result = player;
-			break;
-		}
-	}
-
-	return result;
-}
-
-void s_player::set_team(datum player_index, e_game_team team)
-{
-	if (!is_index_valid(player_index))
-	{
-		return;
-	}
-	s_player* player = (s_player*)datum_get(get_data(), player_index);
-	player->properties[0].team_index = (int8)team;
-}
-
-void s_player::set_unit_character_type(datum player_index, e_character_type character_type)
-{
-	if (!is_index_valid(player_index))
-	{
-		return;
-	}
-	s_player* player = (s_player*)datum_get(get_data(), player_index);
-
-	player->properties[0].profile_traits.profile.player_character_type = character_type;
-	// shouldn't be needed
-	//player->properties[1].profile_traits.profile.player_character_type = character_type;
-	return;
-}
-
-void s_player::set_unit_speed(datum player_index, float speed)
-{
-	if (!is_index_valid(player_index))
-	{
-		return;
-	}
-
-	s_player* player = (s_player*)datum_get(get_data(), player_index);
-	player->unit_speed = speed;
-	return;
-}
-
-const wchar_t* s_player::get_name(datum player_index)
-{
-	if (!is_index_valid(player_index))
-	{
-		return L"";
-	}
-
-	const s_player* player = (s_player*)datum_get(get_data(), player_index);
-	return player->properties[0].player_name;
-}
-
-datum s_player::get_unit_index(datum player_index)
-{
-	if (!is_index_valid(player_index)) 
-	{
-		return NONE;
-	}
-
-	const s_player* player = (s_player*)datum_get(get_data(), player_index);
-	return player->unit_index;
-}
-
-// TODO: remove this
-void s_player::set_player_unit_grenade_count(datum player_index, int16 type, int8 count, bool reset_equipment)
-{
-	int32 abs_player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
-	datum unit_datum_index = s_player::get_unit_index(player_index);
-	unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_datum_index, _object_mask_biped);
-
-	// send simulation update for grenades if we control the simulation
-	if (unit != NULL && !game_is_predicted())
-	{
-		// delete all weapons if required
-		if (reset_equipment)
-		{
-			unit_delete_all_weapons(unit_datum_index);
-		}
-
-		unit->unit.grenade_counts[type] = count;
-		simulation_action_object_update(unit_datum_index, FLAG(_simulation_action_update_grenade_count_bit));
-
-		LOG_TRACE_GAME("set_player_unit_grenade_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", abs_player_index, NetworkSession::GetPeerIndex(abs_player_index));
-	}
-}
-
-uint64 s_player::get_id(datum player_index)
-{
-	if (!is_index_valid(player_index))
-	{
-		return 0ull;
-	}
-
-	const s_player* player = (s_player*)datum_get(get_data(), player_index);
-	return player->identifier;
-}
-
 c_player_in_game_iterator::c_player_in_game_iterator(void)
 {
-	iterator_new(&m_data_iterator, s_player::get_data());
+	iterator_new(&m_data_iterator, player_data_get());
 	return;
 }
 
 c_player_with_unit_iterator::c_player_with_unit_iterator(void)
 {
-	iterator_new(&m_data_iterator, s_player::get_data());
+	iterator_new(&m_data_iterator, player_data_get());
 	return;
 }
 
 bool c_player_in_game_iterator::next(void)
 {
-	m_current_player = (s_player*)iterator_next(&m_data_iterator);
+	m_current_player = (player_datum*)iterator_next(&m_data_iterator);
 
 	while (m_current_player)
 	{
@@ -186,13 +59,13 @@ bool c_player_in_game_iterator::next(void)
 			break;
 		}
 
-		m_current_player = (s_player*)iterator_next(&m_data_iterator);
+		m_current_player = (player_datum*)iterator_next(&m_data_iterator);
 	}
 
 	return m_current_player != nullptr;
 }
 
-s_player* c_player_in_game_iterator::get_datum(void) const
+player_datum* c_player_in_game_iterator::get_datum(void) const
 {
 	return m_current_player;
 }
@@ -209,7 +82,7 @@ int32 c_player_in_game_iterator::get_absolute_index(void) const
 
 bool c_player_with_unit_iterator::next(void)
 {
-	m_current_player = (s_player*)iterator_next(&m_data_iterator);
+	m_current_player = (player_datum*)iterator_next(&m_data_iterator);
 
 	while (m_current_player)
 	{
@@ -218,13 +91,13 @@ bool c_player_with_unit_iterator::next(void)
 			break;
 		}
 
-		m_current_player = (s_player*)iterator_next(&m_data_iterator);
+		m_current_player = (player_datum*)iterator_next(&m_data_iterator);
 	}
 
 	return m_current_player != nullptr;
 }
 
-s_player* c_player_with_unit_iterator::get_datum(void) const
+player_datum* c_player_with_unit_iterator::get_datum(void) const
 {
 	return m_current_player;
 }
@@ -239,7 +112,7 @@ int32 c_player_with_unit_iterator::get_absolute_index(void) const
 	return m_data_iterator.absolute_index;
 }
 
-s_players_globals* get_players_globals()
+s_players_globals* get_players_globals(void)
 {
 	return *Memory::GetAddress<s_players_globals**>(0x4A825C, 0x4D64C0);
 }
@@ -455,9 +328,9 @@ void __cdecl players_update_activation(void)
 	if (!game_is_predicted())
 	{
 		data_iterator iterator;
-		iterator_new(&iterator, s_player::get_data());
+		iterator_new(&iterator, player_data_get());
 
-		s_player* player = (s_player*)iterator_next(&iterator);
+		player_datum* player = (player_datum*)iterator_next(&iterator);
 		while (player)
 		{
 			if (!TEST_BIT(player->flags, _player_left_game_bit))
@@ -496,7 +369,7 @@ void __cdecl players_update_activation(void)
 				}
 			}
 
-			player = (s_player*)iterator_next(&iterator);
+			player = (player_datum*)iterator_next(&iterator);
 		}
 	}
 	return;
@@ -547,9 +420,9 @@ void player_user_weapon_interaction_reset(void)
 	return;
 }
 
-void player_examine_nearby_weapon(datum weapon_datum, datum player_datum, s_player_interaction_context* out_action_context)
+void player_examine_nearby_weapon(datum weapon_datum, datum player_index, s_player_interaction_context* out_action_context)
 {
-	const s_player* player = (const s_player*)datum_get(s_player::get_data(), player_datum);
+	const player_datum* player = (const player_datum*)datum_get(player_data_get(), player_index);
 
 	if (player->user_index != NONE)
 		if (!TEST_BIT(g_user_weapon_interactions_mask, player->user_index))
@@ -559,7 +432,7 @@ void player_examine_nearby_weapon(datum weapon_datum, datum player_datum, s_play
 	__asm
 	{
 		push weapon_datum
-		push player_datum
+		push player_index
 		mov eax, out_action_context
 
 		call player_examine_nearby_weapon_usercall
@@ -583,9 +456,9 @@ void __cdecl player_examine_nearby_control(datum control_datum, datum player_dat
 	}
 }
 
-void __cdecl player_find_action_context(datum player_datum, s_player_interaction_context* out_action_context)
+void __cdecl player_find_action_context(datum player_index, s_player_interaction_context* out_action_context)
 {
-	const s_player* player = (const s_player*)datum_get(s_player::get_data(), player_datum);
+	const player_datum* player = (const player_datum*)datum_get(player_data_get(), player_index);
 
 	ASSERT(out_action_context);
 
@@ -660,16 +533,16 @@ void __cdecl player_find_action_context(datum player_datum, s_player_interaction
 							switch (type)
 							{
 							case _object_type_biped:
-								player_examine_nearby_biped(nearby_object_index, player_datum, out_action_context);
+								player_examine_nearby_biped(nearby_object_index, player_index, out_action_context);
 								break;
 							case _object_type_vehicle:
-								player_examine_nearby_vehicle(nearby_object_index, player_datum, out_action_context);
+								player_examine_nearby_vehicle(nearby_object_index, player_index, out_action_context);
 								break;
 							case _object_type_weapon:
-								player_examine_nearby_weapon(nearby_object_index, player_datum, out_action_context);
+								player_examine_nearby_weapon(nearby_object_index, player_index, out_action_context);
 								break;
 							case _object_type_control:
-								player_examine_nearby_control(nearby_object_index, player_datum, out_action_context);
+								player_examine_nearby_control(nearby_object_index, player_index, out_action_context);
 								break;
 							default:
 							{

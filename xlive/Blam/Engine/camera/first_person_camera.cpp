@@ -104,7 +104,7 @@ static void __cdecl first_person_camera_update(int8* camera, s_director_update* 
 	if (players_user_is_active(director_update->user_index))
 	{
 		const datum player_index = player_index_from_user_index(director_update->user_index);
-		player_unit_index = ((s_player*)datum_get(s_player::get_data(), player_index))->unit_index;
+		player_unit_index = ((player_datum*)datum_get(player_data_get(), player_index))->unit_index;
 	}
 
 	real_vector3d unit_facing;

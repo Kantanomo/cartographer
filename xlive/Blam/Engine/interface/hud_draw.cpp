@@ -15,7 +15,7 @@
 
 void hud_render_player_indicator(datum player_index)
 {
-	const s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
+	const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 	
 	// Get head position and offset it to get the indicator position
 	real_point3d head_position;

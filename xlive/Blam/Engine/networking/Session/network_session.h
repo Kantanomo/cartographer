@@ -111,15 +111,13 @@ namespace NetworkSession
 	/* Use this to verify if a player is currently active in the network session */
 	/* Otherwise you will wonder why you don't get the right data/player index etc. */
 	bool PlayerIsActive(datum player_index);
-	std::vector<uint64> GetActivePlayerIdList();
 	std::vector<int32> GetActivePlayerIndicesList();
 
 	int32 GetPlayerCount();
 	const wchar_t* GetPlayerName(datum player_index);
-	uint64 GetPlayerId(datum player_index);
+	s_player_identifier GetPlayerId(datum player_index);
 
 	int8 GetPlayerTeam(datum player_index);
-	int32 GetPeerIndexFromId(uint64 xuid);
 
 	wchar_t* GetGameVariantName();
 
@@ -256,7 +254,7 @@ ASSERT_STRUCT_SIZE(s_membership_peer, 268);
 
 struct s_membership_player
 {
-	uint64 identifier; // -0xA
+	s_player_identifier identifier; // -0xA
 	int32 peer_index; // -0x8
 	int32 peer_user_index; // -0x4
 	WORD player_flags; // 0x0
@@ -470,7 +468,7 @@ public:
 		return m_session_membership.player_count;
 	}
 
-	uint64 get_player_id(datum player_index)
+	s_player_identifier get_player_id(datum player_index)
 	{
 		return get_player_membership(player_index)->identifier;
 	}

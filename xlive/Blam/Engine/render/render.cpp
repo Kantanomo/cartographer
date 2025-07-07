@@ -280,7 +280,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
 	e_controller_index controller_index = k_no_controller;
 	if (window->user_index != NONE)
 	{
-		controller_index = ((s_player*)datum_get(s_player::get_data(), player_index_from_user_index(window->user_index)))->controller_index;
+		controller_index = ((player_datum*)datum_get(player_data_get(), player_index_from_user_index(window->user_index)))->controller_index;
 		render_screen_flash(window->user_index, &screen_flash);
 	}
 

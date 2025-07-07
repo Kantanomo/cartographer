@@ -1,5 +1,4 @@
 #pragma once
-#include "game_allegiance.h"
 #include "player_constants.h"
 
 #include "input/controllers.h"
@@ -15,11 +14,11 @@ enum e_player_flags : int16
 };
 
 #pragma pack(push, 1)
-struct s_player
+struct player_datum
 {
 	uint16 datum_salt;
 	uint16 flags;
-	uint64 identifier;
+	s_player_identifier identifier;
 	int32 player_creation_tick;
 	s_machine_identifier machine_identifier;
 	int16 machine_index;
@@ -64,25 +63,8 @@ struct s_player
 	int16 random_index;
 	int8 gap_1FE[2];
 	int32 is_chatting;
-
-	/*
-	- TO NOTE: 
-	- These functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (Blam/Engine/networking/session)
-	*/
-
-	static data_array* get_data();
-	static bool is_index_valid(datum player_index);
-	static e_game_team get_team(datum player_index);
-	static s_player* get_from_unit_index(datum unit_index);
-	static void set_team(datum player_index, e_game_team team);
-	static void set_unit_character_type(datum player_index, e_character_type character_type);
-	static void set_player_unit_grenade_count(datum player_index, int16 type, int8 count, bool reset_equipment);
-	static void set_unit_speed(datum player_index, float speed);
-	static const wchar_t* get_name(datum player_index);
-	static datum get_unit_index(datum player_index);
-	static uint64 get_id(datum player_index);
 };
-ASSERT_STRUCT_SIZE(s_player, 516);
+ASSERT_STRUCT_SIZE(player_datum, 516);
 #pragma pack(pop)
 
 class c_player_in_game_iterator 
@@ -91,12 +73,12 @@ public:
 	c_player_in_game_iterator(void);
 	
 	bool next(void);
-	s_player* get_datum(void) const;
+	player_datum* get_datum(void) const;
 	datum get_index(void) const;
 	int32 get_absolute_index(void) const;
 
 private:
-	s_player* m_current_player;
+	player_datum* m_current_player;
 	data_iterator m_data_iterator;
 };
 
@@ -106,12 +88,12 @@ public:
 	c_player_with_unit_iterator(void);
 
 	bool next(void);
-	s_player* get_datum(void) const;
+	player_datum* get_datum(void) const;
 	datum get_index(void) const;
 	int32 get_absolute_index(void) const;
 
 private:
-	s_player* m_current_player;
+	player_datum* m_current_player;
 	data_iterator m_data_iterator;
 };
 
@@ -144,7 +126,9 @@ struct s_players_globals
 };
 ASSERT_STRUCT_SIZE(s_players_globals, 312);
 
-s_players_globals* get_players_globals();
+s_players_globals* get_players_globals(void);
+
+data_array* player_data_get(void);
 
 datum __cdecl player_index_from_user_index(int32 user_index);
 

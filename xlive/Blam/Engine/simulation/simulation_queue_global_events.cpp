@@ -130,7 +130,7 @@ void simulation_queue_player_event_apply(const s_simulation_queue_element* eleme
 	if (!stream.error_occured())
 	{
 		datum player_index = player_index_from_absolute_player_index(abs_player_index);
-		s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
+		player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 		if (TEST_BIT(player->flags, 0) != active)
 		{
 			SET_FLAG(player->flags, 0, active);

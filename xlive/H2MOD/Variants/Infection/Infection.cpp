@@ -9,6 +9,7 @@
 #include "interface/user_interface_controller.h"
 #include "items/item_collection_definition.h"
 #include "networking/network_event.h"
+#include "networking/network_game_definitions.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
@@ -20,10 +21,22 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "interface/new_hud_draw.h"
 
-std::vector<uint64> Infection::zombieIdentifiers;
+static std::vector<uint64> zombieIdentifiers;
+
+/* constants */
+
+enum
+{
+	k_use_flood_zombies = true,
+};
 
 #define k_humans_team _game_team_red
 #define k_zombie_team _game_team_green
+
+#define k_human_unit_speed 1.f
+#define k_zombie_unit_speed 1.1f
+
+/* globals */
 
 bool initialSpawn;
 bool infectedPlayed[k_number_of_users]{};
@@ -41,6 +54,17 @@ const wchar_t *const infectionSoundTable[k_language_count][e_infection_sounds::_
 	{SND_INFECTION_CH, SND_INFECTED_CH, SND_NEW_ZOMBIE_CH },
 };
 
+/* prototypes */
+
+static e_character_type infection_human_get_player_type(void);
+
+static e_character_type infection_zombie_get_character_type(void);
+
+static void reset_zombie_player_status(void);
+
+static void set_zombie_player_status(uint64 identifier);
+
+/* public code */
 
 int Infection::calculateZombiePlayerIndex()
 {
@@ -142,22 +166,13 @@ void Infection::InitClient()
 	}
 }
 
-void Infection::resetZombiePlayerStatus() {
-	zombieIdentifiers.clear();
-}
-
-void Infection::setZombiePlayerStatus(uint64 identifier)
-{
-	zombieIdentifiers.push_back(identifier);
-}
-
 void Infection::InitHost() {
 	event(_event_status, "h2mod:infection: Host init setting unit speed patch");
 	//Applying SpeedCheck fix
 	H2MOD::set_unit_speed_patch(true);
 
 	event(_event_status, "h2mod:infection: Host init resetting zombie player data status");
-	Infection::resetZombiePlayerStatus();
+	reset_zombie_player_status();
 }
 
 bool Infection::shouldEndGame()
@@ -167,7 +182,10 @@ bool Infection::shouldEndGame()
 	c_player_in_game_iterator player_it;
 	while (player_it.next())
 	{
-		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), player_it.get_datum()->identifier) != Infection::zombieIdentifiers.end();
+		uint64 id;
+		csmemcpy(&id, &player_it.get_datum()->identifier, sizeof(uint64));
+
+		bool isZombie = std::find(zombieIdentifiers.begin(), zombieIdentifiers.end(), id) != zombieIdentifiers.end();
 
 		if (isZombie)
 			zombieCount++;
@@ -198,22 +216,28 @@ void Infection::preSpawnServerSetup() {
 	c_player_in_game_iterator player_it;
 	while (player_it.next())
 	{
+		player_datum* player = player_it.get_datum();
 		int32 currentPlayerIndex = player_it.get_absolute_index();
-		uint64 playerIdentifier = player_it.get_datum()->identifier;
-		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
 
-		bool zombie_team_status_human = isZombie == false && s_player::get_team(currentPlayerIndex) == k_zombie_team;
-		if (zombie_team_status_human) {
+		uint64 id;
+		csmemcpy(&id, &player->identifier, sizeof(uint64));
+
+		bool isZombie = std::find(zombieIdentifiers.begin(), zombieIdentifiers.end(), id) != zombieIdentifiers.end();
+		
+		const bool zombie_team_status_human = isZombie == false && player->properties[0].team_index == k_zombie_team;
+		if (zombie_team_status_human)
+		{
+
 			// if the player just joined the and he doesn't have zombie status, and his team is green, add him in the array
-			setZombiePlayerStatus(playerIdentifier);
+			set_zombie_player_status(id);
 			isZombie = true;
 		}
 
-		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", currentPlayerIndex, isZombie, playerIdentifier, s_player::get_name(currentPlayerIndex));
+		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", currentPlayerIndex, isZombie, id, player->properties[0].player_name);
 		if (isZombie) 
 		{
-			s_player::set_unit_character_type(currentPlayerIndex, _character_type_flood);
-			if (s_player::get_team(currentPlayerIndex) != k_zombie_team) 
+			player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+			if (player->properties[0].team_index != k_zombie_team)
 			{
 				// prevent the fucks from switching to humans in the pre-game lobby after joining
 				session->switch_player_team(player_it.get_absolute_index(), k_zombie_team);
@@ -221,27 +245,25 @@ void Infection::preSpawnServerSetup() {
 		}
 		else 
 		{
-			if (get_current_special_event() == _special_event_halloween && H2Config_spooky_boy)
-				s_player::set_unit_character_type(currentPlayerIndex, _character_type_skeleton);
-			else
-				s_player::set_unit_character_type(currentPlayerIndex, _character_type_spartan);
+			player->properties[0].profile_traits.profile.player_character_type = infection_human_get_player_type();
 		}
 	}
 }
 
-void Infection::setPlayerAsHuman(int playerIndex) {
-	if (get_current_special_event() == _special_event_halloween && H2Config_spooky_boy)
-		s_player::set_unit_character_type(playerIndex, _character_type_skeleton);
-	else
-		s_player::set_unit_character_type(playerIndex, _character_type_spartan);
-	s_player::set_unit_speed(playerIndex, 1.0f);
+void Infection::setPlayerAsHuman(int player_index)
+{
+	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player->properties[0].profile_traits.profile.player_character_type = infection_human_get_player_type();
+	player->unit_speed = k_human_unit_speed;
 }
 
-void Infection::setPlayerAsZombie(int playerIndex) {
-	s_player::set_unit_character_type(playerIndex, _character_type_flood);
-	s_player::set_unit_speed(playerIndex, 1.1f);
-
-	call_give_player_weapon(playerIndex, e_weapons_datum_index::energy_blade, 1);
+void Infection::setPlayerAsZombie(int player_index)
+{
+	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+	player->unit_speed = k_zombie_unit_speed;
+	call_give_player_weapon(player_index, e_weapons_datum_index::energy_blade, 1);
+	return;
 }
 
 void Infection::onGameTick()
@@ -335,7 +357,11 @@ void Infection::Initialize()
 			event(_event_verbose, "h2mod:infection:  Peer host setting player as human");
 			//send out the team change packets to peers
 			Infection::sendTeamChange();
-			Infection::setZombiePlayerStatus(NetworkSession::GetPlayerId(zombiePlayerIndex));
+
+			uint64 id;
+			const s_player_identifier identifier = NetworkSession::GetPlayerId(zombiePlayerIndex);
+			csmemcpy(&id, &identifier, sizeof(uint64));
+			set_zombie_player_status(id);
 		}
 	}
 }
@@ -394,7 +420,7 @@ void Infection::OnMapLoad(ExecTime execTime, s_game_options* options)
 
 void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 {
-	datum playerUnitDatum = s_player::get_unit_index(player_index);
+	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 
 	switch (execTime)
 	{
@@ -404,21 +430,19 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 		{
 			if (!shell_is_dedicated_server())
 			{
-				if (s_player::get_team(player_index) != k_zombie_team)
+				if (player->properties[0].team_index != k_zombie_team)
 				{
-					s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
-
 					if (player->user_index != NONE)
 					{
-						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", s_player::get_name(player_index), player->identifier);
+						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", player->properties[0].player_name, player->identifier);
 						user_interface_controller_set_desired_team_index(player->controller_index, k_zombie_team);
 						user_interface_controller_update_network_properties(player->controller_index);
-						s_player::set_unit_character_type(player_index, _character_type_flood);
+						player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
 					}
 					else
 					{
 						//if not, then this is a new zombie
-						event(_event_verbose, "h2mod:infection: Player died, name=%ws, identifer=%llu", s_player::get_name(player_index), player->identifier);
+						event(_event_verbose, "h2mod:infection: Player died, name=%ws, identifer=%llu", player->properties[0].player_name, player->identifier);
 						Infection::triggerSound(_snd_new_zombie, 1000);
 					}
 				}
@@ -427,14 +451,19 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 			// host code
 			if (!game_is_predicted())
 			{
-				void* unit_object = object_try_and_get_and_verify_type(playerUnitDatum, _object_mask_biped);
-				if (unit_object) {
-					if (unit_get_team_index(playerUnitDatum) != k_zombie_team) {
-						Infection::setZombiePlayerStatus(s_player::get_id(player_index));
+				unit_datum* unit_object = (unit_datum*)object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
+				if (unit_object)
+				{
+					if (unit_get_team_index(player->unit_index) != k_zombie_team)
+					{
+						uint64 id;
+						csmemcpy(&id, &player->identifier, sizeof(uint64));
+						set_zombie_player_status(id);
 					}
-					else {
+					else
+					{
 						// take away zombie's weapons
-						unit_delete_all_weapons(playerUnitDatum);
+						unit_delete_all_weapons(player->unit_index);
 					}
 				}
 			}
@@ -451,10 +480,10 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 	}
 }
 
-void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
+void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 {
-	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
-	datum playerUnitDatum = s_player::get_unit_index(playerIdx);
+	const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
+	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 
 	switch (execTime)
 	{
@@ -464,8 +493,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 		if (!shell_is_dedicated_server())
 		{
-			s_player* player = (s_player*)datum_get(s_player::get_data(), playerIdx);
-			event(_event_verbose, "h2mod:infection: Client pre spawn, playerIndex=%d, playerIdentifier=%llu", absPlayerIdx, player->identifier);
+			event(_event_verbose, "h2mod:infection: Client pre spawn, playerIndex=%d, playerIdentifier=%llu", player_abs_index, player->identifier);
 
 			if(player->user_index != NONE)
 			{
@@ -475,8 +503,8 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 				if(team == k_zombie_team)
 				{
-					event(_event_verbose, "h2mod:infection: Client is infected! switching bipeds: %d", absPlayerIdx);
-					s_player::set_unit_character_type(playerIdx, _character_type_flood);
+					event(_event_verbose, "h2mod:infection: Client is infected! switching bipeds: %d", player_abs_index);
+					player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
 				}
 			}
 		}
@@ -491,8 +519,6 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		// client only
 		if (!shell_is_dedicated_server())
 		{
-			s_player* player = (s_player*)datum_get(s_player::get_data(), playerIdx);
-
 			if(player->user_index != NONE)
 			{
 				if(initialSpawn)
@@ -515,7 +541,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				}
 				else if (team == k_zombie_team)
 				{
-					s_player::set_unit_character_type(playerIdx, _character_type_flood);
+					player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
 					player_user_weapon_interaction_set(player->user_index, false);
 					hud_player_indicators_draw_enabled_set(player->user_index, true);
 				}
@@ -525,18 +551,20 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		// host only (both client/dedicated server)
 		if (!game_is_predicted())
 		{
-			event(_event_verbose, "h2mod:infection: Spawn player server index=%d", absPlayerIdx);
-			void* unit_object = object_try_and_get_and_verify_type(playerUnitDatum, _object_mask_biped);
-			if (unit_object) {
+			event(_event_verbose, "h2mod:infection: Spawn player server index=%d", player_abs_index);
+			void* unit_object = object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
+			if (unit_object)
+			{
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
-				e_game_team team = unit_get_team_index(playerUnitDatum);
-				event(_event_verbose, "h2mod:infection: Spawn player server index=%d, unit team index=%d", absPlayerIdx, (int16)team);
-				if (team == k_humans_team) {
-					Infection::setPlayerAsHuman(absPlayerIdx);
+				e_game_team team = unit_get_team_index(player->unit_index);
+				event(_event_verbose, "h2mod:infection: Spawn player server index=%d, unit team index=%d", player_abs_index, (int16)team);
+				if (team == k_humans_team)
+				{
+					Infection::setPlayerAsHuman(player_abs_index);
 				}
-
-				if (team == k_zombie_team) {
-					Infection::setPlayerAsZombie(absPlayerIdx);
+				else if (team == k_zombie_team)
+				{
+					Infection::setPlayerAsZombie(player_abs_index);
 				}
 			}
 		}
@@ -548,4 +576,27 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		event(_event_verbose, "h2mod:infection: %s - unknown execTime", __FUNCTION__);
 		break;
 	}
+}
+
+/* private code */
+
+static e_character_type infection_human_get_player_type(void)
+{
+	const bool human_should_be_skeleton = get_current_special_event() == _special_event_halloween && H2Config_spooky_boy;
+	return human_should_be_skeleton ? _character_type_skeleton : _character_type_spartan;
+}
+
+static e_character_type infection_zombie_get_character_type(void)
+{
+	return k_use_flood_zombies ? _character_type_flood : _character_type_elite;
+}
+
+static void reset_zombie_player_status(void)
+{
+	zombieIdentifiers.clear();
+}
+
+static void set_zombie_player_status(uint64 identifier)
+{
+	zombieIdentifiers.push_back(identifier);
 }

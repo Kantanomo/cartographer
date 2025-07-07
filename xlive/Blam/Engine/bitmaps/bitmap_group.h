@@ -191,7 +191,7 @@ struct bitmap_data
 	char signature[4];
 	int16 width;
 	int16 height;
-	uint8 depth_pixels;                       // Depth is 1 for 2D textures and cube maps.
+	uint8 depth;							// Depth is 1 for 2D textures and cube maps.
 
 	e_more_bitmap_data_flags more_flags;
 	e_bitmap_type type;                     // Determines bitmap "geometry."
@@ -218,7 +218,7 @@ struct bitmap_data
 	int32 lod3_size;
 	uint32 unk1[3];
 	datum parent_bitmap_tag;        // References the parent bitmap tag this bitmap data is located in
-	IDirect3DTexture9* d3dtexture;
+	void* hardware_format;
 	uint8* base_address;
 	int64 frame_cached;
 	int32 low_detail_offset;
