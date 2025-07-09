@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "network_message_gateway.h"
 
+#include "network_message_handler.h"
+#include "network_message_type_collection.h"
 
 /* constants */
 
@@ -26,7 +28,7 @@ bool c_network_message_gateway::initialize_gateway(c_network_link* link, c_netwo
 	m_message_types = message_types;
 	m_message_types->check_message_types();
 	m_handler = NULL;
-	m_field_14 = false;
+	m_outgoing_packet_pending = false;
 	m_initialized = true;
 	return true;
 }
