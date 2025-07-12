@@ -23,7 +23,12 @@ enum
 #define XSOCK_MUTICAST_ADDR  0xefff0001
 #define XSOCK_MULTICAST_PORT 56011
 
-struct XVirtualSocket;
+enum e_system_link_socket_type
+{
+	_system_link_socket_type_lan,
+	_system_link_socket_type_localhost,
+	k_system_link_socket_type_count
+};
 
 class XSocketManager
 {
@@ -68,8 +73,7 @@ class XSocketManager
 	};
 
 	XInternalSocket m_mainUdpSocket;
-	XInternalSocket m_broadcastLANSock;
-	XInternalSocket m_broadcastLocalhostSock;
+	XInternalSocket m_systemLinkSockets[k_system_link_socket_type_count];
 
 public:
 	void Initialize();
@@ -88,45 +92,39 @@ public:
 		return m_mainUdpSocket.m_systemSockHandle;
 	}
 
-	bool CreateSocketUDP(XInternalSocket* sock, unsigned long interfaceAddress, WORD port, bool multicast);
+	bool CreateSocketUDP(XInternalSocket* sock, unsigned long interfaceAddress, WORD port, bool multicast, bool allow_address_reuse);
 
 	WORD SystemLinkGetPort() const
 	{
-		return m_broadcastLANSock.m_port;
+		return m_systemLinkSockets[_system_link_socket_type_lan].m_port;
 	}
 
 	SOCKET SystemLinkGetLANSystemSockHandle() const
 	{
-		return m_broadcastLANSock.m_systemSockHandle;
+		return m_systemLinkSockets[_system_link_socket_type_lan].m_systemSockHandle;
 	}
 
-	SOCKET SystemLinkGetSystemSockHandle(int index) const
+	SOCKET SystemLinkGetSystemSockHandle(e_system_link_socket_type type) const
 	{
-		switch (index)
-		{
-		case 0:
-			return m_broadcastLANSock.m_systemSockHandle;
-		case 1:
-			return m_broadcastLocalhostSock.m_systemSockHandle;
-		}
-
-		return INVALID_SOCKET;
+		return m_systemLinkSockets[type].m_systemSockHandle;
 	}
 
 	bool SystemLinkAvailable() const
 	{
-		for (int i = 0; i < 2; i++)
+		bool result = false;
+		for (size_t i = 0; i < k_system_link_socket_type_count; ++i)
 		{
-			if (SystemLinkGetSystemSockHandle(i) != INVALID_SOCKET)
+			if (SystemLinkGetSystemSockHandle((e_system_link_socket_type)i) != INVALID_SOCKET)
 			{
-				return true;
+				result = true;
+				break;
 			}
 		}
-		return false;
+		return result;
 	}
 
 	void SocketsDisposeAll();
-	std::vector<XVirtualSocket*> sockets;
+	std::vector<struct XVirtualSocket*> sockets;
 };
 
 struct XVirtualSocket
