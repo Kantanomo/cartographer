@@ -603,7 +603,7 @@ const wchar_t* c_static_wchar_string<T>::append_print(const wchar_t* format, ...
 	ASSERT(format);
 	ASSERT(current_length >= 0 && current_length < NUMBEROF(m_string));
 
-	uvsnprintf(&m_string[current_length], T - current_length, a2, args);
+	uvsnprintf(&m_string[current_length], T - current_length, format, args);
 	va_end(args);
 	return m_string;
 }
