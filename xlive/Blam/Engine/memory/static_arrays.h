@@ -610,6 +610,9 @@ const wchar_t* c_static_wchar_string<T>::append_print(const wchar_t* format, ...
 
 /* globals */
 
+typedef c_static_wchar_string<512> c_maximum_interface_text;
+
+
 #ifdef ASSERTS_ENABLED
 extern c_static_string<256> g_static_string_assert_text;
 #endif
