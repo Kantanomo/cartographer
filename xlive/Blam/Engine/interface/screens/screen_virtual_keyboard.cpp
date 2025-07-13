@@ -197,7 +197,7 @@ void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_t
 {
 	s_screen_parameters virtual_keyboard_params;
 	virtual_keyboard_params.m_context = nullptr;
-	virtual_keyboard_params.data_new(0, FLAG(0), _user_interface_channel_type_keyboard, _window_4, c_screen_virtual_keyboard::load);
+	virtual_keyboard_params.data_new(0, FLAG(0), _user_interface_channel_type_virtual_keyboard, _window_4, c_screen_virtual_keyboard::load);
 	c_screen_virtual_keyboard* virtual_keyboard = (c_screen_virtual_keyboard*)virtual_keyboard_params.ui_screen_load_proc_exec();
 
 	virtual_keyboard->set_context(keyboard_type);

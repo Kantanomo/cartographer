@@ -420,7 +420,7 @@ void c_squad_settings_list::handle_item_change_level(s_event_record** pevent)
 	params.m_window_index = _window_4;
 	params.m_context = 0;
 	params.m_user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_dialog;
+	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
@@ -434,7 +434,7 @@ void c_squad_settings_list::handle_item_change_difficulty(s_event_record** peven
 	params.m_window_index = _window_4;
 	params.m_context = 0;
 	params.m_user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_dialog;
+	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
@@ -455,7 +455,7 @@ void c_squad_settings_list::handle_item_switch_to_coop(s_event_record** pevent)
 		|| network_squad_session_get_session_class() == _network_session_class_xbox_live)
 	{
 		screen_error_ok_dialog_with_custom_text(
-			_user_interface_channel_type_dialog,
+			_user_interface_channel_type_gameshell_dialog,
 			_ui_error_generic, _window_4,
 			FLAG((*pevent)->controller), NULL, NULL, L"Access Denied", L"Coming Soon....");
 	}
@@ -482,7 +482,7 @@ void c_squad_settings_list::handle_item_switch_to_optimatch(s_event_record** pev
 	//return INVOKE_TYPE(0x211BA1, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
 
 	screen_error_ok_dialog_with_custom_text(
-		_user_interface_channel_type_dialog,
+		_user_interface_channel_type_gameshell_dialog,
 		_ui_error_generic, _window_4,
 		FLAG((*pevent)->controller), nullptr, nullptr, L"Alert", L"This feature is not currently available");
 }
