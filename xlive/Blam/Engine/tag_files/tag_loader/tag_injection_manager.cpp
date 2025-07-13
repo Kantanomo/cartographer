@@ -4,6 +4,7 @@
 #include "tag_injection_define.h"
 
 #include "bitmaps/bitmap_group.h"
+#include "cache/cache_files.h"
 #include "cache/pc_geometry_cache.h"
 #include "cache/pc_texture_cache.h"
 #include "creatures/creature_definitions.h"
@@ -15,6 +16,7 @@
 #include "render/weather_definitions.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
+#include "tag_files/tag_loader/xml/xml_definition_loader.h"
 #include "units/biped_definitions.h"
 #include "units/vehicle_definitions.h"
 

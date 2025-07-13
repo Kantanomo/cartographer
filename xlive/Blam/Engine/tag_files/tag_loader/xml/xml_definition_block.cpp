@@ -1,11 +1,9 @@
 #include "stdafx.h"
 #include "xml_definition_block.h"
 
-#include <tinyxml/tinyxml2.h>
-
 /* public code */
 
-c_xml_definition_block::c_xml_definition_block(tinyxml2::XMLElement* base_element, uint32 offset, uint32 size)
+c_xml_definition_block::c_xml_definition_block(const tinyxml2::XMLElement* base_element, uint32 offset, uint32 size)
 {
 	// Checks to make sure the correct parameters were passed.
 	// offset and size are default -1 and overwritten if the attribute exists
@@ -14,58 +12,58 @@ c_xml_definition_block::c_xml_definition_block(tinyxml2::XMLElement* base_elemen
 	ASSERT(offset != UINT_MAX);
 	ASSERT(size != UINT_MAX);
 
-	this->m_element = base_element;
-	this->m_offset = offset;
-	this->m_size = size;
-	this->m_tag_references = nullptr;
-	this->m_classless_tag_references = nullptr;
-	this->m_string_ids = nullptr;
-	this->m_data_references = nullptr;
-	this->m_tag_blocks = nullptr;
+	m_element = base_element;
+	m_offset = offset;
+	m_size = size;
+	m_tag_references = nullptr;
+	m_classless_tag_references = nullptr;
+	m_string_ids = nullptr;
+	m_data_references = nullptr;
+	m_tag_blocks = nullptr;
 
 #if TAG_INJECTION_DEBUG
-	this->m_tag_reference_names = nullptr;
-	this->m_classless_tag_reference_names = nullptr;
-	this->m_data_reference_names = nullptr;
-	this->m_tag_block_names = nullptr;
+	m_tag_reference_names = nullptr;
+	m_classless_tag_reference_names = nullptr;
+	m_data_reference_names = nullptr;
+	m_tag_block_names = nullptr;
 #endif
 
-	this->reset_counts();
+	reset_counts();
 
-	if (this->m_element->Attribute("name"))
-		this->m_name.set(this->m_element->Attribute("name"));
+	if (m_element->Attribute("name"))
+		m_name.set(m_element->Attribute("name"));
 	
 	// do a first pass of the current element to get the counts we need
 	// for allocating the buffers
-	this->get_element_counts();
-	this->allocate_buffers();
+	get_element_counts();
+	allocate_buffers();
 
 	// counts are reset to be re-used to keep track of which index
 	// inside the array the current item should be placed
-	this->reset_counts();
-	this->populate_buffers();
+	reset_counts();
+	populate_buffers();
 	return;
 }
 
 void c_xml_definition_block::reset_counts()
 {
-	this->m_tag_reference_count = 0;
-	this->m_classless_tag_reference_count = 0;
-	this->m_string_id_count = 0;
-	this->m_data_reference_count = 0;
-	this->m_tag_block_count = 0;
+	m_tag_reference_count = 0;
+	m_classless_tag_reference_count = 0;
+	m_string_id_count = 0;
+	m_data_reference_count = 0;
+	m_tag_block_count = 0;
 }
 
 void c_xml_definition_block::get_element_counts()
 {
-	tinyxml2::XMLElement* element = this->m_element->FirstChildElement();
+	const tinyxml2::XMLElement* element = m_element->FirstChildElement();
 	while (element)
 	{
 		const char* element_name = element->Name();
 
 		if (strcmp(element_name, "tagblock") == 0 || strcmp(element_name, "reflexive") == 0)
 		{
-			this->m_tag_block_count++;
+			m_tag_block_count++;
 
 			element = element->NextSiblingElement();
 			continue;
@@ -74,23 +72,23 @@ void c_xml_definition_block::get_element_counts()
 		{
 			if (element->BoolAttribute("withClass") || element->Attribute("withClass") 
 				|| element->BoolAttribute("withGroup") || element->Attribute("withGroup"))
-				this->m_classless_tag_reference_count++;
+				m_classless_tag_reference_count++;
 			else
-				this->m_tag_reference_count++;
+				m_tag_reference_count++;
 
 			element = element->NextSiblingElement();
 			continue;
 		}
 		if (strcmp(element_name, "stringId") == 0 || strcmp(element_name, "stringid") == 0)
 		{
-			this->m_string_id_count++;
+			m_string_id_count++;
 
 			element = element->NextSiblingElement();
 			continue;
 		}
 		if (strcmp(element_name, "dataref") == 0)
 		{
-			this->m_data_reference_count++;
+			m_data_reference_count++;
 
 			element = element->NextSiblingElement();
 			continue;
@@ -102,39 +100,39 @@ void c_xml_definition_block::get_element_counts()
 
 void c_xml_definition_block::allocate_buffers()
 {
-	if (this->m_tag_reference_count)
-		this->m_tag_references = (uint32*)malloc(sizeof(uint32) * this->m_tag_reference_count);
+	if (m_tag_reference_count)
+		m_tag_references = (uint32*)malloc(sizeof(uint32) * m_tag_reference_count);
 
-	if (this->m_classless_tag_reference_count)
-		this->m_classless_tag_references = (uint32*)malloc(sizeof(uint32) * this->m_classless_tag_reference_count);
+	if (m_classless_tag_reference_count)
+		m_classless_tag_references = (uint32*)malloc(sizeof(uint32) * m_classless_tag_reference_count);
 
-	if (this->m_string_id_count)
-		this->m_string_ids = (uint32*)malloc(sizeof(uint32) * this->m_string_id_count);
+	if (m_string_id_count)
+		m_string_ids = (uint32*)malloc(sizeof(uint32) * m_string_id_count);
 
-	if (this->m_data_reference_count)
-		this->m_data_references = (uint32*)malloc(sizeof(uint32) * this->m_data_reference_count);
+	if (m_data_reference_count)
+		m_data_references = (uint32*)malloc(sizeof(uint32) * m_data_reference_count);
 
-	if (this->m_tag_block_count)
-		this->m_tag_blocks = new c_xml_definition_block[this->m_tag_block_count];
+	if (m_tag_block_count)
+		m_tag_blocks = new c_xml_definition_block[m_tag_block_count];
 
 #if TAG_INJECTION_DEBUG
-	if (this->m_tag_reference_count)
-		this->m_tag_reference_names = new c_static_string<64>[this->m_tag_reference_count];
+	if (m_tag_reference_count)
+		m_tag_reference_names = new c_static_string<64>[m_tag_reference_count];
 
-	if (this->m_classless_tag_reference_count)
-		this->m_classless_tag_reference_names = new c_static_string<64>[this->m_classless_tag_reference_count];
+	if (m_classless_tag_reference_count)
+		m_classless_tag_reference_names = new c_static_string<64>[m_classless_tag_reference_count];
 
-	if (this->m_data_reference_count)
-		this->m_data_reference_names = new c_static_string<64>[this->m_data_reference_count];
+	if (m_data_reference_count)
+		m_data_reference_names = new c_static_string<64>[m_data_reference_count];
 
-	if (this->m_tag_block_count)
-		this->m_tag_block_names = new c_static_string<64>[this->m_tag_block_count];
+	if (m_tag_block_count)
+		m_tag_block_names = new c_static_string<64>[m_tag_block_count];
 #endif
 }
 
 void c_xml_definition_block::populate_buffers()
 {
-	tinyxml2::XMLElement* element = this->m_element->FirstChildElement();
+	const tinyxml2::XMLElement* element = m_element->FirstChildElement();
 	while (element)
 	{
 		const char* element_name = element->Name();
@@ -149,13 +147,13 @@ void c_xml_definition_block::populate_buffers()
 			else if (element->Attribute("elementSize") != nullptr)
 				size = strtoul(element->Attribute("elementSize"), nullptr, 16);
 
-			new (&this->m_tag_blocks[this->m_tag_block_count]) c_xml_definition_block(element, offset, size);
+			new (&m_tag_blocks[m_tag_block_count]) c_xml_definition_block(element, offset, size);
 
 #if TAG_INJECTION_DEBUG
-			this->m_tag_block_names[this->m_tag_block_count].set(element->Attribute("name"));
+			m_tag_block_names[m_tag_block_count].set(element->Attribute("name"));
 #endif
 
-			this->m_tag_block_count++;
+			m_tag_block_count++;
 
 			element = element->NextSiblingElement();
 			continue;
@@ -165,23 +163,23 @@ void c_xml_definition_block::populate_buffers()
 			if (element->BoolAttribute("withClass") || element->Attribute("withClass")
 				|| element->BoolAttribute("withGroup") || element->Attribute("withGroup"))
 			{
-				this->m_classless_tag_references[this->m_classless_tag_reference_count] = offset;
+				m_classless_tag_references[m_classless_tag_reference_count] = offset;
 
 #if TAG_INJECTION_DEBUG
-				this->m_classless_tag_reference_names[this->m_classless_tag_reference_count].set(element->Attribute("name"));
+				m_classless_tag_reference_names[m_classless_tag_reference_count].set(element->Attribute("name"));
 #endif
 
-				this->m_classless_tag_reference_count++;
+				m_classless_tag_reference_count++;
 			}
 			else
 			{
-				this->m_tag_references[this->m_tag_reference_count] = offset;
+				m_tag_references[m_tag_reference_count] = offset;
 
 #if TAG_INJECTION_DEBUG
-				this->m_tag_reference_names[this->m_tag_reference_count].set(element->Attribute("name"));
+				m_tag_reference_names[m_tag_reference_count].set(element->Attribute("name"));
 #endif
 
-				this->m_tag_reference_count++;
+				m_tag_reference_count++;
 			}
 
 			element = element->NextSiblingElement();
@@ -189,21 +187,21 @@ void c_xml_definition_block::populate_buffers()
 		}
 		if (strcmp(element_name, "stringId") == 0 || strcmp(element_name, "stringid") == 0)
 		{
-			this->m_string_ids[this->m_string_id_count] = offset;
-			this->m_string_id_count++;
+			m_string_ids[m_string_id_count] = offset;
+			m_string_id_count++;
 
 			element = element->NextSiblingElement();
 			continue;
 		}
 		if (strcmp(element_name, "dataref") == 0)
 		{
-			this->m_data_references[this->m_data_reference_count] = offset;
+			m_data_references[m_data_reference_count] = offset;
 
 #if TAG_INJECTION_DEBUG
-			this->m_data_reference_names[this->m_data_reference_count].set(element->Attribute("name"));
+			m_data_reference_names[m_data_reference_count].set(element->Attribute("name"));
 #endif
 
-			this->m_data_reference_count++;
+			m_data_reference_count++;
 
 			element = element->NextSiblingElement();
 			continue;
@@ -214,129 +212,129 @@ void c_xml_definition_block::populate_buffers()
 
 void c_xml_definition_block::clear()
 {
-	if (this->m_tag_reference_count)
-		free(this->m_tag_references);
+	if (m_tag_reference_count)
+		free(m_tag_references);
 
-	if (this->m_classless_tag_reference_count)
-		free(this->m_classless_tag_references);
+	if (m_classless_tag_reference_count)
+		free(m_classless_tag_references);
 
-	if (this->m_string_id_count)
-		free(this->m_string_ids);
+	if (m_string_id_count)
+		free(m_string_ids);
 
-	if (this->m_tag_reference_count)
-		free(this->m_data_references);
+	if (m_tag_reference_count)
+		free(m_data_references);
 
 #if TAG_INJECTION_DEBUG
-	if (this->m_tag_reference_count)
-		delete[] this->m_tag_reference_names;
+	if (m_tag_reference_count)
+		delete[] m_tag_reference_names;
 
-	if (this->m_classless_tag_reference_count)
-		delete[] this->m_classless_tag_reference_names;
+	if (m_classless_tag_reference_count)
+		delete[] m_classless_tag_reference_names;
 
-	if (this->m_data_reference_count)
-		delete[] this->m_data_reference_names;
+	if (m_data_reference_count)
+		delete[] m_data_reference_names;
 
-	if (this->m_tag_block_count)
-		delete[] this->m_tag_block_names;
+	if (m_tag_block_count)
+		delete[] m_tag_block_names;
 #endif
 
-	if (this->m_tag_block_count)
+	if (m_tag_block_count)
 	{
-		for (uint32 i = 0; i < this->m_tag_block_count; i++)
+		for (uint32 i = 0; i < m_tag_block_count; i++)
 		{
-			this->m_tag_blocks[i].clear();
+			m_tag_blocks[i].clear();
 		}
-		free(this->m_tag_blocks);
+		free(m_tag_blocks);
 	}
 
-	this->reset_counts();
+	reset_counts();
 }
 
 uint32 c_xml_definition_block::get_size() const
 {
-	return this->m_size;
+	return m_size;
 }
 
 uint32 c_xml_definition_block::get_offset() const
 {
-	return this->m_offset;
+	return m_offset;
 }
 
 const char* c_xml_definition_block::get_name() const
 {
-	return this->m_name.get_string();
+	return m_name.get_string();
 }
 
 uint32 c_xml_definition_block::get_tag_references_count() const
 {
-	return this->m_tag_reference_count;
+	return m_tag_reference_count;
 }
 
 uint32 c_xml_definition_block::get_tag_reference_offset(uint32 index) const
 {
-	return this->m_tag_references[index];
+	return m_tag_references[index];
 }
 
 uint32 c_xml_definition_block::get_classless_tag_references_count() const
 {
-	return this->m_classless_tag_reference_count;
+	return m_classless_tag_reference_count;
 }
 
 uint32 c_xml_definition_block::get_classless_tag_reference_offset(uint32 index) const
 {
-	return this->m_classless_tag_references[index];
+	return m_classless_tag_references[index];
 }
 
 uint32 c_xml_definition_block::get_data_references_count() const
 {
-	return this->m_data_reference_count;
+	return m_data_reference_count;
 }
 
 uint32 c_xml_definition_block::get_data_reference_offset(uint32 index) const
 {
-	return this->m_data_references[index];
+	return m_data_references[index];
 }
 
 uint32 c_xml_definition_block::get_string_id_count() const
 {
-	return this->m_string_id_count;
+	return m_string_id_count;
 }
 
 uint32 c_xml_definition_block::get_string_id_offset(uint32 index) const
 {
-	return this->m_string_ids[index];
+	return m_string_ids[index];
 }
 
 uint32 c_xml_definition_block::get_tag_block_count() const
 {
-	return this->m_tag_block_count;
+	return m_tag_block_count;
 }
 
 c_xml_definition_block* c_xml_definition_block::get_tag_block(uint32 index) const
 {
-	return &this->m_tag_blocks[index];
+	return &m_tag_blocks[index];
 }
 
 #if TAG_INJECTION_DEBUG
 
 c_static_string<64>* c_xml_definition_block::get_tag_reference_name(uint32 index) const
 {
-	return &this->m_tag_reference_names[index];
+	return &m_tag_reference_names[index];
 }
 
 c_static_string<64>* c_xml_definition_block::get_classless_tag_reference_name(uint32 index) const
 {
-	return &this->m_classless_tag_reference_names[index];
+	return &m_classless_tag_reference_names[index];
 }
 
 c_static_string<64>* c_xml_definition_block::get_data_reference_name(uint32 index) const
 {
-	return &this->m_data_reference_names[index];
+	return &m_data_reference_names[index];
 }
 
 c_static_string<64>* c_xml_definition_block::get_tag_block_name(uint32 index) const
 {
-	return &this->m_tag_block_names[index];
+	return &m_tag_block_names[index];
 }
 
 #endif

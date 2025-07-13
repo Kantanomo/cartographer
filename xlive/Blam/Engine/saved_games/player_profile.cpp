@@ -3,11 +3,13 @@
 
 #include "saved_game_files_async_windows.h"
 
+/* public code */
+
 void __cdecl saved_game_player_profile_set_default_variant(void* saved_game_variant)
 {
 	INVOKE(0x98FD, 0, saved_game_player_profile_set_default_variant, saved_game_variant);
+	return;
 }
-
 
 void saved_game_player_profile_default_new(s_saved_game_player_profile* profile, int32 default_profile_type)
 {

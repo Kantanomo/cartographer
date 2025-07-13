@@ -11,13 +11,14 @@
 #include "simpleini/SimpleIni.h"
 
 #pragma region Config IO
-const wchar_t H2AccountsFilename[] = L"%wshalo2accounts.ini";
 
-static const std::string H2ConfigAccountStr = "Account:";
-static const std::string H2ConfigAccountStrOld = "Account";
+#define H2AccConfigVersion "1"
 
-static const std::string H2AccConfigVersion = "1";
-static const std::string H2AccConfigVersionStr = "H2AccountsVersion:" + H2AccConfigVersion;
+static const wchar_t H2AccountsFilename[] = L"%wshalo2accounts.ini";
+
+static const char H2ConfigAccountStr[] = "Account:";
+static const char H2ConfigAccountStrOld[] = "Account";
+static const char H2AccConfigVersionStr[] = "H2AccountsVersion:" H2AccConfigVersion;
 
 int H2AccountCount = 0;
 static int H2AccountArrayLen = 0;
@@ -121,8 +122,8 @@ void SaveH2Accounts() {
 				"\n\n"
 			);
 
-			ini.SetLongValue(H2AccConfigVersionStr.c_str(), "last_used", H2AccountLastUsed);
-			ini.SetLongValue(H2AccConfigVersionStr.c_str(), "account_count", H2AccountCount);
+			ini.SetLongValue(H2AccConfigVersionStr, "last_used", H2AccountLastUsed);
+			ini.SetLongValue(H2AccConfigVersionStr, "account_count", H2AccountCount);
 
 			if (H2AccountArrayLoginToken && H2AccountArrayUsername && H2AccountCount > 0) {
 				for (int i = 0; i < H2AccountCount; i++) {
@@ -315,8 +316,8 @@ bool ReadH2Accounts() {
 			else
 			{
 				// read the accounts in the file
-				H2AccountLastUsed = ini.GetLongValue(H2AccConfigVersionStr.c_str(), "last_used", H2AccountLastUsed);
-				int AccountCount = ini.GetLongValue(H2AccConfigVersionStr.c_str(), "account_count", -1);
+				H2AccountLastUsed = ini.GetLongValue(H2AccConfigVersionStr, "last_used", H2AccountLastUsed);
+				int AccountCount = ini.GetLongValue(H2AccConfigVersionStr, "account_count", -1);
 				if (AccountCount != -1 && AccountCount > 0)
 				{
 					for (int i = 0; i < AccountCount; i++)

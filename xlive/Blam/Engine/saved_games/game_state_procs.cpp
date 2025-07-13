@@ -3,6 +3,16 @@
 
 #include "main/interpolator.h"
 
+/* typedefs */
+
+typedef void(__cdecl* game_state_call_after_load_procs_t)(int32);
+
+/* globals */
+
+game_state_call_after_load_procs_t p_game_state_call_after_load_procs;
+
+/* public code */
+
 void __cdecl game_state_call_before_save_procs(int32 a1)
 {
 	INVOKE(0x8C21B, 0xCB8EC, game_state_call_before_save_procs, a1);
@@ -15,8 +25,6 @@ void __cdecl game_state_call_after_save_procs(int32 a1)
 	return;
 }
 
-typedef void(__cdecl* game_state_call_after_load_procs_t)(int32);
-game_state_call_after_load_procs_t p_game_state_call_after_load_procs;
 void __cdecl game_state_call_after_load_procs_hook(int32 a1)
 {
 	p_game_state_call_after_load_procs(a1);

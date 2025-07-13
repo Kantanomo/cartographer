@@ -1,7 +1,14 @@
 #pragma once
 #include "tag_files/tag_block.h"
 
-#define k_maximum_number_of_camera_track_control_points 16
+/* constants */
+
+enum
+{
+	k_maximum_number_of_camera_track_control_points = 16
+};
+
+/* structures */
 
 // max: k_maximum_number_of_camera_track_control_points
 struct s_camera_track_control_point

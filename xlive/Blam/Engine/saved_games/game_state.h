@@ -1,8 +1,8 @@
 #pragma once
-
 #include "game/game_options.h"
 
-#pragma pack(push,1)
+/* structures */
+
 struct s_game_state_header
 {
 	int alloc_checksum;
@@ -29,8 +29,9 @@ struct s_game_state_header
 	int field_12F0;
 	int field_12F4;
 };
-ASSERT_STRUCT_SIZE(s_game_state_header, 0x12F8);
-#pragma pack(pop)
+ASSERT_STRUCT_SIZE(s_game_state_header, 4856);
+
+/* prototypes */
 
 void __cdecl game_state_initialize(void);
 

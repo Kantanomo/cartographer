@@ -12,6 +12,7 @@
 #include "math/matrix_math.h"
 #include "models/models.h"
 #include "models/render_model_definitions.h"
+#include "render/render_cameras.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "tag_files/global_string_ids.h"
 #include "units/units.h"

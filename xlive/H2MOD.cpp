@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "H2MOD.h"
 
+#include "cache/cache_files.h"
 #include "camera/camera.h"
 #include "camera/dead_camera.h"
 #include "camera/editor_camera.h"

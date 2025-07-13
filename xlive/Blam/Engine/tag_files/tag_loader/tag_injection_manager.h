@@ -1,14 +1,19 @@
 #pragma once
 #include "tag_injection_table.h"
+
+#include "cache/cache_files.h"
 #include "tag_files/tag_groups.h"
 #include "xml/xml_agent.h"
 
-#define k_first_injected_datum 15268
-#define k_max_tag_instance_count 65535
+/* constants */
 
-// 20mb
-#define k_injectable_allocation_size (1024 * 1024 * 20)
+enum
+{
+	// 20mb
+	k_injectable_allocation_size = (1024 * 1024 * 20)
+};
 
+/* classes */
 
 class c_tag_injecting_manager
 {
@@ -71,5 +76,4 @@ private:
 	void load_raw_data_from_cache(datum injected_index) const;
 	static void apply_definition_fixup(e_tag_group group, datum injected_index);
 	static void initialize_shader_template(datum injected_datum);
-
 };

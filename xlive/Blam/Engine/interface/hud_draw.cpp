@@ -8,6 +8,7 @@
 #include "cache/pc_texture_cache.h"
 #include "game/players.h"
 #include "math/matrix_math.h"
+#include "render/render_cameras.h"
 #include "units/units.h"
 
 /* public code */

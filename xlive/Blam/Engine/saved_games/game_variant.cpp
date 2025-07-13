@@ -3,6 +3,8 @@
 
 #include "game/game.h"
 
+/* public code */
+
 s_game_variant* get_game_variant(void)
 {
 	return &game_options_get()->game_variant;

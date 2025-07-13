@@ -1,5 +1,7 @@
 #pragma once
 
+/* enums */
+
 enum e_game_playback_type : int16
 {
 	_game_playback_none = 0,
