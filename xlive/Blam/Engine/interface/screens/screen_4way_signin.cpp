@@ -519,7 +519,7 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			{
 				if (this->m_call_context == _4_way_signin_type_crossgame_invite)
 				{
-					user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+					user_interface_error_ok_cancle_dialog_show_confirmation(
 						_user_interface_channel_type_gameshell_dialog,
 						_window_4,
 						FLAG(event->controller),
@@ -528,7 +528,7 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 				}
 				else
 				{
-					user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+					user_interface_error_ok_cancle_dialog_show_confirmation(
 						_user_interface_channel_type_gameshell_dialog,
 						_window_4,
 						FLAG(event->controller),
@@ -569,7 +569,7 @@ bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event
 		|| event->component == _user_interface_controller_component_button_back)
 		&& !user_interface_controller_get_signed_in_controller_count())
 	{
-		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+		user_interface_error_ok_cancle_dialog_show_confirmation(
 			_user_interface_channel_type_gameshell_dialog,
 			_window_4,
 			FLAG(event->controller),

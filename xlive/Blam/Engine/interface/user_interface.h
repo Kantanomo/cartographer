@@ -293,6 +293,7 @@ enum e_ui_error_types : uint32
 	_ui_error_locator_service_timed_out = 0x11D,
 	_ui_error_connection_to_host_lost = 0x11E,
 	_ui_error_map_download_profane_name = 0x11F,
+	k_last_ui_error_code = _ui_error_map_download_profane_name
 };
 
 enum e_user_interface_channel_type
@@ -381,7 +382,7 @@ bool __cdecl user_interface_error_screen_is_active(e_user_interface_channel_type
 void __cdecl screen_error_ok_dialog_show(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback, void* fallback);
 void __cdecl screen_error_ok_dialog_with_custom_text(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback, void* fallback, const wchar_t* custom_title, const wchar_t* custom_body);
 
-void __cdecl user_interface_error_display_ok_cancel_dialog_with_ok_callback(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback_handle, e_ui_error_types error_type);
+void __cdecl user_interface_error_ok_cancle_dialog_show_confirmation(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback_handle, e_ui_error_types error_type);
 void __cdecl user_interface_back_out_from_channel(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index);
 void __cdecl user_interface_enter_game_shell(int32 context);
 
@@ -392,3 +393,13 @@ void __cdecl user_interface_return_to_mainmenu(bool a1);
 void __cdecl user_interface_update(real32 dt);
 
 uint32 user_interface_set_context_presence(e_context_presence game_mode);
+
+void user_interface_debug_load_main_menu();
+void user_interface_debug_text_bounds(bool value);
+void user_interface_debug_show_title_safe_bounds(bool value);
+void user_interface_debug_element_bounds(bool value);
+void user_interface_transition_out_console_window();
+void user_interface_set_beta(bool value);
+void user_interface_test_error_ok(int16 id);
+void user_interface_test_error_ok_cancel(int16 id);
+void user_interface_test_confirmation(int16 id);

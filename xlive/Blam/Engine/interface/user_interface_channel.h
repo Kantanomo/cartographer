@@ -32,6 +32,9 @@ private:
 
 public:
 
+	bool active_or_incoming_screen_exists();
+	void transition_out();
+
 	// c_user_interface_channel virtual functions
 
 	virtual ~c_user_interface_channel();

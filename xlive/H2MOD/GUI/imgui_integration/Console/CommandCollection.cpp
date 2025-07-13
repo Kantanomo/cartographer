@@ -9,6 +9,7 @@
 #include "game/cheats.h"
 #include "game/game.h"
 #include "game/players.h"
+#include "interface/user_interface.h"
 #include "main/main.h"
 #include "main/main_game.h"
 #include "main/main_game_time.h"
@@ -91,6 +92,17 @@ namespace CommandCollection
 	static int net_event_display_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int net_event_log_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int net_event_list_categories_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+#endif
+#ifdef UI_DEBUG
+	static int ui_debug_load_main_menu(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int ui_debug_text_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int ui_debug_show_title_safe_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int ui_debug_element_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int ui_transition_out_console_window(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int ui_set_beta(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int ui_test_error_ok(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int ui_test_error_ok_cancel(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
+	static int ui_test_confirmation(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 #endif
 
 	// misc
@@ -176,6 +188,18 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand("net_event_log_category", "sets the log level for a named category of network events", 2, 2, net_event_log_category_evaluate));
 	InsertCommand(new ConsoleCommand("net_event_list_categories", "lists all categories that exist under a particular category string", 1, 1, net_event_list_categories_evaluate));
 #endif
+#ifdef UI_DEBUG
+	InsertCommand(new ConsoleCommand("ui_debug_load_main_menu", "loads the main menu screen", 0, 0, CommandCollection::ui_debug_load_main_menu));
+	InsertCommand(new ConsoleCommand("ui_debug_text_bounds", "toggle rendering of ui text boundaries", 1, 1, CommandCollection::ui_debug_text_bounds));
+	InsertCommand(new ConsoleCommand("ui_debug_show_title_safe_bounds", "toggle display of title safe boundary", 1, 1, CommandCollection::ui_debug_show_title_safe_bounds));
+	InsertCommand(new ConsoleCommand("ui_debug_element_bounds", "toggle rendering of widget tag block bounds ", 1, 1, CommandCollection::ui_debug_element_bounds));
+	InsertCommand(new ConsoleCommand("ui_transition_out_console_window", "transition out any ui on the console window", 0, 0, CommandCollection::ui_transition_out_console_window));
+	InsertCommand(new ConsoleCommand("ui_set_beta", "set ui beta testing on/off", 1, 1, CommandCollection::ui_set_beta));
+	InsertCommand(new ConsoleCommand("ui_test_error_ok", "test error code display w/ ok dialog", 1, 1, CommandCollection::ui_test_error_ok));
+	InsertCommand(new ConsoleCommand("ui_test_error_ok_cancel", "test error code display w/ ok-cancel dialog", 1, 1, CommandCollection::ui_test_error_ok_cancel));
+	InsertCommand(new ConsoleCommand("ui_test_confirmation", "test confirmation dialog display", 1, 1, CommandCollection::ui_test_confirmation));
+#endif
+
 
 	atexit([]() -> void {
 		for (auto command : commandTable)
@@ -1047,6 +1071,168 @@ static int CommandCollection::net_event_log_category_evaluate(const std::vector<
 static int CommandCollection::net_event_list_categories_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	network_event_dump_categories(tokens[1].c_str());
+	return 0;
+}
+#endif
+
+#ifdef UI_DEBUG
+static int CommandCollection::ui_debug_load_main_menu(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+	if (shell_is_dedicated_server()) {
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	user_interface_debug_load_main_menu();
+	return 0;
+}
+
+static int CommandCollection::ui_debug_text_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+	bool value;
+
+	if (shell_is_dedicated_server()) {
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	std::string exception;
+	if (!ComVar(&value).SetFromStr(tokens[1], exception))
+	{
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
+		return 0;
+	}
+
+	user_interface_debug_text_bounds(value);
+	return 0;
+}
+
+static int CommandCollection::ui_debug_show_title_safe_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+	bool value;
+
+	if (shell_is_dedicated_server()) {
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	std::string exception;
+	if (!ComVar(&value).SetFromStr(tokens[1], exception))
+	{
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
+		return 0;
+	}
+
+	user_interface_debug_show_title_safe_bounds(value);
+	return 0;
+}
+
+static int CommandCollection::ui_debug_element_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+	bool value;
+
+	if (shell_is_dedicated_server()) {
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	std::string exception;
+	if (!ComVar(&value).SetFromStr(tokens[1], exception))
+	{
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
+		return 0;
+	}
+
+	user_interface_debug_element_bounds(value);
+	return 0;
+}
+
+static int CommandCollection::ui_transition_out_console_window(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+	if (shell_is_dedicated_server()) {
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	user_interface_transition_out_console_window();
+	return 0;
+}
+
+static int CommandCollection::ui_set_beta(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+	bool value;
+
+	if (shell_is_dedicated_server()) {
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	std::string exception;
+	if (!ComVar(&value).SetFromStr(tokens[1], exception))
+	{
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "\t%s", exception.c_str());
+		return 0;
+	}
+
+	user_interface_set_beta(value);
+	return 0;
+}
+
+static int CommandCollection::ui_test_error_ok(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+	if (shell_is_dedicated_server()) {
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	int32 error_id;
+	std::string exception;
+	ComVar(&error_id).SetFromStr(tokens[1], 0, exception);
+
+	user_interface_test_error_ok((int16)error_id);
+	return 0;
+}
+
+static int CommandCollection::ui_test_error_ok_cancel(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+	if (shell_is_dedicated_server()) {
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	int32 error_id;
+	std::string exception;
+	ComVar(&error_id).SetFromStr(tokens[1], 0, exception);
+
+	user_interface_test_error_ok_cancel((int16)error_id);
+	return 0;
+}
+
+static int CommandCollection::ui_test_confirmation(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	TextOutputCb* outputCb = ctx.outputCb;
+	if (shell_is_dedicated_server()) {
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	int32 error_id;
+	std::string exception;
+	ComVar(&error_id).SetFromStr(tokens[1], 0, exception);
+
+	user_interface_test_confirmation((int16)error_id);
 	return 0;
 }
 #endif

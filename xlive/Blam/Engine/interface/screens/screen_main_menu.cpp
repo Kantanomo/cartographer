@@ -259,7 +259,7 @@ void c_main_menu_list::handle_item_campaign(s_event_record** pevent)
 	}
 	else
 	{
-		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+		user_interface_error_ok_cancle_dialog_show_confirmation(
 			_user_interface_channel_type_gameshell_dialog,
 			_window_4,
 			FLAG((*pevent)->controller),
@@ -336,7 +336,7 @@ void c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
 	}
 	else if (online_connected_to_xbox_live())
 	{
-		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+		user_interface_error_ok_cancle_dialog_show_confirmation(
 			_user_interface_channel_type_gameshell_dialog,
 			_window_4,
 			FLAG((*pevent)->controller),
@@ -365,7 +365,7 @@ void c_main_menu_list::handle_item_system_link(s_event_record** pevent)
 	}
 	else if (online_connected_to_xbox_live())
 	{
-		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+		user_interface_error_ok_cancle_dialog_show_confirmation(
 			_user_interface_channel_type_gameshell_dialog,
 			_window_4,
 			FLAG((*pevent)->controller),
