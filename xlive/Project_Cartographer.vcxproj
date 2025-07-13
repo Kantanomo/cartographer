@@ -1347,7 +1347,13 @@
     <ClInclude Include="Blam\Engine\input\input_process.h" />
     <ClInclude Include="Blam\Engine\input\input_windows.h" />
     <ClInclude Include="Blam\Engine\input\input_xinput.h" />
+    <ClInclude Include="Blam\Engine\interface\channel_with_history.h" />
+    <ClInclude Include="Blam\Engine\interface\dialog_channel.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
+    <ClInclude Include="Blam\Engine\interface\gameshell_background_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\gameshell_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\game_error_dialog_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\hardware_error_dialog_channel.h" />
     <ClInclude Include="Blam\Engine\interface\hud.h" />
     <ClInclude Include="Blam\Engine\interface\hud_draw.h" />
     <ClInclude Include="Blam\Engine\interface\hud_messaging.h" />
@@ -1357,6 +1363,7 @@
     <ClInclude Include="Blam\Engine\interface\motion_sensor.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_draw.h" />
+    <ClInclude Include="Blam\Engine\interface\online_menu_channel.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screens_patches.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_4way_signin.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_about_dialog.h" />
@@ -1393,11 +1400,13 @@
     <ClInclude Include="Blam\Engine\interface\signal_slot.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_bitmap_block.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_channel.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_globals.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_group_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_guide.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_hud_block.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_main_menu_music.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_memory.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_model_block.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />
@@ -1408,6 +1417,9 @@
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_text_block.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_text_chat.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_text_chat_receiver.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_text_chat_sender.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_utilities.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_button.h" />

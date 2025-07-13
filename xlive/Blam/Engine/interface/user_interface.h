@@ -315,7 +315,7 @@ enum e_user_interface_render_window
 	_window_3,
 	_window_4,
 
-	k_number_of_render_windows = 4
+	k_number_of_render_windows = 5
 };
 
 /* typedefs */
