@@ -273,6 +273,8 @@ enum e_juggernaut_engine_flags
 	_juggernaut_is_damage_resistant_bit = 6,
 };
 
+/* structures */
+
 struct s_variant_description_map
 {
 	const char* name;
@@ -334,6 +336,8 @@ struct s_game_variant
 	int8 data[64];
 };
 ASSERT_STRUCT_SIZE(s_game_variant, 304);
+
+/* prototypes */
 
 s_game_variant* get_game_variant(void);
 

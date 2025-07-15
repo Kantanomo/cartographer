@@ -4,7 +4,7 @@
 #include "cache/physical_memory_map.h"
 #include "text/unicode.h"
 
-/* globals */
+/* constants  */
 
 const wchar_t* k_saved_game_file_type_strings[k_number_of_saved_game_file_types]
 {
@@ -23,15 +23,18 @@ const wchar_t* k_saved_game_file_type_strings[k_number_of_saved_game_file_types]
 /* typedef */
 
 typedef void(__cdecl* t_saved_games_load_save_file_information_from_disk)(c_static_array<s_saved_game_main_menu_globals_save_file_info, k_maximum_enumerated_saved_game_files_any_type_per_memory_unit>* save_files_storage);
-t_saved_games_load_save_file_information_from_disk p_saved_games_load_save_file_information_from_disk;
 
 /* prototypes */
 
-void saved_game_main_menu_globals_set(s_saved_game_main_menu_globals* new_globals);
-uint32 __cdecl saved_games_loading_allocate_storage(int32 a1, s_saved_game_file_loading_information* loading_information);
-void saved_games_load_save_file_information_from_disk(c_static_array<s_saved_game_main_menu_globals_save_file_info, k_maximum_enumerated_saved_game_files_any_type_per_memory_unit>* save_files_storage);
-void saved_game_main_menu_globals_initialize(void);
-void saved_game_files_memory_initialize(int32 unk);
+static void saved_game_main_menu_globals_set(s_saved_game_main_menu_globals* new_globals);
+static uint32 __cdecl saved_games_loading_allocate_storage(int32 a1, s_saved_game_file_loading_information* loading_information);
+static void saved_games_load_save_file_information_from_disk(c_static_array<s_saved_game_main_menu_globals_save_file_info, k_maximum_enumerated_saved_game_files_any_type_per_memory_unit>* save_files_storage);
+static void saved_game_main_menu_globals_initialize(void);
+static void saved_game_files_memory_initialize(int32 unk);
+
+/* globals */
+
+t_saved_games_load_save_file_information_from_disk p_saved_games_load_save_file_information_from_disk;
 
 /* public code */
 
@@ -88,7 +91,7 @@ bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* ou
 
 const wchar_t* saved_games_get_file_type_as_string(e_saved_game_file_type file_type)
 {
-	return file_type < k_number_of_saved_game_file_types ? k_saved_game_file_type_strings[file_type] : L"unknown";
+	return VALID_INDEX(file_type, k_number_of_saved_game_file_types) ? k_saved_game_file_type_strings[file_type] : L"unknown";
 }
 
 bool saved_games_append_file_type_to_path(const wchar_t* in_path, e_saved_game_file_type file_type, wchar_t* out_path)
@@ -141,23 +144,23 @@ void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name
 
 /* private code */
 
-void saved_game_main_menu_globals_set(s_saved_game_main_menu_globals* new_globals)
+static void saved_game_main_menu_globals_set(s_saved_game_main_menu_globals* new_globals)
 {
 	*Memory::GetAddress<s_saved_game_main_menu_globals**>(0x482300) = new_globals;
 }
 
-uint32 __cdecl saved_games_loading_allocate_storage(int32 a1, s_saved_game_file_loading_information* loading_information)
+static uint32 __cdecl saved_games_loading_allocate_storage(int32 a1, s_saved_game_file_loading_information* loading_information)
 {
 	return INVOKE(0x9CC67, 0, saved_games_loading_allocate_storage, a1, loading_information);
 }
 
 
-void saved_games_load_save_file_information_from_disk(c_static_array<s_saved_game_main_menu_globals_save_file_info, k_maximum_enumerated_saved_game_files_any_type_per_memory_unit>* save_files_storage)
+static void saved_games_load_save_file_information_from_disk(c_static_array<s_saved_game_main_menu_globals_save_file_info, k_maximum_enumerated_saved_game_files_any_type_per_memory_unit>* save_files_storage)
 {
 	return p_saved_games_load_save_file_information_from_disk(save_files_storage);
 }
 
-void saved_game_main_menu_globals_initialize(void)
+static void saved_game_main_menu_globals_initialize(void)
 {
 	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
 
@@ -184,7 +187,7 @@ void saved_game_main_menu_globals_initialize(void)
 	return;
 }
 
-void saved_game_files_memory_initialize(int32 unk)
+static void saved_game_files_memory_initialize(int32 unk)
 {
 	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
 

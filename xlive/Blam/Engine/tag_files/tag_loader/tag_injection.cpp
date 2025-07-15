@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "tag_injection.h"
 
+#include "cache/cache_files.h"
 #include "networking/network_event.h"
 #include "shell/shell.h"
 

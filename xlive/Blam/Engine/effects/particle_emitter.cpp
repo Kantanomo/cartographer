@@ -1,12 +1,10 @@
 #include "stdafx.h"
 #include "particle_emitter.h"
 
-#include "effects.h"
 #include "particle_state.h"
 
-#include "objects/objects.h"
-
 #include "camera/camera.h"
+#include "render/render_cameras.h"
 
 data_array* get_particle_emitter_table()
 {

@@ -3,14 +3,21 @@
 #include "tag_files/string_id.h"
 #include "tag_files/tag_groups.h"
 
-#define CACHE_FILE_PAGE_SIZE 512
-#define FIRST_SHARED_TAG_INSTANCE_INDEX 10000
-#define MAXIMUM_SIMULTANEOUS_TAG_INSTANCES_TOTAL 20000
-#define k_cache_file_max_string_ids 24576
+/* constants */
 
-#define k_cache_file_debug_name_buffer_size 5120000
-#define k_cache_file_debug_string_id_index_buffer_size (k_cache_file_max_string_ids * sizeof(string_id))
-#define k_cache_file_debug_string_id_storage_size 393216
+enum
+{
+	CACHE_FILE_PAGE_SIZE = 512,
+	FIRST_SHARED_TAG_INSTANCE_INDEX = 10000,
+	MAXIMUM_SIMULTANEOUS_TAG_INSTANCES_TOTAL = 20000,
+	k_cache_file_max_string_ids = 24576,
+
+	k_cache_file_debug_name_buffer_size = 5120000,
+	k_cache_file_debug_string_id_index_buffer_size = (k_cache_file_max_string_ids * sizeof(string_id)),
+	k_cache_file_debug_string_id_storage_size = 393216,
+};
+
+/* enums */
 
 enum e_shared_resource_database_type : int32
 {
@@ -20,6 +27,8 @@ enum e_shared_resource_database_type : int32
 	k_shared_resource_database_type_count,
 	_shared_resource_database_type_none = NONE
 };
+
+/* structures */
 
 struct cache_file_tag_instance
 {

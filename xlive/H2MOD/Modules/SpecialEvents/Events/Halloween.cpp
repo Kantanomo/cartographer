@@ -6,6 +6,7 @@
 
 #include "structures/structure_lightmap.h"
 
+#include "cache/cache_files.h"
 #include "models/models.h"
 #include "objects/objects.h"
 #include "objects/scenery.h"
@@ -15,12 +16,14 @@
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
-datum lbitm_datum = NONE;
-datum sky_datum = NONE;
-datum candle_datum = NONE;
-datum candle_fire_datum = NONE;
-datum large_candle_datum = NONE;
-datum pump_datum = NONE;
+/* globals */
+
+static datum lbitm_datum = NONE;
+static datum sky_datum = NONE;
+static datum candle_datum = NONE;
+static datum candle_fire_datum = NONE;
+static datum large_candle_datum = NONE;
+static datum pump_datum = NONE;
 
 /* prototypes */
 
@@ -115,7 +118,7 @@ static void halloween_game_life_cycle_update(e_game_life_cycle state)
 		const s_cache_header* cache_header = cache_files_get_header();
 		if (!strcmp(cache_header->name, "coagulation"))
 		{
-			for (auto& scen_place : coag_scen_places)
+			for (auto& scen_place : k_coag_scen_places)
 			{
 				// Set type of object and variant
 				switch (scen_place.type)
@@ -144,7 +147,7 @@ static void halloween_game_life_cycle_update(e_game_life_cycle state)
 		}
 		else if (!strcmp(cache_header->name, "lockout"))
 		{
-			for (auto& scen_place : lockout_scen_places)
+			for (auto& scen_place : k_lockout_scen_places)
 			{
 				// Set type of object and variant
 				switch (scen_place.type)

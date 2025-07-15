@@ -1648,6 +1648,8 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Birthday.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Halloween.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Mook.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEventHelpers.cpp" />
