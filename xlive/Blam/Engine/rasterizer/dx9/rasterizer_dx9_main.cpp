@@ -249,7 +249,7 @@ void rasterizer_dx9_main_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x26375D), rasterizer_dx9_device_initialize);
 
 	// Redirect dx9 initialization function so we can use d3d9on12 and do other cool stuff
-	DETOUR_ATTACH(p_rasterizer_dx9_initialize, Memory::GetAddress<rasterizer_dx9_initialize_t>(0x263359, 0x0), rasterizer_dx9_initialize);
+	DETOUR_ATTACH(p_rasterizer_dx9_initialize, Memory::GetAddress<rasterizer_dx9_initialize_t>(0x263359, 0x0), rasterizer_initialize);
 
 	// disable gamma correction by using D3D9::SetGammaRamp, TODO: implement a shader to take care of this, because D3D9::SetGammaRamp function seems to have 2 issues:
 	// 1) it's very heavy on NVIDIA/Intel (not sure about AMD) GPUs (or there is something wrong with the drivers), causing stuttering on maps that override gamma (like Warlock, Turf, Backwash)
@@ -259,6 +259,12 @@ void rasterizer_dx9_main_apply_patches(void)
 	BYTE SetGammaRampSkipBytes[] = { 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
 	NopFill(Memory::GetAddress(0x26192F), 15);
 	WriteBytes(Memory::GetAddress(0x26193E), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
+	return;
+}
+
+void rasterizer_dx9_sapien_apply_patches(void)
+{
+	WriteValue(Memory::GetAddressRelative(0x1924CB8), 1);	// Set hardware vertex processing to enabled
 	return;
 }
 
@@ -285,11 +291,6 @@ D3DCAPS9* rasterizer_dx9_caps_get(void)
 int32* hardware_vertex_processing_get(void)
 {
 	return Memory::GetAddress<int32*>(0x9DA8B0);
-}
-
-bool __cdecl rasterizer_initialize(void)
-{
-	return INVOKE(0x263359, 0x0, rasterizer_initialize);
 }
 
 bool __cdecl rasterizer_dx9_reset(bool create_window)
@@ -709,7 +710,7 @@ void __cdecl rasterizer_dx9_initialize_camera_projection(
 	return;
 }
 
-bool __cdecl rasterizer_dx9_initialize(void)
+bool __cdecl rasterizer_initialize(void)
 {
 	bool result = true;
 
