@@ -17,8 +17,9 @@ enum e_bitstream_state : uint32
 	k_bitstream_state_count
 };
 
-struct c_bitstream
+class c_bitstream
 {
+public:
 	uint8* m_stream_buf;
 	int32 m_stream_buf_size_bytes;
 	int32 m_data_size_alignment;
