@@ -175,7 +175,7 @@ size_t csstrnlen(const char* s, size_t size)
 	return length;
 }
 
-char* csnappendf(char* s, size_t size, const char* format)
+char* csnappendf(char* s, size_t size, const char* format, ...)
 {
 	va_list va_args;
 	va_start(va_args, format);
