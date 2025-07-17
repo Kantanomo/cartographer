@@ -184,23 +184,24 @@ bool xbox_tickrate_is_enabled()
 
 #pragma region PlayerFunctions
 
-void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
+void call_give_player_weapon(int player_index, datum weaponId, bool resetLoadout)
 {
-	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
+	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 
-	datum unit_datum = s_player::get_unit_index(playerIndex);
-	if (unit_datum != NONE)
+	if (player->unit_index != NONE)
 	{
 		object_placement_data nObject;
 
-		object_placement_data_new(&nObject, weaponId, unit_datum, 0);
+		object_placement_data_new(&nObject, weaponId, player->unit_index, 0);
 
 		datum object_idx = object_new(&nObject);
 
 		if (resetLoadout)
-			unit_delete_all_weapons(unit_datum);
+		{
+			unit_delete_all_weapons(player->unit_index);
+		}
 
-		unit_add_weapon_to_inventory(unit_datum, object_idx, _weapon_addition_method_one);
+		unit_add_weapon_to_inventory(player->unit_index, object_idx, _weapon_addition_method_one);
 	}
 }
 

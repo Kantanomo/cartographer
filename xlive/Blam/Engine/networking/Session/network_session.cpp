@@ -37,24 +37,6 @@ bool NetworkSession::PlayerIsActive(datum player_index)
 	return GetActiveNetworkSession()->is_session_player_active(player_index);
 }
 
-std::vector<uint64> NetworkSession::GetActivePlayerIdList()
-{
-	std::vector<uint64> activePlayerIdList;
-	if (GetPlayerCount() > 0)
-	{
-		for (int32 playerIdx = 0; playerIdx < k_maximum_players; playerIdx++)
-		{
-			if (PlayerIsActive(playerIdx))
-			{
-				uint64 playerId = GetPlayerId(playerIdx);
-				activePlayerIdList.emplace_back(playerId);
-			}
-		}
-	}
-
-	return activePlayerIdList;
-}
-
 std::vector<int32> NetworkSession::GetActivePlayerIndicesList()
 {
 	std::vector<int32> activePlayersIndices;
@@ -137,7 +119,7 @@ const wchar_t* NetworkSession::GetPlayerName(datum player_index)
 	return GetActiveNetworkSession()->get_player_name(player_index);
 }
 
-uint64 NetworkSession::GetPlayerId(datum player_index)
+s_player_identifier NetworkSession::GetPlayerId(datum player_index)
 {
 	return GetActiveNetworkSession()->get_player_id(player_index);
 }
@@ -145,19 +127,6 @@ uint64 NetworkSession::GetPlayerId(datum player_index)
 int8 NetworkSession::GetPlayerTeam(datum player_index)
 {
 	return GetActiveNetworkSession()->get_player_membership(player_index)->properties[0].team_index;
-}
-
-int32 NetworkSession::GetPeerIndexFromId(uint64 xuid)
-{
-	if (GetPlayerCount() > 0)
-	{
-		for (int32 player_index = 0; player_index < k_maximum_players; player_index++)
-		{
-			if (PlayerIsActive(player_index) && GetPlayerId(player_index) == xuid)
-				return GetPeerIndex(player_index);
-		}
-	}
-	return NONE;
 }
 
 void NetworkSession::KickPeer(int32 peer_index)

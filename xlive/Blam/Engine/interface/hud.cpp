@@ -108,7 +108,7 @@ void hud_draw_screen(void)
 			!cubemap_screenshot_in_progress())
 		{
 			const s_hud_scripted_globals* g_hud_scripted_globals = get_hud_scripted_globals();
-			const s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
+			const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 			int32 perspective = director_get_perspective(g_user_render_index);
 
 			if (g_hud_scripted_globals->field_0)
@@ -153,13 +153,13 @@ void __cdecl hud_play_unit_sounds(int32 user_index)
 
 void hud_render_player_indicators(datum player_index)
 {
-	data_array* player_data_array = s_player::get_data();
-	const s_player* player = (s_player*)datum_get(player_data_array, player_index);
+	data_array* player_data_array = player_data_get();
+	const player_datum* player = (player_datum*)datum_get(player_data_array, player_index);
 	if (game_is_campaign() && !cinematic_in_progress())
 	{
 		data_iterator iterator;
 		iterator_new(&iterator, player_data_array);
-		s_player* current_player = (s_player*)iterator_next(&iterator);
+		player_datum* current_player = (player_datum*)iterator_next(&iterator);
 		while (current_player != NULL)
 		{
 			bool is_enemy;
@@ -177,7 +177,7 @@ void hud_render_player_indicators(datum player_index)
 				hud_render_player_indicator(iterator.index);
 			}
 
-			current_player = (s_player*)iterator_next(&iterator);
+			current_player = (player_datum*)iterator_next(&iterator);
 		}
 	}
 	return;

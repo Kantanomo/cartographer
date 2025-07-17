@@ -301,7 +301,7 @@ void halo_interpolator_object_populate_interpolation_data(
 					const datum player_index = player_index_from_unit_index(object_index);
 					if (player_index != NONE)
 					{
-						const s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
+						const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 						if (player->user_index != NONE)
 						{
 							g_target_interpolation_frame_data->crouch[player->user_index] = unit->unit.crouching;
@@ -495,7 +495,7 @@ bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_
 	int32 abs_object_index;
 	if (player_index != NONE && halo_interpolator_object_can_interpolate(object_index, &abs_object_index))
 	{
-		const s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
+		const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 		if (player->user_index != NONE)
 		{
 			real32 distance = g_previous_interpolation_frame_data->crouch[player->user_index] - g_target_interpolation_frame_data->crouch[player->user_index];

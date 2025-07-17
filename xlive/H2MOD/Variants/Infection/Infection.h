@@ -67,14 +67,10 @@ public:
 	static void preSpawnServerSetup();
 	static void resetWeaponInteractionAndEmblems();
 	static void sendTeamChange();
-	static void resetZombiePlayerStatus();
-	static void setZombiePlayerStatus(uint64 identifier);
 	static void setPlayerAsHuman(int playerIndex);
 	static void setPlayerAsZombie(int playerIndex);
 	static void triggerSound(e_infection_sounds sound, int sleep);
 	static void onGameTick();
 	static void removeUnwantedItems();
 	static int calculateZombiePlayerIndex();
-private:
-	static std::vector<unsigned long long> zombieIdentifiers;
 };

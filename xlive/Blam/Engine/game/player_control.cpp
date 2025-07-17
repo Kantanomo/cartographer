@@ -99,7 +99,7 @@ real32 local_player_held_zoom_delta_time[4]
 	0.f, 0.f, 0.f, 0.f
 };
 
-void __cdecl update_player_control_zoom_updates_held(s_player* player, s_player_control* player_control, real32 delta)
+void __cdecl update_player_control_zoom_updates_held(player_datum* player, s_player_control* player_control, real32 delta)
 {
 	if (player->user_index != NONE)
 	{
@@ -111,7 +111,7 @@ void __cdecl update_player_control_zoom_updates_held(s_player* player, s_player_
 }
 
 
-void __cdecl update_player_control_check_held_time(s_player* player, s_player_control* player_control)
+void __cdecl update_player_control_check_held_time(player_datum* player, s_player_control* player_control)
 {
 	if (player->user_index != NONE)
 	{
@@ -122,17 +122,32 @@ void __cdecl update_player_control_check_held_time(s_player* player, s_player_co
 	}
 }
 
-int16 __cdecl unit_rotate_zoom_level_hook(datum object_index, __int16 a2)
+int16 __cdecl unit_rotate_zoom_level_hook(datum unit_index, int16 a2)
 {
-	int16 result = INVOKE(0x1413CE, 0, unit_rotate_zoom_level_hook, object_index, a2);
-	if(result != NONE)
+	int16 result = INVOKE(0x1413CE, 0, unit_rotate_zoom_level_hook, unit_index, a2);
+
+	// This sucks......
+	if (result != NONE)
 	{
-		s_player* player = s_player::get_from_unit_index(object_index);
+		player_datum* player = NULL;
+		c_player_in_game_iterator player_it;
+		while (player_it.next())
+		{
+			player_datum* current_player = player_it.get_datum();
+			if (current_player->unit_index == unit_index)
+			{
+				player = current_player;
+				break;
+			}
+		}
+
 		if (player)
 		{
 			int16 user_index = player->user_index;
 			if (user_index != NONE)
+			{
 				local_player_held_zoom_delta_time[user_index] = 0.f;
+			}
 		}
 	}
 	return result;
@@ -151,7 +166,7 @@ __declspec(naked) void update_player_control_zoom_updates_held_jmp()
 
 		push ebx
 		push ebp // push pointer to s_player_control
-		push esi // push pointer to s_player
+		push esi // push pointer to player_datum
 
 		call update_player_control_zoom_updates_held
 
@@ -176,7 +191,7 @@ __declspec(naked) void update_player_control_check_held_time_jmp()
 		pushfd
 
 		push ebp // push pointer to s_player_control
-		push esi // push pointer to s_player
+		push esi // push pointer to player_datum
 
 		call update_player_control_check_held_time
 

@@ -637,7 +637,7 @@ void draw_hud_text_get_string(s_draw_hud_widget_input_results* widget_function_r
 	{
 		if(user_state->player_talking && user_state->player_index != NONE)
 		{
-			const s_player* player = (s_player*)datum_get(s_player::get_data(), user_state->player_index);
+			const player_datum* player = (player_datum*)datum_get(player_data_get(), user_state->player_index);
 			out_string->print(L"%s", player->properties[0].player_name);
 		}
 		else

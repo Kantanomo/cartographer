@@ -566,18 +566,31 @@ static int CommandCollection::LogPlayersCmd(const std::vector<std::string>& toke
 		{
 			char player_name[XUSER_NAME_SIZE * 2];
 			wchar_string_to_utf8_string(session->get_player_name(player_index), player_name, NUMBEROF(player_name));
+			
+			c_static_string<512> string;
+			string.set("# Player index=");
+			string.append(std::to_string(player_index).c_str());
 
-			std::string outStr = "# Player index=" + std::to_string(player_index);
-			outStr += ", Peer index=" + std::to_string(NetworkSession::GetPeerIndex(player_index));
-			outStr += ", PlayerName=" + std::string(player_name);
+			string.append(", Peer index=");
+			string.append(std::to_string(NetworkSession::GetPeerIndex(player_index)).c_str());
+			
+			string.append(", PlayerName=");
+			string.append(player_name);
 
-			wchar_string_to_utf8_string(s_player::get_name(player_index), player_name, NUMBEROF(player_name));
+			const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+			wchar_string_to_utf8_string(player->properties[0].player_name, player_name, NUMBEROF(player_name));
 
-			outStr += ", Name from game player state=" + std::string(player_name);
-			outStr += ", Team=" + std::to_string(NetworkSession::GetPlayerTeam(player_index));
-			outStr += ", Identifier=" + std::to_string(NetworkSession::GetPlayerId(player_index));
+			string.append(", Name from game player state=");
+			string.append(player_name);
 
-			outputCb(StringFlag_None, outStr.c_str());
+			string.append(", Team=");
+			string.append(std::to_string(NetworkSession::GetPlayerTeam(player_index)).c_str());
+			
+			string.append(", Identifier=");
+			string.append(std::to_string(NetworkSession::GetPlayerId(player_index).id_low).c_str());
+			string.append(std::to_string(NetworkSession::GetPlayerId(player_index).id_high).c_str());
+
+			outputCb(StringFlag_None, string.get_string());
 		}
 	}
 
@@ -626,7 +639,8 @@ static int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens
 		string.append(std::to_string(session->m_session_membership.membership_peers[peer_index].map_status).c_str());
 		
 		const datum player_index = session->m_session_membership.membership_peers[peer_index].local_players_indexes[0];
-		if (player_index != NONE)
+		const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+		if (player)
 		{
 			wchar_string_to_utf8_string(session->get_player_membership(player_index)->properties[0].player_name, name, NUMBEROF(name));
 
@@ -635,7 +649,7 @@ static int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens
 			string.append(", Player name=");
 			string.append(name);
 
-			wchar_string_to_utf8_string(s_player::get_name(player_index), name, NUMBEROF(name));
+			wchar_string_to_utf8_string(player->properties[0].player_name, name, NUMBEROF(name));
 			string.append(", Name from game player state=");
 			string.append(name);
 		}

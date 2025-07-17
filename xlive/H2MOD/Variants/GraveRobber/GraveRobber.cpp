@@ -71,18 +71,17 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 }
 
 
-void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
+void GraveRobber::PickupSkull(datum player_index, datum skull_datum)
 {
 	if (skull_datum == NONE) { return; }
 
-	s_player* player = (s_player*)datum_get(s_player::get_data(), player_datum);
-	int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
+	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 
 	c_game_statborg* game_statborg = game_engine_get_statborg();
 	if (!game_is_predicted())
 	{
 		player_is_picking_up_skull = true;
-		game_statborg->adjust_player_stat(player_datum, statborg_entry_score, 1, -1, true);
+		game_statborg->adjust_player_stat(player_index, statborg_entry_score, 1, -1, true);
 		if (game_engine_has_teams())
 		{
 			if (game_statborg->get_team_stat(player->properties[0].team_index, statborg_entry_score) == current_game_variant()->score_to_win_round)
@@ -92,9 +91,10 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 		}
 		else
 		{
-			if (game_statborg->get_player_stat(player_index, statborg_entry_score) == current_game_variant()->score_to_win_round)
+			const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
+			if (game_statborg->get_player_stat(player_abs_index, statborg_entry_score) == current_game_variant()->score_to_win_round)
 			{
-				game_engine_end_round_with_winner(player_datum, false);
+				game_engine_end_round_with_winner(player_index, false);
 			}
 		}
 
@@ -107,7 +107,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 	{
 		for (int i = 0; i < k_number_of_users; i++)
 		{
-			if (player_index_from_user_index(i) == player_datum)
+			if (player_index_from_user_index(i) == player_index)
 			{
 				TriggerSound(_snd_skull_scored, 500);
 				break;
@@ -185,16 +185,16 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 	}
 }
 
-void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
+void GraveRobber::OnPlayerDeath(ExecTime execTime, datum player_index)
 {
-	const datum unit_datum = s_player::get_unit_index(playerIdx);
+	const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 
 	switch (execTime)
 	{
 	case ExecTime::_preEventExec:
 		// to note after the original function executes, the controlled unit by this player is set to NONE
-		if (!game_is_predicted() && unit_datum != object_get_damage_owner(unit_datum))
-			GraveRobber::SpawnSkull(unit_datum);
+		if (!game_is_predicted() && player->unit_index != object_get_damage_owner(player->unit_index))
+			GraveRobber::SpawnSkull(player->unit_index);
 		break;
 
 	case ExecTime::_postEventExec:

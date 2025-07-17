@@ -10,6 +10,7 @@
 #include "networking/messages/network_message_type_collection.h"
 #include "networking/messages/network_messages_cartographer.h"
 #include "networking/session/network_observer.h"
+#include "simulation/game_interface/simulation_game_action.h"
 #include "physics/physics_constants.h"
 #include "shell/shell.h"
 #include "units/units.h"
@@ -94,14 +95,17 @@ namespace CustomVariantSettings
 		ApplyCustomSettings(&currentVariantSettings);
 	}
 
-	void OnPlayerSpawn(datum playerIndex)
+	void OnPlayerSpawn(datum player_index)
 	{
 		if (!game_is_predicted()) 
 		{
 			if (currentVariantSettings.infiniteGrenades)
 			{
-				s_player::set_player_unit_grenade_count(playerIndex, _unit_grenade_human_fragmentation, 4, false);
-				s_player::set_player_unit_grenade_count(playerIndex, _unit_grenade_covenant_plasma, 4, false);
+				const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+				unit_datum* unit = unit_try_and_get(player->unit_index);
+				unit->unit.grenade_counts[_unit_grenade_human_fragmentation] = 4;
+				unit->unit.grenade_counts[_unit_grenade_covenant_plasma] = 4;
+				simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));
 			}
 		}
 	}

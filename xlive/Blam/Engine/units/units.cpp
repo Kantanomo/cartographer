@@ -4,6 +4,7 @@
 #include "unit_definitions.h"
 
 #include "cache/cache_files.h"
+#include "simulation/game_interface/simulation_game_action.h"
 #include "tag_files/global_string_ids.h"
 
 /* prototypes */
@@ -105,6 +106,30 @@ bool unit_does_not_show_readied_weapon(datum unit_index)
 	ASSERT(unit_definition);
 
 	return unit_definition->unit.flags.test(_unit_definition_doesnt_show_readied_weapon_bit);
+}
+
+void unit_set_desired_grenade_type(datum unit_index, int16 grenade_type)
+{
+	unit_datum* unit = unit_try_and_get(unit_index);
+	ASSERT((grenade_type >= 0) && (grenade_type < k_unit_grenade_types_count));
+	unit->unit.current_grenade_index = (int8)grenade_type;
+	unit->unit.desired_grenade_index = (int8)grenade_type;
+	return;
+}
+
+void unit_add_grenade_type_to_inventory(datum unit_index, int16 grenade_type, int16 grenade_count)
+{
+	unit_datum* unit = unit_try_and_get(unit_index);
+	ASSERT(grenade_count >= 0);
+	ASSERT((grenade_type >= 0) && (grenade_type < k_unit_grenade_types_count));
+
+	unit->unit.grenade_counts[grenade_type] += (int8)grenade_count;
+	unit_set_desired_grenade_type(unit_index, grenade_type);
+
+	// Originally the simulation did not update the grenade count when a grenade type was added to the unit's inventory
+	// We want this to be updated across the simulation
+	simulation_action_object_update(unit_index, FLAG(_simulation_action_update_grenade_count_bit));
+	return;
 }
 
 /* private code */
