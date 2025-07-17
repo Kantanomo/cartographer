@@ -222,7 +222,7 @@ const char* csnprintf(char* buffer, size_t size, size_t max_count, const char* f
 
 size_t csstrnlen(const char* s, size_t size);
 
-char* csnappendf(char* s, size_t size, const char* format);
+char* csnappendf(char* s, size_t size, const char* format, ...);
 
 char* csstrncpy(char* s1, const char* s2, size_t size);
 
