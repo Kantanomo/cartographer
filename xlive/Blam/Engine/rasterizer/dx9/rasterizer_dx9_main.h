@@ -69,6 +69,8 @@ struct s_rasterizer_dx9_main_globals
 
 void rasterizer_dx9_main_apply_patches(void);
 
+void rasterizer_dx9_sapien_apply_patches(void);
+
 s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals_get(void);
 
 IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void);
@@ -78,8 +80,6 @@ datum last_bitmap_tag_index_get(void);
 D3DCAPS9* rasterizer_dx9_caps_get(void);
 
 int32* hardware_vertex_processing_get(void);
-
-bool __cdecl rasterizer_initialize(void);
 
 bool __cdecl rasterizer_dx9_reset(bool create_window);
 
@@ -125,7 +125,7 @@ void __cdecl rasterizer_dx9_initialize_camera_projection(
 	const render_projection* projection,
 	e_rasterizer_target rasterizer_target);
 
-bool __cdecl rasterizer_dx9_initialize(void);
+bool __cdecl rasterizer_initialize(void);
 
 bool __cdecl rasterizer_dx9_vertex_shaders_initialize(void);
 
