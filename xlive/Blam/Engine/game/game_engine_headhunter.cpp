@@ -306,7 +306,7 @@ void c_headhunter_engine::update()
 
 		s_game_variant* variant = get_game_variant();
 
-		if(variant->game_engine_variant.king.hill_move_time)
+		if(variant->game_engine_variant.king.hill_move_time || g_headhunter_engine_globals->m_ticks_till_hill_move != 0)
 		{
 			--g_headhunter_engine_globals->m_ticks_till_hill_move;
 
