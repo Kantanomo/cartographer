@@ -127,6 +127,14 @@ static e_h2_type detect_process_type(void)
 				free(version_info);
 			}
 		}
+		// If there's no original version info
+		else
+		{
+			if (ustrstr(exe_file_path, L"tool.exe"))
+			{
+				result = _h2_type_ek_tool;
+			}
+		}
 	}
 	return result;
 }
