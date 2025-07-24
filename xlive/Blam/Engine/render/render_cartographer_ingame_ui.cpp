@@ -19,7 +19,6 @@
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
-#include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/Updater/Updater.h"
 #include "version_git.h"
 
@@ -44,6 +43,8 @@ enum
 	k_netdebug_text_font = 0,
 	k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator),
 };
+
+static const char g_cartographer_build_text[] = "Project Cartographer (v" DLL_VERSION_STR ") - Build Time: " __DATE__ " "  __TIME__;
 
 /* prototypes */
 
