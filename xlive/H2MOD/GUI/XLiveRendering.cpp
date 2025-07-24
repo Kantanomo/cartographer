@@ -19,11 +19,6 @@ bool doDrawIMGUI = false;
 HWND H2hWnd;
 D3DPRESENT_PARAMETERS g_d3dPresentParameters;
 
-char g_cartographer_build_text[256] = {};
-
-const char CompileDate[] = __DATE__;
-const char CompileTime[] = __TIME__;
-
 int verticalRes = 0;
 int horizontalRes = 0;
 
@@ -49,8 +44,6 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 
 	if (pXii->pD3D) {
 		XLiveRendering::InitializeD3D9((D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
-
-		snprintf(g_cartographer_build_text, NUMBEROF(g_cartographer_build_text), "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 	}
 
 	UpdateMasterStatus(-1, "Status: Initializing");
