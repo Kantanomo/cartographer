@@ -334,8 +334,10 @@ void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool confirm
 	}
 	else
 	{		
+#ifdef TERMINAL_ENABLED
 		 //console_printf("error code #%d= '%s'", error_id, user_interface_error_codes_get_name(error_id));
 		CartographerConsole::LogToMainTabCb(StringFlag_None, "error code #%d= '%s'", error_id, user_interface_error_codes_get_name(error_id));
+#endif
 	
 		if (confirmation)
 		{
