@@ -12,3 +12,4 @@ struct s_posture_definition
 };
 ASSERT_STRUCT_SIZE(s_posture_definition, 16);
 
+void unit_action_system_apply_patches();

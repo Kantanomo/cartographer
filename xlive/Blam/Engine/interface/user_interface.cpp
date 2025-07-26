@@ -8,6 +8,7 @@
 
 #include "cutscene/cinematics.h"
 #include "game/game.h"
+#include "saved_games/saved_game_files.h"
 
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 #include "XLive/xbox/xbox.h"
@@ -413,23 +414,23 @@ bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type
 	return INVOKE(0x20BAAA, 0x0, user_interface_in_screen, channel_type, window_index, screen_id);
 }
 
-bool __cdecl user_interface_error_screen_is_active(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index, e_ui_error_types error_code)
+bool __cdecl user_interface_error_screen_is_active(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index, e_ui_error_type error_code)
 {
 	return INVOKE(0x20A77D, 0x0, user_interface_error_screen_is_active, channel_index, window_index, error_code);
 }
 
-void __cdecl screen_error_ok_dialog_show(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback, void* fallback)
+void __cdecl screen_error_ok_dialog_show(e_user_interface_channel_type channel_type, e_ui_error_type ui_error_index, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback, void* fallback)
 {
 	INVOKE(0x20E1D8, 0x0, screen_error_ok_dialog_show, channel_type, ui_error_index, window_index, user_flags, ok_callback, fallback);
 	return;
 }
 
-void __cdecl screen_error_ok_dialog_with_custom_text(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback, void* fallback, const wchar_t* custom_title, const wchar_t* custom_body)
+void __cdecl screen_error_ok_dialog_with_custom_text(e_user_interface_channel_type channel_type, e_ui_error_type ui_error_index, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback, void* fallback, const wchar_t* custom_title, const wchar_t* custom_body)
 {
 	return INVOKE(0x20E1DA, 0x0, screen_error_ok_dialog_with_custom_text, channel_type, ui_error_index, window_index, user_flags, ok_callback, fallback, custom_title, custom_body);
 }
 
-void __cdecl user_interface_error_ok_cancel_dialog_show_confirmation(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback_handle, e_ui_error_types error_type)
+void __cdecl user_interface_error_display_ok_cancel_dialog_with_ok_callback(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback_handle, e_ui_error_type error_type)
 {
 	INVOKE(0x20E3BB, 0x0, user_interface_error_ok_cancel_dialog_show_confirmation, channel_type, window_index, user_flags, ok_callback_handle, error_type);
 	return;
@@ -450,6 +451,51 @@ void __cdecl user_interface_enter_game_shell(int32 context)
 {
 	INVOKE(0x20CE70, 0x0, user_interface_enter_game_shell, context);
 	return;
+}
+
+void user_interface_set_variant(enumerated_file_index enumerated_file_index, s_game_variant* variant)
+{
+	INVOKE(0x209A6E, 0, user_interface_set_variant, enumerated_file_index, variant);
+}
+
+s_game_variant* user_interface_get_variant()
+{
+	return INVOKE(0x209A92, 0, user_interface_get_variant);
+}
+
+void user_interface_clear_variant()
+{
+	INVOKE(0x209A98, 0, user_interface_clear_variant);
+}
+
+bool __cdecl user_interface_construct_default_game_variant_from_file_type(s_game_variant* out_variant,
+	e_saved_game_file_type type)
+{
+	e_game_variant_description_index variant_description = saved_game_type_to_variant_description(type);
+
+	switch (variant_description)
+	{
+	case _game_variant_description_slayer:
+	case _game_variant_description_oddball:
+	case _game_variant_description_juggernaut:
+	case _game_variant_description_king:
+	case _game_variant_description_ctf:
+	case _game_variant_description_invasion:
+	case _game_variant_description_territories:
+		return INVOKE(0x20BCEE, 0, user_interface_construct_default_game_variant_from_file_type, out_variant, type);
+		//todo: add race
+		//case _game_variant_description_race
+	case _game_variant_description_zombies:
+	case _game_variant_description_headhunter:
+		// todo: create default variant constructor for types
+		// requires creating a hard defined copy instance of the goof tag
+		// the tag that controls default variants.
+		game_variant_create_default_new(out_variant, variant_description);
+		return game_variant_cleanup(out_variant);
+	}
+
+	game_variant_create_default_new(out_variant, _game_variant_description_slayer);
+	return game_variant_cleanup(out_variant);
 }
 
 void __cdecl render_menu_user_interface(int32 controller_index, e_user_interface_render_window render_window, rectangle2d* out_rect2d)
