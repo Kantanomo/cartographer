@@ -44,6 +44,8 @@ const s_keyboard_custom_labels k_keyboard_custom_label_globals[k_language_count]
 
 bool g_vkbd_create_open_profile_config = true;
 
+/* private code */
+
 // header & subheader
 static void get_keyboard_labels(e_vkbd_context_type context, const wchar_t** out_header_text, const wchar_t** out_subheader_text)
 {
@@ -54,6 +56,8 @@ static void get_keyboard_labels(e_vkbd_context_type context, const wchar_t** out
 	*out_subheader_text = k_keyboard_custom_label_globals[_language_english][context - k_virtual_keyboard_custom_context_start].subheader_text;
 	return;
 }
+
+/* public code */
 
 c_virtual_keyboard_button::c_virtual_keyboard_button():
 	c_button_widget(NONE,0)
@@ -229,6 +233,9 @@ void __declspec(naked) jmp_c_screen_virtual_keyboard__load_player_profile_edit()
 void c_screen_virtual_keyboard::apply_patches()
 {
 	DETOUR_ATTACH(p_load_player_profile_edit, Memory::GetAddress<t_load_player_profile_edit>(0x23C7B2), jmp_c_screen_virtual_keyboard__load_player_profile_edit);
+	
+	//remove 16 character check for squad-name-entry
+	NopFill(Memory::GetAddress(0x23B1D1), 3);
 }
 
 void ui_set_virtual_keyboard_in_use(bool state)

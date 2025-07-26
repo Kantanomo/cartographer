@@ -339,7 +339,7 @@ void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool confirm
 	
 		if (confirmation)
 		{
-			user_interface_error_ok_cancle_dialog_show_confirmation(
+			user_interface_error_ok_cancel_dialog_show_confirmation(
 				_user_interface_channel_type_game_error,
 				_window_4,
 				NONE,
@@ -423,9 +423,9 @@ void __cdecl screen_error_ok_dialog_with_custom_text(e_user_interface_channel_ty
 	return INVOKE(0x20E1DA, 0x0, screen_error_ok_dialog_with_custom_text, channel_type, ui_error_index, window_index, user_flags, ok_callback, fallback, custom_title, custom_body);
 }
 
-void __cdecl user_interface_error_ok_cancle_dialog_show_confirmation(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback_handle, e_ui_error_types error_type)
+void __cdecl user_interface_error_ok_cancel_dialog_show_confirmation(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback_handle, e_ui_error_types error_type)
 {
-	INVOKE(0x20E3BB, 0x0, user_interface_error_ok_cancle_dialog_show_confirmation, channel_type, window_index, user_flags, ok_callback_handle, error_type);
+	INVOKE(0x20E3BB, 0x0, user_interface_error_ok_cancel_dialog_show_confirmation, channel_type, window_index, user_flags, ok_callback_handle, error_type);
 	return;
 }
 

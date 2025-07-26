@@ -573,7 +573,7 @@ static void user_interface_controller_boot_to_dash_check(void)
 			exit_callback = user_interface_save_map_and_exit;
 		}
 
-		user_interface_error_ok_cancle_dialog_show_confirmation(
+		user_interface_error_ok_cancel_dialog_show_confirmation(
 			//_user_interface_channel_type_gameshell_dialog, //orignally this , but changed to hardware_error so it can overrule disconnection screen
 			_user_interface_channel_type_hardware_error,
 			_window_4,
