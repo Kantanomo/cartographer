@@ -310,7 +310,7 @@ enum e_variant_setting_parameter_type : uint32
 	_variant_setting_parameter_type_uns_force_even_teams,
 
 	// cartographer settings
-	_variant_setting_parameter_type_cartographer_engine_mode,
+	_variant_setting_parameter_type_cartographer_engine_mode = 113,
 	_variant_setting_parameter_type_cartographer_infinite_ammo,
 	_variant_setting_parameter_type_cartographer_infinite_grenades,
 	_variant_setting_parameter_type_cartographer_explosion_physics,
@@ -323,7 +323,7 @@ enum e_variant_setting_parameter_type : uint32
 
 	k_variant_setting_parameter_type_count,
 	k_variant_setting_parameter_type_base_count = 112,
-	k_variant_setting_parameter_type_cartographer_count = (k_variant_setting_parameter_type_count - k_variant_setting_parameter_type_base_count),
+	k_variant_setting_parameter_type_cartographer_count = 10,
 
 	_variant_setting_parameter_type_invalid = (uint32)NONE
 };

@@ -289,8 +289,4 @@ bool game_variant_cartographer_settings_validate(s_game_variant* variant)
 	return true;
 }
 
-void asdf()
-{
-	//t.cartographer_settings.
-}
 #undef variant_setting_pin

@@ -511,6 +511,12 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 				g_xbox_tickrate_enabled = true;
 			}
 
+			if (options->game_variant.cartographer_settings.flags.test(_cartographer_variant_thirty_tick_rate))
+			{
+				event(_event_status, "h2mod: 30 tick engine mode enabled");
+				g_xbox_tickrate_enabled = true;
+			}
+
 			toggle_xbox_tickrate(options, g_xbox_tickrate_enabled);
 			if (!g_xbox_tickrate_enabled)
 			{

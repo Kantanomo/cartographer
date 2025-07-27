@@ -289,7 +289,7 @@ void render_cartographer_variant_extra_settings(rectangle2d* bounds)
 		bounds->top += line_height * 3;
 		bounds->bottom = bounds->top + line_height;
 
-		for (uint32 i = k_variant_setting_parameter_type_base_count; i < k_variant_setting_parameter_type_base_count + k_variant_setting_parameter_type_cartographer_count; ++i)
+		for (uint32 i = k_variant_setting_parameter_type_base_count + 1; i < k_variant_setting_parameter_type_base_count + 1 + k_variant_setting_parameter_type_cartographer_count; ++i)
 		{
 			e_variant_setting_parameter_type type = (e_variant_setting_parameter_type)i;
 

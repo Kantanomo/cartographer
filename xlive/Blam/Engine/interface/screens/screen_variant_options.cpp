@@ -204,7 +204,7 @@ void c_variant_options_list::link_item_widgets_cartographer()
 			s_variant_options_list_item* list_item = (s_variant_options_list_item*)datum_get(this->m_list_data, datum_new(this->m_list_data));
 
 			list_item->sily_definition = nullptr;
-			list_item->parameter_type = (e_variant_setting_parameter_type)(i + k_variant_setting_parameter_type_base_count);
+			list_item->parameter_type = (e_variant_setting_parameter_type)(i + k_variant_setting_parameter_type_base_count + 1);
 		}
 	}
 
