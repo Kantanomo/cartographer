@@ -57,6 +57,45 @@ static void get_keyboard_labels(e_vkbd_context_type context, const wchar_t** out
 	return;
 }
 
+static void apply_rename_squad_entry_patches()
+{
+    static uint8 accentsPatchCode[] =
+    {
+        0x83,0xF9,_vkbd_context_message_entry,
+        0x0F,0x8C,0x03,0xFF,0xFF,0xFF,
+        0x83,0xF9,_vkbd_context_search_description,
+        0x0F,0x8F,0xFA,0xFE,0xFF,0xFF,
+        0x90
+    };
+
+    static uint8 symbolsPatchCode[] =
+    {
+        0x83,0xF9,_vkbd_context_message_entry,
+        0x0F,0x8C,0xE4,0xFE,0xFF,0xFF,
+        0x83,0xF9,_vkbd_context_search_description,
+        0x0F,0x8F,0xDB,0xFE,0xFF,0xFF,
+        0x90
+    };
+
+    /*
+    
+          if ( vkbd_context == _vkbd_context_type_message_entry
+          || vkbd_context == _vkbd_context_type_message_entry2
+          || vkbd_context == _vkbd_context_type_search_description )
+
+          with
+
+          if ( vkbd_context >= _vkbd_context_type_message_entry 
+          && vkbd_context <= _vkbd_context_type_search_description )
+
+    */
+
+    WriteBytes(Memory::GetAddress(0x23CED1), accentsPatchCode, NUMBEROF(accentsPatchCode));// case _vkbd_button_type_accents_0:
+    WriteBytes(Memory::GetAddress(0x23CEF0), symbolsPatchCode, NUMBEROF(symbolsPatchCode));// case _vkbd_button_type_symbols_0:
+
+}
+
+
 /* public code */
 
 c_virtual_keyboard_button::c_virtual_keyboard_button():
@@ -233,9 +272,8 @@ void __declspec(naked) jmp_c_screen_virtual_keyboard__load_player_profile_edit()
 void c_screen_virtual_keyboard::apply_patches()
 {
 	DETOUR_ATTACH(p_load_player_profile_edit, Memory::GetAddress<t_load_player_profile_edit>(0x23C7B2), jmp_c_screen_virtual_keyboard__load_player_profile_edit);
-	
-	//remove 16 character check for squad-name-entry
-	NopFill(Memory::GetAddress(0x23B1D1), 3);
+
+    apply_rename_squad_entry_patches();
 }
 
 void ui_set_virtual_keyboard_in_use(bool state)
