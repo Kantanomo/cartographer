@@ -149,12 +149,15 @@ static const char k_squad_setting_list_name[] = "squad setting list";
 
 /* globals */
 
-datum new_xbox_live_bitmap_datum = NONE;
-datum xbox_live_menu_bitmap_datum = NONE;
-datum variant_bitmap_datum = NONE;
-wchar_t session_name_tmp[32] = L"<insert-name-here>";
-c_maximum_interface_text rename_squad_header;
-c_maximum_interface_text rename_squad_help;
+static datum new_xbox_live_bitmap_datum = NONE;
+static datum xbox_live_menu_bitmap_datum = NONE;
+static datum variant_bitmap_datum = NONE;
+static wchar_t session_name_tmp[32] = L"<insert-name-here>";
+static c_maximum_interface_text rename_squad_header;
+static c_maximum_interface_text rename_squad_help;
+
+
+/* public code */
 
 c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 	c_list_widget(user_flags),
@@ -727,11 +730,13 @@ void c_screen_squad_settings::update()
 
 	}
 
-	if (option_help_text_block && value_string != _string_id_invalid)
+	const bool value_string_set = value_string != _string_id_invalid;
+
+	if (option_help_text_block && value_string_set)
 		option_help_text_block->set_text_from_string_id(help_string);
-	if (option_header_text_block && value_string != _string_id_invalid)
+	if (option_header_text_block && value_string_set)
 		option_header_text_block->set_text_from_string_id(header_string);
-	if (option_value_text_block && value_string != _string_id_invalid)
+	if (option_value_text_block && value_string_set)
 		option_value_text_block->set_text_from_string_id(value_string);
 	
 	if (option_bitmap)

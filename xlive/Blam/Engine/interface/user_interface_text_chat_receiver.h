@@ -2,7 +2,7 @@
 #include "user_interface_text_chat.h"
 #include "tag_files/string_id.h"
 
-/* structures */
+/* classes */
 
 #pragma pack(push,1)
 class c_user_interface_text_chat_receiver
@@ -21,7 +21,7 @@ class c_user_interface_text_chat_receiver
 public:
 	string_id get_vote_error_message();
 	void post_incoming_messages();
-	void post_vote_error(wchar_t* Source);
+	void post_vote_error(const wchar_t* Source);
 	void add_chat_message(s_text_chat_message* message);
 };
 #pragma pack(pop)

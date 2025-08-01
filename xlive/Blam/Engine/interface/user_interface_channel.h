@@ -17,12 +17,12 @@ enum e_focussed_widget_type : int32
 };
 
 
-/* structures */
+/* classes */
 
 class c_user_interface_channel
 {
 private:
-	/*c_user_interface_channel::_vftable* vtable;*/
+
 	int32 m_window_index;
 	c_screen_widget* m_active_screen;
 	c_screen_widget* m_incoming_screen;

@@ -1,7 +1,7 @@
 #pragma once
 #include "user_interface_text_chat.h"
 
-/* structures */
+/* classes */
 
 class c_user_interface_text_chat_sender
 {
@@ -11,6 +11,6 @@ private:
 
 public:
 	void set_chat_data(e_text_chat_type chat_type, int32 players_mask);
-	void process_raw_message(wchar_t* raw_msg);
+	void process_raw_message(const wchar_t* raw_msg);
 };
 ASSERT_STRUCT_SIZE(c_user_interface_text_chat_sender, 0x8);

@@ -1,7 +1,7 @@
 #pragma once
 
 
-/* structures */
+/* classes */
 
 class c_user_interface_main_menu_music
 {

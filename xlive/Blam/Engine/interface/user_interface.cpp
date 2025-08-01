@@ -12,16 +12,20 @@
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 #include "XLive/xbox/xbox.h"
 
+/* macros */
+
 #define ERROR_STRING_CREATE(_value)\
 				_value,STRINGIFY(_value)
 
-/* constants */
+/* structures */
 
 struct error_code_string_mapping
 {
 	e_ui_error_types error_code;
 	const char* string;
 };
+
+/* constants */
 
 static error_code_string_mapping table[] =
 {

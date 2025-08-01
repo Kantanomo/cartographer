@@ -11,6 +11,9 @@ struct s_user_interface_widget_stack
 };
 ASSERT_STRUCT_SIZE(s_user_interface_widget_stack, 0x28);
 
+
+/* classes */
+
 class c_channel_with_history : public c_user_interface_channel
 {
 private:

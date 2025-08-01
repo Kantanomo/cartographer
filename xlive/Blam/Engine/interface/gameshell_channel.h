@@ -1,7 +1,7 @@
 #pragma once
 #include "channel_with_history.h"
 
-/* structures */
+/* classes */
 
 class c_gameshell_channel : public c_channel_with_history
 {

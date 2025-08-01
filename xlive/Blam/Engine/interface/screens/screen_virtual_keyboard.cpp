@@ -44,6 +44,12 @@ const s_keyboard_custom_labels k_keyboard_custom_label_globals[k_language_count]
 
 bool g_vkbd_create_open_profile_config = true;
 
+/* prototypes */
+
+static void get_keyboard_labels(e_vkbd_context_type context, const wchar_t** out_header_text, const wchar_t** out_subheader_text);
+static void apply_rename_squad_entry_patches();
+
+
 /* private code */
 
 // header & subheader

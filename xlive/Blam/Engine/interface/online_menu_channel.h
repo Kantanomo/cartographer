@@ -1,7 +1,7 @@
 #pragma once
 #include "user_interface_channel.h"
 
-/* structures */
+/* classes */
 
 
 //stubbing for now
