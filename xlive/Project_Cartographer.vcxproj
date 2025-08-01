@@ -1804,7 +1804,6 @@
     <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
     <ClInclude Include="Blam\Engine\objects\object_globals.h" />
     <ClInclude Include="Blam\Engine\objects\object_identifier.h" />
-    <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
     <ClInclude Include="Blam\Engine\objects\scenery.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\antenna_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\widgets.h" />

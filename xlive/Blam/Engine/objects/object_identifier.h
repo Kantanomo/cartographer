@@ -1,5 +1,5 @@
 #pragma once
-#include "object_type_list.h"
+#include "object_types.h"
 
 enum e_object_source : int8
 {
