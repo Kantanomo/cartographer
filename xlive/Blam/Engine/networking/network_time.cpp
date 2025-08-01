@@ -7,7 +7,7 @@ static s_network_time_globals* network_time_globals_get(void);
 
 /* public code */
 
-bool network_session_time_get_id_and_time(int32 session_id, XNKID* id, uint32* time)
+bool network_session_time_get_id_and_time(int32 session_id, s_transport_secure_identifier* id, uint32* time)
 {
 	s_network_time_globals* network_time_globals = network_time_globals_get();
 
@@ -18,7 +18,7 @@ bool network_session_time_get_id_and_time(int32 session_id, XNKID* id, uint32* t
 		c_network_session* session = network_time_globals->session_manager->get_session(session_id);
 		if (session && session->m_time_exists)
 		{
-			session->get_secure_key(id, NULL, NULL, NULL);
+			session->get_transport_session_id(id);
 			*time = session->time_get();
 			result = true;
 		}

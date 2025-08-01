@@ -899,7 +899,7 @@ static int CommandCollection::invite(const std::vector<std::string>& tokens, Con
 		bool session_host = session->is_host();
 
 		XSESSION_INFO x_session_info;
-		x_session_info.sessionID = session->m_session_id;
+		csmemcpy(&x_session_info.sessionID, &session->m_session_id, sizeof(x_session_info.sessionID));
 		x_session_info.keyExchangeKey = session->m_session_key;
 		x_session_info.hostAddress = (session_host ? session->m_session_virtual_couch.xsession_info.hostAddress :
 			session->m_network_observer->m_observer_channels[session->get_session_peer(session->m_session_host_peer_index)->observer_channel_index].xnaddr);

@@ -1,7 +1,9 @@
 #pragma once
 #include "network_messages_out_of_band.h"
 
+#include "memory/bitstream.h"
 #include "networking/delivery/network_link.h"
+#include "networking/transport/transport_address.h"
 
 /* classes */
 

@@ -3,11 +3,8 @@
 // Network Observer
 //	- manages network bandwidth based on network conditions
 
-#include "networking/delivery/network_link.h"
-#include "networking/messages/network_message_gateway.h"
-#include "networking/transport/transport.h"
+#include "networking/transport/transport_address.h"
 #include "networking/transport/transport_qos.h"
-
 #include "networking/network_statistics.h"
 
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
@@ -31,6 +28,8 @@
 
 #define k_online_netcode_rate_real 60.0f
 
+/* constants */
+
 enum
 {
 	k_network_channel_count = 16,
@@ -46,7 +45,7 @@ enum
 	k_online_netcode_server_max_bandwidth_per_channel = ((int32)k_online_netcode_server_rate_real * k_online_netcode_server_max_packet_size_bytes * 8)
 };
 
-struct s_network_observer_configuration;
+/* enums */
 
 enum e_observer_channel_state : int32
 {
@@ -56,7 +55,9 @@ enum e_observer_channel_state : int32
 	_observer_channel_state_connected = 7
 };
 
-struct alignas(8) s_observer_channel
+/* structures */
+
+struct s_observer_channel
 {
 	int32 state;
 	int32 field_4;
@@ -154,14 +155,14 @@ struct alignas(8) s_observer_channel
 };
 ASSERT_STRUCT_SIZE(s_observer_channel, 0x740);
 
-class alignas(8) c_network_observer
+class c_network_observer
 {
 public:
 	void* vtbl;
 	void* m_network_link;
 	void* m_network_message_gateway;
 	void* m_message_types;
-	s_network_observer_configuration* m_configuration;
+	struct s_network_observer_configuration* m_configuration;
 	int32 *field_14;
 	uint8 gap_18[8];
 	XNKID session_id;
@@ -213,7 +214,7 @@ public:
 	static void apply_patches();
 	static void reset_network_observer_bandwidth_preferences();
 
-	bool initialize_observer(c_network_link* link, c_network_message_type_collection* message_types, c_network_message_gateway* message_gateway, s_network_observer_configuration* configuration);
+	bool initialize_observer(class c_network_link* link, class c_network_message_type_collection* message_types, class c_network_message_gateway* message_gateway, struct s_network_observer_configuration* configuration);
 	bool __thiscall channel_should_send_packet_hook(
 		int32 network_channel_index,
 		bool a4,
@@ -255,7 +256,7 @@ private:
 };
 ASSERT_STRUCT_SIZE(c_network_observer, 0x75C8);
 
-struct __declspec(align(4)) s_network_observer_configuration
+struct s_network_observer_configuration
 {
 	int32 field_0;
 	int32 field_4;

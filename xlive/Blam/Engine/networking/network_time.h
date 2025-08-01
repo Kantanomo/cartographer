@@ -13,7 +13,7 @@ struct s_network_time_globals
 
 /* prototypes */
 
-bool network_session_time_get_id_and_time(int32 session_id, XNKID* id, uint32* time);
+bool network_session_time_get_id_and_time(int32 session_id, s_transport_secure_identifier* id, uint32* time);
 
 uint32 __cdecl network_time_get_exact(void);
 

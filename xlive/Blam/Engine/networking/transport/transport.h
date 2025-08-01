@@ -19,22 +19,12 @@ enum e_transport_type : int32
 
 enum e_transport_platform : int32
 {
-	// TODO: populate
+	_transport_platform_xbox,
+	_transport_platform_windows,
+	k_transport_platform_count
 };
 
 /* structures */
-
-struct transport_address
-{
-	union
-	{
-		int ipv4;
-		char ipv6[16];
-	} address;
-	short port;
-	short address_type;
-};
-ASSERT_STRUCT_SIZE(transport_address, 20);
 
 struct s_transport_globals
 {

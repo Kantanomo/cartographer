@@ -1,5 +1,5 @@
 #pragma once
-#include "network_message_type_collection.h"
+#include "network_message_handler.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 /* structures */
@@ -38,7 +38,7 @@ struct s_network_message_session_custom_variant_settings
 
 /* prototypes */
 
-void network_message_types_register_cartographer_types(c_network_message_type_collection* message_collection);
+void network_message_types_register_cartographer_types(class c_network_message_type_collection* message_collection);
 
 void network_message_cartographer_send_request_map_filename(int32 map_download_id);
 

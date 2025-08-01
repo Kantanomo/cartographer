@@ -1,6 +1,6 @@
 #include "stdafx.h"
-
 #include "XSocket.h"
+
 #include "XLive/xnet/IpManagement/XnIp.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
