@@ -250,7 +250,7 @@ void c_main_menu_list::handle_item_campaign(s_event_record** pevent)
 		params.m_window_index = _window_4;
 		params.m_context = 0;
 		params.m_user_flags = FLAG((*pevent)->controller);
-		params.m_channel_type = _user_interface_channel_type_dialog;
+		params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 		params.m_screen_state.field_0 = NONE;
 		params.m_screen_state.m_last_focused_item_order = NONE;
 		params.m_screen_state.m_last_focused_item_index = NONE;
@@ -259,8 +259,8 @@ void c_main_menu_list::handle_item_campaign(s_event_record** pevent)
 	}
 	else
 	{
-		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
-			_user_interface_channel_type_dialog,
+		user_interface_error_ok_cancel_dialog_show_confirmation(
+			_user_interface_channel_type_gameshell_dialog,
 			_window_4,
 			FLAG((*pevent)->controller),
 			screen_show_campaign_options_without_achievement,
@@ -336,8 +336,8 @@ void c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
 	}
 	else if (online_connected_to_xbox_live())
 	{
-		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
-			_user_interface_channel_type_dialog,
+		user_interface_error_ok_cancel_dialog_show_confirmation(
+			_user_interface_channel_type_gameshell_dialog,
 			_window_4,
 			FLAG((*pevent)->controller),
 			screen_show_screen_4way_signin_splitscreen_offline,
@@ -365,8 +365,8 @@ void c_main_menu_list::handle_item_system_link(s_event_record** pevent)
 	}
 	else if (online_connected_to_xbox_live())
 	{
-		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
-			_user_interface_channel_type_dialog,
+		user_interface_error_ok_cancel_dialog_show_confirmation(
+			_user_interface_channel_type_gameshell_dialog,
 			_window_4,
 			FLAG((*pevent)->controller),
 			screen_show_screen_4way_signin_system_link_offline,
@@ -417,7 +417,7 @@ static bool __cdecl screen_show_campaign_options_without_achievement(e_controlle
 	params.m_window_index = _window_4;
 	params.m_context = 0;
 	params.m_user_flags = user_interface_controller_get_signed_in_controllers_mask(); //replacing 0xFF with active_controllers so that controller-removed-handler stops panicking here
-	params.m_channel_type = _user_interface_channel_type_dialog;
+	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;
 	params.m_screen_state.m_last_focused_item_index = NONE;

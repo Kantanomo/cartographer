@@ -275,7 +275,7 @@ void c_settings_list::handle_item_network(s_event_record** pevent)
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
 	params.m_user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_dialog;
+	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
@@ -290,7 +290,7 @@ void c_settings_list::handle_item_about(s_event_record** pevent)
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
 	params.m_user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_dialog;
+	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;

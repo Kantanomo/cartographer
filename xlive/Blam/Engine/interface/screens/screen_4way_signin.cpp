@@ -490,7 +490,7 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 
 			//this needs further research
 
-			screen_error_ok_dialog_show(_user_interface_channel_type_dialog, _ui_error_cant_join_gameinvite_without_signon, _window_4, FLAG(event->controller), 0, 0);
+			screen_error_ok_dialog_show(_user_interface_channel_type_gameshell_dialog, _ui_error_cant_join_gameinvite_without_signon, _window_4, FLAG(event->controller), 0, 0);
 
 			break;
 		}
@@ -519,8 +519,8 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			{
 				if (this->m_call_context == _4_way_signin_type_crossgame_invite)
 				{
-					user_interface_error_display_ok_cancel_dialog_with_ok_callback(
-						_user_interface_channel_type_dialog,
+					user_interface_error_ok_cancel_dialog_show_confirmation(
+						_user_interface_channel_type_gameshell_dialog,
 						_window_4,
 						FLAG(event->controller),
 						user_interface_mainmenu_sign_out_controller_callback,
@@ -528,8 +528,8 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 				}
 				else
 				{
-					user_interface_error_display_ok_cancel_dialog_with_ok_callback(
-						_user_interface_channel_type_dialog,
+					user_interface_error_ok_cancel_dialog_show_confirmation(
+						_user_interface_channel_type_gameshell_dialog,
 						_window_4,
 						FLAG(event->controller),
 						user_interface_sign_out_controller_default_callback,
@@ -538,7 +538,7 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			}
 			else
 			{
-				screen_error_ok_dialog_show(_user_interface_channel_type_dialog, _ui_error_cant_sign_out_master_with_guests, _window_4, FLAG(event->controller), NULL, NULL);
+				screen_error_ok_dialog_show(_user_interface_channel_type_gameshell_dialog, _ui_error_cant_sign_out_master_with_guests, _window_4, FLAG(event->controller), NULL, NULL);
 
 			}
 			this->m_controllers_mask |= FLAG(event->controller);
@@ -569,8 +569,8 @@ bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event
 		|| event->component == _user_interface_controller_component_button_back)
 		&& !user_interface_controller_get_signed_in_controller_count())
 	{
-		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
-			_user_interface_channel_type_dialog,
+		user_interface_error_ok_cancel_dialog_show_confirmation(
+			_user_interface_channel_type_gameshell_dialog,
 			_window_4,
 			FLAG(event->controller),
 			user_interface_decline_invite_callback,

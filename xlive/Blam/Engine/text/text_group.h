@@ -19,7 +19,7 @@ public:
 	utf8* get_string_utf8(string_id id, int32 starting_index, int32 max_count);
 	const int32 get_num_of_strings() const;
 	
-	void string_list_get_normal_string(string_id id, wchar_t* out_string, int32 strings_start_index, int32 strings_count);
+	void string_list_get_normal_string(string_id id, c_maximum_interface_text* out_string, int32 strings_start_index, int32 strings_count);
 	void get_string_ids(string_id* array, int32 array_size, int32 starting_index, int32 max_count);
 
 private:
@@ -35,5 +35,5 @@ ASSERT_STRUCT_SIZE(c_language_pack, 28);
 
 /* public code */
 
-void __cdecl string_list_get_normal_string(datum unic_datum, string_id id, wchar_t* out_string);
+void __cdecl string_list_get_normal_string(datum unic_datum, string_id id, c_maximum_interface_text* out_string);
 void __cdecl string_list_get_string_id_list(datum unic_datum, string_id* out_ids, int32 out_count);

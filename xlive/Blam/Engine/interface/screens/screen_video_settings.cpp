@@ -210,7 +210,7 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 	params.m_window_index = _window_4;
 	params.m_context = 0;
 	params.m_user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_dialog;
+	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;
 	params.m_screen_state.m_last_focused_item_index = NONE;

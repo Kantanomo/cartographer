@@ -603,12 +603,15 @@ const wchar_t* c_static_wchar_string<T>::append_print(const wchar_t* format, ...
 	ASSERT(format);
 	ASSERT(current_length >= 0 && current_length < NUMBEROF(m_string));
 
-	uvsnprintf(&m_string[current_length], T - current_length, a2, args);
+	uvsnprintf(&m_string[current_length], T - current_length, format, args);
 	va_end(args);
 	return m_string;
 }
 
 /* globals */
+
+typedef c_static_wchar_string<512> c_maximum_interface_text;
+
 
 #ifdef ASSERTS_ENABLED
 extern c_static_string<256> g_static_string_assert_text;

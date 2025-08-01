@@ -60,6 +60,11 @@ void c_screen_error_dialog_ok::apply_patches()
 	WritePointer(Memory::GetAddress(0x20E173) + 1, c_screen_error_dialog_ok::load_for_active_users);
 }
 
+void c_screen_error_dialog_ok_cancel::show_dialog(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8)
+{
+	p_ok_cancel_dialog(channel_type, error_type, window_index, user_flags, ok_callback, fallback, a7, a8);
+}
+
 void c_screen_error_dialog_ok_cancel::apply_patches()
 {
 	DETOUR_ATTACH(p_ok_cancel_dialog, Memory::GetAddress<ok_cancel_dialog_t>(0x20E243), ok_cancel_dialog_show_hook);	

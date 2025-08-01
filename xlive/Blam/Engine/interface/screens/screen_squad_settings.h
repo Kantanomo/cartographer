@@ -31,6 +31,7 @@ protected:
 	void handle_item_switch_to_optimatch(s_event_record** pevent);
 	void handle_item_change_hopper(s_event_record** pevent);
 	void handle_item_party_management(s_event_record** pevent);
+	void handle_item_rename_squad(s_event_record** pevent);
 
 
 public:

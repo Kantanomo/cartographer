@@ -44,6 +44,14 @@ const s_keyboard_custom_labels k_keyboard_custom_label_globals[k_language_count]
 
 bool g_vkbd_create_open_profile_config = true;
 
+/* prototypes */
+
+static void get_keyboard_labels(e_vkbd_context_type context, const wchar_t** out_header_text, const wchar_t** out_subheader_text);
+static void apply_rename_squad_entry_patches();
+
+
+/* private code */
+
 // header & subheader
 static void get_keyboard_labels(e_vkbd_context_type context, const wchar_t** out_header_text, const wchar_t** out_subheader_text)
 {
@@ -54,6 +62,47 @@ static void get_keyboard_labels(e_vkbd_context_type context, const wchar_t** out
 	*out_subheader_text = k_keyboard_custom_label_globals[_language_english][context - k_virtual_keyboard_custom_context_start].subheader_text;
 	return;
 }
+
+static void apply_rename_squad_entry_patches()
+{
+    static uint8 accentsPatchCode[] =
+    {
+        0x83,0xF9,_vkbd_context_message_entry,
+        0x0F,0x8C,0x03,0xFF,0xFF,0xFF,
+        0x83,0xF9,_vkbd_context_search_description,
+        0x0F,0x8F,0xFA,0xFE,0xFF,0xFF,
+        0x90
+    };
+
+    static uint8 symbolsPatchCode[] =
+    {
+        0x83,0xF9,_vkbd_context_message_entry,
+        0x0F,0x8C,0xE4,0xFE,0xFF,0xFF,
+        0x83,0xF9,_vkbd_context_search_description,
+        0x0F,0x8F,0xDB,0xFE,0xFF,0xFF,
+        0x90
+    };
+
+    /*
+    
+          if ( vkbd_context == _vkbd_context_type_message_entry
+          || vkbd_context == _vkbd_context_type_message_entry2
+          || vkbd_context == _vkbd_context_type_search_description )
+
+          with
+
+          if ( vkbd_context >= _vkbd_context_type_message_entry 
+          && vkbd_context <= _vkbd_context_type_search_description )
+
+    */
+
+    WriteBytes(Memory::GetAddress(0x23CED1), accentsPatchCode, NUMBEROF(accentsPatchCode));// case _vkbd_button_type_accents_0:
+    WriteBytes(Memory::GetAddress(0x23CEF0), symbolsPatchCode, NUMBEROF(symbolsPatchCode));// case _vkbd_button_type_symbols_0:
+
+}
+
+
+/* public code */
 
 c_virtual_keyboard_button::c_virtual_keyboard_button():
 	c_button_widget(NONE,0)
@@ -197,7 +246,7 @@ void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_t
 {
 	s_screen_parameters virtual_keyboard_params;
 	virtual_keyboard_params.m_context = nullptr;
-	virtual_keyboard_params.data_new(0, FLAG(0), _user_interface_channel_type_keyboard, _window_4, c_screen_virtual_keyboard::load);
+	virtual_keyboard_params.data_new(0, FLAG(0), _user_interface_channel_type_virtual_keyboard, _window_4, c_screen_virtual_keyboard::load);
 	c_screen_virtual_keyboard* virtual_keyboard = (c_screen_virtual_keyboard*)virtual_keyboard_params.ui_screen_load_proc_exec();
 
 	virtual_keyboard->set_context(keyboard_type);
@@ -229,6 +278,8 @@ void __declspec(naked) jmp_c_screen_virtual_keyboard__load_player_profile_edit()
 void c_screen_virtual_keyboard::apply_patches()
 {
 	DETOUR_ATTACH(p_load_player_profile_edit, Memory::GetAddress<t_load_player_profile_edit>(0x23C7B2), jmp_c_screen_virtual_keyboard__load_player_profile_edit);
+
+    apply_rename_squad_entry_patches();
 }
 
 void ui_set_virtual_keyboard_in_use(bool state)

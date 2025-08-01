@@ -33,9 +33,9 @@ const int32 c_language_pack::get_num_of_strings() const
 	return m_strings_count;
 }
 
-void c_language_pack::string_list_get_normal_string(string_id id, wchar_t* out_string, int32 strings_start_index, int32 strings_count)
+void c_language_pack::string_list_get_normal_string(string_id id, c_maximum_interface_text* out_string, int32 strings_start_index, int32 strings_count)
 {
-	INVOKE_TYPE(0x3E332, 0x0, void(__thiscall*)(c_language_pack*, string_id, wchar_t*, int32, int32), this, id, out_string, strings_start_index, strings_count);
+	INVOKE_TYPE(0x3E332, 0x0, void(__thiscall*)(c_language_pack*, string_id, c_maximum_interface_text*, int32, int32), this, id, out_string, strings_start_index, strings_count);
 }
 
 void c_language_pack::get_string_ids(string_id* out_ids, int32 out_count, int32 starting_index, int32 max_count)
@@ -54,7 +54,7 @@ void c_language_pack::get_string_ids(string_id* out_ids, int32 out_count, int32 
 	}
 }
 
-void __cdecl string_list_get_normal_string(datum unic_datum, string_id id, wchar_t* out_string)
+void __cdecl string_list_get_normal_string(datum unic_datum, string_id id, c_maximum_interface_text* out_string)
 {
 	INVOKE(0x3E3AC, 0x0, string_list_get_normal_string, unic_datum, id, out_string);
 }

@@ -44,7 +44,7 @@ void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t p_ui_screen_proc
 	s_screen_parameters new_screen_params;
 	switch (open_method) {
 	case 3:
-		new_screen_params.data_new(0, FLAG(0), _user_interface_channel_type_dialog, _window_4, p_ui_screen_proc_cb);
+		new_screen_params.data_new(0, FLAG(0), _user_interface_channel_type_gameshell_dialog, _window_4, p_ui_screen_proc_cb);
 		break;
 	case 0:
 	default:
