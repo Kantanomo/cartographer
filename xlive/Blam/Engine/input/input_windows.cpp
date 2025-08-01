@@ -22,7 +22,6 @@ bool* g_input_windows_request_terminate;
 
 /* constants */
 
-XINPUT_VIBRATION g_vibration_state[k_number_of_controllers]{};
 real32 g_rumble_factor = 1.0f;
 
 /* prototypes */
@@ -268,7 +267,7 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 	state.wRightMotorSpeed = (WORD)(state.wRightMotorSpeed * g_rumble_factor);
 
 	bool enabled = user_interface_controller_get_rumble_enabled((e_controller_index)gamepad_index);
-	g_vibration_state[gamepad_index] = (enabled ? state : state_none);
+	input_globals->rumble_states[gamepad_index] = (enabled ? state : state_none);
 	return;
 }
 
