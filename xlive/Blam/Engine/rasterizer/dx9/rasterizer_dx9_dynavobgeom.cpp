@@ -7,6 +7,7 @@
 #include "rasterizer_dx9_shader_submit.h"
 #include "rasterizer_dx9_submit.h"
 
+#include "render/render.h"
 
 /* globals */
 

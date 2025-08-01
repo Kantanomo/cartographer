@@ -6,6 +6,7 @@
 #include "rasterizer/dx9/rasterizer_dx9_dynamic_geometry.h"
 #include "rasterizer/dx9/rasterizer_dx9_dynavobgeom.h"
 #include "rasterizer/rasterizer_globals.h"
+#include "render/render.h"
 
 /* constants */
 
@@ -108,7 +109,7 @@ void set_display_type(e_display_type display_type)
 void render_splitscreen_line(void)
 {
 	const int32 player_window_count = get_player_window_count();
-	ASSERT(IN_RANGE(player_window_count, 1, 4));
+	ASSERT(IN_RANGE(player_window_count, 1, k_number_of_users));
 
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 	const int16 resolution_x = (int16)rasterizer_globals->resolution_x;

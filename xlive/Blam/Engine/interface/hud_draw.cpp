@@ -30,7 +30,7 @@ void hud_render_player_indicator(datum player_index)
 	real_point2d screen_point;
 	if (render_camera_world_to_screen(global_camera, global_projection, NULL, &world_position, &screen_point))
 	{
-		datum multiplayer_hud_bitmap_tag_index = interface_get_tag_index(_interface_tag_multiplayer_hud_bitmap);
+		datum multiplayer_hud_bitmap_tag_index = interface_get_tag_index(_interface_multiplayer_hud_bitmap);
 		bitmap_data* bitmap_from_sequence = bitmap_group_get_bitmap_from_sequence(multiplayer_hud_bitmap_tag_index, 0, 0);
 		if (bitmap_from_sequence)
 		{

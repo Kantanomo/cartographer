@@ -47,12 +47,21 @@ static_assert(sizeof(real64) == 8);
 typedef long datum;
 static_assert(sizeof(datum) == 4);
 
+// 32-bit character that's specified as a utf32 string
+struct utf32
+{
+	uint32 character;
+};
+
+
 enum
 {
 	k_kilo = 1024,
 	SHORT_MAX = 32767,
 	k_unsigned_short_max = 0xffff
 };
+
+#define EOL_STRING "\r\n"
 
 #define SIZEOF_BITS(value) (8 * sizeof(value))
 #define CHAR_BITS SIZEOF_BITS(int8)

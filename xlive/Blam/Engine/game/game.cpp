@@ -11,6 +11,7 @@
 #include "cutscene/cinematics.h"
 #include "cutscene/recorded_animations.h"
 #include "effects/effects.h"
+#include "effects/player_effects.h"
 #include "hs/hs.h"
 #include "interface/hud.h"
 #include "interface/motion_sensor.h"

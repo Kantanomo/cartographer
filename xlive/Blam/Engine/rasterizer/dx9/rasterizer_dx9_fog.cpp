@@ -10,6 +10,7 @@
 #include "game/game_globals.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/dx9/shaders/compiled/fog_atmospheric_apply.h"
+#include "render/render.h"
 #include "render/render_patchy_fog.h"
 
 /* constants */
