@@ -833,6 +833,7 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">4131</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">4131</DisableSpecificWarnings>
     </ClCompile>
+    <ClCompile Include="Blam\Engine\achievements\achievement_live_interface.cpp" />
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
@@ -1229,6 +1230,7 @@
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zconf.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zlib.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zutil.h" />
+    <ClInclude Include="Blam\Engine\achievements\achievement_live_interface.h" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
     <ClInclude Include="Blam\Engine\ai\actor_moving.h" />
