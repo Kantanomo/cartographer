@@ -77,7 +77,7 @@ void __cdecl interface_draw_bitmap(
 		vertex_data[vertex_index].color = { D3DCOLOR_ARGB((uint8)(alpha * 255.f), 255, 255, 255) };	// Set color to white with alpha from parameter
 	}
 
-	s_dynamic_geometry_parameters parameters;
+	rasterizer_dynamic_screen_geometry_parameters parameters;
 	csmemset(&parameters, 0, sizeof(parameters));
 
 	parameters.height_ratio = 1.f;
@@ -85,8 +85,8 @@ void __cdecl interface_draw_bitmap(
 	parameters.vs_constants_second_4.j = 1.f;
 	parameters.vs_constants_second_4.i = 1.f;
 	parameters.meter_parameters = NULL;
-	parameters.point_interpolation = false;
-	parameters.blend_function = _framebuffer_blend_function_alpha_multiply_add;
+	parameters.point_sampled = false;
+	parameters.framebuffer_blend_function = _framebuffer_blend_function_alpha_multiply_add;
 	parameters.map[0] = bitmap;
 	rasterizer_dx9_dynamic_screen_geometry_draw(&parameters, vertex_data);
 	return;
