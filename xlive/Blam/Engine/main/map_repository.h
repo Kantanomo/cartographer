@@ -73,7 +73,8 @@ struct s_custom_map_file_cache_header
 };
 
 #pragma pack(push, 4)
-class c_custom_map_manager
+// TODO: move this class to map_manager.cpp
+class c_map_manager
 {
 public:
 	// we don't re-implement this from scratch, thus we re-use it
@@ -102,6 +103,10 @@ public:
 
 	static void create_custom_map_data_directory();
 
+	void load_data(void);
+
+	void map_synchronize_process(bool async);
+
 	void __thiscall mark_all_cached_maps_for_deletion();
 	bool __thiscall remove_marked_for_deletion();
 
@@ -110,12 +115,12 @@ public:
 	void __thiscall save_custom_map_data();
 	void load_map_data_cache_from_file_cache(s_custom_map_file_cache_header* custom_map_file_cache);
 
-	void __thiscall load_custom_map_data_cache();
+	void __thiscall map_repository_load();
 
 	// goes through all custom maps in directory
 	// and creates a linked list of maps that are not cached/registered
 	// and removes custom maps cached entries that are not present anymore in the folder
-	void __thiscall start_custom_map_sync();
+	void __thiscall start_map_synchronize();
 
 	uint32 __thiscall get_custom_map_list_ids(s_custom_map_id* out_ids, uint32 out_ids_count);
 	uint32 __thiscall get_custom_map_list_ids_by_map_name(const wchar_t* map_name, s_custom_map_id* out_ids, uint32 out_ids_count);
@@ -144,9 +149,9 @@ private:
 	void __thiscall remove_entry_by_index(uint16 idx);
 };
 #pragma pack(pop)
-static_assert(sizeof(c_custom_map_manager) == 0x24444);
+static_assert(sizeof(c_map_manager) == 0x24444);
 
 void map_repository_apply_sapien_patches(void);
 
-c_custom_map_manager* get_custom_map_manager();
+c_map_manager* map_manager_get();
 const wchar_t* get_custom_map_folder_path();
