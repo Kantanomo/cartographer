@@ -4,6 +4,9 @@
 #include "kablam_config.h"
 #include "kablam_log.h"
 
+#include "game/game_allegiance.h"
+#include "networking/logic/life_cycle_manager.h"
+#include "networking/session/network_session.h"
 #include "networking/network_event.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
