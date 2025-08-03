@@ -122,7 +122,7 @@ struct s_screen_4way_items
 
 /* constants */
 
-const s_screen_4way_items k_4way_screen_items[k_number_of_controllers]
+static const s_screen_4way_items k_4way_screen_items[k_number_of_controllers]
 {
 	{
 		_4way_signin_main_pane_0_text_player0_profile_name,
@@ -172,6 +172,58 @@ const s_screen_4way_items k_4way_screen_items[k_number_of_controllers]
 		_4way_signin_main_pane_0_bitmap_6,
 		_4way_signin_main_pane_0_bitmap_player_3_controller_signin,
 	}
+};
+
+static const point2d k_bitmap_positions[] = {
+	{ -227   ,   198   },
+	{ -280   ,   180   },
+	{   45   ,    31   },
+	{ -107   ,   123   },
+	{  172   ,   123   },
+	{ -107   ,   -54   },
+	{  172   ,   -54   },
+	{ -181   ,   145   },
+	{   94   ,   145   },
+	{ -181   ,   -32   },
+	{   94   ,   -32   }
+};
+
+static const rectangle2d k_text_bounds[] = {
+	{ 68    ,  -179    ,  46     ,  -4   },
+	{166    ,  -179    ,  118    ,  -4   },
+	{ 68    ,   100    ,  46     ,  275  },
+	{166    ,   100    ,  118    ,  275  },
+	{-108   ,  -179    , -130    ,  -4   },
+	{-5     ,  -179    ,  -59    ,  -4   },
+	{-108   ,   100    ,  -130   ,  275  },
+	{-5     ,   100    ,  -59    ,  275  },
+	{ 86    ,  -179    ,   68    ,  -4   },
+	{ 47    ,  -179    ,   29    ,  -4   },
+	{ 29    ,  -179    ,   7     ,  -4   },
+	{ 86    ,   100    ,   68    ,  275  },
+	{ 47    ,   100    ,   29    ,  275  },
+	{ 29    ,   100    ,   7     ,  275  },
+	{-90    ,  -179    ,  -108   ,  -4   },
+	{-130   ,  -179    ,  -148   ,  -4   },
+	{-148   ,  -179    ,  -170   ,  -4   },
+	{-90    ,   100    ,  -108   ,  275  },
+	{-130   ,   100    ,  -148   ,  275  },
+	{-148   ,   100    ,  -170   ,  275  },
+	{ 68    ,  -229    ,   14    ,  -47  },
+	{ 68    ,    46    ,   14    , 	228  },
+	{-108   ,  -229    ,  -162   ,  -47  },
+	{-108   ,    46    ,  -162   ,  228  }
+};
+
+static const rectangle2d k_model_viewports[] = {
+		{240 , -320,  0		, 320 }   ,
+		{240 , -320,  0		, 320 }   ,
+		{0   , -320,-240	, 320 }   ,
+		{0   , -320,-240	, 320 }   ,
+		{240 , -320,  0		, 320 }   ,
+		{240 , -320,  0		, 320 }   ,
+		{0   , -320,-240	, 320 }   ,
+		{0   , -320,-240	, 320 }   ,
 };
 
 /* globals */
@@ -719,86 +771,36 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
 	s_window_pane_reference* base_pane = main_widget_tag->panes[0];
 
-	const point2d bitmap_positions[] = {
-		{ -227   ,   198   },
-		{ -280   ,   180   },
-		{   45   ,    31   },
-		{ -107   ,   123   },
-		{  172   ,   123   },
-		{ -107   ,   -54   },
-		{  172   ,   -54   },
-		{ -181   ,   145   },
-		{   94   ,   145   },
-		{ -181   ,   -32   },
-		{   94   ,   -32   }
-	};
-
 	if (base_pane->bitmap_blocks.count > 0)
 	{
 		for (uint8 itr = 0; itr < base_pane->bitmap_blocks.count; itr++)
 		{
-			point2d bitmap_pos = bitmap_positions[itr];
+			point2d bitmap_pos = k_bitmap_positions[itr];
 			point2d_scale(&bitmap_pos, scale_factor);
 			base_pane->bitmap_blocks[itr]->topleft = bitmap_pos;
 		}
 	}
 
-	const rectangle2d text_bounds[] = {
-		{ 68    ,  -179    ,  46     ,  -4   },
-		{166    ,  -179    ,  118    ,  -4   },
-		{ 68    ,   100    ,  46     ,  275  },
-		{166    ,   100    ,  118    ,  275  },
-		{-108   ,  -179    , -130    ,  -4   },
-		{-5     ,  -179    ,  -59    ,  -4   },
-		{-108   ,   100    ,  -130   ,  275  },
-		{-5     ,   100    ,  -59    ,  275  },
-		{ 86    ,  -179    ,   68    ,  -4   },
-		{ 47    ,  -179    ,   29    ,  -4   },
-		{ 29    ,  -179    ,   7     ,  -4   },
-		{ 86    ,   100    ,   68    ,  275  },
-		{ 47    ,   100    ,   29    ,  275  },
-		{ 29    ,   100    ,   7     ,  275  },
-		{-90    ,  -179    ,  -108   ,  -4   },
-		{-130   ,  -179    ,  -148   ,  -4   },
-		{-148   ,  -179    ,  -170   ,  -4   },
-		{-90    ,   100    ,  -108   ,  275  },
-		{-130   ,   100    ,  -148   ,  275  },
-		{-148   ,   100    ,  -170   ,  275  },
-		{ 68    ,  -229    ,   14    ,  -47  },
-		{ 68    ,    46    ,   14    , 	228  },
-		{-108   ,  -229    ,  -162   ,  -47  },
-		{-108   ,    46    ,  -162   ,  228  }
-	};
-
 	if (base_pane->text_blocks.count > 0)
 	{
 		for (uint8 itr = 0; itr < base_pane->text_blocks.count; itr++)
 		{
-			rectangle2d og = text_bounds[itr];
+			rectangle2d og = k_text_bounds[itr];
 			rectangle2d_scale(&og, scale_factor);
 			base_pane->text_blocks[itr]->text_bounds = og;
 		}
 	}
 
-	const rectangle2d model_viewports[] = {
-		{240 , -320,  0		, 320 }   ,
-		{240 , -320,  0		, 320 }   ,
-		{0   , -320,-240	, 320 }   ,
-		{0   , -320,-240	, 320 }   ,
-		{240 , -320,  0		, 320 }   ,
-		{240 , -320,  0		, 320 }   ,
-		{0   , -320,-240	, 320 }   ,
-		{0   , -320,-240	, 320 }   ,
-	};
 	if (base_pane->model_scene_blocks.count > 0)
 	{
 		for (uint8 itr = 0; itr < base_pane->model_scene_blocks.count; itr++)
 		{
-			rectangle2d og = model_viewports[itr];
+			rectangle2d og = k_model_viewports[itr];
 			rectangle2d_scale(&og, scale_factor);
 			base_pane->model_scene_blocks[itr]->ui_viewport = og;
 		}
 	}
+
 	if (base_pane->player_blocks.count > 0)
 	{
 		s_player_block_reference* players = base_pane->player_blocks[0];

@@ -1,7 +1,5 @@
 #pragma once
-
-#include "networking/transport/transport.h"
-#include "networking/session/network_observer.h"
+#include "networking/transport/transport_address.h"
 
 enum e_network_channel_closure_reason
 {
@@ -33,7 +31,7 @@ enum e_network_channel_state
 	_network_channel_state_5 = 5,
 };
 
-struct alignas(8) s_network_channel
+struct s_network_channel
 {
 	void* m_network_link;
 	void* m_network_message_gateway;
@@ -53,7 +51,7 @@ struct alignas(8) s_network_channel
 	int32 field_34;
 	int32 field_38;
 	void* simulation_interface;
-	c_network_observer* network_observer;
+	class c_network_observer* network_observer;
 	int32 channel_index;
 	int32 channel_flags;
 	int32 remote_identifier;

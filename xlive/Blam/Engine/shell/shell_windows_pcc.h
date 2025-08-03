@@ -24,9 +24,10 @@ struct s_shell_pcc_settings
 };
 ASSERT_STRUCT_SIZE(s_shell_pcc_settings, 0x50);
 
+/* prototypes */
 
-/* public */
+bool __cdecl shell_windows_pcc_initialize(void);
 
-bool __cdecl shell_windows_pcc_initialize();
-s_shell_pcc_settings* shell_windows_pcc_get_properties();
-bool shell_windows_pcc_allows_vsync();
+s_shell_pcc_settings* shell_windows_pcc_get_properties(void);
+
+bool shell_windows_pcc_allows_vsync(void);

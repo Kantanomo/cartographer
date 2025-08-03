@@ -10,6 +10,7 @@
 #include "cache/pc_geometry_cache.h"
 #include "game/players.h"
 #include "rasterizer/rasterizer_globals.h"
+#include "render/render.h"
 #include "render/render_weather.h"
 
 /* structures */

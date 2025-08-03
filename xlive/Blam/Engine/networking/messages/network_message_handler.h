@@ -1,4 +1,17 @@
 #pragma once
+#include "networking/transport/transport_security.h"
+
+/* structures */
+
+struct s_network_message_session_data
+{
+	s_transport_secure_identifier identifier;
+};
+
+struct s_network_message_leave_session
+{
+	s_network_message_session_data session_data;
+};
 
 /* classes */
 

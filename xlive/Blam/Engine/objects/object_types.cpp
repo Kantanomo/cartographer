@@ -3,6 +3,8 @@
 
 #include "objects.h"
 
+#include "structures/cluster_partitions.h"
+
 /* public code */
 
 object_type_definition** get_object_type_definitions(void)

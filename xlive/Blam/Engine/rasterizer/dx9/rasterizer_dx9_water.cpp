@@ -5,6 +5,7 @@
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_targets.h"
 
+#include "render/render.h"
 #include "structures/structure_bsp_definitions.h"
 
 /* globals */

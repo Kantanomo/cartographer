@@ -273,7 +273,7 @@ static void network_event_dump_categories_recursive(datum category_index)
 
 static void network_event_print(const char* format, e_event_level event_level, int32 category, char* ap)
 {
-	uint32 flags = network_event_get_flags(event_level, category);
+	const uint32 flags = network_event_get_flags(event_level, category);
 	if (flags)
 	{
 		const char* severity = k_event_level_severity_strings[event_level];
@@ -292,7 +292,7 @@ static void network_event_print(const char* format, e_event_level event_level, i
 			const char* padding_string = (i != 1 ? " " : "");
 
 			uint32 time = 0;
-			XNKID id;
+			s_transport_secure_identifier id;
 			if (network_session_time_get_id_and_time(i, &id, &time))
 			{
 				const int32 minutes = time / 1000 / 60;
@@ -487,7 +487,7 @@ static datum network_event_find_category(const char* event_name, int32 level)
 static void network_event_log_cateory_recursive(datum network_category_index, e_event_level display_level, e_event_level log_level, char continue_iterating)
 {
 	s_network_event_datum* category;
-	for (datum current_category_index = network_category_index; current_category_index != -1; current_category_index = category->next_index)
+	for (datum current_category_index = network_category_index; current_category_index != NONE; current_category_index = category->next_index)
 	{
 		category = (s_network_event_datum*)datum_get(network_event_globals.categories, current_category_index);
 		if (display_level != _event_invalid)

@@ -6,6 +6,7 @@
 #include "input_xinput.h"
 
 #include "interface/user_interface_controller.h"
+#include "main/main_time.h"
 #include "render/render.h"							/* PC1 */
 #include "shell/shell_windows.h"
 
@@ -22,7 +23,6 @@ bool* g_input_windows_request_terminate;
 
 /* constants */
 
-XINPUT_VIBRATION g_vibration_state[k_number_of_controllers]{};
 real32 g_rumble_factor = 1.0f;
 
 /* prototypes */
@@ -78,7 +78,7 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 	if (input_handled
 		&& g_window_handle == GetFocus()
 		&& g_window_handle == GetForegroundWindow()
-		&& !game_is_minimized())
+		&& !main_time_is_throttled())
 	{
 		if ((input_globals->field7D8 & 1) == 0)
 		{
@@ -268,7 +268,7 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 	state.wRightMotorSpeed = (WORD)(state.wRightMotorSpeed * g_rumble_factor);
 
 	bool enabled = user_interface_controller_get_rumble_enabled((e_controller_index)gamepad_index);
-	g_vibration_state[gamepad_index] = (enabled ? state : state_none);
+	input_globals->rumble_states[gamepad_index] = (enabled ? state : state_none);
 	return;
 }
 

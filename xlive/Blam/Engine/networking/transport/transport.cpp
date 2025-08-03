@@ -3,6 +3,7 @@
 
 #include "networking/delivery/network_channel.h"
 #include "networking/messages/network_message_type_collection.h"
+#include "networking/session/network_observer.h"
 #include "shell/shell.h"
 
 /* typedefs */

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "network_session_manager.h"
 
+#include "network_session.h"
+#include "networking/transport/transport_security.h"
 
 /* constants */
 
@@ -25,21 +27,23 @@ bool c_network_session_manager::initialize_session_manager(void)
 c_network_session* c_network_session_manager::get_session(uint32 session_index) const
 {
 	ASSERT(VALID_INDEX(session_index, NUMBEROF(m_sessions)));
-	return this->m_sessions[session_index];
+	return m_sessions[session_index];
 }
 
-c_network_session* c_network_session_manager::get_session(const XNKID* target_session_id) const
+c_network_session* c_network_session_manager::get_session(const s_transport_secure_identifier* target_id) const
 {
-	XNKID session_id;
-
 	c_network_session* session = NULL;
 	for (int32 i = 0; i < k_network_maximum_sessions; i++)
 	{
-		session = m_sessions[i];
-		if (session && session->get_secure_key(&session_id, NULL, NULL, NULL))
+		c_network_session* current_session = m_sessions[i];
+		if (current_session)
 		{
-			if (csmemcmp(session_id.ab, target_session_id->ab, sizeof(session_id)) == 0)
+			s_transport_secure_identifier id;
+			if (current_session->get_transport_session_id(&id) && csmemcmp(&id, target_id, sizeof(id)))
+			{
+				session = current_session;
 				break;
+			}
 		}
 	}
 

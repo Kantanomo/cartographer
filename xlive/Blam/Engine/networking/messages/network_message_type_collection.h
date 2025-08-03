@@ -66,11 +66,6 @@ enum e_network_message_type : int32
 
 /* structures */
 
-struct s_network_message_session_data
-{
-	XNKID session_id;
-};
-
 struct s_network_message_type
 {
 	bool initialized;

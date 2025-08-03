@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "main_game_time.h"
 
+#include "main_time.h"
+
 #include "H2MOD.h"
 
 #include "game/game.h"
@@ -164,7 +166,7 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 
 static bool __cdecl should_limit_framerate_hook()
 {
-	bool result = game_is_minimized() || g_main_game_time_frame_limiter_enabled;
+	bool result = main_time_is_throttled() || g_main_game_time_frame_limiter_enabled;
 	if (!halo_frame_interpolator_enabled())
 	{
 		result |= xbox_tickrate_is_enabled();

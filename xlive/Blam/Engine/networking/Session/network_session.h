@@ -4,6 +4,7 @@
 #include "input/controllers.h"
 #include "networking/network_game_definitions.h"
 #include "networking/transport/transport.h"
+#include "networking/transport/transport_security.h"
 #include "saved_games/game_variant.h"
 
 /* enums */
@@ -229,7 +230,7 @@ ASSERT_STRUCT_SIZE(s_session_vote, 160);
 
 struct s_membership_peer
 {
-	XNADDR secure_address;
+	s_transport_secure_address secure_address;
 	uint8 gap_24[4];
 	wchar_t name[16];
 	wchar_t peer_session_name[32];
@@ -244,7 +245,8 @@ struct s_membership_peer
 	uint32 latency_min;
 	uint32 latency_est;
 	uint32 latency_max;
-	uint8 gap_9C[68];
+	int32 field_AC;
+	wchar_t description[32];
 	uint32 field_F0;
 	uint32 field_F4;
 	uint32 update_number;
@@ -339,7 +341,7 @@ public:
 	int32 m_session_index;
 	int32 m_session_type;
 	e_network_session_class m_session_class;
-	XNKID m_session_id;
+	s_transport_secure_identifier m_session_id;
 	wchar_t field_28[16];
 	bool field_48;
 	XNKEY m_session_key;
@@ -437,7 +439,7 @@ public:
 
 	bool channel_is_authoritative(int32 network_channel_index) const;
 
-	e_network_session_state get_session_local_state() const
+	e_network_session_state current_local_state() const
 	{
 		ASSERT(VALID_INDEX(m_local_state, k_network_session_state_count));
 		return m_local_state;
@@ -498,16 +500,16 @@ public:
 		return get_local_peer_index() == peer_index;
 	}
 
-	bool disconnected() const
+	bool disconnected(void) const
 	{
-		return get_session_local_state() == _network_session_state_none;
+		return current_local_state() == _network_session_state_none;
 	}
 
 	bool leaving() const
 	{
 		bool result = false;
 
-		switch (get_session_local_state())
+		switch (current_local_state())
 		{
 		case _network_session_state_peer_join_abort:
 		case _network_session_state_peer_leaving:
@@ -525,15 +527,17 @@ public:
 		return result;
 	}
 
-	bool is_host() const
+	bool is_host(void) const
 	{
-		bool result = get_session_local_state() == _network_session_state_host_established
-			|| get_session_local_state() == _network_session_state_host_disband
-			|| get_session_local_state() == _network_session_state_host_handoff
-			|| get_session_local_state() == _network_session_state_host_reestablish;
+		bool result = false;
+		const e_network_session_state state = current_local_state();
 
-		if (result)
+		if (state == _network_session_state_host_established ||
+			state == _network_session_state_host_disband ||
+			state == _network_session_state_host_handoff ||
+			state == _network_session_state_host_reestablish)
 		{
+			result = true;
 			ASSERT(m_local_peer_index == m_session_host_peer_index);
 		}
 		else if (established())
@@ -556,14 +560,14 @@ public:
 
 	bool peer_joining() const
 	{
-		return get_session_local_state() == _network_session_state_peer_joining;
+		return current_local_state() == _network_session_state_peer_joining;
 	}
 
 	bool established() const
 	{
 		bool result = false;
 
-		switch (get_session_local_state())
+		switch (current_local_state())
 		{
 		case _network_session_state_none:
 		case _network_session_state_peer_joining:
@@ -600,9 +604,9 @@ public:
 		return TEST_BIT(m_session_membership.players_active_mask, DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index));
 	}
 
-	int32 get_peer_index_from_address(const transport_address* address)
+	int32 get_peer_index_from_address(const struct transport_address* address)
 	{
-		return INVOKE_BY_TYPE(0x1C71DF, 0x19E9CF, int32(__thiscall*)(c_network_session*, const transport_address*), this, address);
+		return INVOKE_BY_TYPE(0x1C71DF, 0x19E9CF, int32(__thiscall*)(c_network_session*, const struct transport_address*), this, address);
 	}
 
 	void request_membership_update()
@@ -650,8 +654,8 @@ public:
 		return m_session_class == _network_session_class_xbox_live;
 	}
 
-	bool get_secure_key(XNKID* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, e_transport_platform* transport_platform) const;
-	bool get_transport_session_id(XNKID* out_session_id) const;
+	bool get_secure_key(s_transport_secure_identifier* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, e_transport_platform* transport_platform) const;
+	bool get_transport_session_id(s_transport_secure_identifier* out_session_id) const;
 	uint32 time_get(void) const;
 	
 	const char* describe_network_protocol_type() const

@@ -4,11 +4,15 @@
 #include "network_messages_cartographer.h"
 
 #include "cartographer/twizzler/twizzler.h"
-#include "networking/network_event.h"
 #include "networking/delivery/network_channel.h"
+#include "networking/logic/life_cycle_manager.h"
+#include "networking/messages/network_message_gateway.h"
+#include "networking/messages/network_message_type_collection.h"
 #include "networking/session/network_session.h"
-#include "networking/Session/network_session_manager.h"
+#include "networking/session/network_session_manager.h"
 #include "networking/session/network_observer.h"
+#include "networking/transport/transport_security.h"
+#include "networking/network_event.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -136,7 +140,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 	if (peer_network_channel->get_network_address(&addr))
 	{
 		event(_event_verbose, "h2mod:custom_message: %s - Received message: %s from network channel: %d, address: %x",
-			__FUNCTION__, get_network_message_description(message_type), network_channel_index, ntohl(addr.address.ipv4));
+			__FUNCTION__, get_network_message_description(message_type), network_channel_index, ntohl(addr.address.raw_ipv4));
 	}
 	else
 	{
@@ -208,7 +212,7 @@ void c_network_message_handler::register_observer(c_network_observer* observer)
 
 void c_network_message_handler::handle_request_map_filename(const transport_address* address, const s_network_message_request_map_filename* received_data)
 {
-	c_network_session* session = m_session_manager->get_session(&received_data->session_data.session_id);
+	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
 	if (session)
 	{
 		event(_event_message, "h2mod:custom_message: received on read_channel_message_hook request-map-filename from XUID: %llu", received_data->player_id);
@@ -248,7 +252,7 @@ void c_network_message_handler::handle_request_map_filename(const transport_addr
 
 void c_network_message_handler::handle_map_filename_response(const transport_address* address, int32 channel_index, const s_network_message_custom_map_filename* received_data)
 {
-	c_network_session* session = m_session_manager->get_session(&received_data->session_data.session_id);
+	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
 	if (session)
 	{
 		if (session->channel_is_authoritative(channel_index))
@@ -272,7 +276,7 @@ void c_network_message_handler::handle_map_filename_response(const transport_add
 
 void c_network_message_handler::handle_player_property_rank(const transport_address* address, int32 channel_index, const s_network_message_rank_change* received_data)
 {
-	c_network_session* session = m_session_manager->get_session(&received_data->session_data.session_id);
+	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
 	if (session)
 	{
 		if (session->channel_is_authoritative(channel_index))
@@ -285,7 +289,7 @@ void c_network_message_handler::handle_player_property_rank(const transport_addr
 
 void c_network_message_handler::handle_session_anticheat_status(const transport_address* address, int32 channel_index, const s_network_message_anti_cheat* received_data)
 {
-	c_network_session* session = m_session_manager->get_session(&received_data->session_data.session_id);
+	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
 	if (session)
 	{
 		if (session->channel_is_authoritative(channel_index))
@@ -297,7 +301,7 @@ void c_network_message_handler::handle_session_anticheat_status(const transport_
 
 void c_network_message_handler::handle_session_custom_variant_settings(const transport_address* address, int32 channel_index, const s_network_message_session_custom_variant_settings* received_data)
 {
-	c_network_session* session = m_session_manager->get_session(&received_data->session_data.session_id);
+	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
 	if (session)
 	{
 		if (session->channel_is_authoritative(channel_index))
@@ -309,7 +313,7 @@ void c_network_message_handler::handle_session_custom_variant_settings(const tra
 
 void c_network_message_handler::handle_leave_session(const transport_address* address, const s_network_message_session_data* received_data)
 {
-	c_network_session* session = m_session_manager->get_session(&received_data->session_id);
+	c_network_session* session = m_session_manager->get_session(&received_data->identifier);
 	if (session)
 	{
 		int32 sender_peer_index = session->get_peer_index_from_address(address);
@@ -324,7 +328,7 @@ void c_network_message_handler::handle_leave_session(const transport_address* ad
 
 void c_network_message_handler::handle_membership_update(const transport_address* address, int32 channel_index, const s_network_message_session_data* received_data)
 {
-	c_network_session* session = m_session_manager->get_session(&received_data->session_id);
+	c_network_session* session = m_session_manager->get_session(&received_data->identifier);
 	if (session)
 	{
 		if (session->channel_is_authoritative(channel_index))
@@ -336,7 +340,7 @@ void c_network_message_handler::handle_membership_update(const transport_address
 
 void c_network_message_handler::handle_player_add(const transport_address* address, const s_network_message_session_data* received_data)
 {
-	c_network_session* session = m_session_manager->get_session(&received_data->session_id);
+	c_network_session* session = m_session_manager->get_session(&received_data->identifier);
 	if (session)
 	{
 		int32 sender_peer_index = session->get_peer_index_from_address(address);

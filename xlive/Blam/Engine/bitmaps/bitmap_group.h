@@ -2,6 +2,11 @@
 #include "tag_files/data_reference.h"
 #include "tag_files/tag_block.h"
 
+enum
+{
+	MAXIMUM_BITMAPS_PER_BITMAP_GROUP = 65536,
+};
+
 enum e_bitmap_tag_type : int16
 {
 	_bitmap_tag_type_2d_textures = 0,
@@ -158,7 +163,7 @@ enum e_bitmap_data_format : int16
 	k_bitmap_format_count
 };
 
-enum e_bitmap_cache_usage : byte
+enum e_bitmap_cache_usage : uint8
 {
 	bitmap_cache_usage_default = 0,
 	bitmap_cache_usage_environment = 1,
@@ -181,8 +186,6 @@ enum e_bitmap_cache_usage : byte
 	bitmap_cache_usage_first_person = 18,
 	bitmap_cache_usage_rasterizer = 19
 };
-
-#define MAXIMUM_BITMAPS_PER_BITMAP_GROUP 65536
 
 // force 4 byte alignment because (int64 frame_cached) causes it to become 8 byte aligned
 #pragma pack(push, 4)

@@ -51,7 +51,7 @@ public:
 	template<>
 	static signed short ToIntegral<signed short>(const std::string& str, int _Base)
 	{
-		return ToIntegral<int>(str, _Base);
+		return (signed short)ToIntegral<int>(str, _Base);
 	}
 
 	template<>

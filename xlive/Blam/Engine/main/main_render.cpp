@@ -39,12 +39,18 @@ void main_render_apply_patches(void)
 	// this is replacing a nullsub
 	PatchCall(Memory::GetAddress(0x19228E), main_render_hook);
 
-	PatchCall(Memory::GetAddress(0x27009A), main_render);
+	PatchCall(Memory::GetAddress(0x27009A), main_render_player_view);
 	PatchCall(Memory::GetAddress(0x2700A5), main_render_previous_backbuffer);
 	return;
 }
 
 void __cdecl main_render(void)
+{
+	INVOKE(0x27002A, 0x0, main_render);
+	return;
+}
+
+void __cdecl main_render_player_view(void)
 {
 	int32 player_window_count;
 	if (cinematic_in_progress())

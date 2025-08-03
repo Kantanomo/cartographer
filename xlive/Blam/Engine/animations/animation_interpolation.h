@@ -1,6 +1,6 @@
 #pragma once
 
-enum e_interpolation_type : byte
+enum e_interpolation_type : uint8
 {
 	_interpolation_type_none = 0,
 	_interpolation_type_ease_in_ease_out = 1,

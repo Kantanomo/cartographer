@@ -59,7 +59,7 @@ namespace CustomVariantSettings
 		s_network_message_session_custom_variant_settings data;
 
 		if (session->is_host() 
-			&& session->get_transport_session_id(&data.session_data.session_id)
+			&& session->get_transport_session_id(&data.session_data.identifier)
 			&& shell_is_dedicated_server())
 		{
 			//TODO: Find and map out struct with current variant information.

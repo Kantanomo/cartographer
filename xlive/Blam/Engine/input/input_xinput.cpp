@@ -103,11 +103,11 @@ void input_xinput_update_rumble_state(void)
 
 			if (!global_suppress_rumble && rumble_enabled)
 			{
-				csmemcpy(&g_xinput_vibration, &g_vibration_state[controller_index], sizeof(g_xinput_vibration));
+				g_xinput_vibration = input_globals->rumble_states[controller_index];
 			}
 			else
 			{
-				csmemset(&g_xinput_vibration, 0, sizeof(g_xinput_vibration));
+				g_xinput_vibration = {};
 			}
 
 			if (device)

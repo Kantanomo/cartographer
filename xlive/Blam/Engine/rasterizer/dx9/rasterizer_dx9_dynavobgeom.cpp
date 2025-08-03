@@ -7,6 +7,7 @@
 #include "rasterizer_dx9_shader_submit.h"
 #include "rasterizer_dx9_submit.h"
 
+#include "render/render.h"
 
 /* globals */
 
@@ -47,7 +48,7 @@ void __cdecl rasterizer_dx9_create_dynavobgeom_pixel_shaders(void)
 	return;
 }
 
-void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parameters* parameters, const s_dynamic_vertex_data* vertex_data)
+void rasterizer_dx9_dynamic_screen_geometry_draw(const rasterizer_dynamic_screen_geometry_parameters* parameters, const s_dynamic_vertex_data* vertex_data)
 {
 	// INVOKE(0x271C57, 0x0, rasterizer_dx9_dynamic_screen_geometry_draw, parameters, vertex_data);
 
@@ -65,14 +66,14 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 		rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
 		rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);
 		rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
-		rasterizer_dx9_set_blend_render_state(parameters->blend_function);
+		rasterizer_dx9_set_blend_render_state(parameters->framebuffer_blend_function);
 
 		const int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
 		const int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
 
-		const bool f4_valid = parameters->field_4;
-		const real32 v1 = (f4_valid ? (parameters->field_4->i * 2.f) / width : 0.f);
-		const real32 v2 = (f4_valid ? (parameters->field_4->j * -2.f) / width : 0.f);
+		const bool valid_offset = parameters->offset != NULL;
+		const real32 v1 = (valid_offset ? (parameters->offset->i * 2.f) / width : 0.f);
+		const real32 v2 = (valid_offset ? (parameters->offset->j * -2.f) / width : 0.f);
 
 		const real32 width_ratio = 1.f / width;
 		const real32 height_ratio = 1.f / height;
@@ -97,20 +98,20 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 		real_vector4d vs_constants_second[6];
 		vs_constants_second[0] = parameters->vs_constants_second_0;
 
-		vs_constants_second[1].i = (parameters->field_8 ? 1.f : 0.f);
-		vs_constants_second[1].j = (parameters->field_8 ? 0.f : 1.f);
-		vs_constants_second[1].k = (parameters->field_9 ? 1.f : 0.f);
-		vs_constants_second[1].l = (parameters->field_9 ? 0.f : 1.f);
+		vs_constants_second[1].i = (parameters->map_anchor_screen[0] ? 1.f : 0.f);
+		vs_constants_second[1].j = (parameters->map_anchor_screen[0] ? 0.f : 1.f);
+		vs_constants_second[1].k = (parameters->map_anchor_screen[1] ? 1.f : 0.f);
+		vs_constants_second[1].l = (parameters->map_anchor_screen[1] ? 0.f : 1.f);
 
-		vs_constants_second[2].i = (parameters->field_10 ? 1.f : 0.f);
-		vs_constants_second[2].j = (parameters->field_10 ? 0.f : 1.f);
-		vs_constants_second[2].k = (parameters->field_1C ? parameters->field_1C->i : 0.f);
-		vs_constants_second[2].l = (parameters->field_1C ? parameters->field_1C->j : 0.f);
+		vs_constants_second[2].i = (parameters->map_anchor_screen[2] ? 1.f : 0.f);
+		vs_constants_second[2].j = (parameters->map_anchor_screen[2] ? 0.f : 1.f);
+		vs_constants_second[2].k = (parameters->map_offset[0] ? parameters->map_offset[0]->i : 0.f);
+		vs_constants_second[2].l = (parameters->map_offset[0] ? parameters->map_offset[0]->j : 0.f);
 
-		vs_constants_second[3].i = (parameters->field_20 ? parameters->field_20->i : 0.f);
-		vs_constants_second[3].j = (parameters->field_20 ? parameters->field_20->j : 0.f);
-		vs_constants_second[3].k = (parameters->field_24 ? parameters->field_24->i : 0.f);
-		vs_constants_second[3].l = (parameters->field_24 ? parameters->field_24->j : 0.f);
+		vs_constants_second[3].i = (parameters->map_offset[1] ? parameters->map_offset[1]->i : 0.f);
+		vs_constants_second[3].j = (parameters->map_offset[1] ? parameters->map_offset[1]->j : 0.f);
+		vs_constants_second[3].k = (parameters->map_offset[2] ? parameters->map_offset[2]->i : 0.f);
+		vs_constants_second[3].l = (parameters->map_offset[2] ? parameters->map_offset[2]->j : 0.f);
 		
 		vs_constants_second[4] = parameters->vs_constants_second_4;
 		vs_constants_second[5] = { parameters->field_34.i, parameters->field_34.j, 0.f, 0.f };
@@ -135,8 +136,8 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 				break;
 			}
 
-			uint32 filter = (parameters->point_interpolation ? D3DTEXF_POINT : D3DTEXF_LINEAR);
-			uint32 address = (parameters->wrap_uv[sampler] ? D3DTADDRESS_WRAP : D3DTADDRESS_MIRRORONCE);
+			uint32 filter = (parameters->point_sampled ? D3DTEXF_POINT : D3DTEXF_LINEAR);
+			uint32 address = (parameters->map_wrapped[sampler] ? D3DTADDRESS_WRAP : D3DTADDRESS_MIRRORONCE);
 			rasterizer_set_texture_bitmap_data(sampler, bitmap);
 			rasterizer_dx9_set_sampler_state(sampler, D3DSAMP_ADDRESSU, address);
 			rasterizer_dx9_set_sampler_state(sampler, D3DSAMP_ADDRESSV, address);
@@ -162,7 +163,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 			real_vector4d ps_constants[6] = { 0 };
 			for (uint8 i = 0; i < k_dynamic_geometry_map_max_count; i++)
 			{
-				const s_dynamic_geometry_map_color_parameters* color = parameters->map_color[i];
+				const s_dynamic_geometry_map_color_parameters* color = parameters->map_tint[i];
 
 				// Copy colour to vs constants if one is supplied, otherwise copy white
 				csmemcpy(&ps_constants[i], (color != NULL ? color->color : global_real_rgb_white), sizeof(real_rgb_color));
@@ -173,21 +174,21 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 
 			if (parameters->map[1])
 			{
-				ps_constants[3].i = (real32)(parameters->field_90 == 0);
-				ps_constants[3].j = (real32)(parameters->field_90 == 1);
-				ps_constants[3].k = (real32)(parameters->field_90 == 2);
-				ps_constants[3].l = (real32)(parameters->field_90 == 3);
-				ps_constants[4].i = (real32)(parameters->field_90 == 4);
-				ps_constants[4].j = (real32)(parameters->field_90 == 5);
+				ps_constants[3].i = (real32)(parameters->map0_to_1_blend_function == _framebuffer_blend_function_alpha_blend);
+				ps_constants[3].j = (real32)(parameters->map0_to_1_blend_function == _framebuffer_blend_function_multiply);
+				ps_constants[3].k = (real32)(parameters->map0_to_1_blend_function == _framebuffer_blend_function_double_multiply);
+				ps_constants[3].l = (real32)(parameters->map0_to_1_blend_function == _framebuffer_blend_function_add);
+				ps_constants[4].i = (real32)(parameters->map0_to_1_blend_function == _framebuffer_blend_function_subtract);
+				ps_constants[4].j = (real32)(parameters->map0_to_1_blend_function == _framebuffer_blend_function_component_min);
 			}
 
 			if (parameters->map[2])
 			{
-				ps_constants[4].k = (real32)(parameters->field_92 == 0);
-				ps_constants[4].l = (real32)(parameters->field_92 == 1);
-				ps_constants[5].i = (real32)(parameters->field_92 == 2);
-				ps_constants[5].j = (real32)(parameters->field_92 == 3);
-				ps_constants[5].k = (real32)(parameters->field_92 == 4);
+				ps_constants[4].k = (real32)(parameters->map1_to_2_blend_function == _framebuffer_blend_function_alpha_blend);
+				ps_constants[4].l = (real32)(parameters->map1_to_2_blend_function == _framebuffer_blend_function_multiply);
+				ps_constants[5].i = (real32)(parameters->map1_to_2_blend_function == _framebuffer_blend_function_double_multiply);
+				ps_constants[5].j = (real32)(parameters->map1_to_2_blend_function == _framebuffer_blend_function_add);
+				ps_constants[5].k = (real32)(parameters->map1_to_2_blend_function == _framebuffer_blend_function_subtract);
 			}
 
 			draw_geometry = SUCCEEDED(global_d3d_device->SetPixelShader(dynavobgeom_pixel_shaders_get()[0]));

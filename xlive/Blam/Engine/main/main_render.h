@@ -16,4 +16,6 @@ void main_render_apply_patches(void);
 
 void __cdecl main_render(void);
 
+void __cdecl main_render_player_view(void);
+
 void __cdecl main_render_previous_backbuffer(int32 a1, int32 a2);

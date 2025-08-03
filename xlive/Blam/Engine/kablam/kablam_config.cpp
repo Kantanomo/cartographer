@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "kablam_config.h"
 
+#include "networking/logic/life_cycle_manager.h"
+#include "networking/session/network_session.h"
+
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"

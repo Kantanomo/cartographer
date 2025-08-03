@@ -1,7 +1,13 @@
 #pragma once
 
-#define k_real_epsilon 0.0001f
+/* constants */
+
+#define _real_epsilon 0.0001f
+#define k_real_epsilon _real_epsilon
+
 #define _pi M_PI
+
+/* macros */
 
 #define DEGREES_TO_RADIANS(angle) ((real32)((angle) * M_PI / 180.0))
 #define RADIANS_TO_DEGREES(angle) ((real32)((angle) * 180.0 / M_PI))

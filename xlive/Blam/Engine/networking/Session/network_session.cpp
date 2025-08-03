@@ -101,7 +101,7 @@ int32 NetworkSession::GetLocalPeerIndex()
 
 IN_ADDR NetworkSession::GetLocalNetworkAddress()
 {
-	return GetActiveNetworkSession()->m_session_membership.membership_peers[GetLocalPeerIndex()].secure_address.inaOnline;
+	return GetActiveNetworkSession()->m_session_membership.membership_peers[GetLocalPeerIndex()].secure_address.addr.inaOnline;
 }
 
 int32 NetworkSession::GetPeerIndex(datum player_index)
@@ -345,7 +345,7 @@ void c_network_session::switch_players_to_teams(datum* player_indexes, int32 pla
 	}
 }
 
-bool c_network_session::get_secure_key(XNKID* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, e_transport_platform* transport_platform) const
+bool c_network_session::get_secure_key(s_transport_secure_identifier* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, e_transport_platform* transport_platform) const
 {
 	bool result = false;
 
@@ -377,7 +377,7 @@ bool c_network_session::get_secure_key(XNKID* out_session_id, XNKEY* out_session
 	return result;
 }
 
-bool c_network_session::get_transport_session_id(XNKID* out_session_id) const
+bool c_network_session::get_transport_session_id(s_transport_secure_identifier* out_session_id) const
 {
 	return get_secure_key(out_session_id, NULL, NULL, NULL);
 }

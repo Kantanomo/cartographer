@@ -2,7 +2,6 @@
 #include "rasterizer_dx9_targets.h"
 
 #include "bitmaps/bitmap_group.h"
-#include "render/render.h"
 #include "rasterizer/rasterizer_globals.h"
 
 /* enums */
@@ -89,7 +88,7 @@ void rasterizer_dx9_present(bitmap_data* screenshot_bitmap, bool a2);
 
 void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4);
 
-bool __cdecl rasterizer_window_begin(s_frame* preferences);
+bool __cdecl rasterizer_window_begin(struct s_frame* preferences);
 
 void __cdecl rasterizer_update_cameras(void);
 
@@ -121,15 +120,15 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 
 void __cdecl rasterizer_dx9_initialize_camera_projection(
 	bool is_texture_camera,
-	const render_camera* camera,
-	const render_projection* projection,
+	const struct render_camera* camera,
+	const struct render_projection* projection,
 	e_rasterizer_target rasterizer_target);
 
 bool __cdecl rasterizer_initialize(void);
 
 bool __cdecl rasterizer_dx9_vertex_shaders_initialize(void);
 
-bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* parameters);
+bool __cdecl rasterizer_dx9_render_scene_start(const struct s_render_scene_parameters* parameters);
 
 bool __cdecl rasterizer_dx9_render_scene_end(void);
 

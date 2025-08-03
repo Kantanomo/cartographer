@@ -287,15 +287,15 @@ void MapManager::ApplyPatches() {
 	NopFill(Memory::GetAddress(0x1B5421, 0x1A917F), 5);
 
 	// custom map cache patches/hooks
-	c_custom_map_manager::ApplyCustomMapExtensionLimitPatches();
+	c_map_manager::ApplyCustomMapExtensionLimitPatches();
 }
 
 /**
 * Actually calls the real map reload function in halo2.exe
 */
 void MapManager::ReloadAllMaps() {
-	get_custom_map_manager()->load_custom_map_data_cache();
-	get_custom_map_manager()->start_custom_map_sync();
+	map_manager_get()->map_repository_load();
+	map_manager_get()->start_map_synchronize();
 }
 
 bool MapManager::GetMapFilename(std::wstring& buffer) {
@@ -407,7 +407,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 
 		if (res == CURLE_OK)
 		{
-			if (http_code != 404 && get_custom_map_manager()->add_custom_map_entry_by_map_file_path(map_path.get_string())) {
+			if (http_code != 404 && map_manager_get()->add_custom_map_entry_by_map_file_path(map_path.get_string())) {
 				//if we succesfully downloaded the map, return true
 				return true;
 			}

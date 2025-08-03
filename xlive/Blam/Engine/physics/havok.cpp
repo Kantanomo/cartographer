@@ -5,7 +5,7 @@
 
 #include "cache/cache_files.h"
 #include "objects/object_definition.h"
-#include "objects/object_type_list.h"
+#include "objects/object_types.h"
 
 /* prototypes */
 

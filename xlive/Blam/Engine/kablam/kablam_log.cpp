@@ -63,7 +63,7 @@ static void __cdecl kablam_log(const char* format, ...)
 	{
 		FILE* g_kablam_log = *Memory::GetAddress<_iobuf**>(0x0, 0x4904EC);
 		vfprintf_s(g_kablam_log, format, args);
-		fprintf_s(g_kablam_log, "\r\n");
+		fprintf_s(g_kablam_log, EOL_STRING);
 		fflush(g_kablam_log);
 	}
 
