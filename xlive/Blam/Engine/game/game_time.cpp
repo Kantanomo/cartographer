@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "game_time.h"
 
+#include "main/main_time.h"
 #include "H2MOD.h"
-
 #include "cutscene/cinematics.h"
 #include "math/math.h"
 #include "main/interpolator.h"
@@ -99,7 +99,7 @@ bool __cdecl cinematic_is_running_hook()
 	}
 	else
 	{
-		result = cinematic_is_running() || xbox_tickrate_is_enabled() || game_is_minimized() || g_main_game_time_frame_limiter_enabled;
+		result = cinematic_is_running() || xbox_tickrate_is_enabled() || main_time_is_throttled() || g_main_game_time_frame_limiter_enabled;
 	}
 	
 	return result;

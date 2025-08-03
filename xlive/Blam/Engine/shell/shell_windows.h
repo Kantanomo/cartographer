@@ -38,8 +38,6 @@ void shell_windows_apply_patches();
 
 void shell_windows_initialize();
 
-bool __cdecl game_is_minimized(void);
-
 uint32 __cdecl system_milliseconds(void);
 
 LARGE_INTEGER shell_time_counter_freq();

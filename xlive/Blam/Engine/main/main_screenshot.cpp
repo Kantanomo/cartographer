@@ -88,6 +88,18 @@ bool cubemap_screenshot_in_progress(void)
 	return screenshot_globals->taking_screenshot && screenshot_globals->cubemap_screenshot;
 }
 
+bool movie_recording(void)
+{
+	const s_movie_globals* movie_globals = movie_globals_get();
+	return movie_globals->in_progress;
+}
+
+real32 movie_recording_timestep(void)
+{
+	const s_movie_globals* movie_globals = movie_globals_get();
+	return movie_globals->in_progress ? movie_globals->recording_dt : 0.f;
+}
+
 void screenshot_cubemap(const char* name)
 {
 	s_screenshot_globals* screenshot_globals = get_screenshot_globals();

@@ -31,8 +31,11 @@ s_shell_build_version k_shell_build_versions[] =
 	{11122, "11122.07.08.24.1808.main"},
 };
 
+
+
 /* globals */
 
+bool g_shell_application_is_paused = false;
 
 /* prototypes */
 
@@ -56,6 +59,17 @@ void shell_apply_patches(void)
 e_shell_tool_type shell_tool_type(void)
 {
 	return _shell_tool_type_game;
+}
+
+// TODO: properly set this up
+const char* shell_get_target(void)
+{
+	return "halo2_pc_cache_";
+}
+
+bool shell_application_is_paused(void)
+{
+	return g_shell_application_is_paused;
 }
 
 bool shell_is_dedicated_server(void)
@@ -91,7 +105,7 @@ void shell_command_line_flag_set(e_shell_command_line_flags flag, int32 state)
 // TODO: properly set this up
 const char* shell_get_version(void)
 {
-	// FORMAT: (build_type configuration platform build_number.branch)
+	// FORMAT: (target build_type platform build_number.branch)
 	return "halo2_pc_cache_  release pc 11122.07.08.24.1808.main";
 }
 

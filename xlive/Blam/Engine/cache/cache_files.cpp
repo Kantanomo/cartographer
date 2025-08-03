@@ -298,7 +298,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 	// read tag header
 	if(!cache_file_blocking_read(NONE, cache_header->tag_offset, aligned_tag_header_read_size, memory_tag_header_data_start))
 	{
-		game_preferences_flag_dirty();
+		global_preferences_flag_dirty();
 		error(_error_log, "failed to read the tags header, instances, and names section");
 		event(_event_error, "failed to read the tags header, instances, and names section [%s]", scenario_path);
 		scenario_tags_load_internal_panic();
@@ -308,7 +308,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 	// read tag data
 	if(!cache_file_blocking_read(NONE, cache_header->data_offset + cache_header->tag_offset, aligned_tag_data_read_size, memory_tag_data_start))
 	{
-		game_preferences_flag_dirty();
+		global_preferences_flag_dirty();
 		error(_error_log, "failed to read the tag data section");
 		event(_event_error, "failed to read the tag data section [%s]", scenario_path);
 		scenario_tags_load_internal_panic();
@@ -318,7 +318,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 	// read debug info
 	if(!scenario_tags_load_debug())
 	{
-		game_preferences_flag_dirty();
+		global_preferences_flag_dirty();
 		scenario_tags_load_internal_panic();
 		return false;
 	}
@@ -327,7 +327,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 
 	if(!tag_header->tag_instances || tag_header->tag_count <= 0 || tag_header->signature != 'tags')
 	{
-		game_preferences_flag_dirty();
+		global_preferences_flag_dirty();
 		error(_error_log, "tag header is invalid");
 		event(_event_error, "tag header is invalid [%s]", scenario_path);
 		scenario_tags_load_internal_panic();

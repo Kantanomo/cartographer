@@ -49,6 +49,10 @@ bool screenshot_in_progress(void);
 
 bool cubemap_screenshot_in_progress(void);
 
+bool movie_recording(void);
+
+real32 movie_recording_timestep(void);
+
 void screenshot_cubemap(const char* name);
 
 bool __cdecl screenshot_render(window_bound* window);

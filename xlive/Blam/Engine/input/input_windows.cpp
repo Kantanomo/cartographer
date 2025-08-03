@@ -6,6 +6,7 @@
 #include "input_xinput.h"
 
 #include "interface/user_interface_controller.h"
+#include "main/main_time.h"
 #include "render/render.h"							/* PC1 */
 #include "shell/shell_windows.h"
 
@@ -77,7 +78,7 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 	if (input_handled
 		&& g_window_handle == GetFocus()
 		&& g_window_handle == GetForegroundWindow()
-		&& !game_is_minimized())
+		&& !main_time_is_throttled())
 	{
 		if ((input_globals->field7D8 & 1) == 0)
 		{

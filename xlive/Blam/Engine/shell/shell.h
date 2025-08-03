@@ -61,6 +61,8 @@ void shell_apply_patches(void);
 
 e_shell_tool_type shell_tool_type(void);
 
+bool shell_application_is_paused(void);
+
 bool shell_is_dedicated_server(void);
 
 bool shell_command_line_flag_is_set(e_shell_command_line_flags flag);
