@@ -36,7 +36,7 @@ namespace playlist_loader
 		{L"Infinite Ammo", e_custom_setting::infinite_ammo},
 		{L"Explosion Physics", e_custom_setting::explosion_physics},
 		{L"Hill Rotation", e_custom_setting::hill_rotation},
-		{L"Game Speed", e_custom_setting::game_speed},
+		//{L"Game Speed", e_custom_setting::game_speed}, removed because it's broken
 		{L"Infinite Grenades", e_custom_setting::infinite_grenades},
 		{L"Hill Set", e_custom_setting::hill_set},
 		{L"Spawn Protection", e_custom_setting::spawn_protection},
