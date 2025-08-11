@@ -190,7 +190,6 @@ void input_windows_apply_patches(void);
 
 int32* hs_debug_simulate_gamepad_global_get(void);
 
-bool* input_suppress_global_get(void);
 
 void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right);
 

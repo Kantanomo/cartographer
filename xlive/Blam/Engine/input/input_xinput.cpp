@@ -40,7 +40,6 @@ XInputGetStateEx_t XInputGetStateEx;
 
 HMODULE g_xinput1_4_module;
 
-bool g_input_feedback_suppress = false;
 
 XINPUT_VIBRATION g_xinput_vibration{};
 
@@ -63,16 +62,16 @@ uint32 xinput_device::get_port() const
 	return dwUserIndex;
 }
 
-void input_xinput_clear_rumble_state(void)
+void input_clear_all_rumblers(void)
 {
 	// Originally 20
 	// We set to 4 and check if if the controller is plugged in
 	XINPUT_VIBRATION vibration{};
 
-	for (uint32 i = 0; i < 4; i++)
+	for (uint16 device_index = 0; device_index < k_number_of_controllers; device_index++)
 	{
-		input_device* device = g_xinput_devices[i];
-		if (device && controller_button_state_get((e_controller_index)i)->plugged_in)
+		input_device* device = g_xinput_devices[device_index];
+		if (device && input_has_gamepad_plugged(device_index))
 		{
 			device->XSetState(&vibration);
 		}
@@ -84,8 +83,8 @@ void input_xinput_update_rumble_state(void)
 {
 	bool global_suppress_rumble = false;
 
-	if (g_input_feedback_suppress
-		|| *input_suppress_global_get()
+	if (input_globals->feedback_suppress
+		|| input_globals->input_suppressed
 		|| !game_in_progress()
 		|| game_time_get_paused())
 	{
@@ -96,12 +95,13 @@ void input_xinput_update_rumble_state(void)
 	{
 		e_controller_index controller_index = (e_controller_index)device_index;
 
-		if (controller_button_state_get(controller_index)->plugged_in)
+		if (input_has_gamepad_plugged((uint16)controller_index))
 		{
+			s_gamepad_input_preferences preference;
 			input_device* device = g_xinput_devices[device_index];
-			bool rumble_enabled = controller_profile_get(controller_index)->field_1658;
+			input_abstraction_get_controller_preferences(controller_index, &preference);
 
-			if (!global_suppress_rumble && rumble_enabled)
+			if (!global_suppress_rumble && preference.field_1658 == 1) //last used device being gamepad ?
 			{
 				g_xinput_vibration = input_globals->rumble_states[controller_index];
 			}
@@ -301,7 +301,7 @@ void xinput_apply_patches(void)
 	g_main_controller_index = Memory::GetAddress<uint32*>(0x47A714);
 
 	PatchCall(Memory::GetAddress(0x2FBDA), input_xinput_update_rumble_state);
-	PatchCall(Memory::GetAddress(0x2FC34), input_xinput_clear_rumble_state);
+	PatchCall(Memory::GetAddress(0x2FC34), input_clear_all_rumblers);
 	PatchCall(Memory::GetAddress(0x2FD7E), xinput_load);
 
 	return;
