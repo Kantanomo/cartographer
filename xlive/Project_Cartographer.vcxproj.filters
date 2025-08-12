@@ -506,6 +506,7 @@
     <ClCompile Include="Blam\Engine\physics\impacts.cpp" />
     <ClCompile Include="Blam\Engine\game\game_allegiance.cpp" />
     <ClCompile Include="Blam\Engine\sapien\patches_initialize.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_splitscreen_setting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2044,6 +2045,7 @@
     <ClInclude Include="Blam\Engine\game\game_grief.h" />
     <ClInclude Include="Blam\Engine\physics\impacts.h" />
     <ClInclude Include="Blam\Engine\sapien\patches_initialize.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_splitscreen_setting.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

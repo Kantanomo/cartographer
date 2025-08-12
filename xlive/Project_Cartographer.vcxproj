@@ -939,6 +939,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_difficulty_select.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_level_select.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_splitscreen_setting.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_squad_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_video_settings.cpp" />
@@ -1395,6 +1396,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_difficulty_select.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_level_select.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_splitscreen_setting.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_squad_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_video_settings.h" />

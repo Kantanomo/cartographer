@@ -409,6 +409,7 @@ public:
 	void initialize_button_keys_text(bool add_new_child);
 	void set_list_arrows_widget(c_bitmap_widget* up_arrow, c_bitmap_widget* down_arrow);
 	void* get_screen_definition();
+	void get_string_by_string_id(string_id sid, c_maximum_interface_text* out_string);
 	
 	
 	// c_screen_widget virtual functions
