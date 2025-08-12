@@ -3,6 +3,7 @@
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
+#include "main/game_preferences.h"
 
 /* constants */
 /* enums */
@@ -55,3 +56,5 @@ public:
 	virtual const void* load_proc() const override;
 
 };
+
+extern const wchar_t* const k_splitscreen_header_string[k_language_count];

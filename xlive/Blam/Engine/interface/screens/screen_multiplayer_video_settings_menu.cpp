@@ -9,6 +9,7 @@
 #include "screen_safe_area_setting.h"
 #include "screen_restore_video_defaults.h"
 #include "screen_vsync_setting.h"
+#include "screen_splitscreen_setting.h"
 
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_controller.h"
@@ -24,11 +25,12 @@ enum e_mp_video_settings_list_items : uint16
 {
 	_item_display_mode,
 	_item_resolution,
-	_item_vsync,
+	_item_vsync, //new-addon
 	_item_brightness_level,
 	_item_gamma_setting,
 	_item_anti_aliasing,
 	_item_safe_area,
+	_item_splitscreen,//new-addon
 	_item_restore_defaults,
 
 	k_total_no_of_mp_video_settings_list_items
@@ -46,6 +48,7 @@ static const s_custom_item_text_mapping k_screen_multiplayer_video_settings_menu
 	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_gamma_setting)				, _item_gamma_setting 		},
 	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_anti_aliasing)				, _item_anti_aliasing 		},
 	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_safe_area)					, _item_safe_area 			},
+	{ k_splitscreen_header_string, _item_splitscreen, true 													},
 	{ STRING_ID_TO_CUSTOM_ITEM_MAPPING(_string_id_restore_video_defaults)		, _item_restore_defaults 	},
 
 };
@@ -80,6 +83,7 @@ c_multiplayer_video_settings_list::c_multiplayer_video_settings_list(uint16 user
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_gamma_setting;
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_anti_aliasing;
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_safe_area;
+	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_splitscreen;
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_restore_defaults;
 
 #undef LIST_ITEM_DATUM_GET_NEW
@@ -151,6 +155,9 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 			break;
 		case _item_safe_area:
 			params.m_load_function = &c_screen_safe_area_menu::load_mp;
+			break;
+		case _item_splitscreen:
+			params.m_load_function = &c_screen_splitscreen_menu::load;
 			break;
 		case _item_restore_defaults:
 			params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load_mp;

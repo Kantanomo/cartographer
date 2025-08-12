@@ -4,7 +4,6 @@
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_utilities.h"
-#include "main/game_preferences.h"
 #include "tag_files/global_string_ids.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/text_group.h"
@@ -122,11 +121,11 @@ c_splitscreen_edit_list::c_splitscreen_edit_list(uint16 user_flags) :
 
 	linker_type2.link(&m_slot);
 
-
-	const datum screen_tag_index = user_interface_get_widget_tag_index_from_screen_id(_screen_pp_controller_settings);
-	const s_user_interface_screen_widget_definition* tag_data = (s_user_interface_screen_widget_definition*)tag_get_fast(screen_tag_index);
-
-	string_list_get_normal_string(tag_data->string_list_tag.index, _string_id_default, &default_text);
+	const char* main_tag_path = "ui\\global_strings\\global_strings";
+	const datum unic_tag_datum = tag_loaded(_tag_group_multilingual_unicode_string_list, main_tag_path);
+	ASSERT(unic_tag_datum != NONE);
+	
+	string_list_get_normal_string(unic_tag_datum, _string_id_default_player_profile_name, &default_text);
 
 }
 
