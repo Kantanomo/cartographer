@@ -8,6 +8,7 @@
 #include "render/render_lod_new.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "rasterizer/dx9/rasterizer_dx9_9on12.h"
+#include <render/render.h>
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
@@ -200,7 +201,7 @@ set_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* c
 
 e_override_texture_resolution H2Config_Override_Shadows = e_override_texture_resolution::tex_default;
 e_override_texture_resolution H2Config_Override_Water = e_override_texture_resolution::tex_default;
-e_override_splitscreen_mode H2Config_split_mode = e_override_splitscreen_mode::automatic;
+e_display_split_type H2Config_split_mode = _display_split_type_none; // treating none as automatic
 
 bool H2Config_upnp_enable = true;
 bool H2Config_no_events = false;
@@ -738,8 +739,8 @@ void ReadH2Config()
 
 				int splitscreen_override;
 				CONFIG_GET(&ini, "splitscreen_mode", "0", &splitscreen_override);
-				splitscreen_override = IN_RANGE(splitscreen_override, e_override_splitscreen_mode::automatic, e_override_splitscreen_mode::horizontal) ? splitscreen_override : e_override_splitscreen_mode::automatic;
-				H2Config_split_mode = (e_override_splitscreen_mode)splitscreen_override;
+				splitscreen_override = IN_RANGE(splitscreen_override, _display_split_type_none, _display_split_type_vertical) ? splitscreen_override : _display_split_type_none;
+				H2Config_split_mode = (e_display_split_type)splitscreen_override;
 			}
 			// dedicated server only
 			else

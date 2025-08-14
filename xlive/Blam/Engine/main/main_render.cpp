@@ -79,17 +79,19 @@ void __cdecl main_render_player_view(void)
 		display_split_type = _display_split_type_none;
 	}
 	else
-	{
-		const bool use_horizontal_split = g_debug_render_horizontal_splitscreen || rasterizer_get_display_type() == _display_type_4_by_3;
-		
-		if(H2Config_split_mode == e_override_splitscreen_mode::automatic)
+	{	
+		// treating _display_split_type_none as automatic 
+		// we also want to enforce horitzontal split if g_debug_render_horizontal_splitscreen is enabled
+		if (H2Config_split_mode != _display_split_type_none) 
 		{
-			display_split_type = use_horizontal_split ? _display_split_type_horizontal : _display_split_type_vertical;
+			display_split_type = H2Config_split_mode;
 		}
 		else
 		{
-			display_split_type = H2Config_split_mode == e_override_splitscreen_mode::horizontal ? _display_split_type_horizontal : _display_split_type_vertical;
+			display_split_type = rasterizer_get_display_type() == _display_type_4_by_3 ? _display_split_type_horizontal : _display_split_type_vertical;
 		}
+
+		display_split_type = g_debug_render_horizontal_splitscreen ? _display_split_type_horizontal : display_split_type;
 	}
 
 	window_bound* g_window_bounds = window_bound_get();

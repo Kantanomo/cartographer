@@ -16,6 +16,7 @@
 #include "interface/user_interface_globals.h"
 #include "main/game_preferences.h"
 #include "rasterizer/rasterizer_settings.h"
+#include "render/render.h"
 #include "tag_files/global_string_ids.h"
 
 
@@ -83,7 +84,10 @@ c_multiplayer_video_settings_list::c_multiplayer_video_settings_list(uint16 user
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_gamma_setting;
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_anti_aliasing;
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_safe_area;
-	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_splitscreen;
+	if (get_player_window_count() > 1)
+	{
+		LIST_ITEM_DATUM_GET_NEW()->item_id = _item_splitscreen;
+	}
 	LIST_ITEM_DATUM_GET_NEW()->item_id = _item_restore_defaults;
 
 #undef LIST_ITEM_DATUM_GET_NEW
