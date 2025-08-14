@@ -1,6 +1,5 @@
 #pragma once
 #include "tag_files/tag_loader/tag_injection_define.h"
-#include <tinyxml/tinyxml2.h>
 
 /* classes */
 
@@ -8,7 +7,7 @@ class c_xml_definition_block
 {
 public:
 	c_xml_definition_block(void) = default;
-	c_xml_definition_block(const tinyxml2::XMLElement* base_element, uint32 offset, uint32 size);
+	c_xml_definition_block(const void* base_element, uint32 offset, uint32 size);
 	~c_xml_definition_block(void) = default;
 
 	void reset_counts();
@@ -44,7 +43,7 @@ public:
 #endif
 
 private:
-	const tinyxml2::XMLElement* m_element;
+	const void* m_element;	// tinyxml2::XMLElement
 	uint32 m_offset;
 	uint32 m_size;
 	c_static_string<64> m_name;

@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "xml_definition_block.h"
 
+#include <tinyxml/tinyxml2.h>
+
 /* public code */
 
-c_xml_definition_block::c_xml_definition_block(const tinyxml2::XMLElement* base_element, uint32 offset, uint32 size)
+c_xml_definition_block::c_xml_definition_block(const void* base_element, uint32 offset, uint32 size)
 {
 	// Checks to make sure the correct parameters were passed.
 	// offset and size are default -1 and overwritten if the attribute exists
@@ -30,8 +32,10 @@ c_xml_definition_block::c_xml_definition_block(const tinyxml2::XMLElement* base_
 
 	reset_counts();
 
-	if (m_element->Attribute("name"))
-		m_name.set(m_element->Attribute("name"));
+	if (((tinyxml2::XMLElement*)m_element)->Attribute("name"))
+	{
+		m_name.set(((tinyxml2::XMLElement*)m_element)->Attribute("name"));
+	}
 	
 	// do a first pass of the current element to get the counts we need
 	// for allocating the buffers
@@ -56,7 +60,7 @@ void c_xml_definition_block::reset_counts()
 
 void c_xml_definition_block::get_element_counts()
 {
-	const tinyxml2::XMLElement* element = m_element->FirstChildElement();
+	const tinyxml2::XMLElement* element = ((tinyxml2::XMLElement*)m_element)->FirstChildElement();
 	while (element)
 	{
 		const char* element_name = element->Name();
@@ -132,7 +136,7 @@ void c_xml_definition_block::allocate_buffers()
 
 void c_xml_definition_block::populate_buffers()
 {
-	const tinyxml2::XMLElement* element = m_element->FirstChildElement();
+	const tinyxml2::XMLElement* element = ((tinyxml2::XMLElement*)m_element)->FirstChildElement();
 	while (element)
 	{
 		const char* element_name = element->Name();
