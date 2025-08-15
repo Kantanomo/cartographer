@@ -47,7 +47,7 @@ public:
 #endif
 
 private:
-	const tinyxml2::XMLElement* m_element;	// tinyxml2::XMLElement
+	const tinyxml2::XMLElement* m_element;
 	uint32 m_offset;
 	uint32 m_size;
 	c_static_string<64> m_name;

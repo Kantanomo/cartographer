@@ -61,6 +61,12 @@ bool unit_is_dual_wielding(datum unit_index)
 	return unit->unit.weapon_indices[0] != NONE && unit->unit.weapon_indices[1] != NONE;
 }
 
+bool unit_in_vehicle(datum unit_index) 
+{
+	unit_datum* unit = (unit_datum*)object_get_fast_unsafe(unit_index);
+	return unit->unit.parent_seat_index != NONE;
+}
+
 datum player_index_from_unit_index(datum unit_index)
 {
 	unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);

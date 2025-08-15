@@ -260,7 +260,7 @@ static bool cheat_place_tag(const real_vector3d* forward, datum tag_index, const
 		}
 #endif
 
-		if (object->object.object_type == _object_type_biped && ((unit_datum*)object_get_and_verify_type(object_index, _object_mask_biped))->unit.weapon_index == NONE)
+		if (object_get_type(object_index) == _object_type_biped && ((unit_datum*)object_get_and_verify_type(object_index, _object_mask_biped))->unit.weapon_index == NONE)
 		{
 			tag_iterator weapon_iterator;
 			tag_iterator_new(&weapon_iterator, _tag_group_weapon);

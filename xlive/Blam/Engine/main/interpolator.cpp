@@ -285,7 +285,13 @@ void halo_interpolator_object_populate_interpolation_data(
 		if (abs_object_index < k_maximum_objects_per_map)
 		{
 			object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
-			if (object->object.flags.test(_object_hidden_bit))
+
+			// interpolate position of hidden bipeds, in a vehicle seat (tanks)
+			// for smooth death camera when spectating them specifically
+			bool object_biped_in_vehicle = object_get_type(object_index) == _object_type_biped 
+				&& unit_in_vehicle(object_index);
+
+			if (object->object.flags.test(_object_hidden_bit) && !object_biped_in_vehicle)
 			{
 				g_target_interpolation_frame_data->object_data[abs_object_index].object_index = NONE;
 				// discard previous as well

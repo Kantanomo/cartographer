@@ -232,6 +232,8 @@ float __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera_
 
 bool unit_is_dual_wielding(datum unit_index);
 
+bool unit_in_vehicle(datum unit_index);
+
 datum __cdecl unit_inventory_get_weapon(datum unit_index, int16 weapon_slot);
 
 datum player_index_from_unit_index(datum unit_index);
