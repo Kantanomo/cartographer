@@ -64,9 +64,9 @@ void __cdecl user_interface_get_cursor_position_scaled(point2d* out_position)
 {
 	if (out_position)
 	{
-		point2d temp_position;
+		point2d cur_pos;
 		// Get the current cursor position
-		user_interface_get_cursor_position(&temp_position);
+		user_interface_get_cursor_position(&cur_pos);
 
 		const window_bound* user_bounds = get_user_window_bounds(0);
 
@@ -82,14 +82,14 @@ void __cdecl user_interface_get_cursor_position_scaled(point2d* out_position)
 			bounds = { user_bounds->rasterizer_camera.viewport_bounds.right, user_bounds->rasterizer_camera.window_bounds.bottom };
 		}
 
-		temp_position.x = (int16)(temp_position.x - (bounds.x / 2.f));
-		temp_position.y = (int16)((bounds.y / 2.f) - temp_position.y);
+		cur_pos.x = (int16)(cur_pos.x - (bounds.x / 2.f));
+		cur_pos.y = (int16)((bounds.y / 2.f) - cur_pos.y);
 
-		temp_position.x = (int16)(temp_position.x / *get_ui_scale());
-		temp_position.y = (int16)(temp_position.y / *get_ui_scale());
+		cur_pos.x = (int16)(cur_pos.x / *get_ui_scale());
+		cur_pos.y = (int16)(cur_pos.y / *get_ui_scale());
 
 		// Convert to integer coordinates
-		*out_position = temp_position;
+		*out_position = cur_pos;
 	}
 	return;
 }

@@ -6,8 +6,9 @@
 
 real_point3d* __cdecl object_try_and_get_interpolated_position(datum object_index, int16 node_index, real_point3d* out_pos)
 {
-	real_matrix4x3 out_mat = *object_try_get_node_matrix_interpolated(object_index, node_index, &out_mat);
-	*out_pos = out_mat.position;
+	real_matrix4x3 node_matrix;
+	object_try_get_node_matrix_interpolated(object_index, node_index, &node_matrix);
+	*out_pos = node_matrix.position;
 	return out_pos;
 }
 
@@ -52,14 +53,12 @@ void dead_camera_switch_patch()
 	*	input_get_gamepad_state(controller_index)->button_frames_down[_xinput_gamepad_a];
 	*		to
 	*	input_abstraction_globals->input_states[controller_index].m_down_frames[_button_jump];
-	*
 	*/
 
 	// Patch call inside dead_camera update that gets input_get_gamepad_state
 	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
+
 	//uint8 orignal_opcodes[] = { 0x80 ,0x78 , _xinput_gamepad_a ,0x01 };
-
-
 	uint8 opcodes[] = { 0x80 ,0x78 ,_button_jump ,0x01 };
 	WriteBytes(Memory::GetAddress(0xCDEFF), opcodes, NUMBEROF(opcodes));
 }

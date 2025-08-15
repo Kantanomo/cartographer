@@ -13,6 +13,8 @@
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
+#include "H2MOD/Modules/Shell/Config.h"
+
 /* constants */
 
 #define USE_PRECISE_COUNTERS 1
@@ -100,7 +102,6 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 		dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
-		// in case of fixed time step, frame limiter should be handled by the other frame limiter
 		if (should_limit_framerate())
 		{
 			if (time_globals::available())
@@ -131,6 +132,11 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 				Sleep(15u);
 				dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
 			}
+		}
+		else
+		{
+			shell_windows_throttle_framerate(H2Config_fps_limit);
+			dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
 		}
 	}
 

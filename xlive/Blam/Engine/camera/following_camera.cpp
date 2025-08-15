@@ -34,7 +34,7 @@
 //
 //	if(camera_track->control_points.count < 4)
 //	{
-//		*forward_out = global_forward3d;
+//		*forward_out = *global_forward3d;
 //		position_out->x = 0;
 //		position_out->y = 0;
 //		position_out->z = 0;

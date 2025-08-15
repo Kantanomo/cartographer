@@ -49,7 +49,6 @@ e_display_type rasterizer_get_display_type(void)
 static void __cdecl rasterizer_present_hook(bitmap_data* bitmap)
 {
 	rasterizer_dx9_present(bitmap, false);
-	shell_windows_throttle_framerate(H2Config_fps_limit);
 	return;
 }
 
