@@ -3,11 +3,15 @@
 
 /* classes */
 
+namespace tinyxml2 {
+	class XMLElement;
+};
+
 class c_xml_definition_block
 {
 public:
 	c_xml_definition_block(void) = default;
-	c_xml_definition_block(const void* base_element, uint32 offset, uint32 size);
+	c_xml_definition_block(const tinyxml2::XMLElement* base_element, uint32 offset, uint32 size);
 	~c_xml_definition_block(void) = default;
 
 	void reset_counts();
@@ -43,7 +47,7 @@ public:
 #endif
 
 private:
-	const void* m_element;	// tinyxml2::XMLElement
+	const tinyxml2::XMLElement* m_element;	// tinyxml2::XMLElement
 	uint32 m_offset;
 	uint32 m_size;
 	c_static_string<64> m_name;
