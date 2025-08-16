@@ -2,7 +2,6 @@
 
 #ifdef TERMINAL_ENABLED
 
-#include "imgui.h"
 #include "CommandHandler.h"
 
 class CartographerConsole;
@@ -41,10 +40,9 @@ private:
 	bool                                m_reclaim_input_box_focus = false;
 
 	char                                m_input_buffer[MAX_CONSOLE_INPUT_BUFFER];
-	ImGuiTextInputCompletion*           m_completion_data;
+	struct ImGuiTextInputCompletion*    m_completion_data;
 	CircularStringBuffer                m_completion_text_buffer;
 	int                                 m_history_string_index;
-	ImGuiTextFilter                     m_filter;
 	int                                 m_selected_tab;
 	bool                                m_selected_tab_dirty;
 
@@ -53,7 +51,7 @@ private:
 
 	bool                                m_docked;
 
-	static int TextEditCallback(ImGuiInputTextCallbackData* data);
+	static int TextEditCallback(struct ImGuiInputTextCallbackData* data);
 
 	void ExecCommand(const char* command_line, size_t command_line_length);
 
@@ -78,15 +76,11 @@ public:
 
 	void SwitchToTab(ConsoleTabs tab);
 
+	unsigned int GetCompletionCandidatesCount(void) const;
+
 	bool CompletionAvailable() const
 	{
 		return m_completion_data != NULL;
-	};
-
-	unsigned int GetCompletionCandidatesCount() const 
-	{
-		if (!CompletionAvailable()) return 0;
-		return m_completion_data->Count;
 	};
 
 	CircularStringBuffer* GetTabOutput(ConsoleTabs tab)
