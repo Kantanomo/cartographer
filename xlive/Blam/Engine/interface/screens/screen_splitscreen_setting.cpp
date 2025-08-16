@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "screen_splitscreen_setting.h"
 
-#include "cache/cache_files.h"
 #include "interface/user_interface_memory.h"
+#include "interface/user_interface_shared_globals.h"
 #include "render/render.h"
 #include "tag_files/global_string_ids.h"
 #include "text/text_group.h"
@@ -120,12 +120,12 @@ c_splitscreen_edit_list::c_splitscreen_edit_list(uint16 user_flags) :
 
 	linker_type2.link(&m_slot);
 
-	const char* main_tag_path = "ui\\global_strings\\global_strings";
-	const datum unic_tag_datum = tag_loaded(_tag_group_multilingual_unicode_string_list, main_tag_path);
-	ASSERT(unic_tag_datum != NONE);
-	
-	string_list_get_normal_string(unic_tag_datum, _string_id_default_player_profile_name, &default_text);
+	const s_user_interface_shared_globals* ui_shared_globals = user_interface_shared_globals_get();
 
+	ASSERT(ui_shared_globals->unicode_string_list_tag.index != NONE);
+	
+	string_list_get_normal_string(ui_shared_globals->unicode_string_list_tag.index, _string_id_default_player_profile_name, &default_text);
+	return;
 }
 
 c_list_item_widget* c_splitscreen_edit_list::get_list_items()

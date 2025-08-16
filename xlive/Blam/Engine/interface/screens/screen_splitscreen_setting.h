@@ -34,7 +34,6 @@ public:
 };
 
 
-
 class c_screen_splitscreen_menu : public c_screen_with_menu
 {
 protected:
