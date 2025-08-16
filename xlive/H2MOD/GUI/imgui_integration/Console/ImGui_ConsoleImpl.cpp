@@ -4,7 +4,10 @@
 #ifdef TERMINAL_ENABLED
 
 #include "CommandCollection.h"
+
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
+
+#include <imgui.h>
 
 #define CONSOLE_CLAMP(V, MN, MX)     ((V) < (MN) ? (MN) : (V) > (MX) ? (MX) : (V))
 
@@ -355,6 +358,12 @@ void CartographerConsole::SwitchToTab(ConsoleTabs tab)
 	m_selected_tab_dirty = true;
 	m_selected_tab = tab;
 }
+
+unsigned int CartographerConsole::GetCompletionCandidatesCount(void) const
+{
+	if (!CompletionAvailable()) return 0;
+	return m_completion_data->Count;
+};
 
 void CartographerConsole::Draw(const char* title, bool* p_open)
 {
