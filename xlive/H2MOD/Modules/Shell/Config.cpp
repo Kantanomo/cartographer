@@ -8,6 +8,7 @@
 #include "render/render_lod_new.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "rasterizer/dx9/rasterizer_dx9_9on12.h"
+#include "render/render.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
@@ -200,6 +201,7 @@ set_config_entry(CSimpleIniA* simple_ini, const char* section_key, const char* c
 
 e_override_texture_resolution H2Config_Override_Shadows = e_override_texture_resolution::tex_default;
 e_override_texture_resolution H2Config_Override_Water = e_override_texture_resolution::tex_default;
+e_display_split_type H2Config_split_mode = _display_split_type_none; // treating none as automatic
 
 bool H2Config_upnp_enable = true;
 bool H2Config_no_events = false;
@@ -494,6 +496,7 @@ void SaveH2Config()
 			CONFIG_SET(&ini, "use_d3d9on12", &g_rasterizer_dx9on12_enabled);
 			CONFIG_SET(&ini, "disable_amd_or_ati_patches", &g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
 			CONFIG_SET(&ini, "use_vsync", &H2Config_use_vsync);
+			CONFIG_SET(&ini, "splitscreen_mode", (int)H2Config_split_mode);
 		}
 
 		CONFIG_SET(&ini, "enable_xdelay", &H2Config_xDelay);
@@ -733,6 +736,11 @@ void ReadH2Config()
 					"false",
 					&g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
 				CONFIG_GET(&ini, "use_vsync", "false", &H2Config_use_vsync);
+
+				int splitscreen_override;
+				CONFIG_GET(&ini, "splitscreen_mode", "0", &splitscreen_override);
+				splitscreen_override = IN_RANGE(splitscreen_override, _display_split_type_none, _display_split_type_vertical) ? splitscreen_override : _display_split_type_none;
+				H2Config_split_mode = (e_display_split_type)splitscreen_override;
 			}
 			// dedicated server only
 			else

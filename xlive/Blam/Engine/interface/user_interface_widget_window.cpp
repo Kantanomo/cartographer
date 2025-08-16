@@ -101,6 +101,11 @@ void* c_screen_widget::get_screen_definition()
 	return INVOKE_TYPE(0x20E8A6, 0x0, void*(__thiscall*)(c_screen_widget*), this);
 }
 
+void c_screen_widget::get_string_by_string_id(string_id sid, c_maximum_interface_text* out_string)
+{
+	INVOKE_TYPE(0x2101A4, 0x0, void(__thiscall*)(c_screen_widget*, string_id, c_maximum_interface_text*), this, sid, out_string);
+}
+
 
 // c_screen_widget virtual functions
 

@@ -9,6 +9,7 @@
 #include "screen_safe_area_setting.h"
 #include "screen_restore_video_defaults.h"
 #include "screen_vsync_setting.h"
+#include "screen_splitscreen_setting.h"
 
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_controller.h"
@@ -17,6 +18,7 @@
 #include "interface/user_interface_utilities.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "tag_files/global_string_ids.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 
@@ -34,12 +36,13 @@ enum e_video_settings_list_items : uint16
 {
 	_item_display_mode,
 	_item_resolution,
-	_item_vsync,
+	_item_vsync,//new-addon
 	_item_brightness_level,
 	_item_gamma_setting,
 	_item_anti_aliasing,
 	_item_lod_setting,
 	_item_safe_area,
+	_item_splitscreen,//new-addon
 	_item_restore_defaults,
 
 	k_total_no_of_video_settings_list_items
@@ -54,7 +57,7 @@ enum e_settings_list_skin_bitmap_hilite : uint16
 
 /* globals */
 
-bool g_can_use_vsync = true;
+static bool g_can_use_vsync = true;
 
 /* prototypes */
 
@@ -106,6 +109,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 
 	s_rasterizer_settings* rasterizer_settings = rasterizer_settings_get();
 	e_rasterizer_window_mode display_mode = (e_rasterizer_window_mode)rasterizer_settings->display_mode;
+	const e_language language = get_current_language();
 
 	if (primary_text)
 	{
@@ -116,7 +120,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 			if (display_mode == _rasterizer_window_mode_borderless)
 			{
 				secondary_string = _string_id_invalid;
-				secondary_text->set_text(k_borderless_string[get_current_language()]);
+				secondary_text->set_text(k_borderless_string[language]);
 			}
 			else
 			{
@@ -133,7 +137,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 			break;
 		case _item_vsync:
 			primary_string = _string_id_invalid;
-			primary_text->set_text(k_vsync_header_string[get_current_language()]);
+			primary_text->set_text(k_vsync_header_string[language]);
 			secondary_string = H2Config_use_vsync ? _string_id_on : _string_id_off;
 
 			primary_text->set_change_color(g_can_use_vsync ? k_default_text_change_color : k_list_item_disabled_text_change_color);
@@ -163,6 +167,12 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 		case _item_safe_area:
 			primary_string = _string_id_safe_area;
 			secondary_string = rasterizer_settings_get_safe_area_string(rasterizer_settings->safe_area);
+			break;
+		case _item_splitscreen:
+			primary_string = _string_id_invalid;
+			secondary_string = _string_id_invalid;
+			primary_text->set_text(c_screen_splitscreen_menu::get_header_string());
+			secondary_text->set_text(c_screen_splitscreen_menu::get_option_string());
 			break;
 		case _item_restore_defaults:
 			primary_string = _string_id_restore_video_defaults;
@@ -242,6 +252,9 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 	case _item_safe_area:
 		params.m_load_function = &c_screen_safe_area_menu::load;
 		break;
+	case _item_splitscreen:
+		params.m_load_function = &c_screen_splitscreen_menu::load;
+		break;
 	case _item_restore_defaults:
 		params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load;
 		break;
@@ -299,4 +312,20 @@ void* c_screen_video_settings::load(s_screen_parameters* parameters)
 	}
 
 	return screen;
+}
+
+void c_screen_video_settings::apply_patches_on_map_load()
+{
+	const char* main_widget_tag_path = "ui\\screens\\game_shell\\settings_screen\\video_settings\\video_settings";
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+
+	if (main_widget_datum_index == NONE)
+	{
+		error(_error_immediate, "bad datum found");
+		return;
+	}
+	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
+	
+	//orignal value was 9 , but now that we have 10 elements to show this needs to be increased
+	main_widget_tag->panes[0]->list_block[0]->num_visible_items = k_no_of_visible_items_for_video_settings;
 }

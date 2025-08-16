@@ -26,6 +26,8 @@ enum e_override_texture_resolution : int
 	tex_ultra
 };
 
+enum e_display_split_type : uint32;
+
 /* globals */
 
 extern bool g_force_cartographer_update;
@@ -81,6 +83,7 @@ extern bool H2Config_spooky_boy;
 extern bool H2Config_force_off_d3d9ex;
 extern bool H2Config_force_off_sm3;
 extern bool H2Config_use_vsync;
+extern e_display_split_type H2Config_split_mode;
 
 #ifndef NDEBUG
 extern int H2Config_forced_event;
