@@ -4,7 +4,7 @@
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_utilities.h"
-#include <render/render.h>
+#include "render/render.h"
 #include "tag_files/global_string_ids.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/text_group.h"
@@ -254,34 +254,36 @@ const wchar_t* const c_screen_splitscreen_menu::get_option_string()
 
 static const e_splitscreen_list_items get_item_type_from_split_mode(e_display_split_type mode)
 {
-	switch(mode)
+	e_splitscreen_list_items ret = _item_automatic;
+	switch (mode)
 	{
 	case _display_split_type_none:
-		return _item_automatic;
+		ret = _item_automatic;
 		break;
 	case _display_split_type_vertical:
-		return _item_vertical;
+		ret = _item_vertical;
 		break;
 	case _display_split_type_horizontal:
-		return _item_horizontal;
+		ret = _item_horizontal;
 		break;
 	}
-	return _item_automatic;
+	return ret;
 }
 
 static const e_display_split_type get_split_mode_from_item_type(e_splitscreen_list_items item)
 {
+	e_display_split_type ret = _display_split_type_none;
 	switch (item)
 	{
 	case _item_automatic:
-		return _display_split_type_none;
+		ret = _display_split_type_none;
 		break;
 	case _item_vertical:
-		return _display_split_type_vertical;
+		ret = _display_split_type_vertical;
 		break;
 	case _item_horizontal:
-		return _display_split_type_horizontal;
+		ret = _display_split_type_horizontal;
 		break;
 	}
-	return _display_split_type_none;
+	return ret;
 }

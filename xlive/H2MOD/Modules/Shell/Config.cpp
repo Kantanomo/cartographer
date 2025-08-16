@@ -8,7 +8,7 @@
 #include "render/render_lod_new.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "rasterizer/dx9/rasterizer_dx9_9on12.h"
-#include <render/render.h>
+#include "render/render.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
@@ -496,7 +496,7 @@ void SaveH2Config()
 			CONFIG_SET(&ini, "use_d3d9on12", &g_rasterizer_dx9on12_enabled);
 			CONFIG_SET(&ini, "disable_amd_or_ati_patches", &g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
 			CONFIG_SET(&ini, "use_vsync", &H2Config_use_vsync);
-			CONFIG_SET(&ini, "splitscreen_mode", std::to_string(H2Config_split_mode).c_str());
+			CONFIG_SET(&ini, "splitscreen_mode", (int)H2Config_split_mode);
 		}
 
 		CONFIG_SET(&ini, "enable_xdelay", &H2Config_xDelay);

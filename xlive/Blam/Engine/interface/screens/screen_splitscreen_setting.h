@@ -6,7 +6,6 @@
 #include "main/game_preferences.h"
 
 /* constants */
-/* enums */
 enum
 {
 	k_no_of_visible_items_for_splitscren = 3
