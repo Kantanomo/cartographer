@@ -1,5 +1,4 @@
 #pragma once
-#include "interface/user_interface.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
@@ -55,5 +54,7 @@ public:
 	virtual const void* load_proc() const override;
 
 };
+
+/* constants */
 
 extern const wchar_t* const k_splitscreen_header_string[k_language_count];

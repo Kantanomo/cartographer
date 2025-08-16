@@ -1,12 +1,10 @@
 ﻿#include "stdafx.h"
 #include "screen_splitscreen_setting.h"
 
+#include "cache/cache_files.h"
 #include "interface/user_interface_memory.h"
-#include "interface/user_interface_screen_widget_definition.h"
-#include "interface/user_interface_utilities.h"
 #include "render/render.h"
 #include "tag_files/global_string_ids.h"
-#include "tag_files/tag_loader/tag_injection.h"
 #include "text/text_group.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -43,57 +41,57 @@ static const wchar_t* const k_splitscreen_description_string[k_language_count] =
 	L"Altere o layout da tela ao jogar em tela dividida com os amigos"          // Portuguese
 };
 
-const wchar_t* const k_splitscreen_header_string[k_language_count]
-{
-	L"Splitscreen Mode",           // English
-    L"画面分割モード",             // Japanese
-    L"Splitscreen-Modus",          // German
-    L"Mode écran partagé",         // French
-    L"Modo de pantalla dividida",  // Spanish
-    L"Modalità a schermo diviso",  // Italian
-    L"분할 화면 모드",             // Korean
-    L"分屏模式",                   // Chinese
-    L"Modo de tela dividida"       // Portuguese
-};
-
 const wchar_t* const k_splitscreen_options_string[k_no_of_visible_items_for_splitscren][k_language_count]
 {
 	{
-		L"Automatic",            // English
-		L"自動",                 // Japanese
-		L"Automatisch",          // German
-		L"Automatique",          // French
-		L"Automático",           // Spanish
-		L"Automatico",           // Italian
-		L"자동",                 // Korean
-		L"自动",                 // Chinese
-		L"Automático"            // Portuguese
+		L"Automatic",			// English
+		L"自動",					// Japanese
+		L"Automatisch",			// German
+		L"Automatique",			// French
+		L"Automático",			// Spanish
+		L"Automatico",			// Italian
+		L"자동",					// Korean
+		L"自动",					// Chinese
+		L"Automático"			// Portuguese
 	},
 
 	{
-		L"Vertical",             // English
-		L"垂直",                 // Japanese
-		L"Vertikal",             // German
-		L"Vertical",             // French
-		L"Vertical",             // Spanish
-		L"Verticale",            // Italian
-		L"수직",                 // Korean
-		L"垂直",                 // Chinese
-		L"Vertical"              // Portuguese
+		L"Vertical",			// English
+		L"垂直",					// Japanese
+		L"Vertikal",			// German
+		L"Vertical",			// French
+		L"Vertical",			// Spanish
+		L"Verticale",			// Italian
+		L"수직",					// Korean
+		L"垂直",					// Chinese
+		L"Vertical"				// Portuguese
 	},
 
 	{
-		L"Horizontal",           // English
-		L"水平",                 // Japanese
-		L"Horizontal",           // German
-		L"Horizontal",           // French
-		L"Horizontal",           // Spanish
-		L"Orizzontale",          // Italian
-		L"수평",                 // Korean
-		L"水平",                 // Chinese
-		L"Horizontal"            // Portuguese
+		L"Horizontal",          // English
+		L"水平",					// Japanese
+		L"Horizontal",          // German
+		L"Horizontal",          // French
+		L"Horizontal",          // Spanish
+		L"Orizzontale",			// Italian
+		L"수평",					// Korean
+		L"水平",					// Chinese
+		L"Horizontal"			// Portuguese
 	}
+};
 
+
+const wchar_t* const k_splitscreen_header_string[k_language_count]
+{
+	L"Splitscreen Mode",			// English
+	L"画面分割モード",					// Japanese
+	L"Splitscreen-Modus",			// German
+	L"Mode écran partagé",			// French
+	L"Modo de pantalla dividida",	// Spanish
+	L"Modalità a schermo diviso",	// Italian
+	L"분할 화면 모드",				// Korean
+	L"分屏模式",						// Chinese
+	L"Modo de tela dividida"		// Portuguese
 };
 
 /* globals */
