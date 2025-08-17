@@ -212,42 +212,57 @@ void c_network_message_handler::register_observer(c_network_observer* observer)
 
 void c_network_message_handler::handle_request_map_filename(const transport_address* address, const s_network_message_request_map_filename* received_data)
 {
-	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
-	if (session)
+	s_network_message_custom_map_filename data;
+	c_network_session* current_session;
+	if (network_life_cycle_in_squad_session(&current_session)
+		&& current_session->is_host()
+		&& current_session->get_transport_session_id(&data.session_data.identifier))
 	{
-		event(_event_message, "h2mod:custom_message: received on read_channel_message_hook request-map-filename from XUID: %llu", received_data->player_id);
-
-		int32 sender_peer_index = session->get_peer_index_from_address(address);
-
-		if (sender_peer_index != NONE
-			&& !session->is_peer_local(sender_peer_index))
+		c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
+		if (session)
 		{
-			s_network_message_custom_map_filename data{};
+			event(_event_message, "h2mod:custom_message: received on read_channel_message_hook request-map-filename from XUID: %llu", received_data->player_id);
 
-			std::wstring map_filename;
-			mapManager->GetMapFilename(map_filename);
-			if (!map_filename.empty())
+			int32 sender_peer_index = session->get_peer_index_from_address(address);
+
+			if (sender_peer_index != NONE && !session->is_peer_local(sender_peer_index))
 			{
-				wcsncpy_s(data.file_name, map_filename.c_str(), map_filename.length());
-				data.map_download_id = received_data->map_download_id;
+				std::wstring map_filename;
+				mapManager->GetMapFilename(map_filename);
+				if (!map_filename.empty())
+				{
+					wcsncpy_s(data.file_name, map_filename.c_str(), map_filename.length());
+					data.map_download_id = received_data->map_download_id;
 
-				event(_event_message, "h2mod:custom_message: sending map file name packet to player id: %llu, peer index: %d, map name: %ws, download id %d",
-					received_data->player_id,
-					sender_peer_index, map_filename.c_str(), received_data->map_download_id);
+					event(
+						_event_message,
+						"h2mod:custom_message: sending map file name packet to player id: %llu, peer index: %d, map name: %ws, download id %d",
+						received_data->player_id,
+						sender_peer_index,
+						map_filename.c_str(),
+						received_data->map_download_id
+					);
 
-				c_network_observer* observer = session->m_network_observer;
-				s_session_peer* peer = session->get_session_peer(sender_peer_index);
+					c_network_observer* observer = session->m_network_observer;
+					s_session_peer* peer = session->get_session_peer(sender_peer_index);
 
-				if (peer->is_remote_peer)
-					observer->send_message(session->m_session_index, peer->observer_channel_index, false, _network_message_type_custom_map_filename, sizeof(s_network_message_custom_map_filename), &data);
-			}
-			else
-			{
-				event(_event_message, "h2mod:custom_message: no map file name found, abort sending packet! player id: %llu, peer idx: %d map filename: %ws",
-					received_data->player_id, sender_peer_index, map_filename.c_str());
+					if (peer->is_remote_peer)
+						observer->send_message(session->m_session_index, peer->observer_channel_index, false, _network_message_type_custom_map_filename, sizeof(s_network_message_custom_map_filename), &data);
+				}
+				else
+				{
+					event(
+						_event_message, 
+						"h2mod:custom_message: no map file name found, abort sending packet! player id: %llu, peer idx: %d map filename: %ws",
+						received_data->player_id,
+						sender_peer_index,
+						map_filename.c_str()
+					);
+				}
 			}
 		}
 	}
+	return;
 }
 
 void c_network_message_handler::handle_map_filename_response(const transport_address* address, int32 channel_index, const s_network_message_custom_map_filename* received_data)

@@ -9,7 +9,6 @@
 #include "main/game_preferences.h"
 #include "networking/network_event.h"
 #include "networking/logic/life_cycle_manager.h"
-#include "networking/logic/network_life_cycle.h"
 #include "networking/messages/network_messages_cartographer.h"
 #include "networking/session/network_session.h"
 #include "shell/shell.h"

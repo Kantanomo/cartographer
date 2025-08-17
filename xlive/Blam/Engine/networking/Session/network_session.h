@@ -343,7 +343,7 @@ public:
 	e_network_session_class m_session_class;
 	s_transport_secure_identifier m_session_id;
 	wchar_t field_28[16];
-	bool field_48;
+	bool m_field_48;
 	XNKEY m_session_key;
 	char pad[3];
 	int32 m_session_transport_index;
