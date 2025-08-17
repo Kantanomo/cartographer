@@ -349,7 +349,7 @@ bool c_network_session::get_secure_key(s_transport_secure_identifier* out_sessio
 {
 	bool result = false;
 
-	if (!disconnected() && field_48)
+	if (!disconnected() && m_field_48)
 	{
 		if (out_session_id != NULL)
 		{

@@ -39,7 +39,7 @@ c_network_session* c_network_session_manager::get_session(const s_transport_secu
 		if (current_session)
 		{
 			s_transport_secure_identifier id;
-			if (current_session->get_transport_session_id(&id) && csmemcmp(&id, target_id, sizeof(id)))
+			if (current_session->get_transport_session_id(&id) && !csmemcmp(&id, target_id, sizeof(id)))
 			{
 				session = current_session;
 				break;
