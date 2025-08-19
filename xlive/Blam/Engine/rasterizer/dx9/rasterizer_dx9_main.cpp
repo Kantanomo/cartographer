@@ -715,7 +715,7 @@ bool __cdecl rasterizer_initialize(void)
 
 	s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 
-	if (!rasterizer_globals->rasterizer_initialized && shell_tool_type() != _shell_tool_type_editing_tools)
+	if (!rasterizer_globals->rasterizer_initialized && shell_application_type() != _shell_application_tool)
 	{
 		rasterizer_globals->use_d3d9_ex = rasterizer_dx9_should_use_d3d9ex();
 		
@@ -1093,7 +1093,7 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 			{
 				// Game wants to know what state the user session is in if we're a game
 				// It uses this for preventing us from opening the game while using RDP
-				if (shell_tool_type() == _shell_tool_type_game)
+				if (shell_application_type() == _shell_application_game)
 				{
 					// Commented out because we removed the RDP check in cartographer...
 					//WTSRegisterSessionNotification(*g_hwnd, NOTIFY_FOR_THIS_SESSION);

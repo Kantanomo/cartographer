@@ -56,9 +56,9 @@ void shell_apply_patches(void)
 	return;
 }
 
-e_shell_tool_type shell_tool_type(void)
+e_shell_application_type shell_application_type(void)
 {
-	return _shell_tool_type_game;
+	return _shell_application_game;
 }
 
 // TODO: properly set this up

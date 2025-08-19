@@ -310,7 +310,7 @@ void __cdecl game_initialize(void)
 	}
 
 	// Interpolation allocation
-	const bool initialize_interpolation = shell_tool_type() != _shell_tool_type_editing_tools && !shell_is_dedicated_server();
+	const bool initialize_interpolation = shell_application_type() != _shell_application_tool && !shell_is_dedicated_server();
 	if (initialize_interpolation)
 	{
 		halo_interpolator_initialize();

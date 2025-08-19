@@ -2,11 +2,11 @@
 
 /* enums */
 
-enum e_shell_tool_type
+enum e_shell_application_type
 {
-	_shell_tool_type_editing_tools = 0,
-	_shell_tool_type_sapien = 1,
-	_shell_tool_type_game = 2
+	_shell_application_tool = 0,
+	_shell_application_editor = 1,
+	_shell_application_game = 2
 };
 
 enum e_shell_command_line_flags : int32
@@ -59,7 +59,7 @@ struct s_shell_build_version
 
 void shell_apply_patches(void);
 
-e_shell_tool_type shell_tool_type(void);
+e_shell_application_type shell_application_type(void);
 
 bool shell_application_is_paused(void);
 
