@@ -222,35 +222,38 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 
 			event(_event_verbose, "h2mod:gungame: %s - player index: %d - new level: %d ", __FUNCTION__, player_abs_index, level);
 
-			if (level == 15)
+			if (player->unit_index != NONE)
 			{
-				event(_event_verbose, "h2mod:gungame: %s - %ws Level 15 - Frag Grenades!", __FUNCTION__, player->properties[0].player_name);
-				unit_delete_all_weapons(player->unit_index);
-				unit_add_grenade_type_to_inventory(player->unit_index, _unit_grenade_human_fragmentation, 99);
-			}
-			else if (level == 16)
-			{
-				event(_event_verbose, "h2mod:gungame: %s - %ws Level 16 - Plasma Grenades!", __FUNCTION__, player->properties[0].player_name);
-				unit_delete_all_weapons(player->unit_index);
+				if (level == 15)
+				{
+					event(_event_verbose, "h2mod:gungame: %s - %ws Level 15 - Frag Grenades!", __FUNCTION__, player->properties[0].player_name);
+					unit_delete_all_weapons(player->unit_index);
+					unit_add_grenade_type_to_inventory(player->unit_index, _unit_grenade_human_fragmentation, 99);
+				}
+				else if (level == 16)
+				{
+					event(_event_verbose, "h2mod:gungame: %s - %ws Level 16 - Plasma Grenades!", __FUNCTION__, player->properties[0].player_name);
+					unit_delete_all_weapons(player->unit_index);
 
-				unit_datum* unit = unit_try_and_get(player->unit_index);
-				unit->unit.grenade_counts[_unit_grenade_human_fragmentation] = 0;
-				unit->unit.grenade_counts[_unit_grenade_covenant_plasma] = 0;
-				simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));
+					unit_datum* unit = unit_try_and_get(player->unit_index);
+					unit->unit.grenade_counts[_unit_grenade_human_fragmentation] = 0;
+					unit->unit.grenade_counts[_unit_grenade_covenant_plasma] = 0;
+					simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));
 
-				unit_add_grenade_type_to_inventory(player->unit_index, _unit_grenade_covenant_plasma, 99);
-			}
-			else
-			{
-				event(_event_verbose, "h2mod:gungame: %s - %ws on level %d giving them weapon...", __FUNCTION__, player->properties[0].player_name, level);
+					unit_add_grenade_type_to_inventory(player->unit_index, _unit_grenade_covenant_plasma, 99);
+				}
+				else
+				{
+					event(_event_verbose, "h2mod:gungame: %s - %ws on level %d giving them weapon...", __FUNCTION__, player->properties[0].player_name, level);
 
-				unit_datum* unit = unit_try_and_get(player->unit_index);
-				unit->unit.grenade_counts[_unit_grenade_human_fragmentation] = 0;
-				unit->unit.grenade_counts[_unit_grenade_covenant_plasma] = 0;
-				simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));
+					unit_datum* unit = unit_try_and_get(player->unit_index);
+					unit->unit.grenade_counts[_unit_grenade_human_fragmentation] = 0;
+					unit->unit.grenade_counts[_unit_grenade_covenant_plasma] = 0;
+					simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));
 
-				unit_delete_all_weapons(player->unit_index);
-				call_give_player_weapon(player_abs_index, (datum)k_level_weapons[level], 1);
+					unit_delete_all_weapons(player->unit_index);
+					call_give_player_weapon(player_abs_index, (datum)k_level_weapons[level], 1);
+				}
 			}
 		}
 
