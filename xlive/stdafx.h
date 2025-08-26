@@ -90,7 +90,6 @@
 
 #include "Util/curl-interface.h"
 #include "Util/Hooks/Hook.h"
-#include "Util/log.h"
 #include "Util/Memory.h"
 
 // blam includes
