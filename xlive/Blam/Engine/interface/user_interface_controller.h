@@ -161,19 +161,19 @@ struct s_user_interface_controller
 	c_flags_no_init<e_controller_state_flags, uint32, k_controller_state_flags_count> m_flags;
 	uint32 user_index;
 	s_player_identifier controller_user_identifier;
-	PAD32;
+	int32 pad;
 	s_saved_game_player_profile player_profile;
 	uint32 profile_index;
 	e_game_team player_team;
-	PAD16;
+	int16 pad_1;
 	e_user_interface_controller_handicap player_handicap_level;
-	PAD24;
+	int8 pad_2[3];
 	int8 bungienet_user;
-	PAD24;
+	int8 pad_3[3];
 	int8 player_is_griefer;
-	PAD24;
+	int8 pad_4[3];
 	int8 achievement_flags;
-	PAD24;
+	int8 pad_5[3];
 	s_player_identifier field_1234;
 	wchar_t player_name[32];
 };
@@ -185,7 +185,6 @@ struct s_user_interface_controller_globals
 	s_event_record event_records[k_number_of_controllers];
 	bool controller_detached[k_number_of_controllers];
 	bool event_manager_suppress;
-	PAD24;
 };
 ASSERT_STRUCT_SIZE(s_user_interface_controller_globals, 19000);
 

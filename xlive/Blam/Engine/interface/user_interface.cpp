@@ -1,16 +1,28 @@
 #include "stdafx.h"
 #include "user_interface.h"
 
-#include "main/console.h"
-#include "screens/screen_error_dialog.h"
-#include "user_interface_globals.h"
+#include "dialog_channel.h"
+#include "game_error_dialog_channel.h"
+#include "gameshell_background_channel.h"
+#include "gameshell_channel.h"
+#include "hardware_error_dialog_channel.h"
+#include "user_interface_channel.h"
+#include "user_interface_main_menu_music.h"
+#include "user_interface_text_chat_receiver.h"
+#include "user_interface_text_chat_sender.h"
 #include "user_interface_widget_window.h"
 
 #include "cutscene/cinematics.h"
 #include "game/game.h"
+#include "interface/screens/screen_error_dialog.h"
+#ifdef TERMINAL_ENABLED
+#include "main/console.h"
+#endif
+#include "saved_games/game_variant.h"
+#include "saved_games/player_profile.h"
+#include "scenario/scenario_definitions.h"
 
-#include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
-#include "XLive/xbox/xbox.h"
+#include <XLive/xbox/xbox.h>
 
 /* macros */
 
@@ -18,6 +30,69 @@
 				_value,STRINGIFY(_value)
 
 /* structures */
+
+#pragma pack(push,1)
+struct s_user_interface_globals
+{
+	int32 field_0;
+	bool game_shell_active;
+	bool render_title_safe_bounds;
+	bool render_screen_tag_path;
+	bool render_element_bounds;
+	bool build_is_beta;
+	int8 gap_9[3];
+	int32 field_C;
+	/*e_scenario_type*/int8 map_type;
+	int8 gap_11[3];
+	float m_near_clip_distance;
+	float m_projection_plane_distance;
+	float m_far_clip_distance;
+	int32 field_20;
+	int32 field_24;
+	int32 field_28;
+	c_gameshell_background_channel gameshell_background_channel;
+	c_gameshell_channel gameshell_channel[k_number_of_render_windows];
+	c_user_interface_channel dialog_channel[k_number_of_render_windows];
+	c_game_error_dialog_channel game_error_channel[k_number_of_render_windows];
+	c_dialog_channel dialog_history_channel[k_number_of_render_windows];
+	c_hardware_error_dialog_channel hardware_errror_channel;
+	c_user_interface_channel virtual_keyboard_channel;
+	c_screen_widget* screen_collection[k_maximum_number_of_active_screens];
+	int8 field_6A8[104];
+	int32 online_task_datum;
+	int32 field_714;
+	int8 field_718[1694];
+	int8 field_DB6[142];
+	int32 field_E44;
+	int32 field_E48;
+	int8 gap_E4C[8];
+	int32 edit_saved_game_variant_index;
+	s_game_variant edit_saved_game_variant;
+	int32 m_controller_index;
+	int32 edit_player_profile_index;
+	s_saved_game_player_profile m_player_profile;
+	int8 field_2198;
+	int8 gap_2199[3];
+	int32 field_219C;
+	int32 m_game_campaign_id;
+	int32 m_game_map_id;
+	int32 m_game_difficulty;
+	bool load_from_persistent_storage;
+	int8 field_21AD;
+	int32 current_year;
+	int32 field_21B2;
+	int32 time_in_hours;
+	int32 field_21BA;
+	int8 gap_21BE[2];
+	c_user_interface_main_menu_music main_menu_music;
+	int32 field_21D8;
+	bool xbox_live_active;
+	int8 gap_21DD[3];
+	c_user_interface_text_chat_sender text_chat_sender;
+	c_user_interface_text_chat_receiver text_chat_receiver;
+};
+#pragma pack(pop)
+ASSERT_STRUCT_SIZE(s_user_interface_globals, 0x3FED);
 
 struct error_code_string_mapping
 {
@@ -27,7 +102,7 @@ struct error_code_string_mapping
 
 /* constants */
 
-static error_code_string_mapping table[] =
+static error_code_string_mapping table[k_last_ui_error_code + 1] =
 {
 	{ERROR_STRING_CREATE(_ui_error_unknown)},
 	{ERROR_STRING_CREATE(_ui_error_generic)},
@@ -321,55 +396,15 @@ static error_code_string_mapping table[] =
 };
 
 
+/* prototypes */
+
+static s_user_interface_globals* user_interface_globals_get(void);
+
 /* private code */
 
-const char* user_interface_error_codes_get_name(e_ui_error_types error_code)
-{
-	ASSERT(IN_RANGE(error_code, _ui_error_unknown, k_last_ui_error_code));
-	ASSERT(table[error_code].error_code == error_code);
-	return table[error_code].string;
-}
+static const char* user_interface_error_codes_get_name(e_ui_error_types error_code);
 
-void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool confirmation)
-{
-	if (error_id > k_last_ui_error_code)
-	{
-		error(_error_silent, "error code must be between 0 & %d", (int32)k_last_ui_error_code);
-	}
-	else
-	{		
-#ifdef TERMINAL_ENABLED
-		 //console_printf("error code #%d= '%s'", error_id, user_interface_error_codes_get_name(error_id));
-		CartographerConsole::LogToMainTabCb(StringFlag_None, "error code #%d= '%s'", error_id, user_interface_error_codes_get_name(error_id));
-#endif
-	
-		if (confirmation)
-		{
-			user_interface_error_ok_cancel_dialog_show_confirmation(
-				_user_interface_channel_type_game_error,
-				_window_4,
-				NONE,
-				nullptr,
-				error_id);
-		}
-		else if (use_cancel)
-		{
-			c_screen_error_dialog_ok_cancel::show_dialog(
-				_user_interface_channel_type_game_error,
-				error_id,
-				_window_4,
-				(uint16)NONE,
-				nullptr,
-				nullptr,
-				0,
-				0);
-		}
-		else
-		{
-			screen_error_ok_dialog_show(_user_interface_channel_type_game_error, error_id, _window_4, NONE, nullptr, nullptr);
-		}
-	}
-}
+static void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool confirmation);
 
 /* public code */
 
@@ -531,3 +566,111 @@ void user_interface_test_confirmation(int16 id)
 	ui_test_error_code((e_ui_error_types)id, false, true);
 }
 
+bool __cdecl user_interface_globals_is_beta_build()
+{
+	return INVOKE(0x209ED8, 0x0, user_interface_globals_is_beta_build);
+}
+
+int32 __cdecl user_interface_globals_get_game_difficulty()
+{
+	return INVOKE(0x209E98, 0x0, user_interface_globals_get_game_difficulty);
+}
+
+int32 __cdecl user_interface_globals_get_edit_player_profile_index()
+{
+	return INVOKE(0x209BA3, 0, user_interface_globals_get_edit_player_profile_index);
+}
+
+s_saved_game_player_profile* __cdecl user_interface_globals_get_edit_player_profile()
+{
+	return INVOKE(0x209B9D, 0, user_interface_globals_get_edit_player_profile);
+}
+
+e_scenario_type __cdecl user_interface_globals_get_map_type()
+{
+	return INVOKE(0x20B8BB, 0x0, user_interface_globals_get_map_type);
+}
+
+void __cdecl user_interface_globals_set_game_difficulty_real(int32 difficulty)
+{
+	INVOKE(0x209E44, 0x0, user_interface_globals_set_game_difficulty_real, difficulty);
+}
+
+void __cdecl user_interface_globals_set_loading_from_persistent_storage(bool a1)
+{
+	INVOKE(0x209E6C, 0x0, user_interface_globals_set_loading_from_persistent_storage, a1);
+}
+
+void __cdecl user_interface_globals_commit_edit_profile_changes()
+{
+	INVOKE(0x209A98, 0x0, user_interface_globals_commit_edit_profile_changes);
+}
+
+void __cdecl user_interface_globals_save_profile_changes_to_disk()
+{
+	INVOKE(0x209C3E, 0x0, user_interface_globals_save_profile_changes_to_disk);
+}
+
+void __cdecl user_interface_globals_finish_saving_profile_changes()
+{
+	INVOKE(0x209D08, 0x0, user_interface_globals_finish_saving_profile_changes);
+}
+
+void __cdecl user_interface_globals_set_edit_player_profile(e_controller_index controller_index, uint32 profile_index, s_saved_game_player_profile* profile)
+{
+	INVOKE(0x209B72, 0x0, user_interface_globals_set_edit_player_profile, controller_index, profile_index, profile);
+}
+
+/* private code */
+
+static s_user_interface_globals* user_interface_globals_get(void)
+{
+	return Memory::GetAddress<s_user_interface_globals*>(0x9718E0);
+}
+
+static const char* user_interface_error_codes_get_name(e_ui_error_types error_code)
+{
+	ASSERT(IN_RANGE(error_code, _ui_error_unknown, k_last_ui_error_code));
+	ASSERT(table[error_code].error_code == error_code);
+	return table[error_code].string;
+}
+
+static void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool confirmation)
+{
+	if (error_id > k_last_ui_error_code)
+	{
+		error(_error_silent, "error code must be between 0 & %d", (int32)k_last_ui_error_code);
+	}
+	else
+	{
+#ifdef TERMINAL_ENABLED
+		console_printf("error code #%d= '%s'", error_id, user_interface_error_codes_get_name(error_id));
+#endif
+
+		if (confirmation)
+		{
+			user_interface_error_ok_cancel_dialog_show_confirmation(
+				_user_interface_channel_type_game_error,
+				_window_4,
+				NONE,
+				nullptr,
+				error_id);
+		}
+		else if (use_cancel)
+		{
+			c_screen_error_dialog_ok_cancel::show_dialog(
+				_user_interface_channel_type_game_error,
+				error_id,
+				_window_4,
+				(uint16)NONE,
+				nullptr,
+				nullptr,
+				0,
+				0);
+		}
+		else
+		{
+			screen_error_ok_dialog_show(_user_interface_channel_type_game_error, error_id, _window_4, NONE, nullptr, nullptr);
+		}
+	}
+}

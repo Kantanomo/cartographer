@@ -947,7 +947,6 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_bitmap_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_channel.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
-    <ClCompile Include="Blam\Engine\interface\user_interface_globals.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_group_widget.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_hud_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_memory.cpp" />
@@ -1407,7 +1406,6 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_bitmap_block.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_channel.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
-    <ClInclude Include="Blam\Engine\interface\user_interface_globals.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_group_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_guide.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_hud_block.h" />

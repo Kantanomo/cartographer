@@ -4,7 +4,6 @@
 #include "cache/cache_files.h"
 #include "input/input_abstraction.h"
 #include "interface/user_interface_memory.h"
-#include "interface/user_interface_globals.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "saved_games/player_profile.h"
 #include "tag_files/global_string_ids.h"

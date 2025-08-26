@@ -10,7 +10,6 @@
 #include "interface/user_interface_networking.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_bitmap_block.h"
-#include "interface/user_interface_globals.h"
 #include "interface/user_interface_utilities.h"
 #include "main/levels.h"
 #include "main/level_definitions.h"
@@ -424,9 +423,9 @@ void c_squad_settings_list::handle_item_change_level(s_event_record** pevent)
 	params.m_context = 0;
 	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+	params.m_screen_state.field_0 = NONE;
+	params.m_screen_state.m_last_focused_item_order = NONE;
+	params.m_screen_state.m_last_focused_item_index = NONE;
 	params.m_load_function = c_screen_single_player_level_select::load_lobby;
 	params.m_load_function(&params);
 }
@@ -438,9 +437,9 @@ void c_squad_settings_list::handle_item_change_difficulty(s_event_record** peven
 	params.m_context = 0;
 	params.m_user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+	params.m_screen_state.field_0 = NONE;
+	params.m_screen_state.m_last_focused_item_order = NONE;
+	params.m_screen_state.m_last_focused_item_index = NONE;
 	params.m_load_function = c_screen_single_player_difficulty_select::load_lobby;
 	params.m_load_function(&params);
 }

@@ -3,7 +3,6 @@
 
 #include "interface/user_interface_widget_list_item.h"
 #include "saved_games/saved_game_files.h"
-#include "interface/user_interface_globals.h"
 
 /* constants */
 
