@@ -177,7 +177,7 @@ void game_engine_event_execute_sound(s_multiplayer_event_response_definition* ev
 		language_index = get_current_language();
 	}
 
-	datum sound_datum = *(&event_response->primary_sound.english_sound.index + 2 * language_index);
+	datum sound_datum = event_response->primary_sound.sound[language_index].index;
 
 	int32 sound_delay = 0;
 
@@ -196,7 +196,7 @@ void game_engine_event_execute_sound(s_multiplayer_event_response_definition* ev
 			probability_accum += permu->probability;
 			if (random_probability * k_event_sound_permutation_modifier > probability_accum)
 			{
-				sound_datum = *(&permu->english_sound.index + 2 * language_index);
+				sound_datum = permu->sound[language_index].index;
 				is_announcer = permu->sound_flags.test(_multiplayer_event_response_sound_announcer_sound);
 				break;
 			}

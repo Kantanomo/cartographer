@@ -1,4 +1,5 @@
 #pragma once
+#include "main/game_preferences.h"
 #include "math/color_math.h"
 #include "memory/static_arrays.h"
 #include "tag_files/string_id.h"
@@ -260,15 +261,8 @@ struct s_multiplayer_event_response_sound
 
 	int16 pad_1;
 
-	tag_reference english_sound;
-	tag_reference japanese_sound;
-	tag_reference german_sound;
-	tag_reference french_sound;
-	tag_reference spanish_sound;
-	tag_reference italian_sound;
-	tag_reference korean_sound;
-	tag_reference chinese_sound;
-	tag_reference portuguese_sound;
+	tag_reference sound[k_language_count];
+
 	real32 probability;
 };
 

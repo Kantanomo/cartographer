@@ -69,7 +69,7 @@ bool __cdecl server_browser_cache_session_is_valid(uint32 session_index)
 		}
 	}
 
-	return false;
+	return result;
 }
 
 /* public code */

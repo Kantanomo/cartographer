@@ -235,7 +235,7 @@ void c_custom_game_profile_list::perform_save_type_search()
 				{
 					uint8 description_index = PIN((uint8)(search_variant.description_index), 0, k_maximum_enumerated_default_save_game_files - 1);
 					if (description_index == (uint8)search_variant.description_index)
-						next_item->description_text = string_id_get_number_string(description_index);
+						next_item->description_text = string_id_number(description_index);
 				}
 				this->enumerated_file_index_storage[index] = search_results[index];
 			}

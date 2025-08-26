@@ -92,6 +92,9 @@ void unit_get_aiming_vector(datum unit_index, real_vector3d* out_vector)
 {
 	unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);
 
+	ASSERT(unit);
+	ASSERT(out_vector);
+
 	*out_vector = unit->unit.aiming_vector;
 }
 

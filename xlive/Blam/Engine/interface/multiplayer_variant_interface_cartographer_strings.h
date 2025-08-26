@@ -261,9 +261,9 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_game_speed_st
     // Japanese
     {
         L"デフォルト",
-        L"50%の速度",
-        L"150%の速度",
-        L"200%の速度",
+        L"50%%の速度",
+        L"150%%の速度",
+        L"200%%の速度",
         L"もうやめる時間だ！"
     },
     // German
@@ -277,25 +277,25 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_game_speed_st
     // French
     {
         L"Par défaut",
-        L"Vitesse 50%",
-        L"Vitesse 150%",
-        L"Vitesse 200%",
+        L"Vitesse 50%%",
+        L"Vitesse 150%%",
+        L"Vitesse 200%%",
         L"Il est temps d'arrêter !"
     },
     // Spanish
     {
         L"Predeterminado",
-        L"Velocidad 50%",
-        L"Velocidad 150%",
-        L"Velocidad 200%",
+        L"Velocidad 50%%",
+        L"Velocidad 150%%",
+        L"Velocidad 200%%",
         L"¡Es hora de parar!"
     },
     // Italian
     {
         L"Predefinito",
-        L"Velocità 50%",
-        L"Velocità 150%",
-        L"Velocità 200%",
+        L"Velocità 50%%",
+        L"Velocità 150%%",
+        L"Velocità 200%%",
         L"È ora di fermarsi!"
     },
     // Korean
@@ -317,9 +317,9 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_game_speed_st
     // Portuguese
     {
         L"Padrão",
-        L"Velocidade 50%",
-        L"Velocidade 150%",
-        L"Velocidade 200%",
+        L"Velocidade 50%%",
+        L"Velocidade 150%%",
+        L"Velocidade 200%%",
         L"É hora de parar!"
     }
 };
@@ -340,13 +340,13 @@ const static wchar_t* g_multiplayer_variant_interface_cartographer_gravity_strin
     // Japanese
     {
         L"デフォルト",
-        L"重力25%",
-        L"重力50%",
-        L"重力75%",
-        L"重力125%",
-        L"重力150%",
-        L"重力175%",
-        L"重力200%"
+        L"重力25%%",
+        L"重力50%%",
+        L"重力75%%",
+        L"重力125%%",
+        L"重力150%%",
+        L"重力175%%",
+        L"重力200%%"
     },
     // German
     {

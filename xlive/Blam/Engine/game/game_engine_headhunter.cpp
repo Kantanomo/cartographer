@@ -83,22 +83,11 @@ bool c_headhunter_engine::setup()
 
 	datum ping_sound = tag_loaded(_tag_group_sound, "sound\\game_sfx\\multiplayer\\target_point_collected");
 
-	skull_pickup_event->primary_sound.english_sound.group.group = _tag_group_sound;
-	skull_pickup_event->primary_sound.english_sound.index = ping_sound;
-	skull_pickup_event->primary_sound.chinese_sound.group.group = _tag_group_sound;
-	skull_pickup_event->primary_sound.chinese_sound.index = ping_sound;
-	skull_pickup_event->primary_sound.french_sound.group.group = _tag_group_sound;
-	skull_pickup_event->primary_sound.french_sound.index = ping_sound;
-	skull_pickup_event->primary_sound.german_sound.group.group = _tag_group_sound;
-	skull_pickup_event->primary_sound.german_sound.index = ping_sound;
-	skull_pickup_event->primary_sound.italian_sound.group.group = _tag_group_sound;
-	skull_pickup_event->primary_sound.italian_sound.index = ping_sound;
-	skull_pickup_event->primary_sound.japanese_sound.group.group = _tag_group_sound;
-	skull_pickup_event->primary_sound.japanese_sound.index = ping_sound;
-	skull_pickup_event->primary_sound.korean_sound.group.group = _tag_group_sound;
-	skull_pickup_event->primary_sound.korean_sound.index = ping_sound;
-	skull_pickup_event->primary_sound.portuguese_sound.group.group = _tag_group_sound;
-	skull_pickup_event->primary_sound.portuguese_sound.index = ping_sound;
+	for (uint32 language = 0; language < k_language_count; ++language)
+	{
+		skull_pickup_event->primary_sound.sound[language].group.group = _tag_group_sound;
+		skull_pickup_event->primary_sound.sound[language].index = ping_sound;
+	}
 
 	// swap the indicator for the hill from crown to skull
 	datum hud_globals_datum = tag_loaded(_tag_group_hud_globals, "ui\\hud\\default");

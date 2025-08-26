@@ -35,7 +35,7 @@ ASSERT_STRUCT_SIZE(s_damage_owner, 12);
 struct s_damage_data
 {
 	datum definition_index;
-	c_flags<e_damage_data_flags, uint32, NUMBER_OF_DAMAGE_DATA_FLAGS> flags;
+	c_flags_no_init<e_damage_data_flags, uint32, NUMBER_OF_DAMAGE_DATA_FLAGS> flags;
 	s_damage_owner owner;
 	int32 field_1C;
 	datum inventory_owner_unit_index;

@@ -19,11 +19,11 @@ void unit_throw_grenade_move_to_hand(datum unit_index)
 {
 	unit_datum* unit = (unit_datum*)object_get_fast_unsafe(unit_index);
 
-	int8* object_header = ((int8*)unit) + unit->unit.object_header_358.offset;
+	s_action_state* action_state = (s_action_state*)object_header_block_get(unit_index, &unit->unit.action_storage);
 
 	if (unit->unit.current_grenade_index == NONE)
 	{
-		object_header[3] = 3;
+		action_state->throw_state = _throw_ending;
 		return;
 	}
 
@@ -35,7 +35,7 @@ void unit_throw_grenade_move_to_hand(datum unit_index)
 
 	bool unit_can_throw_grenade = true;
 
-	if (unit->unit.actor_datum == NONE || !unit_throw_grenade_actors_unlimited_grenades() && !object_header[13])
+	if (unit->unit.actor_datum == NONE || !unit_throw_grenade_actors_unlimited_grenades() && !action_state->throw_predicted)
 	{
 		if (unit->unit.grenade_counts[unit->unit.current_grenade_index] <= 0)
 		{
@@ -50,20 +50,20 @@ void unit_throw_grenade_move_to_hand(datum unit_index)
 				if (!variant->cartographer_settings.flags.test(_cartographer_variant_infinite_grenades))
 				{
 					--unit->unit.grenade_counts[unit->unit.current_grenade_index];
-					simulation_action_object_update(unit_index, 0x400000);
+					simulation_action_object_update(unit_index, FLAG(_simulation_action_update_grenade_count_bit));
 				}
 			}
 			else
 			{
 				--unit->unit.grenade_counts[unit->unit.current_grenade_index];
-				simulation_action_object_update(unit_index, 0x400000);
+				simulation_action_object_update(unit_index, FLAG(_simulation_action_update_grenade_count_bit));
 			}
 		}
 	}
 
 	if (!current_grenade || !unit_can_throw_grenade)
 	{
-		object_header[3] = 3;
+		action_state->throw_state = _throw_ending;
 		return;
 	}
 
@@ -90,15 +90,15 @@ void unit_throw_grenade_move_to_hand(datum unit_index)
 
 	if (new_object_index == NONE)
 	{
-		object_header[3] = 3;
+		action_state->throw_state = _throw_ending;
 		return;
 	}
 	else
 	{
 		object_attach_to_node(unit_index, new_object_index, spawn_marker.node_index);
-		*((datum*)object_header + 4) = new_object_index;
-		*((int16*)object_header + 10) = unit->unit.current_grenade_index;
-		object_header[12] = 2;
+		action_state->throw_grenade_object = new_object_index;
+		action_state->throw_grenade_index = unit->unit.current_grenade_index;
+		action_state->throw_state = _throw_in_hand;
 	}
 }
 

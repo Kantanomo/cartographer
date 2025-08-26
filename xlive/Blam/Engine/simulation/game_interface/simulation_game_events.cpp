@@ -59,7 +59,7 @@ void game_engine_event_play(s_game_engine_event* event)
 		c_player_in_game_iterator it;
 		while (it.next())
 		{
-			if (!(TEST_BIT(it.get_datum()->flags, 1)))
+			if (!(TEST_BIT(it.get_datum()->flags, _player_left_game_bit)))
 				game_engine_event_evaluate(event, it.get_index());
 		}
 	}

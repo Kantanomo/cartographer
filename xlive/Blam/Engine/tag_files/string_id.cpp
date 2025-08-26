@@ -7,7 +7,7 @@ void __cdecl user_interface_global_string_get(string_id id, c_maximum_interface_
 	return;
 }
 
-string_id string_id_get_number_string(uint8 number)
+string_id string_id_number(uint8 number)
 {
-	return INVOKE(0xCBF98, 0, string_id_get_number_string, number);
+	return INVOKE(0xCBF9B, 0, string_id_number, number);
 }

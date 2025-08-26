@@ -267,15 +267,7 @@ void H2MOD::disable_score_announcer_sounds(uint32 sound_flags)
 							// disable all sounds from english to chinese
 							for (size_t language = 0; language < k_language_count; ++language)
 							{
-								general_event->primary_sound.english_sound.index = NONE;
-								general_event->primary_sound.spanish_sound.index = NONE;
-								general_event->primary_sound.chinese_sound.index = NONE;
-								general_event->primary_sound.french_sound.index = NONE;
-								general_event->primary_sound.german_sound.index = NONE;
-								general_event->primary_sound.italian_sound.index = NONE;
-								general_event->primary_sound.japanese_sound.index = NONE;
-								general_event->primary_sound.korean_sound.index = NONE;
-								general_event->primary_sound.portuguese_sound.index = NONE;
+								general_event->primary_sound.sound[language].index = NONE;
 							}
 						}
 					}

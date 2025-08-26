@@ -206,7 +206,7 @@ struct _unit_datum
 	real32 boost_dead_time;
 	object_header_block_reference weapon_raised_block;
 	object_header_block_reference udlg_block;
-	object_header_block_reference object_header_358;
+	object_header_block_reference action_storage;
 	int32 field_35C;
 };
 

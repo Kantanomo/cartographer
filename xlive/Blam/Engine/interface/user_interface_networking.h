@@ -16,8 +16,6 @@ enum e_session_protocol
 
 /* forward decleration */
 
-union s_game_variant;
-
 /* public methods */
 
 void __cdecl user_interface_networking_apply_patches();
@@ -30,8 +28,8 @@ bool __cdecl user_interface_squad_session_is_xbox_live();
 int16 __cdecl user_interface_session_get_campaign_difficulty(void);
 int16 __cdecl user_interface_squad_get_player_count();
 e_session_protocol __cdecl user_interface_squad_get_active_protocol();
-bool __cdecl user_interface_game_settings_set_game_variant(s_game_variant* variant);
-s_game_variant* __cdecl user_interface_session_get_game_variant(void);
+bool __cdecl user_interface_game_settings_set_game_variant(union s_game_variant* variant);
+union s_game_variant* __cdecl user_interface_session_get_game_variant(void);
 
 void __cdecl user_interface_networking_reset_player_counts(void);
 void __cdecl user_interface_squad_clear_match_playlist(void);
