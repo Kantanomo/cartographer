@@ -60,7 +60,7 @@ enum e_ui_error_default_button : uint8
 	_ui_error_default_button_default_cancel,
 };
 
-enum e_ui_error_type : uint32
+enum e_ui_error_types : uint32
 {
 	_ui_error_unknown = 0x0,
 	_ui_error_generic = 0x1,
@@ -350,6 +350,7 @@ enum e_ui_error_type : uint32
 	_ui_error_locator_service_timed_out = 0x11D,
 	_ui_error_connection_to_host_lost = 0x11E,
 	_ui_error_map_download_profane_name = 0x11F,
+	k_last_ui_error_code = _ui_error_map_download_profane_name
 };
 
 enum e_header_text_type
@@ -488,7 +489,7 @@ enum e_bitmap_blend_method : int16
 
 struct s_ui_error_information
 {
-	e_ui_error_type error;
+	e_ui_error_types error;
 	e_ui_error_category_flags flags;
 	e_ui_error_default_button default_button;
 	int8 pad;

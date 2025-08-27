@@ -72,7 +72,7 @@ void c_custom_game_profile_list::handle_item_pressed_event(s_event_record** peve
 					params.data_new(
 						0,
 						FLAG((*pevent)->controller),
-						_user_interface_channel_type_dialog,
+						_user_interface_channel_type_gameshell_dialog,
 						_window_4,
 						c_screen_saved_game_file_actions::load_settings);
 
@@ -131,7 +131,7 @@ void c_custom_game_profile_list::handle_item_pressed_event(s_event_record** peve
 		}
 		s_event_record* t_record = *pevent;
 		c_screen_custom_game_profile_select::set_global_enumerated_index(selected_item->enumerated_index);
-		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+		user_interface_error_ok_cancel_dialog_show_confirmation(
 			_user_interface_channel_type_game_error,
 			_window_4,
 			1 << ((*pevent)->controller),

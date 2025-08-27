@@ -1,4 +1,5 @@
 #pragma once
+#include "network_message_handler.h"
 #include "network_message_type_collection.h"
 
 /* structures */

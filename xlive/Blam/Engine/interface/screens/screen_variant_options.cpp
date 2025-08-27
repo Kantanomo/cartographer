@@ -157,12 +157,12 @@ void c_variant_options_list::update_list_items_default(c_list_item_widget* item,
 	c_text_widget* title_text = item->try_find_text_widget(0);
 	c_text_widget* value_text = item->try_find_text_widget(1);
 
-	wchar_t temp_string[512];
+	c_maximum_interface_text temp_string;
 	if (title_text)
 	{
-		temp_string[0] = '\0';
-		string_list_get_normal_string(list_item->sily_definition->string_list.index, list_item->sily_definition->title_text, temp_string);
-		title_text->set_text(temp_string);
+		temp_string.clear();
+		string_list_get_normal_string(list_item->sily_definition->string_list.index, list_item->sily_definition->title_text, &temp_string);
+		title_text->set_text(temp_string.get_buffer());
 	}
 	if (value_text)
 	{
@@ -182,11 +182,11 @@ void c_variant_options_list::update_list_items_default(c_list_item_widget* item,
 		{
 			int32 variant_setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, list_item->sily_definition->parameter);
 			s_text_value_pair_reference_new* variant_setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(list_item->sily_definition, variant_setting_value);
-			temp_string[0] = '\0';
+			temp_string.clear();
 			if (variant_setting_label)
 			{
-				string_list_get_normal_string(list_item->sily_definition->string_list.index, variant_setting_label->label_string, temp_string);
-				value_text->set_text(temp_string);
+				string_list_get_normal_string(list_item->sily_definition->string_list.index, variant_setting_label->label_string, &temp_string);
+				value_text->set_text(temp_string.get_buffer());
 			}
 		}
 	}
@@ -307,7 +307,7 @@ void c_variant_options_list::handle_item_pressed_event(s_event_record** event, d
 		{
 			c_screen_variant_parameter_setting::new_instance(
 				item->parameter_type,
-				_user_interface_channel_type_online_menu,
+				_user_interface_channel_type_gameshell_dialog_history,
 				_window_4,
 				this->m_controllers_mask,
 				this->m_is_quick_options

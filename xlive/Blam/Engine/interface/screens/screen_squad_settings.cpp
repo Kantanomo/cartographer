@@ -457,7 +457,7 @@ void c_squad_settings_list::handle_item_quick_options(s_event_record** pevent)
 		{
 			c_screen_variant_options::new_instance(
 				g_variant_setting_category_type_quick_options[type],
-				_user_interface_channel_type_online_menu,
+				_user_interface_channel_type_gameshell_dialog_history,
 				_window_4,
 				1 << (*pevent)->controller
 			);

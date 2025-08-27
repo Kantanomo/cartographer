@@ -84,7 +84,7 @@ bool __cdecl user_interface_parse_string(wchar_t* string, size_t max_length, cha
 	return INVOKE(0x22F712, 0x0, user_interface_parse_string, string, max_length, a3);
 }
 
-static wchar_t g_user_interface_parse_private_use_charater_game_type_buffer[512]{};
+static c_maximum_interface_text g_user_interface_parse_private_use_charater_game_type_buffer;
 
 void __cdecl user_interface_parse_private_use_character_game_type(int32 a1, wchar_t* buffer)
 {
@@ -136,9 +136,10 @@ void __cdecl user_interface_parse_private_use_character_game_type(int32 a1, wcha
 			default:
 				break;
 		}
-		string_list_get_normal_string(user_interface_shared_globals->gametype_strings.index, variant_id, g_user_interface_parse_private_use_charater_game_type_buffer);
+		g_user_interface_parse_private_use_charater_game_type_buffer.clear();
+		string_list_get_normal_string(user_interface_shared_globals->gametype_strings.index, variant_id, &g_user_interface_parse_private_use_charater_game_type_buffer);
 	}
-	ustrncpy(buffer, g_user_interface_parse_private_use_charater_game_type_buffer, NUMBEROF(g_user_interface_parse_private_use_charater_game_type_buffer));
+	ustrncpy(buffer, g_user_interface_parse_private_use_charater_game_type_buffer.get_buffer(), NUMBEROF(g_user_interface_parse_private_use_charater_game_type_buffer.get_buffer()));
 }
 
 

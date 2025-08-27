@@ -219,7 +219,7 @@ void c_variant_parameter_setting_list::update_list_items(c_list_item_widget* ite
 		if (!variant)
 			return;
 
-		wchar_t temp_string[512]{};
+		c_maximum_interface_text temp_string;
 
 
 		s_variant_parameter_setting_list_item* list_item = (s_variant_parameter_setting_list_item*)datum_get(this->m_list_data, item->get_last_data_index());
@@ -229,22 +229,22 @@ void c_variant_parameter_setting_list::update_list_items(c_list_item_widget* ite
 		{
 			if (this->m_sily_definition && this->m_sily_definition->string_list.index != NONE && text_widget && list_item->text_value_pair_reference)
 			{
-				string_list_get_normal_string(this->m_sily_definition->string_list.index, list_item->text_value_pair_reference->label_string, temp_string);
+				string_list_get_normal_string(this->m_sily_definition->string_list.index, list_item->text_value_pair_reference->label_string, &temp_string);
 
-				text_widget->set_text(temp_string);
+				text_widget->set_text(temp_string.get_buffer());
 			}
 		}
 		else if (IN_RANGE(this->get_variant_parameter_type(), k_variant_setting_parameter_type_base_count, k_variant_setting_parameter_type_base_count + k_variant_setting_parameter_type_cartographer_count))
 		{
-			multiplayer_variant_settings_interface_get_custom_variant_parameter_label(nullptr, this->m_variant_setting_parameter_type, DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()), temp_string);
+			multiplayer_variant_settings_interface_get_custom_variant_parameter_label(nullptr, this->m_variant_setting_parameter_type, DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()), temp_string.get_buffer());
 
-			text_widget->set_text(temp_string);
+			text_widget->set_text(temp_string.get_buffer());
 		}
 		else
 		{
-			multiplayer_variant_settings_interface_get_custom_variant_parameter_label(variant, this->m_variant_setting_parameter_type, DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()), temp_string);
+			multiplayer_variant_settings_interface_get_custom_variant_parameter_label(variant, this->m_variant_setting_parameter_type, DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index()), temp_string.get_buffer());
 
-			text_widget->set_text(temp_string);
+			text_widget->set_text(temp_string.get_buffer());
 		}
 	}
 }
@@ -363,20 +363,20 @@ void c_screen_variant_parameter_setting::post_initialize_default()
 
 	s_text_value_pair_definition* value_reference = multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(this->m_list.get_variant_parameter_type());
 
-	wchar_t temp_string[512]{};
+	c_maximum_interface_text temp_string;
 
 	if (value_reference && value_reference->string_list.index != NONE)
 	{
 		if (header_text)
 		{
-			string_list_get_normal_string(value_reference->string_list.index, value_reference->header_text, temp_string);
-			header_text->set_text(temp_string);
+			string_list_get_normal_string(value_reference->string_list.index, value_reference->header_text, &temp_string);
+			header_text->set_text(temp_string.get_buffer());
 		}
 
 		if (description_text)
 		{
-			string_list_get_normal_string(value_reference->string_list.index, value_reference->description_test, temp_string);
-			description_text->set_text(temp_string);
+			string_list_get_normal_string(value_reference->string_list.index, value_reference->description_test, &temp_string);
+			description_text->set_text(temp_string.get_buffer());
 		}
 	}
 }

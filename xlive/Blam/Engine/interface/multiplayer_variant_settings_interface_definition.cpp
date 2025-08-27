@@ -455,8 +455,8 @@ void multiplayer_variant_settings_interface_get_variant_setting_string(s_game_va
 		if (slayer_reference && king_reference)
 		{
 			s_text_value_pair_definition* option;
-			wchar_t label_buffer[512];
-			wchar_t value_buffer[512];
+			c_maximum_interface_text label_buffer;
+			c_maximum_interface_text value_buffer;
 
 			switch (setting_index)
 			{
@@ -469,8 +469,8 @@ void multiplayer_variant_settings_interface_get_variant_setting_string(s_game_va
 			case 4: // Max Heads Carried
 			{
 				option = nullptr;
-				multiplayer_variant_settings_interface_get_custom_variant_parameter_label(variant, _variant_setting_parameter_type_headhunter_max_heads_carried, variant->game_engine_variant.head_hunter.max_heads_carried, value_buffer);
-				multiplayer_variant_settings_interface_get_custom_variant_parameter_title(variant, _variant_setting_parameter_type_headhunter_max_heads_carried, label_buffer);
+				multiplayer_variant_settings_interface_get_custom_variant_parameter_label(variant, _variant_setting_parameter_type_headhunter_max_heads_carried, variant->game_engine_variant.head_hunter.max_heads_carried, value_buffer.get_buffer());
+				multiplayer_variant_settings_interface_get_custom_variant_parameter_title(variant, _variant_setting_parameter_type_headhunter_max_heads_carried, label_buffer.get_buffer());
 				break;
 			}
 			default:
@@ -485,15 +485,15 @@ void multiplayer_variant_settings_interface_get_variant_setting_string(s_game_va
 				int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, option->parameter);
 				s_text_value_pair_reference_new* setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(option, setting_value);
 
-				string_list_get_normal_string(option->string_list.index, option->title_text, label_buffer);
+				string_list_get_normal_string(option->string_list.index, option->title_text, &label_buffer);
 
 				if (setting_label)
-					string_list_get_normal_string(option->string_list.index, setting_label->label_string, value_buffer);
+					string_list_get_normal_string(option->string_list.index, setting_label->label_string, &value_buffer);
 			}
 
 			if (widget)
 			{
-				usnzprintf(buffer, 512, L"%s%s%s", label_buffer, separator, value_buffer);
+				usnzprintf(buffer, 512, L"%s%s%s", label_buffer.get_buffer(), separator, value_buffer.get_buffer());
 				widget->set_text(buffer);
 				widget->set_visible(true);
 			}
@@ -508,24 +508,24 @@ void multiplayer_variant_settings_interface_get_variant_setting_string(s_game_va
 		{
 			s_text_value_pair_definition* option = (s_text_value_pair_definition*)tag_get_fast(reference->options[setting_index]->index);
 
-			wchar_t label_buffer[512];
-			wchar_t value_buffer[512];
+			c_maximum_interface_text label_buffer;
+			c_maximum_interface_text value_buffer;
 
 			if (option)
 			{
 				int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, option->parameter);
 				s_text_value_pair_reference_new* setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(option, setting_value);
 
-				string_list_get_normal_string(option->string_list.index, option->title_text, label_buffer);
+				string_list_get_normal_string(option->string_list.index, option->title_text, &label_buffer);
 
 				if (setting_label)
-					string_list_get_normal_string(option->string_list.index, setting_label->label_string, value_buffer);
+					string_list_get_normal_string(option->string_list.index, setting_label->label_string, &value_buffer);
 			}
 			if (widget)
 			{
-				if (ustrnlen(value_buffer, 511) > 0)
+				if (ustrnlen(value_buffer.get_buffer(), 511) > 0)
 				{
-					usnzprintf(buffer, 512, L"%s%s%s", label_buffer, separator, value_buffer);
+					usnzprintf(buffer, 512, L"%s%s%s", label_buffer.get_buffer(), separator, value_buffer.get_buffer());
 					widget->set_text(buffer);
 					widget->set_visible(true);
 				}

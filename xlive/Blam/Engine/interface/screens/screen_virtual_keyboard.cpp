@@ -260,7 +260,7 @@ void ui_load_virtual_keyboard_variant(e_controller_index controller_index, e_vkb
 {
 	s_screen_parameters virtual_keyboard_params;
 	virtual_keyboard_params.m_context = nullptr;
-	virtual_keyboard_params.data_new(0, 1 << controller_index, _user_interface_channel_type_keyboard, _window_4, c_screen_virtual_keyboard::load);
+	virtual_keyboard_params.data_new(0, 1 << controller_index, _user_interface_channel_type_virtual_keyboard, _window_4, c_screen_virtual_keyboard::load);
 	c_screen_virtual_keyboard* virtual_keyboard = (c_screen_virtual_keyboard*)virtual_keyboard_params.ui_screen_load_proc_exec();
 
 	virtual_keyboard->set_context(type);

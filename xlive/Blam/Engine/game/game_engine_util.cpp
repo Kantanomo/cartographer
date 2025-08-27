@@ -306,17 +306,17 @@ void game_engine_event_execute(s_multiplayer_event_response_definition* event_re
 		{
 			if (event_response->display_string != NONE && event_response->display_string)
 			{
-				wchar_t display_string[512];
+				c_maximum_interface_text display_string;
 				wchar_t formatted_string[512];
-				string_list_get_normal_string(runtime->in_game_text.index, event_response->display_string, display_string);
-				game_engine_build_event_string(display_string, event, 256, formatted_string);
+				string_list_get_normal_string(runtime->in_game_text.index, event_response->display_string, &display_string);
+				game_engine_build_event_string(display_string.get_buffer(), event, 256, formatted_string);
 
 				if (event_response->flags.test(_multiplayer_event_response_quantity_message))
 				{
-					wchar_t plural_string[512];
+					c_maximum_interface_text plural_string;
 					wchar_t formatted_plural_string[512];
-					string_list_get_normal_string(runtime->in_game_text.index, event_response->plural_display_string, plural_string);
-					game_engine_build_event_string(plural_string, event, 256, formatted_plural_string);
+					string_list_get_normal_string(runtime->in_game_text.index, event_response->plural_display_string, &plural_string);
+					game_engine_build_event_string(plural_string.get_buffer(), event, 256, formatted_plural_string);
 					hud_messaging_add_message_plural(player->user_index, formatted_string, formatted_plural_string, event->field_1C);
 				}
 				else
@@ -327,10 +327,10 @@ void game_engine_event_execute(s_multiplayer_event_response_definition* event_re
 
 			if (event_response->primary_string != NONE && event_response->primary_string)
 			{
-				wchar_t primary_string[512];
+				c_maximum_interface_text primary_string;
 				wchar_t formatted_string[512];
-				string_list_get_normal_string(runtime->in_game_text.index, event_response->primary_string, primary_string);
-				game_engine_build_event_string(primary_string, event, 256, formatted_string);
+				string_list_get_normal_string(runtime->in_game_text.index, event_response->primary_string, &primary_string);
+				game_engine_build_event_string(primary_string.get_buffer(), event, 256, formatted_string);
 
 				int32 display_time = time_globals::seconds_to_ticks_round((real32)event_response->primary_string_duration);
 				hud_messaging_display_primary_text(player->user_index, formatted_string, display_time);

@@ -84,15 +84,15 @@ void c_screen_game_engine_category_list::update_list_items(c_list_item_widget* i
 	{
 		s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item->get_last_data_index());
 		const e_language language = get_current_language();
-		wchar_t temp[512]{};
+		c_maximum_interface_text temp;
 
 		s_user_interface_shared_globals* user_interface_shared_globals = user_interface_shared_globals_get();
 
 		ASSERT(user_interface_shared_globals);
 
-		string_list_get_normal_string(user_interface_shared_globals->gametype_strings.index, items_map[item_datum->item_id].item_text, temp);
+		string_list_get_normal_string(user_interface_shared_globals->gametype_strings.index, items_map[item_datum->item_id].item_text, &temp);
 
-		item_text->set_text(temp);
+		item_text->set_text(temp.get_buffer());
 	}
 }
 
@@ -270,7 +270,7 @@ void c_screen_game_engine_category_list::handle_item_pressed_event(s_event_recor
 				++(*(DWORD*)params.m_context);
 
 			if (this->type != _screen_game_engine_category_settings && !this->data[1])
-				params.m_channel_type = _user_interface_channel_type_online_menu;
+				params.m_channel_type = _user_interface_channel_type_gameshell_dialog_history;
 
 			params.m_load_function(&params);
 		}
