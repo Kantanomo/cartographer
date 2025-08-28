@@ -48,7 +48,11 @@
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
+#if WINVER > 0x0600 && WINVER < 0x0602
 #include <dwmapi.h>
+#pragma comment(lib, "dwmapi")
+#endif
+
 /*
 	The below was used before when creating the main window to call: WTSRegisterSessionNotification
 	Since we removed the call as a part of the RDP check we don't need to include and link to this lib

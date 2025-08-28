@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#ifndef IMGUI_DISABLE
 #include "imgui.h"
 #include "imgui_handler.h"
 
@@ -1119,3 +1120,5 @@ static void advanced_settings_create_weapon_offsets_button(real32 height)
 	ImGui::NextColumn();
 	return;
 }
+
+#endif

@@ -300,7 +300,14 @@ void render_main_game_time_debug(void)
 
 void render_netdebug_text(void)
 {
-	if (ImGuiHandler::g_network_stats_overlay != _network_stats_display_none)
+
+	if (
+#ifndef IMGUI_DISABLE
+		ImGuiHandler::g_network_stats_overlay != _network_stats_display_none
+#else
+		false
+#endif
+	)
 	{
 		c_network_session* session = NULL;
 		if (network_life_cycle_in_squad_session(&session))

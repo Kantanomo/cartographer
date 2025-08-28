@@ -1,4 +1,7 @@
 #pragma once
+
+#ifndef IMGUI_DISABLE
+
 #include "input/controllers.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
@@ -93,3 +96,5 @@ namespace ImGuiHandler
 		void Close();
 	}
 }
+
+#endif

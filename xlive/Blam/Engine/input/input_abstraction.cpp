@@ -527,9 +527,11 @@ void __cdecl input_abstraction_update(void)
 			{
 				if (!g_controller_advanced_settings_toggle[controller])
 				{
+#ifndef IMGUI_DISABLE
 					ImGuiHandler::ImAdvancedSettings::set_controller_index(controller);
 					ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
 					g_controller_advanced_settings_toggle[controller] = true;
+#endif
 				}
 			}
 			else

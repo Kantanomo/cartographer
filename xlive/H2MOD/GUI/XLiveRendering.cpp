@@ -12,7 +12,10 @@
 
 
 extern void initialize_instance();
+
+#ifndef IMGUI_DISABLE
 extern LRESULT IMGUI_IMPL_API ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
 
 bool doDrawIMGUI = false;
 
@@ -26,13 +29,17 @@ void XLiveRendering::InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
 {
 	g_d3dPresentParameters = *presentParameters;
 
+#ifndef IMGUI_DISABLE
 	ImGuiHandler::Initalize(presentParameters->hDeviceWindow);
+#endif
 }
 
 void XLiveRendering::D3D9ReleaseResources()
 {
+#ifndef IMGUI_DISABLE
 	ImGuiHandler::release_motd_texture();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
+#endif
 }
 
 // #5297: XLiveInitializeEx
@@ -83,8 +90,10 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
 	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
 
+#ifndef IMGUI_DISABLE
 	ImGuiHandler::release_motd_texture();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
+#endif
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;
 }
@@ -92,8 +101,10 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
+#ifndef IMGUI_DISABLE
 	ImGuiHandler::release_motd_texture();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
+#endif
 	XLiveRendering::D3D9ReleaseResources();
 	
 	//LOG_TRACE_XLIVE("XLiveOnDestroyDevice");
@@ -149,7 +160,9 @@ HRESULT WINAPI XLiveRender()
 		return E_UNEXPECTED;
 	}
 
+#ifndef IMGUI_DISABLE
 	ImGuiHandler::DrawImgui();
+#endif
 	return S_OK;
 }
 

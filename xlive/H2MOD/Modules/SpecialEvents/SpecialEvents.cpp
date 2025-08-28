@@ -105,12 +105,14 @@ void load_special_event()
 	}
 	else
 	{
+#ifndef IMGUI_DISABLE
 		if (!NetworkSession::LocalPeerIsSessionHost())
 		{
 			*Memory::GetAddress<byte*>(0x46DCF1) = 1;
 			ImGuiHandler::ImMessageBox::SetMessage(k_cartographer_shared_missing_message);
 			ImGuiHandler::ToggleWindow(k_message_box_window_name);
 		}
+#endif
 	}
 }
 

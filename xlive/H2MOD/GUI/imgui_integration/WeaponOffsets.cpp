@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#ifndef IMGUI_DISABLE
+
 #include "WeaponOffsetsStringTable.h"
 
 #include "game/game.h"
@@ -122,3 +124,5 @@ static const char* weapon_offsets_get_string(e_weapon_offsets_string string, con
 
 	return result;
 }
+
+#endif

@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#ifndef IMGUI_DISABLE
+
 #include "imgui_handler.h"
 
 
@@ -215,3 +218,5 @@ namespace ImGuiHandler
 		}
 	}
 }
+
+#endif

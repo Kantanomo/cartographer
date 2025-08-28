@@ -114,8 +114,10 @@ void hotkeyFuncToggleHideIngameChat() {
 	}
 }
 void hotkeyFuncGuide() {
+#ifndef IMGUI_DISABLE
 	ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller_index_0);
 	ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+#endif
 }
 
 void hotkeyFuncConsole() {
