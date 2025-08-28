@@ -1066,7 +1066,9 @@
     <ClCompile Include="Blam\Engine\networking\session\network_session_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\Session\network_text_chat_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\transport.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\transport_address.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\transport_qos.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\transport_security.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\objects\lights.cpp" />
@@ -1790,7 +1792,9 @@
     <ClInclude Include="Blam\Engine\networking\session\network_session_manager.h" />
     <ClInclude Include="Blam\Engine\networking\Session\network_text_chat_manager.h" />
     <ClInclude Include="Blam\Engine\networking\transport\transport.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\transport_address.h" />
     <ClInclude Include="Blam\Engine\networking\transport\transport_qos.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\transport_security.h" />
     <ClInclude Include="Blam\Engine\objects\crates.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
