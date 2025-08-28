@@ -15,6 +15,7 @@ static s_network_heap_stats g_network_heap_allocations;
 
 /* prototypes */
 
+CLASS_HOOK_DECLARE_LABEL(c_network_heap__dispose, c_network_heap::dispose);
 static __declspec(naked) void jmp_c_network_heap__discard(void)
 {
 	CLASS_HOOK_JMP(c_network_heap__dispose, c_network_heap::dispose);
@@ -47,7 +48,6 @@ int32 c_network_heap::get_block_size(const void* block) const
 	return size;
 }
 
-CLASS_HOOK_DECLARE_LABEL(c_network_heap__dispose, c_network_heap::dispose);
 void c_network_heap::dispose(void)
 {
 	g_network_heap_allocations.allocations = 0;

@@ -1,4 +1,14 @@
 #pragma once
+#include "input/controllers.h"
+#include "tag_files/tag_groups.h"
+#include "tag_files/tag_reference.h"
+
+/* constants */
+
+enum
+{
+	k_maximum_number_of_active_screens = 36,
+};
 
 /* enums */
 
@@ -363,7 +373,25 @@ struct s_screen_parameters
 };
 ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
 
-/* forward declations*/
+struct s_user_interface_tag_globals
+{
+	// Explaination("Shared Globals", "This is a reference to the ui shared globals tag")
+	tag_reference shared_globals;	// wigl
+
+	// Explaination("Screen Widgets", "These are the screen widgets")
+	s_tag_block screen_widgets;	// s_user_interface_widget_reference
+
+	// Explaination("Multiplayer Variant Settings Interface", "This blob defines the ui for setting multiplayer game variant parameters")
+	tag_reference mp_variant_settings_ui;	// goof
+
+	// Explaination("Game Hopper Localization Strings", "This is for the loc game hopper strings")
+	tag_reference game_hopper_descriptions;	// unic
+};
+ASSERT_STRUCT_SIZE(s_user_interface_tag_globals, 32);
+
+/* forward declarations */
+
+enum e_scenario_type : int16;
 enum e_user_interface_screen_id : uint32;
 
 /* prototypes */
@@ -403,3 +431,15 @@ void user_interface_set_beta(bool value);
 void user_interface_test_error_ok(int16 id);
 void user_interface_test_error_ok_cancel(int16 id);
 void user_interface_test_confirmation(int16 id);
+
+bool __cdecl user_interface_globals_is_beta_build();
+int32 __cdecl user_interface_globals_get_game_difficulty();
+int32 __cdecl user_interface_globals_get_edit_player_profile_index();
+struct s_saved_game_player_profile* user_interface_globals_get_edit_player_profile();
+e_scenario_type __cdecl user_interface_globals_get_map_type();
+void __cdecl user_interface_globals_set_game_difficulty_real(int32 difficulty);
+void __cdecl user_interface_globals_set_loading_from_persistent_storage(bool a1);
+void __cdecl user_interface_globals_commit_edit_profile_changes();
+void __cdecl user_interface_globals_save_profile_changes_to_disk();
+void __cdecl user_interface_globals_finish_saving_profile_changes();
+void __cdecl user_interface_globals_set_edit_player_profile(e_controller_index controller_index, uint32 profile_index, struct s_saved_game_player_profile* profile);

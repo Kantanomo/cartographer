@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#ifndef IMGUI_DISABLE
 #include "imgui.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
@@ -200,3 +201,5 @@ void ShowNetworkStatsOverlay(bool* p_open)
 
 	ImGui::End();
 }
+
+#endif

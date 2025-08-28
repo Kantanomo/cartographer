@@ -5,7 +5,6 @@
 #include "screen_brightness_level.h"
 #include "screen_gamma_setting.h"
 #include "screen_anti_aliasing.h"
-#include "screen_lod_setting.h"
 #include "screen_safe_area_setting.h"
 #include "screen_restore_video_defaults.h"
 #include "screen_vsync_setting.h"
@@ -13,8 +12,6 @@
 
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_controller.h"
-#include "interface/user_interface_globals.h"
-#include "main/game_preferences.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "render/render.h"
 #include "tag_files/global_string_ids.h"

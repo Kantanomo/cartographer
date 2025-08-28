@@ -16,12 +16,17 @@
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 
+#ifndef IMGUI_DISABLE
+
 #include "imgui.h"
 #include "backends/imgui_impl_dx9.h"
 #include "backends/imgui_impl_win32.h"
 
 /* prototypes */
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+#endif
 
 /* constants */
 
@@ -433,10 +438,12 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	bool* shell_window_proc_game_message_during_map_load = Memory::GetAddress<bool*>(0x46DAD8);
 	WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
 
+#ifndef IMGUI_DISABLE
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 	{
 		return 1;
 	}
+#endif
 
 	LRESULT result = 1;
 

@@ -46,7 +46,7 @@ void network_globals_apply_patches(void)
 #ifdef EVENTS_ENABLED
 	PatchCall(Memory::GetAddress(0x1B502A, 0x1A8D88), network_event_dispose);	// network_globals_dispose
 #endif
-	WritePointer((uintptr_t)&get_game_systems()[4], network_globals_initialize);
+	WritePointer((uintptr_t)&get_game_systems()[4], network_initialize);
 	return;
 }
 
@@ -95,10 +95,10 @@ c_network_text_chat_manager** global_network_text_chat_manager_get(void)
 	return Memory::GetAddress<c_network_text_chat_manager**>(0x51C47C, 0x520B9C);
 }
 
-void network_globals_initialize(void)
+void network_initialize(void)
 {
 	s_network_globals* network_globals = network_globals_get();
-	if (shell_tool_type() == _shell_tool_type_game && !network_globals->network_initialized)
+	if (shell_application_type() == _shell_application_game && !network_globals->network_initialized)
 	{
 		if (shell_command_line_flag_is_set(_shell_command_line_flag_disable_voice_chat))
 		{
@@ -192,7 +192,7 @@ void network_globals_initialize(void)
 			else
 			{
 				error(_error_silent, "%s(): failed to initialize networking", __FUNCTION__);
-				network_globals_dispose();
+				network_dispose();
 			}
 		}
 		else
@@ -203,9 +203,27 @@ void network_globals_initialize(void)
 	return;
 }
 
-void network_globals_dispose(void)
+void network_dispose(void)
 {
-	INVOKE(0x1B4F46, 0x1A8CA4, network_globals_dispose);
+	INVOKE(0x1B4F46, 0x1A8CA4, network_dispose);
+	return;
+}
+
+void __cdecl network_receive(void)
+{
+	INVOKE(0x1B542F, 0x1A918D, network_receive);
+	return;
+}
+
+void __cdecl network_send(void)
+{
+	INVOKE(0x1B5456, 0x1A91B4, network_send);
+	return;
+}
+
+void __cdecl network_update(void)
+{
+	INVOKE(0x1B53C7, 0x1A9125, network_update);
 	return;
 }
 

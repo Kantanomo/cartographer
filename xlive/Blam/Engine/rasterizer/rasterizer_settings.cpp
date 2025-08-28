@@ -199,7 +199,7 @@ void __cdecl rasterizer_settings_update_window_position(void)
 		UINT set_window_pos_flags = SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING;
 		if (rasterizer_settings->display_mode != _rasterizer_window_mode_real_fullscreen)
 		{
-			if (shell_tool_type() == _shell_tool_type_game)
+			if (shell_application_type() == _shell_application_game)
 			{
 				rect.top = 0;
 				rect.left = 0;
@@ -356,7 +356,7 @@ DWORD __cdecl rasterizer_settings_get_window_flags(e_rasterizer_window_mode wind
 	if (window_mode == _rasterizer_window_mode_windowed)
 	{
 		result = 
-			shell_tool_type() == _shell_tool_type_sapien ?
+			shell_application_type() == _shell_application_editor ?
 			WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_DLGFRAME | WS_BORDER :
 			WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SIZEBOX | WS_SYSMENU | WS_DLGFRAME | WS_BORDER;	// In original h2v WS_MAXIMIZEBOX and WS_SIZEBOX were not included in the window flags
 	}

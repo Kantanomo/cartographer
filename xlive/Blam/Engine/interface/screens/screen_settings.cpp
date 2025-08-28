@@ -14,7 +14,6 @@
 #include "interface/user_interface_networking.h"
 #include "interface/user_interface_widget_text.h"
 #include "interface//user_interface_bitmap_block.h"
-#include "interface/user_interface_globals.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/screens/screen_cartographer_menus.h"
 #include "networking/network_event.h"

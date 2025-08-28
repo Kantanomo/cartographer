@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#ifndef IMGUI_DISABLE
+
 #include "ImGui_CartographerStyle.h"
 
 const static ImVec2 wPadding(20, 10);
@@ -74,8 +76,8 @@ const real_vector4d k_imgui_style_colors[ImGuiCol_COUNT]
 	{0.56f, 0.69f, 0.81f, 1.00f},
 	{1.00f, 1.00f, 1.00f, 1.00f},
 	{0.19f, 0.19f, 0.20f, 1.00f},
-	{0.31f, 0.31f, 0.35f, 1.00f},    // Prefer using Alpha=1.0 here
-	{0.23f, 0.23f, 0.25f, 1.00f},     // Prefer using Alpha=1.0 here
+	{0.31f, 0.31f, 0.35f, 1.00f},	// Prefer using Alpha=1.0 here
+	{0.23f, 0.23f, 0.25f, 1.00f},	// Prefer using Alpha=1.0 here
 	{0.00f, 0.00f, 0.00f, 0.00f},
 	{1.00f, 1.00f, 1.00f, 0.06f},
 	{0.09f, 0.31f, 0.53f, 1.00f},
@@ -160,3 +162,5 @@ void imgui::Cartographer::PopStyle()
 {
 	ImGui::PopStyleVar(20);
 }
+
+#endif

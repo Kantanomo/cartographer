@@ -851,15 +851,19 @@ void sign_in_xbox_task_progress_cb(c_screen_xbox_live_task_progress_dialog* dial
 				}
 				else
 				{
+#ifndef IMGUI_DISABLE
 					ImGuiHandler::ToggleWindow(k_motd_window_name);
-					/*extern int notify_xlive_ui;
+#else
+					extern int notify_xlive_ui;
 					notify_xlive_ui = 0;
-					XUserSignInSetStatusChanged(0);*/
+					XUserSignInSetStatusChanged(0);
+#endif
+
 				}
-				return;
 			}
 		}
 	}
+	return;
 }
 
 DWORD WINAPI thread_account_login_proc_cb(LPVOID lParam)

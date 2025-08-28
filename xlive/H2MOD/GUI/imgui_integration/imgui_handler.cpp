@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "imgui_handler.h"
 
+#ifndef IMGUI_DISABLE
+
 #include "game/player_control.h"
 #include "interface/user_interface_guide.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
@@ -276,3 +278,5 @@ namespace ImGuiHandler
 		}
 	}
 }
+
+#endif

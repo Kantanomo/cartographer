@@ -1,5 +1,5 @@
 #pragma once
-#include "user_interface.h"
+#include "user_interface_controller.h"
 #include "user_interface_widget.h"
 #include "user_interface_widget_text.h"
 #include "signal_slot.h"
@@ -400,7 +400,7 @@ public:
 	c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags);
 	
 
-	const e_user_interface_screen_id get_id() const;
+	e_user_interface_screen_id get_id() const;
 	c_text_widget* get_screen_header_text();
 	c_text_widget* get_screen_button_key_text();
 	c_text_widget* try_find_screen_text(uint32 idx);
@@ -430,14 +430,14 @@ public:
 	virtual int32 sub_60F1F4(s_event_record* a2);
 	virtual uint8 sub_60EFC1(s_event_record* event);
 	virtual int32 sub_60F081(s_event_record* a2);
-	virtual enum e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
+	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
 	virtual bool sub_40AD53(int32 a2);
 	virtual e_user_interface_channel_type get_channel();
 	virtual e_user_interface_render_window get_render_window();
 	virtual int32 sub_60EB92(int32 a2);
 	virtual void sub_60EBC2(int32 a1);
-	virtual void* sub_60EC5C(s_screen_state* state);
-	virtual void sub_60ECC9(s_screen_state* state);
+	virtual void* sub_60EC5C(struct s_screen_state* state);
+	virtual void sub_60ECC9(struct s_screen_state* state);
 	virtual const void* load_proc(void) const = 0;
 	virtual bool overlay_effect_is_disabled();
 	virtual void set_favourites_bitmap_visible(bool show_icon);

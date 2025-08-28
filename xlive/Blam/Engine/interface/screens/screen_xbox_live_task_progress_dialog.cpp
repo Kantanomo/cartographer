@@ -235,5 +235,6 @@ void c_screen_xbox_live_task_progress_dialog::apply_patches_on_map_load()
 	{
 		pane_definition->model_scene_blocks[0]->ui_viewport = { 78, -110, -174, 110 };
 	}
+	return;
 }
 
