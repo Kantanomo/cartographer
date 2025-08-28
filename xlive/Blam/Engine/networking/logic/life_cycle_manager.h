@@ -19,18 +19,18 @@ enum e_game_life_cycle : int32
 /* typedefs */
 
 e_game_life_cycle get_game_life_cycle(void);
-typedef bool (*life_cycle_update)(void* life_cycle_handler);
-typedef void (*life_cycle_initialize)(void* life_cycle_handler_requested, void* life_cycle_handler_current, int32 unk_1, void* unk_2);
-typedef void (*life_cycle_dispose)(void* life_cycle_handler_current, void* life_cycle_handler_requested);
+typedef bool (*life_cycle_update_t)(void* life_cycle_handler);
+typedef void (*life_cycle_initialize_t)(void* life_cycle_handler_requested, void* life_cycle_handler_current, int32 unk_1, void* unk_2);
+typedef void (*life_cycle_dispose_t)(void* life_cycle_handler_current, void* life_cycle_handler_requested);
 
 /* classes */
 
 class c_game_life_cycle_handler_functions
 {
 public:
-	life_cycle_update update;
-	life_cycle_initialize initialize;
-	life_cycle_dispose dispose;
+	life_cycle_update_t update;
+	life_cycle_initialize_t initialize;
+	life_cycle_dispose_t dispose;
 };
 
 class c_game_life_cycle_handler
@@ -180,3 +180,5 @@ bool game_life_cycle_initialized();
 bool network_life_cycle_in_squad_session(class c_network_session** out_network_session);
 
 void game_life_cycle_apply_patches();
+
+void life_cycle_update(void);

@@ -48,6 +48,7 @@
 #include "main/main_game_time.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "networking/network_event.h"
 #include "networking/network_globals.h"
 #include "networking/network_utilities.h"

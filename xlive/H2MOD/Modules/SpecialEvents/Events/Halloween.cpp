@@ -10,6 +10,7 @@
 #include "models/models.h"
 #include "objects/objects.h"
 #include "objects/scenery.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "scenario/scenario_definitions.h"
 #include "structures/structure_bsp_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"

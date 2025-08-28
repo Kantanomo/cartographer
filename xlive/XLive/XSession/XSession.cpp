@@ -14,7 +14,7 @@ struct XSESSIONS
 	XSESSION_INFO sessionInfo;
 };
 
-std::map<HANDLE, XSESSIONS> sessionMap;
+std::unordered_map<HANDLE, XSESSIONS> sessionMap;
 
 // #5300: XSessionCreate
 LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, ULONGLONG *pqwSessionNonce, PXSESSION_INFO pSessionInfo, PXOVERLAPPED pOverlapped, HANDLE *phEnum)

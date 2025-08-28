@@ -1,16 +1,17 @@
 #include "stdafx.h"
 #include "life_cycle_manager.h"
 
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "networking/session/network_session.h"
 
 /* constants */
+
+
 /* typedefs */
 
 typedef void(__cdecl* t_game_life_cycle_update)();
 
 /* prototypes */
 
-static void game_life_cycle_update();
 
 /* globals */
 
@@ -29,7 +30,13 @@ bool game_life_cycle_initialized()
 
 void game_life_cycle_apply_patches()
 {
-	PatchCall(Memory::GetAddress(0x1AD84D, 0x1A67CA), game_life_cycle_update);
+	return;
+}
+
+void life_cycle_update(void)
+{
+	INVOKE(0x1AD83F, 0x1A67BC, life_cycle_update);
+	return;
 }
 
 e_game_life_cycle __cdecl get_game_life_cycle()
@@ -57,19 +64,6 @@ bool network_life_cycle_in_squad_session(c_network_session** out_active_session)
 }
 
 /* private code */
-
-static void game_life_cycle_update()
-{
-	static e_game_life_cycle previous_life_cycle = _life_cycle_none;
-	c_game_life_cycle_manager* life_cycle_manager = c_game_life_cycle_manager::get();
-
-	life_cycle_manager->update();
-
-	if (previous_life_cycle != life_cycle_manager->get_life_cycle()) {
-		previous_life_cycle = life_cycle_manager->get_life_cycle();
-		EventHandler::GameLifeCycleEventExecute(EventExecutionType::execute_after, life_cycle_manager->get_life_cycle());
-	}
-}
 
 void c_game_life_cycle_handler::initialize(c_game_life_cycle_manager* life_cycle_manager, e_game_life_cycle life_cycle, bool a3)
 {
