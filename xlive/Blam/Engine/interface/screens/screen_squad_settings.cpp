@@ -822,5 +822,20 @@ void c_screen_squad_settings::apply_patches_on_map_load()
 	xbox_live_menu_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live_menu");
 	variant_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\variant_settings\\variant");
 
+	//shifting the help text to accomodate 7 list items 
+	//(top -30, bottom -30)
+	const char* main_widget_tag_path = "ui\\screens\\game_shell\\pregame_lobby\\squad_settings_dialog";
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+	if (main_widget_datum_index == NONE)
+	{
+		error(_error_immediate, "bad datum found");
+		return;
+	}
+
+	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
+	s_window_pane_reference* base_pane = main_widget_tag->panes[0];
+	base_pane->text_blocks[0]->text_bounds.top-=30;
+	base_pane->text_blocks[0]->text_bounds.bottom-=30;
+
 	return;
 }
