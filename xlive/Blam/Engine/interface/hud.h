@@ -23,5 +23,5 @@ void set_crosshair_offset(real32 offset);
 
 void __cdecl hud_update(void);
 
-void hud_draw_screen(void);
+void interface_draw_screen(void);
 

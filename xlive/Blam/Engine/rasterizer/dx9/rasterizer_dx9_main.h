@@ -2,6 +2,7 @@
 #include "rasterizer_dx9_targets.h"
 
 #include "bitmaps/bitmap_group.h"
+#include "math/color_math.h"
 #include "rasterizer/rasterizer_globals.h"
 
 /* enums */
@@ -90,7 +91,7 @@ void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_ind
 
 bool __cdecl rasterizer_window_begin(struct s_frame* preferences);
 
-void __cdecl rasterizer_update_cameras(void);
+void __cdecl rasterizer_window_end(void);
 
 void __cdecl rasterizer_dx9_set_stencil_mode(int16 mode);
 
@@ -128,7 +129,7 @@ bool __cdecl rasterizer_initialize(void);
 
 bool __cdecl rasterizer_dx9_vertex_shaders_initialize(void);
 
-bool __cdecl rasterizer_dx9_render_scene_start(const struct s_render_scene_parameters* parameters);
+bool __cdecl rasterizer_dx9_render_scene_start(const struct rasterizer_scene_begin_parameters* parameters);
 
 bool __cdecl rasterizer_dx9_render_scene_end(void);
 

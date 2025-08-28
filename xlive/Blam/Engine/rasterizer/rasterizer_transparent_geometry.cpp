@@ -13,8 +13,8 @@ void __cdecl rasterizer_transparent_geometry_reset_counts(void)
 	return;
 }
 
-void __cdecl transparent_geometry_draw(void)
+void __cdecl rasterizer_transparent_geometry_draw(void)
 {
-	INVOKE(0x2787F3, 0x0, transparent_geometry_draw);
+	INVOKE(0x2787F3, 0x0, rasterizer_transparent_geometry_draw);
 	return;
 }

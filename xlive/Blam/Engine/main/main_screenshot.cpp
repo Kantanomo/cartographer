@@ -13,6 +13,7 @@
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/rasterizer_main.h"
 #include "render/render.h"
+#include "shell/shell.h"
 #include "tag_files/files_windows.h"
 
 /* constants */
@@ -90,8 +91,14 @@ bool cubemap_screenshot_in_progress(void)
 
 bool movie_recording(void)
 {
-	const s_movie_globals* movie_globals = movie_globals_get();
-	return movie_globals->in_progress;
+	bool result = false;
+	if (!shell_is_dedicated_server())
+	{
+		const s_movie_globals* movie_globals = movie_globals_get();
+		result = movie_globals->in_progress;
+	}
+
+	return result;
 }
 
 real32 movie_recording_timestep(void)

@@ -67,7 +67,6 @@ bool* global_sky_active_get(void);
 int32* global_sky_index_get(void);
 s_scenario_fog_result* global_fog_result_get(void);
 bool* global_byte_4E6938_get(void);
-void __cdecl rasterizer_render_scene(bool is_texture_camera);
 
 void render_view(
 	real_rectangle2d* frustum_bounds,
@@ -91,7 +90,6 @@ void render_view(
 	s_screen_flash* screen_flash);
 
 void __cdecl render_scene_bitflags_set(void);
-void render_scene_wrapper(bool is_texture_camera);
 void __cdecl render_camera_scene(
 	int32 render_layer_debug_view,
 	bool render_transparent_geo,
@@ -189,9 +187,9 @@ uint32* global_frame_index_get(void)
 	return Memory::GetAddress<uint32*>(0x4E695C);
 }
 
-bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index)
+bool __cdecl render_structure_find_camera(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index)
 {
-	return INVOKE(0x191032, 0x0, structure_get_cluster_and_leaf_from_render_point, point, out_cluster_index, out_leaf_index);
+	return INVOKE(0x191032, 0x0, render_structure_find_camera, point, out_cluster_index, out_leaf_index);
 }
 
 e_screen_split_type get_screen_split_type(int32 render_user_index)
@@ -221,10 +219,10 @@ void render_scene_geometry(e_collection_type collection_type, e_render_layer ren
 	ASSERT(VALID_INDEX(collection_type, k_number_collection_types));
 	ASSERT(VALID_INDEX(render_layer, k_number_of_render_layers));
 
-	if (render_layer != _render_layer_debug_view && prepare_render_layer(render_layer))
+	if (render_layer != _render_layer_debug_view && render_layer_begin(render_layer))
 	{
-		draw_render_layer();
-		reset_after_render_layer_draw();
+		render_layer_draw();
+		render_layer_end();
 	}
 	return;
 }
@@ -249,9 +247,9 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
 	int32 leaf_index = *get_global_window_out_leaf_index(window->window_bound_index);
 	screen_flash.intensity = 0.0f;
 	screen_flash.type = _screen_flash_type_none;
-	bool bsp_test_success = structure_get_cluster_and_leaf_from_render_point(&window->render_camera.point, &cluster_index, &leaf_index);
 
-	if (bsp_test_success)
+	const bool found_camera = render_structure_find_camera(&window->render_camera.point, &cluster_index, &leaf_index);
+	if (found_camera)
 	{
 		*get_global_window_out_cluster_index(window->window_bound_index) = cluster_index;
 		*get_global_window_out_leaf_index(window->window_bound_index) = leaf_index;
@@ -263,7 +261,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
 	bool draw_sky = structure_get_sky(cluster_index, &visible_sky_index, &clear_color, &clear_color_active);
 
 	s_scenario_fog_result fog;
-	render_scenario_fog(cluster_index, &window->render_camera, &window->render_camera.forward, draw_sky, *get_render_fog_enabled(), &fog);
+	scenario_get_atmospheric_fog(cluster_index, &window->render_camera, &window->render_camera.forward, draw_sky, *get_render_fog_enabled(), &fog);
 	if (clear_color_active)
 	{
 		fog.clear_color = clear_color;
@@ -312,7 +310,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
 			is_texture_camera,
 			cluster_index,
 			leaf_index,
-			!bsp_test_success,
+			!found_camera,
 			0,
 			window->user_index,
 			controller_index,
@@ -342,7 +340,7 @@ void __cdecl render_scene(
 	int32 effect_flag,
 	real32 depth_range)
 {
-	s_render_scene_parameters parameters;
+	rasterizer_scene_begin_parameters parameters;
 	uint32* g_scene_rendered_count = global_scene_rendered_count_get();
 	parameters.scene_rendered_count = ++*g_scene_rendered_count;
 	parameters.effect_flags = effect_flag;
@@ -504,7 +502,7 @@ render_layer_2:
 
 			if (render_transparent_geo)
 			{
-				transparent_geometry_draw();
+				rasterizer_transparent_geometry_draw();
 			}
 
 			if (g_submit_occlusion_tests && effect_flag != 2)
@@ -764,12 +762,6 @@ bool* global_byte_4E6938_get(void)
 	return Memory::GetAddress<bool*>(0x4E6938);
 }
 
-void __cdecl rasterizer_render_scene(bool is_texture_camera) 
-{
-	INVOKE(0x25F015, 0x0, rasterizer_render_scene, is_texture_camera);
-	return;
-}
-
 void render_view(
 	real_rectangle2d* frustum_bounds,
 	render_camera* rasterizer_camera,
@@ -838,9 +830,9 @@ void render_view(
 	rasterizer_shader_level_of_detail_bias_update();
 	if (result)
 	{
-		if (media_foundation_player_running())
+		if (wmv_playback_in_progress())
 		{
-			media_foundation_player_frame();
+			wmv_render();
 		}
 		else
 		{
@@ -848,11 +840,11 @@ void render_view(
 			render_beam();
 			render_light_clear_data();
 			render_view_visibility_compute_to_usercall(user_index);
-			render_scene_wrapper(is_texture_camera);
+			rasterizer_render_scene(is_texture_camera);
 
 			rasterizer_dx9_perf_event_begin("interface", NULL);
 			rasterizer_dx9_set_stencil_mode(0);
-			hud_draw_screen();
+			interface_draw_screen();
 			rasterizer_dx9_render_screen_flash();
 			render_menu_user_interface(controller_index, (e_user_interface_render_window)NONE, &camera->viewport_bounds);
 			rasterizer_dx9_perf_event_end("interface");
@@ -866,7 +858,7 @@ void render_view(
 		}
 	}
 
-	rasterizer_update_cameras();
+	rasterizer_window_end();
 	return;
 }
 
@@ -891,7 +883,7 @@ bool render_scene_is_splitscreen(void)
 		get_player_window_count() > 1;
 }
 
-void render_scene_wrapper(bool is_texture_camera)
+void rasterizer_render_scene(bool is_texture_camera)
 {
 	const s_frame* global_window_parameters = global_window_parameters_get();
 	const s_frame_parameters* g_frame_parameters = global_frame_parameters_get();

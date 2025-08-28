@@ -310,7 +310,7 @@ void __cdecl rasterizer_dx9_reset_depth_buffer(void)
 void rasterizer_dx9_present(bitmap_data* screenshot_bitmap, bool a2)
 {
 	bool result = true;
-	if (!media_foundation_player_running())
+	if (!wmv_playback_in_progress())
 	{
 		s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 		s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
@@ -387,9 +387,9 @@ bool __cdecl rasterizer_window_begin(s_frame* preferences)
 	return INVOKE(0x2620CF, 0x0, rasterizer_window_begin, preferences);
 }
 
-void __cdecl rasterizer_update_cameras(void)
+void __cdecl rasterizer_window_end(void)
 {
-	return INVOKE(0x26268D, 0x0, rasterizer_update_cameras);
+	return INVOKE(0x26268D, 0x0, rasterizer_window_end);
 }
 
 void __cdecl rasterizer_dx9_set_stencil_mode(int16 mode)
@@ -896,7 +896,7 @@ bool __cdecl rasterizer_dx9_vertex_shaders_initialize(void)
 	return INVOKE(0x285061, 0x0, rasterizer_dx9_vertex_shaders_initialize);
 }
 
-bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* parameters) 
+bool __cdecl rasterizer_dx9_render_scene_start(const rasterizer_scene_begin_parameters* parameters) 
 {
 	return INVOKE(0x262105, 0x0, rasterizer_dx9_render_scene_start, parameters);
 }

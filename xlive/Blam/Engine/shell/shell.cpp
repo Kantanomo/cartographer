@@ -21,17 +21,22 @@
 #include "tag_files/tag_files.h"
 #include "text/font_group.h"
 
+/* structures*/
+
+struct s_shell_build_version
+{
+	int32 version;
+	const char* string;
+};
 
 /* constants */
 
-s_shell_build_version k_shell_build_versions[] =
+const s_shell_build_version k_shell_build_versions[] =
 {
 	{11028, "11028.07.03.23.1927.main"},	// Preview build of Vista
 	{11081, "11081.07.04.30.0934.main"},
 	{11122, "11122.07.08.24.1808.main"},
 };
-
-
 
 /* globals */
 

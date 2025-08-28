@@ -1,13 +1,21 @@
 #include "stdafx.h"
 #include "wmv_playback.h"
 
-bool __cdecl media_foundation_player_running(void)
+/* public code */
+
+void __cdecl wmv_update(void)
 {
-	return INVOKE(0x39F09, 0x0, media_foundation_player_running);
+	INVOKE(0x3A125, 0x0, wmv_update);
+	return;
 }
 
-void __cdecl media_foundation_player_frame(void)
+bool __cdecl wmv_playback_in_progress(void)
 {
-	INVOKE(0x3A264, 0x0, media_foundation_player_frame);
+	return INVOKE(0x39F09, 0x0, wmv_playback_in_progress);
+}
+
+void __cdecl wmv_render(void)
+{
+	INVOKE(0x3A264, 0x0, wmv_render);
 	return;
 }

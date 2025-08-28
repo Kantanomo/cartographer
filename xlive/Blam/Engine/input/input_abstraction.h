@@ -17,13 +17,9 @@ enum
 };
 
 // Set this to a default of 8
-const real32 k_default_right_thumbstick_deadzone_radial_percentage = THUMBSTICK_POINT_TO_PERCENTAGE(THUMBSTICK_PERCENTAGE_TO_POINT(8));
+extern const real32 k_default_right_thumbstick_deadzone_radial_percentage;
 
-const real_point2d k_default_right_thumbstick_deadzone_axial_percentage =
-{
-	THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE),
-	THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
-};
+extern const real_point2d k_default_right_thumbstick_deadzone_axial_percentage;
 
 /* enums */
 
