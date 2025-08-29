@@ -39,7 +39,7 @@ public:
 	virtual void handle_player_objective_touch_interaction(datum player_index, datum object_index);
 	virtual void update();
 	virtual real32 get_player_speed_modifier(datum player_index);
-	virtual uint32 function_21(datum object_index);
+	virtual int32 function_21(datum object_index);
 	virtual void update_object_color_change(datum object_index);
 	virtual void function_23(datum index);
 	virtual void handle_object_taken_event(datum weapon_index, datum biped_index);

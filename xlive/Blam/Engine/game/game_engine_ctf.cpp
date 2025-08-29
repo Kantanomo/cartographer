@@ -64,7 +64,7 @@ real32 c_ctf_engine::get_player_speed_modifier(datum player_index)
 	return INVOKE_TYPE(0xD43B1, 0xD20B0, real32(__thiscall*)(c_game_engine*, datum), this, player_index);
 }
 
-uint32 c_ctf_engine::function_21(datum object_index)
+int32 c_ctf_engine::function_21(datum object_index)
 {
 	return INVOKE_TYPE(0xD440F, 0xD2124, uint32(__thiscall*)(c_game_engine*, datum), this, object_index);
 }

@@ -3,7 +3,7 @@
 #include "main/game_preferences.h"
 #include "saved_games/game_variant.h"
 
-const static wchar_t* g_multiplayer_variant_interface_headhunter_parameter_title_strings[k_language_count][k_multiplayer_variant_headhunter_parameter_count] =
+extern wchar_t* g_multiplayer_variant_interface_headhunter_parameter_title_strings[k_language_count][k_multiplayer_variant_headhunter_parameter_count] =
 {
     // English
     {
@@ -97,7 +97,7 @@ const static wchar_t* g_multiplayer_variant_interface_headhunter_parameter_title
     }
 };
 
-const static wchar_t* g_multiplayer_variant_interface_headhunter_parameter_description_strings[k_language_count][k_multiplayer_variant_headhunter_parameter_count] =
+extern wchar_t* g_multiplayer_variant_interface_headhunter_parameter_description_strings[k_language_count][k_multiplayer_variant_headhunter_parameter_count] =
 {
     // English
     {
@@ -191,7 +191,7 @@ const static wchar_t* g_multiplayer_variant_interface_headhunter_parameter_descr
     }
 };
 
-const static wchar_t* g_multiplayer_variant_interface_headhunter_speed_with_head_strings[k_language_count][k_ctf_engine_player_speed_count] =
+extern wchar_t* g_multiplayer_variant_interface_headhunter_speed_with_head_strings[k_language_count][k_ctf_engine_player_speed_count] =
 {
     // English
     {
@@ -249,7 +249,7 @@ const static wchar_t* g_multiplayer_variant_interface_headhunter_speed_with_head
     }
 };
 
-const static wchar_t* g_multiplayer_variant_interface_headhunter_max_heads_carried_strings[k_language_count][k_headhunter_max_heads_carried_count] =
+extern wchar_t* g_multiplayer_variant_interface_headhunter_max_heads_carried_strings[k_language_count][k_headhunter_max_heads_carried_count] =
 {
     // English
     {

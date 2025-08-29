@@ -1,7 +1,7 @@
 #pragma once
 #include "simulation_game_engine.h"
 
-#define k_simulation_king_entity_name "king-engine-globals"
+static const char* k_simulation_king_entity_name = "king-engine-globals";
 
 enum e_simulation_king_engine_state_data_flags
 {

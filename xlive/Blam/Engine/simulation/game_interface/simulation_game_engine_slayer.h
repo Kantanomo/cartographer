@@ -1,7 +1,7 @@
 #pragma once
 #include "simulation_game_engine.h"
 
-#define k_simulation_slayer_engine_entity_name "slayer-engine-globals"
+static const char* k_simulation_slayer_engine_entity_name = "slayer-engine-globals";
 
 struct s_slayer_engine_state_data : s_game_engine_state_data {};
 

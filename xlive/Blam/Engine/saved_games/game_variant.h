@@ -410,7 +410,7 @@ enum e_headhunter_engine_flags : uint32
 	k_headhunter_engine_flags_count
 };
 
-enum e_cartographer_variant_settings_version : uint32
+enum e_cartographer_variant_settings_version : uint8
 {
 	_cartographer_variant_settings_version_none,
 	_cartographer_variant_settings_version_one
@@ -547,107 +547,22 @@ union s_game_engine_variant
 };
 ASSERT_STRUCT_SIZE(s_game_engine_variant, 64);
 
-// this structure is specially built to use the unused data inside s_game_variant.
-// using padding to align our project settings to the empty spaces
-struct s_cartographer_variant_settings
+#pragma pack(push, 1)
+struct s_cart_variant_settings
 {
-private:
-	int8 pad1[16];
-
-public:
 	e_cartographer_variant_settings_version version;
 	c_flags_no_init<e_cartographer_variant_flags, uint32, k_cartographer_variant_flags_count> flags;
 	e_game_speed_modifier game_speed;
 	e_game_gravity_modifier gravity;
 	e_player_spawn_protection_timer spawn_protection;
-	int8 usable_space[6];
 
-private:
-	int8 pad2[24];
-
-public:
-	int32 setting_storage2[6];
-
-private:
-	int8 pad3[20];
-
-public:
-	int32 setting_storage3[5];
-
-private:
-	int8 pad4[11];
-
-public:
-	int32 setting_storage4[6];
+	int8 available_storage[16];
 };
+#pragma pack(pop)
+ASSERT_STRUCT_SIZE(s_cart_variant_settings, 24);
 
-union s_game_variant
-{
-	struct
-	{
-		int16 flags;
-		int8 pad;
-		e_game_variant_description_index description_index;
-		wchar_t variant_name[32];
-		e_game_engine_type variant_game_engine_index;
-		c_flags_no_init<e_game_engine_flags, uint32, k_game_engine_flags_count> game_engine_flags;
 
-		union
-		{
-			struct
-			{
-				e_game_engine_round_setting round_setting;
-				int32 score_to_win_round;
-				int32 round_time_limit;
-				e_game_engine_join_in_progress join_in_progress_setting;
-				int32 unused_match_settings[6];
-
-				int32 max_players;
-				int32 max_living_players;
-				int32 lives_per_round;
-				int32 respawn_time;
-				int32 suicide_penalty;
-				e_game_engine_shield_setting shield_setting;
-				int32 unused_player_settings[6];
-
-				e_game_engine_team_score team_score_setting;
-				e_game_engine_team_respawn team_respawn_setting;
-				int32 betrayal_penalty;
-				int32 unk;
-				int32 maximum_allowable_teams;
-				int32 unused_team_settings[5];
-
-				e_game_engine_respawn_setting vehicle_respawn_setting;
-				e_game_engine_light_land_vehicle primary_light_land_vehicle;
-				e_game_engine_light_land_vehicle secondary_light_land_vehicle;
-				e_game_engine_heavy_land_vehicle primary_heavy_land_vehicle;
-				e_game_engine_flying_vehicle primary_flying_vehicle;
-				e_game_engine_heavy_land_vehicle secondary_heavy_land_vehicle;
-				e_game_engine_turret_vehicle primary_turret_vehicle;
-				e_game_engine_turret_vehicle secondary_turret_vehicle;
-
-				e_game_engine_weapon_set weapon_set;
-				e_game_engine_respawn_setting weapon_respawn_setting;
-				e_game_engine_starting_weapon starting_equipment_primary;
-				e_game_engine_starting_weapon starting_equipment_secondary;
-
-				/* Maybe make use of these? */
-				int32 unused_settings[6];
-			};
-
-			s_cartographer_variant_settings cartographer_settings;
-
-			int8 variant_settings_buffer[164];
-		};
-
-		s_game_engine_variant game_engine_variant;
-	};
-private:
-	int8 max_struct_data[304];
-};
-ASSERT_STRUCT_SIZE(s_game_variant, 304);
-
-struct s_game_variant_old
+struct s_game_variant
 {
 	int16 flags;
 	int8 pad;
@@ -697,11 +612,16 @@ struct s_game_variant_old
 	e_game_engine_starting_weapon starting_equipment_secondary;
 
 	/* Maybe make use of these? */
-	int32 unused_settings[6];
+
+	union
+	{
+		int32 unused_settings[6];
+		s_cart_variant_settings cartographer_settings;
+	};
 
 	s_game_engine_variant game_engine_variant;
 };
-ASSERT_STRUCT_SIZE(s_game_variant_old, 304);
+ASSERT_STRUCT_SIZE(s_game_variant, 304);
 
 void game_variant_apply_patches();
 

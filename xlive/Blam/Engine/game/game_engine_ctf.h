@@ -20,7 +20,7 @@ public:
 	virtual void handle_player_objective_touch_interaction(datum player_index, datum object_index) override;
 	virtual void update() override;
 	virtual real32 get_player_speed_modifier(datum player_index) override;
-	virtual uint32 function_21(datum object_index) override;
+	virtual int32 function_21(datum object_index) override;
 	virtual void update_object_color_change(datum object_index) override;
 	virtual void handle_object_taken_event(datum weapon_index, datum biped_index) override;
 	virtual void handle_object_dropped_event(datum weapon_index, datum biped_index) override;
