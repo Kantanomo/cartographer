@@ -8,6 +8,7 @@
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_utilities.h"
 #include "main/game_preferences.h"
+#include "H2MOD/Modules/Accounts/Accounts.h"
 
 /* structures */
 
@@ -179,6 +180,9 @@ void c_cartographer_error_menu::pre_destroy()
 			c_cartographer_account_manager_menu::load_for_account_add_context();
 			c_cartographer_account_manager_menu::g_accounting_go_back_to_list = true;
 		}
+
+		// Make sure we read the accounts file again so we can modify it later on
+		ReadH2Accounts();
 		c_cartographer_account_manager_menu::update_accounting_active_handle(false);
 		break;
 	case _cartpgrapher_error_id_none:
