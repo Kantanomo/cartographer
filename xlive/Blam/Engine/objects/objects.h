@@ -338,6 +338,8 @@ void* object_header_block_get_with_count(const datum object_datum, const object_
 
 void __cdecl object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, s_damage_owner* damage_owner);
 
+int32 __cdecl object_index_from_name_index(int16 name_index);
+
 bool __cdecl object_is_connected_to_map(datum object_index);
 
 void __cdecl object_update_collision_culling(datum object_datum);

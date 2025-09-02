@@ -35,6 +35,18 @@ collision_bsp* global_collision_bsp_get(void)
 	return *Memory::GetAddress<collision_bsp**>(0x479E64, 0x4A6420);
 }
 
+void global_scenario_index_set(datum scenario_index)
+{
+	datum* global_scenario_index = Memory::GetAddress<datum*>(0x4119A0, 0x3B528C);
+	*global_scenario_index = scenario_index;
+	return;
+}
+
+int32 global_scenario_index_get(void)
+{
+	return *Memory::GetAddress<int32*>(0x4119A0, 0x3B528C);
+}
+
 void scenario_apply_patches(void)
 {
 	PatchCall(Memory::GetAddress(0x28516), scenario_tags_postprocess);	// Default Maps

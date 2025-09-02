@@ -1,5 +1,11 @@
 #pragma once
 
+/* macros */
+
+#define scenario_get_hs_script(scnr, index) \
+((hs_script*)tag_block_get_element_with_size((s_tag_block*)(&((scnr)->hs_scripts)), (index), sizeof(hs_script)))
+
+
 /* public code */
 
 struct scenario* global_scenario_get(void);
@@ -7,6 +13,10 @@ struct scenario* global_scenario_get(void);
 void set_global_scenario(struct scenario* _scenario);
 
 struct collision_bsp* global_collision_bsp_get(void);
+
+int32 global_scenario_index_get(void);
+
+void global_scenario_index_set(datum scenario_index);
 
 void scenario_apply_patches(void);
 
