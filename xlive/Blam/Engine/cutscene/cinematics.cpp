@@ -9,7 +9,7 @@ s_cinematic_globals* get_cinematic_globals(void)
 	return *Memory::GetAddress<s_cinematic_globals**>(0x48227C, 0x4F3DB0);
 }
 
-bool cinematic_is_running()
+bool cinematic_in_progress_not_main_menu()
 {
 	bool result = false;
 
@@ -36,7 +36,7 @@ bool __cdecl cinematics_in_progress_disable_framerate_cap_hook(void)
 	}
 	else
 	{
-		result = cinematic_is_running();
+		result = cinematic_in_progress_not_main_menu();
 	}
 
 	return result;
@@ -61,9 +61,9 @@ void __cdecl cinematic_update(void)
 	return;
 }
 
-void __cdecl cinematics_draw_line(rectangle2d* points, pixel32 rect_color)
+void __cdecl draw_quad(const rectangle2d* points, pixel32 rect_color)
 {
-	INVOKE(0x3B101, 0x0, cinematics_draw_line, points, rect_color);
+	INVOKE(0x3B101, 0x0, draw_quad, points, rect_color);
 	return;
 }
 

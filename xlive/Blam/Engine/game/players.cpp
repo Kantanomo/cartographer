@@ -9,11 +9,10 @@
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
-#include "simulation/game_interface/simulation_game_action.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_queue_global_events.h"
 #include "units/bipeds.h"
-#include "units/units.h"
+#include "objects/objects.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -359,7 +358,7 @@ void __cdecl players_update_activation(void)
 					}
 					else
 					{
-						SET_FLAG(player->flags, _player_active_in_game_bit, machine_active_in_game);
+						SET_BIT(player->flags, _player_active_in_game_bit, machine_active_in_game);
 
 						if (machine_active_in_game)
 						{
@@ -409,7 +408,7 @@ void player_user_weapon_interaction_set(int32 user_index, bool enabled)
 {
 	ASSERT(VALID_INDEX(user_index, k_number_of_users));
 
-	SET_FLAG(g_user_weapon_interactions_mask, user_index, enabled);
+	SET_BIT(g_user_weapon_interactions_mask, user_index, enabled);
 	return;
 }
 
@@ -575,13 +574,13 @@ int16 local_player_count(void)
 	return get_players_globals()->local_player_count;
 }
 
-void __cdecl players_update_before_game(const simulation_update* update)
+void __cdecl players_update_before_game(const struct simulation_update* update)
 {
 	INVOKE(0x5815E, 0x60656, players_update_before_game, update);
 	return;
 }
 
-void __cdecl players_update_after_game(const simulation_update* update)
+void __cdecl players_update_after_game(const struct simulation_update* update)
 {
 	INVOKE(0x58C22, 0x6111A, players_update_after_game, update);
 	return;

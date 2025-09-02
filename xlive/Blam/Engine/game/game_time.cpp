@@ -99,7 +99,7 @@ bool __cdecl cinematic_is_running_hook()
 	}
 	else
 	{
-		result = cinematic_is_running() || xbox_tickrate_is_enabled() || main_time_is_throttled() || g_main_game_time_frame_limiter_enabled;
+		result = cinematic_in_progress_not_main_menu() || xbox_tickrate_is_enabled() || main_time_is_throttled() || g_main_game_time_frame_limiter_enabled;
 	}
 	
 	return result;

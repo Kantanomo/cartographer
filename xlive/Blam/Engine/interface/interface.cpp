@@ -10,21 +10,25 @@
 
 /* constants */
 
-#define k_splitscreen_line_colour D3DCOLOR_ARGB(255, 0, 0, 0);
+enum
+{
+	k_splitscreen_original_game_height = 480,
+	k_splitscreen_line_colour = D3DCOLOR_ARGB(255, 0, 0, 0)
+};
 
 /* globals */
 
 /* prototypes */
 
-e_display_type get_display_split_type(void);
-void set_display_type(e_display_type display_type);
-void render_splitscreen_line(void);
+static e_display_type get_display_split_type(void);
+static void set_display_type(e_display_type display_type);
+static void interface_splitscreen_render(void);
 
 /* public code */
 
 void apply_interface_hooks(void)
 {
-	PatchCall(Memory::GetAddress(0x227A17), render_splitscreen_line);
+	PatchCall(Memory::GetAddress(0x227A17), interface_splitscreen_render);
 	return;
 }
 
@@ -94,69 +98,69 @@ void __cdecl interface_draw_bitmap(
 
 /* private code */
 
-e_display_type get_display_split_type(void)
+static e_display_type get_display_split_type(void)
 {
 	return *Memory::GetAddress<e_display_type*>(0x4E6970);
 }
 
-void set_display_type(e_display_type display_type)
+static void set_display_type(e_display_type display_type)
 {
 	WriteValue<e_display_type>(Memory::GetAddress(0xA3E460), display_type);
 }
 
 // Renders the lines inbetween windows in splitscreen
 // Updated function so it works when the resolution isnt 640x480
-void render_splitscreen_line(void)
+static void interface_splitscreen_render(void)
 {
 	const int32 player_window_count = get_player_window_count();
 	ASSERT(IN_RANGE(player_window_count, 1, k_number_of_users));
 
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-	const int16 resolution_x = (int16)rasterizer_globals->resolution_x;
-	const int16 resolution_y = (int16)rasterizer_globals->resolution_y;
+	const point2d resolution = { (int16)rasterizer_globals->resolution_x, (int16)rasterizer_globals->resolution_y };
 
 	// We calculate the size of the line by dividing our resolution by the height the original game ran at
-	const int16 line_size = resolution_y / 480;		
+	const int16 line_size = resolution.y / k_splitscreen_original_game_height;
 	
-	rectangle2d line;
-	pixel32 color = k_splitscreen_line_colour;
 	if (player_window_count > 1)
 	{
+		const pixel32 color = (pixel32)k_splitscreen_line_colour;
+
+		rectangle2d line;
 		if (get_display_split_type() == _display_split_type_horizontal)
 		{
-			line.top = (resolution_y / 2) - line_size;
+			line.top = (resolution.y / 2) - line_size;
 			line.left = 0;
-			line.bottom = (resolution_y / 2) + line_size;
-			line.right = resolution_x;
-			cinematics_draw_line(&line, color);
+			line.bottom = (resolution.y / 2) + line_size;
+			line.right = resolution.x;
+			draw_quad(&line, color);
 
 			// Draw horizontal line between players
 			if (player_window_count > 2)
 			{
-				line.left = (resolution_x / 2) - line_size;
-				line.bottom = resolution_y;
-				line.right = (resolution_x / 2) + line_size;
-				line.top = (player_window_count == 3 ? resolution_y / 2 : 0);
+				line.left = (resolution.x / 2) - line_size;
+				line.bottom = resolution.y;
+				line.right = (resolution.x / 2) + line_size;
+				line.top = (player_window_count == 3 ? resolution.y / 2 : 0);
 			}
 		}
 		else
 		{
 			line.top = 0;
-			line.left = (resolution_x / 2) - line_size;
-			line.bottom = resolution_y;
-			line.right = (resolution_x / 2) + line_size;
-			cinematics_draw_line(&line, color);
+			line.left = (resolution.x / 2) - line_size;
+			line.bottom = resolution.y;
+			line.right = (resolution.x / 2) + line_size;
+			draw_quad(&line, color);
 
 			// Draw vertical line between players
 			if (player_window_count > 2)
 			{
-				line.top = (resolution_y / 2) - line_size;
-				line.bottom = (resolution_y / 2) + line_size;
-				line.right = resolution_x;
-				line.left = (player_window_count == 3 ? resolution_x / 2 : 0);
+				line.top = (resolution.y / 2) - line_size;
+				line.bottom = (resolution.y / 2) + line_size;
+				line.right = resolution.x;
+				line.left = (player_window_count == 3 ? resolution.x / 2 : 0);
 			}
 		}
-		cinematics_draw_line(&line, color);
+		draw_quad(&line, color);
 	}
 	return;
 }

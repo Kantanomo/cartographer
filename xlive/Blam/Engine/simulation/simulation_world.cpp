@@ -125,7 +125,7 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 	}
 }
 
-void c_simulation_world::apply_simulation_queue(const c_simulation_queue* simulation_queue, const simulation_update* update)
+void c_simulation_world::apply_simulation_queue(const c_simulation_queue* simulation_queue, const struct simulation_update* update)
 {
 	ASSERT(simulation_queue != NULL);
 

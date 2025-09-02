@@ -49,7 +49,7 @@ typedef void(__cdecl* activation_proc_t)(s_game_cluster_bit_vectors*, s_game_clu
 
 /* prototypes */
 
-static void set_main_game_globals(s_main_game_globals* main);
+static void set_main_game_globals(game_globals_storage* main);
 
 static void __cdecl main_loop_process_global_state_changes_hook(void);
 
@@ -107,9 +107,9 @@ s_game_systems* get_game_systems(void)
 	return Memory::GetAddress<s_game_systems*>(0x3A0468, 0x35D198);
 }
 
-s_main_game_globals* get_main_game_globals(void)
+game_globals_storage* get_main_game_globals(void)
 {
-	return *Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520);
+	return *Memory::GetAddress<game_globals_storage**>(0x482D3C, 0x4CB520);
 }
 
 bool map_initialized(void)
@@ -119,7 +119,7 @@ bool map_initialized(void)
 
 s_game_options* game_options_get(void)
 {
-	s_main_game_globals* game_globals = get_main_game_globals();
+	game_globals_storage* game_globals = get_main_game_globals();
 	// TODO: fix code in H2MOD that causes this assert
 	//ASSERT(game_globals && (game_globals->initializing || game_globals->map_active));
 	return &game_globals->options;
@@ -207,7 +207,7 @@ bool game_in_progress(void)
 
 bool game_is_active(void)
 {
-	const s_main_game_globals* g_main_game_globals = get_main_game_globals();
+	const game_globals_storage* g_main_game_globals = get_main_game_globals();
 	return g_main_game_globals && g_main_game_globals->map_active && g_main_game_globals->active_structure_bsp_index != NONE;
 }
 
@@ -296,10 +296,10 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, in
 void __cdecl game_initialize(void)
 {
 	game_state_initialize();
-	s_main_game_globals* main_game_globals = (s_main_game_globals*)game_state_malloc("game globals", NULL, sizeof(s_main_game_globals));
-	csmemset(main_game_globals, 0, sizeof(s_main_game_globals));
+	game_globals_storage* main_game_globals = (game_globals_storage*)game_state_malloc("game globals", NULL, sizeof(game_globals_storage));
+	csmemset(main_game_globals, 0, sizeof(game_globals_storage));
 	main_game_globals->active_structure_bsp_index = NONE;
-	*Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520) = main_game_globals;    // Write allocated globals back to the original exe
+	*Memory::GetAddress<game_globals_storage**>(0x482D3C, 0x4CB520) = main_game_globals;    // Write allocated globals back to the original exe
 
 	real_math_reset_precision();
 
@@ -344,10 +344,10 @@ void __cdecl game_tick(void)
 {
 	//INVOKE(0x4A4AF, 0x4372D, game_tick);
 
-	s_main_game_globals* game_globals = get_main_game_globals();
+	game_globals_storage* game_globals = get_main_game_globals();
 	ASSERT(game_globals && game_globals->map_active && game_globals->active_structure_bsp_index != NONE);
 
-	simulation_update update;
+	struct simulation_update update;
 
 	//main_status("game_tick", "time %d", game_time_get());
 
@@ -443,7 +443,7 @@ void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt)
 
 void __cdecl game_initialize_for_new_map(const s_game_options* options)
 {
-	s_main_game_globals* game_globals = get_main_game_globals();
+	game_globals_storage* game_globals = get_main_game_globals();
 
 	ASSERT(options);
 	// TODO: implement 
@@ -474,17 +474,21 @@ void __cdecl game_initialize_for_new_map(const s_game_options* options)
 
 void __cdecl game_frame(real32 dt)
 {
-	halo_interpolator_update_delta();
-	motion_sensor_update_with_delta(dt);
-	p_game_frame(dt);
+	if (halo_frame_interpolator_enabled())
+	{
+		halo_interpolator_update_delta();
+		motion_sensor_update_with_delta(dt);
+	}
+
+	INVOKE(0x48CDC, 0x41F7D, game_frame, dt);
 	return;
 }
 
 /* private code */
 
-static void set_main_game_globals(s_main_game_globals* main)
+static void set_main_game_globals(game_globals_storage* main)
 {
-	*Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520) = main;
+	*Memory::GetAddress<game_globals_storage**>(0x482D3C, 0x4CB520) = main;
 	return;
 }
 
@@ -502,7 +506,7 @@ static void __cdecl main_loop_process_global_state_changes_hook(void)
 
 static void game_info_initialize_for_new_map(const s_game_options* options)
 {
-	s_main_game_globals* game_globals = get_main_game_globals();
+	game_globals_storage* game_globals = get_main_game_globals();
 
 	game_globals->options = *options;
 	game_globals->options.load_level_only = false;
@@ -519,7 +523,7 @@ static void game_info_initialize_for_new_map(const s_game_options* options)
 	return;
 }
 
-static void __cdecl game_tick_pulse_random_seed_deterministic(const simulation_update* update)
+static void __cdecl game_tick_pulse_random_seed_deterministic(const struct simulation_update* update)
 {
 	INVOKE(0x49B02, 0x42D80, game_tick_pulse_random_seed_deterministic, update);
 	return;

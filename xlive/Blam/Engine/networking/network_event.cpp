@@ -9,6 +9,7 @@
 #include "game/game_time.h"
 #include "main/console.h"
 #include "memory/data.h"
+#include "memory/rockall_heap_manager.h"
 #include "render/render.h"
 
 /* structures */
@@ -244,12 +245,12 @@ static uint32 network_event_get_flags(e_event_level event_level, datum index)
 			s_network_event_datum* category = (s_network_event_datum*)datum_get(network_event_globals.categories, index);
 			if (category->current_display_level != _event_invalid)
 			{
-				SET_FLAG(result, 0, event_level >= category->current_display_level);
+				SET_BIT(result, 0, event_level >= category->current_display_level);
 			}
 
 			if (category->current_log_level != _event_invalid)
 			{
-				SET_FLAG(result, 1, event_level >= category->current_log_level);
+				SET_BIT(result, 1, event_level >= category->current_log_level);
 			}
 		}
 	}

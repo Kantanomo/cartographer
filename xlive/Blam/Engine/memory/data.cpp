@@ -82,7 +82,7 @@ data_array* data_new(
 	if (result)
 	{
 		data_initialize(result, data_name, maximum_count, size, alignment_bits, allocator);
-		SET_FLAG(result->flags, 2, true);
+		SET_BIT(result->flags, 2, true);
 	}
 
 	return result;

@@ -507,7 +507,7 @@ void setCustomLanguage(int main, int variant) {
 	
 	setGameLanguage();
 
-	s_main_game_globals* game_globals = get_main_game_globals();
+	game_globals_storage* game_globals = get_main_game_globals();
 	if (game_globals) {
 		game_globals->options.game_mode = _game_mode_campaign;
 		BYTE& QuitLevel = *(BYTE*)((char*)Memory::GetAddress() + 0x482251);

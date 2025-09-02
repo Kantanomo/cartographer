@@ -122,14 +122,14 @@ extern bool g_catch_exceptions;
 #define FLAG(bit) ( (unsigned)1 << (unsigned)(bit) )
 #define TEST_BIT(flags, bit)( ((flags) & FLAG(bit)) != 0 )
 #define TEST_FLAG(flag, flags)( ((flag) & (flags)) != 0 )
-#define SET_FLAG(flags, bit, value)( (value) ? ((flags) |= FLAG(bit)) : ((flags) &= ~FLAG(bit)) )
+#define SET_BIT(flags, bit, value)( (value) ? ((flags) |= FLAG(bit)) : ((flags) &= ~FLAG(bit)) )
 #define SWAP_FLAG(flags, bit)			( (flags) ^=FLAG(bit) )
 #define FLAG_RANGE(first_bit, last_bit)	( (FLAG( (last_bit)+1 - (first_bit) )-1) << (first_bit) )
 
 #define BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT) (((BIT_COUNT) + (LONG_BITS - 1)) / LONG_BITS)
 #define BIT_VECTOR_SIZE_IN_BYTES(BIT_COUNT) (4 * BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT))
 #define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1))))
-#define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_FLAG(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1)), ENABLE))
+#define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_BIT(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1)), ENABLE))
 
 // Creates a bitmask that sets every bit between (bit) - 1 and bit 0 to 1
 // It does this by taking the FLAG value of bit - 1 and using logical OR on it with one of two choices:

@@ -22,7 +22,7 @@ typedef void(__cdecl* activation_proc_t)(s_game_cluster_bit_vectors*, s_game_clu
 
 /* structures */
 
-struct s_main_game_globals
+struct game_globals_storage
 {
 	bool initializing;
 	bool map_active;
@@ -46,7 +46,7 @@ struct s_main_game_globals
 	WORD pvs_object_is_set;		// If it's 2 then it's set but if it's 1 or 0 then it's not?
 	datum pvs_object_datum;
 };
-ASSERT_STRUCT_SIZE(s_main_game_globals, 0x1270);
+ASSERT_STRUCT_SIZE(game_globals_storage, 0x1270);
 
 struct s_game_systems
 {
@@ -78,7 +78,7 @@ void game_apply_pre_winmain_patches(void);
 
 s_game_systems* get_game_systems(void);
 
-s_main_game_globals* get_main_game_globals(void);
+game_globals_storage* get_main_game_globals(void);
 
 bool map_initialized(void);
 s_game_options* game_options_get(void);
@@ -94,6 +94,11 @@ bool game_in_progress(void);
 bool game_is_active(void);
 bool game_is_predicted(void);
 bool game_is_distributed(void);
+
+e_game_simulation game_simulation_get(void);
+
+bool game_is_networked(void);
+
 bool game_is_server(void);
 bool game_is_playback(void);
 bool game_is_authoritative(void);

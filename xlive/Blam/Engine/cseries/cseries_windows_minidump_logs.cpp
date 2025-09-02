@@ -355,7 +355,7 @@ static void setup_game_global_text(const wchar_t* reports_path)
 
 	FILE* file;
 	errno_t error = _wfopen_s(&file, report_info_path_game_globals->get_string(), L"w+");
-	const s_main_game_globals* game_globals = get_main_game_globals();
+	const game_globals_storage* game_globals = get_main_game_globals();
 	if (!error && file != NULL && game_globals != NULL)
 	{
 

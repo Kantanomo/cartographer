@@ -65,7 +65,7 @@ bool simulation_queue_game_global_event_requires_cutoff(const s_simulation_queue
 	return result;
  }
 
-void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, const simulation_update* update)
+void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, const struct simulation_update* update)
 {
 	e_simulation_queue_global_event_type type;
 	if (simulation_queue_game_global_event_decode(element, &type))
@@ -133,7 +133,7 @@ void simulation_queue_player_event_apply(const s_simulation_queue_element* eleme
 		player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 		if (TEST_BIT(player->flags, 0) != active)
 		{
-			SET_FLAG(player->flags, 0, active);
+			SET_BIT(player->flags, 0, active);
 			if (active)
 			{
 				game_engine_player_activated(player_index);
