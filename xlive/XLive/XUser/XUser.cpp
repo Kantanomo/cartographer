@@ -9,81 +9,84 @@
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
-bool signInChanged[4];
-XUSER_SIGNIN_INFO usersSignInInfo[4];
+bool g_xXUserSignInChanged[4];
+static XUSER_SIGNIN_INFO g_xUserSignInInfo[4];
 
-bool UserSignInChanged()
+XUSER_SIGNIN_INFO* XUserGetSignInInfo(DWORD dwUserIndex)
+{
+	return &g_xUserSignInInfo[dwUserIndex];
+}
+
+bool XUserSignInChanged()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		if (signInChanged[i])
+		if (g_xXUserSignInChanged[i])
 			return true;
 	}
 	return false;
 }
 
-bool UserSignedIn(DWORD dwUserIndex)
+bool XUserSignedIn(DWORD dwUserIndex)
 {
-	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInLocally
-		|| usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInToLive)
-		return true;
+	XUSER_SIGNIN_INFO* userInfo = XUserGetSignInInfo(dwUserIndex);
 
-	return false;
+	bool result = userInfo->UserSigninState == eXUserSigninState_SignedInLocally
+		|| userInfo->UserSigninState == eXUserSigninState_SignedInToLive;
+
+	return result;
 }
 
-bool UserSignedInLocally(DWORD dwUserIndex)
+bool XUserSignedInLocally(DWORD dwUserIndex)
 {
-	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInLocally)
-		return true;
-
-	return false;
+	XUSER_SIGNIN_INFO* userInfo = XUserGetSignInInfo(dwUserIndex);
+	return userInfo->UserSigninState == eXUserSigninState_SignedInLocally;
 }
 
-bool UserSignedOnline(DWORD dwUserIndex)
+bool XUserSignedOnline(DWORD dwUserIndex)
 {
-	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInToLive)
-		return true;
-
-	return false;
+	XUSER_SIGNIN_INFO* userInfo = XUserGetSignInInfo(dwUserIndex);
+	return userInfo->UserSigninState == eXUserSigninState_SignedInToLive;
 }
 
-XUSER_SIGNIN_INFO* UserGetSignInInfo(DWORD dwUserIndex)
-{
-	if (dwUserIndex != 0)
-		dwUserIndex = 0;
-
-	return &usersSignInInfo[dwUserIndex];
-}
-
-void XUserSetupGuests(XUID primary_xuid,bool online)
+void XUserSetupGuests(XUID primary_xuid, bool online)
 {
 	for (DWORD dwUserIndex = 1; dwUserIndex < 4; dwUserIndex++)
 	{
 		if (online)
 		{
-			usersSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED | XUSER_INFO_FLAG_GUEST;
-			usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInToLive;
+			g_xUserSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED | XUSER_INFO_FLAG_GUEST;
+			g_xUserSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInToLive;
 			// primary_xuid in ONLINE is sure to have last 2 bits 0
 			// we can just use OR operator to append the guest_index to make them different
 			// this is then used to create online_guest_names which are tied to this guest_index
-			usersSignInInfo[dwUserIndex].xuid = primary_xuid | dwUserIndex;
+			g_xUserSignInInfo[dwUserIndex].xuid = primary_xuid | dwUserIndex;
 		}
 		else
 		{
-			usersSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_GUEST;
-			usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInLocally;
+			g_xUserSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_GUEST;
+			g_xUserSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInLocally;
 			// primary_xuid in OFFLINE is returned by rand() and we have no idea which bits are set
 			// in this case we will just add the local_user_index to make the xuids slightly different
 			// offline_guest_names are determined by profile names so it doesnt matter what we set the xuid as
-			usersSignInInfo[dwUserIndex].xuid = primary_xuid + dwUserIndex;
+			g_xUserSignInInfo[dwUserIndex].xuid = primary_xuid + dwUserIndex;
 		}
 
-		usersSignInInfo[dwUserIndex].dwGuestNumber = dwUserIndex;
-		usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
+		g_xUserSignInInfo[dwUserIndex].dwGuestNumber = dwUserIndex;
+		g_xUserSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 	}
 }
 
-void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline, bool online)
+void XUserSetup(
+	DWORD dwUserIndex,
+	XUID xuid,
+	const char* userName,
+	unsigned long xnaddr,
+	unsigned long lanaddr,
+	unsigned short baseport,
+	const char* abEnet,
+	const char* abOnline,
+	bool online)
 {
 	// GFWL supports only 1 user logged in at the time
 	if (dwUserIndex != 0)
@@ -91,21 +94,21 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned lon
 
 	if (online)
 	{
-		usersSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED;
-		usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInToLive;
-		strncpy_s(usersSignInInfo[dwUserIndex].szUserName, userName, strnlen_s(userName, XUSER_MAX_NAME_LENGTH));
+		g_xUserSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED;
+		g_xUserSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInToLive;
+		strncpy_s(g_xUserSignInInfo[dwUserIndex].szUserName, userName, strnlen_s(userName, XUSER_MAX_NAME_LENGTH));
 		GetAchievements(xuid);
 	}
 	else
 	{
-		usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInLocally;
+		g_xUserSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInLocally;
 	}
 
-	usersSignInInfo[dwUserIndex].xuid = xuid;
-	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
-	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
+	g_xUserSignInInfo[dwUserIndex].xuid = xuid;
+	g_xUserSignInInfo[dwUserIndex].dwGuestNumber = 0;
+	g_xUserSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 
-	//fixes guest_signins
+	// fixes guest_signins
 	XUserSetupGuests(xuid, online);
 
 	gXnIpMgr.SetupLocalConnectionInfo(xnaddr, lanaddr, baseport, abEnet, abOnline);
@@ -113,16 +116,16 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned lon
 
 void XUserSignInSetStatusChanged(DWORD dwUserIndex)
 {
-	signInChanged[dwUserIndex] = true;
+	g_xXUserSignInChanged[dwUserIndex] = true;
 }
 
 void XUserSignOut(DWORD dwUserIndex)
 {
 	// clear user sign in
-	SecureZeroMemory(&usersSignInInfo[dwUserIndex], sizeof(XUSER_SIGNIN_INFO));
+	SecureZeroMemory(&g_xUserSignInInfo[dwUserIndex], sizeof(XUSER_SIGNIN_INFO));
 	// clear connection data
 	gXnIpMgr.UnregisterLocalConnectionInfo();
-	signInChanged[dwUserIndex] = true;
+	g_xXUserSignInChanged[dwUserIndex] = true;
 }
 
 // #5261: XUserGetXUID
@@ -136,10 +139,10 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 
 	memset(pXuid, 0, sizeof(XUID));
 
-	if (!UserSignedIn(dwUserIndex))
+	if (!XUserSignedIn(dwUserIndex))
 		return ERROR_NOT_LOGGED_ON;
 
-	*pXuid = usersSignInInfo[dwUserIndex].xuid;
+	*pXuid = g_xUserSignInInfo[dwUserIndex].xuid;
 	return ERROR_SUCCESS;
 }
 
@@ -150,30 +153,32 @@ XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
-	XUSER_SIGNIN_STATE ret;
-	const char* state;
+	XUSER_SIGNIN_STATE result;
+	const char* signInStateStr;
 
-	switch (usersSignInInfo[dwUserIndex].UserSigninState)
+	XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
+
+	switch (signedInUser->UserSigninState)
 	{
 	case eXUserSigninState_SignedInToLive:
-		ret = eXUserSigninState_SignedInToLive;
-		state = "Online";
+		result = eXUserSigninState_SignedInToLive;
+		signInStateStr = "Online";
 		break;
 
 	case eXUserSigninState_SignedInLocally:
-		ret = eXUserSigninState_SignedInLocally;
-		state = "Local profile";
+		result = eXUserSigninState_SignedInLocally;
+		signInStateStr = "Local profile";
 		break;
 
 	case eXUserSigninState_NotSignedIn:
 	default:
-		ret = eXUserSigninState_NotSignedIn;
-		state = "Not signed in";
+		result = eXUserSigninState_NotSignedIn;
+		signInStateStr = "Not signed in";
 		break;
 	}
 
-	LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninState() - {}", state);
-	return ret;
+	LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninState() - {}", signInStateStr);
+	return result;
 }
 
 
@@ -187,9 +192,11 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
-	if (usersSignInInfo[dwUserIndex].UserSigninState != eXUserSigninState_NotSignedIn)
+	XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
+
+	if (signedInUser->UserSigninState != eXUserSigninState_NotSignedIn)
 	{
-		strncpy_s(szUserName, cchUserName, usersSignInInfo[dwUserIndex].szUserName, strnlen_s(usersSignInInfo[dwUserIndex].szUserName, XUSER_MAX_NAME_LENGTH));
+		strncpy_s(szUserName, cchUserName, signedInUser->szUserName, strnlen_s(signedInUser->szUserName, XUSER_MAX_NAME_LENGTH));
 		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetName  (userIndex = {}, userName = {}, cchUserName = {})", dwUserIndex, szUserName, cchUserName);
 
 		return ERROR_SUCCESS;
@@ -206,6 +213,8 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
+	XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
+
 	if (pSigninInfo == NULL)
 		return ERROR_INVALID_PARAMETER;
 
@@ -217,9 +226,9 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 
 	memset(pSigninInfo, 0, sizeof(XUSER_SIGNIN_INFO));
 
-	if (usersSignInInfo[dwUserIndex].UserSigninState != eXUserSigninState_NotSignedIn)
+	if (signedInUser->UserSigninState != eXUserSigninState_NotSignedIn)
 	{
-		*pSigninInfo = usersSignInInfo[dwUserIndex];
+		*pSigninInfo = *signedInUser;
 		return ERROR_SUCCESS;
 	}
 	else
@@ -377,7 +386,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
-	if (!UserSignedOnline(dwUserIndex))
+	if (!XUserSignedOnline(dwUserIndex))
 		return ERROR_NOT_FOUND;
 
 	BOOL async = pOverlapped != NULL;

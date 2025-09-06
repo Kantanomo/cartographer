@@ -482,7 +482,6 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 			//show select profile gui
 			extern int notify_xlive_ui;
 			notify_xlive_ui = 0;
-			H2Config_master_ip = inet_addr("127.0.0.1");
 			XUserSignInSetStatusChanged(0);
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}

@@ -25,9 +25,11 @@ DWORD WINAPI XStorageBuildServerPath(DWORD dwUserIndex, XSTORAGE_FACILITY Storag
 		size_t required_count;
 		_wgetenv_s(&required_count, userprofile, L"USERPROFILE");
 
+		XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
+
 		std::wstring itemName(pwszItemName);
 		std::wstring path(userprofile);
-		std::wstring xuidAsString = std::to_wstring(usersSignInInfo[dwUserIndex].xuid);
+		std::wstring xuidAsString = std::to_wstring(signedInUser->xuid);
 
 		path += L"\\AppData\\Local\\Microsoft\\Halo 2\\XLive\\";
 		path += xuidAsString;
@@ -148,6 +150,8 @@ DWORD WINAPI XStorageDownloadToMemory(DWORD dwUserIndex,
 	GetSystemTime(&systemTime);
 	SystemTimeToFileTime(&systemTime, &fileTime);
 
+	XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
+
 	errno_t err = _wfopen_s(&fp, wszServerPath, L"rb");
 	if (err)
 	{
@@ -191,7 +195,7 @@ DWORD WINAPI XStorageDownloadToMemory(DWORD dwUserIndex,
 
 	pResults->dwBytesTotal = size;
 	pResults->ftCreated = fileTime;
-	pResults->xuidOwner = usersSignInInfo[dwUserIndex].xuid;
+	pResults->xuidOwner = signedInUser->xuid;
 
 	LOG_TRACE_XLIVE("- Read total bytes = {}", pResults->dwBytesTotal);
 

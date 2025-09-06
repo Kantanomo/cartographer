@@ -10,6 +10,8 @@
 #define XNIP_MAX_PCK_STR_HDR_LEN 32
 #define XNIP_MAX_NET_STATS_SAMPLES 30
 
+#define XNIP_QOS_PORT_OFFSET 10
+
 enum 
 {
 	EXNIP_PACKET_SIGNATURE_XNET_REQUEST		= 'XNeT',
@@ -486,6 +488,8 @@ public:
 
 	// local network address
 	static XnIp* GetLocalUserXn();
+	static u_short GetQoSPort();
+
 	static void UnregisterLocalConnectionInfo();
 	static void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* machineUID, const char* abOnline);
 

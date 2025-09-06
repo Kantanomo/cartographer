@@ -33,8 +33,6 @@ enum e_display_split_type : uint32;
 extern bool g_force_cartographer_update;
 extern bool g_h2_portable;
 
-extern unsigned long H2Config_master_ip;
-
 extern unsigned short H2Config_base_port;
 extern unsigned long H2Config_ip_lan;
 extern unsigned long H2Config_ip_broadcast_override;

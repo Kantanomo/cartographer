@@ -29,7 +29,7 @@ bool c_screen_press_start_introduction::handle_event(s_event_record* event)
 CLASS_HOOK_DECLARE_LABEL(c_screen_press_start_introduction__initialize, c_screen_press_start_introduction::initialize);
 void c_screen_press_start_introduction::initialize(s_screen_parameters* parameters)
 {
-	if (UserSignedIn(0)) {
+	if (XUserSignedIn(0)) {
 		XUserSignOut(0);
 		UpdateMasterLoginStatus();
 	}

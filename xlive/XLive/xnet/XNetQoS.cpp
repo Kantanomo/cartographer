@@ -35,7 +35,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 			TEST_N_DEF(XL8);
 
 			char port[8];
-			sprintf_s(port, "%d", ntohs(xn->wPortOnline) + k_xnet_qos_port_offset);
+			sprintf_s(port, "%d", ntohs(xn->wPortOnline) + XNIP_QOS_PORT_OFFSET);
 			const char* addr = inet_ntoa(target_ip);
 
 			//	LOG_TRACE_NETWORK_N("[XNetQoSLookup] QoSLookup, addr={0}, port={1}", addr.c_str(), prt.c_str());
@@ -328,7 +328,7 @@ void CXNetQoS::Listener()
 
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_addr.s_addr = htonl(INADDR_ANY); // anyone can connect
-		serverAddr.sin_port = htons(H2Config_base_port + k_xnet_qos_port_offset);
+		serverAddr.sin_port = XnIpManager::GetQoSPort();
 
 		DWORD dwBytes = 0;
 		GUID GuidAcceptEx = WSAID_ACCEPTEX;

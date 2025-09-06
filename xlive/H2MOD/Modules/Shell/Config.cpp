@@ -39,8 +39,6 @@ static const char* k_default_base_port_string = "2000";
 bool g_force_cartographer_update = false;
 bool g_h2_portable = false;
 
-unsigned long H2Config_master_ip = inet_addr("149.56.81.89");
-
 // config variables
 
 uint16 H2Config_base_port = k_default_base_port;

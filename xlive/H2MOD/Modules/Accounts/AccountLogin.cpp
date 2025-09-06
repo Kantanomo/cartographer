@@ -15,7 +15,6 @@
 
 const char k_login_code_secondary_string[] = "login_code_secondary=";
 const char k_login_external_addr_string[] = "login_external_addr=";
-const char k_login_master_relay_ip_string[] = "login_master_relay_ip=";
 const char k_login_token_string[] = "login_token=";
 const char k_login_username_string[] = "login_username=";
 const char k_login_ab_online_string[] = "login_abOnline=";
@@ -59,13 +58,13 @@ void UpdateMasterStatus(int new_state, const char* state_str, ...)
 
 void UpdateMasterLoginStatus(bool developer) {
 	
-	if (UserSignedOnline(0)) {
+	if (XUserSignedOnline(0)) {
 		const char* statusStr = "Status: Online";
 		if (developer)
 			statusStr = "Status: Developer";
 		UpdateMasterStatus(10, statusStr);
 	}
-	else if (UserSignedInLocally(0)) {
+	else if (XUserSignedInLocally(0)) {
 		UpdateMasterStatus(2, "Status: Locally signed in");
 	}
 	else {
@@ -206,31 +205,6 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE) {
 				xnaddr = resolvedAddr;
-			}
-		}
-		else if (strstr(fileLine, k_login_master_relay_ip_string)) {
-			char* tempName = fileLine + NUMBEROF(k_login_master_relay_ip_string) - 1;
-			while (isspace(*tempName)) {
-				tempName++;
-			}
-			snprintf(tempstr1, 128 + 1, tempName);
-			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
-				if (isspace(tempstr1[j])) {
-					tempstr1[j] = 0;
-				}
-				else {
-					break;
-				}
-			}
-			unsigned long resolvedAddr;
-			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE || strcmp(tempstr1, "255.255.255.255") == 0) {
-				//addDebugText("H2 master relay IP is: %s", tempstr1);
-				H2Config_master_ip = resolvedAddr;
-			}
-		}
-		else if (sscanf_s(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
-			if (tempint1 >= 0) {
-				//addDebugText("H2 master relay port is: %d", tempint1);
 			}
 		}
 		else if (strstr(fileLine, k_login_token_string)) {
@@ -484,13 +458,13 @@ HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD d
 	addDebugText("Logging the Dedi Server in...");
 
 	// clear LAN login info if we are logged in locally
-	if (UserSignedInLocally(0))
+	if (XUserSignedInLocally(0))
 	{
 		XUserSignOut(0);
 	}
 
 	// if we are not signed in online, sign us in
-	if (!UserSignedOnline(0))
+	if (!XUserSignedOnline(0))
 	{
 		//none of that stuff is setup for the dedi server yet since there are no gui commands for it.
 		//currently credentials are taken from the config file.

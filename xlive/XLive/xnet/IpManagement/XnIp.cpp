@@ -363,6 +363,11 @@ XnIp* XnIpManager::GetLocalUserXn()
 	return &m_ipLocal;
 }
 
+u_short XnIpManager::GetQoSPort()
+{
+	return htons(ntohs(GetLocalUserXn()->m_xnaddr.wPortOnline) + XNIP_QOS_PORT_OFFSET);
+}
+
 void XnIpManager::HandleXNetRequestPacket(XVirtualSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount)
 {
 	IN_ADDR connectionIdentifier;
