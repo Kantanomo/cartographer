@@ -73,11 +73,11 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 		}
 	}
 
-	HWND g_window_handle = *shell_windows_get_hwnd();
+	const s_window_globals* window_globals = window_globals_get();
 
 	if (input_handled
-		&& g_window_handle == GetFocus()
-		&& g_window_handle == GetForegroundWindow()
+		&& window_globals->hWnd == GetFocus()
+		&& window_globals->hWnd == GetForegroundWindow()
 		&& !main_time_is_throttled())
 	{
 		if ((input_globals->field7D8 & 1) == 0)

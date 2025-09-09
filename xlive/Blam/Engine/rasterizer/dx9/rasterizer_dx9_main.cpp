@@ -481,9 +481,11 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 	csmemmove(&rasterizer_globals->clipping_parameters.parameters, parameters, sizeof(s_rasterizer_parameters));
 
 	const bool is_fullscreen = rasterizer_globals->display_parameters.window_mode == _rasterizer_window_mode_real_fullscreen;
+	const s_window_globals* window_globals = window_globals_get();
+
 
 	D3DPRESENT_PARAMETERS d3d_present_parameters = {};
-	d3d_present_parameters.hDeviceWindow = *shell_windows_get_hwnd();
+	d3d_present_parameters.hDeviceWindow = window_globals->hWnd;
 	//rasterizer_globals->display_parameters.backbuffer_format = D3DFMT_A8R8G8B8;
 	d3d_present_parameters.BackBufferFormat = rasterizer_globals->display_parameters.backbuffer_format;
 	d3d_present_parameters.Windowed = !is_fullscreen;
@@ -1019,11 +1021,10 @@ static void __cdecl display_blackness_window(void)
 static HWND __cdecl rasterizer_dx9_create_main_window(void)
 {
 	//return INVOKE(0x26101B, 0x0, rasterizer_dx9_create_main_window);
-	
-	HWND* g_hwnd = shell_windows_get_hwnd();
+	s_window_globals* window_globals = window_globals_get();
 
 	bool success = true;
-	if (!*g_hwnd)
+	if (!window_globals->hWnd)
 	{
 		s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 		const int16 width = rectangle2d_width(&rasterizer_globals->screen_bounds);
@@ -1038,7 +1039,7 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 		WNDCLASSEXW wnd_class = {};
 		wnd_class.cbSize = sizeof(WNDCLASSEXW);
 		wnd_class.style = CS_VREDRAW | CS_HREDRAW | CS_CLASSDC;
-		wnd_class.lpfnWndProc = g_wndproc_procedure;
+		wnd_class.lpfnWndProc = window_globals->wnd_proc;
 		wnd_class.cbClsExtra = 0;
 		wnd_class.cbWndExtra = 0;
 		wnd_class.hInstance = *Memory::GetAddress<HINSTANCE*>(0x46D9C0);
@@ -1046,7 +1047,7 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 		wnd_class.hCursor = LoadCursorA(0, (LPCSTR)0x7F00);
 		wnd_class.hbrBackground = 0;
 		wnd_class.lpszMenuName = 0;
-		wnd_class.lpszClassName = g_window_classname;
+		wnd_class.lpszClassName = window_globals->class_name;
 		wnd_class.hIconSm = 0;
 		const ATOM window_class = RegisterClassExW(&wnd_class);
 		success = window_class != 0;
@@ -1088,10 +1089,12 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 
 			DWORD style = 0;
 			DWORD window_flags = rasterizer_settings_get_window_flags(rasterizer_globals->display_parameters.window_mode, &style);
-			const HWND window_handle = CreateWindowExW(style, g_window_classname, g_window_name, window_flags, 0, 0, width, height, GetDesktopWindow(), 0, wnd_class.hInstance, 0);
+
+
+			const HWND window_handle = CreateWindowExW(style, window_globals->class_name, window_globals->window_name, window_flags, 0, 0, width, height, GetDesktopWindow(), 0, wnd_class.hInstance, 0);
 			success = !window_handle ? false : success;
 			
-			*g_hwnd = window_handle;
+			window_globals->hWnd = window_handle;
 
 			if (success)
 			{
@@ -1125,9 +1128,9 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 				success = pos_result;
 				if (success)
 				{
-					ShowWindow(window_handle, g_cmd_show);
-					SetForegroundWindow(*g_hwnd);
-					SetFocus(*g_hwnd);
+					ShowWindow(window_handle, window_globals->show_cmd);
+					SetForegroundWindow(window_globals->hWnd);
+					SetFocus(window_globals->hWnd);
 				}
 			}
 		}
@@ -1142,7 +1145,7 @@ static HWND __cdecl rasterizer_dx9_create_main_window(void)
 		}
 	}
 
-	return (success ? *g_hwnd : 0);
+	return (success ? window_globals->hWnd : 0);
 }
 
 static void rasterizer_dx9_prime_shader_initialize(void)
