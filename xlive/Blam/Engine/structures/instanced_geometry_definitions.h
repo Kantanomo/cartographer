@@ -4,7 +4,6 @@
 
 #include "geometry/geometry_block.h"
 #include "geometry/geometry_definitions_new.h"
-#include "math/matrix_math.h"
 #include "physics/collision_model_definitions.h"
 
 #define k_maximum_instance_geometry_instances_per_structure_bsp 1024

@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "upnp.h"
 
+#include "H2MOD/Modules/Shell/Config.h"
+
+#include <Xlive/xnet/XNetQoS.h>
+
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
-
-#include "Xlive/xnet/XNetQoS.h"
-#include "H2MOD/Modules/Shell/Config.h"
 
 /* Ripped from ED thanks guys - PermaNull*/
 ModuleUPnP::ModuleUPnP()

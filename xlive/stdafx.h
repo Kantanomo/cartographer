@@ -70,7 +70,7 @@
 #include <random>
 #include <numeric>
 #include <unordered_map>
-#include <filesystem>
+#include <chrono>
 
 #include <d3d9.h>
 #include <d3dx9.h>
@@ -122,5 +122,3 @@ extern std::random_device rd;
 	namespace _time_name = std::chrono; \
 	using _clock_name = std::chrono::steady_clock; \
 	using namespace std::chrono_literals;
-
-#undef small

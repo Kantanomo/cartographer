@@ -1,7 +1,10 @@
 #pragma once
 #include "game/player_constants.h"
 
-#define k_maximum_multiplayer_players k_maximum_players
+enum
+{
+	k_maximum_multiplayer_players = k_maximum_players
+};
 
 struct s_simulation_game_engine_player_creation_data
 {

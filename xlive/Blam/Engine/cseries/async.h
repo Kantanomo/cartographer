@@ -14,4 +14,6 @@ ASSERT_STRUCT_SIZE(s_async_completion, 2060);
 
 void __cdecl async_initialize(void);
 
+void async_idle(void);
+
 void __cdecl async_yield_until_done(s_async_completion* completion, bool play_sound);

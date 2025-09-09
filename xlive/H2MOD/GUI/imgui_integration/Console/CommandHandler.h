@@ -5,7 +5,6 @@
 #include "CommandsUtil.h"
 #include "ComVar.h"
 
-class ConsoleCommand;
 struct ConsoleCommandCtxData;
 typedef int CommandFlags;
 
@@ -17,7 +16,7 @@ typedef int(__cdecl TextOutputCb)(StringHeaderFlags strFlags, const char* fmt, .
 struct ConsoleCommandCtxData
 {
 	TextOutputCb* outputCb;
-	const ConsoleCommand* consoleCommand;
+	const class ConsoleCommand* consoleCommand;
 };
 
 enum CommandFlags_
