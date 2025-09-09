@@ -31,11 +31,11 @@ real32 projectile_get_update_tick_length(datum projectile_datum_index, bool proj
 		&& (projectile_instant_update || *(uint32*)(object_data + 428) == game_time_get())) // also check if the projectile is updated twice in the same tick
 	{
 		//LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
-		return game_tick_length() * ((real32)time_globals::get()->ticks_per_second / 30.f);
+		return game_tick_length() * ((real32)game_tick_rate() / 30.f);
 	}
 	else
 	{
-		//LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get_tickrate());
+		//LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, s_time_globals::get_tickrate());
 		return game_tick_length();
 	}
 }

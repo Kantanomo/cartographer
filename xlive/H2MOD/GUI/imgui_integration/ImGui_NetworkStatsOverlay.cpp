@@ -129,7 +129,7 @@ void ShowNetworkStatsOverlay(bool* p_open)
 		// ImGui::Text("Object count from iter: %d", object_count_from_iter());
 		// ImGui::Text("Object to interpolate count: %d", ObjectInterpolate::GetObjectInterpolateCount());
 
-		ImGui::Text("Game tick fraction leftover: %.5f", time_globals::get_ticks_fraction_leftover());
+		ImGui::Text("Game tick fraction leftover: %.5f", game_time_get_leftover());
 
 		// s_player_effect_user_globals* user_effect = player_effects_get_user_globals(0);
 

@@ -115,7 +115,7 @@ namespace CustomVariantSettings
 		//
 		//Anything to be done on host and client goes here.
 		//
-		time_globals::get()->game_speed = newVariantSettings->gameSpeed;
+		game_time_set_speed(newVariantSettings->gameSpeed);
 		s_physics_constants::get()->gravity = newVariantSettings->gravity * s_physics_constants::get_default_gravity();
 		//mov [ecx+6], ax
 		static BYTE InfiniteAmmoMagazineASM[] = { 0x66, 0x89, 0x41, 0x06 };

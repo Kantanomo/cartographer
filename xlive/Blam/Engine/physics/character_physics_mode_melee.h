@@ -36,7 +36,7 @@ struct alignas(4) c_character_physics_mode_melee_datum
 {
 	int m_time_to_target_in_ticks;
 	int m_melee_tick;
-	int m_maximum_counter;
+	int32 m_maximum_counter;
 	bool m_weapon_is_sword;
 	bool m_has_target;
 	bool field_E;

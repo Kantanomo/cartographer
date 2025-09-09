@@ -3,7 +3,6 @@
 
 #include "cache/cache_files.h"
 #include "items/weapon_definitions.h"
-#include "game/game_time.h"
 
 const H2X::h2x_mod_info weapons[] =
 {
@@ -20,6 +19,7 @@ const H2X::h2x_mod_info weapons[] =
 	{ "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", 10.0f, 11.0f, 0, true }
 };
 
+/*
 float __cdecl game_seconds_to_ticks_real_weapon_adjust(float s)
 {
 	// if the recovery time set in the tags isn't at least game's seconds per tick (i.e. 1/tickrate seconds) or a multiple of it,
@@ -30,10 +30,11 @@ float __cdecl game_seconds_to_ticks_real_weapon_adjust(float s)
 
 	float tick_difference = 0.0f;
 	if (trunc(s) != s)
-		tick_difference = MAX(time_globals::get_ticks_difference_real() - 1.0f, 0.0f);
-	float seconds_to_ticks_adjusted = (float)time_globals::get()->ticks_per_second * s + tick_difference;
+		tick_difference = MAX(s_time_globals::get_ticks_difference_real() - 1.0f, 0.0f);
+	float seconds_to_ticks_adjusted = (float)s_time_globals::get()->tick_rate * s + tick_difference;
 	return seconds_to_ticks_adjusted;
 }
+*/
 
 void H2X::ApplyMapLoadPatches(bool enable)
 {

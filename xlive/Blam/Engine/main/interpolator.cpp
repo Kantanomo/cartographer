@@ -24,8 +24,6 @@ s_interpolation_data* g_frame_data_intermediate = NULL;
 
 /* prototypes */
 
-static real32 halo_interpolator_get_interpolation_time_internal(void);
-
 static object_datum* halo_interpolator_object_can_interpolate(datum object_index, int32* out_abs_object_index);
 
 static void halo_interpolator_interpolate_position_data(int32 user_index, uint32 position_index, real_point3d* position);
@@ -85,13 +83,13 @@ void halo_interpolator_set_state(bool enabled)
 
 void halo_interpolator_update_delta(void)
 {
-	g_interpolator_delta = halo_interpolator_get_interpolation_time_internal();
+	g_interpolator_delta = game_time_get_leftover();
 	return;
 }
 
 real32 halo_interpolator_get_interpolation_time(void)
 {
-	return (g_interpolation_update_in_progress ? 0.f : halo_interpolator_get_interpolation_time_internal());
+	return (g_interpolation_update_in_progress ? 0.f : game_time_get_leftover());
 }
 
 void halo_interpolator_reset(void)
@@ -552,11 +550,6 @@ bool halo_interpolator_interpolate_position_backwards(int32 user_index, uint32 p
 }
 
 /* private code */
-
-static real32 halo_interpolator_get_interpolation_time_internal(void)
-{
-	return MAX(0.0f, MIN(time_globals::get_ticks_fraction_leftover(), 1.0f));
-}
 
 static object_datum* halo_interpolator_object_can_interpolate(datum object_index, int32* out_abs_object_index)
 {

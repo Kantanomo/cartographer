@@ -599,7 +599,7 @@ __declspec(naked) static void object_function_value_adjust_primary_firing(void)
 		fld seconds_trigger_hold
 		push eax
 		fstp dword ptr[esp]
-		call time_globals::seconds_to_ticks_real
+		call game_seconds_to_ticks_real
 		fstp dword ptr[esp]
 		cvttss2si esi, [esp]
 		add esp, 4
