@@ -47,8 +47,8 @@ struct s_render_layer_globals
 
 s_render_layer_globals* render_layer_globals_get(void);
 
-bool __cdecl prepare_render_layer(e_render_layer layer);
+bool __cdecl render_layer_begin(e_render_layer layer);
 
-void __cdecl draw_render_layer(void);
+void __cdecl render_layer_draw(void);
 
-void __cdecl reset_after_render_layer_draw(void);
+void __cdecl render_layer_end(void);

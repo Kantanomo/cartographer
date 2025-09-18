@@ -37,8 +37,6 @@ s_main_time_debug g_main_game_time_debug;
 
 /* prototypes */
 
-static real32 main_time_get_max_frame_time(void);
-
 static real32 main_time_get_delta_sec_precise(LARGE_INTEGER counter_now, LARGE_INTEGER freq);
 
 static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER freq);
@@ -94,8 +92,10 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 	if (fixed_time_step)
 	{
 		dt_sec = fixed_time_delta;
-		if (time_globals::available())
-			time_globals::get()->game_ticks_leftover = 0.0f;
+		if (game_time_initialized())
+		{
+			//time_globals::get()->game_ticks_leftover = 0.0f;
+		}
 	}
 	else
 	{
@@ -104,12 +104,12 @@ real32 __cdecl main_time_update(bool fixed_time_step, real32 fixed_time_delta)
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
 		if (should_limit_framerate())
 		{
-			if (time_globals::available())
+			if (game_time_initialized())
 			{
 				// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
 				// FIXED by interpolation: 
 				// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
-				const real32 desired_frame_time = main_time_get_max_frame_time();
+				const real32 desired_frame_time = game_time_get_max_frame_time();
 				while (dt_sec < desired_frame_time)
 				{
 					uint32 yield_time_msec = 0;
@@ -179,13 +179,6 @@ static bool __cdecl should_limit_framerate_hook()
 	}
 
 	return result;
-}
-
-static real32 main_time_get_max_frame_time(void)
-{
-	time_globals* time_globals = time_globals::get();
-	real32 result = time_globals->tick_length - (real32)(time_globals->game_ticks_leftover / (real32)time_globals->ticks_per_second);
-	return MAX(result, 0.0f);
 }
 
 static real32 main_time_get_delta_sec_precise(LARGE_INTEGER counter_now, LARGE_INTEGER freq)

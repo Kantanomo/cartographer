@@ -1,5 +1,4 @@
 #pragma once
-#include <miniupnpc/upnpdev.h>
 
 namespace Utils
 {
@@ -48,7 +47,7 @@ public:
 	Utils::UPnPResult UPnPForwardPort(bool tcp, int externalport, int internalport, const char* ruleName);
 private:
 	int upnpDiscoverError;
-	UPNPDev* upnpDevice = nullptr;
+	struct UPNPDev* upnpDevice = nullptr;
 };
 
 void ForwardPorts();

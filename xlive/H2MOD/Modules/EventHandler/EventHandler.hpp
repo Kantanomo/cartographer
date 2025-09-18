@@ -1,9 +1,5 @@
 #pragma once
 
-#include "kablam/kablam.h"
-#include "game/game_options.h"
-#include "networking/logic/life_cycle_manager.h"
-
 /*
  * To Setup a new Event you need to add an enum to EventType above the none enum
  * Then inside EventHandler you need to create a function alias type use the current ones as an example
@@ -28,19 +24,18 @@
 		execute_callback<callback_definition>(event_execution_type, event_type, std::forward<Args>(args) ...); \
 	} \
 
-enum class EventType
+enum EventType
 {
-	none = -1,
+	none = NONE,
 	network_player,
 	gamelifecycle_change,
 	game_loop,
 	server_command,
 	map_load,
 	countdown_start,
-	player_control,
 	blue_screen,
 	player_spawn,
-	object_damage
+	k_event_handler_type_count
 };
 
 enum class EventExecutionType
@@ -67,23 +62,22 @@ public:
 	}
 };
 
-extern std::map<EventType, std::vector<EventCallback>> event_map;
+extern std::vector<EventCallback> event_map[k_event_handler_type_count];
 
 namespace EventHandler
 {
 	enum class NetworkPlayerEventType
 	{
 		add,
-		remove
 	};
 
 	using CountdownStartEventCallback = void(*)();
-	using GameLifeCycleEventCallback = void(*)(e_game_life_cycle state);
+	using GameLifeCycleEventCallback = void(*)(enum e_game_life_cycle state);
 	using NetworkPlayerEventCallback = void(*)(int peerIndex, NetworkPlayerEventType type);
 	using GameLoopEventCallback = void(*)();
-	using ServerCommandEventCallback = void(*)(e_server_console_commands command);
+	using ServerCommandEventCallback = void(*)(enum e_server_console_commands command);
 	using PlayerControlEventCallback = void(*)(float* yaw, float* pitch);
-	using MapLoadEventCallback = void(*)(e_game_mode type);
+	using MapLoadEventCallback = void(*)(enum e_game_mode type);
 	using BlueScreenEventCallback = void(*)();
 	using PlayerSpawnEventCallback = void(*)(datum PlayerDatum);
 	using ObjectDamageEventCallback = void(*)(datum PlayerDatum, datum KillerDatum);
@@ -104,14 +98,10 @@ namespace EventHandler
 			return STRINGIFY(EventType::map_load);
 		case EventType::countdown_start:
 			return STRINGIFY(EventType::countdown_start);
-		case EventType::player_control:
-			return STRINGIFY(EventType::player_control);
 		case EventType::blue_screen:
 			return STRINGIFY(EventType::blue_screen);
 		case EventType::player_spawn:
 			return STRINGIFY(EventType::player_spawn);
-		case EventType::object_damage:
-			return STRINGIFY(EventType::object_damage);
 		case EventType::none:
 			return STRINGIFY(EventType::none);
 		default:
@@ -139,15 +129,7 @@ namespace EventHandler
 	 */
 	static std::vector<EventCallback>* get_vector(EventType type)
 	{
-		auto event = event_map.find(type);
-		if (event == event_map.end())
-		{
-			//If the map doesn't contain a vector for the type create one
-			event_map.emplace(std::make_pair(type, std::vector<EventCallback>()));
-			return &event_map[type];
-		}
-
-		return &event->second;
+		return &event_map[type];
 	}
 
 	/**
@@ -240,8 +222,6 @@ namespace EventHandler
 	REGISTER_EVENT_EXECUTE_METHOD(ServerCommandEventExecute, EventType::server_command, ServerCommandEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(MapLoadEventExecute, EventType::map_load, MapLoadEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(CountdownStartEventExecute, EventType::countdown_start, CountdownStartEventCallback);
-	REGISTER_EVENT_EXECUTE_METHOD(PlayerControlEventExecute, EventType::player_control, PlayerControlEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(BlueScreenEventExecute, EventType::blue_screen, BlueScreenEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(PlayerSpawnEventExecute, EventType::player_spawn, PlayerSpawnEventCallback);
-	REGISTER_EVENT_EXECUTE_METHOD(ObjectDamageEventExecute, EventType::object_damage, ObjectDamageEventCallback);
 }

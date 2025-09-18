@@ -15,7 +15,6 @@
 #include "networking/network_event.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 
 /* constants */
@@ -32,6 +31,12 @@ typedef void(__stdcall* t_handle_out_of_band_message)(c_network_message_handler*
 static void __stdcall handle_out_of_band_message_hook(c_network_message_handler* thisx, transport_address* address, e_network_message_type message_type, int32 a4, uint8* packet);
 static void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32 network_channel_index, e_network_message_type message_type, int32 message_storage_size, uint8* packet);
 
+CLASS_HOOK_DECLARE_LABEL(c_network_message_handler__handle_leave_session, c_network_message_handler::handle_leave_session);
+static __declspec(naked) void jmp_c_network_message_handler__handle_leave_session()
+{
+	CLASS_HOOK_JMP(c_network_message_handler__handle_leave_session, c_network_message_handler::handle_leave_session);
+}
+
 /* globals */
 
 t_read_channel_message p_read_channel_message;
@@ -43,6 +48,7 @@ void network_message_handler_apply_patches(void)
 {
 	p_read_channel_message = (t_read_channel_message)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1E929C, 0x1CB25C), (BYTE*)read_channel_message_hook, 8);
 	p_handle_out_of_band_message = (t_handle_out_of_band_message)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1E907B, 0x1CB03B), (BYTE*)handle_out_of_band_message_hook, 8);
+	WriteJmpTo(Memory::GetAddress(0x1E8D13, 0x1CACD3), jmp_c_network_message_handler__handle_leave_session);
 }
 
 /* private code */
@@ -121,18 +127,6 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 		}
 		break;
 	}
-
-	// default packet
-	case _network_message_type_leave_session:
-	{
-		if (peer_network_channel->is_channel_state_5()
-			&& peer_network_channel->get_network_address(&addr))
-		{
-			thisx->handle_leave_session(&addr, (s_network_message_session_data*)packet);
-		}
-		break; // don't return, leave the game to update state
-	}
-
 	default:
 		break;
 	} // switch (message_type)
@@ -149,7 +143,9 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 	}
 
 	if (!is_message_custom(message_type))
+	{
 		p_read_channel_message(thisx, network_channel_index, message_type, message_storage_size, packet);
+	}
 
 	switch (message_type)
 	{
@@ -204,6 +200,43 @@ void c_network_message_handler::register_observer(c_network_observer* observer)
 	ASSERT(observer);
 	ASSERT(m_observer == NULL);
 	m_observer = observer;
+	return;
+}
+
+void c_network_message_handler::handle_leave_session(const transport_address* address, const s_network_message_leave_session* received_data)
+{
+	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
+	if (session)
+	{
+		if (session->is_host())
+		{
+			if (!session->handle_leave_request(address))
+			{
+				event(
+					_event_warning,
+					"networking:messages:leave-session: can't handle leave-session request (%s) from '%s'",
+					transport_secure_identifier_get_string(&received_data->session_data.identifier),
+					transport_address_get_string(address)
+				);
+			}
+		}
+		else
+		{
+			event(
+				_event_warning,
+				"networking:messages:leave-session: ignoring leave-session from '%s' (not hosting)",
+				transport_address_get_string(address)
+			);
+		}
+	}
+	else
+	{
+		event(
+			_event_warning,
+			"networking:messages:leave-session: ignoring leave-session from '%s' (not hosting)",
+			transport_address_get_string(address)
+		);
+	}
 	return;
 }
 
@@ -320,21 +353,6 @@ void c_network_message_handler::handle_session_custom_variant_settings(const tra
 	}
 }
 
-void c_network_message_handler::handle_leave_session(const transport_address* address, const s_network_message_session_data* received_data)
-{
-	c_network_session* session = m_session_manager->get_session(&received_data->identifier);
-	if (session)
-	{
-		int32 sender_peer_index = session->get_peer_index_from_address(address);
-
-		if (sender_peer_index != NONE
-			&& !session->is_peer_local(sender_peer_index))
-		{
-			EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_before, sender_peer_index, EventHandler::NetworkPlayerEventType::remove);
-		}
-	}
-}
-
 void c_network_message_handler::handle_membership_update(const transport_address* address, int32 channel_index, const s_network_message_session_data* received_data)
 {
 	c_network_session* session = m_session_manager->get_session(&received_data->identifier);
@@ -357,8 +375,6 @@ void c_network_message_handler::handle_player_add(const transport_address* addre
 		if (sender_peer_index != NONE
 			&& !session->is_peer_local(sender_peer_index))
 		{
-			EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_after, sender_peer_index, EventHandler::NetworkPlayerEventType::add);
-
 			if (session->is_host())
 			{
 				network_message_cartographer_send_anti_cheat(sender_peer_index);

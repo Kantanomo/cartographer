@@ -48,6 +48,7 @@
 #include "main/main_game_time.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "networking/network_event.h"
 #include "networking/network_globals.h"
 #include "networking/network_utilities.h"
@@ -94,7 +95,6 @@
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
-#include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
@@ -358,7 +358,6 @@ void H2MOD::Initialize()
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MapSlots::Initialize();
-	HaloScript::Initialize();
 	ProjectileFix::ApplyPatches();
 	H2X::ApplyPatches();
 	h2mod_apply_hooks();
@@ -600,7 +599,7 @@ __declspec(naked) static void object_function_value_adjust_primary_firing(void)
 		fld seconds_trigger_hold
 		push eax
 		fstp dword ptr[esp]
-		call time_globals::seconds_to_ticks_real
+		call game_seconds_to_ticks_real
 		fstp dword ptr[esp]
 		cvttss2si esi, [esp]
 		add esp, 4

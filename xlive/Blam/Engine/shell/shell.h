@@ -44,14 +44,6 @@ enum e_shell_command_line_flags : int32
 	k_number_of_shell_command_line_flags
 };
 
-/* structures*/
-
-struct s_shell_build_version
-{
-	int32 version;
-	const char* string;
-};
-
 /* globals */
 
 

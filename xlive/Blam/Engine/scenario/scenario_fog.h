@@ -164,4 +164,4 @@ ASSERT_STRUCT_SIZE(s_scenario_planar_fog_palette_entry, 16);
 
 // CLIENT ONLY
 // Renders the fog defined in the scenario
-bool __cdecl render_scenario_fog(int32 cluster_index, render_camera* camera_position, real_vector3d* camera_forward, bool a4, bool render_fog, s_scenario_fog_result* result);
+bool __cdecl scenario_get_atmospheric_fog(int32 cluster_index, render_camera* camera_position, real_vector3d* camera_forward, bool a4, bool render_fog, s_scenario_fog_result* result);

@@ -9,31 +9,37 @@
 
 /* prototypes */
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__read_creation_from_packet, c_simulation_entity_database::read_creation_from_packet);
 static __declspec(naked) void jmp_c_simulation_entity_database__read_creation_from_packet()
 {
 	CLASS_HOOK_JMP(c_simulation_entity_database__read_creation_from_packet, c_simulation_entity_database::read_creation_from_packet);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__process_creation, c_simulation_entity_database::process_creation);
 static __declspec(naked) void jmp_c_simulation_entity_database__process_creation()
 {
 	CLASS_HOOK_JMP(c_simulation_entity_database__process_creation, c_simulation_entity_database::process_creation);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__read_update_from_packet, c_simulation_entity_database::read_update_from_packet);
 static __declspec(naked) void jmp_c_simulation_entity_database__read_update_from_packet()
 {
 	CLASS_HOOK_JMP(c_simulation_entity_database__read_update_from_packet, c_simulation_entity_database::read_update_from_packet);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__process_update, c_simulation_entity_database::process_update);
 static __declspec(naked) void jmp_c_simulation_entity_database__process_update()
 {
 	CLASS_HOOK_JMP(c_simulation_entity_database__process_update, c_simulation_entity_database::process_update);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__notify_mark_entity_for_deletion, c_simulation_entity_database::notify_mark_entity_for_deletion);
 static __declspec(naked) void jmp_c_simulation_entity_database__notify_mark_entity_for_deletion()
 {
 	CLASS_HOOK_JMP(c_simulation_entity_database__notify_mark_entity_for_deletion, c_simulation_entity_database::notify_mark_entity_for_deletion);
 }
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__notify_promote_to_authority, c_simulation_entity_database::notify_promote_to_authority);
 static __declspec(naked) void jmp_c_simulation_entity_database__notify_promote_to_authority()
 {
 	CLASS_HOOK_JMP(c_simulation_entity_database__notify_promote_to_authority, c_simulation_entity_database::notify_promote_to_authority);
@@ -70,7 +76,6 @@ c_simulation_entity_database* simulation_get_entity_database(void)
 	return &simulation_get_world()->get_distributed_world()->m_entity_database;
 }
 
-CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__process_creation, c_simulation_entity_database::process_creation);
 bool c_simulation_entity_database::process_creation(int32 entity_index, e_simulation_entity_type entity_type, uint32 update_mask, int32 block_count, s_replication_allocation_block* blocks)
 {
 	ASSERT(entity_index != NONE);
@@ -150,7 +155,6 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
 	return result;
 }
 
-CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__read_creation_from_packet, c_simulation_entity_database::read_creation_from_packet);
 uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_index, 
 	e_simulation_entity_type* out_entity_type, 
 	uint32* out_entity_initial_update_mask, 
@@ -422,7 +426,6 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 	return result;
 }
 
-CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__process_update, c_simulation_entity_database::process_update);
 bool c_simulation_entity_database::process_update(int32 entity_index, uint32 update_mask, int32 block_count, s_replication_allocation_block* blocks)
 {
 	bool result = false;
@@ -439,7 +442,6 @@ bool c_simulation_entity_database::process_update(int32 entity_index, uint32 upd
 	return result;
 }
 
-CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__read_update_from_packet, c_simulation_entity_database::read_update_from_packet);
 int32 c_simulation_entity_database::read_update_from_packet(
 	int32 entity_index, 
 	uint32* out_update_mask, 
@@ -572,7 +574,6 @@ int32 c_simulation_entity_database::read_update_from_packet(
 	return result;
 }
 
-CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__notify_mark_entity_for_deletion, c_simulation_entity_database::notify_mark_entity_for_deletion);
 void c_simulation_entity_database::notify_mark_entity_for_deletion(int32 entity_index)
 {
 	this->entity_delete_gameworld(entity_index);
@@ -594,7 +595,6 @@ void c_simulation_entity_database::entity_delete_gameworld(int32 entity_index)
 	return;
 }
 
-CLASS_HOOK_DECLARE_LABEL(c_simulation_entity_database__notify_promote_to_authority, c_simulation_entity_database::notify_promote_to_authority);
 bool c_simulation_entity_database::notify_promote_to_authority(int32 entity_index)
 {
 	s_simulation_game_entity* entity = this->entity_get(entity_index);

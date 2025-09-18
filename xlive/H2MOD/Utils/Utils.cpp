@@ -2,6 +2,7 @@
 #include "Utils.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include <iomanip>
 #include <sstream>
 
 // Copyright (C) 1986 Gary S. Brown.  You may use this program, or

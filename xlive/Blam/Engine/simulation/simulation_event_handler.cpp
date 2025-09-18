@@ -17,6 +17,7 @@ t_process_incoming_event p_process_incoming_event;
 
 /* prototypes */
 
+CLASS_HOOK_DECLARE_LABEL(c_simulation_event_handler__process_incoming_event, c_simulation_event_handler::process_incoming_event);
 static __declspec(naked) void jmp_c_simulation_event_handler_process_incoming_event()
 {
 	CLASS_HOOK_JMP(c_simulation_event_handler__process_incoming_event, c_simulation_event_handler::process_incoming_event);
@@ -30,7 +31,6 @@ void simulation_event_handler_apply_patches(void)
 	return;
 }
 
-CLASS_HOOK_DECLARE_LABEL(c_simulation_event_handler__process_incoming_event, c_simulation_event_handler::process_incoming_event);
 void c_simulation_event_handler::process_incoming_event(e_simulation_event_type event_type, int32* entity_reference_indices, int32 block_count, s_replication_allocation_block* payload_block)
 {
 	ASSERT(VALID_INDEX(event_type, m_type_collection->get_event_definition_count()));

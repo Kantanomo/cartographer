@@ -272,7 +272,7 @@ ASSERT_STRUCT_SIZE(s_membership_player, 296);
 
 struct s_session_membership
 {
-	uint32 update_number; // 0x70
+	int32 update_number; // 0x70
 	int32 session_leader_peer_index; // 0x74
 	uint64 dedicated_server_xuid; // 0x78
 	int32 xbox_session_leader_peer_index; // 0x80
@@ -505,6 +505,39 @@ public:
 		return current_local_state() == _network_session_state_none;
 	}
 
+	bool has_membership(void) const
+	{
+		return m_session_membership.update_number != NONE;
+	}
+
+	bool established(void)
+	{
+		bool result;
+		switch (current_local_state())
+		{
+		case _network_session_state_none:
+		case _network_session_state_peer_joining:
+		case _network_session_state_peer_join_abort:
+		case _network_session_state_election:
+		case _network_session_state_dead:
+			result = false;
+			break;
+		case _network_session_state_peer_established:
+		case _network_session_state_peer_leaving:
+		case _network_session_state_host_established:
+		case _network_session_state_host_disband:
+		case _network_session_state_host_handoff:
+		case _network_session_state_host_reestablish:
+			result = true;
+			break;
+		default:
+			unreachable();
+			result = false;
+		}
+
+		return result;
+	}
+
 	bool leaving() const
 	{
 		bool result = false;
@@ -662,6 +695,17 @@ public:
 	{
 		return VALID_INDEX(this->m_session_class, k_network_session_class_count) ? k_network_protocols_text[this->m_session_class] : "<unknown>";
 	}
+
+	bool handle_leave_request(const struct transport_address* incoming_address);
+
+	bool handle_leave_internal(int32 peer_index);
+
+private:
+	const char* get_peer_description(int32 peer_index) const;
+
+	int32 get_peer_from_incoming_address(const transport_address* incoming_address) const;
+	
+	int32 get_peer_from_secure_address(const s_transport_secure_address* secure_address) const;
 };
 ASSERT_STRUCT_SIZE(c_network_session, 31624);
 ASSERT_STRUCT_OFFSET(c_network_session, m_session_membership, 0x70);

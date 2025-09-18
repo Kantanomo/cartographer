@@ -19,7 +19,7 @@
 
 /* constants */
 
-static const std::map<const wchar_t*, e_server_console_commands> k_commands_map =
+static const std::unordered_map<const wchar_t*, e_server_console_commands> k_commands_map =
 {
 	{L"ban", _kablam_command_ban},
 	{L"description", _kablam_command_description},

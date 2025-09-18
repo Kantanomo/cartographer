@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PlaylistLoader.h"
 
+#include "kablam/kablam.h"
 #include "networking/network_event.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"

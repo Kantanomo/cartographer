@@ -714,12 +714,19 @@ static void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 we
 				weapon_data->animation_manager.setup_animation_channel_by_index(
 					&weapon_channel,
 					weapon_data->ammo_animation_id,
-					0))
+					0)
+				)
 			{
 				const c_model_animation* weapon_state_animation = weapon_channel.get_state_animation();
-				string_id state_name = weapon_data->animation_manager.get_state_name();
-				if (weapon_definition->weapon.weapon_type == _weapon_type_needler &&
-					(state_name == _string_id_reload_empty || state_name == _string_id_reload_full))
+				const string_id state_name = weapon_data->animation_manager.get_state_name();
+				
+				real32 position;
+				if (weapon_definition->weapon.weapon_type == _weapon_type_needler && 
+					(
+						state_name == _string_id_reload_empty || 
+						state_name == _string_id_reload_full
+					)
+				)
 				{
 					int16 rounds_loaded_maximum = weapon->weapon.magazines[0].rounds_loaded_maximum;
 					int16 ammunition_result = weapon->weapon.magazines[0].field_4 - weapon->weapon.magazines[0].field_2;
@@ -744,29 +751,17 @@ static void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 we
 
 						ammunition_frame_position = (int16)(((rounds_total - rounds_loaded_maximum) * v1) + rounds_loaded_maximum);
 					}
-					weapon_channel.set_frame_position((real32)ammunition_frame_position);
-					weapon_channel.apply_node_orientations(0.0f, 0.0f, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, 0, 0);
+					position = (real32)ammunition_frame_position;
 				}
 				else
 				{
-					int16 frame_count = weapon_state_animation->get_frame_count();
-					int16 rounds_loaded_maximum = weapon->weapon.magazines[0].rounds_loaded_maximum;
-					int32 position = frame_count - 1;
-					if (rounds_loaded_maximum >= 0)
-					{
-						if (rounds_loaded_maximum <= position)
-						{
-							position = weapon->weapon.magazines[0].rounds_loaded_maximum;
-						}
-					}
-					else
-					{
-						position = 0;
-					}
-					weapon_channel.set_frame_position((real32)position);
-					weapon_channel.apply_node_orientations(0.0f, 0.0f, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, 0, 0);
+					const int16 frame_count = weapon_state_animation->get_frame_count();
+					position = (real32)PIN(weapon->weapon.magazines[0].rounds_loaded_maximum, 0, frame_count - 1);
 				}
+				weapon_channel.set_frame_position(position);
+				weapon_channel.apply_node_orientations(0.f, 0.f, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, 0, 0);
 			}
+
 			if (TEST_BIT(fp_data->flags, 1) && weapon_data->animation_manager.interpolator_controls[1].enabled())
 			{
 				ASSERT(weapon_data->node_orientations_count == weapon_data->animation_manager.get_node_count());
@@ -776,7 +771,7 @@ static void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 we
 					fp_orientations->hand_orientations,
 					fp_orientations->weapon_orientations);
 			}
-			SET_FLAG(fp_data->flags, 1, true);
+			SET_BIT(fp_data->flags, 1, true);
 
 
 			const real_point3d* weapon_offset = first_person_weapons_get_weapon_offset(user_index, weapon_definition, weapon);
@@ -804,7 +799,7 @@ static void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 we
 				const int32 adjustment_matrix_index = fp_data->adjustment_matrix_index;
 				const bool valid_adjustment_matrix_index = adjustment_matrix_index != NONE;
 
-				SET_FLAG(fp_data->flags, _first_person_weapon_valid_adjustment_matrix_bit, valid_adjustment_matrix_index);
+				SET_BIT(fp_data->flags, _first_person_weapon_valid_adjustment_matrix_bit, valid_adjustment_matrix_index);
 				if (valid_adjustment_matrix_index)
 				{
 					fp_data->adjustment_matrix = weapon_data->nodes[adjustment_matrix_index];

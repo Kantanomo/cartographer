@@ -97,7 +97,7 @@ void __cdecl hud_update(void)
 	return;
 }
 
-void hud_draw_screen(void)
+void interface_draw_screen(void)
 {
 	int32 g_user_render_index = *global_user_render_index_get();
 	if (g_user_render_index != NONE && !new_hud_dont_draw())

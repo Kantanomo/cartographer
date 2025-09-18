@@ -190,8 +190,9 @@ void __cdecl rasterizer_settings_update_window_position(void)
 
 	IDirect3D9Ex* global_d3d_interface = rasterizer_dx9_main_globals_get()->global_d3d_interface;
 
-	const HWND g_hwnd = *shell_windows_get_hwnd();
-	if (g_hwnd && global_d3d_interface)
+	const s_window_globals* window_globals = window_globals_get();
+
+	if (window_globals->hWnd && global_d3d_interface)
 	{
 		const s_rasterizer_settings* rasterizer_settings = rasterizer_settings_get();
 		
@@ -205,8 +206,8 @@ void __cdecl rasterizer_settings_update_window_position(void)
 				rect.left = 0;
 				rect.bottom = rasterizer_settings->screen_height;
 				rect.right = rasterizer_settings->screen_width;
-				LONG wl_0 = GetWindowLongA(g_hwnd, GWL_EXSTYLE);
-				LONG wl_1 = GetWindowLongA(g_hwnd, GWL_STYLE);
+				LONG wl_0 = GetWindowLongA(window_globals->hWnd, GWL_EXSTYLE);
+				LONG wl_1 = GetWindowLongA(window_globals->hWnd, GWL_STYLE);
 				AdjustWindowRectEx(&rect, wl_1, false, wl_0);
 				set_window_pos_flags = SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING;
 			}
@@ -235,19 +236,19 @@ void __cdecl rasterizer_settings_update_window_position(void)
 				rect.left = 0;
 				rect.bottom = rasterizer_settings->screen_height;
 			}
-			LONG wl = GetWindowLongA(g_hwnd, GWL_STYLE);
-			SetWindowLongA(g_hwnd, GWL_STYLE, wl & 0xFF3FFFFF);
+			LONG wl = GetWindowLongA(window_globals->hWnd, GWL_STYLE);
+			SetWindowLongA(window_globals->hWnd, GWL_STYLE, wl & 0xFF3FFFFF);
 			
-			wl = GetWindowLongA(g_hwnd, GWL_EXSTYLE);
-			SetWindowLongA(g_hwnd, GWL_EXSTYLE, wl & 0xFFFFFEFF);
+			wl = GetWindowLongA(window_globals->hWnd, GWL_EXSTYLE);
+			SetWindowLongA(window_globals->hWnd, GWL_EXSTYLE, wl & 0xFFFFFEFF);
 			
-			LONG wl_0 = GetWindowLongA(g_hwnd, GWL_EXSTYLE);
-			LONG wl_1 = GetWindowLongA(g_hwnd, GWL_STYLE);
+			LONG wl_0 = GetWindowLongA(window_globals->hWnd, GWL_EXSTYLE);
+			LONG wl_1 = GetWindowLongA(window_globals->hWnd, GWL_STYLE);
 			AdjustWindowRectEx(&rect, wl_1, 0, wl_0);
 			set_window_pos_flags = SWP_NOMOVE | SWP_NOACTIVATE | SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOSENDCHANGING;
 		}
 		SetWindowPos(
-			g_hwnd,
+			window_globals->hWnd,
 			HWND_NOTOPMOST,
 			0,
 			0,

@@ -3,7 +3,6 @@
 
 #include "cseries/cseries_system_memory.h"
 #include "game/game_globals.h"
-#include "main/main_game.h"
 #include "memory/data.h"
 #include "networking/network_event.h"
 #include "scenario/scenario.h"
@@ -348,7 +347,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 	{
 		cache_file_memory_globals->tags_loaded = true;
 		scenario_tags_load_internal_panic();
-		main_game_set_global_scenario_index(NONE);
+		global_scenario_index_set(NONE);
 		return false;
 	}
 
@@ -357,7 +356,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 	const uint32 scenario_address = cache_file_memory_globals->tag_cache_base_address + tag_header->tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_header->scenario_index)].data_offset;
 	const uint32 globals_address = cache_file_memory_globals->tag_cache_base_address + tag_header->tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_header->globals_index)].data_offset;
 
-	main_game_set_global_scenario_index(tag_header->scenario_index);
+	global_scenario_index_set(tag_header->scenario_index);
 
 	set_global_scenario((scenario*)(scenario_address));
 

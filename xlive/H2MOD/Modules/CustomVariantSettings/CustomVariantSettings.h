@@ -55,6 +55,6 @@ namespace CustomVariantSettings
 }
 
 extern CustomVariantSettings::s_variant_settings currentVariantSettings;
-extern std::map<std::wstring, CustomVariantSettings::s_variant_settings> customVariantSettingsMap;
+extern std::unordered_map<std::wstring, CustomVariantSettings::s_variant_settings> customVariantSettingsMap;
 
 #define k_custom_variant_settings_packet_size (sizeof(CustomVariantSettings::s_variant_settings))

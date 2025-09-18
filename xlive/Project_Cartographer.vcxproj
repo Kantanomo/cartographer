@@ -1066,7 +1066,9 @@
     <ClCompile Include="Blam\Engine\networking\session\network_session_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\Session\network_text_chat_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\transport.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\transport_address.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\transport_qos.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\transport_security.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\objects\lights.cpp" />
@@ -1648,7 +1650,6 @@
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
-    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
@@ -1790,7 +1791,9 @@
     <ClInclude Include="Blam\Engine\networking\session\network_session_manager.h" />
     <ClInclude Include="Blam\Engine\networking\Session\network_text_chat_manager.h" />
     <ClInclude Include="Blam\Engine\networking\transport\transport.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\transport_address.h" />
     <ClInclude Include="Blam\Engine\networking\transport\transport_qos.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\transport_security.h" />
     <ClInclude Include="Blam\Engine\objects\crates.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
@@ -2767,7 +2770,6 @@
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
-    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />

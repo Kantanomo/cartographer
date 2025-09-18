@@ -8,16 +8,27 @@
 #include "main/game_preferences.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
+#ifndef IMGUI_DISABLE
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
+#endif
 
 /* constants */
 
-const real32 k_gamepad_stick_angles[] =
+static const real32 k_gamepad_stick_angles[] =
 {
-	DEGREES_TO_RADIANS(45.0f),
-	DEGREES_TO_RADIANS(135.0f),
-	DEGREES_TO_RADIANS(-45.0f),
-	DEGREES_TO_RADIANS(-135.0f)
+	DEGREES_TO_RADIANS(45.f),
+	DEGREES_TO_RADIANS(135.f),
+	DEGREES_TO_RADIANS(-45.f),
+	DEGREES_TO_RADIANS(-135.f)
+};
+
+// Set this to a default of 8
+const real32 k_default_right_thumbstick_deadzone_radial_percentage = THUMBSTICK_POINT_TO_PERCENTAGE(THUMBSTICK_PERCENTAGE_TO_POINT(8));
+
+const real_point2d k_default_right_thumbstick_deadzone_axial_percentage =
+{
+	THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE),
+	THUMBSTICK_POINT_TO_PERCENTAGE(XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 };
 
 /* globals */

@@ -6,7 +6,6 @@
 
 
 #include "cseries/cseries_windows_debug_pc.h"
-#include "kablam/kablam.h"
 #include "sapien/patches_initialize.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
@@ -15,6 +14,8 @@
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
+
+#include <filesystem>
 
 /* constants */
 

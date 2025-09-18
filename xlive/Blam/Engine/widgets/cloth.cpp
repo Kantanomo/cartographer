@@ -51,7 +51,7 @@ void cloth_frame_advance(real32 dt)
 
 	for (datum index = data_next_index(cloth_array, NONE); index != NONE; index = data_next_index(cloth_array, index))
 	{
-		if (time_globals::available())
+		if (game_time_initialized())
 		{
 			s_cloth* cloth = (s_cloth*)datum_get(cloth_array, index);
 			cloth->accum += dt;

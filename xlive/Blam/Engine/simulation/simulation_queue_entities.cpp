@@ -437,7 +437,7 @@ bool decode_simulation_queue_update_from_buffer(int32 encoded_size, uint8* encod
 			{
 				event(
 					_event_error,
-					"networking:simulation:queue:entities: creation data size for update exceeds scratch size?",
+					"networking:simulation:queue:entities: creation data size for update exceeds scratch size?"
 				);
 			}
 		}

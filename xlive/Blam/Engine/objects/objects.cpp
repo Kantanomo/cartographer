@@ -273,6 +273,11 @@ void __cdecl object_placement_data_new(object_placement_data* object_placement_d
 	return;
 }
 
+int32 __cdecl object_index_from_name_index(int16 name_index)
+{
+	return INVOKE(0x1335FB, 0x0, object_index_from_name_index, name_index);
+}
+
 bool __cdecl object_is_connected_to_map(datum object_index)
 {
 	return INVOKE(0x132922, 0x1217F2, object_is_connected_to_map, object_index);
@@ -1149,7 +1154,7 @@ void objects_dump_memory(void)
 	qsort(dumps, object_count, sizeof(dump_datum), (_CoreCrtNonSecureSearchSortCompareFunction)sort_dumps);
 	qsort(object_type_dumps, NUMBEROF(object_type_dumps), sizeof(dump_datum), (_CoreCrtNonSecureSearchSortCompareFunction)sort_dumps);
 
-	const char* tag_path = tag_get_name(main_game_get_global_scenario_index());
+	const char* tag_path = tag_get_name(global_scenario_index_get());
 	const char* tag_name = tag_name_strip_path(tag_path);
 
 	char filepath[256];

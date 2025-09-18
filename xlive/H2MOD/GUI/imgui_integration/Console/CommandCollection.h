@@ -2,7 +2,7 @@
 
 #ifdef TERMINAL_ENABLED
 
-#include "CommandHandler.h"
+class ConsoleCommand;
 
 namespace CommandCollection
 {

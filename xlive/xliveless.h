@@ -183,40 +183,6 @@ do \
 // "Wait, that's illegal" except it is definitely not a joke related to xLiveLess
 #define LOG_CRITICAL_XLIVE(msg, ...)     LOG_CRITICAL  (xlive_log, msg, __VA_ARGS__)
 
-inline void verify_output_log(const char *expression, const char *func_name, const char* file, const int line)
-{
-	LOG_TRACE_GAME("'{0}' failed in '{1}' at '{2}:{3:d}'!", func_name, expression, file, line);
-	DWORD last_error = GetLastError();
-	if (last_error)
-	{
-		LPWSTR messageBuffer = NULL;
-		size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL, last_error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&messageBuffer, 0, NULL);
-		if (size) {
-			LOG_ERROR_GAME(L"Last error: '{}'", messageBuffer);
-			LocalFree(messageBuffer);
-		}
-		else {
-			LOG_ERROR_GAME("Converting error {} to string failed!", last_error);
-		}
-		SetLastError(ERROR_SUCCESS);
-	}
-}
-
-template <typename T>
-inline T verify_output(T output, const char *expression, const char *func_name, const char* file, const int line)
-{
-	if (!output) {
-		verify_output_log(expression, func_name, file, line);
-	}
-	return output;
-}
-
-/*
-	Isn't actually va-args just looks like that so that commas don't cause issues
-*/
-#define LOG_CHECK(...) \
-	verify_output((__VA_ARGS__), #__VA_ARGS__, __FUNCTION__, __FILE__, __LINE__)
 #else
 
 #define LIMITED_LOG(log_limit, logger, ...) (void)0

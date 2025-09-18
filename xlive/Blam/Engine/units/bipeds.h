@@ -51,3 +51,8 @@ void __cdecl biped_get_sight_position(
 	real_vector3d* desired_facing_vector,
 	real_vector3d* desired_gun_offset,
 	real_point3d* object_origin);
+
+/* macros */
+
+#define biped_get(index) ((biped_datum*)object_get_and_verify_type(index, _object_mask_biped))
+#define biped_try_and_get(index) ((biped_datum*)object_try_and_get_and_verify_type(index, _object_mask_biped))

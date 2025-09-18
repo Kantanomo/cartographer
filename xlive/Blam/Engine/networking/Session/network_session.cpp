@@ -20,6 +20,10 @@ const char* const k_network_protocols_text[] =
 };
 
 /* gloabls */
+
+static char g_network_session_peer_description[2][35] = {};
+static int32 g_network_session_peer_description_index = 0;
+
 c_network_session_cartographer g_cartographer_network_session;
 
 /* public code */
@@ -386,4 +390,93 @@ uint32 c_network_session::time_get(void) const
 {
 	ASSERT(m_time_exists);
 	return m_time + network_time_get_exact();
+}
+
+bool c_network_session::handle_leave_request(const transport_address* incoming_address)
+{
+	const int32 peer = get_peer_from_incoming_address(incoming_address);
+	ASSERT(is_host());
+
+	bool result;
+	if (peer == NONE || peer == m_local_peer_index)
+	{
+		event(
+			_event_warning,
+			"networking:session:membership: [%s] leave-request received from an incorrect peer [%s] (invalid or local)",
+			managed_session_get_id_string(&m_session_id),
+			get_peer_description(peer)
+		);
+		result = false;
+	}
+	else
+	{
+		event(
+			_event_message,
+			"session:membership: [%s] leave-request received from peer [%s]",
+			managed_session_get_id_string(&m_session_id),
+			get_peer_description(peer)
+		);
+		result = handle_leave_internal(peer);
+	}
+
+	return result;
+}
+
+bool c_network_session::handle_leave_internal(int32 peer_index)
+{
+	return INVOKE_TYPE(0x1CC7B4, 0x1A3D34, bool(__thiscall*)(c_network_session*, int32), this, peer_index);
+}
+
+/* private code */
+
+const char* c_network_session::get_peer_description(int32 peer_index) const
+{
+	char* result = g_network_session_peer_description[g_network_session_peer_description_index];
+	g_network_session_peer_description_index = (g_network_session_peer_description_index + 1) % 2;
+
+	if (established() && VALID_INDEX(peer_index, m_session_membership.peer_count) && m_session_membership.membership_peers[peer_index].description[0] != '\0')
+	{
+		const char* mac_string = transport_secure_address_get_mac_string(&m_session_membership.membership_peers[peer_index].secure_address);
+		csprintf(result, 35, "#%02d:%S:%s", peer_index, m_session_membership.membership_peers[peer_index].description[0], mac_string);
+	}
+	else
+	{
+		csprintf(result, 35, "#%02d", peer_index);
+	}
+	return result;
+}
+
+int32 c_network_session::get_peer_from_incoming_address(const transport_address* incoming_address) const
+{
+	ASSERT(incoming_address);
+
+	int32 result = NONE;
+	if (!disconnected() && m_field_48)
+	{
+		s_transport_secure_address secure_address;
+		if (transport_secure_identifier_retrieve(incoming_address, m_session_transport_platform, NULL, NULL, NULL, &secure_address))
+		{
+			result = get_peer_from_secure_address(&secure_address);
+		}
+	}
+	return result;
+}
+
+int32 c_network_session::get_peer_from_secure_address(const s_transport_secure_address* secure_address) const
+{
+	ASSERT(secure_address);
+	
+	int32 result = NONE;
+	if (!disconnected() && has_membership())
+	{
+		for (int32 i = 0; i < m_session_membership.peer_count; ++i)
+		{
+			if (transport_secure_address_compare(secure_address, &m_session_membership.membership_peers[i].secure_address))
+			{
+				result = i;
+				break;
+			}
+		}
+	}
+	return result;
 }

@@ -182,8 +182,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 				m_melee_start_origin = *player_origin;
 				m_has_target = true;
 				m_flags = 0;
-				m_maximum_counter = blam_ticks_real_to_integer((real32)(m_weapon_is_sword ? 7 : 1) + lunge_tick_count_2);
-				// m_maximum_counter = (real32)(m_weapon_is_sword ? 7 : 1) + lunge_tick_count_2;
+				m_maximum_counter = (int32)((m_weapon_is_sword ? 7.f : 1.f) + lunge_tick_count_2);
 
 				if (unk_distance1 > k_valid_real_epsilon)
 				{
@@ -299,17 +298,17 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 						real_vector3d v;
 						scale_vector3d(
 							&direction_of_current_translational_velocity,
-							-deceleration * time_globals::get_ticks_difference_real(),
+							-deceleration * ((real32)game_tick_rate() / 30.f),
 							//-deceleration,
 							&v);
 						add_vectors3d(&v, &current_translational_velocity_per_tick, &physics_output->translational_velocity);
 
 						// for some reason in the actual game the following line of code is missing from the actual game
 						// no idea why
-						//scale_vector3d(&physics_output->out_translational_velocity, time_globals::seconds_to_ticks_precise(1.0f), &physics_output->out_translational_velocity);
+						//scale_vector3d(&physics_output->out_translational_velocity, s_time_globals::seconds_to_ticks_precise(1.0f), &physics_output->out_translational_velocity);
 
 						// to reproduce the same behaviour 30 tick has, scale the vector with the difference between the tickrates
-						// scale_vector3d(&physics_output->translational_velocity, time_globals::get_ticks_difference_real(), &physics_output->translational_velocity);
+						// scale_vector3d(&physics_output->translational_velocity, s_time_globals::get_ticks_difference_real(), &physics_output->translational_velocity);
 
 						if (min_velocity_after_deceleration_per_tick > ((temp_current_velocity_per_tick - ((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f)) + k_valid_real_epsilon))
 						{
@@ -331,7 +330,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 								&decelerated_velocity);
 							add_vectors3d(&decelerated_velocity, &current_translational_velocity_per_tick, &physics_output->translational_velocity);							
 							
-							scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
+							scale_vector3d(&physics_output->translational_velocity, game_seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
 							set_time_to_target((distance_to_target_point / unk1) - 0.5f);
 
 							// increase the counter only if we're not pre-decelerating
@@ -357,7 +356,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 						scale_vector3d(&direction_of_current_translational_velocity, 0.f, &decelerated_velocity);
 						add_vectors3d(&decelerated_velocity, &current_translational_velocity_per_tick, &physics_output->translational_velocity);
 
-						scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
+						scale_vector3d(&physics_output->translational_velocity, game_seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
 						set_time_to_target(0.0f);
 					}
 
@@ -369,7 +368,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					scale_vector3d(&m_aiming_direction, 0.f, &decelerated_velocity);
 					add_vectors3d(&decelerated_velocity, &current_translational_velocity_per_tick, &physics_output->translational_velocity);
 
-					scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
+					scale_vector3d(&physics_output->translational_velocity, game_seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
 
 					// FIXME we should use 30hz values here when computing the time to target
 					// and adjust it to 60hz or to whatever tickrate where this is used
@@ -396,7 +395,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					add_vectors3d(&accelerated_direction, &current_translational_velocity_per_tick, &physics_output->translational_velocity);
 					
 					
-					scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
+					scale_vector3d(&physics_output->translational_velocity, game_seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
 
 					// static_assert(offsetof(c_character_physics_mode_melee_datum, m_aiming_direction) == 0x3C);
 
@@ -449,7 +448,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 		int added_ticks = m_maximum_counter - 6 - (m_weapon_is_sword ? 7 : 1);
 #endif
 
-		LOG_TRACE_MELEE("{} - update melee at tickrate: {}", __FUNCTION__, time_globals::get()->ticks_per_second);
+		LOG_TRACE_MELEE("{} - update melee at tickrate: {}", __FUNCTION__, s_time_globals::get()->tick_rate);
 		LOG_TRACE_MELEE("{} - added tick count to maximum counter: {}", __FUNCTION__, added_ticks);
 		LOG_TRACE_MELEE("{} - target_distance: {}, maximum counter: {}", __FUNCTION__, distance_between_havok_components, m_maximum_counter);
 	}

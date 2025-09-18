@@ -10,21 +10,28 @@ enum
 	k_shell_time_usec_denominator = 1000000
 };
 
+/* structures */
+
+struct s_window_globals
+{
+	HCURSOR cursor;
+	LPSTR lpCmdLine;
+	HINSTANCE hInstance;
+	HWND hWnd;
+	HWND hWndPresentTarget;
+	int32 show_cmd;
+	WNDPROC wnd_proc;
+	wchar_t class_name[64];
+	wchar_t window_name[64];
+};
+
 /* globals */
 
 extern uint32 g_instance_number;
 
-extern int32 g_cmd_show;
-
-extern WNDPROC g_wndproc_procedure;
-
-extern wchar_t g_window_classname[64];
-
-extern wchar_t g_window_name[64];
-
 /* prototypes */
 
-HWND* shell_windows_get_hwnd(void);
+s_window_globals* window_globals_get(void);
 
 bool shell_platform_initialize(void);
 

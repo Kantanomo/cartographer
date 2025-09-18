@@ -798,7 +798,7 @@ int16 hud_bitmap_data_index_get(void)
 
 void hud_player_indicators_draw_enabled_set(int32 user_index, bool enabled)
 {
-	SET_FLAG(g_draw_hud_user_draw_player_indicators_mask, user_index, enabled);
+	SET_BIT(g_draw_hud_user_draw_player_indicators_mask, user_index, enabled);
 	return;
 }
 

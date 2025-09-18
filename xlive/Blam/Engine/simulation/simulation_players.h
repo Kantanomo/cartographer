@@ -55,11 +55,11 @@ struct c_simulation_player
 	e_simulation_player_type m_player_type;
 	uint64 m_player_identifier;
 	s_machine_identifier m_player_machine_identifier;
-	PAD(2);
+	int16 pad;
 	void* m_simulation_world;
 	char m_field_20;
 	bool m_active;
-	PAD(2);
+	int16 pad_1;
 	uint32 m_start_commit_ticks;
 	player_action m_actions;
 };

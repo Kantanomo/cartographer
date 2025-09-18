@@ -353,7 +353,7 @@ struct s_game_engine_globals
 	uint8 gapF9[523];
 	c_game_statborg game_statborg;
 	s_game_engine_global_player_info player_info[k_maximum_players];
-	uint32 ticks;
+	uint32 last_netdebug_update_time;
 	s_simulation_player_netdebug_data netdebug_data[k_maximum_players];
 	uint8 gap81C[1064];
 	int32 field_C44;

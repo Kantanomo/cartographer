@@ -78,13 +78,13 @@ struct window_bound
 };
 ASSERT_STRUCT_SIZE(window_bound, 280);
 
-struct s_render_scene_parameters
+struct rasterizer_scene_begin_parameters
 {
 	uint32 scene_rendered_count;
 	uint32 effect_flags;
 	real32 depth_range;
 };
-ASSERT_STRUCT_SIZE(s_render_scene_parameters, 12);
+ASSERT_STRUCT_SIZE(rasterizer_scene_begin_parameters, 12);
 
 /* globals */
 
@@ -129,12 +129,14 @@ uint32* global_effect_flag_get(void);
 // ### TODO: better function name
 bool frame_parameters_type_is_above_or_equal_to_7(void);
 
+void rasterizer_render_scene(bool is_texture_camera);
+
 void render_scene_geometry(e_collection_type collection_type, e_render_layer render_layer);
 
 // CLIENT ONLY
 // Get cluster index and leaf index from render position provided
 // Return true if out_cluster_index and out_leaf_index are valid
-bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index);
+bool __cdecl render_structure_find_camera(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index);
 
 e_screen_split_type get_screen_split_type(int32 render_user_index);
 

@@ -71,7 +71,7 @@ namespace ImGuiHandler
 		}
 		bool LoadMOTD(const wchar_t* file_path, e_imgui_aspect_ratio ratio)
 		{
-			if (std::filesystem::exists(file_path))
+			if (PathFileExists(file_path))
 			{
 				return ImGuiHandler::LoadTextureFromFile(file_path, patch_notes, &X, &Y);
 			}

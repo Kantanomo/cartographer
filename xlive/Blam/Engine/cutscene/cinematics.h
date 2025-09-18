@@ -40,12 +40,12 @@ ASSERT_STRUCT_SIZE(s_cinematic_globals, 36);
 
 s_cinematic_globals* get_cinematic_globals(void);
 
-bool cinematic_is_running(void);
+bool cinematic_in_progress_not_main_menu(void);
 
 bool cinematic_in_progress(void);
 
 void __cdecl cinematic_update(void);
 
-void __cdecl cinematics_draw_line(rectangle2d* points, pixel32 rect_color);
+void __cdecl draw_quad(const rectangle2d* points, pixel32 rect_color);
 
 void cinematics_apply_patches(void);

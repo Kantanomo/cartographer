@@ -20,8 +20,8 @@
 // Hud tags are packaged using the data saver option which will cause h2tool to reuse tag blocks
 // this will cause the offset fix to apply multiple times to individual blocks here we are just keeping
 // a temporary map of all the blocks that have already been adjusted.
-int32 g_already_adjusted_blocks[k_maximum_hud_bitmap_widgets_per_tag + k_maximum_hud_text_widgets_per_tag + k_maximum_hud_screen_effect_widgets_per_tag];
-uint32 g_adjusted_blocks_count = 0;
+static int32 g_already_adjusted_blocks[k_maximum_hud_bitmap_widgets_per_tag + k_maximum_hud_text_widgets_per_tag + k_maximum_hud_screen_effect_widgets_per_tag];
+static uint32 g_adjusted_blocks_count = 0;
 
 /* prototypes */
 

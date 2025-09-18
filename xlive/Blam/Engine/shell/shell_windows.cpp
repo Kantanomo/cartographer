@@ -5,9 +5,7 @@
 #include "shell_windows_internals.h"
 #include "shell_windows_pcc.h"
 
-#include "cseries/cseries_errors.h"
 #include "main/main.h"
-#include "math/math.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
@@ -19,8 +17,6 @@
 #ifndef IMGUI_DISABLE
 
 #include "imgui.h"
-#include "backends/imgui_impl_dx9.h"
-#include "backends/imgui_impl_win32.h"
 
 /* prototypes */
 
@@ -45,14 +41,6 @@ static bool(__cdecl* p_shell_set_game_cursor_state)(bool enabled);
 static bool g_custom_mouse_cursor_enabled = false;
 
 uint32 g_instance_number = 0;
-
-int32 g_cmd_show = 0;
-
-WNDPROC g_wndproc_procedure = NULL;
-
-wchar_t g_window_classname[64] = {};
-
-wchar_t g_window_name[64] = {};
 
 /* prototypes */
 
@@ -115,9 +103,9 @@ static BOOL WINAPI CryptUnprotectDataHook(
 
 /* public code */
 
-HWND* shell_windows_get_hwnd(void)
+s_window_globals* window_globals_get(void)
 {
-	return Memory::GetAddress<HWND*>(0x46D9C4);
+	return Memory::GetAddress<s_window_globals*>(0x46D9B8);
 }
 
 bool shell_platform_initialize(void)
@@ -327,15 +315,17 @@ static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>,
 
 static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+	s_window_globals* window_globals = window_globals_get();
+
 	// set args
-	WriteValue(Memory::GetAddress(0x46D9BC), lpCmdLine); // command_line_args
-	WriteValue(Memory::GetAddress(0x46D9C0), hInstance); // g_instance
-	g_cmd_show = nShowCmd; // g_CmdShow
+	window_globals->lpCmdLine = lpCmdLine;
+	window_globals->hInstance = hInstance;
+	window_globals->show_cmd = nShowCmd;
 
 	// window setup
-	ustrncpy(g_window_classname, L"halo", NUMBEROF(g_window_classname));
-	ustrncpy(g_window_name, L"Halo 2 - Project Cartographer", NUMBEROF(g_window_name));
-	g_wndproc_procedure = H2WndProc;
+	ustrncpy(window_globals->class_name, L"halo", NUMBEROF(window_globals->class_name));
+	ustrncpy(window_globals->window_name, L"Halo 2 - Project Cartographer", NUMBEROF(window_globals->window_name));
+	window_globals->wnd_proc = H2WndProc;
 
 	bool pcc_result = shell_windows_pcc_initialize();
 	if (!pcc_result)
@@ -350,9 +340,7 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 		show_fatal_error(108);
 	}
 
-	// mouse cursor setup
-	HCURSOR cursor = LOG_CHECK(LoadCursor(NULL, MAKEINTRESOURCE(0x7F00)));
-	WriteValue(Memory::GetAddress(0x46D9B8), cursor); // g_hCursor
+	window_globals->cursor = LoadCursor(NULL, MAKEINTRESOURCE(0x7F00));
 
 	*should_initilize_xlive_get() = true;
 
@@ -386,18 +374,16 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 
 static void destroy_windows(void)
 {
-	HWND hWnd = *shell_windows_get_hwnd();
-	HWND d3d_window = *Memory::GetAddress<HWND*>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
-	if (hWnd)
+	const s_window_globals* window_globals = window_globals_get();
+	if (window_globals->hWnd)
 	{
-		DestroyWindow(hWnd);
+		DestroyWindow(window_globals->hWnd);
 	}
 
-	if (d3d_window)
+	if (window_globals->hWndPresentTarget)
 	{
-		DestroyWindow(d3d_window);
+		DestroyWindow(window_globals->hWndPresentTarget);
 	}
-
 	return;
 }
 
@@ -579,7 +565,8 @@ static void shell_windows_adjust_name(void)
 {
 	if (g_instance_number > 1)
 	{
-		usnprintf(g_window_name, NUMBEROF(g_window_name), L"%ws (P%d)", g_window_name, g_instance_number);
+		s_window_globals* window_globals = window_globals_get();
+		usnprintf(window_globals->window_name, NUMBEROF(window_globals->window_name), L"%ws (P%d)", window_globals->window_name, g_instance_number);
 	}
 	return;
 }

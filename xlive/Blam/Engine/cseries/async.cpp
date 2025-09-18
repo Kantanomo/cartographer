@@ -16,6 +16,12 @@ void __cdecl async_initialize(void)
 	return;
 }
 
+void async_idle(void)
+{
+	// Not implemented in vista?
+	return;
+}
+
 void __cdecl async_yield_until_done(s_async_completion* completion, bool play_sound)
 {
 	async_yield_until_done_function(completion, simple_yield_function, play_sound);

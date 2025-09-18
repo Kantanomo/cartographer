@@ -12,7 +12,6 @@
 #include "networking/network_event.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "shell/shell.h"
-#include "H2MOD/Modules/HaloScript/HaloScript.h"
 
 bool firstPlayerSpawn;
 bool player_is_picking_up_skull = false;
@@ -101,7 +100,7 @@ void GraveRobber::PickupSkull(datum player_index, datum skull_datum)
 		player_is_picking_up_skull = false;
 	}
 	
-	HaloScript::ObjectDestroy(skull_datum);
+	object_delete(skull_datum);
 
 	if (!shell_is_dedicated_server())
 	{

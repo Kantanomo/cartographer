@@ -153,18 +153,6 @@ void main_game_apply_patches(void)
 	return;
 }
 
-void main_game_set_global_scenario_index(datum scenario_index)
-{
-	datum* global_scenario_index = Memory::GetAddress<datum*>(0x4119A0, 0x3B528C);
-	*global_scenario_index = scenario_index;
-	return;
-}
-
-datum main_game_get_global_scenario_index(void)
-{
-	return *Memory::GetAddress<datum*>(0x4119A0, 0x3B528C);
-}
-
 /* private code */
 
 void main_game_launch_setup_game_mode_details(void)
