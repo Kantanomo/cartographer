@@ -113,7 +113,6 @@ void input_abstraction_patches_apply(void)
 {
 	g_input_abstraction_globals = Memory::GetAddress<s_input_abstraction_globals*>(0x4A89B0);
 
-	PatchCall(Memory::GetAddress(0x39B82), input_abstraction_update);
 	PatchCall(Memory::GetAddress(0x61FBD), input_abstraction_controller_plugged_hook); //inside input_abstraction_update_input_state
 	return;
 }

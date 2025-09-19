@@ -1,16 +1,33 @@
 #pragma once
-#include "game/game_options.h"
 
-#define k_campaign_difficulty_levels_count 4
+/* constants */
+
+/* prototypes */
+
+void main_game_apply_patches(void);
 
 // Initialize options structure for the map_name command
 void main_game_initialize(void);
+
+bool __cdecl main_game_loaded_map(void);
+
+bool __cdecl main_game_loaded_pregame(void);
+
+void __cdecl main_game_launch_default(void);
+
+void __cdecl main_game_reset_map(void);
+
+void __cdecl main_game_unload_and_prepare_for_next_game(void);
+
+bool  __cdecl main_game_change_update(void);
 
 // Set the difficulty for the map launched with the map_name command
 void main_game_launch_set_map_name(const char* map_name);
 
 // Starts a new game with the options provided
-bool main_game_change(const s_game_options* options);
+bool __cdecl main_game_change(const struct s_game_options* options);
+
+bool __cdecl main_game_change_immediate(const struct s_game_options* options);
 
 // Set the difficulty for the map launched with the map_name command
 void main_game_launch_set_difficulty(int16 difficulty);
@@ -27,7 +44,17 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name);
 // Set the game mode for the map launched with the map_name command
 void main_game_launch_set_game_mode(int32 game_mode);
 
+void main_game_launch_legacy(const char* map_name);
+
 // Start a new game with the following map name
 void main_game_launch(const char* map_name);
 
-void main_game_apply_patches(void);
+void main_menu_launch(uint32 context);
+
+void main_menu_launch_force(void);
+
+/* globals */
+
+extern int32 g_main_game_launch_user_count;
+extern struct s_game_options g_main_game_launch_options;
+extern bool debug_load_panic_to_main_menu;

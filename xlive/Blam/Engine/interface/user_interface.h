@@ -396,8 +396,6 @@ enum e_user_interface_screen_id : uint32;
 
 /* prototypes */
 
-void user_interface_apply_patches(void);
-
 bool __cdecl user_interface_automation_is_active(void);
 uint32 __cdecl user_interface_milliseconds(void);
 bool __cdecl user_interface_error_display_allowed(void);

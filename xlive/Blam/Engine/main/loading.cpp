@@ -1,12 +1,24 @@
 #include "stdafx.h"
 #include "loading.h"
 
+/* public code */
 
-
-void loading_apply_patches(void)
+void main_loading_initialize(void)
 {
-	// Removes call to main_loading_idle to improve framerates
-	// Used for playing while disc installs (not supported in carto)
-	NopFill(Memory::GetAddress(0x39BAB), 5);
+	// Does nothing in release code
+	// TODO: reimplement debug functionality
+	return;
+}
+
+void main_loading_dispose(void)
+{
+	// Does nothing in release code
+	// TODO: reimplement debug functionality
+	return;
+}
+
+void main_loading_idle(void)
+{
+	// We disabled this functionality...
 	return;
 }

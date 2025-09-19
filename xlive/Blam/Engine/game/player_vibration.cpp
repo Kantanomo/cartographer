@@ -43,13 +43,7 @@ s_vibration_user_globals* vibration_get(int32 user_index)
 	return &vibration_globals->user_data[user_index];
 }
 
-void player_vibration_apply_patches(void)
-{
-	PatchCall(Memory::GetAddress(0x39D69), vibration_update);
-	return;
-}
-
-void __cdecl vibration_update(real32 dt)
+void vibration_update(real32 dt)
 {
 	// ### TODO Use game_tick_length() here when we use 30 tick in multiplayer
 	const real32 k_vibration_tick_length = 1.f / 30.f;
@@ -98,6 +92,12 @@ void __cdecl vibration_update(real32 dt)
 		}
 	}
 
+	return;
+}
+
+void __cdecl vibration_clear_all_now(void)
+{
+	INVOKE(0x901B8, 0x0, vibration_clear_all_now);
 	return;
 }
 

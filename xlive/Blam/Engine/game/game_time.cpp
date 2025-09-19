@@ -1,14 +1,6 @@
 #include "stdafx.h"
 #include "game_time.h"
 
-#include "main/main_time.h"
-#include "H2MOD.h"
-#include "cutscene/cinematics.h"
-#include "math/math.h"
-#include "main/interpolator.h"
-#include "main/main_game_time.h"
-#include "shell/shell_windows.h"
-
 /* structures */
 
 struct s_time_globals
@@ -31,16 +23,7 @@ ASSERT_STRUCT_SIZE(s_time_globals, 36);
 
 static s_time_globals* time_globals_get(void);
 
-static bool __cdecl cinematic_is_running_hook(void);
-
 /* public code */
-
-void game_time_apply_patches(void)
-{
-	// apply framerate throttle patches for when the game is minimized
-	PatchCall(Memory::GetAddress(0x39A2A), cinematic_is_running_hook);
-	return;
-}
 
 bool game_time_initialized(void)
 {
@@ -219,22 +202,4 @@ real32 game_time_get_leftover(void)
 static s_time_globals* time_globals_get(void)
 {
 	return *Memory::GetAddress<s_time_globals**>(0x4C06E4, 0x4CF0EC);
-}
-
-// Disables broken/experimental main loop patches in the vanilla game 
-// that are also disabled when playing cinematics
-// This also fixes the built in frame limiter while the game is minimized, as well as the speeding up issue
-static bool __cdecl cinematic_is_running_hook(void)
-{
-	bool result;
-	if (halo_frame_interpolator_enabled())
-	{
-		result = true; // these two options disable the hacks that hired gun added to the main loop
-	}
-	else
-	{
-		result = cinematic_in_progress_not_main_menu() || xbox_tickrate_is_enabled() || main_time_is_throttled() || g_main_game_time_frame_limiter_enabled;
-	}
-
-	return result;
 }

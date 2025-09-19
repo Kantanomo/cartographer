@@ -1,3 +1,9 @@
 #pragma once
 
-void loading_apply_patches(void);
+/* prototypes */
+
+void main_loading_initialize(void);
+
+void main_loading_dispose(void);
+
+void main_loading_idle(void);

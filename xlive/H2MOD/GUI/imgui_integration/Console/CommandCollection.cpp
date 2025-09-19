@@ -13,7 +13,7 @@
 #include "interface/user_interface.h"
 #include "main/main.h"
 #include "main/main_game.h"
-#include "main/main_game_time.h"
+#include "main/main_time.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
 #include "networking/logic/life_cycle_manager.h"

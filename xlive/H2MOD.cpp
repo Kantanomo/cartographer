@@ -23,7 +23,6 @@
 #include "game/game_time.h"
 #include "game/multiplayer_globals.h"
 #include "game/player_control.h"
-#include "game/player_vibration.h"
 #include "hs/hs.h"
 #include "input/input_xinput.h"
 #include "input/input_windows.h"
@@ -35,7 +34,6 @@
 #include "interface/first_person_weapons.h"
 #include "interface/new_hud.h"
 #include "interface/new_hud_draw.h"
-#include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_text.h"
 #include "interface/user_interface_utilities.h"
@@ -43,19 +41,17 @@
 #include "items/weapon_definitions.h"
 #include "kablam/kablam.h"
 #include "main/levels.h"
-#include "main/loading.h"
 #include "main/main.h"
 #include "main/main_game.h"
-#include "main/main_game_time.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "networking/transport/transport.h"
 #include "networking/network_event.h"
 #include "networking/network_globals.h"
 #include "networking/network_utilities.h"
 #include "networking/network_memory.h"
 #include "networking/network_configuration.h"
-#include "networking/transport/transport.h"
 #include "units/bipeds.h"
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/rasterizer_main.h"
@@ -90,7 +86,9 @@
 #include "widgets/cloth.h"
 #include "widgets/liquid.h"
 
+#ifdef TERMINAL_ENABLED
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
+#endif
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
@@ -621,7 +619,6 @@ static void h2mod_apply_hooks(void)
 
 	cheats_apply_patches();
 	main_apply_patches();
-	main_game_time_apply_patches();
 	game_statborg_apply_patches();
 	simulation_game_objects_apply_patches();
 	simulation_game_units_apply_patches();
@@ -691,7 +688,6 @@ static void h2mod_apply_hooks(void)
 		bipeds_apply_patches();
 		unit_apply_patches();
 
-		user_interface_apply_patches();
 		user_interface_text_apply_hooks();
 		user_interface_controller_apply_patches();
 		hud_messaging_apply_hooks();
@@ -724,11 +720,9 @@ static void h2mod_apply_hooks(void)
 		render_weather_apply_patches();
 
 		cinematics_apply_patches();
-		game_time_apply_patches();
 		game_state_procs_apply_patches();
 		apply_particle_update_patches();
 		apply_dead_camera_patches();
-		loading_apply_patches();
 		liquid_apply_patches();
 		contrails_apply_patches();
 		cloth_apply_patches();
@@ -736,7 +730,6 @@ static void h2mod_apply_hooks(void)
 		player_control_apply_patches();
 		effects_apply_patches();
 		xinput_apply_patches();
-		player_vibration_apply_patches();
 		input_windows_apply_patches();
 		input_abstraction_patches_apply();
 		render_apply_patches();
@@ -899,7 +892,7 @@ __declspec(naked) static void update_biped_ground_mode_physics_constant(void)
 static void bipeds_physics_apply_patches(void)
 {
 	// fixes edge drop fast fall when using higher tickrates than 30
-	PatchCall(Memory::GetAddress(0x1082B4, 0xFA5D4), biped_ground_mode_update_to_stdcall);
+	//PatchCall(Memory::GetAddress(0x1082B4, 0xFA5D4), biped_ground_mode_update_to_stdcall);
 	Codecave(Memory::GetAddress(0x106E23, 0xF9143), update_biped_ground_mode_physics_constant, 3);
 
 	// melee physics mode hooks
@@ -916,13 +909,12 @@ static void __stdcall biped_ground_mode_update_hook(
 {
 	const real32 k_edge_drop_value = 0.117f;
 
-	typedef void(__thiscall* biped_ground_mode_update_t)(void*, void*, void*, void*, int32, real32);
-	auto p_biped_ground_mode_update = Memory::GetAddress<biped_ground_mode_update_t>(0x1067F0, 0xF8B10);
 
 	real32 edge_drop_per_tick = 30.f * k_edge_drop_value * game_tick_length();
 
 	// push last parameter despite the function taking just 5 parameters
-	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edge_drop_per_tick);
+	INVOKE_TYPE(0x1067F0, 0xF8B10, void(__thiscall*)(void*, void*, void*, void*, int32, real32), thisx, physics_output, physics_input, a4, a5, edge_drop_per_tick);
+
 
 	// account for the last parameter that doesn't get handled by the actual function
 	__asm add esp, 4;

@@ -7,3 +7,8 @@ bool __cdecl network_search_initialize(void)
 {
 	return INVOKE(0x1E9D0A, 0x1A9410, network_search_initialize);
 }
+
+void __cdecl network_search_update(void)
+{
+	return INVOKE(0x1EA00A, 0x1A9710, network_search_update);
+}

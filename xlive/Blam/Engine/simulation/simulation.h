@@ -11,7 +11,7 @@ enum
 	k_maximum_simulation_player_updates = 64
 };
 
-struct alignas(8) simulation_update
+struct simulation_update
 {
 	int32 simulation_time;
 	bool simulation_in_progress;
@@ -52,6 +52,9 @@ s_simulation_globals* simulation_get_globals();
 
 void simulation_reset(void);
 bool simulation_reset_in_progress();
+
+void __cdecl simulation_update(void);
+
 bool simulation_starting_up(void);
 void simulation_notify_reset_complete();
 
@@ -60,13 +63,15 @@ void simulation_destroy_update(void);
 bool simulation_query_object_is_predicted(datum object_datum);
 c_simulation_type_collection* simulation_get_type_collection();
 
-void __cdecl simulation_apply_before_game(const simulation_update* update);
+void __cdecl simulation_apply_before_game(const struct simulation_update* update);
 
-void simulation_apply_after_game(const simulation_update* update);
+void simulation_apply_after_game(const struct simulation_update* update);
 
-void __cdecl simulation_build_update(simulation_update* update);
+void __cdecl simulation_build_update(struct simulation_update* update);
 
-void __cdecl simulation_update_aftermath(const simulation_update* update);
+void __cdecl simulation_update_aftermath(const struct simulation_update* update);
+
+void simulation_update_pregame(void);
 
 void __cdecl simulation_process_input(uint32 player_action_mask, const player_action* player_actions);
 

@@ -12,7 +12,17 @@
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
-real32 g_player_control_dt = 0.0f;
+/* globals */
+
+static real32 g_player_control_dt = 0.0f;
+
+/* public code */
+
+void __cdecl player_control_update(real32 world_seconds_elapsed, real32 game_seconds_elapsed)
+{
+	INVOKE(0x93857, 0x4BB57, player_control_update, world_seconds_elapsed, game_seconds_elapsed);
+	return;
+}
 
 void player_control_update_dt(real32 dt)
 {

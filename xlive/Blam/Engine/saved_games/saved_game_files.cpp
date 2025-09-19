@@ -55,6 +55,12 @@ s_saved_game_files_globals* saved_game_files_globals_get()
 	return Memory::GetAddress<s_saved_game_files_globals*>(0x482424);
 }
 
+void __cdecl saved_game_files_update(void)
+{
+	INVOKE(0x46834, 0x0, saved_game_files_update);
+	return;
+}
+
 bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* out_info, uint32 enumerated_index)
 {
 	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();

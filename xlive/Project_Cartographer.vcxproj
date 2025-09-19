@@ -865,6 +865,7 @@
     <ClCompile Include="Blam\Engine\bitmaps\targa_file.cpp" />
     <ClCompile Include="Blam\Engine\bitmaps\tiff_file.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
+    <ClCompile Include="Blam\Engine\cache\cache_files_windows.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_file_verification.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_geometry_cache.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_texture_cache.cpp" />
@@ -899,6 +900,7 @@
     <ClCompile Include="Blam\Engine\cseries\threads_windows.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\recorded_animations.cpp" />
+    <ClCompile Include="Blam\Engine\editor\editor_stubs.cpp" />
     <ClCompile Include="Blam\Engine\effects\beam.cpp" />
     <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
     <ClCompile Include="Blam\Engine\effects\effects.cpp" />
@@ -930,6 +932,7 @@
     <ClCompile Include="Blam\Engine\input\input_process.cpp" />
     <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
     <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
+    <ClCompile Include="Blam\Engine\interface\damaged_media.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_draw.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_nav_points.cpp" />
     <ClCompile Include="Blam\Engine\interface\interface.cpp" />
@@ -1001,7 +1004,6 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_guide.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_networking.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game.cpp" />
-    <ClCompile Include="Blam\Engine\main\main_game_time.cpp" />
     <ClCompile Include="Blam\Engine\main\main_render.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_debug_pc.cpp" />
@@ -1101,6 +1103,7 @@
     <ClCompile Include="Blam\Engine\physics\collisions.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_model_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_usage.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok.cpp" />
     <ClCompile Include="Blam\Engine\physics\impacts.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
@@ -1394,6 +1397,7 @@
     <ClInclude Include="Blam\Engine\input\input_windows.h" />
     <ClInclude Include="Blam\Engine\input\input_xinput.h" />
     <ClInclude Include="Blam\Engine\interface\channel_with_history.h" />
+    <ClInclude Include="Blam\Engine\interface\damaged_media.h" />
     <ClInclude Include="Blam\Engine\interface\dialog_channel.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
     <ClInclude Include="Blam\Engine\interface\gameshell_background_channel.h" />
@@ -1496,7 +1500,6 @@
     <ClInclude Include="Blam\Engine\main\loading.h" />
     <ClInclude Include="Blam\Engine\main\main.h" />
     <ClInclude Include="Blam\Engine\main\main_game.h" />
-    <ClInclude Include="Blam\Engine\main\main_game_time.h" />
     <ClInclude Include="Blam\Engine\main\main_render.h" />
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
     <ClInclude Include="Blam\Engine\items\items.h" />
@@ -1867,6 +1870,7 @@
     <ClInclude Include="Blam\Engine\physics\collision_bsp_definition.h" />
     <ClInclude Include="Blam\Engine\physics\collision_models.h" />
     <ClInclude Include="Blam\Engine\physics\collision_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_usage.h" />
     <ClInclude Include="Blam\Engine\physics\havok.h" />
     <ClInclude Include="Blam\Engine\physics\havok_component.h" />
     <ClInclude Include="Blam\Engine\physics\havok_memory.h" />

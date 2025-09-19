@@ -400,19 +400,11 @@ static error_code_string_mapping table[k_last_ui_error_code + 1] =
 
 static s_user_interface_globals* user_interface_globals_get(void);
 
-/* private code */
-
 static const char* user_interface_error_codes_get_name(e_ui_error_types error_code);
 
 static void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool confirmation);
 
 /* public code */
-
-void user_interface_apply_patches(void)
-{
-	PatchCall(Memory::GetAddress(0x39C7A), user_interface_update);
-	return;
-}
 
 bool __cdecl user_interface_automation_is_active(void)
 {

@@ -100,11 +100,14 @@ struct s_player_control_camera_info
 };
 ASSERT_STRUCT_SIZE(s_player_control_camera_info, 24);
 
+void __cdecl player_control_update(real32 world_seconds_elapsed, real32 game_seconds_elapsed);
+
 void player_control_disable_local_camera(bool state);
 
 s_player_control_globals* player_control_globals_get(void);
 s_player_control* player_control_get(int32 user_index);
 int16 player_control_get_zoom_level(int32 user_index);
+
 
 void player_control_update_dt(real32 dt);
 
