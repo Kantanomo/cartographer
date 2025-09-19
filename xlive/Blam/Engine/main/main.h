@@ -17,3 +17,6 @@ void __cdecl main_loop_pregame(int32 a1, int32 a2);
 void __cdecl main_reset_map_immediate(void);
 
 void __cdecl main_loop_body(void);
+
+void main_halt_and_catch_fire(void);
+

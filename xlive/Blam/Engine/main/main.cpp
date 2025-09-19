@@ -60,6 +60,12 @@ void __cdecl main_reset_map_immediate()
 	return;
 }
 
+void main_halt_and_catch_fire(void)
+{
+	// TODO: implement
+	return;
+}
+
 /* private code */
 
 static void __cdecl main_game_reset_map_blue_screen_detection()
