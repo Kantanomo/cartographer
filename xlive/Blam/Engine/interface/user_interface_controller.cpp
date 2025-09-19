@@ -547,7 +547,7 @@ static void user_interface_controller_removed_handler(void)
 
 		const scenario* scnr = global_scenario_get();
 
-		if (scnr && scnr->type == scenario_type_singleplayer && !game_time_get_paused())
+		if (scnr && scnr->type == _scenario_type_solo && !game_time_get_paused())
 		{
 			game_time_set_paused(true);
 			sound_pause(false);
@@ -566,7 +566,7 @@ static void user_interface_controller_boot_to_dash_check(void)
 		e_ui_error_types error_id = _ui_error_confirm_boot_to_dash;
 		void* exit_callback = user_interface_exit_to_dash;
 
-		if (user_interface_globals_get_map_type() == scenario_type_singleplayer)
+		if (user_interface_globals_get_map_type() == _scenario_type_solo)
 		{
 			error_id = _ui_error_confirm_save_and_exit_campaign;
 			exit_callback = user_interface_save_map_and_exit;

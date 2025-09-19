@@ -36,7 +36,7 @@ void halloween_event_map_load(void)
 {
 	// Load specific tags from shared and modify placements depending on the map being played
 
-	const s_cache_header* cache_header = cache_files_get_header();
+	const cache_file_header* cache_header = cache_files_get_header();
 
 	tag_injection_set_active_map(k_events_map);
 
@@ -62,11 +62,12 @@ void halloween_event_map_load(void)
 		}
 
 		scenario* scenario_definition = (scenario*)tag_get_fast(cache_files_get_tags_header()->scenario_index);
-		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(scenario_definition->structure_bsps[0]->structure_bsp.index);
+		const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsps, 0, scenario_structure_bsp_reference);
+		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(reference->structure_bsp.index);
 
 		if (tag_injection_is_injected(sky_datum))
 		{
-			scenario_definition->skies[0]->index = sky_datum;
+			TAG_BLOCK_GET_ELEMENT(&scenario_definition->skies, 0, tag_reference)->index = sky_datum;
 		}
 
 		if (ltmp_datum != NONE && lbitm_datum != NONE)
@@ -116,7 +117,7 @@ static void halloween_game_life_cycle_update(e_game_life_cycle state)
 		scenery_definition* pump = (scenery_definition*)tag_get_fast(pump_datum);
 		s_model_definition* pump_hmlt = (s_model_definition*)tag_get_fast(pump->object.model.index);
 
-		const s_cache_header* cache_header = cache_files_get_header();
+		const cache_file_header* cache_header = cache_files_get_header();
 		if (!strcmp(cache_header->name, "coagulation"))
 		{
 			for (auto& scen_place : k_coag_scen_places)

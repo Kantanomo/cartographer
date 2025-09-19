@@ -94,7 +94,8 @@ static void tag_fixes_masterchief(void)
 	if (visor_shader_datum != NONE)
 	{
 		s_shader_definition* visor_shader = (s_shader_definition*)tag_get_fast(visor_shader_datum);
-		visor_shader->postprocess_definition[0]->shader_template_index = tex_bump_env_datum;
+		s_shader_postprocess_definition_new* postprocess = TAG_BLOCK_GET_ELEMENT(&visor_shader->postprocess_definition, 0, s_shader_postprocess_definition_new);
+		postprocess->shader_template_index = tex_bump_env_datum;
 	}
 	return;
 }
@@ -131,12 +132,14 @@ static void tag_fixes_brute(void)
 	if (brute_shader_index != NONE && brute_head_shader_index != NONE)
 	{
 		s_shader_definition* shader = (s_shader_definition*)tag_get_fast(brute_shader_index);
-		*shader->postprocess_definition[0]->pixel_constants[0] = D3DCOLOR_RGBA(87, 79, 69, 0);
-		*shader->postprocess_definition[0]->pixel_constants[1] = D3DCOLOR_RGBA(180, 179, 189, 0);
+		s_shader_postprocess_definition_new* postprocess = TAG_BLOCK_GET_ELEMENT(&shader->postprocess_definition, 0, s_shader_postprocess_definition_new);
+
+		*postprocess->pixel_constants[0] = D3DCOLOR_RGBA(87, 79, 69, 0);
+		*postprocess->pixel_constants[1] = D3DCOLOR_RGBA(180, 179, 189, 0);
 
 		shader = (s_shader_definition*)tag_get_fast(brute_head_shader_index);
-		*shader->postprocess_definition[0]->pixel_constants[0] = D3DCOLOR_RGBA(255, 255, 255, 0);
-		*shader->postprocess_definition[0]->pixel_constants[1] = D3DCOLOR_RGBA(180, 179, 189, 0);
+		*postprocess->pixel_constants[0] = D3DCOLOR_RGBA(255, 255, 255, 0);
+		*postprocess->pixel_constants[1] = D3DCOLOR_RGBA(180, 179, 189, 0);
 	}
 	return;
 }
@@ -156,7 +159,8 @@ static void tag_fixes_smg(void)
 		datum tex_bump_active_camo_index = tag_loaded(_tag_group_shader_template, "shaders\\shader_templates\\opaque\\tex_bump_active_camo");
 		if (tex_bump_active_camo_index != NONE)
 		{
-			smg_painted_metal->postprocess_definition[0]->shader_template_index = tex_bump_active_camo_index;
+			s_shader_postprocess_definition_new* postprocess = TAG_BLOCK_GET_ELEMENT(&smg_painted_metal->postprocess_definition, 0, s_shader_postprocess_definition_new);
+			postprocess->shader_template_index = tex_bump_active_camo_index;
 		}
 	}
 	return;
@@ -172,8 +176,14 @@ static void tag_fixes_environment(void)
 	{
 		// Set bitmaps to originals (Changed for some reason in h2v)
 		s_shader_definition* glass_interrior = (s_shader_definition*)tag_get_fast(glass_interrior_index);
-		glass_interrior->postprocess_definition[0]->bitmaps[0]->bitmap_index = forerunner_interiors_index;
-		glass_interrior->postprocess_definition[0]->bitmaps[2]->bitmap_index = glass_smudged_index;
+
+		s_shader_postprocess_definition_new* postprocess = TAG_BLOCK_GET_ELEMENT(&glass_interrior->postprocess_definition, 0, s_shader_postprocess_definition_new);
+		
+		s_shader_postprocess_bitmap_new* bitmap_0 = TAG_BLOCK_GET_ELEMENT(&postprocess->bitmaps, 0, s_shader_postprocess_bitmap_new);
+		bitmap_0->bitmap_index = forerunner_interiors_index;
+
+		s_shader_postprocess_bitmap_new* bitmap_2 = TAG_BLOCK_GET_ELEMENT(&postprocess->bitmaps, 2, s_shader_postprocess_bitmap_new);
+		bitmap_2->bitmap_index = glass_smudged_index;
 	}
 
 	// Fix forerunner strips shader
@@ -181,8 +191,9 @@ static void tag_fixes_environment(void)
 	datum tex_bump_index = tag_loaded(_tag_group_shader_template, "shaders\\shader_templates\\opaque\\tex_bump");
 	if (panel_thin_strips_index != NONE && tex_bump_index != NONE)
 	{
-		s_shader_definition* shader = (s_shader_definition*)tag_get_fast(panel_thin_strips_index);
-		shader->postprocess_definition[0]->shader_template_index = tex_bump_index;
+		const s_shader_definition* shader = (s_shader_definition*)tag_get_fast(panel_thin_strips_index);
+		s_shader_postprocess_definition_new* postprocess = TAG_BLOCK_GET_ELEMENT(&shader->postprocess_definition, 0, s_shader_postprocess_definition_new);
+		postprocess->shader_template_index = tex_bump_index;
 	}
 
 	return;
@@ -190,7 +201,7 @@ static void tag_fixes_environment(void)
 
 static void tag_fixes_misty_rain(void)
 {
-	const s_cache_header* cache_header = cache_files_get_header();
+	const cache_file_header* cache_header = cache_files_get_header();
 
 	if (!strcmp(cache_header->name, "05a_deltaapproach"))
 	{
@@ -205,16 +216,17 @@ static void tag_fixes_misty_rain(void)
 
 				// Set the field in the scenario
 				scenario* scenario_definition = global_scenario_get();
-				structure_weather_palette_entry* palette = scenario_definition->weather_palette[0];
+				structure_weather_palette_entry* palette = TAG_BLOCK_GET_ELEMENT(&scenario_definition->weather_palette, 0, structure_weather_palette_entry);
 				const char name[] = "misty_cs";
 				csstrncpy(palette->name, name, NUMBEROF(name));
 				palette->weather_system.group.group = _tag_group_weather_system;
 				palette->weather_system.index = misty_rain_datum;
 
 				// Set the field in every single bsp in the scenario
-				for(int32 i = 0; i < scenario_definition->structure_bsps.count; ++i)
+				for (int32 i = 0; i < scenario_definition->structure_bsps.count; ++i)
 				{
-					structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(global_scenario_get()->structure_bsps[i]->structure_bsp.index);
+					const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsps, i, scenario_structure_bsp_reference);
+					structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(reference->structure_bsp.index);
 					structure_weather_palette_entry* bsp_palette = bsp_definition->weather_palette[0];
 					csstrncpy(bsp_palette->name, name, NUMBEROF(name));
 					bsp_palette->weather_system.group.group = _tag_group_weather_system;

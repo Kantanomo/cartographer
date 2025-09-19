@@ -4,26 +4,26 @@
 #include "ai_scenario_definitions.h"
 #include "zone.h"
 
-enum e_order_flags : int
+enum e_order_flags : int32
 {
-	order_flag_locked = FLAG(0),
-	order_flag_always_active = FLAG(1),
-	order_flag_debug_on = FLAG(2),
-	order_flag_strict_area_def = FLAG(3),
-	order_flag_follow_closest_player = FLAG(4),
-	order_flag_follow_squad = FLAG(5),
-	order_flag_active_camo = FLAG(6),
-	order_flag_suppress_combat_until_engaged = FLAG(7),
-	order_flag_inhibit_vehicle_use = FLAG(8)
+	_order_locked_bit = 0,
+	_order_always_active_bit = 1,
+	_order_debug_on_bit = 2,
+	_order_strict_area_def_bit = 3,
+	_order_follow_closest_player_bit = 4,
+	_order_follow_squad_bit = 5,
+	_order_active_camo_bit = 6,
+	_order_suppress_combat_until_engaged_bit = 7,
+	_order_inhibit_vehicle_use_bit = 8
 };
 
-enum e_force_combat_status : short
+enum e_force_combat_status : int16
 {
-	force_combat_status_none = 0,
-	force_combat_status_asleep = 1,
-	force_combat_status_idle = 2,
-	force_combat_status_alert = 3,
-	force_combat_status_combat = 4
+	_force_combat_status_none = 0,
+	_force_combat_status_asleep = 1,
+	_force_combat_status_idle = 2,
+	_force_combat_status_alert = 3,
+	_force_combat_status_combat = 4
 };
 
 enum e_order_trigger_reference : int
@@ -31,11 +31,46 @@ enum e_order_trigger_reference : int
 	order_trigger_reference_flag_not = FLAG(0)
 };
 
+enum e_trigger_flags : int
+{
+	trigger_flag_latch_on_when_triggered = FLAG(0)
+};
+
+enum e_order_rule_type : int16
+{
+	_order_rule_type_a_or_greater_alive = 0,
+	_order_rule_type_a_or_fewer_alive = 1,
+	_order_rule_type_x_or_greater_strength = 2,
+	_order_rule_type_x_or_less_strength = 3,
+	_order_rule_type_if_enemy_sighted = 4,
+	_order_rule_type_after_a_ticks = 5,
+	_order_rule_type_if_alerted_by_squad_a = 6,
+	_order_rule_type_script_ref_true = 7,
+	_order_rule_type_script_ref_false = 8,
+	_order_rule_type_if_player_in_trigger_volume = 9,
+	_order_rule_type_if_all_players_in_trigger_volume = 10,
+	_order_rule_type_combat_status_a_or_more = 11,
+	_order_rule_type_combat_status_a_or_less = 12,
+	_order_rule_type_arrived = 13,
+	_order_rule_type_in_vehicle = 14,
+	_order_rule_type_sighted_player = 15,
+	_order_rule_type_a_or_greater_fighting = 16,
+	_order_rule_type_a_or_fewer_fighting = 17,
+	_order_rule_type_player_within_x_world_units = 18,
+	_order_rule_type_player_shot_more_than_x_seconds_ago = 19,
+	_order_rule_type_game_safe_to_save = 20
+};
+
+enum e_order_completion_condition_flags
+{
+	order_completion_condition_flag_not = FLAG(0)
+};
+
 // max_count: 10
 struct order_trigger_reference
 {
 	e_order_trigger_reference trigger_flags;
-	short trigger;                  // Block index: triggers_block
+	short trigger;                  // Block index: trigger_definition
 	short pad;
 };
 ASSERT_STRUCT_SIZE(order_trigger_reference, 8);
@@ -65,15 +100,15 @@ struct orders_definition
 {
 	/* filt */
 	char name[32];
-	short style;            // Block Index: style_palette_block
-	short pad;
+	int16 style;            // Block Index: style_palette_block
+	int16 pad;
 	e_order_flags flags;
 	e_force_combat_status force_combat_status;
-	short pad1;
+	int16 pad1;
 	char entry_script[32];
-	short pad2;
-	short follow_squad;      // Block Index: squads_block
-	float follow_radius;
+	int16 entry_script_index;
+	int16 follow_squad;      // Block Index: squads_block
+	real32 follow_radius;
 
 	tag_block<orders_area_reference_definition> primary_area_set;
 	tag_block<orders_area_reference_definition> secondary_area_set;
@@ -83,70 +118,39 @@ struct orders_definition
 };
 ASSERT_STRUCT_SIZE(orders_definition, 124);
 
-enum e_trigger_flags : int
-{
-	trigger_flag_latch_on_when_triggered = FLAG(0)
-};
-
-enum e_order_rule_type : short
-{
-	order_rule_type_a_or_greater_alive = 0,
-	order_rule_type_a_or_fewer_alive = 1,
-	order_rule_type_x_or_greater_strength = 2,
-	order_rule_type_x_or_less_strength = 3,
-	order_rule_type_if_enemy_sighted = 4,
-	order_rule_type_after_a_ticks = 5,
-	order_rule_type_if_alerted_by_squad_a = 6,
-	order_rule_type_script_ref_true = 7,
-	order_rule_type_script_ref_false = 8,
-	order_rule_type_if_player_in_trigger_volume = 9,
-	order_rule_type_if_all_players_in_trigger_volume = 10,
-	order_rule_type_combat_status_a_or_more = 11,
-	order_rule_type_combat_status_a_or_less = 12,
-	order_rule_type_arrived = 13,
-	order_rule_type_in_vehicle = 14,
-	order_rule_type_sighted_player = 15,
-	order_rule_type_a_or_greater_fighting = 16,
-	order_rule_type_a_or_fewer_fighting = 17,
-	order_rule_type_player_within_x_world_units = 18,
-	order_rule_type_player_shot_more_than_x_seconds_ago = 19,
-	order_rule_type_game_safe_to_save = 20
-};
-
-enum e_order_completion_condition_flags
-{
-	order_completion_condition_flag_not = FLAG(0)
-};
-
 // max count: 5
 struct order_completion_condition_definition
 {
 	e_order_rule_type rule_type;
-	short squad;            // Block Index: squads_block
-	short squad_group;      // Block Index: squad_groups_block
-	short a;
-	float x;
-	short trigger_volume;    // Block Index: scenario_trigger_volume_block
-	short pad;
+	int16 squad;            // Block Index: squads_block
+	int16 squad_group;      // Block Index: squad_groups_block
+	int16 a;
+	real32 x;
+	int16 trigger_volume;    // Block Index: scenario_trigger_volume_block
+	int16 pad;
 	char exit_condition_script[32];
-	short exit_condition_script_index;
-	short pad1;
+	int16 exit_condition_script_index;
+	int16 pad1;
 	e_order_completion_condition_flags flags;
 };
 ASSERT_STRUCT_SIZE(order_completion_condition_definition, 56);
 
 // max count: 256
-struct triggers_block
+struct trigger_definition
 {
 	/* filt */
 	char name[32];
 	e_trigger_flags trigger_flags;
 	e_combination_rule combination_rule;
-	short pad;
-	tag_block<order_completion_condition_definition> conditions;
+	int16 pad;
+	s_tag_block conditions;	// struct: order_completion_condition_definition
 };
-ASSERT_STRUCT_SIZE(triggers_block, 48);
+ASSERT_STRUCT_SIZE(trigger_definition, 48);
 
 /* prototypes */
 
 void __cdecl orders_initialize_for_new_map(void);
+
+bool orders_verify_script_references(orders_definition* orders, bool a2);
+
+bool trigger_verify_script_references(trigger_definition* trigger, bool a2);

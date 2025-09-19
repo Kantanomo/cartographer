@@ -308,7 +308,7 @@ void Infection::removeUnwantedItems()
 		{
 			item_collection_definition* itmc = (item_collection_definition*)tag_get_fast(iterator.current_tag_index);
 
-			for (int i = 0; i < itmc->item_permutations.count; i++)
+			for (int32 i = 0; i < itmc->item_permutations.count; i++)
 			{
 				itmc->item_permutations[i]->item.group.group = _tag_group_equipment;
 				itmc->item_permutations[i]->item.index = shotgun_ammo_equip_datum;
@@ -320,7 +320,7 @@ void Infection::removeUnwantedItems()
 	scenario* scenario_definition = global_scenario_get();
 	for (int32 i = 0; i < scenario_definition->netgame_equipment.count; i++)
 	{
-		scenario_netgame_equipment* netgame_equipment = scenario_definition->netgame_equipment[i];
+		scenario_netgame_equipment* netgame_equipment = TAG_BLOCK_GET_ELEMENT(&scenario_definition->netgame_equipment, i, scenario_netgame_equipment);
 		if (netgame_equipment->item_vehicle_collection.group.group == _tag_group_vehicle_collection)
 		{
 			netgame_equipment->classification = netgame_item_classification_powerup;

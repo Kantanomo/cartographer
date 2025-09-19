@@ -1,11 +1,16 @@
 #pragma once
+#include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
+
+/* enums */
 
 enum e_cs_point_set_flags : int
 {
 	cs_point_set_flag_manual_reference_frame = FLAG(0),
 	cs_point_set_flag_turret_deployment = FLAG(1)
 };
+
+/* structures */
 
 // max count: 20
 struct cs_point
@@ -23,8 +28,8 @@ struct cs_point_set
 {
 	char name[32];
 	tag_block<cs_point> points;
-	short bsp_index;            // Block index: scenario_structure_bsp_reference
-	short manual_reference_frame;
+	int16 bsp_index;            // Block index: scenario_structure_bsp_reference
+	int16 manual_reference_frame;
 	e_cs_point_set_flags flags;
 };
 ASSERT_STRUCT_SIZE(cs_point_set, 48);
@@ -32,8 +37,8 @@ ASSERT_STRUCT_SIZE(cs_point_set, 48);
 // max count: 1
 struct cs_script_data
 {
-	tag_block<cs_point_set> point_sets;
-	byte pad[120];
+	s_tag_block point_sets;	// struct: cs_point_set
+	int8 pad[120];
 };
 ASSERT_STRUCT_SIZE(cs_script_data, 128);
 

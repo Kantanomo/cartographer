@@ -101,7 +101,7 @@ ASSERT_STRUCT_SIZE(s_shader_postprocess_bitmap_new, 12);
 struct s_shader_postprocess_definition_new
 {
 	datum shader_template_index;
-	tag_block<s_shader_postprocess_bitmap_new> bitmaps;
+	s_tag_block bitmaps;			// struct: s_shader_postprocess_bitmap_new
 	tag_block<pixel32> pixel_constants;
 	tag_block<real_vector4d> vertex_constants;
 	tag_block<s_shader_postprocess_level_of_detail_new> levels_of_detail;
@@ -112,25 +112,19 @@ struct s_shader_postprocess_definition_new
 	tag_block<s_shader_postprocess_overlay_reference> overlay_references;
 	tag_block<s_shader_postprocess_animated_parameter> animated_parameters;
 	tag_block<s_shader_postprocess_animated_parameter_reference> animated_parameter_references;
-	tag_block<s_shader_postprocess_bitmap_property> bitmap_properties;
+	s_tag_block bitmap_properties;	// struct: s_shader_postprocess_bitmap_property
 	tag_block<s_shader_postprocess_color_property> color_properties;
 	tag_block<s_shader_postprocess_value_property> value_properties;
 	tag_block<s_shader_postprocess_level_of_detail_new> old_levels_of_detail;
 
 	s_shader_postprocess_bitmap_property* bitmap_property_get(int32 index) const
 	{
-		return (s_shader_postprocess_bitmap_property*)tag_block_get_element_with_size(
-			(s_tag_block*)&this->bitmap_properties,
-			index,
-			sizeof(s_shader_postprocess_bitmap_property));
+		return TAG_BLOCK_GET_ELEMENT(&bitmap_properties, index, s_shader_postprocess_bitmap_property);
 	}
 
 	s_shader_postprocess_bitmap_new* bitmap_get(int16 index) const
 	{
-		return (s_shader_postprocess_bitmap_new*)tag_block_get_element_with_size(
-			(s_tag_block*)&this->bitmaps,
-			index,
-			sizeof(s_shader_postprocess_bitmap_new));
+		return TAG_BLOCK_GET_ELEMENT(&bitmaps, index, s_shader_postprocess_bitmap_new);
 	}
 };
 ASSERT_STRUCT_SIZE(s_shader_postprocess_definition_new, 124)

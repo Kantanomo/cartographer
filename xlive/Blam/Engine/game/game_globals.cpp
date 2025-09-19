@@ -286,12 +286,17 @@ static void add_simulation_table_entries(s_game_globals_custom_representation_re
 	}
 
 	// do a second pass to place them into the new table
-	s_scenario_simulation_definition_table_element* new_blocks = (s_scenario_simulation_definition_table_element*)tag_injection_extend_block(&scenario->simulation_definition_table, scenario->simulation_definition_table.type_size(), new_entry_count);
+	s_scenario_simulation_definition_table_element* new_blocks = (s_scenario_simulation_definition_table_element*)
+	tag_injection_extend_block(
+		&scenario->simulation_definition_table,
+		sizeof(s_scenario_simulation_definition_table_element),
+		new_entry_count
+	);
 	new_entry_count = 0;
 
 	for(uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
 	{
-		if(representations[i].success && representations[i].third_person_unit != NONE)
+		if (representations[i].success && representations[i].third_person_unit != NONE)
 		{
 			new_blocks[new_entry_count].tag_datum = representations[i].third_person_unit;
 			++new_entry_count;

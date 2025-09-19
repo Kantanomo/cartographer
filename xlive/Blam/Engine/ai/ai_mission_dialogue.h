@@ -1,8 +1,5 @@
 #pragma once
 #include "ai_scenario_definitions.h"
-#include "ai_orders.h"
-
-#include "tag_files/tag_block.h"
 #include "tag_files/string_id.h"
 
 /* constants */
@@ -32,7 +29,7 @@ enum e_ai_scene_role_group : int16
 
 enum e_ai_conversation_flags : uint16
 {
-	_ai_conversation_stop_if_anyone_dies_bit = 0,           // This Conversation Will Be Aborted If Any Participant Dies
+	_ai_conversation_stop_if_anyone_dies_bit = 0,       // This Conversation Will Be Aborted If Any Participant Dies
 	_ai_conversation_stop_if_damaged_bit = 1,			// An Actor Will Abort This Conversation If They Are Damaged
 	_ai_conversation_stop_if_visible_enemy_bit = 2,     // An Actor Will Abort This Conversation If They See An Enemy
 	_ai_conversation_stop_if_alerted_to_enemy_bit = 3,	// An Actor Will Abort This Conversation If They Suspect An Enemy 
@@ -54,11 +51,12 @@ enum e_ai_conversation_line_flags : uint16
 	k_number_of_conversation_line_flags
 };
 
-enum e_conversation_line_addressee : short
+enum e_conversation_line_addressee : int16
 {
-	conversation_line_addressee_none = 0,
-	conversation_line_addressee_player = 1,
-	conversation_line_addressee_participant = 2
+	_ai_conversation_address_none = 0,
+	_ai_conversation_address_player,
+	_ai_conversation_address_participant,
+	NUMBER_OF_CONVERSATION_ADDRESS_TYPES,
 };
 
 /* structures */
@@ -68,7 +66,7 @@ struct ai_scene_trigger
 {
 	e_combination_rule combination_rule;
 	int16 pad;
-	tag_block<order_trigger_reference> triggers;
+	s_tag_block triggers;	// struct: order_trigger_reference
 };
 ASSERT_STRUCT_SIZE(ai_scene_trigger, 12);
 
@@ -85,7 +83,7 @@ struct ai_scene_role
 	string_id name;
 	e_ai_scene_role_group group;
 	int16 pad;
-	tag_block<ai_scene_role_variant> role_variants;
+	s_tag_block role_variants;	// struct: ai_scene_role_variant
 };
 ASSERT_STRUCT_SIZE(ai_scene_role, 16);
 
@@ -94,8 +92,8 @@ struct ai_scene
 {
 	string_id name;
 	c_flags_no_init<e_ai_scene_flags, uint32, k_ai_scene_flag_count> flags;
-	tag_block<ai_scene_trigger> trigger_conditions;
-	tag_block<ai_scene_role> roles;
+	s_tag_block trigger_conditions;	// struct: ai_scene_trigger
+	s_tag_block roles;				// struct: ai_scene_role
 };
 ASSERT_STRUCT_SIZE(ai_scene, 24);
 
@@ -151,11 +149,13 @@ struct ai_conversation
 	real32 trigger_dist;		// (World Units) distance the player must enter before the conversation can trigger
 	real32 run_to_player_dist;	// (World Units) if the 'involves player' flag is set, when triggered the conversation's participant(s) will run to within this distance of the player
 	
-	tag_block<ai_conversation_participant> participants;
-	tag_block<ai_conversation_line> lines;
-	tag_block<> null_tagblock;
+	uint32 unused[9];
+
+	s_tag_block participants;	// struct: ai_conversation_participant
+	s_tag_block lines;			// struct: ai_conversation_line
+	s_tag_block unused_block;
 };
-ASSERT_STRUCT_SIZE(ai_scene, 24);
+ASSERT_STRUCT_SIZE(ai_conversation, 104);
 
 // max count: k_max_variants_per_line
 struct mission_dialogue_variant
@@ -170,7 +170,7 @@ ASSERT_STRUCT_SIZE(mission_dialogue_variant, 16);
 struct mission_dialogue_line
 {
 	string_id name;
-	tag_block<mission_dialogue_variant> variants;
+	s_tag_block variants;	// struct: mission_dialogue_variant
 	string_id default_sound_effect;
 };
 ASSERT_STRUCT_SIZE(mission_dialogue_line, 16);
@@ -178,7 +178,7 @@ ASSERT_STRUCT_SIZE(mission_dialogue_line, 16);
 // max count: 1
 struct ai_mission_dialogue
 {
-	tag_block<mission_dialogue_line> lines;
+	s_tag_block lines;		// struct: mission_dialogue_line
 };
 ASSERT_STRUCT_SIZE(ai_mission_dialogue, 8);
 

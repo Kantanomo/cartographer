@@ -270,13 +270,13 @@ void c_shader_submission_interface_new::stage_texture(
 		case _shader_pass_texture_source_extern_shader_active_camo_bump:
 			ASSERT(m_extern_shader_index != NONE);
 			
-			shader_def = (s_shader_definition*)tag_get_fast(this->m_extern_shader_index);
-			pp_def = shader_def->postprocess_definition[0];
+			shader_def = (s_shader_definition*)tag_get_fast(m_extern_shader_index);
+			pp_def = TAG_BLOCK_GET_ELEMENT(&shader_def->postprocess_definition, 0, s_shader_postprocess_definition_new);
 			bitmap_index = pp_def->bitmap_property_get(4)->bitmap_index;
 			if (bitmap_index == NONE)
 			{
 				shader_def = (s_shader_definition*)tag_get_fast(rasterizer_globals_get_data()->global_shader.index);
-				pp_def = shader_def->postprocess_definition[0];
+				pp_def = TAG_BLOCK_GET_ELEMENT(&shader_def->postprocess_definition, 0, s_shader_postprocess_definition_new);
 				bitmap_index = pp_def->bitmap_property_get(4)->bitmap_index;
 
 				ASSERT(bitmap_index != NONE);

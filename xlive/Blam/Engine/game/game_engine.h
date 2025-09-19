@@ -1,7 +1,6 @@
 #pragma once
 #include "game_allegiance.h"
 #include "game_statborg.h"
-#include "players.h"
 
 #include "main/game_preferences.h"
 #include "math/color_math.h"
@@ -18,17 +17,6 @@ enum
 };
 
 /* enums */
-
-enum e_valid_multiplayer_games : short
-{
-	valid_multiplayer_game_capture_the_flag = FLAG(0),
-	valid_multiplayer_game_slayer = FLAG(1),
-	valid_multiplayer_game_oddball = FLAG(2),
-	valid_multiplayer_game_king_of_the_hill = FLAG(3),
-	valid_multiplayer_game_juggernaut = FLAG(4),
-	valid_multiplayer_game_territories = FLAG(5),
-	valid_multiplayer_game_assault = FLAG(6),
-};
 
 enum e_relevant_multiplayer_games : int
 {
@@ -417,7 +405,7 @@ s_simulation_player_netdebug_data* game_engine_get_netdebug_data(datum player_in
 
 void __cdecl game_engine_apply_map_patches(void);
 
-bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
+bool __cdecl game_engine_get_change_colors(struct s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
 
 bool __cdecl game_engine_variant_cleanup(uint16* flags);
 

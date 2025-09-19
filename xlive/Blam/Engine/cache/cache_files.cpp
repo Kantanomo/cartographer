@@ -58,7 +58,7 @@ bool cache_file_is_loaded()
 	return cache_file_memory_globals->tags_loaded;
 }
 
-s_cache_header* cache_files_get_header(void)
+cache_file_header* cache_files_get_header(void)
 {
 	s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
 
@@ -123,7 +123,7 @@ void __cdecl cache_file_close()
 	INVOKE(0x64C37, 0x4CC8E, cache_file_close);
 }
 
-bool __cdecl cache_header_verify(s_cache_header* cache_header)
+bool __cdecl cache_header_verify(cache_file_header* cache_header)
 {
 	return INVOKE(0x310E9, 0x24F99, cache_header_verify, cache_header);
 }
@@ -138,34 +138,19 @@ bool __cdecl cache_file_blocking_read(intptr_t a1, uint32 cache_offset, uint32 r
 	return INVOKE(0x64D01, 0x4CD58, cache_file_blocking_read, a1, cache_offset, read_size, out_buffer);
 }
 
-void scenario_tags_load_internal_panic()
-{
-	const s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
-
-	if(cache_file_memory_globals->tag_cache_base_address)
-	{
-		CSERIES_FREE((int*)(cache_file_memory_globals->tag_cache_base_address - *(int*)(cache_file_memory_globals->tag_cache_base_address - 4)));
-		cache_file_memory_globals = nullptr;
-	}
-
-	cache_file_close();
-	return;
-}
-
-
 bool scenario_tags_load_process_shared_tags()
 {
 	s_cache_file_memory_globals* cache_file_memory = cache_file_memory_globals_get();
 
 	cache_file_tags_header* tag_header = cache_file_memory->tags_header;
 	cache_file_tags_header* unmasked_tag_header = (cache_file_tags_header*)cache_file_memory->tag_cache_base_address;
-	s_cache_header* cache_header = cache_files_get_header();
-	s_cache_header shared_header;
+	cache_file_header* cache_header = cache_files_get_header();
+	cache_file_header shared_header;
 
-	csmemset(&shared_header, 0, sizeof(s_cache_header));
+	csmemset(&shared_header, 0, sizeof(cache_file_header));
 
 	// Read cache header
-	if(!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, 0, sizeof(s_cache_header), &shared_header, false))
+	if(!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, 0, sizeof(cache_file_header), &shared_header, false))
 		return false;
 
 	const uint32 aligned_tag_size = cache_file_align_read_size_to_cache_page(shared_header.tag_size);
@@ -208,52 +193,16 @@ bool scenario_tags_load_process_shared_tags()
 	return true;
 }
 
-bool scenario_tags_load_debug(void)
-{
-	s_cache_header* cache_header = cache_files_get_header();
-
-	const uint32 aligned_tag_name_read_size = cache_file_align_read_size_to_cache_page(cache_header->tag_name_buffer_size);
-	const uint32 aligned_tag_name_offset_read_size = cache_file_align_read_size_to_cache_page(sizeof(datum) * cache_header->debug_tag_name_count);
-
-	const uint32 aligned_string_id_table_read_size = cache_file_align_read_size_to_cache_page(cache_header->string_table_size);
-	const uint32 aligned_string_id_index_buffer_read_size = cache_file_align_read_size_to_cache_page(sizeof(string_id) * cache_header->string_table_count);
-
-	if(!cache_file_blocking_read(NONE, cache_header->tag_name_buffer_offset, aligned_tag_name_read_size, g_cache_file_debug_globals.debug_tag_name_buffer))
-	{
-		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load tag names from cache");
-		return false;
-	}
-
-	if (!cache_file_blocking_read(NONE, cache_header->tag_name_offsets_offset, aligned_tag_name_offset_read_size, g_cache_file_debug_globals.debug_tag_name_offsets))
-	{
-		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load tag name offsets from cache");
-		return false;
-	}
-
-	if(!cache_file_blocking_read(NONE, cache_header->string_table_offset, aligned_string_id_table_read_size, g_cache_file_debug_globals.debug_string_id_storage))
-	{
-		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load string table from cache");
-		return false;
-	}
-
-	if(!cache_file_blocking_read(NONE, cache_header->string_idx_offset, aligned_string_id_index_buffer_read_size, g_cache_file_debug_globals.debug_string_id_index))
-	{
-		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load string index table from cache");
-		return false;
-	}
-
-	return true;
-}
-
 bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 {
-	s_cache_header* cache_header = cache_files_get_header();
+	int32 tag_index = NONE;
+
+	cache_file_header* cache_header = cache_files_get_header();
 	s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
 
 	const bool custom_map = cache_file_memory_globals->custom_map;
-	const uint32 aligned_tag_size_read = cache_header->tag_size + cache_header->tag_offset_mask;
-
 	bool is_compatible = false;
+	
 	if (cache_header_verify(cache_header) && csstrnlen(cache_header->version_string, NUMBEROF(cache_header->version_string)) < 32)
 	{
 		if (shell_build_string_is_compatible(cache_header->version_string))
@@ -268,58 +217,50 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 
 	if (!is_compatible)
 	{
-		scenario_tags_load_internal_panic();
-		return false;
+		goto cache_file_header_invalid;
 	}
 
 	cache_header->tag_size = cache_file_align_read_size_to_cache_page(cache_header->tag_size);
 
+	const uint32 aligned_tag_size_read = cache_header->tag_size + cache_header->tag_offset_mask;
 	cache_file_memory_globals->tag_cache_base_address = datum_header_allocate(aligned_tag_size_read + k_injectable_allocation_size, 12);
 
 	if(!cache_file_memory_globals->tag_cache_base_address)
 	{
 		error(_error_log, "failed to allocate the physical memory for the tags");
+cache_file_header_invalid:
 		error(_error_log, "cache file header is invalid");
-		scenario_tags_load_internal_panic();
-		return false;
+		goto scenario_tags_load_internal_end;
 	}
 
 	csmemset((void*)cache_file_memory_globals->tag_cache_base_address, 0, aligned_tag_size_read);
-
-	set_tag_group_data_info(cache_file_memory_globals->tag_cache_base_address, aligned_tag_size_read);
+	tag_group_set_data_info(cache_file_memory_globals->tag_cache_base_address, aligned_tag_size_read);
 
 	const uint32 aligned_tag_header_read_size = cache_file_align_read_size_to_cache_page(cache_header->data_offset);
 	const uint32 aligned_tag_data_read_size = cache_file_align_read_size_to_cache_page(cache_header->data_size);
 
-	int8* memory_tag_header_data_start = (int8*)(cache_file_memory_globals->tag_cache_base_address + cache_header->tag_offset_mask);
-	int8* memory_tag_data_start = (int8*)(cache_header->tag_size + cache_header->tag_offset_mask + cache_file_memory_globals->tag_cache_base_address - cache_header->data_size);
+	// Read tag header data
 
-	// read tag header
-	if(!cache_file_blocking_read(NONE, cache_header->tag_offset, aligned_tag_header_read_size, memory_tag_header_data_start))
+	void* memory_tag_header_data_start = (void*)(cache_file_memory_globals->tag_cache_base_address + cache_header->tag_offset_mask);
+	is_compatible = cache_file_blocking_read(NONE, cache_header->tag_offset, aligned_tag_header_read_size, memory_tag_header_data_start);
+	if (!is_compatible)
 	{
 		global_preferences_flag_dirty();
 		error(_error_log, "failed to read the tags header, instances, and names section");
 		event(_event_error, "failed to read the tags header, instances, and names section [%s]", scenario_path);
-		scenario_tags_load_internal_panic();
-		return false;
+		goto cache_file_header_invalid;
 	}
 
-	// read tag data
-	if(!cache_file_blocking_read(NONE, cache_header->data_offset + cache_header->tag_offset, aligned_tag_data_read_size, memory_tag_data_start))
+	// Read tag data
+
+	void* memory_tag_data_start = (void*)(cache_header->tag_size + cache_header->tag_offset_mask + cache_file_memory_globals->tag_cache_base_address - cache_header->data_size);
+	is_compatible = cache_file_blocking_read(NONE, cache_header->data_offset + cache_header->tag_offset, aligned_tag_data_read_size, memory_tag_data_start);
+	if(!is_compatible)
 	{
 		global_preferences_flag_dirty();
 		error(_error_log, "failed to read the tag data section");
 		event(_event_error, "failed to read the tag data section [%s]", scenario_path);
-		scenario_tags_load_internal_panic();
-		return false;
-	}
-
-	// read debug info
-	if(!scenario_tags_load_debug())
-	{
-		global_preferences_flag_dirty();
-		scenario_tags_load_internal_panic();
-		return false;
+		goto cache_file_header_invalid;
 	}
 
 	cache_file_tags_header* tag_header = (cache_file_tags_header*)memory_tag_header_data_start;
@@ -329,8 +270,49 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 		global_preferences_flag_dirty();
 		error(_error_log, "tag header is invalid");
 		event(_event_error, "tag header is invalid [%s]", scenario_path);
-		scenario_tags_load_internal_panic();
-		return false;
+		goto cache_file_header_invalid;
+	}
+
+	cache_file_memory_globals->tags_header = tag_header;
+
+	is_compatible = string_id_load_strings(&cache_file_memory_globals->header);
+	if (!is_compatible)
+	{
+		event(_event_error, "failed to load the string ids [%s]", scenario_path);
+		goto cache_file_header_invalid;
+	}
+
+	// Read tag names
+
+	const uint32 aligned_tag_name_read_size = cache_file_align_read_size_to_cache_page(cache_file_memory_globals->header.tag_name_buffer_size);
+	ASSERT(aligned_tag_name_read_size <= sizeof(g_cache_file_debug_globals.debug_tag_name_buffer));
+
+	is_compatible = cache_file_blocking_read(
+		NONE,
+		cache_file_memory_globals->header.tag_name_buffer_offset,
+		aligned_tag_name_read_size,
+		g_cache_file_debug_globals.debug_tag_name_buffer //cache_file_memory_globals->debug_tag_name_buffer
+	);
+
+	if (!is_compatible)
+	{
+		goto cache_file_header_invalid;
+	}
+
+	// Read tag name offsets
+
+	uint32 aligned_tag_name_offset_read_size = cache_file_align_read_size_to_cache_page(sizeof(int32) * cache_file_memory_globals->header.debug_tag_name_count);
+	ASSERT(aligned_tag_name_offset_read_size <= sizeof(g_cache_file_debug_globals.debug_tag_name_offsets));
+	is_compatible = cache_file_blocking_read(
+		NONE,
+		cache_file_memory_globals->header.tag_name_offset,
+		aligned_tag_name_offset_read_size,
+		g_cache_file_debug_globals.debug_tag_name_offsets //cache_file_memory_globals->tag_name_offsets
+	);
+
+	if (!is_compatible)
+	{
+		goto cache_file_header_invalid;
 	}
 
 	// Change the pointers in the header to point to the new locations in memory
@@ -341,32 +323,42 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 	*Memory::GetAddress<cache_file_tag_instance**>(0x47cd50, 0x4A29B8) = tag_header->tag_instances;
 	*Memory::GetAddress<uint32*>(0x47cd54, 0x4A29BC) = cache_file_memory_globals->tag_cache_base_address;
 
-	cache_file_memory_globals->tags_header = tag_header;
-
 	if(tag_header->tag_count >= FIRST_SHARED_TAG_INSTANCE_INDEX && !scenario_tags_load_process_shared_tags())
 	{
-		cache_file_memory_globals->tags_loaded = true;
-		scenario_tags_load_internal_panic();
-		global_scenario_index_set(NONE);
-		return false;
+		error(_error_log, "failed to load shared tag instances");
+		is_compatible = false;
 	}
 
 	cache_file_memory_globals->tags_loaded = true;
+	tag_index = tag_header->scenario_index;
+scenario_tags_load_internal_end:
+	if (!is_compatible)
+	{
+		error(_error_log, "failed to load tags for cache file");
 
-	const uint32 scenario_address = cache_file_memory_globals->tag_cache_base_address + tag_header->tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_header->scenario_index)].data_offset;
-	const uint32 globals_address = cache_file_memory_globals->tag_cache_base_address + tag_header->tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_header->globals_index)].data_offset;
+		if (cache_file_memory_globals->tag_cache_base_address)
+		{
+			CSERIES_FREE((int32*)(cache_file_memory_globals->tag_cache_base_address - *(int32*)(cache_file_memory_globals->tag_cache_base_address - 4)));
+			cache_file_memory_globals = NULL;
+		}
+		cache_file_close();
 
-	global_scenario_index_set(tag_header->scenario_index);
+		ASSERT(tag_index == NONE);
+	}
 
-	set_global_scenario((scenario*)(scenario_address));
+	if (tag_index != NONE)
+	{
+		global_scenario_index_set(tag_index);
+		set_global_scenario((scenario*)tag_get_fast(/*'scnr',*/ tag_index));
+		scenario_set_game_globals((s_game_globals*)tag_get_fast(/*'matg',*/ cache_file_memory_globals->tags_header->globals_index));
 
-	scenario_set_game_globals((s_game_globals*)(globals_address));
+		initialize_runtime_sound_gestalt_definition();
 
-	initialize_runtime_sound_gestalt_definition();
+		tag_injection_scenario_load_setup(cache_header->tag_size + cache_header->tag_offset_mask);
+		is_compatible = true;
+	}
 
-	tag_injection_scenario_load_setup(aligned_tag_size_read);
-
-	return true;
+	return is_compatible;
 }
 
 datum tag_loaded(int32 group_tag, const char* name)

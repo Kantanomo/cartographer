@@ -3,7 +3,7 @@
 /* macros */
 
 #define scenario_get_hs_script(scnr, index) \
-((hs_script*)tag_block_get_element_with_size((s_tag_block*)(&((scnr)->hs_scripts)), (index), sizeof(hs_script)))
+(TAG_BLOCK_GET_ELEMENT(&((scnr)->hs_scripts), (index), hs_script))
 
 
 /* public code */

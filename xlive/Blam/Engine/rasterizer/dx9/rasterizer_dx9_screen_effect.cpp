@@ -14,6 +14,7 @@
 #include "rasterizer/rasterizer_screen_effects.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
+#include "scenario/scenario_interpolators.h"
 
 /* constants */
 
@@ -189,7 +190,7 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 
 			for (int32 i = 0; i < global_scenario->screen_effect_references.count; ++i)
 			{
-				s_scenario_screen_effect_reference* screen_effect_reference = global_scenario->screen_effect_references[i];
+				s_scenario_screen_effect_reference* screen_effect_reference = TAG_BLOCK_GET_ELEMENT(&global_scenario->screen_effect_references, i, s_scenario_screen_effect_reference);
 				if (screen_effect_reference->screen_effect.index != NONE)
 				{
 					real32 interpolator_result[4] = { 0.f };

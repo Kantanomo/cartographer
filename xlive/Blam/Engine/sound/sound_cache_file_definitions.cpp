@@ -117,7 +117,7 @@ void initialize_runtime_sound_gestalt_definition()
 {
 	runtime_global_sound_gestalt* global_sound_gestalt = get_runtime_global_sound_gestalt();
 	s_game_globals* game_globals = scenario_get_game_globals();
-	s_cache_header* cache_header = cache_files_get_header();
+	cache_file_header* cache_header = cache_files_get_header();
 
 	if(global_sound_gestalt->initialized)
 	{

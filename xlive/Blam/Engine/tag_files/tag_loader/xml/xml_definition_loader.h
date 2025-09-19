@@ -27,7 +27,7 @@ public:
 	void init(
 		c_xml_definition_block* definition,
 		FILE* file_handle,
-		s_cache_header* cache_header,
+		cache_file_header* cache_header,
 		cache_file_tags_header* tags_header,
 		uint32 scenario_instance_offset,
 		datum cache_index);
@@ -52,7 +52,7 @@ private:
 
 	FILE* m_file_handle;
 
-	s_cache_header* m_cache_header;
+	cache_file_header* m_cache_header;
 	cache_file_tags_header* m_tags_header;
 	uint32 m_scenario_instance_offset;
 

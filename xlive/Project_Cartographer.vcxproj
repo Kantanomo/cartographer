@@ -1307,6 +1307,7 @@
     <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
     <ClInclude Include="Blam\Engine\creatures\creature_definitions.h" />
+    <ClInclude Include="Blam\Engine\creatures\creature_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\cseries\async.h" />
     <ClInclude Include="Blam\Engine\cartographer\discord\discord_interface.h" />
     <ClInclude Include="Blam\Engine\cseries\async_helpers.h" />
@@ -1319,7 +1320,9 @@
     <ClInclude Include="Blam\Engine\cseries\cseries.h" />
     <ClInclude Include="Blam\Engine\cseries\debug_memory.h" />
     <ClInclude Include="Blam\Engine\cseries\runtime_state.h" />
+    <ClInclude Include="Blam\Engine\cutscene\cinematics_definitions.h" />
     <ClInclude Include="Blam\Engine\cutscene\recorded_animations.h" />
+    <ClInclude Include="Blam\Engine\cutscene\recorded_animation_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
@@ -1463,6 +1466,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_text_entry.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_window.h" />
     <ClInclude Include="Blam\Engine\items\equipment.h" />
+    <ClInclude Include="Blam\Engine\items\equipment_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\items\garbage.h" />
     <ClInclude Include="Blam\Engine\items\item_collection_definition.h" />
     <ClInclude Include="Blam\Engine\items\item_definitions.h" />
@@ -1470,6 +1474,7 @@
     <ClInclude Include="Blam\Engine\items\projectile_definition.h" />
     <ClInclude Include="Blam\Engine\items\vehicle_collection_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
+    <ClInclude Include="Blam\Engine\items\weapon_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_config.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_log.h" />
     <ClInclude Include="Blam\Engine\main\console.h" />
@@ -1599,6 +1604,7 @@
     <ClCompile Include="Blam\Engine\saved_games\player_profile.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\saved_game_files_async_windows.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\saved_game_files.cpp" />
+    <ClInclude Include="Blam\Engine\objects\object_scenario_definitions.h" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_fog.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_interpolators.cpp" />
@@ -1824,13 +1830,16 @@
     <ClInclude Include="Blam\Engine\networking\transport\transport_qos.h" />
     <ClInclude Include="Blam\Engine\networking\transport\transport_security.h" />
     <ClInclude Include="Blam\Engine\objects\crates.h" />
+    <ClInclude Include="Blam\Engine\objects\crate_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
     <ClInclude Include="Blam\Engine\objects\damage_effects.h" />
     <ClInclude Include="Blam\Engine\objects\emblems.h" />
     <ClInclude Include="Blam\Engine\objects\lights.h" />
+    <ClInclude Include="Blam\Engine\objects\lights_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\light_definitions.h" />
+    <ClInclude Include="Blam\Engine\objects\object_constants.h" />
     <ClInclude Include="Blam\Engine\objects\object_location.h" />
     <ClInclude Include="Blam\Engine\objects\object_definition.h" />
     <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
@@ -2676,11 +2685,13 @@
     <ClInclude Include="Blam\Engine\saved_games\player_profile.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_film.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_game_files.h" />
+    <ClInclude Include="Blam\Engine\devices\device_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_fog.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_interpolators.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.h" />
+    <ClInclude Include="Blam\Engine\scenario\scenario_lights.h" />
     <ClInclude Include="Blam\Engine\shaders\pixel_shader.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_definitions.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_passes.h" />
@@ -2762,6 +2773,7 @@
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
     <ClInclude Include="Blam\Engine\text\unicode.h" />
     <ClInclude Include="Blam\Engine\units\biped_definitions.h" />
+    <ClInclude Include="Blam\Engine\units\biped_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\units\dialogue_definitions.h" />
     <ClInclude Include="Blam\Engine\units\units.h" />
     <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />
@@ -2772,7 +2784,9 @@
     <ClInclude Include="Blam\Engine\units\unit_action_system.h" />
     <ClInclude Include="Blam\Engine\units\unit_definitions.h" />
     <ClInclude Include="Blam\Engine\units\unit_dialogue.h" />
+    <ClInclude Include="Blam\Engine\units\unit_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\units\vehicle_definitions.h" />
+    <ClInclude Include="Blam\Engine\units\vehicle_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\widgets\cloth.h" />
     <ClInclude Include="Blam\Engine\widgets\liquid.h" />
     <ClInclude Include="CartographerDllConf.h" />

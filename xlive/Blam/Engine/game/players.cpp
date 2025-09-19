@@ -200,7 +200,7 @@ void __cdecl player_configuration_validate_character_type(s_player_properties* c
 			bool found = false;
 			for (uint32 i = 0; i < block_size; ++i)
 			{
-				scenario_player* player_starting_location = scnr->player_starting_locations[i];
+				const scenario_player* player_starting_location = TAG_BLOCK_GET_ELEMENT(&scnr->player_starting_locations, i, scenario_player);
 				if (player_starting_location->campaign_player_type != NONE)
 				{
 					configuration_data->team_index = _game_team_player;

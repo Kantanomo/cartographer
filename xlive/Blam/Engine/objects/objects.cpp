@@ -369,16 +369,16 @@ datum __cdecl object_new(object_placement_data* data)
 	
 	ASSERT(data->scale > 0.f);
 
-	if (!data->flags.test(_scenario_object_placement_bit_4) && data->tag_index != NONE)
+	if (!TEST_BIT(data->flags, 4) && data->definition_index != NONE)
 	{
 		object_type_adjust_placement(data);
 	}
 
-	if (data->tag_index != NONE)
+	if (data->definition_index != NONE)
 	{
 		const bool process_is_game_client = !shell_is_dedicated_server();
 
-		const struct object_definition* object_definition = (struct object_definition*)tag_get_fast(data->tag_index);
+		const struct object_definition* object_definition = (struct object_definition*)tag_get_fast(data->definition_index);
 		const s_model_definition* model_definition = NULL;
 
 		const datum object_model_index = object_definition->object.model.index;
@@ -404,7 +404,7 @@ datum __cdecl object_new(object_placement_data* data)
 			havok_memory_garbage_collect();
 		}
 
-		object_index = object_allocate_header(data->tag_index);
+		object_index = object_allocate_header(data->definition_index);
 		
 		if (object_index == NONE)
 		{
@@ -423,7 +423,7 @@ datum __cdecl object_new(object_placement_data* data)
 
 			object_header->flags.set(_object_header_post_update_bit, true);
 			object_header->type = (int8)object_definition->object.object_type;
-			object->definition_index = data->tag_index;
+			object->definition_index = data->definition_index;
 
 			if (data->object_identifier.get_source() == NONE)
 			{
@@ -450,7 +450,7 @@ datum __cdecl object_new(object_placement_data* data)
 			object->object.angular_velocity = data->angular_velocity;
 			object->object.scale = data->scale;
 
-			bool enable = data->flags.test(_scenario_object_placement_bit_0);
+			bool enable = TEST_BIT(data->flags, 0);
 			object->object.flags.set(_object_mirrored_bit, enable);
 			enable = model_definition && model_definition->collision_model.index != NONE;
 			object->object.flags.set(_object_uses_collidable_list_bit, enable);
@@ -486,7 +486,7 @@ datum __cdecl object_new(object_placement_data* data)
 			object->object.cached_render_state_index = NONE;
 			object->object.field_D0 = NONE;
 			object->object.physics_flags.clear();
-			object->object.physics_flags.set(_object_physics_bit_8, data->flags.test(_scenario_object_placement_bit_3));
+			object->object.physics_flags.set(_object_physics_bit_8, TEST_BIT(data->flags, 3));
 			object->object.havok_datum = NONE;
 			object->object.simulation_entity_index = NONE;
 			object->object.simulation_flags.clear();
@@ -503,7 +503,7 @@ datum __cdecl object_new(object_placement_data* data)
 				if (model_definition->nodes.count < 1)
 				{
 					const char* model_name = tag_get_name(object_model_index);
-					const char* object_name = tag_get_name(data->tag_index);
+					const char* object_name = tag_get_name(data->definition_index);
 					error(_error_category_objects, _error_silent, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
 				}
 				else
@@ -514,7 +514,7 @@ datum __cdecl object_new(object_placement_data* data)
 				if (model_definition->collision_regions.count < 1)
 				{
 					const char* model_name = tag_get_name(object_model_index);
-					const char* object_name = tag_get_name(data->tag_index);
+					const char* object_name = tag_get_name(data->definition_index);
 					error(_error_category_objects, _error_silent, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
 				}
 				else
@@ -538,7 +538,7 @@ datum __cdecl object_new(object_placement_data* data)
 						// allow interpolation if object is device and device flags include interpolation
 						if (TEST_FLAG(FLAG(object_definition->object.object_type), _object_mask_device))
 						{
-							device_definition* device_def = (device_definition*)tag_get_fast(data->tag_index);
+							device_definition* device_def = (device_definition*)tag_get_fast(data->definition_index);
 							if (TEST_FLAG(device_def->device.flags, _device_definition_allow_interpolation))
 							{
 								can_interpolate = true;
@@ -582,7 +582,7 @@ datum __cdecl object_new(object_placement_data* data)
 			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.original_orientation_block), orientation_size, 4);
 			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.node_orientation_block), orientation_size, 4);
 			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object.animation_manager_block), (valid_animation_manager ? 144 : 0), 0);
-			can_create_object &= havok_can_allocate_space_for_instance_of_object_definition(data->tag_index);
+			can_create_object &= havok_can_allocate_space_for_instance_of_object_definition(data->definition_index);
 
 			// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
 			out_of_objects = !can_create_object;
@@ -634,14 +634,14 @@ datum __cdecl object_new(object_placement_data* data)
 			if (can_create_object)
 			{
 				bool object_flag_check = object->object.flags.test(_object_deleted_when_deactivated_bit);
-				if (data->flags.test(_scenario_object_placement_bit_1) || data->flags.test(_scenario_object_placement_bit_2))
+				if (TEST_BIT(data->flags, 1) || TEST_BIT(data->flags, 2))
 				{
 					object->object.flags.set(_object_deleted_when_deactivated_bit, false);
 				}
 
 				object_variant_index_update(object_index, data->variant_name);
 				update_object_region_information(object_index, data->region_index);
-				object_set_initial_change_colors(object_index, data->active_change_colors_mask, data->change_colors);
+				object_set_initial_change_colors(object_index, data->change_color_override_mask, data->change_color_overrides);
 				object_initialize_vitality(object_index, NULL, NULL);
 				object_compute_change_colors(object_index);
 				object->object.emblem_info = data->emblem_info;
@@ -656,11 +656,11 @@ datum __cdecl object_new(object_placement_data* data)
 				// If the object (can) connect to the map we make sure it gets connected
 				if (objects_can_connect_to_map())
 				{
-					data->object_is_inside_cluster = set_object_position_if_in_cluster(&data->location, object_index);
+					data->location_valid = set_object_position_if_in_cluster(&data->location, object_index);
 
 					// If the object is inside a cluster set the location to the one passed in the placement data
 					// If not then pass null
-					s_location* p_location = (data->object_is_inside_cluster ? &data->location : NULL);
+					s_location* p_location = (data->location_valid ? &data->location : NULL);
 					object_reconnect_to_map(p_location, object_index);
 				}
 
@@ -669,7 +669,7 @@ datum __cdecl object_new(object_placement_data* data)
 
 				object_wake(object_index);
 
-				object->object.physics_flags.set(_object_physics_bit_2, data->flags.test(_scenario_object_placement_bit_5));
+				object->object.physics_flags.set(_object_physics_bit_2, TEST_BIT(data->flags, 5));
 
 				object_reconnect_to_physics(object_index);
 				object_initialize_effects(object_index);
@@ -695,9 +695,9 @@ datum __cdecl object_new(object_placement_data* data)
 					object->object.flags.test(_object_deleted_when_deactivated_bit) && 
 					!object_header->flags.test(_object_header_active_bit) && 
 					objects_can_connect_to_map() && 
-					!data->flags.test(_scenario_object_placement_bit_1))
+					!TEST_BIT(data->flags, 1))
 				{
-					if (!data->flags.test(_scenario_object_placement_bit_2))
+					if (!TEST_BIT(data->flags, 2))
 					{
 						if (object->object.location.cluster_index != NONE)
 						{
@@ -723,10 +723,10 @@ datum __cdecl object_new(object_placement_data* data)
 		}
 	}
 
-	if (object_index == NONE && data->tag_index != NONE)
+	if (object_index == NONE && data->definition_index != NONE)
 	{
 		const char* message = out_of_objects ? "OUT OF OBJECTS" : "OBJECT CREATION FAILED";
-		const char* object_path = tag_get_name(data->tag_index);
+		const char* object_path = tag_get_name(data->definition_index);
 		const char* object_name = tag_name_strip_path(object_path);
 		error(_error_category_objects, _error_log, "%s: cannot create %s", message, object_name);
 

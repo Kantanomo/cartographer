@@ -29,7 +29,7 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
 		if (datum unit_rep_tag_index = game_globals_get_representation(creation_data->profile_traits.profile.player_character_type)->third_person_unit.index;
 			unit_rep_tag_index != NONE)
 		{
-			placement_data.tag_index = unit_rep_tag_index;
+			placement_data.definition_index = unit_rep_tag_index;
 			creation_data->object.object_definition_index = unit_rep_tag_index;
 		}
 	}
@@ -41,8 +41,8 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
 	if ((initial_state_data->controlling_actor_index == NONE) &&
 		game_engine_get_change_colors(&creation_data->profile_traits.profile, creation_data->team, change_colors))
 	{
-		placement_data.active_change_colors_mask |= 15u;
-		csmemcpy(placement_data.change_colors, change_colors, sizeof(placement_data.change_colors));
+		placement_data.change_color_override_mask |= 15u;
+		csmemcpy(placement_data.change_color_overrides, change_colors, sizeof(placement_data.change_color_overrides));
 	}
 
 	datum unit_index = c_simulation_object_entity_definition__object_create_object(_this, &creation_data->object, &initial_state_data->object_state_data, flags, &placement_data);

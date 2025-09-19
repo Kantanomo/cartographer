@@ -920,7 +920,7 @@ static void __cdecl close_cache_header(HANDLE* map_handle)
 
 static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
 {
-	s_cache_header header;
+	cache_file_header header;
 	HANDLE map_cache_handle;
 	wchar_t* file_name = custom_map_entry->file_path;
 	if (!open_cache_header(file_name, &header, &map_cache_handle))
@@ -940,7 +940,7 @@ static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;
 	}
-	if (header.type != scenario_type_multiplayer && header.type != scenario_type_singleplayer)
+	if (header.type != _scenario_type_multiplayer && header.type != _scenario_type_solo)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
 		return false;

@@ -3,7 +3,28 @@
 
 #include "cache/cache_files.h"
 
+/* constants */
+
+enum
+{
+	k_maximum_string_id_storage = 0x60000
+};
+
+/* typedefs */
+
 typedef int32(__cdecl* subtract_function_t)(uint32 a1, uint32 a2, uint32 a3);
+
+/* globals */
+
+static int32 g_string_id_table_count;
+
+static int32 g_string_id_block_offset;
+
+static int32 g_string_id_index_buffer[13478];
+
+static char g_string_id_storage[k_maximum_string_id_storage];
+
+/* public code */
 
 int32 __cdecl tag_group_get_link_set_sort(uint32 a1, uint32 a2, uint32 a3)
 {
@@ -183,11 +204,44 @@ void* __cdecl tag_block_get_element_with_size(const s_tag_block* block, int32 in
 	return INVOKE(0x3C772, 0x32899, tag_block_get_element_with_size, block, index, block_size);
 }
 
-void set_tag_group_data_info(uint32 tag_data, uint32 tag_data_size)
+void tag_group_set_data_info(uint32 tag_data, uint32 tag_data_size)
 {
 	uint32* g_tag_group_data = Memory::GetAddress<uint32*>(0x482290, 0x4A6438);
 	uint32* g_tag_group_data_size = Memory::GetAddress<uint32*>(0x482294, 0x4A643C);
 
 	*g_tag_group_data = tag_data;
 	*g_tag_group_data_size = tag_data_size;
+	return;
+}
+
+bool string_id_load_strings(const cache_file_header* header)
+{
+	const int32 string_idx_offset = header->string_idx_offset;
+	g_string_id_block_offset = header->string_block_offset;
+	g_string_id_table_count = header->string_table_count;
+
+	uint32 read_count = cache_file_align_read_size_to_cache_page(sizeof(string_id) * g_string_id_table_count);
+	ASSERT(read_count < sizeof(g_string_id_index_buffer));
+
+	const bool result = cache_file_blocking_read(NONE, string_idx_offset, read_count, g_string_id_index_buffer);
+	if (result)
+	{
+		read_count = cache_file_align_read_size_to_cache_page(header->string_table_size);
+		cache_file_blocking_read(NONE, header->string_table_offset, read_count, g_string_id_storage);
+	}
+	return result;
+}
+
+const char* string_id_get_string_const(int32 id)
+{
+	const char* result = NULL;
+	if ((id & 0xFFFFFF) < g_string_id_table_count)
+	{
+		uint32 storage_index = g_string_id_index_buffer[id & 0xFFFFFF];
+		
+		ASSERT(VALID_INDEX(storage_index, k_maximum_string_id_storage));
+		result = &g_string_id_storage[storage_index];
+	}
+
+	return result;
 }

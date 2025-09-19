@@ -17,7 +17,7 @@
 	(TYPE*)malloc(sizeof(TYPE) * (COUNT))
 
 void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* file_handle, 
-	s_cache_header* cache_header, cache_file_tags_header* tags_header, uint32 scenario_instance_offset, datum cache_index)
+	cache_file_header* cache_header, cache_file_tags_header* tags_header, uint32 scenario_instance_offset, datum cache_index)
 {
 	this->m_tag_reference_offsets = nullptr;
 	this->m_classless_tag_reference_offsets = nullptr;

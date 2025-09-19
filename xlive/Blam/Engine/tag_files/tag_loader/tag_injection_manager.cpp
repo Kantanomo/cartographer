@@ -132,7 +132,7 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 	this->m_active_map_file_handle = _wfsopen(this->m_active_map.get_string(), L"rb", SH_DENYNO);
 
 	// Read cache header from map file
-	file_seek_and_read(this->m_active_map_file_handle, 0, sizeof(s_cache_header), 1, &this->m_active_map_cache_header);
+	file_seek_and_read(this->m_active_map_file_handle, 0, sizeof(cache_file_header), 1, &this->m_active_map_cache_header);
 
 	// Read tags header from map file
 	file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_offset, sizeof(cache_file_tags_header), 1, &this->m_active_map_tags_header);
@@ -146,7 +146,7 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 	
 
 	// fix for multiplayer shared cache type, where the tag table was intentionally made to be pushed farther down to prevent collisions.
-	if ((e_scenario_type)this->m_active_map_cache_header.type == scenario_type_multiplayer_shared)
+	if ((e_scenario_type)this->m_active_map_cache_header.type == _scenario_type_multiplayer_shared)
 	{
 		// The hired gun special
 		this->m_active_map_scenario_instance_offset = this->m_active_map_cache_header.data_offset;
@@ -174,7 +174,7 @@ void c_tag_injecting_manager::reset()
 
 	// just for safety clear the stored data for active map
 	this->m_active_map.clear();
-	csmemset(&this->m_active_map_cache_header, 0, sizeof(s_cache_header));
+	csmemset(&this->m_active_map_cache_header, 0, sizeof(cache_file_header));
 	csmemset(&this->m_active_map_tags_header, 0, sizeof(cache_file_tags_header));
 	this->m_active_map_scenario_instance_offset = 0;
 
@@ -360,7 +360,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 	int32 start_index = 0;
 
 	// fix for multiplayer shared cache type, where the tag table was intentionally made to be pushed farther down to prevent collisions.
-	if ((e_scenario_type)this->m_active_map_cache_header.type == scenario_type_multiplayer_shared)
+	if ((e_scenario_type)this->m_active_map_cache_header.type == _scenario_type_multiplayer_shared)
 		start_index = FIRST_SHARED_TAG_INSTANCE_INDEX;
 
 	for(int32 current_index = start_index; current_index < this->m_active_map_cache_header.debug_tag_name_count; ++current_index)
@@ -369,14 +369,14 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 		if (current_index + 1 != this->m_active_map_cache_header.debug_tag_name_count)
 		{
 			// Get the offset of the current index
-			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * current_index, sizeof(uint32), 1, &current_offset);
+			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offset + sizeof(uint32) * current_index, sizeof(uint32), 1, &current_offset);
 
 			// If the current offset is -1 it means we have reached the end of the index table
 			if (current_offset == NONE)
 				break;
 
 			// Get the offset of the next index
-			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * (current_index + 1), sizeof(uint32), 1, &next_offset);
+			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offset + sizeof(uint32) * (current_index + 1), sizeof(uint32), 1, &next_offset);
 
 			// Current size is calculated using the offsets of the two indexes
 			// if next offset is none, the current offset is the end of the table and just read max path
@@ -398,10 +398,10 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 		else
 		{
 			// Get the offset of the current index
-			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * current_index, sizeof(uint32), 1, &current_offset);
+			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offset + sizeof(uint32) * current_index, sizeof(uint32), 1, &current_offset);
 
 			// Current size is calculated using the total size of the buffer and the current offset;
-			current_size = (this->m_active_map_cache_header.tag_name_offsets_offset + (this->m_active_map_cache_header.debug_tag_name_count * sizeof(uint32))) - current_offset;
+			current_size = (this->m_active_map_cache_header.tag_name_offset + (this->m_active_map_cache_header.debug_tag_name_count * sizeof(uint32))) - current_offset;
 
 			// Read the current debug name
 			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, &name_buffer);
@@ -444,7 +444,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 	if (absolute_index + 1 != this->m_active_map_cache_header.debug_tag_name_count)
 	{
 		// Get the offset of the cache index
-		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * absolute_index, sizeof(uint32), 1, &current_offset);
+		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offset + sizeof(uint32) * absolute_index, sizeof(uint32), 1, &current_offset);
 
 		// If the current offset is -1 it means we have reached the end of the index table
 		if (current_offset == NONE)
@@ -454,7 +454,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 		}
 
 		// Get the offset of the next index
-		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * (absolute_index + 1), sizeof(uint32), 1, &next_offset);
+		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offset + sizeof(uint32) * (absolute_index + 1), sizeof(uint32), 1, &next_offset);
 
 		// Current size is calculated using the offsets of the two indexes
 		// if next offset is none, the current offset is the end of the table and just read max path
@@ -466,7 +466,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 	else
 	{
 		// Get the offset of the cache index
-		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * absolute_index, sizeof(uint32), 1, &current_offset);
+		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offset + sizeof(uint32) * absolute_index, sizeof(uint32), 1, &current_offset);
 
 		// If the current offset is -1 it means we have reached the end of the index table
 		if (current_offset == NONE)
@@ -476,7 +476,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 		}
 
 		// Current size is calculated using the total size of the buffer and the current offset;
-		current_size = (this->m_active_map_cache_header.tag_name_offsets_offset + (this->m_active_map_cache_header.debug_tag_name_count * sizeof(uint32))) - current_offset;
+		current_size = (this->m_active_map_cache_header.tag_name_offset + (this->m_active_map_cache_header.debug_tag_name_count * sizeof(uint32))) - current_offset;
 
 		// Read the current debug name
 		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, out_name);

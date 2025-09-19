@@ -20,7 +20,7 @@ struct tag_block
 
 	inline T* operator[](int32 index) const
 	{
-		return (T*)tag_block_get_element_with_size((s_tag_block*)this, index, sizeof(T));
+		return TAG_BLOCK_GET_ELEMENT((s_tag_block*)this, index, T);
 	}
 };
 ASSERT_STRUCT_SIZE(tag_block<>, 8);

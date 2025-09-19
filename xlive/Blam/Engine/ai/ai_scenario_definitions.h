@@ -4,21 +4,11 @@
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 
-
 enum e_combination_rule : short
 {
 	combination_rule_or = 0,
 	combination_rule_and = 1
 };
-
-// max count: 100
-struct squad_group_definition
-{
-	char name[32];
-	short parent;           // Block index: squad_groups_definition
-	short initial_orders;   // Block index: orders_definition
-};
-ASSERT_STRUCT_SIZE(squad_group_definition, 36);
 
 enum e_squad_definition_flags : int
 {
@@ -81,6 +71,15 @@ enum e_initial_movement_mode : short
 	initial_movement_mode_climbing = 1,
 	initial_movement_mode_flying = 2
 };
+
+// max count: 100
+struct squad_group_definition
+{
+	char name[32];
+	int16 parent;           // Block index: squad_groups_definition
+	int16 initial_orders;   // Block index: orders_definition
+};
+ASSERT_STRUCT_SIZE(squad_group_definition, 36);
 
 // max count: 32
 struct actor_starting_location_definition

@@ -1,28 +1,6 @@
 #pragma once
 #include "math/color_math.h"
-#include "math/function_definitions.h"
-#include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
-
-enum e_light_placement_flags : short
-{
-    light_placement_flag_custom_geometry = FLAG(0),
-    light_placement_flag_unused = FLAG(1),
-    light_placement_flag_cinematicOnly = FLAG(2)
-};
-
-enum e_lightmap_type : short
-{
-    lightmap_type_use_light_tag_setting = 0,
-    lightmap_type_dynamic_only = 1,
-    lightmap_type_dynamic_with_lightmaps = 2,
-    lightmap_type_lightmaps_only = 3
-};
-
-enum e_lightmap_flags: short
-{
-    lightmap_placement_flag_unused = FLAG(0),
-};
 
 enum e_light_definition_flags : uint32
 {
@@ -146,25 +124,8 @@ enum e_light_definition_distance_fade : uint16
 
 enum e_light_definition_animation_flags : uint32
 {
-	_light_definition_animation_synchronized = FLAG(0)
+	_light_definition_animation_synchronized_bit = 0
 };
-
-struct s_scenario_light_datum
-{
-    e_light_type type;
-    e_light_placement_flags flags;
-	e_lightmap_type lightmap_type;
-    e_lightmap_flags lightmap_flags;
-    float lightmap_half_life;
-    float lightmap_light_scale;
-    real_point3d target_point;
-    float width_world_units;
-    float height_scale_world_units;
-    float field_of_view_degrees;
-    float falloff_distance_world_units;
-    float cutoff_distance_world_units_from_far_plane;
-};
-ASSERT_STRUCT_SIZE(s_scenario_light_datum, 48);
 
 struct light_definition
 {
@@ -264,9 +225,9 @@ struct light_definition
 
 	// Explaination("ANIMATION PARAMETERS", "EMPTY STRING")
 	e_light_definition_animation_flags animation_flags;
-	tag_block<c_function_definition> brightness_animation;
-	tag_block<c_function_definition> color_animation;
-	tag_block<c_function_definition> gel_animation;
+	s_tag_block brightness_animation;	// struct: c_function_definition
+	s_tag_block color_animation;		// struct: c_function_definition
+	s_tag_block gel_animation;			// struct: c_function_definition
 
 	// Explaination("SHADER", "EMPTY STRING")
 	tag_reference shader; // shad

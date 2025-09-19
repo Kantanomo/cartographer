@@ -8,6 +8,7 @@
 #include "main/main.h"
 #include "game/game.h"
 #include "game/game_engine.h"
+#include "game/players.h"
 #include "memory/bitstream.h"
 
 static void simulation_queue_global_event_allocate_and_insert(e_event_queue_type type, void* data, int32 data_size)

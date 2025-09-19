@@ -14,7 +14,6 @@ enum
 
 	k_cache_file_debug_name_buffer_size = 5120000,
 	k_cache_file_debug_string_id_index_buffer_size = (k_cache_file_max_string_ids * sizeof(string_id)),
-	k_cache_file_debug_string_id_storage_size = 393216,
 };
 
 /* enums */
@@ -53,7 +52,7 @@ struct cache_file_tags_header
 };
 ASSERT_STRUCT_SIZE(cache_file_tags_header, 32);
 
-struct s_cache_header
+struct cache_file_header
 {
 	int32 header_signature;
 	int32 version;
@@ -100,7 +99,7 @@ struct s_cache_header
 	int32 debug_tag_name_count;
 	int32 tag_name_buffer_offset;
 	int32 tag_name_buffer_size;
-	int32 tag_name_offsets_offset;
+	int32 tag_name_offset;
 	int32 language_pack_offset;
 	int32 language_pack_size;
 	datum secondary_ugh_tag_index;
@@ -113,7 +112,7 @@ struct s_cache_header
 	int8 field_2F8[1284];
 	int32 footer_signature;
 };
-ASSERT_STRUCT_SIZE(s_cache_header, 0x800);
+ASSERT_STRUCT_SIZE(cache_file_header, 0x800);
 
 struct s_cache_file_memory_globals
 {
@@ -121,7 +120,7 @@ struct s_cache_file_memory_globals
 	bool custom_map;
 	int8 pad[2];
 	uint32 tag_cache_base_address;
-	s_cache_header header;
+	cache_file_header header;
 	cache_file_tags_header* tags_header;
 	void* field_80C;
 };
@@ -131,8 +130,6 @@ struct s_cache_file_debug_globals
 {
 	char debug_tag_name_buffer[k_cache_file_debug_name_buffer_size];
 	int32 debug_tag_name_offsets[MAXIMUM_SIMULTANEOUS_TAG_INSTANCES_TOTAL + 96];
-	int8 debug_string_id_storage[k_cache_file_debug_string_id_storage_size];
-	int8 debug_string_id_index[k_cache_file_debug_string_id_index_buffer_size];
 };
 
 struct tag_iterator
@@ -158,7 +155,7 @@ s_cache_file_memory_globals* cache_file_memory_globals_get(void);
 
 bool cache_file_is_loaded();
 
-s_cache_header* cache_files_get_header(void);
+cache_file_header* cache_files_get_header(void);
 
 cache_file_tags_header* cache_files_get_tags_header(void);
 
@@ -180,7 +177,7 @@ void* __cdecl tag_get_fast(datum tag_index);
 
 void __cdecl cache_file_close();
 
-bool __cdecl cache_header_verify(s_cache_header* cache_header);
+bool __cdecl cache_header_verify(cache_file_header* cache_header);
 
 uint32 __cdecl cache_file_align_read_size_to_cache_page(uint32 size);
 
