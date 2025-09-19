@@ -241,7 +241,7 @@ static void setup_game_options_text(const wchar_t* reports_path)
 		fwprintf(file, L"\n");
 
 		fwprintf(file, L"Simulation Type: ");
-		switch (game_options->simulation_type)
+		switch (game_options->game_simulation)
 		{
 		case _game_simulation_none:
 			fwprintf(file, L"None");

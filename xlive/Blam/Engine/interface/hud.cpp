@@ -165,11 +165,11 @@ void hud_render_player_indicators(datum player_index)
 			bool is_enemy;
 			if (game_is_campaign())
 			{
-				is_enemy = current_player->properties[0].team_index != player->properties[0].team_index;
+				is_enemy = current_player->configuration.team_index != player->configuration.team_index;
 			}
 			else
 			{
-				is_enemy = game_engine_team_is_enemy((e_game_team)current_player->properties[0].team_index, (e_game_team)player->properties[0].team_index);
+				is_enemy = game_engine_team_is_enemy((e_game_team)current_player->configuration.team_index, (e_game_team)player->configuration.team_index);
 			}
 
 			if (iterator.index != player_index && !is_enemy && current_player->unit_index != NONE)

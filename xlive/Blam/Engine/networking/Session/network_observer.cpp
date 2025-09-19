@@ -1,7 +1,8 @@
 #include "stdafx.h"
-
 #include "network_observer.h"
+
 #include "networking/delivery/network_channel.h"
+#include "networking/messages/network_message_gateway.h"
 
 #include "shell/shell.h"
 

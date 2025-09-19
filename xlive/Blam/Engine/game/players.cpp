@@ -186,7 +186,7 @@ uint32 player_appearance_required_bits()
 	return 39;
 }
 
-void __cdecl player_configuration_validate_character_type(s_player_properties* configuration_data)
+void __cdecl player_configuration_validate_character_type(s_player_configuration* configuration_data)
 {
 	// Campaign verification
 	if (game_is_campaign())
@@ -257,7 +257,7 @@ void __cdecl player_configuration_validate_character_type(s_player_properties* c
 	}
 }
 
-void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data)
+void __cdecl player_validate_configuration(datum player_index, s_player_configuration* configuration_data)
 {
 	player_configuration_validate_character_type(configuration_data);
 	

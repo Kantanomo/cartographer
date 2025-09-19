@@ -151,7 +151,7 @@ bool game_is_ui_shell(void)
 
 bool game_is_distributed(void)
 {
-	const e_game_simulation simulation_type = game_options_get()->simulation_type;
+	const e_game_simulation simulation_type = game_options_get()->game_simulation;
 	return simulation_type == _game_simulation_distributed_client || simulation_type == _game_simulation_distributed_server;
 }
 
@@ -159,7 +159,7 @@ bool game_is_server(void)
 {
 	const s_game_options* options = game_options_get();
 
-	return !(options->simulation_type == _game_simulation_synchronous_client || options->simulation_type == _game_simulation_distributed_client);
+	return !(options->game_simulation == _game_simulation_synchronous_client || options->game_simulation == _game_simulation_distributed_client);
 }
 
 int16 game_get_active_structure_bsp_index()
@@ -182,7 +182,7 @@ void __cdecl game_shell_set_in_progress(void)
 
 bool game_is_predicted(void)
 {
-	return game_options_get()->simulation_type == _game_simulation_distributed_client;
+	return game_options_get()->game_simulation == _game_simulation_distributed_client;
 }
 
 bool game_in_progress(void)
@@ -207,7 +207,7 @@ bool game_is_active(void)
 
 bool game_is_authoritative(void)
 {
-	return game_options_get()->simulation_type != _game_simulation_distributed_client;
+	return game_options_get()->game_simulation != _game_simulation_distributed_client;
 }
 
 s_game_cluster_bit_vectors* game_get_cluster_activation(void)
@@ -260,7 +260,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, in
 		for (int32 i = 0; i < k_number_of_users; i++)
 		{
 			s_player_identifier temp_identifier;
-			s_player_properties temp_properties;
+			s_player_configuration temp_properties;
 			if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties(i, 0, &temp_properties, 0, 0))
 			{
 				ustrncpy(local_usernames[valid_local_player_count], temp_properties.player_name, NUMBEROF(temp_properties.player_name));

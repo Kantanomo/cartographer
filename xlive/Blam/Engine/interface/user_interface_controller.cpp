@@ -244,7 +244,7 @@ void __cdecl user_interface_controller_get_profile_data(e_controller_index contr
 	return;
 }
 
-void __cdecl user_interface_controller_get_user_properties(e_controller_index controller_index, s_player_identifier* controller_user_identifier, s_player_properties* properties)
+void __cdecl user_interface_controller_get_user_properties(e_controller_index controller_index, s_player_identifier* controller_user_identifier, s_player_configuration* properties)
 {
 	INVOKE(0x20696F, 0x0, user_interface_controller_get_user_properties, controller_index, controller_user_identifier, properties);
 	return;

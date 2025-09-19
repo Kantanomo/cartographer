@@ -219,7 +219,7 @@ bool __cdecl user_interface_controller_sign_in(e_controller_index controller_ind
 void __cdecl user_interface_controller_sign_out(e_controller_index controller_index);
 void __cdecl user_interface_controller_sign_out_all_controllers();
 void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32* profile_index);
-void __cdecl user_interface_controller_get_user_properties(e_controller_index controller_index, s_player_identifier* controller_user_identifier, s_player_properties* properties);
+void __cdecl user_interface_controller_get_user_properties(e_controller_index controller_index, s_player_identifier* controller_user_identifier, s_player_configuration* properties);
 void __cdecl user_interface_controller_event_submit(s_event_record* event);
 
 void __cdecl user_interface_controller_update_network_properties(e_controller_index controller_index);

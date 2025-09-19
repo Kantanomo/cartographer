@@ -28,14 +28,14 @@ enum e_game_mode : int32
 #pragma pack(push, 1)
 struct game_player_options
 {
-	bool player_valid;
+	bool valid;
 	bool player_left_game;
 	int16 user_index;
 	e_controller_index controller_index;
 	s_machine_identifier machine_identifier;
 	s_player_identifier player_identifier;
 	int16 field_16;
-	s_player_properties properties;
+	s_player_configuration properties;
 	s_persistent_campaign_player player_type[2]; // index 0 is masterchief, index 1 is dervish
 };
 ASSERT_STRUCT_SIZE(game_player_options, 212);
@@ -44,8 +44,8 @@ ASSERT_STRUCT_SIZE(game_player_options, 212);
 struct s_game_options
 {
 	e_game_mode game_mode;
-	e_game_simulation simulation_type;
-	int8 network_protocol_related;
+	e_game_simulation game_simulation;
+	int8 game_network_type;
 	bool session_host_is_dedicated;
 	bool scenario_custom;
 	int16 game_tick_rate;

@@ -128,7 +128,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 	{
 		// prespawn handler
 	case ExecTime::_preEventExec:
-		player->properties[0].profile_traits.profile.player_character_type = _character_type_spartan;
+		player->configuration.profile_traits.profile.player_character_type = _character_type_spartan;
 		break;
 
 		// postspawn handler
@@ -136,7 +136,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 		// host only (dedicated server and client)
 		if (!game_is_predicted())
 		{
-			event(_event_verbose, "h2mod:gungame: %s player index: %d, player name: %ws", __FUNCTION__, player_abs_index, player->properties[0].player_name);
+			event(_event_verbose, "h2mod:gungame: %s player index: %d, player name: %ws", __FUNCTION__, player_abs_index, player->configuration.player_name);
 
 			void* unit_object = object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
 			if (unit_object) {
@@ -156,18 +156,18 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 					gungamePlayers.insert(std::make_pair(id, level));
 				}
 
-				event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws - Level: %d", __FUNCTIONW__, player_abs_index, player->properties[0].player_name, level);
+				event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws - Level: %d", __FUNCTIONW__, player_abs_index, player->configuration.player_name, level);
 
 
 				if (level == 15)
 				{
-					event(_event_verbose, "h2mod:gungame: %s - %ws on frag grenade level!", __FUNCTION__, player->properties[0].player_name);
+					event(_event_verbose, "h2mod:gungame: %s - %ws on frag grenade level!", __FUNCTION__, player->configuration.player_name);
 					unit_delete_all_weapons(player->unit_index);
 					unit_add_grenade_type_to_inventory(player->unit_index, _unit_grenade_human_fragmentation, 99);
 				}
 				else if (level == 16)
 				{
-					event(_event_verbose, "h2mod:gungame: %s - %ws on plasma grenade level!", __FUNCTION__, player->properties[0].player_name);
+					event(_event_verbose, "h2mod:gungame: %s - %ws on plasma grenade level!", __FUNCTION__, player->configuration.player_name);
 					unit_delete_all_weapons(player->unit_index);
 					unit_add_grenade_type_to_inventory(player->unit_index, _unit_grenade_covenant_plasma, 99);
 				}
@@ -208,7 +208,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 		if (game_results_statistic == 7
 			&& !game_is_predicted())
 		{
-			event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws", __FUNCTION__, player_abs_index, player->properties[0].player_name);
+			event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws", __FUNCTION__, player_abs_index, player->configuration.player_name);
 
 			int32 level = gungamePlayers[id];
 			++level;
@@ -226,13 +226,13 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 			{
 				if (level == 15)
 				{
-					event(_event_verbose, "h2mod:gungame: %s - %ws Level 15 - Frag Grenades!", __FUNCTION__, player->properties[0].player_name);
+					event(_event_verbose, "h2mod:gungame: %s - %ws Level 15 - Frag Grenades!", __FUNCTION__, player->configuration.player_name);
 					unit_delete_all_weapons(player->unit_index);
 					unit_add_grenade_type_to_inventory(player->unit_index, _unit_grenade_human_fragmentation, 99);
 				}
 				else if (level == 16)
 				{
-					event(_event_verbose, "h2mod:gungame: %s - %ws Level 16 - Plasma Grenades!", __FUNCTION__, player->properties[0].player_name);
+					event(_event_verbose, "h2mod:gungame: %s - %ws Level 16 - Plasma Grenades!", __FUNCTION__, player->configuration.player_name);
 					unit_delete_all_weapons(player->unit_index);
 
 					unit_datum* unit = unit_try_and_get(player->unit_index);
@@ -244,7 +244,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 				}
 				else
 				{
-					event(_event_verbose, "h2mod:gungame: %s - %ws on level %d giving them weapon...", __FUNCTION__, player->properties[0].player_name, level);
+					event(_event_verbose, "h2mod:gungame: %s - %ws on level %d giving them weapon...", __FUNCTION__, player->configuration.player_name, level);
 
 					unit_datum* unit = unit_try_and_get(player->unit_index);
 					unit->unit.grenade_counts[_unit_grenade_human_fragmentation] = 0;

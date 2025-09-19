@@ -1,5 +1,4 @@
 #pragma once
-
 #include "H2MOD/Variants/VariantSystem.h"
 
 #define SND_INFECTION_CH L"sounds/ch/infection.wav"

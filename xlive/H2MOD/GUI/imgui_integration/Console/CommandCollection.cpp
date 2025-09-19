@@ -603,7 +603,7 @@ static int CommandCollection::LogPlayersCmd(const std::vector<std::string>& toke
 			string.append(player_name);
 
 			const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
-			wchar_string_to_utf8_string(player->properties[0].player_name, player_name, NUMBEROF(player_name));
+			wchar_string_to_utf8_string(player->configuration.player_name, player_name, NUMBEROF(player_name));
 
 			string.append(", Name from game player state=");
 			string.append(player_name);
@@ -667,14 +667,14 @@ static int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens
 		const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 		if (player)
 		{
-			wchar_string_to_utf8_string(session->get_player_membership(player_index)->properties[0].player_name, name, NUMBEROF(name));
+			wchar_string_to_utf8_string(session->get_player_membership(player_index)->configuration.player_name, name, NUMBEROF(name));
 
 			string.append(", Player index=");
 			string.append(std::to_string(player_index).c_str());
 			string.append(", Player name=");
 			string.append(name);
 
-			wchar_string_to_utf8_string(player->properties[0].player_name, name, NUMBEROF(name));
+			wchar_string_to_utf8_string(player->configuration.player_name, name, NUMBEROF(name));
 			string.append(", Name from game player state=");
 			string.append(name);
 		}
