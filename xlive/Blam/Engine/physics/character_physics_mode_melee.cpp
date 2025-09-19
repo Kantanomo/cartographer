@@ -278,7 +278,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 						m_distance_to_target_point_before_deceleration = MAX(target_distance_from_vector, k_valid_real_epsilon);
 					}
 
-					bool decelerate_allow = true;
+					bool decelerate_allow;
 					real32 deceleration_tick_count = k_deceleration_ticks_real;
 
 					if (m_weapon_is_sword)
@@ -329,7 +329,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 								-deceleration,
 								&physics_output->new_velocity);
 							add_vectors3d(&physics_output->new_velocity, &current_velocity_per_tick_vector, &physics_output->new_velocity);
-							scale_vector3d(&physics_output->new_velocity, (1.0f), &physics_output->new_velocity);
+							scale_vector3d(&physics_output->new_velocity, game_seconds_to_ticks_real(1.0f), &physics_output->new_velocity);
 
 							set_time_to_target((target_distance_from_vector / unk1) - 0.5f);
 
