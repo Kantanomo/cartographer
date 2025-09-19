@@ -161,7 +161,15 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 	// operation successful or not
 	bool result = false;
 
-	if (!doc.HasMember("dwMaxPublicSlots")) {
+	if (!doc.HasMember("dwServerType"))
+	{
+		BadServer(xuid, "Missing Member: dwServerType");
+		return result;
+	}
+	searchResult.dwServerType = doc["dwServerType"].GetUint();
+
+	if (!doc.HasMember("dwMaxPublicSlots")) 
+	{
 		BadServer(xuid, "Missing Member: dwMaxPublicSlots");
 		return result;
 	}
@@ -188,13 +196,6 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 	}
 	searchResult.dwFilledPrivateSlots = doc["dwMaxFilledPrivateSlots"].GetUint();
 
-	if (!doc.HasMember("dwServerType"))
-	{
-		BadServer(xuid, "Missing Member: dwServerType");
-		return result;
-	}
-	searchResult.dwServerType = doc["dwServerType"].GetUint();
-
 #pragma region Xbox Network Address Reading
 	if (!doc.HasMember("lanaddr") || !doc["lanaddr"].IsUint())
 	{
@@ -219,7 +220,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		BadServer(xuid, "Missing Member: dwPort");
 		return result;
 	}
-	searchResult.serverAddress.wPortOnline = htons((u_short)doc["dwPort"].GetUint());
+	searchResult.serverAddress.wPortOnline = (WORD)doc["dwPort"].GetUint();
 
 	if (!doc.HasMember("abenet"))
 	{
@@ -300,7 +301,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 	for (auto& docProperty : doc["pProperties"].GetArray())
 	{
 		bool propertyNeeded = false;
-		DWORD propertyId = docProperty["dwPropertyId"].GetInt();
+		DWORD propertyId = docProperty["dwPropertyId"].GetUint();
 
 		for (uint32 i = 0; i < m_searchPropertiesIdCount; i++)
 		{
@@ -321,7 +322,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		ZeroMemory(&userProperty, sizeof(XUSER_PROPERTY));
 
 		userProperty.dwPropertyId = propertyId;
-		userProperty.value.type = (BYTE)docProperty["type"].GetInt();
+		userProperty.value.type = (BYTE)docProperty["type"].GetUint();
 
 		propertiesWritten.push_back(propertyId);
 
@@ -329,7 +330,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		GenericStringBuffer<UTF16<> > buffer;
 		Writer<GenericStringBuffer<UTF16<> >, UTF8<>, UTF16<> > writer(buffer);
 
-		int propertyType = docProperty["type"].GetInt();
+		int propertyType = docProperty["type"].GetUint();
 		switch (propertyType)
 		{
 		case XUSER_DATA_TYPE_INT32:
@@ -374,7 +375,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 			break;
 		}
 
-		for (auto property : propertiesWritten)
+		for (const auto& property : propertiesWritten)
 		{
 			uint32 i = 0;
 			bool matchFound = false;
@@ -389,7 +390,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 
 			if (!matchFound)
 			{
-				LOG_WARNING_XLIVE("{} - couldn't find property: 0x{:X}", __FUNCTION__, m_pSearchPropertyIds[i]);
+				LOG_WARNING_XLIVE("{} - couldn't find property ID: {:X}", __FUNCTION__, m_pSearchPropertyIds[i]);
 			}
 		}
 
@@ -752,7 +753,7 @@ DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 	return ERROR_IO_PENDING;
 }
 
-void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
+void CServerList::RemoveServer(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
 {
 	std::lock_guard lk(removeServerMutex);
 
@@ -772,7 +773,9 @@ void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 		document.SetObject();
 		auto& docAllocator = document.GetAllocator();
 
-		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[0].xuid), docAllocator);
+		XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
+
+		document.AddMember("xuid", Value().SetUint64(signedInUser->xuid), docAllocator);
 		document.AddMember("token", Value().SetString(H2CurrentAccountLoginToken, docAllocator), docAllocator);
 
 		StringBuffer buffer;
@@ -814,6 +817,10 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		document.SetObject();
 		auto& docAllocator = document.GetAllocator();
 
+		XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
+
+		const char* server_name = strnlen_s(H2Config_dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? H2Config_dedi_server_name : signedInUser->szUserName;
+
 		Value token(kStringType);
 		if (H2CurrentAccountLoginToken)
 			token.SetString(H2CurrentAccountLoginToken, docAllocator);
@@ -825,19 +832,31 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		xnkey_val.SetString(ByteToHexStr(xnkey.ab, sizeof(xnkey.ab)).c_str(), docAllocator);
 
 		document.AddMember("token", token, docAllocator);
-		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[dwUserIndex].xuid), docAllocator);
-		document.AddMember("dwServerType", Value().SetInt(dwServerType), docAllocator);
-		document.AddMember("dwMaxPublicSlots", Value().SetInt(dwMaxPublicSlots), docAllocator);
-		document.AddMember("dwFilledPublicSlots", Value().SetInt(dwFilledPublicSlots), docAllocator);
-		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), docAllocator);
-		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), docAllocator);
-		document.AddMember("dwPort", Value().SetUint(H2Config_base_port), docAllocator);
+		document.AddMember("xuid", Value().SetUint64(signedInUser->xuid), docAllocator);
+		document.AddMember("dwServerType", Value().SetUint(dwServerType), docAllocator);
+		document.AddMember("dwMaxPublicSlots", Value().SetUint(dwMaxPublicSlots), docAllocator);
+		document.AddMember("dwFilledPublicSlots", Value().SetUint(dwFilledPublicSlots), docAllocator);
+		document.AddMember("dwMaxPrivateSlots", Value().SetUint(dwMaxPrivateSlots), docAllocator);
+		document.AddMember("dwMaxFilledPrivateSlots", Value().SetUint(dwFilledPrivateSlots), docAllocator);
+		document.AddMember("dwPort", Value().SetUint(localUser->m_xnaddr.wPortOnline), docAllocator);
 		TEST_N_DEF(XL6);
 		document.AddMember("lanaddr", Value().SetUint(localUser->m_xnaddr.ina.s_addr), docAllocator);
 		document.AddMember("xnkid", xnkid_val, docAllocator);
 		document.AddMember("xnkey", xnkey_val, docAllocator);
-		document.AddMember("cProperties", Value().SetInt(cProperties + 3), docAllocator);
+		document.AddMember("cProperties", Value().SetUint(cProperties + 3), docAllocator);
 		document.AddMember("pProperties", Value().SetArray(), docAllocator);
+
+		Value serv_name_property(kObjectType);
+		serv_name_property.AddMember("dwPropertyId", Value().SetUint(XUSER_PROPERTY_SERVER_NAME), docAllocator);
+		serv_name_property.AddMember("type", Value().SetUint(XUSER_DATA_TYPE_UNICODE), docAllocator);
+		serv_name_property.AddMember("value", Value().SetString(server_name, strnlen_s(server_name, XUSER_MAX_NAME_LENGTH), docAllocator), docAllocator);
+		document["pProperties"].PushBack(serv_name_property, docAllocator);
+
+		Value user_xuid(kObjectType);
+		user_xuid.AddMember("dwPropertyId", Value().SetUint(XUSER_PROPERTY_XUID), docAllocator);
+		user_xuid.AddMember("type", Value().SetUint(XUSER_DATA_TYPE_INT64), docAllocator);
+		user_xuid.AddMember("value", Value().SetUint64(signedInUser->xuid), docAllocator);
+		document["pProperties"].PushBack(user_xuid, docAllocator);
 
 		for (DWORD i = 0; i < cProperties; i++)
 		{
@@ -845,8 +864,8 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 				continue;
 
 			Value property(kObjectType);
-			property.AddMember("dwPropertyId", Value().SetInt(pProperties[i].dwPropertyId), docAllocator);
-			property.AddMember("type", Value().SetInt(pProperties[i].value.type), docAllocator);
+			property.AddMember("dwPropertyId", Value().SetUint(pProperties[i].dwPropertyId), docAllocator);
+			property.AddMember("type", Value().SetUint(pProperties[i].value.type), docAllocator);
 
 			switch (pProperties[i].value.type)
 			{
@@ -874,22 +893,6 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 			document["pProperties"].PushBack(property, docAllocator);
 		}
 
-		const char* name = strnlen_s(H2Config_dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? H2Config_dedi_server_name : usersSignInInfo[dwUserIndex].szUserName;
-
-		/* For whatever reason the game is currently refusing to send the servername or player profile name so we're going to send it ourselves.*/
-		Value serv_name_property(kObjectType);
-		serv_name_property.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_SERVER_NAME), docAllocator);
-		serv_name_property.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_UNICODE), docAllocator);
-		serv_name_property.AddMember("value", Value().SetString(name, strnlen_s(name, XUSER_MAX_NAME_LENGTH), docAllocator), docAllocator);
-
-		document["pProperties"].PushBack(serv_name_property, docAllocator);
-
-		Value user_xuid(kObjectType);
-		user_xuid.AddMember("dwPropertyId", Value().SetInt(XUSER_PROPERTY_XUID), docAllocator);
-		user_xuid.AddMember("type", Value().SetInt(XUSER_DATA_TYPE_INT64), docAllocator);
-		user_xuid.AddMember("value", Value().SetUint64(usersSignInInfo[dwUserIndex].xuid), docAllocator);
-		document["pProperties"].PushBack(user_xuid, docAllocator);
-
 		StringBuffer buffer;
 		Writer<StringBuffer> writer(buffer);
 		document.Accept(writer);
@@ -910,7 +913,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 
 DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
-	if (!UserSignedOnline(dwUserIndex))
+	if (!XUserSignedOnline(dwUserIndex))
 	{
 		return (DWORD)-1;
 	}
@@ -925,12 +928,12 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
 {
 	LOG_TRACE_XLIVE("XLocatorServerUnAdvertise()");
-	if (!UserSignedOnline(dwUserIndex))
+	if (!XUserSignedOnline(dwUserIndex))
 	{
 		return (DWORD)-1;
 	}
 
-	std::thread(&CServerList::RemoveServer, pOverlapped).detach();
+	std::thread(&CServerList::RemoveServer, dwUserIndex, pOverlapped).detach();
 	return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
 }
 
@@ -942,11 +945,11 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 
 	// hacky but does the job, because the memory we are writing to is not global (at least in H2v)
 	// some dumbass engineer at hired gun decided to keep the server counts in temporary heap memory
-	// and if the async i/o operation is done and the menu is closed, it'll write in free'd memory most likely
+	// and if the async i/o operation is done and the menu is closed, it'll likely write in free'd memory
 	// so instead to write the data asynchronously, we store the properties in XLIVE memory, then pass it to the game when it needs it
 	// and get the properties asynchronously
 
-	if (!UserSignedOnline(dwUserIndex))
+	if (!XUserSignedOnline(dwUserIndex))
 	{
 		return (DWORD)-1;
 	}

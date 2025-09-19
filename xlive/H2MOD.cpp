@@ -767,7 +767,6 @@ static void h2mod_apply_tweaks(void)
 	}
 	else
 	{
-
 		bool intro_high_quality_flag = true;//clients should set on halo2.exe -highquality
 
 		if (!H2Config_skip_intro && intro_high_quality_flag) {
@@ -866,7 +865,6 @@ static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a
 		//boot them offline.
 		XUserSignOut(0);
 		UpdateMasterLoginStatus();
-		H2Config_master_ip = inet_addr("127.0.0.1");
 	}
 	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
 	return result;

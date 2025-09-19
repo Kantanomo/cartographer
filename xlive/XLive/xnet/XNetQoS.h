@@ -1,7 +1,5 @@
 #pragma once
 
-#define k_xnet_qos_port_offset 10
-
 typedef struct _SOCKET_INFORMATION 
 {
 	WSAOVERLAPPED Overlapped;

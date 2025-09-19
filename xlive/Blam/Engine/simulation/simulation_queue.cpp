@@ -35,7 +35,7 @@ void c_simulation_queue::allocate(int32 size, s_simulation_queue_element** eleme
 							allocated_elem->next = NULL;
 
 							++m_allocated_count;
-							m_allocated_size_in_bytes += required_data_size;
+							m_allocated_size += required_data_size;
 							*element_out = allocated_elem;
 						}
 						else
@@ -111,9 +111,9 @@ void c_simulation_queue::transfer_elements(c_simulation_queue* simulation_queue)
 		s_simulation_queue_element* element = NULL;
 		simulation_queue->deque(&element);
 		--simulation_queue->m_allocated_count;
-		simulation_queue->m_allocated_size_in_bytes -= get_element_size_in_bytes(element);
+		simulation_queue->m_allocated_size -= get_element_size_in_bytes(element);
 		++m_allocated_count;
-		m_allocated_size_in_bytes += get_element_size_in_bytes(element);
+		m_allocated_size += get_element_size_in_bytes(element);
 		enqueue(element);
 
 		// if the element type is a global event
@@ -160,7 +160,7 @@ void c_simulation_queue::deallocate(s_simulation_queue_element* element)
 		ASSERT(element->data_size > 0 && element->data_size < k_simulation_queue_element_data_size_max);
 		ASSERT(element->next == NULL);
 
-		m_allocated_size_in_bytes -= get_element_size_in_bytes(element);
+		m_allocated_size -= get_element_size_in_bytes(element);
 		--m_allocated_count;
 
 		ASSERT(allocated_size_in_bytes() >= 0);

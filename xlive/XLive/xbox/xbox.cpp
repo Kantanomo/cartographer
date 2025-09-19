@@ -7,7 +7,7 @@ extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 // #5260: XShowSigninUI
 int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags)
 {
-	if (!UserSignedIn(0))
+	if (!XUserSignedIn(0))
 	{
 		cartographer_account_manager_open_list();
 	}

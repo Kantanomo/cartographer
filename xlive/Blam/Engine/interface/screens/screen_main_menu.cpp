@@ -498,7 +498,7 @@ static bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_control
 
 static bool __cdecl screen_show_screen_4way_signin_xbox_live_callback(void)
 {
-	if (!UserSignedOnline(_controller_index_0))
+	if (!XUserSignedOnline(_controller_index_0))
 		return true;
 
 	if (!user_interface_controller_is_player_profile_valid(_controller_index_0))

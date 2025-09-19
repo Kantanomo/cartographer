@@ -18,6 +18,8 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 	LOG_TRACE_XLIVE("XUserWriteAchievements  (count = {0:#x}, buffer = {1:p}, pOverlapped = {2:p})",
 		dwNumAchievements, (void*)pAchievement, (void*)pOverlapped);
 
+	XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(pAchievement->dwUserIndex);
+
 	if (dwNumAchievements > 0)
 	{
 		for (DWORD i = 0u; i < dwNumAchievements; i++)
@@ -206,7 +208,7 @@ DWORD WINAPI XUserWriteAchievements(DWORD dwNumAchievements, PXUSER_ACHIEVEMENT 
 
 				AchievementMap[AchievementData.c_str()] = false;
 
-				std::thread(AchievementUnlock, usersSignInInfo[0].xuid, achievementID, pOverlapped).detach();
+				std::thread(AchievementUnlock, signedInUser->xuid, achievementID, pOverlapped).detach();
 			}
 			else {
 				LOG_TRACE_GAME("Achievement {} was already unlocked", achievementID);

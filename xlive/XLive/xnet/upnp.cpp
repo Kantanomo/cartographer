@@ -8,6 +8,9 @@
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
 
+#include "Xlive/xnet/IpManagement/XnIp.h"
+#include "H2MOD/Modules/Shell/Config.h"
+
 /* Ripped from ED thanks guys - PermaNull*/
 ModuleUPnP::ModuleUPnP()
 {
@@ -58,7 +61,7 @@ void ForwardPorts()
 	upnpResult = upnp.UPnPForwardPort(false, H2Config_base_port + 1, H2Config_base_port + 1, "Halo2_port1");
 	LOG_INFO_NETWORK("ForwardPorts() - Halo2 port forwarding result: {}", upnpResult.ErrorCode);
 
-	upnpResult = upnp.UPnPForwardPort(true, H2Config_base_port + k_xnet_qos_port_offset, H2Config_base_port + k_xnet_qos_port_offset, "Halo2_port_QoS");
+	upnpResult = upnp.UPnPForwardPort(true, H2Config_base_port + XNIP_QOS_PORT_OFFSET, H2Config_base_port + XNIP_QOS_PORT_OFFSET, "Halo2_port_QoS");
 	LOG_INFO_NETWORK("ForwardPorts() - Halo2 QoS forwarding result: {}", upnpResult.ErrorCode);
 
 	LOG_INFO_NETWORK("ForwardPorts() - Finished forwarding ports.");

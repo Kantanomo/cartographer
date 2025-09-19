@@ -16,7 +16,6 @@
 
 #if defined(USE_LIVE_NETWORK_PROTOCOL)
 #	if USE_LIVE_NETWORK_PROTOCOL == true
-#		define INCREASE_NETWORK_TICKRATE_OBSOLETE 0 // old method of incresing the packet rate, now OBSOLETE
 #		define LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS true
 #	endif
 #endif

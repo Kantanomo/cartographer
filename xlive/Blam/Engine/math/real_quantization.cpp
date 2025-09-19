@@ -42,7 +42,7 @@ int32 quantize_unit_vector(const real_vector3d* u)
 {
 	int32 type;
 	real32 f1, f2;
-	real_vector3d v = { abs(u->i), abs(u->j), abs(u->k) };
+	real_vector3d v = { ::abs(u->i), ::abs(u->j), ::abs(u->k) };
 
 	if (v.i > v.j
 		&& v.i > v.k)

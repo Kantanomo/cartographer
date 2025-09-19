@@ -100,7 +100,7 @@ public:
 
 	// basic functions 
 	static void GetServerCounts(PXOVERLAPPED);
-	static void RemoveServer(PXOVERLAPPED pOverlapped);
+	static void RemoveServer(DWORD dwUserIndex, PXOVERLAPPED pOverlapped);
 	static void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
 
 #pragma region ServerListQuery
