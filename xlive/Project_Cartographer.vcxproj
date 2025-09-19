@@ -1349,6 +1349,7 @@
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\input\input_abstraction.h" />
+    <ClInclude Include="Blam\Engine\input\input_constants.h" />
     <ClInclude Include="Blam\Engine\input\input_process.h" />
     <ClInclude Include="Blam\Engine\input\input_windows.h" />
     <ClInclude Include="Blam\Engine\input\input_xinput.h" />

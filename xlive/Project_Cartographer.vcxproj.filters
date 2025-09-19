@@ -2046,6 +2046,7 @@
     <ClInclude Include="Blam\Engine\physics\impacts.h" />
     <ClInclude Include="Blam\Engine\sapien\patches_initialize.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_splitscreen_setting.h" />
+    <ClInclude Include="Blam\Engine\input\input_constants.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
