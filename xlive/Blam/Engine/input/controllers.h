@@ -1,5 +1,7 @@
 #pragma once
 
+/* enum */
+
 enum e_controller_index : int32
 {
 	_controller_index_0 = 0,
@@ -10,5 +12,8 @@ enum e_controller_index : int32
 	k_no_controller = NONE
 };
 
-e_controller_index first_controller();
+/* prototypes */
+
+e_controller_index first_controller(void);
+
 e_controller_index next_controller(e_controller_index controller);

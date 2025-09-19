@@ -1,13 +1,14 @@
 #pragma once
 #include "controllers.h"
+#include "input_abstraction.h"
+#include "input_constants.h"
 
 /* constants */
 
 enum
 {
-	k_number_of_windows_input_virtual_codes = 256,
-	k_number_of_windows_mouse_buttons = 8,
-	k_number_of_buffered_keys = 64,
+	NUMBER_OF_VIRTUAL_CODES = 256,
+	MAXIMUM_BUFFERED_KEYSTROKES = 64,
 	k_number_of_memory_units = 9,
 	k_maximum_delay_for_split_inputs = 250,
 };
@@ -18,6 +19,38 @@ enum
 /* forward declarations */
 
 class c_input_dx9_mouse_cursor; //TODO
+
+/* enums */
+
+enum e_xinput_gamepad_buttons
+{
+	_xinput_gamepad_dpad_up = 0,
+	_xinput_gamepad_dpad_down,
+	_xinput_gamepad_dpad_left,
+	_xinput_gamepad_dpad_right,
+	_xinput_gamepad_start,
+	_xinput_gamepad_back,
+	_xinput_gamepad_left_thumb,
+	_xinput_gamepad_right_thumb,
+	_xinput_gamepad_left_shoulder,
+	_xinput_gamepad_right_shoulder,
+	_xinput_gamepad_a,
+	_xinput_gamepad_b,
+	_xinput_gamepad_x,
+	_xinput_gamepad_y,
+	k_number_of_xinput_buttons,
+
+	_xinput_gamepad_left_trigger = k_number_of_xinput_buttons,
+	_xinput_gamepad_right_trigger,
+};
+
+enum
+{
+	_key_modifier_shift_bit = 0,
+	_key_modifier_control_bit,
+	_key_modifier_alt_bit,
+	NUMBER_OF_KEY_MODIFIER_FLAGS
+};
 
 /* classes */
 
@@ -63,33 +96,15 @@ ASSERT_STRUCT_SIZE(dinput_device, 0x40);
 
 /* structures */
 
-struct s_key_state
+struct key_stroke
 {
-	uint8 gap[0x8];
+	uint8 modifier_flags;
+	int8 ascii_code;
+	wchar_t utf16_code;
+	e_input_key_code key_code;
+	bool repeating;
 };
-ASSERT_STRUCT_SIZE(s_key_state, 0x8);
-
-enum e_xinput_gamepad_buttons
-{
-	_xinput_gamepad_dpad_up = 0x0,
-	_xinput_gamepad_dpad_down = 0x1,
-	_xinput_gamepad_dpad_left = 0x2,
-	_xinput_gamepad_dpad_right = 0x3,
-	_xinput_gamepad_start = 0x4,
-	_xinput_gamepad_back = 0x5,
-	_xinput_gamepad_left_thumb = 0x6,
-	_xinput_gamepad_right_thumb = 0x7,
-	_xinput_gamepad_left_shoulder = 0x8,
-	_xinput_gamepad_right_shoulder = 0x9,
-	_xinput_gamepad_a = 0xa,
-	_xinput_gamepad_b = 0xb,
-	_xinput_gamepad_x = 0xc,
-	_xinput_gamepad_y = 0xd,
-	_xinput_gamepad_left_trigger = 0xe,
-	_xinput_gamepad_right_trigger = 0xf,
-
-	k_number_of_xinput_buttons = 0xE,
-};
+ASSERT_STRUCT_SIZE(key_stroke, 0x8);
 
 struct s_gamepad_input_button_state
 {
@@ -116,9 +131,9 @@ ASSERT_STRUCT_SIZE(s_gamepad_input_state, 0x40);
 
 struct s_keyboard_input_state
 {
-	uint8 frames_down[k_number_of_windows_input_virtual_codes];
-	uint16 msec_down[k_number_of_windows_input_virtual_codes];
-	bool key_bool[k_number_of_windows_input_virtual_codes];
+	uint8 frames_down[NUMBER_OF_KEYS];
+	uint16 msec_down[NUMBER_OF_KEYS];
+	bool key_bool[NUMBER_OF_KEYS];
 };
 ASSERT_STRUCT_SIZE(s_keyboard_input_state, 0x400);
 
@@ -131,17 +146,17 @@ struct s_input_globals
 	bool feedback_suppress;
 	uint32 update_time;
 	uint32 update_msec;
-	IDirectInput8A* dinput;
+	IDirectInput8A* direct_input;
 	s_keyboard_input_state keyboard;
 	int16 buffered_key_read_index;
 	int16 buffered_key_read_count;
-	s_key_state buffered_keys[k_number_of_buffered_keys];
+	key_stroke buffered_keys[MAXIMUM_BUFFERED_KEYSTROKES];
 	LPDIRECTINPUTDEVICE8A mouse_dinput_device;
 	bool mouse_show;
 	uint8 gap_619[3];
 	uint32 field_61C;
 	DIMOUSESTATE2 mouse_state;
-	uint16 mouse_buttons[k_number_of_windows_mouse_buttons];
+	uint16 mouse_buttons[NUMBER_OF_MOUSE_BUTTONS];
 	DIMOUSESTATE2 suppressed_mouse_state;
 	uint8 gap_658[24];
 	uint32 mouse_cursor_state;
@@ -159,17 +174,24 @@ struct s_input_globals
 ASSERT_STRUCT_SIZE(s_input_globals, 0x7D8);
 
 
-/* global externs */
+/* globals */
+
 extern s_input_globals* input_globals;
-extern XINPUT_VIBRATION g_vibration_state[k_number_of_controllers];
 extern bool* g_input_windows_request_terminate;
 extern uint32 input_device_change_delay_timer;
 
 /* public code */
 
+void input_windows_apply_patches(void);
+
 void __cdecl input_initialize();
 void __cdecl input_dispose();
-void __cdecl input_update();
+void __cdecl input_windows_update(void);
+
+void input_suppress(void);
+
+void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled);
+
 void __cdecl input_update_gamepads(uint32 duration_ms);
 //void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms);
 bool __cdecl input_has_gamepad(uint16 gamepad_index, bool* a2);
@@ -180,16 +202,16 @@ s_gamepad_input_state* __cdecl input_get_gamepad(uint16 gamepad_index);
 s_gamepad_input_button_state* __cdecl input_get_gamepad_state(uint16 gamepad_index);
 DIMOUSESTATE2* __cdecl input_get_mouse_state();
 uint16* __cdecl input_get_mouse_button_state();
-bool __cdecl input_get_key(s_key_state* keystate);
+
+bool input_peek_key(key_stroke* key);
+
+bool input_abstraction_get_key(key_stroke* key);
+
 void __cdecl input_update_main_device_state();
 
 bool input_windows_processing_device_change();
 bool input_windows_has_split_device_active();
 void input_windows_notify_change_device_mapping();
-void input_windows_apply_patches(void);
-
-int32* hs_debug_simulate_gamepad_global_get(void);
-
 
 void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right);
 

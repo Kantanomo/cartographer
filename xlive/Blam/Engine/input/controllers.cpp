@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "controllers.h"
 
+/* public code */
 
-e_controller_index first_controller()
+e_controller_index first_controller(void)
 {
 	return _controller_index_0;
 }

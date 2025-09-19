@@ -1,11 +1,16 @@
 #include "stdafx.h"
 #include "input_xinput.h"
+
 #include "input_abstraction.h"
 
 #include "game/game.h"
 #include "game/game_time.h"
+#ifdef TERMINAL_ENABLED
+#include "main/console.h"
+#endif
 #include "networking/logic/life_cycle_manager.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
+
 #include "H2MOD/Modules/Input/ControllerInput.h"
 
 
@@ -36,20 +41,17 @@ const uint32 k_xinput_button_flags[k_number_of_xinput_buttons] =
 
 /* globals */
 
-XInputGetStateEx_t XInputGetStateEx;
+static uint32* g_main_controller_index;
 
-HMODULE g_xinput1_4_module;
+static XInputGetStateEx_t XInputGetStateEx;
 
+static HMODULE g_xinput1_4_module;
 
-XINPUT_VIBRATION g_xinput_vibration{};
+static XINPUT_VIBRATION g_xinput_vibration{};
 
 input_device** g_xinput_devices;
 
-uint32* g_main_controller_index;
-
 uint16 g_controller_radial_deadzones[k_number_of_controllers] = {};
-
-bool g_controller_home_button_state[k_number_of_controllers] = { false, false, false, false };
 
 /* prototypes */
 

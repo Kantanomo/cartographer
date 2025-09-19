@@ -11,7 +11,7 @@ protected:
 	XINPUT_STATE xinput_state;
 public:
 
-	uint32 get_port() const;
+	uint32 get_port(void) const;
 	// xinput_device virtual functions
 
 	virtual void XInputOpen(void) override { return; };
@@ -24,6 +24,8 @@ public:
 ASSERT_STRUCT_SIZE(xinput_device, 0x1C);
 
 /* globals */
+
+extern input_device** g_xinput_devices;
 
 extern uint16 g_controller_radial_deadzones[k_number_of_controllers];
 

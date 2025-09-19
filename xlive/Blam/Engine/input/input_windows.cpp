@@ -7,46 +7,269 @@
 
 #include "interface/user_interface_controller.h"
 #include "main/main_time.h"
-#include "render/render.h"							/* PC1 */
+#include "main/game_preferences.h"
+#ifdef PC1
+#include "render/render.h"
+#endif
 #include "shell/shell_windows.h"
-
-extern input_device** g_xinput_devices;
-extern s_input_abstraction_globals* g_input_abstraction_globals;
-
-/* globals */
-
-bool g_should_offset_gamepad_indices = false;
-bool g_notified_to_change_mapping = false;
-uint32 input_device_change_delay_timer = NULL;
-s_input_globals* input_globals;
-bool* g_input_windows_request_terminate;
 
 /* constants */
 
-real32 g_rumble_factor = 1.0f;
+real32 g_rumble_factor = 1.f;
+
+/* structures */
+
+struct ascii_key
+{
+	e_input_key_code key;
+	bool remapped;
+	int32 field_8;
+	int16 remapped_key;
+};
+
+struct s_key_remap
+{
+	const e_input_key_code key;
+	const WCHAR ch;
+	int32 virtual_key;
+};
 
 /* prototypes */
 
-int compare_device_compatibility(const void* p1, const void* p2);
-int compare_device_ports(const void* p1, const void* p2);
-void input_windows_update_device_mapping();
-void input_windows_restore_device_mapping();
+static void input_stop_removed_controller_handler_from_panicking(void);
+
+static ascii_key* ascii_to_key_table_get(void);
+
+static e_input_key_code input_map_ascii_to_keycode(uint8 ascii);
+
+static void input_windows_initialize_key_remapping(void);
+
+static int compare_device_compatibility(const void* p1, const void* p2);
+
+static int compare_device_ports(const void* p1, const void* p2);
+
+static void input_windows_update_device_mapping(void);
+
+static void input_windows_restore_device_mapping(void);
+
+static bool input_has_gamepad_hook(int16 gamepad_index, bool* a1);
+
+/* globals */
+
+// This global stores a list of key codes as well as the associated characters they need to press
+// Virtual keys are resolved at runtime by checking the keyboard layout for this specific character key
+static s_key_remap g_key_remap[REMAPPED_KEY_COUNT] =
+{
+	{ _key_tilde, L'`', NONE },
+	{ _key_subtract, L'-', NONE },
+	{ _key_left_square_bracket, L'[', NONE },
+	{ _key_right_square_bracket, L']', NONE },
+	{ _key_backslash, L'\\', NONE },
+	{ _key_semicolon, L';', NONE },
+	{ _key_apostrophe, L'\'', NONE },
+	{ _key_comma, L',', NONE },
+	{ _key_period, L'.', NONE },
+	{ _key_forwardslash, L'/', NONE },
+	{ _key_equal, L'=', NONE },
+	{ _key_add, L'+', NONE },
+	{ _key_circumflex_accent, L'^', NONE },
+	{ _key_dollar_sign, L'$', NONE },
+	{ _key_asterisk, L'*', NONE },
+	{ _key_colon, L':', NONE },
+	{ _key_exclamation_mark, L'!', NONE },
+	{ _key_ampersand, L'&', NONE },
+	{ _key_quotation_mark, L'\"', NONE },
+	{ _key_u_umlaut, L'\xFC', NONE },
+	{ _key_o_umlaut, L'\xF6', NONE },
+	{ _key_a_umalut, L'\xE4', NONE },
+	{ _key_eszett, L'\xDF', NONE },
+	{ _key_u_accent_grave, L'\xF9', NONE },
+	{ _key_ene, L'\xF1', NONE },
+	{ _key_acute_accent, L'\xB4', NONE },
+	{ _key_e_grave, L'\xE8', NONE },
+	{ _key_o_grave, L'\xF2', NONE },
+	{ _key_a_grave, L'\xE0', NONE },
+	{ _key_c_cedilla, L'\xE7', NONE }
+};
+
+bool g_should_offset_gamepad_indices = false;
+
+bool g_notified_to_change_mapping = false;
+
+uint32 input_device_change_delay_timer = NULL;
+
+s_input_globals* input_globals;
+
+bool* g_input_windows_request_terminate;
 
 /* public code */
 
-void __cdecl input_initialize()
+void input_windows_apply_patches(void)
+{
+	input_globals = Memory::GetAddress<s_input_globals*>(0x479F50);
+	g_input_windows_request_terminate = Memory::GetAddress<bool*>(0x971291);
+
+	PatchCall(Memory::GetAddress(0x9020F), input_set_gamepad_rumbler_state);    // Replace call in rumble_clear_all_now
+
+	PatchCall(Memory::GetAddress(0x2FA62), input_update_main_device_state);		// Replace call in input_windows_update
+	PatchCall(Memory::GetAddress(0x2FC2F), input_update_main_device_state);		// Replace call in input_windows_update
+	PatchCall(Memory::GetAddress(0x2FBD2), input_update_gamepads);				// Replace call in input_windows_update
+
+	input_stop_removed_controller_handler_from_panicking();
+	
+	// Replace initialize key mapping function so we properly handle keyboard layouts
+	PatchCall(Memory::GetAddress(0x2FEA9), input_windows_initialize_key_remapping);
+	PatchCall(Memory::GetAddress(0x7C87), input_add_key);
+	return;
+}
+
+void __cdecl input_initialize(void)
 {
 	INVOKE(0x2FD23, 0x0, input_initialize);
+	return;
 }
 
-void __cdecl input_dispose()
+void __cdecl input_dispose(void)
 {
 	INVOKE(0x2E309, 0x0, input_dispose);
+	return;
 }
 
-void __cdecl input_update()
+void __cdecl input_windows_update(void)
 {
-	INVOKE(0x2F9AC, 0x0, input_update);
+	INVOKE(0x2F9AC, 0x0, input_windows_update);
+	return;
+}
+
+void input_suppress(void)
+{
+	input_globals->input_suppressed = true;
+	return;
+}
+
+void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
+{
+	if (input_globals->mouse_acquired)
+	{
+		bool upper_bit_exists = false;
+
+		uint8 key = _key_not_a_key;
+		key_stroke keystroke;
+		keystroke.modifier_flags = 0;
+		keystroke.ascii_code = NONE;
+		keystroke.key_code = _key_not_a_key;
+
+		// Handle system keys
+		if (msg == WM_KEYFIRST || msg == WM_SYSKEYDOWN)
+		{
+			ASSERT(VALID_INDEX(wParam, NUMBER_OF_VIRTUAL_CODES));
+			
+			key = (uint8)wParam;
+			keystroke.ascii_code = NONE;
+			keystroke.utf16_code = (wchar_t)NONE;
+
+			// Sapien code?
+			if (get_current_language() == _language_german && GetKeyState(VK_CONTROL))
+			{
+				GetKeyState(VK_LMENU);
+			}
+
+			switch (key)
+			{
+			case _key_shift:
+				if (GetKeyState(VK_RSHIFT))
+				{
+					key = VK_RSHIFT;
+				}
+				else if (GetKeyState(VK_LSHIFT))
+				{
+					key = VK_LSHIFT;
+				}
+				break;
+			case _key_control:
+				if (GetKeyState(VK_LCONTROL))
+				{
+					key = VK_LCONTROL;
+				}
+				else if (GetKeyState(VK_RCONTROL))
+				{
+					key = VK_RCONTROL;
+				}
+				break;
+			case _key_menu:
+				if (GetKeyState(VK_RMENU))
+				{
+					key = VK_RMENU;
+				}
+				else if (GetKeyState(VK_LMENU))
+				{
+					key = VK_LMENU;
+				}
+				break;
+			}
+			keystroke.key_code = input_map_ascii_to_keycode(key);
+		}
+		// Handle other characters
+		else if (msg == WM_CHAR || msg == WM_SYSCHAR)
+		{
+			const HKL layout = GetKeyboardLayout(0);
+
+			key = (uint8)VkKeyScanExW((WCHAR)wParam, layout);
+			upper_bit_exists = (wParam & 0xFF00) != 0;
+
+			if (upper_bit_exists || wParam >= VK_SPACE)
+			{
+				keystroke.ascii_code = (int8)(upper_bit_exists ? NONE : wParam);
+				keystroke.utf16_code = (wchar_t)wParam;
+				keystroke.key_code = input_map_ascii_to_keycode(key);
+			}
+		}
+
+		keystroke.repeating = TEST_BIT(lParam, 30);	// Set repeating to if bit 30 is true
+
+		if (keystroke.key_code != NONE || upper_bit_exists)
+		{
+			// If key is already handled and the key code isn't invalid then exit
+			if (fHandled && keystroke.key_code != _key_not_a_key)
+			{
+				input_globals->keyboard.key_bool[key] = true;
+				return;
+			}
+
+			// Set modifier flags on the key pressed
+			SET_BIT(keystroke.modifier_flags, _key_modifier_shift_bit, GetKeyState(VK_SHIFT) < 0);
+			SET_BIT(keystroke.modifier_flags, _key_modifier_control_bit, GetKeyState(VK_CONTROL) < 0);
+			SET_BIT(keystroke.modifier_flags, _key_modifier_alt_bit, GetKeyState(VK_MENU) < 0);
+			
+			// Add keystroke to buffered keys
+			if (input_globals->buffered_key_read_count < MAXIMUM_BUFFERED_KEYSTROKES)
+			{
+				input_globals->buffered_keys[input_globals->buffered_key_read_count] = keystroke;
+				++input_globals->buffered_key_read_count;
+			}
+
+			// Adjust timing for key
+			if (input_globals->keyboard.frames_down[key] == 0)
+			{
+				input_globals->keyboard.frames_down[key] = 1;
+				input_globals->keyboard.msec_down[key] = 1;
+			}
+		}
+	}
+
+	// Clear the key state for system keys
+	byte key_state[256];
+	if (GetKeyboardState(key_state))
+	{
+		key_state[VK_LSHIFT] = 0;
+		key_state[VK_RSHIFT] = 0;
+		key_state[VK_LCONTROL] = 0;
+		key_state[VK_RCONTROL] = 0;
+		key_state[VK_LMENU] = 0;
+		key_state[VK_RMENU] = 0;
+		SetKeyboardState(key_state);
+	}
+	return;
 }
 
 void __cdecl input_update_gamepads(uint32 duration_ms)
@@ -194,9 +417,27 @@ uint16* __cdecl input_get_mouse_button_state()
 	return nullptr;
 }
 
-bool __cdecl input_get_key(s_key_state* keystate)
+bool input_peek_key(key_stroke* key)
 {
-	return INVOKE(0x2E3CB, 0x0, input_get_key, keystate);
+	bool result = false;
+	if (input_globals->buffered_key_read_index < input_globals->buffered_key_read_count)
+	{
+		ASSERT(VALID_INDEX(input_globals->buffered_key_read_index, MAXIMUM_BUFFERED_KEYSTROKES));
+		*key = input_globals->buffered_keys[input_globals->buffered_key_read_index];
+		result = true;
+	}
+	return result;
+}
+
+bool input_abstraction_get_key(key_stroke* key)
+{
+	const bool result = input_peek_key(key);
+	if (result)
+	{
+		ASSERT(VALID_INDEX(input_globals->buffered_key_read_index, MAXIMUM_BUFFERED_KEYSTROKES));
+		++input_globals->buffered_key_read_index;
+	}
+	return result;
 }
 
 void __cdecl input_update_main_device_state()
@@ -246,13 +487,6 @@ void __cdecl input_update_main_device_state()
 	} while (device_index < k_number_of_controllers);
 }
 
-
-int32* hs_debug_simulate_gamepad_global_get(void)
-{
-	return Memory::GetAddress<int32*>(0x47A71C);
-}
-
-
 void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right)
 {
 	ASSERT(VALID_INDEX(gamepad_index, k_number_of_controllers));
@@ -300,7 +534,74 @@ void input_windows_notify_change_device_mapping()
 	g_should_offset_gamepad_indices = !g_should_offset_gamepad_indices;
 }
 
-int compare_device_compatibility(const void* p1, const void* p2)
+/* private code */
+
+static void input_stop_removed_controller_handler_from_panicking(void)
+{
+	PatchCall(Memory::GetAddress(0x208D3C), input_has_gamepad_hook);
+	PatchCall(Memory::GetAddress(0x2084B3), input_has_gamepad_hook);
+	PatchCall(Memory::GetAddress(0x20844A), input_has_gamepad_hook);
+	return;
+}
+
+static ascii_key* ascii_to_key_table_get(void)
+{
+	return Memory::GetAddress<ascii_key*>(0x411AA0);
+}
+
+static e_input_key_code input_map_ascii_to_keycode(uint8 ascii)
+{
+	const ascii_key* ascii_to_key_table = ascii_to_key_table_get();
+
+	e_input_key_code result = (e_input_key_code)ascii;
+	if (ascii_to_key_table[ascii].key != NONE)
+	{
+		result = ascii_to_key_table[ascii].key;
+	}
+	return result;
+}
+
+static void input_windows_initialize_key_remapping(void)
+{
+	const HKL layout = GetKeyboardLayout(0);
+
+	ascii_key* ascii_to_key_table = ascii_to_key_table_get();
+
+	// Loop through every VK key and set the remapped key
+	for (int32 vk_key = 0; vk_key < NUMBER_OF_KEYS; ++vk_key)
+	{
+		if (!ascii_to_key_table[vk_key].remapped)
+		{
+			const int16 remapped_key = (int16)MapVirtualKeyExW(vk_key, MAPVK_VK_TO_CHAR, layout);
+			if (remapped_key)
+			{
+				ascii_to_key_table[vk_key].remapped = true;
+				ascii_to_key_table[vk_key].remapped_key = remapped_key;
+			}
+		}
+	}
+
+	// Remap every key in the key remap array from the character to be printed
+	// to the key that will print it
+	for (int32 i = 0; i < REMAPPED_KEY_COUNT; ++i)
+	{
+		ASSERT(g_key_remap[i].key == i + FIRST_REMAPPED_KEY);
+	
+		const int16 result = VkKeyScanExW(g_key_remap[i].ch, layout);
+		const bool shift_state_exists = (result & 0xFF00) != 0;
+
+		// Make sure we only add a key remap if it doesn't have a shift state
+		// Ex. pressing Shift/Ctrl and another character to print a specific character is not allowed
+		if (!shift_state_exists)
+		{
+			g_key_remap[i].virtual_key = result;
+			ascii_to_key_table[g_key_remap[i].virtual_key].key = g_key_remap[i].key;
+		}
+	}
+	return;
+}
+
+static int compare_device_compatibility(const void* p1, const void* p2)
 {
 	input_device* device1 = *(input_device**)p1;
 	input_device* device2 = *(input_device**)p2;
@@ -319,7 +620,7 @@ int compare_device_compatibility(const void* p1, const void* p2)
 	return 0;
 }
 
-int compare_device_ports(const void* p1, const void* p2)
+static int compare_device_ports(const void* p1, const void* p2)
 {
 	xinput_device* device1 = *(xinput_device**)p1;
 	xinput_device* device2 = *(xinput_device**)p2;
@@ -327,7 +628,7 @@ int compare_device_ports(const void* p1, const void* p2)
 	return device1->get_port() - device2->get_port();
 }
 
-void input_windows_update_device_mapping()
+static void input_windows_update_device_mapping(void)
 {
 	input_device* g_new_xinput_order[k_number_of_controllers] = {};
 	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
@@ -349,10 +650,10 @@ void input_windows_update_device_mapping()
 		g_xinput_devices[_controller_index_2] = g_new_xinput_order[_controller_index_1];
 		g_xinput_devices[_controller_index_3] = g_new_xinput_order[_controller_index_2];
 	}
-
+	return;
 }
 
-void input_windows_restore_device_mapping()
+static void input_windows_restore_device_mapping(void)
 {
 	input_device* g_new_xinput_order[k_number_of_controllers] = {};
 	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
@@ -371,7 +672,7 @@ void input_windows_restore_device_mapping()
 	}
 }
 
-bool input_has_gamepad_hook(int16 gamepad_index, bool* a1)
+static bool input_has_gamepad_hook(int16 gamepad_index, bool* a1)
 {
 	if (g_should_offset_gamepad_indices && gamepad_index == k_windows_device_controller_index)
 	{
@@ -383,27 +684,4 @@ bool input_has_gamepad_hook(int16 gamepad_index, bool* a1)
 	}
 
 	return input_has_gamepad(gamepad_index, a1);
-}
-
-void input_stop_removed_controller_handler_from_panicking()
-{
-	PatchCall(Memory::GetAddress(0x208D3C), input_has_gamepad_hook);
-	PatchCall(Memory::GetAddress(0x2084B3), input_has_gamepad_hook);
-	PatchCall(Memory::GetAddress(0x20844A), input_has_gamepad_hook);
-}
-
-
-void input_windows_apply_patches(void)
-{
-	input_globals = Memory::GetAddress<s_input_globals*>(0x479F50);
-	g_input_windows_request_terminate = Memory::GetAddress<bool*>(0x971291);
-
-	PatchCall(Memory::GetAddress(0x9020F), input_set_gamepad_rumbler_state);    // Replace call in rumble_clear_all_now
-
-	PatchCall(Memory::GetAddress(0x2FA62), input_update_main_device_state);		// Replace call in input_update
-	PatchCall(Memory::GetAddress(0x2FC2F), input_update_main_device_state);		// Replace call in input_update
-	PatchCall(Memory::GetAddress(0x2FBD2), input_update_gamepads);				// Replace call in input_update
-
-	input_stop_removed_controller_handler_from_panicking();
-	return;
 }
