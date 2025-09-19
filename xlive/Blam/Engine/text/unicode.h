@@ -381,3 +381,37 @@ void __cdecl wchar_string_to_utf8_string(const wchar_t* src, utf8* dst, int32 co
 size_t utf8_string_length(const utf8* src, size_t size);
 
 bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name);
+
+utf32 ascii_string_to_utf32_characters(const char* in_src, const char** out_next);
+
+utf32 __cdecl wchar_string_to_utf32_characters(const wchar_t* in_src, const wchar_t** out_next);
+
+void __cdecl ascii_string_to_utf32_string(const char* string, utf32* utf32_string, int32 count);
+
+void __cdecl wchar_string_to_utf32_string(const wchar_t* string, utf32* utf32_string, int32 count);
+
+
+/* public code */
+
+template<typename t_storage_type>
+void string_to_utf32_string(
+    const t_storage_type* in_src,
+    utf32* in_dst,
+    utf32(*character_type_string_to_utf32_characters)(const t_storage_type*, const t_storage_type**),
+    int32 in_buffer_count
+)
+{
+	while (in_buffer_count > 0)
+	{
+		const bool last_character = in_buffer_count == 1;
+		in_dst[0].character = last_character ? 0 : character_type_string_to_utf32_characters(in_src, &in_src).character;
+        if (!in_dst[0].character)
+        {
+            break;
+        }
+
+        ++in_dst;
+        --in_buffer_count;
+    }
+	return;
+}
