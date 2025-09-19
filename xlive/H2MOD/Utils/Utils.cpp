@@ -360,7 +360,7 @@ char* encode_rfc3986(const char* label_literal, size_t label_literal_length) {
 		}
 		escaped_buff_i++;
 	}
-	label_escaped[escaped_buff_i] = 0;
+	label_escaped[escaped_buff_i] = '\0';
 	return label_escaped;
 }
 

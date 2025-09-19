@@ -161,7 +161,15 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 	// operation successful or not
 	bool result = false;
 
-	if (!doc.HasMember("dwMaxPublicSlots")) {
+	if (!doc.HasMember("dwServerType"))
+	{
+		BadServer(xuid, "Missing Member: dwServerType");
+		return result;
+	}
+	searchResult.dwServerType = doc["dwServerType"].GetUint();
+
+	if (!doc.HasMember("dwMaxPublicSlots")) 
+	{
 		BadServer(xuid, "Missing Member: dwMaxPublicSlots");
 		return result;
 	}
@@ -187,13 +195,6 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		return result;
 	}
 	searchResult.dwFilledPrivateSlots = doc["dwMaxFilledPrivateSlots"].GetUint();
-
-	if (!doc.HasMember("dwServerType"))
-	{
-		BadServer(xuid, "Missing Member: dwServerType");
-		return result;
-	}
-	searchResult.dwServerType = doc["dwServerType"].GetUint();
 
 #pragma region Xbox Network Address Reading
 	if (!doc.HasMember("lanaddr") || !doc["lanaddr"].IsUint())
@@ -374,7 +375,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 			break;
 		}
 
-		for (auto property : propertiesWritten)
+		for (const auto& property : propertiesWritten)
 		{
 			uint32 i = 0;
 			bool matchFound = false;
@@ -389,7 +390,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 
 			if (!matchFound)
 			{
-				LOG_WARNING_XLIVE("{} - couldn't find property: 0x{:X}", __FUNCTION__, m_pSearchPropertyIds[i]);
+				LOG_WARNING_XLIVE("{} - couldn't find property ID: {:X}", __FUNCTION__, m_pSearchPropertyIds[i]);
 			}
 		}
 

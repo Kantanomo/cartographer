@@ -59,7 +59,7 @@ class c_simulation_queue
 {
 	bool	m_initialized;
 	int32	m_allocated_count;
-	int32	m_allocated_size_in_bytes;
+	int32	m_allocated_size;
 
 	int32	m_queued_count;
 	int32	m_size;
@@ -85,7 +85,7 @@ public:
 	void initialize()
 	{
 		m_allocated_count = 0;
-		m_allocated_size_in_bytes = 0;
+		m_allocated_size = 0;
 		m_queued_count = 0;
 		m_size = 0;
 		m_head = NULL;
@@ -140,7 +140,7 @@ public:
 	{
 		if (initialized())
 		{
-			return m_allocated_size_in_bytes;
+			return m_allocated_size;
 		}
 
 		return 0;
