@@ -150,7 +150,7 @@ real32 normalize2d(real_vector2d* v)
 {
 	real32 result = square_root(dot_product2d(v, v));
 
-	if (abs(result) < k_real_epsilon)
+	if (::abs(result) < k_real_epsilon)
 	{
 		result = 0.0f;
 	}
@@ -172,7 +172,7 @@ real_vector2d* perpendicular2d(const real_vector2d* a, real_vector2d* result)
 real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b)
 {
 	real32 magnitude = magnitude3d(a);
-	if (abs(magnitude) < k_real_epsilon)
+	if (::abs(magnitude) < k_real_epsilon)
 	{
 		magnitude = 0.0f;
 		*a = *b;
@@ -215,10 +215,10 @@ bool limit3d(real_vector3d* v, real32 limit)
 {
 	real32 dot_product = dot_product3d(v, v);
 
-	if (dot_product <= pow(limit, 2.0f))
+	if (dot_product <= ::pow(limit, 2.0f))
 		return false;
 	
-	real32 scale = reciprocal_square_root(dot_product)* limit;
+	real32 scale = reciprocal_square_root(dot_product) * limit;
 	scale_vector3d(v, scale, v);
 	return true;
 }

@@ -169,6 +169,16 @@ real32 game_seconds_to_ticks_real(real32 seconds)
 	return ((real32)game_time_globals->tick_rate * seconds);
 }
 
+real32 game_tick_rate_legacy_ratio_real()
+{
+	const s_time_globals* game_time_globals = time_globals_get();
+
+	ASSERT(game_time_globals);
+	ASSERT(game_time_globals->initialized);
+
+	return (real32)game_time_globals->tick_rate / 30.f;
+}
+
 int32 game_seconds_to_ticks_round(real32 seconds)
 {
 	const s_time_globals* game_time_globals = time_globals_get();

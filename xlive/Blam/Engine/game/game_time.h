@@ -30,6 +30,8 @@ real32 game_ticks_to_seconds(real32 ticks);
 
 real32 game_seconds_to_ticks_real(real32 seconds);
 
+real32 game_tick_rate_legacy_ratio_real();
+
 int32 game_seconds_to_ticks_round(real32 seconds);
 
 real32 game_time_get_max_frame_time(void);

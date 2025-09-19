@@ -196,7 +196,7 @@ extern const real_rectangle3d* const global_null_rectangle3d;
 
 inline real32 square_root(real32 f)
 {
-	return sqrt(f);
+	return ::sqrtf(f);
 }
 
 inline real32 reciprocal_square_root(real32 f)
@@ -250,7 +250,7 @@ inline bool valid_real(real32 value)
 inline bool valid_realcmp(real32 a, real32 b)
 {
 	real32 result = a - b;
-	return valid_real(result) && abs(result) < 0.01f;
+	return valid_real(result) && ::abs(result) < 0.01f;
 }
 
 inline bool valid_real_normal3d(const real_vector3d* normal)
@@ -354,18 +354,18 @@ inline real_vector3d* vector_from_points3d(const real_point3d* a, const real_poi
 
 inline real_point3d* point_from_line3d(const real_point3d* p, const real_vector3d* v, real32 t, real_point3d* result)
 {
-	real_vector3d direction_scaled;
-	scale_vector3d(v, t, &direction_scaled);
-	result->x = direction_scaled.i + p->x;
-	result->y = direction_scaled.j + p->y;
-	result->z = direction_scaled.k + p->z;
+	real_vector3d v_scaled;
+	scale_vector3d(v, t, &v_scaled);
+	result->x = p->x + v_scaled.i;
+	result->y = p->y + v_scaled.j;
+	result->z = p->z + v_scaled.k;
 	return result;
 }
 
 inline real32 normalize3d(real_vector3d* v1)
 {
 	real32 length = magnitude3d(v1);
-	if (abs(length) >= k_real_epsilon)
+	if (::abs(length) >= k_real_epsilon)
 	{
 		scale_vector3d(v1, 1.0f / length, v1);
 	}
@@ -394,17 +394,17 @@ inline void set_real_point3d(real_point3d* point, real32 x, real32 y, real32 z)
 
 inline real32 cosine(real32 x)
 {
-	return cos(x);
+	return ::cos(x);
 }
 
 inline real32 sine(real32 x)
 {
-	return sin(x);
+	return ::sin(x);
 }
 
 inline real32 tangent(real32 x)
 {
-	return tan(x);
+	return ::tan(x);
 }
 
 inline real32 arccosine(real32 x)
@@ -412,7 +412,7 @@ inline real32 arccosine(real32 x)
 	ASSERT(x >= -1.f - k_real_epsilon && x <= +1.f + k_real_epsilon);
 
 	// Pin parameter between -1 and 1
-	return acos(PIN(x, -1.f, 1.f));
+	return ::acos(PIN(x, -1.f, 1.f));
 }
 
 inline real32 arcsine(real32 x)
@@ -420,12 +420,12 @@ inline real32 arcsine(real32 x)
 	ASSERT(x >= -1.f - k_real_epsilon && x <= +1.f + k_real_epsilon);
 
 	// Pin parameter between -1 and 1
-	return asin(PIN(x, -1.f, 1.0f));
+	return ::asin(PIN(x, -1.f, 1.0f));
 }
 
 inline real32 arctangent(real32 a, real32 b)
 {
-	return atan2(a, b);
+	return ::atan2(a, b);
 }
 
 
