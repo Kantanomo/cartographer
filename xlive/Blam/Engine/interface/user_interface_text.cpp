@@ -53,9 +53,7 @@ void c_user_interface_text::set_color(const real_rgb_color* color)
 
 bool c_user_interface_text::is_private_use_character(wchar_t character)
 {
-	if (IN_RANGE(character, k_private_use_character_space_start, k_private_use_character_space_end))
-		return true;
-	return false;
+	return IN_RANGE(character, k_first_unicode_private_use_character, k_last_unicode_private_use_character);
 }
 
 // Seperated scale for the text labels (carto addition)

@@ -5,8 +5,11 @@
 
 /* constants */
 
-#define k_no_of_visible_items_for_cartographer_account_manager_list 4
-#define k_cartographer_account_email_and_password_max_length 128
+enum
+{
+	k_no_of_visible_items_for_cartographer_account_manager_list = 4,
+	k_cartographer_account_email_and_password_max_length = 128,
+};
 
 /* enums */
 
