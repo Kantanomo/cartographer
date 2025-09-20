@@ -19,9 +19,9 @@ enum e_game_life_cycle : int32
 /* typedefs */
 
 e_game_life_cycle get_game_life_cycle(void);
-typedef bool (*life_cycle_update_t)(void* life_cycle_handler);
-typedef void (*life_cycle_initialize_t)(void* life_cycle_handler_requested, void* life_cycle_handler_current, int32 unk_1, void* unk_2);
-typedef void (*life_cycle_dispose_t)(void* life_cycle_handler_current, void* life_cycle_handler_requested);
+typedef bool (__cdecl *life_cycle_update_t)(void* life_cycle_handler);
+typedef void (__cdecl *life_cycle_initialize_t)(void* life_cycle_handler_requested, void* life_cycle_handler_current, int32 a3, void* a4);
+typedef void (__cdecl *life_cycle_dispose_t)(void* life_cycle_handler_current, void* life_cycle_handler_requested);
 
 /* classes */
 
@@ -114,12 +114,19 @@ public:
 };
 ASSERT_STRUCT_SIZE(c_game_life_cycle_handler_joining, 0x1084);
 
-struct  c_game_life_cycle_handler_match_making : c_game_life_cycle_handler
+struct c_game_life_cycle_handler_matchmaking : c_game_life_cycle_handler
 {
-	void* some_function_pointer;
+	void(__thiscall* m_execute)(void*);
 	int32 field_14;
+
+	void update() 
+	{
+		// ugly but IDC, this structure holds an actual subclass
+		if (m_execute)
+			m_execute((void*)&m_execute);
+	}
 };
-ASSERT_STRUCT_SIZE(c_game_life_cycle_handler_match_making, 0x18);
+ASSERT_STRUCT_SIZE(c_game_life_cycle_handler_matchmaking, 0x18);
 
 class c_game_life_cycle_manager
 {

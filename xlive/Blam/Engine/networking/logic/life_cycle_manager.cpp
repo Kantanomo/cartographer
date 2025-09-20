@@ -43,6 +43,10 @@ void life_cycle_update(void)
 	if (game_life_cycle_initialized()) {
 		life_cycle_manager->update();
 
+		c_game_life_cycle_handler_matchmaking* life_cycle_matchmaking = (c_game_life_cycle_handler_matchmaking*)life_cycle_manager->m_life_cycle_handlers[_life_cycle_matchmaking];
+
+		life_cycle_matchmaking->update();
+
 		static e_game_life_cycle previous_life_cycle = _life_cycle_none;
 		if (previous_life_cycle != life_cycle_manager->get_life_cycle()) {
 			previous_life_cycle = life_cycle_manager->get_life_cycle();
