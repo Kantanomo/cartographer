@@ -2,6 +2,7 @@
 #include "life_cycle_manager.h"
 
 #include "networking/session/network_session.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
 /* constants */
 
@@ -30,12 +31,24 @@ bool game_life_cycle_initialized()
 
 void game_life_cycle_apply_patches()
 {
+	PatchCall(Memory::GetAddress(0x39C9C, 0xC076), life_cycle_update);
 	return;
 }
 
 void life_cycle_update(void)
 {
-	INVOKE(0x1AD83F, 0x1A67BC, life_cycle_update);
+	// INVOKE(0x1AD83F, 0x1A67BC, life_cycle_update);
+	c_game_life_cycle_manager* life_cycle_manager = c_game_life_cycle_manager::get();
+
+	if (game_life_cycle_initialized()) {
+		life_cycle_manager->update();
+
+		static e_game_life_cycle previous_life_cycle = _life_cycle_none;
+		if (previous_life_cycle != life_cycle_manager->get_life_cycle()) {
+			previous_life_cycle = life_cycle_manager->get_life_cycle();
+			EventHandler::GameLifeCycleEventExecute(EventExecutionType::execute_after, life_cycle_manager->get_life_cycle());
+		}
+	}
 	return;
 }
 

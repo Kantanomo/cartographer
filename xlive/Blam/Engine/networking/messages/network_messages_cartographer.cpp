@@ -234,7 +234,7 @@ static void encode_custom_variant_settings(c_bitstream* stream, int a2, s_networ
 
 static bool decode_custom_variant_settings(c_bitstream* stream, int a2, s_network_message_session_custom_variant_settings* data)
 {
-	stream->write_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
+	stream->read_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
 	CustomVariantSettings::DecodeVariantSettings(stream, a2, &data->settings);
 	return stream->error_occured() == false;
 }

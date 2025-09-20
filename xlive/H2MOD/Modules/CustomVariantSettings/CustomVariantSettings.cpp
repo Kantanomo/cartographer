@@ -53,7 +53,7 @@ namespace CustomVariantSettings
 
 	void SendCustomVariantSettings(int32 peer_index)
 	{
-		c_network_session* session = NULL;;
+		c_network_session* session = NULL;
 
 		s_network_message_session_custom_variant_settings data;
 
