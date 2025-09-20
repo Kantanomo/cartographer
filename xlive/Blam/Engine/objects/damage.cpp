@@ -5,6 +5,10 @@
 #include "networking/network_event.h"
 #include "units/units.h"
 
+#include "shell/shell.h"
+
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+
 /* public code */
 
 void damage_apply_patches(void)
@@ -12,6 +16,11 @@ void damage_apply_patches(void)
 	// Hook on call to prevent guardian glitching
 	// Used to disable it in Infection only, became a bigger problem so now we have to disable it globally.....
 	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), object_cause_damage);
+
+	if (!shell_is_dedicated_server()) 
+	{
+		PatchCall(Memory::GetAddress(0x1FD293), object_apply_damage_aftermath);
+	}
 	return;
 }
 
@@ -48,4 +57,10 @@ void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index,
 		INVOKE(0x17AD81, 0x1525E1, object_cause_damage, damage_data, object_index, node_index, region_index, material_index, object_normal);
 	}
 	return;
+}
+
+void __cdecl object_apply_damage_aftermath(datum object_index, s_damage_aftermath_data* aftermath_data)
+{
+	SET_BIT(aftermath_data->flags, _damage_aftermath_has_explosion_physics, currentVariantSettings.explosionPhysics);
+	INVOKE(0x17A25D, 0x0, object_apply_damage_aftermath, object_index, aftermath_data);
 }

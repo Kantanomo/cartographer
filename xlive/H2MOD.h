@@ -12,7 +12,7 @@ enum e_sound_type
 
 
 bool xbox_tickrate_is_enabled();
-void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout);
+void call_give_player_weapon(datum playerIndex, datum weaponId, bool resetLoadout);
 
 class H2MOD
 {

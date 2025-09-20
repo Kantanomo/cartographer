@@ -4,7 +4,7 @@
 
 namespace CustomVariantSettings
 {
-	enum e_hill_rotation
+	enum e_hill_rotation : int32
 	{
 		_random = 0,
 		_sequential = 1,
@@ -26,8 +26,8 @@ namespace CustomVariantSettings
 		e_hill_rotation hillRotation = _random;
 		real32 gameSpeed = 1.0f;
 		bool infiniteGrenades = false;
-		bool spawnProtection = 1;
-		byte predefinedHillSet[16] = {};
+		bool spawnProtection = true;
+		uint8 predefinedHillSet[16] = {};
 		uint8 forced_fov = 0;
 
 		real32 ComputedGravity() const

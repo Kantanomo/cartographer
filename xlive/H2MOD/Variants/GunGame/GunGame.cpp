@@ -193,7 +193,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 	const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 
 	uint64 id;
-	s_player_identifier identifier = NetworkSession::GetPlayerId(player_abs_index);
+	s_player_identifier identifier = NetworkSession::GetPlayerId(player_index);
 	csmemcpy(&id, &identifier, sizeof(uint64));
 
 	// in gungame we just keep track of the score
@@ -252,7 +252,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 					simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));
 
 					unit_delete_all_weapons(player->unit_index);
-					call_give_player_weapon(player_abs_index, (datum)k_level_weapons[level], 1);
+					call_give_player_weapon(player_index, (datum)k_level_weapons[level], 1);
 				}
 			}
 		}

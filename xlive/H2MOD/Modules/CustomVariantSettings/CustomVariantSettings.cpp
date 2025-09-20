@@ -26,11 +26,11 @@ namespace CustomVariantSettings
 {
 	void EncodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data)
 	{
-		stream->write_raw_data("gravity", &data->gravity, sizeof(data->gravity) * CHAR_BIT); //16.
+		stream->write_raw_data("gravity", &data->gravity, sizeof(data->gravity) * CHAR_BIT);
 		stream->write_raw_data("game speed", &data->gameSpeed, sizeof(data->gameSpeed) * CHAR_BIT);
 		stream->write_bool("infinite ammo", data->infiniteAmmo);
 		stream->write_bool("explosion physics", data->explosionPhysics);
-		stream->write_integer("hill rotation", (byte)data->hillRotation, 8);
+		stream->write_integer("hill rotation", (int32)data->hillRotation, 8);
 		stream->write_bool("infinite grenades", data->infiniteGrenades);
 		stream->write_integer("forced field of view", data->forced_fov, sizeof(data->forced_fov) * CHAR_BIT);
 	}
@@ -53,19 +53,16 @@ namespace CustomVariantSettings
 
 	void SendCustomVariantSettings(int32 peer_index)
 	{
-		c_network_session* session = NULL;
-		network_life_cycle_in_squad_session(&session);
+		c_network_session* session = NULL;;
 
 		s_network_message_session_custom_variant_settings data;
 
-		if (session->is_host() 
-			&& session->get_transport_session_id(&data.session_data.identifier)
-			&& shell_is_dedicated_server())
+		if (shell_is_dedicated_server()
+			&& network_life_cycle_in_squad_session(&session)
+			&& session->is_host() 
+			&& session->get_transport_session_id(&data.session_data.identifier))
 		{
-			//TODO: Find and map out struct with current variant information.
-			auto VariantName = std::wstring(Memory::GetAddress<wchar_t*>(0, 0x534A18));
-
-			auto customVariantSetting = customVariantSettingsMap.find(VariantName);
+			auto customVariantSetting = customVariantSettingsMap.find(session->m_session_parameters.game_variant.variant_name);
 			if (customVariantSetting != customVariantSettingsMap.end())
 			{
 				currentVariantSettings = customVariantSetting->second;
@@ -144,27 +141,11 @@ namespace CustomVariantSettings
 			WriteBytes(Memory::GetAddress(0x1666A8, 0x15C168), InfiniteGrenadesASM, sizeof(InfiniteGrenadesASM));
 		}
 
-		//Client Only
-		if (!shell_is_dedicated_server()) {
-			if (newVariantSettings->explosionPhysics)
-				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1E);
-			else
-				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
-		}
-
-		if (newVariantSettings->forced_fov != 0)
+		if (newVariantSettings->forced_fov > 0)
 		{
-			observer_set_suggested_field_of_view(newVariantSettings->forced_fov);
+			observer_set_suggested_field_of_view((real32)PIN(newVariantSettings->forced_fov, 60, 120));
 		}
 
-		//Server Only
-		if (shell_is_dedicated_server())
-		{
-
-		}
-
-		// *((_DWORD *)v1 + 94) = seconds_to_ticks_imprecise(1);
-		//Changing the argument passed to seconds_to_ticks_impercise.
 		WriteValue(Memory::GetAddress(0x55d01, 0x5e1f9), (BYTE)newVariantSettings->spawnProtection);
 	}
 	void ApplyCurrentSettings()

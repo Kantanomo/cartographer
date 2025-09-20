@@ -184,7 +184,7 @@ bool xbox_tickrate_is_enabled()
 
 #pragma region PlayerFunctions
 
-void call_give_player_weapon(int player_index, datum weaponId, bool resetLoadout)
+void call_give_player_weapon(datum player_index, datum weaponId, bool resetLoadout)
 {
 	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 

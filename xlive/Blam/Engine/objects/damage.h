@@ -7,7 +7,7 @@
 /* enums */
 
 // Unverified, taken from H1
-enum e_damage_data_flags : uint32
+enum e_damage_data_flags : int32
 {
 	_damage_area_of_effect_bit = 0x0,
 	_damage_create_localized_effect_bit = 0x1,
@@ -18,6 +18,11 @@ enum e_damage_data_flags : uint32
 	_damage_damaged_one_object_bit = 0x6,
 	_damage_no_statistics_bit = 0x7,
 	NUMBER_OF_DAMAGE_DATA_FLAGS = 0x8,
+};
+
+enum e_damage_aftermath_flags : int32
+{
+	_damage_aftermath_has_explosion_physics = 8
 };
 
 /* structures */
@@ -60,6 +65,14 @@ struct s_damage_data
 };
 ASSERT_STRUCT_SIZE(s_damage_data, 0x88);
 
+struct s_damage_aftermath_data
+{
+	uint8 gap_0[4];
+	uint32 flags;
+	uint8 gap_8[76];
+};
+ASSERT_STRUCT_SIZE(s_damage_aftermath_data, 0x54);
+
 // max_count: LONG_MAX
 struct s_armor_modifier_definition
 {
@@ -86,3 +99,5 @@ void damage_apply_patches(void);
 void damage_initialize_for_new_map(void);
 
 void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index, int16 node_index, int16 region_index, int16 material_index, real_vector3d* object_normal);
+
+void __cdecl object_apply_damage_aftermath(datum object_index, s_damage_aftermath_data* aftermath_data);

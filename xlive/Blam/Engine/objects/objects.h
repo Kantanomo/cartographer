@@ -229,6 +229,7 @@ struct _object_datum
 	object_header_block_reference change_color_block;
 	object_header_block_reference animation_manager_block;
 };
+ASSERT_STRUCT_SIZE(_object_datum, 296);
 
 struct object_datum
 {
