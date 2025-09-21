@@ -8,6 +8,8 @@ bool game_time_initialized(void);
 
 uint32 game_time_get(void);
 
+real32 game_time_get_speed(void);
+
 void game_time_set_speed(real32 speed);
 
 bool game_time_get_paused(void);
