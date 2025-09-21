@@ -8,9 +8,6 @@
 #include "interface/user_interface_controller.h"
 #include "main/main_time.h"
 #include "main/game_preferences.h"
-#ifdef PC1
-#include "render/render.h"
-#endif
 #include "shell/shell_windows.h"
 
 /* constants */
@@ -227,7 +224,7 @@ void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 
 		keystroke.repeating = TEST_BIT(lParam, 30);	// Set repeating to if bit 30 is true
 
-		if (keystroke.key_code != NONE || upper_bit_exists)
+		if (keystroke.key_code != _key_not_a_key || upper_bit_exists)
 		{
 			// If key is already handled and the key code isn't invalid then exit
 			if (fHandled && keystroke.key_code != _key_not_a_key)
