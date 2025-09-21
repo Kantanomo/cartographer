@@ -108,6 +108,14 @@ void game_time_set_paused(bool pause)
 	return;
 }
 
+real32 game_time_get_speed(void)
+{
+	const s_time_globals* game_time_globals = time_globals_get();
+	ASSERT(game_time_globals);
+	ASSERT(game_time_globals->initialized);
+	return game_time_globals->game_speed;
+}
+
 void game_time_set_speed(real32 speed)
 {
 	s_time_globals* game_time_globals = time_globals_get();
