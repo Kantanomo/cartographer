@@ -89,7 +89,6 @@ namespace CustomVariantSettings
 	void ResetSettings()
 	{
 		currentVariantSettings = defaultCustomVariantSettings;
-		ApplyCustomSettings(&currentVariantSettings);
 	}
 
 	void OnPlayerSpawn(datum player_index)
