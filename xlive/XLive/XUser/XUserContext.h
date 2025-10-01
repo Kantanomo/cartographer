@@ -1,20 +1,6 @@
 #pragma once
 
-#include "cseries/cseries.h"
-
-enum e_context_presence : uint32
-{
-	_context_presence_mainmenu = 0,
-	_context_presence_settings = 1,
-	_context_presence_server_browser = 2,
-	_context_presence_singleplayer = 3,
-	_context_presence_lobby = 4,
-	_context_presence_results = 5,
-	_context_presence_live_in_game = 6,
-	_context_presence_public_game = 7,
-	_context_presence_invite_only_game = 8,
-	_context_presence_network_in_game = 9
-};
+/* structs */
 
 typedef struct _XUSER_CONTEXT
 {
@@ -22,6 +8,6 @@ typedef struct _XUSER_CONTEXT
 	DWORD                               dwValue;
 } XUSER_CONTEXT, *PXUSER_CONTEXT;
 
-DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwContextValue);
+/* prototypes */
 
-void context_update_map_info_campaign(int32 map_id, const utf8* scenario_name);
+DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwContextValue);

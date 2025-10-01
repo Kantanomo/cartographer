@@ -517,13 +517,13 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 			toggle_xbox_tickrate(options, true);
 			if (H2Config_discord_enable)
 			{
-				c_static_wchar_string<260> scenario_path(game_options_get()->scenario_path);
+				c_static_wchar_string<MAX_PATH> scenario_path(game_options_get()->scenario_path);
 				int32 index = scenario_path.last_index_of(L"\\");
 				const wchar_t* scenario_name_wide = &scenario_path.get_string()[index + 1];
 				utf8 scenario_name[MAX_PATH];
 				wchar_string_to_utf8_string(scenario_name_wide, scenario_name, sizeof(scenario_name));
 
-				context_update_map_info_campaign(options->map_id, scenario_name);
+				discord_interface_update_map_info_campaign(options->map_id, scenario_name);
 				discord_interface_set_difficulty(options->difficulty);
 			}
 		}
@@ -806,8 +806,7 @@ static void __cdecl update_keyboard_buttons_state_hook(BYTE* a1, WORD* a2, BYTE*
 	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
 
 	BYTE keyboardState[256] = {};
-	if (!H2Config_disable_ingame_keyboard
-		&& GetKeyboardState(keyboardState))
+	if (!H2Config_disable_ingame_keyboard && GetKeyboardState(keyboardState))
 	{
 		for (int i = 0; i < 256; i++)
 		{

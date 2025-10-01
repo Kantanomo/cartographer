@@ -7,6 +7,10 @@
 #include "networking/session/network_session.h"
 #include "networking/session/network_observer.h"
 #include "networking/network_event.h"
+#include "shell/shell.h"
+#include "shell/shell_windows.h"
+
+#include "H2MOD/Modules/Shell/Config.h"
 
 #include <discord_game_sdk.h>
 
@@ -72,6 +76,12 @@ static const char* k_valid_scenario_names[] = {
 
 /* structures */
 
+struct s_context_campaign_map_info
+{
+	int32 map_id;
+	char map_name[32];
+};
+
 struct s_discord_data
 {
 	IDiscordCore* core;
@@ -88,15 +98,6 @@ struct s_discord_globals
 	HMODULE dll_module;
 	bool update_rich_presence;
 	volatile LONG should_stop;
-};
-
-s_discord_globals g_discord_globals =
-{
-	{},
-	INVALID_HANDLE_VALUE,
-	0,
-	true,
-	FALSE
 };
 
 /* prototypes */
@@ -122,6 +123,37 @@ static void DISCORD_CALLBACK on_user_updated(void* data);
 static void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret);
 static void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message);
 static void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res);
+
+static void context_update_map_info_multiplayer(void);
+
+/* globals */
+
+static const s_context_campaign_map_info k_context_campaign_map_info[] = {
+	1, "The Heretic",
+	101, "Armory",
+	105, "Cairo Station",
+	301, "Outskirts",
+	305, "Metropolis",
+	401, "The Arbiter",
+	405, "Oracle",
+	501, "Delta Halo",
+	505, "Regret",
+	601, "Sacred Icon",
+	605, "Quarantine Zone",
+	701, "Gravemind",
+	801, "High Charity",
+	705, "Uprising",
+	805, "The Great Journey"
+};
+
+static s_discord_globals g_discord_globals =
+{
+	{},
+	INVALID_HANDLE_VALUE,
+	0,
+	true,
+	FALSE
+};
 
 /* public code */
 
@@ -249,6 +281,117 @@ void discord_interface_set_player_counts(void)
 	return;
 }
 
+void discord_interface_update_map_info_campaign(int32 map_id, const utf8* scenario_name)
+{
+	// Get map name
+	const char* map_name = NULL;
+	for (uint32 i = 0; i < NUMBEROF(k_context_campaign_map_info); ++i)
+	{
+		if (k_context_campaign_map_info[i].map_id == map_id)
+		{
+			map_name = k_context_campaign_map_info[i].map_name;
+			break;
+		}
+	}
+
+	// Convert map_name to utf8
+	if (map_name == NULL)
+	{
+		map_name = scenario_name;
+	}
+
+	// Update interface
+	discord_interface_set_map_name(scenario_name, map_name);
+	return;
+}
+
+
+void discord_interface_set_context(e_context_id context_id, uint32 contex_value)
+{
+	if (shell_is_dedicated_server() || !H2Config_discord_enable || g_instance_number > 1)
+	{
+		return;
+	}
+
+	switch (context_id)
+	{
+	case _context_id_variant:
+	{
+		utf8 variant_name[32];
+		wchar_string_to_utf8_string(NetworkSession::GetGameVariantName(), variant_name, sizeof(variant_name));
+		discord_interface_set_variant((e_context_variant)contex_value, variant_name);
+		break;
+	}
+	/* The way hired gun calls XUserSetContext in this situation is bad, don't do this here
+	* Instead we set difficulty on map load with the singleplayer map name
+	case _context_id_difficulty:
+	{
+		discord_interface_set_difficulty(dwContextValue);
+		break;
+	}*/
+	case _context_id_map:
+	{
+		context_update_map_info_multiplayer();
+		break;
+	}
+	case _context_id_presence:
+	{
+		switch ((e_context_presence)contex_value)
+		{
+		case _context_presence_singleplayer:
+		{
+			discord_interface_set_state("Singleplayer");
+			break;
+		}
+		case _context_presence_live_in_game:
+		case _context_presence_public_game:
+		case _context_presence_invite_only_game:
+		case _context_presence_network_in_game:
+			discord_interface_set_state("Multiplayer");
+			break;
+		case _context_presence_mainmenu:
+			discord_interface_set_state("In main menu");
+			discord_interface_set_details("");
+			discord_interface_set_large_image("default", "");
+			discord_interface_set_small_image("", "");
+			break;
+		case _context_presence_lobby:
+			discord_interface_set_state("In Lobby");
+			discord_interface_set_details("");
+			discord_interface_set_large_image("default", "");
+			discord_interface_set_small_image("", "");
+			break;
+		case _context_presence_server_browser:
+			discord_interface_set_state("Browsing server list");
+
+			// Zero player counts here as the game still thinks we are in a network session after leaving a match
+			discord_interface_zero_player_count();
+
+			discord_interface_set_details("");
+			discord_interface_set_large_image("default", "");
+			discord_interface_set_small_image("", "");
+			break;
+		case _context_presence_results:
+		{
+			discord_interface_set_state("Reading carnage report");
+			discord_interface_set_details("");
+			discord_interface_set_large_image("default", "");
+			discord_interface_set_small_image("", "");
+			break;
+		}
+		case _context_presence_settings:
+			discord_interface_set_state("Adjusting settings");
+			break;
+		default:
+			break;
+		}
+		break;
+	}
+	default:
+		break;
+	}
+	return;
+}
 
 /* private code */
 
@@ -437,5 +580,24 @@ static void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscord
 static void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res)
 {
 	ASSERT(res == DiscordResult_Ok);
+	return;
+}
+
+static void context_update_map_info_multiplayer(void)
+{
+	// Get map name and convert to utf8
+	wchar_t* wide_map_name = Memory::GetAddress<wchar_t*>(0x97737C);
+	utf8 map_name[512];
+	wchar_string_to_utf8_string(wide_map_name, map_name, sizeof(map_name));
+
+	// Get scenario name and convert to utf8
+	c_static_wchar_string<260> scenario_path(game_options_get()->scenario_path);
+	int32 index = scenario_path.last_index_of(L"\\");
+	const wchar_t* scenario_name_wide = &scenario_path.get_string()[index + 1];
+	utf8 scenario_name[MAX_PATH];
+	wchar_string_to_utf8_string(scenario_name_wide, scenario_name, sizeof(scenario_name));
+
+	// Update interface
+	discord_interface_set_map_name(scenario_name, map_name);
 	return;
 }

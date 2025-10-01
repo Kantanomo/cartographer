@@ -9,6 +9,7 @@
 #include "screen_single_player_profile_select.h"
 
 #include "cache/cache_files.h"
+#include "cartographer/discord/discord_interface.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_networking.h"
