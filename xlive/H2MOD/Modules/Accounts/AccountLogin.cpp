@@ -97,9 +97,12 @@ int ConfigureUserDetails(const char* username, const char* login_token, unsigned
 	TEST_N_DEF(PC4);
 	UpdateMasterLoginStatus(developer);
 
-	if (online_signin) {
+	if (online_signin)
+	{
 		if (!shell_is_dedicated_server())
-			ForwardPorts();
+		{
+			xlive_upnp_forward_ports();
+		}
 	}
 
 	if (H2CurrentAccountLoginToken) {
