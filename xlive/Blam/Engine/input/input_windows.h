@@ -44,6 +44,15 @@ enum e_xinput_gamepad_buttons
 	_xinput_gamepad_right_trigger,
 };
 
+enum input_dx9_mouse_state : int32
+{
+	k_mouse_state_normal = 0,
+	k_mouse_state_busy,
+	k_mouse_state_hover,
+	k_mouse_state_text_cursor,
+	k_maximum_cursor_bitmaps
+};
+
 enum
 {
 	_key_modifier_shift_bit = 0,
@@ -51,48 +60,6 @@ enum
 	_key_modifier_alt_bit,
 	NUMBER_OF_KEY_MODIFIER_FLAGS
 };
-
-/* classes */
-
-class input_device
-{
-public:
-	// input_device virtual functions
-
-	virtual void XInputOpen(void) = 0;
-	virtual void XInputClose(void) = 0;
-	virtual void XUpdateState(void) = 0;
-	virtual uint32 XGetState(XINPUT_STATE* state) = 0;
-	virtual void XSetState(XINPUT_VIBRATION* state) = 0;
-	virtual void XUpdateImmediate(void) = 0;
-};
-
-class dinput_device : public input_device
-{
-protected:
-	GUID m_rguid;
-	LPDIRECTINPUTDEVICE8A dinput_device;
-	uint32 error_level;
-	XINPUT_STATE gamepad_state;
-	bool m_device_acquired;
-	bool byte2D;
-	uint32 field30;
-	uint32 field34;
-	uint32 field38;
-	uint32 field3C;
-
-public:
-	// dinput_device virtual functions
-
-	virtual void XInputOpen(void) override;
-	virtual void XInputClose(void) override;
-	virtual void XUpdateState(void) override;
-	virtual uint32 XGetState(XINPUT_STATE* state) override;
-	virtual void XSetState(XINPUT_VIBRATION* state) override { return; } ;
-	virtual void XUpdateImmediate(void) override { return; };
-};
-ASSERT_STRUCT_SIZE(dinput_device, 0x40);
-
 
 /* structures */
 
@@ -137,11 +104,15 @@ struct s_keyboard_input_state
 };
 ASSERT_STRUCT_SIZE(s_keyboard_input_state, 0x400);
 
+struct mouse_state
+{
+	DIMOUSESTATE2 state;
+};
 
-struct s_input_globals
+struct input_globals_windows
 {
 	bool initialized;
-	bool mouse_acquired;
+	bool active_flag;
 	bool input_suppressed;
 	bool feedback_suppress;
 	uint32 update_time;
@@ -151,16 +122,17 @@ struct s_input_globals
 	int16 buffered_key_read_index;
 	int16 buffered_key_read_count;
 	key_stroke buffered_keys[MAXIMUM_BUFFERED_KEYSTROKES];
+
 	LPDIRECTINPUTDEVICE8A mouse_dinput_device;
-	bool mouse_show;
-	uint8 gap_619[3];
-	uint32 field_61C;
-	DIMOUSESTATE2 mouse_state;
+	bool mouse_acquired;
+	int32 mouse_wheel_granularity;
+	mouse_state mouse;
 	uint16 mouse_buttons[NUMBER_OF_MOUSE_BUTTONS];
-	DIMOUSESTATE2 suppressed_mouse_state;
+	mouse_state mouse_suppressed;
 	uint8 gap_658[24];
-	uint32 mouse_cursor_state;
-	c_input_dx9_mouse_cursor* mouse_cursor_dx9;
+	input_dx9_mouse_state cursor_state;
+	class c_input_dx9_mouse_cursor* mouse_cursor_dx9;
+	
 	s_gamepad_input_state gamepad_states[k_number_of_controllers];
 	s_gamepad_input_button_state suppressed_gamepad_state;
 	XINPUT_VIBRATION rumble_states[k_number_of_controllers];
@@ -171,12 +143,52 @@ struct s_input_globals
 	int field7D0;
 	int field7D8;
 };
-ASSERT_STRUCT_SIZE(s_input_globals, 0x7D8);
+ASSERT_STRUCT_SIZE(input_globals_windows, 2008);
 
+/* classes */
+
+class input_device
+{
+public:
+	// input_device virtual functions
+
+	virtual void XInputOpen(void) = 0;
+	virtual void XInputClose(void) = 0;
+	virtual void XUpdateState(void) = 0;
+	virtual uint32 XGetState(XINPUT_STATE* state) = 0;
+	virtual void XSetState(XINPUT_VIBRATION* state) = 0;
+	virtual void XUpdateImmediate(void) = 0;
+};
+
+class dinput_device : public input_device
+{
+protected:
+	GUID m_rguid;
+	LPDIRECTINPUTDEVICE8A dinput_device;
+	uint32 error_level;
+	XINPUT_STATE gamepad_state;
+	bool m_device_acquired;
+	bool byte2D;
+	uint32 field30;
+	uint32 field34;
+	uint32 field38;
+	uint32 field3C;
+
+public:
+	// dinput_device virtual functions
+
+	virtual void XInputOpen(void) override;
+	virtual void XInputClose(void) override;
+	virtual void XUpdateState(void) override;
+	virtual uint32 XGetState(XINPUT_STATE* state) override;
+	virtual void XSetState(XINPUT_VIBRATION* state) override { return; };
+	virtual void XUpdateImmediate(void) override { return; };
+};
+ASSERT_STRUCT_SIZE(dinput_device, 0x40);
 
 /* globals */
 
-extern s_input_globals* input_globals;
+extern input_globals_windows* input_globals;
 extern bool* g_input_windows_request_terminate;
 extern uint32 input_device_change_delay_timer;
 
@@ -198,9 +210,12 @@ bool __cdecl input_has_gamepad(uint16 gamepad_index, bool* a2);
 bool __cdecl input_has_gamepad_plugged(uint16 gamepad_index);
 bool __cdecl input_gamepad_just_left(uint16 gamepad_index);
 uint8 __cdecl input_get_connected_gamepads_count();
-s_gamepad_input_state* __cdecl input_get_gamepad(uint16 gamepad_index);
+
+s_gamepad_input_state* input_get_gamepad(uint16 gamepad_index);
+
 s_gamepad_input_button_state* __cdecl input_get_gamepad_state(uint16 gamepad_index);
-DIMOUSESTATE2* __cdecl input_get_mouse_state();
+
+mouse_state* __cdecl input_get_mouse_state(void);
 uint16* __cdecl input_get_mouse_button_state();
 
 bool input_peek_key(key_stroke* key);
