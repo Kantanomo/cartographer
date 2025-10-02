@@ -1,12 +1,11 @@
 #include "stdafx.h"
-
 #include "XSession.h"
 
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
-XSESSION_LOCAL_DETAILS sessionDetails;
+/* structs */
 
 struct XSESSIONS
 {
@@ -14,7 +13,12 @@ struct XSESSIONS
 	XSESSION_INFO sessionInfo;
 };
 
-std::unordered_map<HANDLE, XSESSIONS> sessionMap;
+/* globals */
+
+static XSESSION_LOCAL_DETAILS sessionDetails;
+static std::unordered_map<HANDLE, XSESSIONS> sessionMap;
+
+/* public code */
 
 // #5300: XSessionCreate
 LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, ULONGLONG *pqwSessionNonce, PXSESSION_INFO pSessionInfo, PXOVERLAPPED pOverlapped, HANDLE *phEnum)

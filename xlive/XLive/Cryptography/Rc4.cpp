@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "Rc4.h"
+
+/* public code */
 
 void XeCryptRc4Key(XECRYPT_RC4_STATE* rc4_ctx, const BYTE* key, DWORD key_size)
 {

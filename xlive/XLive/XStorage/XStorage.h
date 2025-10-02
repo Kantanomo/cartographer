@@ -1,6 +1,10 @@
 #pragma once
 
+/* constants */
+
 #define XONLINE_E_STORAGE_FILE_NOT_FOUND 0x8015C004
+
+/* structs */
 
 typedef enum _XSTORAGE_FACILITY
 {
@@ -16,4 +20,3 @@ typedef struct _XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS {
 	FILETIME ftCreated;
 } XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS;
 #pragma pack(pop)
-

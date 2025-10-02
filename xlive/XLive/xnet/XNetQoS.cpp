@@ -4,9 +4,8 @@
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include "IpManagement/XnIp.h"
-#include "H2MOD/Modules/Shell/Config.h"
 
-CXNetQoS XNetQoS;
+static CXNetQoS XNetQoS;
 
 void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQOS** apxnqos, DWORD dwBitsPerSec, XNQOS* pqos)
 {

@@ -10,6 +10,8 @@
 #include "main/game_preferences.h"
 #include "shell/shell_windows.h"
 
+#include "H2MOD/Modules/Shell/Config.h"
+
 /* constants */
 
 real32 g_rumble_factor = 1.f;
@@ -40,6 +42,8 @@ static ascii_key* ascii_to_key_table_get(void);
 static e_input_key_code input_map_ascii_to_keycode(uint8 ascii);
 
 static void input_windows_initialize_key_remapping(void);
+
+static void __cdecl update_button(uint8* frames, uint16* msec, bool* key_bool, bool down, int32 elapsed_msec);
 
 static int compare_device_compatibility(const void* p1, const void* p2);
 
@@ -117,6 +121,9 @@ void input_windows_apply_patches(void)
 	// Replace initialize key mapping function so we properly handle keyboard layouts
 	PatchCall(Memory::GetAddress(0x2FEA9), input_windows_initialize_key_remapping);
 	PatchCall(Memory::GetAddress(0x7C87), input_add_key);
+
+	// Add logic to take the config option to disable the keyboard into account
+	PatchCall(Memory::GetAddress(0x2FAAB), update_button);
 	return;
 }
 
@@ -595,6 +602,16 @@ static void input_windows_initialize_key_remapping(void)
 			ascii_to_key_table[g_key_remap[i].virtual_key].key = g_key_remap[i].key;
 		}
 	}
+	return;
+}
+
+static void __cdecl update_button(uint8* frames, uint16* msec, bool* key_bool, bool down, int32 elapsed_msec)
+{
+	if (H2Config_disable_ingame_keyboard)
+	{
+		down = false;
+	}
+	INVOKE(0x2E4C5, 0x0, update_button, frames, msec, key_bool, down, elapsed_msec);
 	return;
 }
 

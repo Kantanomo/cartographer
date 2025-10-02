@@ -69,7 +69,6 @@ int H2Config_minimum_player_start = 0;
 char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
 bool H2Config_team_flag_array[8];
 short H2Config_team_bit_flags = 0xFF;
-char H2Config_stats_authkey[32 + 1] = { "" };
 bool H2Config_vip_lock = false;
 bool H2Config_even_shuffle_teams = false;
 bool H2Config_koth_random = true;
@@ -775,12 +774,6 @@ void ReadH2Config()
 				CONFIG_GET(&ini, "login_password", "", &login_password);
 				if (login_password) {
 					strncpy_s(H2Config_login_password, login_password, sizeof(H2Config_login_password));
-				}
-
-				const char* stats_authkey = NULL;
-				CONFIG_GET(&ini, "stats_auth_key", "", &stats_authkey);
-				if (stats_authkey) {
-					strncpy_s(H2Config_stats_authkey, stats_authkey, sizeof(H2Config_stats_authkey) - 1); // - 1 for the null character
 				}
 
 				std::string team_bit_mask(ini.GetValue(k_h2config_version_section, "teams_enabled_bit_flags", H2Config_team_bit_flags_str));

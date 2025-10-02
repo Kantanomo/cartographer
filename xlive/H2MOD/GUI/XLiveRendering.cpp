@@ -4,12 +4,8 @@
 #include "imgui.h"
 
 #include "backends/imgui_impl_dx9.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
-
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
-#include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
-
 
 extern void initialize_instance();
 
@@ -17,13 +13,9 @@ extern void initialize_instance();
 extern LRESULT IMGUI_IMPL_API ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #endif
 
-bool doDrawIMGUI = false;
-
-HWND H2hWnd;
-D3DPRESENT_PARAMETERS g_d3dPresentParameters;
-
-int verticalRes = 0;
-int horizontalRes = 0;
+static HWND H2hWnd;
+static D3DPRESENT_PARAMETERS g_d3dPresentParameters;
+static IDirect3DDevice9Ex* g_xlive_d3d_device;
 
 void XLiveRendering::InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
 {
@@ -49,11 +41,11 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 
 	initialize_instance();
 
-	if (pXii->pD3D) {
+	g_xlive_d3d_device = pXii->pD3D;
+	if (g_xlive_d3d_device)
+	{
 		XLiveRendering::InitializeD3D9((D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
 	}
-
-	UpdateMasterStatus(-1, "Status: Initializing");
 
 	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
 	return 0;
@@ -111,20 +103,13 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	return S_OK;
 }
 
-int achievement_height = 0;
-bool achievement_freeze = false;
-int achievement_timer = 0;
-
-char* autoUpdateText = 0;
-
 // #5001
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 {
 	static bool has_initialised_input = false;
-	if (!has_initialised_input) {
-		extern RECT rectScreenOriginal;
+	if (!has_initialised_input)
+	{
 		H2hWnd = pPii->hWnd;
-		GetWindowRect(H2hWnd, &rectScreenOriginal);
 		has_initialised_input = true;
 	}
 
@@ -150,13 +135,13 @@ HRESULT WINAPI XLiveRender()
 	static std::mutex renderMtx;
 	std::lock_guard lg(renderMtx);
 
-	IDirect3DDevice9Ex* device = rasterizer_dx9_device_get_interface();
-
-	if (!device) {
+	if (!g_xlive_d3d_device)
+	{
 		return E_UNEXPECTED;
 	}
 
-	if (FAILED(device->TestCooperativeLevel())) {
+	if (FAILED(g_xlive_d3d_device->TestCooperativeLevel())) 
+	{
 		return E_UNEXPECTED;
 	}
 

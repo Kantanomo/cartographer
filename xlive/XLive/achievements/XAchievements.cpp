@@ -1,14 +1,12 @@
 #include "stdafx.h"
-
 #include "XAchievements.h"
 
 #include "H2MOD/Modules/Achievements/Achievements.h"
 
-DWORD achievementCount = 0;
-DWORD achievementEnumeratorFlags = 0;
-DWORD achievementEnumeratorIndex = 0;
+static DWORD achievementCount = 0;
+static DWORD achievementEnumeratorFlags = 0;
+static DWORD achievementEnumeratorIndex = 0;
 
-extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 HANDLE g_dwFakeAchievementContent = INVALID_HANDLE_VALUE;
 
 

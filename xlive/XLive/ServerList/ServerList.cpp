@@ -14,13 +14,29 @@
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 
+using namespace rapidjson;
+
+
+/* constants */
+
 static const char k_cartographer_add_server_url[] = k_cartographer_url_https"/live/add_server.php";
 static const char k_cartographer_del_server_url[] = k_cartographer_url_https"/live/del_server.php";
 static const char k_cartographer_server_list_url[] = k_cartographer_url_https"/live/server_list.php";
 static const char k_cartographer_server_url[] = k_cartographer_url_https"/live/servers/";
 static const char k_cartographer_dedi_count_url[] = k_cartographer_url_https"/live/dedicount.php";
 
-using namespace rapidjson;
+/* prototypes */
+
+static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock);
+
+static bool RemoveServerListQueryByPtr(CServerList* serverListQuery);
+
+/* globals */
+
+// Title specific XLocator service properties
+static _HALO2VISTA_TITLE_SERVICE_PROPERTIES h2v_service_properties;
+
+static HANDLE g_hXLocatorHandle = INVALID_HANDLE_VALUE;
 
 std::mutex CServerList::addServerMutex;
 std::mutex CServerList::removeServerMutex;
@@ -31,56 +47,7 @@ std::vector<std::pair<HANDLE, CServerList*>> serverListRequests;
 
 bool CServerList::CountResultsUpdated = false;
 
-// Title specific XLocator service properties
-_HALO2VISTA_TITLE_SERVICE_PROPERTIES h2v_service_properties;
-
-HANDLE g_hXLocatorHandle = INVALID_HANDLE_VALUE;
-
-static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
-{
-	std::lock_guard lg(serverListRequestMutex);
-	CServerList* result = nullptr;
-
-	for (auto& request : serverListRequests)
-	{
-		if (request.first == hHandle)
-		{
-			// ugly af but it'll do for now
-			// don't forget to UNLOCK after when you finish working with this
-			// mainly used to prevent the worker thread from discarding the memory
-			// when the game attempts to retrieve info about the query
-			if (lock)
-				request.second->m_itemQueryMutex.lock();
-
-			result = request.second;
-			break;
-		}
-	}
-
-	return result;
-}
-
-static bool RemoveServerListQueryByPtr(CServerList* serverListQuery)
-{
-	// remove from the list, to note memory doesn't get released
-	// because async I/O might still be in progress
-	std::lock_guard lg(serverListRequestMutex);
-
-	bool removed = false;
-
-	for (auto it = serverListRequests.begin(); it != serverListRequests.end(); it++)
-	{
-		if (it->second == serverListQuery)
-		{
-			XCloseHandle(it->first);
-			serverListRequests.erase(it);
-			removed = true;
-			break;
-		}
-	}
-
-	return removed;
-}
+/* public code */
 
 void ServerListQueryCancelAll()
 {
@@ -1049,4 +1016,52 @@ DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 	g_hXLocatorHandle = INVALID_HANDLE_VALUE;
 
 	return ERROR_SUCCESS;
+}
+
+/* private code */
+
+static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
+{
+	std::lock_guard lg(serverListRequestMutex);
+	CServerList* result = nullptr;
+
+	for (auto& request : serverListRequests)
+	{
+		if (request.first == hHandle)
+		{
+			// ugly af but it'll do for now
+			// don't forget to UNLOCK after when you finish working with this
+			// mainly used to prevent the worker thread from discarding the memory
+			// when the game attempts to retrieve info about the query
+			if (lock)
+				request.second->m_itemQueryMutex.lock();
+
+			result = request.second;
+			break;
+		}
+	}
+
+	return result;
+}
+
+static bool RemoveServerListQueryByPtr(CServerList* serverListQuery)
+{
+	// remove from the list, to note memory doesn't get released
+	// because async I/O might still be in progress
+	std::lock_guard lg(serverListRequestMutex);
+
+	bool removed = false;
+
+	for (auto it = serverListRequests.begin(); it != serverListRequests.end(); it++)
+	{
+		if (it->second == serverListQuery)
+		{
+			XCloseHandle(it->first);
+			serverListRequests.erase(it);
+			removed = true;
+			break;
+		}
+	}
+
+	return removed;
 }

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "xam.h"
 
+/* structs */
+
 struct NOTIFY_LISTEN
 {
 	HANDLE id;
@@ -9,10 +11,14 @@ struct NOTIFY_LISTEN
 	CRITICAL_SECTION lock;
 };
 
+/* globals */
+
 static int g_dwListener = 0;
 static NOTIFY_LISTEN g_listener[50];
 
 int notify_xlive_ui = -1;
+
+/* public code */
 
 // #5270: XNotifyCreateListener
 HANDLE WINAPI XNotifyCreateListener(ULONGLONG qwAreas)

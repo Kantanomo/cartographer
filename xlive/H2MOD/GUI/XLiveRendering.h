@@ -3,7 +3,7 @@
 typedef struct _XLIVE_INITIALIZE_INFO {
 	UINT cbSize;
 	DWORD dwFlags;
-	IUnknown* pD3D;
+	IDirect3DDevice9Ex* pD3D;
 	VOID* pD3DPP;
 	LANGID langID;
 	WORD wReserved1;
@@ -22,15 +22,11 @@ typedef struct XLIVE_INPUT_INFO {
 	LRESULT lRet;
 } XLIVE_INPUT_INFO;
 
-#define DISPLAY_DEV_TESTING_MENU 0
-
 namespace XLiveRendering
 {
 	void InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters);
 	void D3D9ReleaseResources();
 };
-
-extern HWND H2hWnd;
 
 HRESULT WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii);
 

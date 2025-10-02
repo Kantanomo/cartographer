@@ -3,6 +3,7 @@
 
 #ifdef TERMINAL_ENABLED
 
+#include "CommandHandler.h"
 #include "CommandsUtil.h"
 #include "ComVar.h"
 

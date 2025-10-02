@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "XUserProperty.h"
 
+/* public code */
+
 // 5288: XUserGetProperty
 DWORD WINAPI XUserGetProperty(DWORD dwUserIndex, DWORD* pcbActual, XUSER_PROPERTY* pProperty, PXOVERLAPPED pOverlapped)
 {
