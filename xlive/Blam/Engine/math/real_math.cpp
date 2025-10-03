@@ -148,16 +148,15 @@ real_quaternion* fast_quaternion_interpolate_and_normalize(const real_quaternion
 
 real32 normalize2d(real_vector2d* v)
 {
-	real32 result = square_root(dot_product2d(v, v));
+	real32 result = magnitude2d(v);
 
 	if (::abs(result) < k_real_epsilon)
 	{
-		result = 0.0f;
+		result = 0.f;
 	}
 	else
 	{
-		v->i *= (1.0f / result);
-		v->j *= (1.0f / result);
+		scale_vector2d(v, 1.f / result, v);
 	}
 	return result;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <XLive/xbox/xbox.h>
 
 /* macros */
 
@@ -6,7 +7,17 @@
 
 /* enums */
 
-enum e_context_variant : uint32
+enum e_context_id
+{
+	_context_id_variant = 2,
+	_context_id_difficulty = 3,
+	_context_id_map = 5,
+	_context_id_presence = X_CONTEXT_PRESENCE,
+	_context_id_game_type = X_CONTEXT_GAME_TYPE,
+	_context_id_game_mode = X_CONTEXT_GAME_MODE
+};
+
+enum e_context_variant
 {
 	_context_variant_ctf = 0,
 	_context_variant_slayer = 1,
@@ -16,6 +27,20 @@ enum e_context_variant : uint32
 	_context_variant_territories = 5,
 	_context_variant_assault = 6,
 	k_context_variant_count
+};
+
+enum e_context_presence
+{
+	_context_presence_mainmenu = 0,
+	_context_presence_settings = 1,
+	_context_presence_server_browser = 2,
+	_context_presence_singleplayer = 3,
+	_context_presence_lobby = 4,
+	_context_presence_results = 5,
+	_context_presence_live_in_game = 6,
+	_context_presence_public_game = 7,
+	_context_presence_invite_only_game = 8,
+	_context_presence_network_in_game = 9
 };
 
 /* prototypes */
@@ -52,3 +77,7 @@ void discord_interface_zero_player_count(void);
 
 // Update player count for discord interface
 void discord_interface_set_player_counts(void);
+
+void discord_interface_update_map_info_campaign(int32 map_id, const utf8* scenario_name);
+
+void discord_interface_set_context(e_context_id context_id, uint32 contex_value);

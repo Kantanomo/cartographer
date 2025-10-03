@@ -1,8 +1,11 @@
 #include "stdafx.h"
 #include "xbox.h"
-#include "interface/screens/screen_cartographer_account_manager.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
+
+extern void cartographer_account_manager_open_list(void);
+
+/* public code */
 
 // #5260: XShowSigninUI
 int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags)
@@ -20,7 +23,6 @@ int WINAPI XShowGuideUI(DWORD dwUserIndex)
 {
 	extern void* ui_load_cartographer_guide_menu(); // Custom menu Guide Popup from H2MOD
 	ui_load_cartographer_guide_menu();
-
 	return 0;
 }
 

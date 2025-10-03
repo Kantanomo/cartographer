@@ -513,7 +513,7 @@ void __cdecl user_interface_update(real32 dt)
 	return;
 }
 
-uint32 user_interface_set_context_presence(e_context_presence game_mode)
+uint32 user_interface_set_context_presence(uint32 game_mode)
 {
 	return XUserSetContext(0, X_CONTEXT_PRESENCE, game_mode);
 }

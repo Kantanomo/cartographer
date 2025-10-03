@@ -1,3 +1,5 @@
 #pragma once
 
-void __cdecl networking_panorama_presence_set_presence(e_context_presence dwContextValue);
+/* prototypes */
+
+void __cdecl networking_panorama_presence_set_presence(uint32 dwContextValue);

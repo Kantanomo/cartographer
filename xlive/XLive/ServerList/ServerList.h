@@ -1,5 +1,7 @@
 #pragma once
 
+/* constants */
+
 #define XUSER_PROPERTY_GAMETYPE_NAME		0x40008228
 #define XUSER_PROPERTY_GAMETYPE_NAME_2		0x4000822B
 #define XUSER_PROPERTY_SERVER_NAME			0x40008230
@@ -59,6 +61,8 @@
 #define XLOCATOR_SERVER_PAGE_MIN_ITEMS		50
 #define XLOCATOR_SERVER_PAGE_MAX_ITEMS		200
 
+/* structs */
+
 typedef struct _XLOCATOR_SEARCHRESULT {
 	ULONGLONG serverID;                     // the ID of dedicated server
 	DWORD dwServerType;                     // see XLOCATOR_SERVERTYPE_PUBLIC, etc
@@ -87,6 +91,8 @@ typedef struct _HALO2VISTA_TITLE_SERVICE_PROPERTIES
 	int total_public_gold_property_id = 0x0;
 	int total_public_gold = 0;
 } HALO2VISTA_TITLE_SERVICE_PROPERTIES;
+
+/* classes */
 
 class CServerList
 {

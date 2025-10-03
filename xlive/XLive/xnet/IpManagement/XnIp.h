@@ -5,7 +5,6 @@
 
 #include "../net_utils.h"
 
-#include "H2MOD/GUI/imgui_integration/Console/CommandHandler.h"
 
 #define XNIP_MAX_PCK_STR_HDR_LEN 32
 #define XNIP_MAX_NET_STATS_SAMPLES 30
@@ -514,7 +513,7 @@ public:
 	
 	// Logging 
 #ifdef TERMINAL_ENABLED
-	void LogConnectionsToConsole(TextOutputCb* outputCb) const;
+	void LogConnectionsToConsole(int(__cdecl* outputCb)(int, const char*, ...)) const;
 #endif
 	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey) const;
 

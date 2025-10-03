@@ -573,7 +573,7 @@ void __cdecl input_abstraction_update_input_state(e_controller_index controller_
 
 static void input_abstraction_store_windows_inputs(void)
 {
-	DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+	mouse_state* mouse_state = input_get_mouse_state();
 	if (mouse_state)
 	{
 		csmemcpy(&g_old_mouse_state, mouse_state, sizeof(*mouse_state));
@@ -591,7 +591,7 @@ static void input_abstraction_store_windows_inputs(void)
 
 static void input_abstraction_restore_windows_inputs(void)
 {
-	DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+	mouse_state* mouse_state = input_get_mouse_state();
 	if (mouse_state)
 	{
 		csmemcpy(mouse_state, &g_old_mouse_state, sizeof(*mouse_state));
@@ -608,7 +608,7 @@ static void input_abstraction_restore_windows_inputs(void)
 
 static void input_abstraction_clear_windows_inputs(void)
 {
-	DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+	mouse_state* mouse_state = input_get_mouse_state();
 	if (mouse_state)
 	{
 		csmemset(mouse_state, 0, sizeof(*mouse_state));
@@ -625,19 +625,13 @@ static void input_abstraction_clear_windows_inputs(void)
 
 static void input_abstraction_store_abstracted_inputs(e_controller_index controller)
 {
-	csmemcpy(
-		&g_abstract_input_states[controller],
-		&g_input_abstraction_globals->abstracted_inputs,
-		sizeof(s_game_abstracted_input_state));
+	g_abstract_input_states[controller] = g_input_abstraction_globals->abstracted_inputs;
 	return;
 }
 
 static void input_abstraction_restore_abstracted_inputs(e_controller_index controller)
 {
-	csmemcpy(
-		&g_input_abstraction_globals->abstracted_inputs,
-		&g_abstract_input_states[controller],
-		sizeof(s_game_abstracted_input_state));
+	g_input_abstraction_globals->abstracted_inputs = g_abstract_input_states[controller];
 	return;
 }
 
@@ -674,14 +668,14 @@ static void input_abstraction_apply_raw_mouse_update(e_controller_index controll
 
 	if (cartographer_player_profile->raw_mouse_input)
 	{
-		DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+		mouse_state* mouse_state = input_get_mouse_state();
 
 		// ### FIXME this is fucking shit
 		real32 raw_mouse_sensitivity = (cartographer_player_profile->raw_mouse_sensitivity / 100.f);
 
 		input_abstraction_set_mouse_look_sensitivity(controller, 1.0f);
-		input_state->mouse.yaw = (real32)-mouse_state->lX;
-		input_state->mouse.pitch = (real32)-mouse_state->lY;
+		input_state->mouse.yaw = (real32)-mouse_state->state.lX;
+		input_state->mouse.pitch = (real32)-mouse_state->state.lY;
 
 		// multiply by 0.016 milliseconds, while this is likely wrong
 		// emulate current behaviour at all tickrates, instead of scaling with tick length lol

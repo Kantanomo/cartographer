@@ -65,8 +65,6 @@ void render_cartographer_ingame_ui(void)
 	// various d3dx9 rendering functions originally were.
 
 	// defined in Modules\Updater\Updater.cpp
-	extern char* autoUpdateText;
-
 #ifdef ACHIVEMENT_RENDER_DEBUG_ENABLED
 	static bool x_test = false;
 	if (x_test)
@@ -78,7 +76,7 @@ void render_cartographer_ingame_ui(void)
 
 	rasterizer_dx9_perf_event_begin("render cartographer ingame ui", NULL);
 	render_cartographer_status_bar(g_cartographer_build_text);
-	render_cartographer_update_message(autoUpdateText, sizeOfDownload, sizeOfDownloaded);
+	render_cartographer_update_message(g_auto_update_text, sizeOfDownload, sizeOfDownloaded);
 	if (!AchievementMap.empty())
 	{
 		auto it = AchievementMap.begin();

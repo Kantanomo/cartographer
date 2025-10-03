@@ -10,6 +10,8 @@
 #include "main/game_preferences.h"
 #include "shell/shell_windows.h"
 
+#include "H2MOD/Modules/Shell/Config.h"
+
 /* constants */
 
 real32 g_rumble_factor = 1.f;
@@ -40,6 +42,8 @@ static ascii_key* ascii_to_key_table_get(void);
 static e_input_key_code input_map_ascii_to_keycode(uint8 ascii);
 
 static void input_windows_initialize_key_remapping(void);
+
+static void __cdecl update_button(uint8* frames, uint16* msec, bool* key_bool, bool down, int32 elapsed_msec);
 
 static int compare_device_compatibility(const void* p1, const void* p2);
 
@@ -95,7 +99,7 @@ bool g_notified_to_change_mapping = false;
 
 uint32 input_device_change_delay_timer = NULL;
 
-s_input_globals* input_globals;
+input_globals_windows* input_globals;
 
 bool* g_input_windows_request_terminate;
 
@@ -103,7 +107,7 @@ bool* g_input_windows_request_terminate;
 
 void input_windows_apply_patches(void)
 {
-	input_globals = Memory::GetAddress<s_input_globals*>(0x479F50);
+	input_globals = Memory::GetAddress<input_globals_windows*>(0x479F50);
 	g_input_windows_request_terminate = Memory::GetAddress<bool*>(0x971291);
 
 	PatchCall(Memory::GetAddress(0x9020F), input_set_gamepad_rumbler_state);    // Replace call in rumble_clear_all_now
@@ -117,6 +121,12 @@ void input_windows_apply_patches(void)
 	// Replace initialize key mapping function so we properly handle keyboard layouts
 	PatchCall(Memory::GetAddress(0x2FEA9), input_windows_initialize_key_remapping);
 	PatchCall(Memory::GetAddress(0x7C87), input_add_key);
+
+	// Add logic to take the config option to disable the keyboard into account
+	PatchCall(Memory::GetAddress(0x2FAAB), update_button);
+
+	PatchCall(Memory::GetAddress(0x621C5), input_get_mouse_state);
+	PatchCall(Memory::GetAddress(0x20780B), input_get_mouse_state);
 	return;
 }
 
@@ -146,7 +156,7 @@ void input_suppress(void)
 
 void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 {
-	if (input_globals->mouse_acquired)
+	if (input_globals->active_flag)
 	{
 		bool upper_bit_exists = false;
 
@@ -383,10 +393,8 @@ uint8 __cdecl input_get_connected_gamepads_count()
 	return count;
 }
 
-s_gamepad_input_state* __cdecl input_get_gamepad(uint16 gamepad_index)
+s_gamepad_input_state* input_get_gamepad(uint16 gamepad_index)
 {
-	//s_gamepad_input_state* global = Memory::GetAddress<s_gamepad_input_state*>(0x47A5C8);
-	//return &global[gamepad_index];
 	return &input_globals->gamepad_states[gamepad_index];
 }
 
@@ -395,15 +403,12 @@ s_gamepad_input_button_state* __cdecl input_get_gamepad_state(uint16 gamepad_ind
 	return INVOKE(0x2F433, 0x0, input_get_gamepad_state, gamepad_index);
 }
 
-DIMOUSESTATE2* __cdecl input_get_mouse_state()
+mouse_state* __cdecl input_get_mouse_state(void)
 {
-	//return INVOKE(0x2E404, 0x0, input_get_mouse_state);
-	if (!input_globals->mouse_dinput_device)
-		return nullptr;
-	if (!input_globals->input_suppressed)
-		return &input_globals->mouse_state;
-
-	return &input_globals->suppressed_mouse_state;
+	// Only pass the mouse state if we have a valid dinput device and our mouse input is not being suppressed
+	// Otherwise, pass it the suppressed state and ignore input
+	const bool available = input_globals->mouse_dinput_device && !input_globals->input_suppressed;
+	return available ? &input_globals->mouse : &input_globals->mouse_suppressed;
 }
 
 uint16* __cdecl input_get_mouse_button_state()
@@ -595,6 +600,16 @@ static void input_windows_initialize_key_remapping(void)
 			ascii_to_key_table[g_key_remap[i].virtual_key].key = g_key_remap[i].key;
 		}
 	}
+	return;
+}
+
+static void __cdecl update_button(uint8* frames, uint16* msec, bool* key_bool, bool down, int32 elapsed_msec)
+{
+	if (H2Config_disable_ingame_keyboard)
+	{
+		down = false;
+	}
+	INVOKE(0x2E4C5, 0x0, update_button, frames, msec, key_bool, down, elapsed_msec);
 	return;
 }
 

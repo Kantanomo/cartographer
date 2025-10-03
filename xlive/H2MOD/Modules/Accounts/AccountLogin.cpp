@@ -11,18 +11,22 @@
 
 #include "XLive/xnet/upnp.h"
 
-#define MASTER_STATE_STR_SIZE 256
+enum
+{
+	MASTER_STATE_STR_SIZE = 256
+};
 
-const char k_login_code_secondary_string[] = "login_code_secondary=";
-const char k_login_external_addr_string[] = "login_external_addr=";
-const char k_login_token_string[] = "login_token=";
-const char k_login_username_string[] = "login_username=";
-const char k_login_ab_online_string[] = "login_abOnline=";
+static const char k_login_code_secondary_string[] = "login_code_secondary=";
+static const char k_login_external_addr_string[] = "login_external_addr=";
+static const char k_login_token_string[] = "login_token=";
+static const char k_login_username_string[] = "login_username=";
+static const char k_login_ab_online_string[] = "login_abOnline=";
 
-const char k_cartographer_login_url[] = k_cartographer_url_https"/login2";
+static const char k_cartographer_login_url[] = k_cartographer_url_https"/login2";
 
-int masterState = -1;
-char* masterStateStr = NULL;
+static int masterState = -1;
+static char masterStateStr[MASTER_STATE_STR_SIZE] = "Status: Offline";
+
 bool AccountEdit_remember = true;
 
 // TODO (Carefully) Cleanup and move
@@ -48,9 +52,6 @@ void UpdateMasterStatus(int new_state, const char* state_str, ...)
 	masterState = new_state;
 	if (!shell_is_dedicated_server())
 	{
-		if (masterStateStr)
-			delete[] masterStateStr;
-		masterStateStr = new char[MASTER_STATE_STR_SIZE];
 		vsnprintf(masterStateStr, MASTER_STATE_STR_SIZE, state_str, v);
 	}
 	va_end(v);
@@ -58,16 +59,21 @@ void UpdateMasterStatus(int new_state, const char* state_str, ...)
 
 void UpdateMasterLoginStatus(bool developer) {
 	
-	if (XUserSignedOnline(0)) {
+	if (XUserSignedOnline(0))
+	{
 		const char* statusStr = "Status: Online";
 		if (developer)
+		{
 			statusStr = "Status: Developer";
+		}
 		UpdateMasterStatus(10, statusStr);
 	}
-	else if (XUserSignedInLocally(0)) {
+	else if (XUserSignedInLocally(0))
+	{
 		UpdateMasterStatus(2, "Status: Locally signed in");
 	}
-	else {
+	else
+	{
 		UpdateMasterStatus(2, "Status: Offline");
 	}
 }
@@ -97,9 +103,12 @@ int ConfigureUserDetails(const char* username, const char* login_token, unsigned
 	TEST_N_DEF(PC4);
 	UpdateMasterLoginStatus(developer);
 
-	if (online_signin) {
+	if (online_signin)
+	{
 		if (!shell_is_dedicated_server())
-			ForwardPorts();
+		{
+			xlive_upnp_forward_ports();
+		}
 	}
 
 	if (H2CurrentAccountLoginToken) {

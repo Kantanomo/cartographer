@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "NIC.h"
 
 // ### FIXME

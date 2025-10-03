@@ -8,7 +8,9 @@
 
 #include "main/main.h"
 
-const char k_cartographer_update_ini_url[] = k_cartographer_url_http"/update1.ini";
+static const char k_cartographer_update_ini_url[] = k_cartographer_url_http"/update1.ini";
+
+char* g_auto_update_text = NULL;
 
 bool fork_cmd_elevate(const wchar_t* cmd, wchar_t* flags = 0) {
 	SHELLEXECUTEINFO shExInfo = { 0 };
@@ -382,15 +384,15 @@ static void FetchUpdateDetails() {
 	if (im_lazy.length() <= 0)
 		im_lazy = "Up to date!";
 
-	extern char* autoUpdateText;
-	char* autoUpdateTextAlt = autoUpdateText;
-	autoUpdateText = 0;
+	extern char* g_auto_update_text;
+	char* autoUpdateTextAlt = g_auto_update_text;
+	g_auto_update_text = 0;
 	if (autoUpdateTextAlt) {
 		free(autoUpdateTextAlt);
 	}
 	autoUpdateTextAlt = (char*)malloc(im_lazy.size() + 1);
 	strcpy_s(autoUpdateTextAlt, im_lazy.size() + 1, im_lazy.c_str());
-	autoUpdateText = autoUpdateTextAlt;
+	g_auto_update_text = autoUpdateTextAlt;
 }
 
 bool DownloadUpdatedFiles() {
@@ -542,10 +544,10 @@ void GSDownloadCancel() {
 		sizeOfDownload = sizeOfDownloaded = 0;
 	}
 
-	extern char* autoUpdateText;
-	if (autoUpdateText) {
-		free(autoUpdateText);
-		autoUpdateText = 0;
+	extern char* g_auto_update_text;
+	if (g_auto_update_text) {
+		free(g_auto_update_text);
+		g_auto_update_text = 0;
 	}
 
 	updater_has_files_to_download = false;

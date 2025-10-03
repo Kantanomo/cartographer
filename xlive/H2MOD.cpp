@@ -147,8 +147,6 @@ static void h2mod_apply_hooks(void);
 
 static void h2mod_apply_tweaks(void);
 
-static void __cdecl update_keyboard_buttons_state_hook(BYTE* a1, WORD* a2, BYTE* a3, bool a4, int a5);
-
 static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6);
 
 static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6);
@@ -517,13 +515,13 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 			toggle_xbox_tickrate(options, true);
 			if (H2Config_discord_enable)
 			{
-				c_static_wchar_string<260> scenario_path(game_options_get()->scenario_path);
+				c_static_wchar_string<MAX_PATH> scenario_path(game_options_get()->scenario_path);
 				int32 index = scenario_path.last_index_of(L"\\");
 				const wchar_t* scenario_name_wide = &scenario_path.get_string()[index + 1];
 				utf8 scenario_name[MAX_PATH];
 				wchar_string_to_utf8_string(scenario_name_wide, scenario_name, sizeof(scenario_name));
 
-				context_update_map_info_campaign(options->map_id, scenario_name);
+				discord_interface_update_map_info_campaign(options->map_id, scenario_name);
 				discord_interface_set_difficulty(options->difficulty);
 			}
 		}
@@ -783,10 +781,6 @@ static void h2mod_apply_tweaks(void)
 		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
 		NopFill(Memory::GetAddressRelative(0x66A092), 8);
 
-		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
-		NopFill(Memory::GetAddressRelative(0x42FAB9), 8);
-		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
-
 		// disable symbol to emoji translation when dealing with player name
 		// works only in game for now, because the name in the pregame lobby uses c_text_widget
 		// and it's harder to deal with
@@ -801,13 +795,12 @@ static void h2mod_apply_tweaks(void)
 	return;
 }
 
-static void __cdecl update_keyboard_buttons_state_hook(BYTE* a1, WORD* a2, BYTE* a3, bool a4, int a5)
+static void __cdecl input_abstraction_update_key_state(BYTE* a1, WORD* a2, BYTE* a3, bool a4, int a5)
 {
-	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
+	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&input_abstraction_update_key_state)>(0x42E4C5);
 
 	BYTE keyboardState[256] = {};
-	if (!H2Config_disable_ingame_keyboard
-		&& GetKeyboardState(keyboardState))
+	if (!H2Config_disable_ingame_keyboard && GetKeyboardState(keyboardState))
 	{
 		for (int i = 0; i < 256; i++)
 		{

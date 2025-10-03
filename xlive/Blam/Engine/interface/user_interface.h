@@ -420,7 +420,7 @@ void __cdecl user_interface_return_to_mainmenu(bool a1);
 
 void __cdecl user_interface_update(real32 dt);
 
-uint32 user_interface_set_context_presence(e_context_presence game_mode);
+uint32 user_interface_set_context_presence(uint32 game_mode);
 
 void user_interface_debug_load_main_menu();
 void user_interface_debug_text_bounds(bool value);

@@ -2,11 +2,8 @@
 #include "KeyboardInput.h"
 
 #include "input/controllers.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
-#include "shell/shell.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -34,7 +31,6 @@ static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 /* globals */
 
 s_keyboard_hotkey_data g_keyboard_hotkey_data[k_number_of_global_hotkeys] = {};
-RECT rectScreenOriginal;
 
 void KeyboardInput::ToggleKeyboardInput()
 {

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "XnIp.h"
 
+#include "H2MOD/GUI/imgui_integration/Console/CommandHandler.h"
 #include "H2MOD/Utils/Utils.h"
 
 #include "XLive/Cryptography/Rc4.h"
