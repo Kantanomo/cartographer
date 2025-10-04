@@ -63,7 +63,7 @@ static void __cdecl first_person_camera_build_observer_command(datum player_unit
 			unit_datum* vehicle_unit = (unit_datum*)object_try_and_get_and_verify_type(player_unit->object.parent_object_index, _object_mask_vehicle);
 			if(vehicle_unit)
 			{
-				struct vehicle_definition* vehicle_definition = (struct vehicle_definition*)tag_get_fast(vehicle_unit->definition_index);
+				const struct vehicle_definition* vehicle_definition = (const struct vehicle_definition*)tag_get_fast(vehicle_unit->definition_index);
 
 				if (vehicle_definition->unit.seats[player_unit->unit.parent_seat_index]->flags.test(_unit_seat_definition_first_person_camera_slaved_to_gun))
 				{

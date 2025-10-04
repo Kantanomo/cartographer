@@ -570,7 +570,7 @@ public:
 	int32 find_node(const string_id string) const;
 	int32 find_node_with_flags(const e_node_model_flags flags) const;
 
-	c_model_animation_graph* get_writable(datum tag_datum_index) const;
+	const c_model_animation_graph* get_writable(datum tag_datum_index) const;
 	const animation_graph_node* get_node(uint8 node_index) const;
 	int16 get_node_count(void) const;
 };

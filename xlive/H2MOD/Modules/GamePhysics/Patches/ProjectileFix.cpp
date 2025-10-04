@@ -11,7 +11,7 @@
 
 // h3 gets the projectile collision data from somewhere else
 #define ENABLE_H3_COLLISION_DATA_SOURCE false
-#define INCREASED_PROJECTILE_OBJECT_DATA_SIZE (PROJECTILE_DEFAULT_OBJECT_DATA_SIZE + sizeof(int) + (ENABLE_H3_COLLISION_DATA_SOURCE ? sizeof(real_point3d) : 0))
+#define INCREASED_PROJECTILE_OBJECT_DATA_SIZE (PROJECTILE_DEFAULT_OBJECT_DATA_SIZE + sizeof(int32) + (ENABLE_H3_COLLISION_DATA_SOURCE ? sizeof(real_point3d) : 0))
 
 typedef bool(__cdecl* projectile_new_t)(datum projectile_object_index, uint8* parent_object);
 projectile_new_t p_projectile_new;
@@ -22,15 +22,15 @@ typedef void(__cdecl* projectile_update_t)(datum projectile_object_index, real_p
 projectile_update_t p_projectile_update;
 
 // determines whether the projectile should be updated in a 30hz context or not
-real32 projectile_get_update_tick_length(datum projectile_datum_index, bool projectile_instant_update)
+real32 projectile_get_update_tick_length(datum projectile_index, bool projectile_instant_update)
 {
-	uint8* object_data = (uint8*)object_get_fast_unsafe(projectile_datum_index);
-	uint8* proj_tag_data = (uint8*)tag_get_fast(*((datum*)object_data));
+	object_datum* object = object_get_fast_unsafe(projectile_index);
+	const _projectile_definition* projectile_definition = (const struct _projectile_definition*)tag_get_fast(object->definition_index);
 
-	if ((*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5)) != 0 // check if travels instantaneously flag is set in the projectile flags
-		&& (projectile_instant_update || *(uint32*)(object_data + 428) == game_time_get())) // also check if the projectile is updated twice in the same tick
+	if (TEST_BIT(projectile_definition->flags, 5) // check if travels instantaneously flag is set in the projectile flags
+		&& (projectile_instant_update || *(uint32*)(((uint8*)object) + 428) == game_time_get())) // also check if the projectile is updated twice in the same tick
 	{
-		//LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
+		//LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_index);
 		return game_tick_length() * ((real32)game_tick_rate() / 30.f);
 	}
 	else
@@ -47,27 +47,27 @@ inline void projectile_set_creation_tick(datum projectile_datum_index)
 	*(uint32*)(object_data + 428) = game_time_get(); // store the projectile creation tick count
 }
 
-bool __cdecl projectile_new_hook(datum projectile_object_index, uint8* parent_object)
+bool __cdecl projectile_new_hook(datum projectile_index, uint8* parent_object)
 {
-	bool ret = p_projectile_new(projectile_object_index, parent_object);
+	bool ret = p_projectile_new(projectile_index, parent_object);
 
-	projectile_set_creation_tick(projectile_object_index);
+	projectile_set_creation_tick(projectile_index);
 
 	return ret;
 }
 
-void __cdecl projectile_update_instantaneous(datum projectile_object_index, real_point3d *a2)
+void __cdecl projectile_update_instantaneous(datum projectile_index, real_point3d *a2)
 {
-	real32 tick_length = projectile_get_update_tick_length(projectile_object_index, true);
-	// LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
-	p_projectile_update(projectile_object_index, a2, tick_length);
+	real32 tick_length = projectile_get_update_tick_length(projectile_index, true);
+	// LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_index, tick_length);
+	p_projectile_update(projectile_index, a2, tick_length);
 }
 
-void __cdecl projectile_update_regular(datum projectile_object_index, real_point3d *a2)
+void __cdecl projectile_update_regular(datum projectile_index, real_point3d *a2)
 {
-	real32 tick_length = projectile_get_update_tick_length(projectile_object_index, false);
-	// LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
-	p_projectile_update(projectile_object_index, a2, tick_length);
+	real32 tick_length = projectile_get_update_tick_length(projectile_index, false);
+	// LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_index, tick_length);
+	p_projectile_update(projectile_index, a2, tick_length);
 }
 
 static real32 __declspec(naked) get_tick_length_hook()
