@@ -30,7 +30,7 @@ jobs:
           Start-BitsTransfer -Source $url -Destination $destSdkExec -DisplayName "DXSDK_Jun10" -Description "Downloading DXSDK" -TransferType Download
           Write-Host "Download complete. Extracting..."
           Write-Host "Extracting DirectX SDK silently using 7-Zip..."
-          & 7z x $destSdkExec DXSDK/Include DXSDK/Lib -oD:\depends\
+          & 7z x $destSdkExec DXSDK/Include DXSDK/Lib -oD:\depends\ -y > $null
 
       - name: Set DXSDK_DIR environment variable
         id: dxsdk-set-path
