@@ -33,5 +33,11 @@ version_git.h
 JSON/
 
 xlive/version_git.h
+xlive/3rdparty/imgui/lib
+xlive/3rdparty/imgui/objects
+xlive/3rdparty/spdlog/lib
+xlive/3rdparty/spdlog/objects
+xlive/3rdparty/tinyxml/lib
+xlive/3rdparty/tinyxml/objects
 xlive/3rdparty/zlib/lib
 xlive/3rdparty/zlib/objects

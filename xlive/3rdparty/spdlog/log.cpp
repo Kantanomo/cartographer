@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "log.h"
 
 #ifndef SPDLOG_DISABLED
@@ -35,10 +34,11 @@ h2log* h2log::create(const std::string &name, const std::wstring &filename, bool
 	{
 		auto new_h2log = new h2log(name);
 		// try opening file to check permissions
-		FILE* fp = ufopen(filename.c_str(), L"a+");
-		if (fp)
+		FILE* fp;
+		const errno_t error = _wfopen_s(&fp, filename.c_str(), L"a+");
+		if (fp && error == ERROR_SUCCESS)
 		{
-			ufclose(fp);
+			fclose(fp);
 			new_h2log->output = spdlog::rotating_logger_mt(name, filename, 1048576 * 2, 3);
 			new_h2log->output->set_level(debugLogLevel ? (spdlog::level::level_enum)debugLogLevel : spdlog::level::trace);
 			new_h2log->output->set_pattern("%d/%m/%Y %H:%M:%S.%e [%n] [%l] : %v");
