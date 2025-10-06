@@ -114,7 +114,6 @@ void __cdecl cache_file_map_clear_all_failures(void)
 void* __cdecl tag_get_fast(datum tag_index)
 {
 	const s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
-
 	return (void*)(cache_file_memory_globals->tag_cache_base_address + 	cache_get_tag_instance(tag_index)->data_offset);
 }
 

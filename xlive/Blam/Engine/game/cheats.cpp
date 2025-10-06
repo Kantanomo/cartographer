@@ -236,7 +236,7 @@ static bool cheat_place_tag(const real_vector3d* forward, datum tag_index, const
 		return false;
 	}
 
-	object_definition* object = (object_definition*)tag_get_fast(/*_tag_group_object,*/ tag_index);
+	const object_definition* object = (object_definition*)tag_get_fast(/*_tag_group_object,*/ tag_index);
 	
 	object_placement_data placement_data;
 	object_placement_data_new(&placement_data, tag_index, NONE, NULL);

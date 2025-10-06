@@ -5,6 +5,8 @@ Official Website: https://cartographer.online/
 ## Contributing
 Pull requests are the best way to submit any additions or fixes. Small changes or tweaks that don't affect functionality (like appearance of something for example) should be communicated to the developers as feedback since we may not agree with such a change/choice. If you intend to work (and are confident you won't just bail on the project) on something that requires online play, you will need to join the #dev_preview program in order to be able to run unofficial builds by logging in to a test account. Ask one of the developers about joining it. You however are expected to already be experienced in C/C++. Experience in reverse engineering binaries will help get you far.
 
+To build the project, you need to install the [DirectX June 2010 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=6812). DXSDK_DIR environment variable should point to the install folder (usually set automatically during the SDK installation).
+
 ## Pull Request Guidelines
 
 	* In depth explanation why this PR is important to the project and what it accomplishes

@@ -6,7 +6,41 @@ permissions:
   contents: read
 
 jobs:
+  fetch-dxsdk2010:
+    runs-on: windows-2022
+    outputs:
+      dxsdk-path: ${{steps.dxsdk-set-path.outputs.DXSDK_DIR}}
+
+    steps:
+      - name: Check if DXSDK is cached
+        id: cache-dxsdk
+        uses: actions/cache@v4
+        with:
+          path: D:\depends\DXSDK
+          key: dxsdk-june2010
+
+      - name: Download DirectX SDK (June 2010)
+        if: steps.cache-dxsdk.outputs.cache-hit != 'true'
+        run: |
+          $ErrorActionPreference = "Stop"
+          $url = "https://download.microsoft.com/download/a/e/7/ae743f1f-632b-4809-87a9-aa1bb3458e31/DXSDK_Jun10.exe"
+          $destSdkExec = "$env:RUNNER_TEMP\DXSDK_Jun10.exe"
+          $extractPath = "D:\depends\DXSDK"
+          Write-Host "Downloading DirectX SDK from $url ..."
+          Start-BitsTransfer -Source $url -Destination $destSdkExec -DisplayName "DXSDK_Jun10" -Description "Downloading DXSDK" -TransferType Download
+          Write-Host "Download complete. Extracting..."
+          Write-Host "Extracting DirectX SDK using 7-Zip..."
+          & 7z x $destSdkExec DXSDK/Include DXSDK/Lib -oD:\depends\ -y > $null
+
+      - name: Set DXSDK_DIR environment variable
+        id: dxsdk-set-path
+        run: |
+          echo 'DXSDK_DIR=D:\depends\DXSDK' >> $env:GITHUB_OUTPUT
+
   build-win:
+    needs: fetch-dxsdk2010
+    runs-on: windows-2022
+
     env:
       SOLUTION_FILE_PATH: .
       PLATFORM: x86
@@ -16,17 +50,27 @@ jobs:
         #BUILD_CONFIGURATION: [debug_msvc, debug_llvm, release_msvc, release_llvm]
         BUILD_CONFIGURATION: [debug_msvc, release_msvc, release_min_msvc]
 
-    runs-on: windows-2022
-
     steps:
     - uses: actions/checkout@v4.1.6
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v2
 
+    - name: Install cached DXSDK
+      id: cache-dxsdk
+      uses: actions/cache@v4
+      with:
+        path: ${{needs.fetch-dxsdk2010.outputs.dxsdk-path}}
+        key: dxsdk-june2010
+
+    - name: Verify DXSDK installation
+      run: |
+        echo "DXSDK_DIR is ${{needs.fetch-dxsdk2010.outputs.dxsdk-path}}"
+        dir ${{needs.fetch-dxsdk2010.outputs.dxsdk-path}}
+
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: msbuild /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} /p:Platform=${{env.PLATFORM}} ${{matrix.SOLUTION_FILE_PATH}}
+      run: msbuild /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} /p:Platform=${{env.PLATFORM}} ${{matrix.SOLUTION_FILE_PATH}} /p:DXSDK_DIR=${{needs.fetch-dxsdk2010.outputs.dxsdk-path}}/
       
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4.5.0
