@@ -4,14 +4,6 @@
 //
 #pragma once
 
-#pragma region Warnings as errors
-#pragma warning(error: 4700)
-#pragma endregion
-
-#pragma region global disabled warnings
-#pragma warning( disable : 4100)	// Disable unreferenced parameter warning
-#pragma endregion
-
 #define CARTOGRAPHER_HEAP_DEBUG 0
 
 #if CARTOGRAPHER_HEAP_DEBUG
@@ -103,11 +95,7 @@
 #include "math/real_math.h"
 #include "memory/static_arrays.h"
 
-#pragma warning( push )
-#pragma warning( disable : 4131)	// Disable old style declarator warning
-#pragma warning( disable : 4244)	// Disable loss of data warning
 #include <contrib/minizip/zip.h>
-#pragma warning( pop )
 
 #pragma comment(lib, "IPHLPAPI.lib")
 

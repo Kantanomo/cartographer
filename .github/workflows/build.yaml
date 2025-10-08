@@ -65,8 +65,7 @@ jobs:
 
     - name: Verify DXSDK installation
       run: |
-        echo "DXSDK_DIR is ${{needs.fetch-dxsdk2010.outputs.dxsdk-path}}"
-        dir ${{needs.fetch-dxsdk2010.outputs.dxsdk-path}}
+        if (-Not (Test-Path -Path "${{needs.fetch-dxsdk2010.outputs.dxsdk-path}}")) { exit 1 }
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}

@@ -118,7 +118,7 @@
     <IntDir>.\objects\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/zlib/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">
@@ -126,7 +126,7 @@
     <IntDir>.\objects\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/zlib/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">
@@ -134,7 +134,7 @@
     <IntDir>.\objects\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/zlib/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">
@@ -142,16 +142,14 @@
     <IntDir>.\objects\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/zlib/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib/release;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\objects\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/zlib/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <IncludePath>$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
@@ -159,9 +157,7 @@
     <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\objects\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/zlib/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <IncludePath>$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
@@ -189,11 +185,11 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\zlib\src;.\3rdparty\discord\include;.\Blam/Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>4505;4189</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4189;4100</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -205,13 +201,14 @@
       <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;spdloglib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;imguilib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -263,11 +260,11 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\zlib\src;.\3rdparty\discord\include;.\Blam/Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>4505;4189</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4189;4100</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -279,13 +276,14 @@
       <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SDLCheck>true</SDLCheck>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -338,7 +336,7 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\zlib\src;.\3rdparty\discord\include;.\Blam/Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -359,7 +357,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;spdloglib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;imguilib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -412,7 +410,7 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\zlib\src;.\3rdparty\discord\include;.\Blam/Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -433,7 +431,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -482,12 +480,12 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\zlib\src;.\3rdparty\discord\include;Blam\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <DisableSpecificWarnings>4505;4189</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4189;4100</DisableSpecificWarnings>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -497,13 +495,14 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <SDLCheck>true</SDLCheck>
       <SupportJustMyCode>false</SupportJustMyCode>
+      <TreatSpecificWarningsAsErrors>4700</TreatSpecificWarningsAsErrors>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;spdloglib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;imguilib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -542,7 +541,7 @@
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\zlib\src;.\3rdparty\discord\include;Blam\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\detours\include;.\3rdparty\discord\include;.\3rdparty\imgui\imgui;.\3rdparty\libcurl;.\3rdparty\miniupnpc\include;.\3rdparty\spdlog\include;.\3rdparty\tinyxml;.\3rdparty\zlib\src;.\Blam\Engine</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -562,7 +561,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;spdloglib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;imguilib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -583,62 +582,6 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="3rdparty\imgui\imgui.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="3rdparty\imgui\imgui_draw.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="3rdparty\imgui\imgui_tables.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Blam\Engine\achievements\achievement_live_interface.cpp" />
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\ai\actor_dynamic_firing_position.cpp" />
@@ -936,107 +879,6 @@
     <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\async.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\async_logger-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\async_logger.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\argv.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\env.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\helpers-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\helpers.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\common-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\common.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\backtracer-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\backtracer.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\circular_q.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\console_globals.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\file_helper-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\file_helper.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\fmt_helper.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\log_msg-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\log_msg.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\log_msg_buffer-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\log_msg_buffer.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\mpmc_blocking_q.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\null_mutex.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\os-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\os.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\periodic_worker-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\periodic_worker.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\registry-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\registry.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\synchronous_factory.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\tcp_client-windows.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\tcp_client.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\thread_pool-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\thread_pool.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\udp_client-windows.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\udp_client.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\details\windows_include.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bin_to_hex.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\args.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\base.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\chrono.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\color.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\compile.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\core.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\format-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\format.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\os.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\std.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\xchar.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\chrono.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\compile.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\fmt.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\ostr.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\ranges.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\std.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\xchar.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\formatter.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fwd.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\logger-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\logger.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\mdc.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\pattern_formatter-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\pattern_formatter.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\android_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\ansicolor_sink-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\ansicolor_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\base_sink-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\base_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\basic_file_sink-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\basic_file_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\callback_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\daily_file_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\dist_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\dup_filter_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\hourly_file_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\kafka_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\mongo_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\msvc_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\null_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\ostream_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\qt_sinks.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\ringbuffer_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\rotating_file_sink-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\rotating_file_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\sink-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\stdout_color_sinks-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\stdout_color_sinks.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\stdout_sinks-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\stdout_sinks.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\syslog_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\systemd_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\tcp_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\udp_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\wincolor_sink-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\wincolor_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\sinks\win_eventlog_sink.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\spdlog-inl.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\spdlog.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\stopwatch.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\tweakme.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\include\zconf.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\include\zlib.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\minizip\unzip.h" />
@@ -1506,7 +1348,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_min_llvm|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Util\curl-interface.cpp" />
-    <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -1568,11 +1409,7 @@
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpdev.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnperrors.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\upnpreplyparse.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\ostream.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\posix.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\printf.h" />
-    <ClInclude Include="3rdparty\spdlog\include\spdlog\fmt\bundled\ranges.h" />
-    <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
@@ -2643,7 +2480,6 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
-    <ClInclude Include="Util\log.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
     <ClInclude Include="XLive\achievements\XAchievements.h" />

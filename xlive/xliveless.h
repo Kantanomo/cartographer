@@ -4,7 +4,7 @@
 #define XLIVELESS_H
 
 #ifndef SPDLOG_DISABLED
-#include "Util/log.h"
+#include "spdlog/log.h"
 #endif
 
 #ifdef XLIVELESS_EXPORTS
