@@ -1,14 +1,75 @@
 #include "stdafx.h"
 #include "main_game.h"
 
-#include "cache/cache_files.h"
+#include "main.h"
 
+#include "cache/cache_files.h"
+#include "cache/pc_texture_cache.h"
 #include "game/game.h"
+#include "game/game_globals.h"
+#include "game/game_options.h"
+#include "interface/damaged_media.h"
+#include "interface/user_interface.h"
 #include "saved_games/game_variant.h"
+
+#include <XLive/XAM/xam.h>
 
 /* constants */
 
-s_variant_description_map k_launch_multiplayer_variants[k_variant_count] =
+enum e_game_loaded_status
+{
+	_game_loaded_status_none = 0,
+	_game_loaded_status_map_loading,
+	_game_loaded_status_map_loaded,
+	_game_loaded_status_map_unloading,
+	_game_loaded_status_map_reloading,
+	_game_loaded_status_pregame,
+	k_game_loaded_status_count,
+};
+
+/* structures */
+
+struct s_main_game_globals
+{
+	int32 game_loaded_status;
+	wchar_t game_loaded_scenario_path[MAX_PATH];
+	bool map_reset_in_progress;
+	bool map_advance_pending;
+	bool map_change_pending;
+	bool map_change_pending_unload;
+	uint32 map_change_initiate_time;
+	uint32 map_change_timer;
+	bool unk_0;
+	bool unk_1;
+	bool unk_2;
+	s_game_options pending_game_options;
+};
+
+/* prototypes */
+
+static s_main_game_globals* main_game_globals_get(void);
+
+// Setup default values for the options structure depending on the game mode set
+static void main_game_launch_setup_game_mode_details(void);
+
+// Perform validation on the game launch options for campaign
+static void main_game_launch_set_campaign_details(void);
+
+// Perform validation on the game launch options for multiplayer
+static void main_game_launch_set_multiplayer_details(void);
+
+// Set default details for the mainmenu
+static void main_game_launch_set_ui_shell_details(void);
+
+static void main_game_internal_pregame_load(void);
+
+static void main_game_load_panic(void);
+
+static void main_menu_build_game_options(s_game_options* options, int32 menu_context);
+
+/* globals */
+
+static const s_variant_description_map k_launch_multiplayer_variants[k_variant_count] =
 {
 	{ "slayer", _game_variant_description_slayer },
 	{ "oddball", _game_variant_description_oddball },
@@ -19,28 +80,59 @@ s_variant_description_map k_launch_multiplayer_variants[k_variant_count] =
 	{ "territories", _game_variant_description_territories }
 };
 
-/* globals */
+static bool g_main_menu_launch_delay_xlive_ui = true;
 
-s_game_options g_main_game_launch_options = {};
 int32 g_main_game_launch_user_count = 1;
+s_game_options g_main_game_launch_options;
 
-/* prototypes */
-
-// Setup default values for the options structure depending on the game mode set
-void main_game_launch_setup_game_mode_details(void);
-// Perform validation on the game launch options for campaign
-void main_game_launch_set_campaign_details(void);
-// Perform validation on the game launch options for multiplayer
-void main_game_launch_set_multiplayer_details(void);
-// Set default details for the mainmenu
-void main_game_launch_set_ui_shell_details(void);
+bool debug_load_panic_to_main_menu;
 
 /* public code */
+
+void main_game_apply_patches(void)
+{
+	PatchCall(Memory::GetAddress(0x9844), main_game_load_panic);
+	PatchCall(Memory::GetAddress(0x39675), main_game_load_panic);
+	return;
+}
 
 void main_game_initialize(void)
 {
 	game_options_new(&g_main_game_launch_options);
 	return;
+}
+
+bool __cdecl main_game_loaded_map(void)
+{
+	return INVOKE(0x0, 0x1E578, main_game_loaded_map);
+}
+
+bool __cdecl main_game_loaded_pregame(void)
+{
+	return INVOKE(0x0, 0x1E56B, main_game_loaded_pregame);
+}
+
+void __cdecl main_game_launch_default(void)
+{
+	INVOKE(0x96EB, 0x0, main_game_launch_default);
+	return;
+}
+
+void __cdecl main_game_reset_map(void)
+{
+	INVOKE(0x9763, 0x0, main_game_reset_map);
+	return;
+}
+
+void __cdecl main_game_unload_and_prepare_for_next_game(void)
+{
+	INVOKE(0x8A7E, 0x0, main_game_unload_and_prepare_for_next_game);
+	return;
+}
+
+bool __cdecl main_game_change_update(void)
+{
+	return INVOKE(0x985E, 0x1FB49, main_game_change_update);
 }
 
 void main_game_launch_set_map_name(const char* map_name)
@@ -53,6 +145,11 @@ void main_game_launch_set_map_name(const char* map_name)
 bool __cdecl main_game_change(const s_game_options* options)
 {
 	return INVOKE(0x89BA, 0x1E4EC, main_game_change, options);
+}
+
+bool __cdecl main_game_change_immediate(const s_game_options* options)
+{
+	return INVOKE(0x911B, 0x1F523, main_game_change_immediate, options);
 }
 
 void main_game_launch_set_difficulty(int16 difficulty)
@@ -136,6 +233,13 @@ void main_game_launch_set_game_mode(int32 game_mode)
 	return;
 }
 
+void main_game_launch_legacy(const char* map_name)
+{
+	damaged_media_clear_error();
+	main_game_launch(map_name);
+	return;
+}
+
 void main_game_launch(const char* map_name)
 {
 	cache_file_map_clear_all_failures();
@@ -146,16 +250,45 @@ void main_game_launch(const char* map_name)
 	return;
 }
 
-void main_game_apply_patches(void)
+void main_menu_launch(uint32 context)
 {
-	// Patch the empty function in the run_main_loop function with the proper function call
-	PatchCall(Memory::GetAddress(0x39E38), main_game_initialize);
+	s_game_options options;
+
+	if (game_in_progress() && game_is_ui_shell())
+	{
+		user_interface_enter_game_shell(context);
+	}
+	else
+	{
+		main_menu_build_game_options(&options, context);
+		main_game_change(&options);
+	}
+	return;
+}
+
+void main_menu_launch_force(void)
+{
+	if (g_main_menu_launch_delay_xlive_ui)
+	{
+		XNotifyDelayUI(120000);
+		main_menu_launch(9);
+		g_main_menu_launch_delay_xlive_ui = false;
+	}
+	else
+	{
+		main_menu_launch(0);
+	}
 	return;
 }
 
 /* private code */
 
-void main_game_launch_setup_game_mode_details(void)
+static s_main_game_globals* main_game_globals_get(void)
+{
+	return Memory::GetAddress<s_main_game_globals*>(0x46DAE4);
+}
+
+static void main_game_launch_setup_game_mode_details(void)
 {
 	switch (g_main_game_launch_options.game_mode)
 	{
@@ -176,14 +309,14 @@ void main_game_launch_setup_game_mode_details(void)
 	}
 	default:
 	{   
-		error(_error_silent, "%s: unknown game mode %d!", __FUNCTION__, (uint32)g_main_game_launch_options.game_mode);
+		error(_error_silent, "%s: unknown game mode %d!", __FUNCTION__, (int32)g_main_game_launch_options.game_mode);
 	}
 	}
 
 	return;
 }
 
-void main_game_launch_set_campaign_details(void)
+static void main_game_launch_set_campaign_details(void)
 {
 	// Ensure difficulty is between 0 and 3
 	g_main_game_launch_options.difficulty = PIN(g_main_game_launch_options.difficulty, 0, k_campaign_difficulty_levels_count - 1);
@@ -208,16 +341,74 @@ void main_game_launch_set_campaign_details(void)
 	return;
 }
 
-void main_game_launch_set_multiplayer_details(void)
+static void main_game_launch_set_multiplayer_details(void)
 {
 	// Ensure user count is between 1 and 4
 	g_main_game_launch_user_count = PIN(g_main_game_launch_user_count, 1, k_number_of_users);
 	return;
 }
 
-void main_game_launch_set_ui_shell_details(void)
+static void main_game_launch_set_ui_shell_details(void)
 {
 	g_main_game_launch_user_count = 1;
 	g_main_game_launch_options.menu_context = 7;
+	return;
+}
+
+static void main_game_internal_pregame_load(void)
+{
+	s_main_game_globals* main_game_globals = main_game_globals_get();
+	ASSERT(main_game_globals->game_loaded_status == _game_loaded_status_none);
+
+	texture_cache_open_pregame();
+	main_game_globals->game_loaded_status = _game_loaded_status_none;
+	return;
+}
+
+static void main_game_load_panic(void)
+{
+	main_game_unload_and_prepare_for_next_game();
+	ASSERT(!main_game_loaded_map() && !main_game_loaded_pregame());
+
+	static bool x_recursion_lock = false;
+	if (debug_load_panic_to_main_menu)
+	{
+		error(_error_log, "### ERROR main_game_load_panic: recursion lock triggered (we must have failed to load the main menu from a panic state)");
+		error(_error_log, "### ERROR main game load failed, unable to recover, aborting to pregame");
+		main_game_internal_pregame_load();
+		main_halt_and_display_errors();
+	}
+	else
+	{
+		if (x_recursion_lock)
+		{
+			error(_error_log, "### ERROR main game load failed, unable to recover, aborting to pregame");
+			main_game_internal_pregame_load();
+			main_halt_and_display_errors();
+		}
+	}
+
+	x_recursion_lock = true;
+
+	s_game_options options;
+	main_menu_build_game_options(&options, 0);
+	main_game_change_immediate(&options);
+
+	x_recursion_lock = false;
+
+	ASSERT(!main_game_loaded_map() && !main_game_loaded_pregame());
+	return;
+}
+
+static void main_menu_build_game_options(s_game_options* options, int32 menu_context)
+{
+	ASSERT(options);
+	
+	game_options_new(options);
+	options->game_mode = _game_mode_ui_shell;
+	ustrncpy_debug(options->scenario_path, L"scenarios\\ui\\mainmenu\\mainmenu", MAX_PATH);
+
+	options->menu_context = menu_context;
+	game_options_setup_default_players(1, options);
 	return;
 }

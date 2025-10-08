@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "pc_texture_cache.h"
 
+#include "bitmaps/bitmap_group.h"
+
 /* public code */
 
 void __cdecl texture_cache_new(void)
@@ -23,4 +25,9 @@ void __cdecl texture_cache_block_for_one_frame(int32 a1)
 {
 	INVOKE(0x265948, 0x0, texture_cache_block_for_one_frame, a1);
 	return;
+}
+
+bool __cdecl texture_cache_open_pregame(void)
+{
+	return INVOKE(0x26590B, 0x0, texture_cache_open_pregame);
 }

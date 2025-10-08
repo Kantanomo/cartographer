@@ -143,7 +143,7 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 user_inde
 		local_player_count = 0;
 		do
 		{
-			s_player_properties player_properties;
+			s_player_configuration player_properties;
 			if (network_session_interface_get_local_user_identifier(local_player_count, &user_identifiers[local_player_count])
 				&& network_session_interface_get_local_user_properties(local_player_count, NULL, &player_properties, NULL, NULL))
 			{

@@ -1,5 +1,7 @@
 #pragma once
 
+/* structures */
+
 struct s_location
 {
 	int32 leaf_index;

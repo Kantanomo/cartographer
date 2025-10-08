@@ -6,8 +6,15 @@
 #include "geometry/geometry_definitions_new.h"
 #include "physics/collision_model_definitions.h"
 
-#define k_maximum_instance_geometry_instances_per_structure_bsp 1024
-#define k_maximum_instance_geometry_definitions_per_structure_bsp 512
+/* constants */
+
+enum
+{
+	k_maximum_instance_geometry_instances_per_structure_bsp = 1024,
+	k_maximum_instance_geometry_definitions_per_structure_bsp = 512
+};
+
+/* enums */
 
 enum e_structure_instanced_geometry_instance_lightmap_policy : uint16
 {
@@ -26,6 +33,8 @@ enum e_structure_instanced_geometry_instance_flags : uint16
 {
 	_structure_instanced_geometry_instance_not_in_light_probes = FLAG(0)
 };
+
+/* structures */
 
 // max: k_maximum_instance_geometry_instances_per_structure_bsp
 struct structure_instanced_geometry_instance
@@ -77,7 +86,7 @@ ASSERT_STRUCT_SIZE(structure_instanced_geometry_definition, 200);
 // max count: k_maximum_instance_geometry_instances_per_structure_bsp
 struct instanced_geometry_reference
 {
-	short pathfinding_object_index;
-	short pad;
+	int16 pathfinding_object_index;
+	int16 pad;
 };
 ASSERT_STRUCT_SIZE(instanced_geometry_reference, 4);

@@ -225,7 +225,7 @@ void Infection::preSpawnServerSetup() {
 
 		bool isZombie = std::find(zombieIdentifiers.begin(), zombieIdentifiers.end(), id) != zombieIdentifiers.end();
 		
-		const bool zombie_team_status_human = isZombie == false && player->properties[0].team_index == k_zombie_team;
+		const bool zombie_team_status_human = isZombie == false && player->configuration.team_index == k_zombie_team;
 		if (zombie_team_status_human)
 		{
 
@@ -234,11 +234,11 @@ void Infection::preSpawnServerSetup() {
 			isZombie = true;
 		}
 
-		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", currentPlayerIndex, isZombie, id, player->properties[0].player_name);
+		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", currentPlayerIndex, isZombie, id, player->configuration.player_name);
 		if (isZombie) 
 		{
-			player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
-			if (player->properties[0].team_index != k_zombie_team)
+			player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+			if (player->configuration.team_index != k_zombie_team)
 			{
 				// prevent the fucks from switching to humans in the pre-game lobby after joining
 				session->switch_player_team(player_it.get_absolute_index(), k_zombie_team);
@@ -246,7 +246,7 @@ void Infection::preSpawnServerSetup() {
 		}
 		else 
 		{
-			player->properties[0].profile_traits.profile.player_character_type = infection_human_get_player_type();
+			player->configuration.profile_traits.profile.player_character_type = infection_human_get_player_type();
 		}
 	}
 }
@@ -254,14 +254,14 @@ void Infection::preSpawnServerSetup() {
 void Infection::setPlayerAsHuman(int player_index)
 {
 	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
-	player->properties[0].profile_traits.profile.player_character_type = infection_human_get_player_type();
+	player->configuration.profile_traits.profile.player_character_type = infection_human_get_player_type();
 	player->unit_speed = k_human_unit_speed;
 }
 
 void Infection::setPlayerAsZombie(int player_index)
 {
 	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
-	player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+	player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
 	player->unit_speed = k_zombie_unit_speed;
 	call_give_player_weapon(player_index, e_weapons_datum_index::energy_blade, 1);
 	return;
@@ -308,7 +308,7 @@ void Infection::removeUnwantedItems()
 		{
 			item_collection_definition* itmc = (item_collection_definition*)tag_get_fast(iterator.current_tag_index);
 
-			for (int i = 0; i < itmc->item_permutations.count; i++)
+			for (int32 i = 0; i < itmc->item_permutations.count; i++)
 			{
 				itmc->item_permutations[i]->item.group.group = _tag_group_equipment;
 				itmc->item_permutations[i]->item.index = shotgun_ammo_equip_datum;
@@ -320,7 +320,7 @@ void Infection::removeUnwantedItems()
 	scenario* scenario_definition = global_scenario_get();
 	for (int32 i = 0; i < scenario_definition->netgame_equipment.count; i++)
 	{
-		scenario_netgame_equipment* netgame_equipment = scenario_definition->netgame_equipment[i];
+		scenario_netgame_equipment* netgame_equipment = TAG_BLOCK_GET_ELEMENT(&scenario_definition->netgame_equipment, i, scenario_netgame_equipment);
 		if (netgame_equipment->item_vehicle_collection.group.group == _tag_group_vehicle_collection)
 		{
 			netgame_equipment->classification = netgame_item_classification_powerup;
@@ -431,19 +431,19 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 		{
 			if (!shell_is_dedicated_server())
 			{
-				if (player->properties[0].team_index != k_zombie_team)
+				if (player->configuration.team_index != k_zombie_team)
 				{
 					if (player->user_index != NONE)
 					{
-						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", player->properties[0].player_name, player->identifier);
+						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", player->configuration.player_name, player->identifier);
 						user_interface_controller_set_desired_team_index(player->controller_index, k_zombie_team);
 						user_interface_controller_update_network_properties(player->controller_index);
-						player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+						player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
 					}
 					else
 					{
 						//if not, then this is a new zombie
-						event(_event_verbose, "h2mod:infection: Player died, name=%ws, identifer=%llu", player->properties[0].player_name, player->identifier);
+						event(_event_verbose, "h2mod:infection: Player died, name=%ws, identifer=%llu", player->configuration.player_name, player->identifier);
 						Infection::triggerSound(_snd_new_zombie, 1000);
 					}
 				}
@@ -505,7 +505,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 				if(team == k_zombie_team)
 				{
 					event(_event_verbose, "h2mod:infection: Client is infected! switching bipeds: %d", player_abs_index);
-					player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+					player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
 				}
 			}
 		}
@@ -542,7 +542,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 				}
 				else if (team == k_zombie_team)
 				{
-					player->properties[0].profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+					player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
 					player_user_weapon_interaction_set(player->user_index, false);
 					hud_player_indicators_draw_enabled_set(player->user_index, true);
 				}

@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "user_interface_player_widget.h"
+
+#include "networking/network_game_definitions.h"
 
 // c_player_widget virtual functions
 
@@ -13,14 +14,14 @@ void c_player_widget::setup_children()
 }
 
 
-c_player_widget_representation::c_player_widget_representation()
+c_player_widget_representation::c_player_widget_representation(void)
 {
 	m_flags = 0;
 }
 
-void c_player_widget_representation::set_player_name_from_configuration(s_player_properties* configuration)
+void c_player_widget_representation::set_player_name_from_configuration(s_player_configuration* configuration)
 {
-	INVOKE_TYPE(0x2205BD, 0x0, void(__thiscall*)(c_player_widget_representation*, s_player_properties*), this, configuration);
+	INVOKE_TYPE(0x2205BD, 0x0, void(__thiscall*)(c_player_widget_representation*, s_player_configuration*), this, configuration);
 }
 
 void c_player_widget_representation::set_player_rank(int32 rank)

@@ -442,6 +442,11 @@ public:
 	virtual bool overlay_effect_is_disabled();
 	virtual void set_favourites_bitmap_visible(bool show_icon);
 
+	e_user_interface_screen_id screen_id_get(void) const
+	{
+		return m_screen_id;
+	}
+
 private:
 	template<typename T>
 	static T c_screen_widget_base_vtable_get_func_ptr(DWORD idx)

@@ -1,6 +1,13 @@
 #pragma once
 
-#define k_tag_group_count 120
+/* constants */
+
+enum
+{
+	k_tag_group_count = 120
+};
+
+/* enums */
 
 enum e_tag_group : int32
 {
@@ -127,6 +134,8 @@ enum e_tag_group : int32
 	_tag_group_none = NONE
 };
 
+/* structures */
+
 union tag_group 
 {
 	e_tag_group group;
@@ -140,12 +149,17 @@ struct s_tag_group_link
 	tag_group parent;
 };
 
-
 struct s_tag_block
 {
 	int32 count;
 	int32 data;
 };
+
+/* macros */
+
+#define TAG_BLOCK_GET_ELEMENT(block_address, index, type) ((type*)tag_block_get_element_with_size((block_address), (index), sizeof(type)))
+
+/* prototypes */
 
 s_tag_group_link* tag_group_get_link_set(tag_group group);
 
@@ -155,4 +169,8 @@ int32 tag_group_get_as_index(tag_group group);
 
 void* __cdecl tag_block_get_element_with_size(const s_tag_block* block, int32 index, int32 block_size);
 
-void __cdecl set_tag_group_data_info(uint32 tag_data, uint32 tag_data_size);
+void __cdecl tag_group_set_data_info(uint32 tag_data, uint32 tag_data_size);
+
+bool string_id_load_strings(const struct cache_file_header* header);
+
+const char* string_id_get_string_const(int32 id);

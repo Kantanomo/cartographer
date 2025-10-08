@@ -1,7 +1,5 @@
 #pragma once
 
-#define k_maximum_string_id_storage 393216
-
 /*********************************************************************
 * string_id
 * 4 BYTE Special Tag Structure for String Values

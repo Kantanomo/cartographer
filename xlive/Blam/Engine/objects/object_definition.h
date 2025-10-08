@@ -15,7 +15,6 @@ enum
 	k_maximum_object_functions = 256,
 	k_maximum_number_of_attachments_per_object = 16,
 	MAXIMUM_WIDGETS_PER_OBJECT = 4,
-	k_object_change_color_count = 4,
 	MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_INITIAL_PERMUTATIONS = 32,
 	MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_FUNCTIONS = 4
 };

@@ -3,7 +3,7 @@
 #include "user_interface_screen_widget_definition.h"
 
 #include "game/game_allegiance.h"
-#include "game/players.h"
+#include "saved_games/player_profile.h"
 
 /* classes */
 
@@ -39,8 +39,8 @@ private:
 	real_rgb_color m_change_colors;
 
 public:
-	c_player_widget_representation();
-	void set_player_name_from_configuration(s_player_properties* configuration);
+	c_player_widget_representation(void);
+	void set_player_name_from_configuration(struct s_player_configuration* configuration);
 	void set_player_rank(int32 rank);
 	void set_player_team(e_game_team team);
 	void set_player_team_name(string_id team_name);

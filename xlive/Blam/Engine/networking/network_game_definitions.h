@@ -21,7 +21,7 @@ struct s_clan_identifiers
 };
 ASSERT_STRUCT_SIZE(s_clan_identifiers, 12);
 
-struct s_player_properties
+struct s_player_configuration
 {
 	wchar_t player_name[XUSER_NAME_SIZE];
 	int32 spawn_protection_time;
@@ -40,4 +40,4 @@ struct s_player_properties
 	int8 achievement_flags;
 	int8 unk2;
 };
-ASSERT_STRUCT_SIZE(s_player_properties, 132);
+ASSERT_STRUCT_SIZE(s_player_configuration, 132);

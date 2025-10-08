@@ -1,6 +1,20 @@
 #include "stdafx.h"
 #include "unicode.h"
 
+#include "shell/shell_windows.h"
+
+/* prototypes */
+
+static utf32 wchar_escape_character_to_utf32(wchar_t character, char* out_found_escape_character);
+
+static void unicode_search_for_escape_sequence_set(bool value);
+
+static bool unicode_search_for_escape_sequence(void);
+
+/* globals */
+
+static uint32 g_last_escape_character_error_time = 0;
+
 /* public code */
 
 int32 ustrcmp(const wchar_t* string1, const wchar_t* string2)
@@ -442,4 +456,112 @@ bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name)
 
 
 	return err == ERROR_SUCCESS;
+}
+
+utf32 ascii_string_to_utf32_characters(const char* in_src, const char** out_next)
+{
+	const char* next = in_src + 1;
+
+	utf32 result = { 0 };
+	if (in_src[0] == L'|')
+	{
+		char found_escape_character = '\0';
+		result = wchar_escape_character_to_utf32(next[0], &found_escape_character);
+		if (in_src)
+		{
+			++next;
+		}
+	}
+	else if (in_src[0] > 127)
+	{
+		result = { _unicode_character_not_found };
+	}
+	else
+	{
+		result = { (uint32)in_src[0] };
+	}
+	
+	ASSERT(out_next != NULL);
+
+	*out_next = next;
+	return result;
+}
+
+utf32 __cdecl wchar_string_to_utf32_characters(const wchar_t* in_src, const wchar_t** out_next)
+{
+	return INVOKE(0x4BF59, 0x0, wchar_string_to_utf32_characters, in_src, out_next);
+}
+
+void __cdecl ascii_string_to_utf32_string(const char* string, utf32* utf32_string, int32 count)
+{
+	string_to_utf32_string<char>(string, utf32_string, ascii_string_to_utf32_characters, count);
+	return;
+}
+
+void __cdecl wchar_string_to_utf32_string(const wchar_t* string, utf32* utf32_string, int32 count)
+{
+	string_to_utf32_string<wchar_t>(string, utf32_string, wchar_string_to_utf32_characters, count);
+	return;
+}
+
+/* private code */
+
+static utf32 wchar_escape_character_to_utf32(wchar_t character, char* out_found_escape_character)
+{
+	char escape_character = '\0';
+
+	ASSERT(out_found_escape_character != NULL);
+
+	const s_escape_table table[7] =
+	{
+		{L'|', (e_utf32)'|' },
+		{L'l', _unicode_private_use_justification_left },
+		{L'r', _unicode_private_use_justification_right },
+		{L'c', _unicode_private_use_justification_center },
+		{L'n', (e_utf32)'\r' },
+		{L't', (e_utf32)'\t' },
+		{L'\0', (e_utf32)'\0' }
+	};
+
+	utf32 result = { '|' };
+
+	if (unicode_search_for_escape_sequence())
+	{
+		for (size_t i = 0; table[i].wchar_character; ++i)
+		{
+			if (character == table[i].wchar_character)
+			{
+				escape_character = '\x01';
+				result.character = table[i].unicode_character;
+				break;
+			}
+		}
+		if (!escape_character)
+		{
+			if (character)
+			{
+				const uint32 time = system_milliseconds();
+				if (time > g_last_escape_character_error_time)
+				{
+					g_last_escape_character_error_time = time + 60000;
+					error(_error_silent, "found an unknown escape sequence '|%c'", character);
+				}
+			}
+		}
+	}
+
+	*out_found_escape_character = escape_character;
+	return result;
+}
+
+static void unicode_search_for_escape_sequence_set(bool value)
+{
+	*Memory::GetAddress<bool*>(0x412A44) = value;
+	return;
+}
+
+
+static bool unicode_search_for_escape_sequence(void)
+{
+	return *Memory::GetAddress<bool*>(0x412A44);
 }

@@ -5,6 +5,8 @@
 
 #include "cache/cache_files.h"
 #include "creatures/creature_definitions.h"
+#include "game/game_engine.h"
+#include "objects/object_location.h"
 #include "physics/collision_model_definitions.h"
 #include "physics/physics_model_definitions.h"
 #include "rasterizer/dx9/rasterizer_dx9_vertex_shaders.h"

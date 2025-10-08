@@ -216,8 +216,8 @@ static void map_slots_get_multiplayer_level_data(FILE* map_handle, s_multiplayer
 	ASSERT(multiplayer_level_data);
 
 	// Read cache header from map file
-	s_cache_header cache_header;
-	file_seek_and_read(map_handle, 0, sizeof(s_cache_header), 1, &cache_header);
+	cache_file_header cache_header;
+	file_seek_and_read(map_handle, 0, sizeof(cache_file_header), 1, &cache_header);
 
 	// Read tags header from map file
 	cache_file_tags_header cache_file_tags_header;

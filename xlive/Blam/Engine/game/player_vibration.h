@@ -47,7 +47,7 @@ void __cdecl rumble_player_set_scripted_scale(real32 scale);
 
 void __cdecl rumble_player_continuous(int32 user_index, real32 rumble_intensity_left, real32 rumble_intensity_right);
 
-void player_vibration_apply_patches(void);
+void vibration_update(real32 dt);
 
-void __cdecl vibration_update(real32 dt);
+void __cdecl vibration_clear_all_now(void);
 

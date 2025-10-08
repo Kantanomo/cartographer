@@ -104,6 +104,8 @@ s_saved_game_main_menu_globals* saved_game_main_menu_globals_get();
 
 s_saved_game_files_globals* saved_game_files_globals_get();
 
+void __cdecl saved_game_files_update(void);
+
 bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* out_info, uint32 enumerated_index);
 
 const wchar_t* saved_games_get_file_type_as_string(e_saved_game_file_type file_type);

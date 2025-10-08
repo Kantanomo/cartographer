@@ -56,9 +56,11 @@ struct utf32
 
 enum
 {
+	BYTE_MAX = 255,
 	k_kilo = 1024,
 	SHORT_MAX = 32767,
-	k_unsigned_short_max = 0xffff
+	k_unsigned_short_max = 0xffff,
+	NONE = -1,
 };
 
 #define EOL_STRING "\r\n"
@@ -82,41 +84,17 @@ extern bool g_catch_exceptions;
 
 /* macros */
 
-#define NONE (-1)
+#define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
+#define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
+
 #define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)(((_salt) << 16) | (_absolute_index))
-#define DATUM_INDEX_TO_ABSOLUTE_INDEX(_datum_index) ((uint16)((_datum_index) & 0xFFFF))
-#define DATUM_INDEX_TO_IDENTIFIER(_datum_index) ((uint16)(((_datum_index) >> 16) & 0xFFFF))
+#define DATUM_INDEX_TO_ABSOLUTE_INDEX(_datum_index) ((uint16)((_datum_index) & k_unsigned_short_max))
+#define DATUM_INDEX_TO_IDENTIFIER(_datum_index) ((uint16)(((_datum_index) >> 16) & k_unsigned_short_max))
 
 #define NUMBEROF(_array) (sizeof(_array) / sizeof(*_array))
 #define IN_RANGE(value, begin, end) (((value) >= (begin)) && ((value) <= (end)))
 #define VALID_INDEX(index, count) ((index) >= 0 && (index) < (count))
 #define VALID_COUNT(index, count) ((index) >= 0 && (index) <= (count))
-
-// TODO remove padding macros
-// Explanation:
-// Harder to debug memory with it since types dont show up in the watch view
-// Some values assigned to these macros actually contain data but are assigned incorrectly as padding
-
-// PADDING MACROS
-#define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
-#define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
-// Pad the desired length of BYTES and also hides it
-#define PAD(BYTES)  char J(Unused_, __LINE__ )[BYTES];       
-
-/// Add an anonymous 8-bit (1 byte) field to a structure.
-#define PAD8 unsigned char : 8;
-/// Add an anonymous 16-bit (2 byte) field to a structure.
-#define PAD16 unsigned short : 16;
-/// Add an anonymous 24-bit field to a structure.
-#define PAD24 unsigned char : 8; unsigned short : 16;
-/// Add an anonymous 32-bit (4 byte) field to a structure.
-#define PAD32 unsigned long : 32;
-/// Add an anonymous 48-bit field to a structure.
-#define PAD48 unsigned short : 16; unsigned long : 32;
-/// Add an anonymous 64-bit (8 byte) field to a structure.
-#define PAD64 unsigned __int64 : 64;
-/// Add an anonymous 128-bit (16 byte) field to a structure.
-#define PAD128 unsigned __int64 : 64; unsigned __int64 : 64;
 
 // Use this for setting up enum bitfields
 #define FLAG(bit) ( (unsigned)1 << (unsigned)(bit) )
@@ -181,6 +159,8 @@ ASSERT_EXCEPTION(STATEMENT, true);	\
 
 #define unreachable() DISPLAY_ASSERT("unreachable")
 
+#define halt() DISPLAY_ASSERT("halt()")
+
 #else
 #define ASSERT_TRIGGER_EXCEPTION()							(void)(0)
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)   (void)(#STATEMENT)
@@ -189,6 +169,7 @@ ASSERT_EXCEPTION(STATEMENT, true);	\
 #define ASSERT(STATEMENT)                                   (void)(#STATEMENT)
 
 #define unreachable() (void)(0)
+#define halt() (void)(0)
 
 #endif // _DEBUG
 
@@ -209,7 +190,13 @@ void* csmemset(void* destination, int32 val, size_t size);
 
 void* csmemcpy(void* destination, const void* source, size_t size);
 
-int csmemcmp(const void* p1, const void* p2, size_t size);
+int32 csmemcmp(const void* p1, const void* p2, size_t size);
+
+int32 ascii_stricmp(const char* s1, const char* s2);
+
+int32 csstrnicmp(const char* s1, const char* s2, size_t size);
+
+int32 csstricmp(const char* s1, const char* s2);
 
 int32 vsprintf(char* buffer, size_t size, const char* format, char* ap);
 
@@ -235,15 +222,19 @@ char* csnappendf(char* s, size_t size, const char* format, ...);
 
 char* csstrncpy(char* s1, const char* s2, size_t size);
 
+wchar_t* ustrncpy_debug(wchar_t* s1, const wchar_t* s2, size_t size);
+
 char* csstrncat(char* s1, char const* s2, size_t size);
 
 size_t cstrlen(const char* s);
 
 char* csstrnupr(char* s, size_t size);
 
-int32 csstricmp(const char* s1, const char* s2);
+int32 csstrcmp(const char* s1, const char* s2);
 
 int32 csstrncmp(const char* s1, const char* s2, size_t size);
 
 // Convert string to lowercase
 char* csstrnlwr(char* s, size_t size);
+
+char* strchr(char* str, int32 ch);

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "game_engine.h"
 
+#include "saved_games/player_profile.h"
+
 /* public code */
 
 c_game_engine* current_game_engine(void)

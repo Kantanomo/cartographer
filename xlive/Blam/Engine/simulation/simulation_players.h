@@ -39,7 +39,7 @@ struct simulation_player_update
 	int32 controller_index;
 	bool player_left_game;
 	int8 pad[3];
-	s_player_properties properties;
+	s_player_configuration properties;
 	int32 swap_player_index;
 	s_player_identifier swap_player_identifier;
 };

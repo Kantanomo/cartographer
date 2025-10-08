@@ -100,8 +100,12 @@ struct s_sound_manager_globals
 };
 ASSERT_STRUCT_SIZE(s_sound_manager_globals, 492);
 
+/* prototypes */
+
 void __cdecl sound_initialize(void);
 
-void __cdecl sound_idle();
+void __cdecl sound_render(void);
+
+void __cdecl sound_idle(void);
 
 void __cdecl sound_pause(bool a1);

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "cseries.h"
 
+#include "main/main.h"
 #include "shell/shell.h"
 
 /* constants */
@@ -64,7 +65,7 @@ void display_assert(const char* condition, char const* file, int32 line, bool as
 		if (!is_debugger_present())
 		{
 			RaiseException(0x73746Bu, 0, 0, 0);
-			// halt_and_catch_fire();
+			main_halt_and_catch_fire();
 			// cseries_windows_trigger_debug_window(-1, condition);
 		}
 	}
@@ -112,11 +113,78 @@ void* csmemcpy(void* destination, const void* source, size_t size)
 	return memcpy(destination, source, size);
 }
 
-int csmemcmp(const void* p1, const void* p2, size_t size)
+int32 csmemcmp(const void* p1, const void* p2, size_t size)
 {
 	ASSERT(size == 0 || (p1 && p2));
 	ASSERT(size >= 0 && size < MAXIMUM_MEMCMP_SIZE);
 	return memcmp(p1, p2, size);
+}
+
+int32 ascii_stricmp(const char* s1, const char* s2)
+{
+	ASSERT(s1 && s2);
+
+	int32 result;
+	for (int32 i = 0; ; ++i)
+	{
+		const wint_t char1 = towlower(s1[i]);
+		const wint_t char2 = towlower(s2[i]);
+
+		if (!char1)
+		{
+			result = -(char2 != 0);
+			break;
+		}
+
+		if (!char2)
+		{
+			result = char1 != 0;
+			break;
+		}
+
+		if (char1 != char2)
+		{
+			result = 2 * (char1 > char2) - 1;
+			break;
+		}
+	}
+	return result;
+}
+
+int32 csstrnicmp(const char* s1, const char* s2, size_t size)
+{
+	ASSERT(s1 && s2);
+
+	int32 result = 0;
+	for (size_t i = 0; i != size; ++i)
+	{
+		const wint_t char1 = towlower(s1[i]);
+		const wint_t char2 = towlower(s2[i]);
+
+		if (!char1)
+		{
+			result = -(char2 != 0);
+			break;
+		}
+
+		if (!char2)
+		{
+			result = char1 != 0;
+			break;
+		}
+
+		if (char1 != char2)
+		{
+			result = 2 * (char1 > char2) - 1;
+			break;
+		}
+	}
+	return result;
+}
+
+int32 csstricmp(const char* s1, const char* s2)
+{
+	return ascii_stricmp(s1, s2);
 }
 
 int32 vsprintf(char* buffer, size_t size, const char* format, char* ap)
@@ -138,6 +206,9 @@ int32 vsnprintf(char* buffer, size_t size, size_t max_count, const char* format,
 	const int32 result = (int32)_vsnprintf_s(buffer, size, max_count, format, ap);
 	return result;
 }
+
+
+
 
 const char* csprintf(char* buffer, size_t size, const char* format, ...)
 {
@@ -193,7 +264,15 @@ char* csstrncpy(char* s1, const char* s2, size_t size)
 {
 	ASSERT(s1 && s2);
 	ASSERT(size > 0 && size < MAXIMUM_STRING_SIZE);
-	strncpy_s(s1, size, s2, UINT_MAX);
+	strncpy_s(s1, size, s2, _TRUNCATE);
+	return s1;
+}
+
+wchar_t* ustrncpy_debug(wchar_t* s1, const wchar_t* s2, size_t size)
+{
+	ASSERT(s1 && s2);
+	ASSERT(size > 0 && size < MAXIMUM_STRING_SIZE);
+	wcsncpy_s(s1, size, s2, _TRUNCATE);
 	return s1;
 }
 
@@ -201,7 +280,7 @@ char* csstrncat(char* s1, char const* s2, size_t size)
 {
 	ASSERT(s1 && s2);
 	ASSERT(size > 0 && size <= MAXIMUM_STRING_SIZE);
-	strncat_s(s1, size, s2, UINT_MAX);
+	strncat_s(s1, size, s2, _TRUNCATE);
 	return s1;
 }
 
@@ -226,7 +305,7 @@ char* csstrnupr(char* s, size_t size)
 	return s;
 }
 
-int32 csstricmp(const char* s1, const char* s2)
+int32 csstrcmp(const char* s1, const char* s2)
 {
 	ASSERT(s1 && s2);
 	return strcmp(s1, s2);
@@ -258,4 +337,9 @@ char* csstrnlwr(char* s, size_t size)
 	}
 
 	return s;
+}
+
+char* strchr(char* str, int32 ch)
+{
+	return std::strchr(str, ch);
 }

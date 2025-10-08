@@ -106,3 +106,5 @@
 #define XN_PARTY_FIRST                                   XNID(0, _XNAREA_PARTY, 0x0001)
 #define XN_PARTY_MEMBERS_CHANGED                         XNID(4, _XNAREA_PARTY, 0x0002)
 #define XN_PARTY_LAST                                    XNID(XNID_CURRENTVERSION+1, _XNAREA_PARTY, 0x0006)
+
+int WINAPI XNotifyDelayUI(int a1);

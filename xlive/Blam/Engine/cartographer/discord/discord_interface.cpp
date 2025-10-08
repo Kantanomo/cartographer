@@ -2,7 +2,7 @@
 #include "discord_interface.h"
 
 #include "game/game.h"
-#include "main/main_game.h"
+#include "game/game_globals.h"
 #include "networking/logic/life_cycle_manager.h" 
 #include "networking/session/network_session.h"
 #include "networking/session/network_observer.h"

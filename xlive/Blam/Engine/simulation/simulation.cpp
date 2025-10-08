@@ -36,6 +36,12 @@ bool simulation_reset_in_progress()
 	return simulation_get_globals()->simulation_reset_in_progress;
 }
 
+void __cdecl simulation_update(void)
+{
+	INVOKE(0x1AE7C5, 0x1A8A1F, simulation_update);
+	return;
+}
+
 bool simulation_starting_up(void)
 {
 	const s_simulation_globals* simulation_globals = simulation_get_globals();
@@ -139,7 +145,7 @@ c_simulation_type_collection* simulation_get_type_collection()
 	return c_simulation_type_collection::get();
 }
 
-void __cdecl simulation_apply_before_game(const simulation_update* update)
+void __cdecl simulation_apply_before_game(const struct simulation_update* update)
 {
 	ASSERT(update != NULL);
 	ASSERT(simulation_get_globals()->initialized);
@@ -234,13 +240,13 @@ void __cdecl simulation_apply_before_game(const simulation_update* update)
 	return;
 }
 
-void simulation_apply_after_game(const simulation_update* update)
+void simulation_apply_after_game(const struct simulation_update* update)
 {
 	// This never did anything
 	return;
 }
 
-void __cdecl simulation_build_update(simulation_update* update)
+void __cdecl simulation_build_update(struct simulation_update* update)
 {
 	s_simulation_globals* simulation_globals = simulation_get_globals();
 
@@ -261,17 +267,17 @@ void __cdecl simulation_build_update(simulation_update* update)
 	return;
 }
 
-void __cdecl simulation_update_aftermath(const simulation_update* update)
+void __cdecl simulation_update_aftermath(const struct simulation_update* update)
 {
 	INVOKE(0x1ADEA9, 0x1A8260, simulation_update_aftermath, update);
 	return;
 }
 
-void __cdecl simulation_update_pregame(void)
+void simulation_update_pregame(void)
 {
 	ASSERT(!simulation_in_progress());
 
-	simulation_update update;
+	struct simulation_update update;
 	s_simulation_globals* simulation_globals = simulation_get_globals();
 
 	if (simulation_globals->initialized && game_in_progress() && !simulation_is_paused())
@@ -287,9 +293,10 @@ void __cdecl simulation_update_pregame(void)
 			simulation_globals->world->queues_update_statistics();
 		}
 	}
+	return;
 }
 
-void simulation_destroy_update(simulation_update* update)
+void simulation_destroy_update(struct simulation_update* update)
 {
 	ASSERT(update);
 	s_simulation_globals* simulation_globals = simulation_get_globals();
@@ -327,7 +334,6 @@ void simulation_apply_patches(void)
 	simulation_entity_database_apply_patches();
 	simulation_game_action_apply_patches();
 
-	PatchCall(Memory::GetAddress(0x39D73, 0xC0F8), simulation_update_pregame);			// main_loop_body
 	PatchCall(Memory::GetAddress(0x1DD22F, 0x1C46E3), simulation_build_player_updates);	// c_simulation_world::build_update
 
 	WriteJmpTo(Memory::GetAddress(0x1AE6D8, 0x1A8932), simulation_reset);

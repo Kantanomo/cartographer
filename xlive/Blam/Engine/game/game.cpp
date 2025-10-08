@@ -19,7 +19,7 @@
 #include "math/random_math.h"
 #include "main/interpolator.h"
 #include "main/main.h"
-#include "main/main_game_time.h"
+#include "main/main_time.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "objects/lights.h"
 #include "physics/havok.h"
@@ -30,13 +30,9 @@
 #include "simulation/simulation.h"
 #include "sound/game_sound_deterministic.h"
 #include "text/unicode.h"
-#include "rasterizer/rasterizer_globals.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 /* typedefs */
 
-typedef void(__cdecl* game_frame_t)(real32);
-typedef void(__cdecl* t_main_loop_process_global_state_changes)();
 
 /* structures */
 
@@ -45,11 +41,9 @@ typedef void(__cdecl* t_main_loop_process_global_state_changes)();
 
 static void set_main_game_globals(game_globals_storage* main);
 
-static void __cdecl main_loop_process_global_state_changes_hook(void);
-
 static void game_info_initialize_for_new_map(const s_game_options* options);
 
-static void __cdecl game_tick_pulse_random_seed_deterministic(const simulation_update* update);
+static void __cdecl game_tick_pulse_random_seed_deterministic(const struct simulation_update* update);
 
 static void __cdecl game_update_pvs(void);
 
@@ -60,10 +54,6 @@ static void __cdecl game_finished_update(void);
 static void __cdecl game_save_update(void);
 
 /* globals */
-
-game_frame_t p_game_frame;
-t_main_loop_process_global_state_changes p_main_loop_process_global_state_changes;
-
 
 void game_apply_pre_winmain_patches(void)
 {
@@ -82,16 +72,11 @@ void game_apply_pre_winmain_patches(void)
 	// Get original game_frame function
 	if (!shell_is_dedicated_server())
 	{
-		p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC, 0x41F7D);
-
-		PatchCall(Memory::GetAddress(0x39D45, 0xC0D4), game_frame);
-
 		// main_loop_process_global_state
 		// nop cmp
 		NopFill(Memory::GetAddress(0x3978B), 2);
 		// then force jmp
 		WriteValue(Memory::GetAddress(0x3978D), (uint8)0xEB);
-		DETOUR_ATTACH(p_main_loop_process_global_state_changes, Memory::GetAddress<t_main_loop_process_global_state_changes>(0x39783), main_loop_process_global_state_changes_hook);
 	}
 	return;
 }
@@ -151,15 +136,26 @@ bool game_is_ui_shell(void)
 
 bool game_is_distributed(void)
 {
-	const e_game_simulation simulation_type = game_options_get()->simulation_type;
+	const e_game_simulation simulation_type = game_options_get()->game_simulation;
 	return simulation_type == _game_simulation_distributed_client || simulation_type == _game_simulation_distributed_server;
+}
+
+e_game_simulation game_simulation_get(void)
+{
+	return game_options_get()->game_simulation;
+}
+
+bool game_is_networked(void)
+{
+	e_game_simulation simulation_type = game_simulation_get();
+	return simulation_type >= _game_simulation_synchronous_client && simulation_type <= _game_simulation_distributed_server;
 }
 
 bool game_is_server(void)
 {
 	const s_game_options* options = game_options_get();
 
-	return !(options->simulation_type == _game_simulation_synchronous_client || options->simulation_type == _game_simulation_distributed_client);
+	return !(options->game_simulation == _game_simulation_synchronous_client || options->game_simulation == _game_simulation_distributed_client);
 }
 
 int16 game_get_active_structure_bsp_index()
@@ -182,7 +178,7 @@ void __cdecl game_shell_set_in_progress(void)
 
 bool game_is_predicted(void)
 {
-	return game_options_get()->simulation_type == _game_simulation_distributed_client;
+	return game_options_get()->game_simulation == _game_simulation_distributed_client;
 }
 
 bool game_in_progress(void)
@@ -207,7 +203,7 @@ bool game_is_active(void)
 
 bool game_is_authoritative(void)
 {
-	return game_options_get()->simulation_type != _game_simulation_distributed_client;
+	return game_options_get()->game_simulation != _game_simulation_distributed_client;
 }
 
 s_game_cluster_bit_vectors* game_get_cluster_activation(void)
@@ -260,7 +256,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, in
 		for (int32 i = 0; i < k_number_of_users; i++)
 		{
 			s_player_identifier temp_identifier;
-			s_player_properties temp_properties;
+			s_player_configuration temp_properties;
 			if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties(i, 0, &temp_properties, 0, 0))
 			{
 				ustrncpy(local_usernames[valid_local_player_count], temp_properties.player_name, NUMBEROF(temp_properties.player_name));
@@ -324,8 +320,8 @@ void __cdecl game_dispose(void)
     
 	halo_interpolator_dispose();
 
-    // reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_hook())
-    timeEndPeriod(SYSTEM_TIMER_RESOLUTION_MS);
+    // Reset time resolution to system default on game exit
+    timeEndPeriod(k_system_timer_resolution_ms);
     return;
 }
 
@@ -483,18 +479,6 @@ void __cdecl game_frame(real32 dt)
 static void set_main_game_globals(game_globals_storage* main)
 {
 	*Memory::GetAddress<game_globals_storage**>(0x482D3C, 0x4CB520) = main;
-	return;
-}
-
-static void __cdecl main_loop_process_global_state_changes_hook(void)
-{
-	IDirect3DDevice9* d3d_device = rasterizer_dx9_device_get_interface();
-
-	if (d3d_device && FAILED(d3d_device->TestCooperativeLevel()))
-	{
-		rasterizer_globals_get()->reset_screen = true;
-	}
-	p_main_loop_process_global_state_changes();
 	return;
 }
 

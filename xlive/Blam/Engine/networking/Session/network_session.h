@@ -263,7 +263,8 @@ struct s_membership_player
 	bool properties_valid;
 	char pad[1];
 	int32 controller_index;
-	s_player_properties properties[2];
+	s_player_configuration configuration;
+	s_player_configuration desired_configuration;
 	uint32 player_voice;
 	uint32 player_text_chat;
 };
@@ -291,7 +292,7 @@ struct s_session_interface_user
 	s_player_identifier network_user_identifier;
 	uint8 gap_B[3];
 	e_controller_index controller_index;
-	s_player_properties properties;
+	s_player_configuration properties;
 	int32 player_voice_exists;
 	int32 player_text_chat_exists;
 	uint32 field_A0[2];
@@ -477,7 +478,7 @@ public:
 
 	const wchar_t* get_player_name(datum player_index)
 	{
-		return get_player_membership(player_index)->properties[0].player_name;
+		return get_player_membership(player_index)->configuration.player_name;
 	}
 
 	int32 get_local_peer_index() const
@@ -657,7 +658,7 @@ public:
 	{
 		if (is_host())
 		{
-			get_player_membership(player_index)->properties[0].team_index = (int8)team_index;
+			get_player_membership(player_index)->configuration.team_index = (int8)team_index;
 			request_membership_update();
 		}
 	}
@@ -724,5 +725,5 @@ e_network_session_class network_squad_session_get_session_class();
 bool network_session_interface_set_local_user_character_type(int32 user_index, e_character_type character_type);
 bool network_session_interface_get_local_user_identifier(int32 user_index, s_player_identifier* out_identifier);
 void network_session_interface_set_local_user_rank(int32 user_index, int8 rank);
-bool __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_properties* out_properties, int32* out_player_voice, int32* out_player_text_chat);
+bool __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_configuration* out_properties, int32* out_player_voice, int32* out_player_text_chat);
 void __cdecl network_globals_switch_environment(int32 a1, bool a2);

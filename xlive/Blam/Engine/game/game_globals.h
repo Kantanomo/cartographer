@@ -4,6 +4,7 @@
 #include "bitmaps/bitmap_group.h"
 #include "camera/camera_track_definition.h"
 #include "interface/interface.h"
+#include "math/color_math.h"
 #include "main/game_preferences.h"
 #include "main/level_definitions.h"
 #include "objects/damage.h"
@@ -18,6 +19,18 @@ enum
 	NUMBER_OF_GLOBAL_SOUNDS = 2,
 	k_maximum_material_types = 256,
 	k_game_globals_maximum_multiplayer_colors = 32
+};
+
+enum e_campaign_difficulty_level
+{
+	_campaign_difficulty_level_easy = 0,
+	_campaign_difficulty_level_normal = 1,
+	_campaign_difficulty_level_hard = 2,
+	_campaign_difficulty_level_impossible = 3,
+	k_campaign_difficulty_levels_count,
+
+	k_campaign_difficulty_level_bits = 2,
+	k_campaign_difficulty_level_none = NONE,
 };
 
 enum e_game_globals_rasterizer_flags : int16

@@ -130,7 +130,7 @@ s_player_identifier NetworkSession::GetPlayerId(datum player_index)
 
 int8 NetworkSession::GetPlayerTeam(datum player_index)
 {
-	return GetActiveNetworkSession()->get_player_membership(player_index)->properties[0].team_index;
+	return GetActiveNetworkSession()->get_player_membership(player_index)->configuration.team_index;
 }
 
 void NetworkSession::KickPeer(int32 peer_index)
@@ -240,7 +240,7 @@ void network_session_interface_set_local_user_rank(int32 user_index, int8 rank)
 	return;
 }
 
-bool __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_properties* out_properties, int32* out_player_voice, int32* out_player_text_chat)
+bool __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_configuration* out_properties, int32* out_player_voice, int32* out_player_text_chat)
 {
 	return INVOKE(0x1B10E0, 0x1970A8, network_session_interface_get_local_user_properties, user_index, out_controller_index, out_properties, out_player_voice, out_player_text_chat);
 }
@@ -269,7 +269,7 @@ void network_session_membership_update_local_players_teams()
 				if (player_index != NONE)
 				{
 					const s_membership_player* membership_player = session->get_player_membership(player_index);
-					user_interface_controller_set_desired_team_index((e_controller_index)i, (e_game_team)membership_player->properties[0].team_index);
+					user_interface_controller_set_desired_team_index((e_controller_index)i, (e_game_team)membership_player->configuration.team_index);
 					user_interface_controller_update_network_properties((e_controller_index)i);
 				}
 			}
@@ -286,11 +286,11 @@ void network_session_set_player_team(datum player_index, e_game_team team)
 			&& session->is_host())
 		{
 			s_membership_player* membership_player = session->get_player_membership(player_index);
-			membership_player->properties[0].team_index = (int8)team;
+			membership_player->configuration.team_index = (int8)team;
 
 			if (session->peer_index_local_peer(membership_player->peer_index))
 			{
-				user_interface_controller_set_desired_team_index((e_controller_index)membership_player->controller_index, (e_game_team)membership_player->properties[0].team_index);
+				user_interface_controller_set_desired_team_index((e_controller_index)membership_player->controller_index, (e_game_team)membership_player->configuration.team_index);
 				user_interface_controller_update_network_properties((e_controller_index)membership_player->controller_index);
 			}
 		}
@@ -342,7 +342,7 @@ void c_network_session::switch_players_to_teams(datum* player_indexes, int32 pla
 		for (int32 i = 0; i < player_count; i++)
 		{
 			s_membership_player* player_membership = get_player_membership(player_indexes[i]);
-			player_membership->properties[0].team_index = (int8)team_indexes[i];
+			player_membership->configuration.team_index = (int8)team_indexes[i];
 		}
 		request_membership_update();
 		network_session_membership_update_local_players_teams();

@@ -1,5 +1,7 @@
 #pragma once
 #include "object_definition.h"
+#include "object_scenario_definitions.h"
+
 #include "objects.h"
 
 /* enums */
@@ -24,6 +26,17 @@ enum e_scenery_lightmapping_policy : int16
 	_scenery_lightmapping_policy_per_pixel = 1,		// not implemented
 	_scenery_lightmapping_policy_dynamic = 2,
 	_scenery_lightmapping_policy_none = NONE
+};
+
+enum e_scenery_valid_multiplayer_games : int16
+{
+	_scenery_valid_multiplayer_game_capture_the_flag_bit = 0,
+	_scenery_valid_multiplayer_game_slayer_bit = 1,
+	_scenery_valid_multiplayer_game_oddball_bit = 2,
+	_scenery_valid_multiplayer_game_king_of_the_hill_bit = 3,
+	_scenery_valid_multiplayer_game_juggernaut_bit = 4,
+	_scenery_valid_multiplayer_game_territories_bit = 5,
+	_scenery_valid_multiplayer_game_assault_bit = 6,
 };
 
 /* structures */
@@ -66,3 +79,29 @@ struct scenery_datum
 	_scenery_datum scenery;
 };
 ASSERT_STRUCT_SIZE(scenery_datum, 316)
+
+struct s_scenario_scenery_datum
+{
+	e_scenery_pathfinding_policy pathfinding_policy;
+	e_scenery_lightmapping_policy lightmapping_policy;
+	s_tag_block pathfinding_references;	// struct: pathfinding_object_index_list
+	int16 pad;
+	e_scenery_valid_multiplayer_games valid_multiplayer_games;
+};
+ASSERT_STRUCT_SIZE(s_scenario_scenery_datum, 16);
+
+// max count: MAXIMUM_SCENERY_DATUMS_PER_SCENARIO 2000
+struct s_scenario_scenery
+{
+	// filt
+	// Block index: scenario_scenery_palette
+	int16 type;
+	// filt
+	// Block index: scenario_object_name
+	int16 name;
+
+	s_scenario_object_datum object_data;
+	s_scenario_object_permutation permutation_data;
+	s_scenario_scenery_datum scenery_data;
+};
+ASSERT_STRUCT_SIZE(s_scenario_scenery, 92);

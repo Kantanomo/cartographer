@@ -33,7 +33,8 @@ struct player_datum
 	int32 InputFlags;
 	int32 InputFlags2;
 	int8 field_3C[4];
-	s_player_properties properties[2];
+	s_player_configuration configuration;
+	s_player_configuration desired_configuration;
 	int32 field_148;
 	int32 respawn_penalty;
 	int32 teleporter_blocked_tick_count;
@@ -148,7 +149,7 @@ void __cdecl players_set_machines(uint32 new_machine_valid_mask, const s_machine
 uint32 player_appearance_required_bits(void);
 
 // Validate player configuration
-void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data);
+void __cdecl player_validate_configuration(datum player_index, s_player_configuration* configuration_data);
 
 // Sets whether or not the passed user can interact with weapons
 void player_user_weapon_interaction_set(int32 user_index, bool enabled);

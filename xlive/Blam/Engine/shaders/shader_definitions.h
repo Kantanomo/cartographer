@@ -127,7 +127,7 @@ struct s_shader_definition
 
 	e_shader_definition_flags flags;
 	tag_block<s_shader_parameter> parameters;
-	tag_block<s_shader_postprocess_definition_new> postprocess_definition;
+	s_tag_block postprocess_definition;	// struct: s_shader_postprocess_definition_new
 	int32 pad1;
 	tag_block<predicted_resource> predicted_resources;
 	tag_reference light_response;	// slit

@@ -2,8 +2,6 @@
 
 /* prototypes */
 
-void game_time_apply_patches(void);
-
 bool game_time_initialized(void);
 
 uint32 game_time_get(void);

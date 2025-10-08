@@ -80,18 +80,18 @@ void GraveRobber::PickupSkull(datum player_index, datum skull_datum)
 	if (!game_is_predicted())
 	{
 		player_is_picking_up_skull = true;
-		game_statborg->adjust_player_stat(player_index, statborg_entry_score, 1, -1, true);
+		game_statborg->adjust_player_stat(player_index, _statborg_entry_round_score, 1, NONE, true);
 		if (game_engine_has_teams())
 		{
-			if (game_statborg->get_team_stat(player->properties[0].team_index, statborg_entry_score) == current_game_variant()->score_to_win_round)
+			if (game_statborg->get_team_stat(player->configuration.team_index, _statborg_entry_round_score) == current_game_variant()->score_to_win_round)
 			{
-				game_engine_end_round_with_winner(player->properties[0].team_index, false);
+				game_engine_end_round_with_winner(player->configuration.team_index, false);
 			}
 		}
 		else
 		{
 			const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
-			if (game_statborg->get_player_stat(player_abs_index, statborg_entry_score) == current_game_variant()->score_to_win_round)
+			if (game_statborg->get_player_stat(player_abs_index, _statborg_entry_round_score) == current_game_variant()->score_to_win_round)
 			{
 				game_engine_end_round_with_winner(player_index, false);
 			}
