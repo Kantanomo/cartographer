@@ -29,7 +29,7 @@ static bool xlive_upnp_forward_port(UPNPDev* device, bool tcp, WORD externalport
 
 /* globals */
 
-static HANDLE g_upnp_thread_handle;
+static uintptr_t g_upnp_thread_handle;
 
 /* public code */
 
@@ -37,7 +37,7 @@ void xlive_upnp_forward_ports(void)
 {
 	if (H2Config_upnp_enable)
 	{
-		g_upnp_thread_handle = (HANDLE)_beginthread(&xlive_upnp_forward_ports_proc, 0, NULL);
+		g_upnp_thread_handle = _beginthread(&xlive_upnp_forward_ports_proc, 0, NULL);
 	}
 	else
 	{
@@ -58,7 +58,16 @@ static void __cdecl xlive_upnp_forward_ports_proc(void* args)
 {
 	int discover_error;
 	UPNPDev* upnp_device = upnpDiscover(UPNP_DEVICE_DISCOVERY_TIMEOUT, NULL, NULL, UPNP_LOCAL_PORT_ANY, 0, UPNP_TTL, &discover_error);
-	if (discover_error == UPNPDISCOVER_SUCCESS)
+
+	UPNPDev* seek_device = upnp_device;
+	do
+	{
+		LOG_INFO_NETWORK("found upnp_device: {}", seek_device->descURL);
+		seek_device = seek_device->pNext;
+
+	} while (seek_device);
+
+	if (discover_error == UPNPDISCOVER_SUCCESS && upnp_device)
 	{
 		for (size_t i = 0; i < NUMBEROF(k_upnp_port_offsets); ++i)
 		{
@@ -105,8 +114,8 @@ static bool xlive_upnp_forward_port(UPNPDev* device, bool tcp, WORD externalport
 {
 	bool continue_forwarding = false;
 
-	struct UPNPUrls urls;
-	struct IGDdatas data;
+	struct UPNPUrls urls = {};
+	struct IGDdatas data = {};
 	char lanaddr[16];
 
 	int result = UPNP_GetValidIGD(device, &urls, &data, lanaddr, sizeof(lanaddr), NULL, 0);
@@ -115,23 +124,26 @@ static bool xlive_upnp_forward_port(UPNPDev* device, bool tcp, WORD externalport
 		char iport_str[6];
 		char eport_string[6];
 
-		if (_itoa_s(internalport, iport_str, NUMBEROF(iport_str)) == ERROR_SUCCESS && _itoa_s(externalport, eport_string, NUMBEROF(eport_string)) == ERROR_SUCCESS)
+		LOG_INFO_NETWORK("Attempting to open port {}, int {}, ext {}, tcp {}, device {}", rule_name, internalport, externalport, tcp, device->descURL);
+
+		if (_itoa_s(internalport, iport_str, 10) == ERROR_SUCCESS && _itoa_s(externalport, eport_string, 10) == ERROR_SUCCESS)
 		{
 			const char* proto = tcp ? "TCP" : "UDP";
 			result = UPNP_AddPortMapping(urls.controlURL, data.first.servicetype, eport_string, iport_str, lanaddr, rule_name, proto, NULL, NULL);
 			if (result == UPNP_PORT_MAPPING_SUCCESS)
 			{
+				LOG_INFO_NETWORK("Successfully opened port {} {}:{}", rule_name, internalport, externalport);
 				continue_forwarding = true;
 			}
 			else
 			{
-				LOG_INFO_NETWORK("UPNP Mapping Error: {}", result);
+				LOG_INFO_NETWORK("Failed to open port {} {}:{} result code {}", rule_name, internalport, externalport, result);
 			}
 		}
 	}
 	else
 	{
-		LOG_INFO_NETWORK("UPNP IGD Error: {}", result);
+		LOG_INFO_NETWORK("UPNP IGD Error: {} on device {}", result, device->descURL);
 	}
 
 	FreeUPNPUrls(&urls);
