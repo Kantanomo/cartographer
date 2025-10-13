@@ -1305,6 +1305,7 @@
     <ClCompile Include="Blam\Engine\text\font_group.cpp" />
     <ClCompile Include="Blam\Engine\text\text_group.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
+    <ClCompile Include="Blam\Engine\tool\tool_patches_initialize.cpp" />
     <ClCompile Include="Blam\Engine\units\bipeds.cpp" />
     <ClCompile Include="Blam\Engine\units\biped_definitions.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
@@ -2404,6 +2405,7 @@
     <ClInclude Include="Blam\Engine\text\font_group.h" />
     <ClInclude Include="Blam\Engine\text\text.h" />
     <ClInclude Include="Blam\Engine\text\text_group.h" />
+    <ClInclude Include="Blam\Engine\tool\tool_patches_initialize.h" />
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
     <ClInclude Include="Blam\Engine\text\unicode.h" />
     <ClInclude Include="Blam\Engine\units\biped_definitions.h" />
