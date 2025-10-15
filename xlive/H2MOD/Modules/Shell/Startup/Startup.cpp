@@ -9,6 +9,7 @@
 #include "sapien/patches_initialize.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
+#include "tool/tool_patches_initialize.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
@@ -272,6 +273,7 @@ static void startup_init_h2_tools(e_h2_type type)
 		sapien_apply_patches();
 		break;
 	case _h2_type_ek_tool:
+		tool_apply_patches();
 		break;
 	case _h2_type_ek_guerilla:
 		break;

@@ -9,6 +9,15 @@ static bool g_debugger_flag_2 = false;
 
 /* public code */
 
+void cseries_windows_tool_apply_patches(void)
+{
+	PatchCall(Memory::GetAddress(0x3F2B6), system_get_user_name);
+	PatchCall(Memory::GetAddress(0x3F6D4), system_get_user_name);
+	PatchCall(Memory::GetAddress(0xDE75D), system_get_user_name);
+	PatchCall(Memory::GetAddress(0x2389A5), system_get_user_name);
+	return;
+}
+
 bool is_debugger_present(void)
 {
 	bool present = g_debugger_flag_0 || IsDebuggerPresent();
@@ -66,6 +75,20 @@ void system_get_date_and_time(char* string, int16 size, bool exclude_millisecond
 void handle_fatal_error(int32 a1, const char* str)
 {
 	// TODO: implement
+	return;
+}
+
+void __cdecl system_get_user_name(char* name, int16 size)
+{
+	wchar_t buffer[2];
+	const bool dont_give_out_username = GetEnvironmentVariable(L"H2TOOL_DONT_GIVE_OUT_MY_USERNAME", buffer, NUMBEROF(buffer)) != 0;	// Added
+	
+	const DWORD dword_size = size;
+	if (dont_give_out_username || !GetUserNameA(name, (LPDWORD)&dword_size))
+	{
+		csstrncpy(name, "User Name", size);
+		SetLastError(0);
+	}
 	return;
 }
 

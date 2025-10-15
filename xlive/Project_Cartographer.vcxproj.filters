@@ -191,7 +191,6 @@
     <ClCompile Include="Blam\Engine\widgets\liquid.cpp" />
     <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
     <ClCompile Include="Blam\Engine\render\render_submit.cpp" />
-    <ClCompile Include="Blam\Engine\main\main_game_time.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fog.cpp" />
     <ClCompile Include="Blam\Engine\render\render.cpp" />
     <ClCompile Include="Blam\Engine\text\draw_string.cpp" />
@@ -504,6 +503,16 @@
     <ClCompile Include="Blam\Engine\ai\ai_flocks.cpp" />
     <ClCompile Include="Blam\Engine\ai\gravemind.cpp" />
     <ClCompile Include="Blam\Engine\ai\event_handling.cpp" />
+    <ClCompile Include="Blam\Engine\cache\cache_files_windows.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries_windows_debug.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\profile.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\sort.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\stack_walk_windows.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\threads_windows.cpp" />
+    <ClCompile Include="Blam\Engine\editor\editor_stubs.cpp" />
+    <ClCompile Include="Blam\Engine\interface\damaged_media.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_usage.cpp" />
+    <ClCompile Include="Blam\Engine\tool\tool_patches_initialize.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -816,7 +825,6 @@
     <ClInclude Include="Blam\Engine\widgets\liquid.h" />
     <ClInclude Include="Blam\Engine\effects\contrails.h" />
     <ClInclude Include="Blam\Engine\render\render_submit.h" />
-    <ClInclude Include="Blam\Engine\main\main_game_time.h" />
     <ClInclude Include="Blam\Engine\math\random_direction_table.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fog.h" />
     <ClInclude Include="Blam\Engine\render\render.h" />
@@ -1938,6 +1946,28 @@
     <ClInclude Include="Blam\Engine\ai\ai_script.h" />
     <ClInclude Include="Blam\Engine\ai\gravemind.h" />
     <ClInclude Include="Blam\Engine\ai\event_handling.h" />
+    <ClInclude Include="Blam\Engine\creatures\creature_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug.h" />
+    <ClInclude Include="Blam\Engine\cseries\profile.h" />
+    <ClInclude Include="Blam\Engine\cseries\sort.h" />
+    <ClInclude Include="Blam\Engine\cseries\stack_walk_windows.h" />
+    <ClInclude Include="Blam\Engine\cseries\threads_windows.h" />
+    <ClInclude Include="Blam\Engine\cutscene\cinematics_definitions.h" />
+    <ClInclude Include="Blam\Engine\cutscene\recorded_animation_definitions.h" />
+    <ClInclude Include="Blam\Engine\interface\damaged_media.h" />
+    <ClInclude Include="Blam\Engine\items\equipment_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\items\weapon_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\objects\object_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\objects\crate_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\objects\lights_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\objects\object_constants.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_usage.h" />
+    <ClInclude Include="Blam\Engine\devices\device_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\scenario\scenario_lights.h" />
+    <ClInclude Include="Blam\Engine\units\biped_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\units\unit_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\units\vehicle_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\tool\tool_patches_initialize.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
