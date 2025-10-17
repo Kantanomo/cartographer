@@ -41,11 +41,11 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
 	if ((initial_state_data->controlling_actor_index == NONE) &&
 		game_engine_get_change_colors(&creation_data->profile_traits.profile, creation_data->team, change_colors))
 	{
-		placement_data.change_color_override_mask |= 15u;
+		placement_data.change_color_override_mask |= MASK(4);
 		csmemcpy(placement_data.change_color_overrides, change_colors, sizeof(placement_data.change_color_overrides));
 	}
 
-	datum unit_index = c_simulation_object_entity_definition__object_create_object(_this, &creation_data->object, &initial_state_data->object_state_data, flags, &placement_data);
+	const datum unit_index = c_simulation_object_entity_definition__object_create_object(_this, &creation_data->object, &initial_state_data->object_state_data, flags, &placement_data);
 	if (unit_index != NONE)
 	{
 		unit_delete_all_weapons(unit_index);

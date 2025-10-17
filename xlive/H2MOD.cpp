@@ -45,6 +45,7 @@
 #include "main/main_game.h"
 #include "main/main_render.h"
 #include "main/main_screenshot.h"
+#include "main/main_time.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/transport/transport.h"
 #include "networking/network_event.h"
@@ -619,6 +620,7 @@ static void h2mod_apply_hooks(void)
 
 	cheats_apply_patches();
 	main_apply_patches();
+	main_time_apply_patches();
 	game_statborg_apply_patches();
 	simulation_game_objects_apply_patches();
 	simulation_game_units_apply_patches();

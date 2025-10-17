@@ -104,12 +104,12 @@ void main_game_initialize(void)
 
 bool __cdecl main_game_loaded_map(void)
 {
-	return INVOKE(0x0, 0x1E578, main_game_loaded_map);
+	return main_game_globals_get()->game_loaded_status == _game_loaded_status_map_loaded;
 }
 
 bool __cdecl main_game_loaded_pregame(void)
 {
-	return INVOKE(0x0, 0x1E56B, main_game_loaded_pregame);
+	return main_game_globals_get()->game_loaded_status == _game_loaded_status_pregame;
 }
 
 void __cdecl main_game_launch_default(void)

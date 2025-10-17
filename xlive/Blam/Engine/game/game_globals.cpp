@@ -108,18 +108,15 @@ static void game_globals_remove_singleplayer_representation(void)
 
 static void game_globals_add_new_player_representations(void)
 {
-	if (!shell_is_dedicated_server())
+	s_game_globals_custom_representation_result representations[k_cartographer_custom_representation_count]{};
+	for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
 	{
-		s_game_globals_custom_representation_result representations[k_cartographer_custom_representation_count]{};
-		for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
-		{
-			ASSERT(k_game_globals_custom_representation_function_table[i]);
-			k_game_globals_custom_representation_function_table[i](&representations[i]);
-		}
-
-		add_new_representations(representations);
-		add_simulation_table_entries(representations);
+		ASSERT(k_game_globals_custom_representation_function_table[i]);
+		k_game_globals_custom_representation_function_table[i](&representations[i]);
 	}
+
+	add_new_representations(representations);
+	add_simulation_table_entries(representations);
 	return;
 }
 
@@ -279,10 +276,12 @@ static void add_simulation_table_entries(s_game_globals_custom_representation_re
 	// do an initial loop through the representation results to determine which ones need new blocks added
 	uint32 new_entry_count = 0;
 
-	for(uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
+	for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
 	{
 		if (representations[i].success && representations[i].third_person_unit != NONE)
+		{
 			++new_entry_count;
+		}
 	}
 
 	// do a second pass to place them into the new table
@@ -292,9 +291,9 @@ static void add_simulation_table_entries(s_game_globals_custom_representation_re
 		sizeof(s_scenario_simulation_definition_table_element),
 		new_entry_count
 	);
-	new_entry_count = 0;
 
-	for(uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
+	new_entry_count = 0;
+	for (uint32 i = 0; i < k_cartographer_custom_representation_count; ++i)
 	{
 		if (representations[i].success && representations[i].third_person_unit != NONE)
 		{
