@@ -499,6 +499,9 @@ static s_main_globals* main_globals_get(void)
 
 static void main_loop_initialize(void)
 {
+	s_main_globals* main_globals = main_globals_get();
+	main_globals->startup_sequence = true;
+
 	main_loading_initialize();
 	SYSTEM_DEBUG_MEMORY(main_loading_initialize());
 	main_game_initialize();
