@@ -18,6 +18,8 @@ extern bool g_main_game_time_frame_limiter_enabled;
 
 /* prototypes */
 
+void main_time_apply_patches(void);
+
 void __cdecl main_time_initialize(void);
 
 void __cdecl main_time_reset(void);
