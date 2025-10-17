@@ -38,6 +38,7 @@ static const char* k_default_base_port_string = "2000";
 
 bool g_force_cartographer_update = false;
 bool g_h2_portable = false;
+bool g_h2config_initialized = false;
 
 // config variables
 
@@ -839,10 +840,16 @@ void InitH2Config()
 	H2Config_disable_ingame_keyboard = g_instance_number > 1 ? true : false;
 	ReadH2Config();
 	H2MOD::RefreshTogglexDelay();
+	g_h2config_initialized = true;
 }
 void DeinitH2Config()
 {
-	SaveH2Config();
+	// Only save the config at deinitialization if we've initialized the config
+	if (g_h2config_initialized)
+	{
+		SaveH2Config();
+	}
+	return;
 }
 #pragma endregion
 
