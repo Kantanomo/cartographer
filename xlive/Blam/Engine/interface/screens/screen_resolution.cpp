@@ -16,8 +16,15 @@ static int32 rasterizer_settings_get_display_mode_hook()
 {
 	// return rasterizer_settings_get()->display_mode;
 	// the caller compares the result with 1 so we can patch this and make it also return 1 for borderless
-	return rasterizer_settings_get()->display_mode == _rasterizer_window_mode_windowed
-		|| rasterizer_settings_get()->display_mode == _rasterizer_window_mode_borderless;
+
+	int32 result = rasterizer_settings_get()->display_mode;
+
+	if (result == _rasterizer_window_mode_borderless)
+	{
+		result = _rasterizer_window_mode_windowed;
+	}
+
+	return result;
 }
 
 void __cdecl c_screen_resolution_menu::apply_instance_patches()

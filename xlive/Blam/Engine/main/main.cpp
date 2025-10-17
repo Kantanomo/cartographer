@@ -195,7 +195,7 @@ void main_loop_body(void)
 	}
 	else
 	{
-		main_globals ->cinematic_sound_sync_completed = false;
+		main_globals->cinematic_sound_sync_completed = false;
 	}
 	main_globals->cinematic_sound_sync_in_progress = false;
 	

@@ -245,8 +245,6 @@ real32 __cdecl main_time_update(void)
 	main_time_globals->last_game_time = game_time;
 	main_time_globals->last_vblank_index = *Memory::GetAddress<int64*>(0xA3E440, 0x4905C8);
 	main_time_globals->last_initial_vblank_index = *Memory::GetAddress<int64*>(0xA3E440, 0x4905C8);
-
-	player_control_update_dt(dt_sec);
 	return dt_sec;
 }
 
