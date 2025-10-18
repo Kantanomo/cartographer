@@ -4,7 +4,6 @@
 #include "../Config.h"
 #include "../H2MODShell.h"
 
-
 #include "cseries/cseries_windows_debug_pc.h"
 #include "sapien/patches_initialize.h"
 #include "shell/shell.h"
@@ -26,32 +25,8 @@ static const wchar_t k_microsoft_folder[] = L"\\Microsoft";
 static const wchar_t k_appdata_default_path[] = L"\\Halo 2\\";
 static const wchar_t k_appdata_dev_preview_path[] = L"DevPreview\\";
 
-namespace filesystem = std::filesystem;
-
-#ifndef SPDLOG_DISABLED
-// xLiveLess specific logger
-h2log *xlive_log = nullptr;
-
-// Mod specific logger
-h2log *h2mod_log = nullptr;
-
-// General network logger
-h2log *network_log = nullptr;
-
-// Map loading logger
-h2log *checksum_log = nullptr;
-
-// OnScreenDebug logger
-h2log *onscreendebug_log = nullptr;
-
-// Console logger, receives output from all loggers
-h2log *console_log = nullptr;
-#endif
-
 wchar_t g_h2_process_file_path[MAX_PATH];
 wchar_t g_h2_appdata_local_path[MAX_PATH];
-
-CRITICAL_SECTION log_section;
 
 static void startup_force_working_directory_to_process_directory(void);
 
@@ -107,55 +82,9 @@ void InitLocalAppData()
 	return;
 }
 
-// use only after initLocalAppData has been called
-// by default useAppDataLocalPath is set to true, if not specified
-void prepareLogFileName(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path)
-{
-	const bool is_dedi = shell_is_dedicated_server();
-	const wchar_t* process_name = is_dedi ? k_server_process_name : k_client_process_name;
-	
-	// We set the instance string based on whether or not 
-	const wchar_t* instance_string = NULL;
-	wchar_t instance_number_string[4];
-
-	if (!config_use_instance_name(&instance_string))
-	{
-		usnprintf(instance_number_string, NUMBEROF(instance_number_string), L"%d", g_instance_number);
-		instance_string = instance_number_string;
-	}
-
-	c_static_wchar_string<MAX_PATH> folders;
-	folders.append(L"logs\\");
-	folders.append(process_name);
-	folders.append(L"\\instance");
-	folders.append(instance_string);
-	
-	// Place logs in server folder when portable or dedi
-	path->set(g_h2_portable || is_dedi ? L"" : g_h2_appdata_local_path);
-	path->append(folders.get_string());
-
-	// try making logs directory
-	if (!filesystem::create_directories(path->get_string()) && !filesystem::is_directory(filesystem::status(path->get_string())))
-	{
-		// try locally if we didn't already
-		if (!g_h2_portable
-			&& filesystem::create_directories(folders.get_string()) || filesystem::is_directory(filesystem::status(folders.get_string())))
-			path->set(folders.get_string());
-		else
-			path->set(L""); // fine then
-	}
-
-	path->append(L"\\");
-	path->append(logFileName);
-	path->append(L".log");
-	return;
-}
-
 ///Before the game window appears
 void InitH2Startup()
 {
-	InitializeCriticalSection(&log_section);
-
 	DETOUR_BEGIN();
 	cseries_windows_debug_initialize();
 	
@@ -196,30 +125,47 @@ void H2DedicatedServerStartup() {
 	}
 }
 
-void startup_initialize_log_directories(void)
+// use only after initLocalAppData has been called
+// by default useAppDataLocalPath is set to true, if not specified
+void log_file_name_prepare(const wchar_t* logFileName, c_static_wchar_string<MAX_PATH>* path)
 {
-#ifndef SPDLOG_DISABLED
-	EnterCriticalSection(&log_section);
+	const bool is_dedi = shell_is_dedicated_server();
+	const wchar_t* process_name = is_dedi ? k_server_process_name : k_client_process_name;
 
-	// prepare default log files if enabled, after we read the H2Config
-	bool should_enable_console_log = H2Config_debug_log && H2Config_debug_log_console;
-	console_log = h2log::create_console("CONSOLE MAIN", should_enable_console_log, H2Config_debug_log_level);
+	// We set the instance string based on whether or not 
+	const wchar_t* instance_string = NULL;
+	wchar_t instance_number_string[4];
 
-	c_static_wchar_string<MAX_PATH> path;
-	prepareLogFileName(L"h2xlive", &path);
-	xlive_log = h2log::create("XLive", path.get_string(), H2Config_debug_log, H2Config_debug_log_level);
-	LOG_DEBUG_XLIVE(DLL_VERSION_STR);
+	if (!config_use_instance_name(&instance_string))
+	{
+		usnprintf(instance_number_string, NUMBEROF(instance_number_string), L"%d", g_instance_number);
+		instance_string = instance_number_string;
+	}
 
-	prepareLogFileName(L"h2mod", &path);
-	h2mod_log = h2log::create("H2MOD", path.get_string(), H2Config_debug_log, H2Config_debug_log_level);
-	LOG_DEBUG_GAME(DLL_VERSION_STR);
+	c_static_wchar_string<MAX_PATH> folders;
+	folders.append(L"logs\\");
+	folders.append(process_name);
+	folders.append(L"\\instance");
+	folders.append(instance_string);
 
-	prepareLogFileName(L"h2network", &path);
-	network_log = h2log::create("Network", path.get_string(), H2Config_debug_log, H2Config_debug_log_level);
-	LOG_DEBUG_NETWORK(DLL_VERSION_STR);
+	// Place logs in server folder when portable or dedi
+	path->set(g_h2_portable || is_dedi ? L"" : g_h2_appdata_local_path);
+	path->append(folders.get_string());
 
-	LeaveCriticalSection(&log_section);
-#endif
+	// try making logs directory
+	if (!std::filesystem::create_directories(path->get_string()) && !std::filesystem::is_directory(std::filesystem::status(path->get_string())))
+	{
+		// try locally if we didn't already
+		if (!g_h2_portable
+			&& std::filesystem::create_directories(folders.get_string()) || std::filesystem::is_directory(std::filesystem::status(folders.get_string())))
+			path->set(folders.get_string());
+		else
+			path->set(L""); // fine then
+	}
+
+	path->append(L"\\");
+	path->append(logFileName);
+	path->append(L".log");
 	return;
 }
 

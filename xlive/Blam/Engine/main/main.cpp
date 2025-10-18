@@ -181,7 +181,6 @@ void main_loop_body(void)
 	s_main_globals* main_globals = main_globals_get();
 	
 	int32 throttled_tick_count = main_time_throttle();
-	bool interpolate = false;
 
 	static int32 x_max_tick_count = main_time_maximum_ticks_per_frame();
 
@@ -191,7 +190,6 @@ void main_loop_body(void)
 	if (halo_frame_interpolator_enabled() || cinematic_in_progress_not_main_menu() || xbox_tickrate_is_enabled() || main_time_is_throttled() || g_main_game_time_frame_limiter_enabled)
 	{
 		throttled_tick_count = 1;
-		interpolate = true;
 	}
 	else
 	{
@@ -202,7 +200,6 @@ void main_loop_body(void)
 	if (throttled_tick_count > x_max_tick_count)
 	{
 		throttled_tick_count = 1;
-		interpolate = true;
 	}
 
 	int32 current_tick = 0;
@@ -285,13 +282,13 @@ void main_loop_body(void)
 
 		if (!shell_application_is_paused())
 		{
-			real32 updated_time = 0.f;
+			real32 dt = 0.f;
 			real32 world_dt = 0.f;
 			real32 game_dt = 0.f;
 			int32 game_ticks_elapsed = 0;
 
-			updated_time = main_time_update();
-			world_dt = main_time_halted() ? 0.f : updated_time;
+			dt = main_time_update();
+			world_dt = main_time_halted() ? 0.f : dt;
 
 #ifdef TERMINAL_ENABLED
 			//terminal_update(world_dt);
@@ -310,7 +307,7 @@ void main_loop_body(void)
 
 			if (!main_time_is_throttled())
 			{
-				user_interface_update(updated_time);
+				user_interface_update(dt);
 				wmv_update();
 			}
 

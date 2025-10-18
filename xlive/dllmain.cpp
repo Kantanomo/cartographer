@@ -23,8 +23,6 @@ HMODULE hThis = NULL;
 
 /* externs */
 
-extern CRITICAL_SECTION log_section;
-
 /* prototypes */
 
 void discord_initialize(void);
@@ -125,17 +123,8 @@ void exit_instance(void)
 	DeinitCustomLanguage();
 	DeinitH2Config();
 
-#ifndef SPDLOG_DISABLED
-	EnterCriticalSection(&log_section);
-	delete xlive_log;
-	delete h2mod_log;
-	delete network_log;
-	delete console_log;
-	delete onscreendebug_log;
+	h2logger_dispose();
 
-	LeaveCriticalSection(&log_section);
-	DeleteCriticalSection(&log_section);
-#endif
 #if CARTOGRAPHER_HEAP_DEBUG
 	_CrtDumpMemoryLeaks();
 #endif
