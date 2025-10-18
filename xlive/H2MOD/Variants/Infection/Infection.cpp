@@ -184,7 +184,7 @@ bool Infection::shouldEndGame()
 	while (player_it.next())
 	{
 		uint64 id;
-		csmemcpy(&id, &player_it.get_datum()->identifier, sizeof(uint64));
+		csmemcpy(&id, &player_it.get_datum()->player_identifier, sizeof(uint64));
 
 		bool isZombie = std::find(zombieIdentifiers.begin(), zombieIdentifiers.end(), id) != zombieIdentifiers.end();
 
@@ -221,7 +221,7 @@ void Infection::preSpawnServerSetup() {
 		int32 currentPlayerIndex = player_it.get_absolute_index();
 
 		uint64 id;
-		csmemcpy(&id, &player->identifier, sizeof(uint64));
+		csmemcpy(&id, &player->player_identifier, sizeof(uint64));
 
 		bool isZombie = std::find(zombieIdentifiers.begin(), zombieIdentifiers.end(), id) != zombieIdentifiers.end();
 		
@@ -435,7 +435,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 				{
 					if (player->user_index != NONE)
 					{
-						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", player->configuration.player_name, player->identifier);
+						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", player->configuration.player_name, player->player_identifier);
 						user_interface_controller_set_desired_team_index(player->controller_index, k_zombie_team);
 						user_interface_controller_update_network_properties(player->controller_index);
 						player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
@@ -443,7 +443,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 					else
 					{
 						//if not, then this is a new zombie
-						event(_event_verbose, "h2mod:infection: Player died, name=%ws, identifer=%llu", player->configuration.player_name, player->identifier);
+						event(_event_verbose, "h2mod:infection: Player died, name=%ws, identifer=%llu", player->configuration.player_name, player->player_identifier);
 						Infection::triggerSound(_snd_new_zombie, 1000);
 					}
 				}
@@ -458,7 +458,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 					if (unit_get_team_index(player->unit_index) != k_zombie_team)
 					{
 						uint64 id;
-						csmemcpy(&id, &player->identifier, sizeof(uint64));
+						csmemcpy(&id, &player->player_identifier, sizeof(uint64));
 						set_zombie_player_status(id);
 					}
 					else
@@ -494,7 +494,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 
 		if (!shell_is_dedicated_server())
 		{
-			event(_event_verbose, "h2mod:infection: Client pre spawn, playerIndex=%d, playerIdentifier=%llu", player_abs_index, player->identifier);
+			event(_event_verbose, "h2mod:infection: Client pre spawn, playerIndex=%d, playerIdentifier=%llu", player_abs_index, player->player_identifier);
 
 			if(player->user_index != NONE)
 			{
