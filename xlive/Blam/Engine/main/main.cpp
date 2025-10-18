@@ -180,105 +180,70 @@ void main_loop_body(void)
 
 	s_main_globals* main_globals = main_globals_get();
 	
-	int32 throttled_tick_count = main_time_throttle();
-
-	static int32 x_max_tick_count = main_time_maximum_ticks_per_frame();
-
-	// Disables broken/experimental main loop patches in the vanilla game 
-	// that are also disabled when playing cinematics
-	// This also fixes the built in frame limiter while the game is minimized, as well as the speeding up issue
-	if (halo_frame_interpolator_enabled() || cinematic_in_progress_not_main_menu() || xbox_tickrate_is_enabled() || main_time_is_throttled() || g_main_game_time_frame_limiter_enabled)
+	if (game_in_editor())
 	{
-		throttled_tick_count = 1;
+		if (!main_game_change_update())
+		{
+			return;
+		}
+
+		main_globals->skip_cinematic = (main_globals->skip_cinematic ? false : main_globals->skip_cinematic);
+		main_globals->reset_map_random_seed = (main_globals->reset_map_random_seed ? false : main_globals->reset_map_random_seed);
+
+		if (main_globals->reset_map && game_in_progress() && !game_time_get_paused())
+		{
+			main_game_reset_map();
+			main_globals->reset_map = false;
+		}
+
+		if (main_globals->prepare_to_switch_bsp)
+		{
+			main_switch_structure_bsp();
+		}
+
+		main_globals->save_map = (main_globals->save_map ? false : main_globals->save_map);
+		main_globals->save_map_and_exit = (main_globals->save_map_and_exit ? false : main_globals->save_map_and_exit);
+		main_globals->save_core = (main_globals->save_core ? false : main_globals->save_core);
+		main_globals->load_core = (main_globals->load_core ? false : main_globals->load_core);
+		main_globals->ui_saving_files = (main_globals->ui_saving_files ? false : main_globals->ui_saving_files);
 	}
 	else
 	{
-		main_globals->cinematic_sound_sync_completed = false;
+		main_globals->run_xdemos = (main_globals->run_xdemos ? false : main_globals->run_xdemos);
+		main_game_launch_default();
+
+		if (!main_game_change_update())
+		{
+			return;
+		}
+		main_save_map_private();
 	}
-	main_globals->cinematic_sound_sync_in_progress = false;
-	
-	if (throttled_tick_count > x_max_tick_count)
+
+	profile_begin_frame();
+	profile_attribute_enter(0, _profile_attribution_subsystem_0);
+	collision_log_begin_frame();
+
+	if (main_time_should_reset())
 	{
-		throttled_tick_count = 1;
+		main_time_continue();
 	}
-
-	int32 current_tick = 0;
-	while (true)
+	else
 	{
-		const bool first_tick = current_tick == 0;
-		const bool final_tick = current_tick == throttled_tick_count - 1 || throttled_tick_count == 0;
-		if (first_tick)
-		{
-			if (game_in_editor())
-			{
-				if (!main_game_change_update())
-				{
-					return;
-				}
-
-				main_globals->skip_cinematic = (main_globals->skip_cinematic ? false : main_globals->skip_cinematic);
-				main_globals->reset_map_random_seed = (main_globals->reset_map_random_seed ? false : main_globals->reset_map_random_seed);
-
-				if (main_globals->reset_map && game_in_progress() && !game_time_get_paused())
-				{
-					main_game_reset_map();
-					main_globals->reset_map = false;
-				}
-
-				if (main_globals->prepare_to_switch_bsp)
-				{
-					main_switch_structure_bsp();
-				}
-
-				main_globals->save_map = (main_globals->save_map ? false : main_globals->save_map);
-				main_globals->save_map_and_exit = (main_globals->save_map_and_exit ? false : main_globals->save_map_and_exit);
-				main_globals->save_core = (main_globals->save_core ? false : main_globals->save_core);
-				main_globals->load_core = (main_globals->load_core ? false : main_globals->load_core);
-				main_globals->ui_saving_files = (main_globals->ui_saving_files ? false : main_globals->ui_saving_files);
-			}
-			else
-			{
-				main_globals->run_xdemos = (main_globals->run_xdemos ? false : main_globals->run_xdemos);
-				main_game_launch_default();
-
-				if (!main_game_change_update())
-				{
-					return;
-				}
-				main_save_map_private();
-			}
-		}
-
-		if (main_time_should_reset())
-		{
-			break;
-		}
-
-		if (first_tick)
-		{
-			profile_begin_frame();
-			profile_attribute_enter(0, _profile_attribution_subsystem_0);
-			collision_log_begin_frame();
-		}
-
 		input_windows_update();
 		if (!main_time_is_throttled())
 		{
 			input_abstraction_update();
 		}
 
-		if (first_tick)
-		{
-			saved_game_files_update();
-			global_preferences_update();
-			font_idle();
-			async_idle();
-			shell_update();
-			cache_files_copy_do_work();
-			main_loading_idle();
-			c_map_manager* g_map_manager = map_manager_get();
-			g_map_manager->map_synchronize_process(true);
-		}
+		saved_game_files_update();
+		global_preferences_update();
+		font_idle();
+		async_idle();
+		shell_update();
+		cache_files_copy_do_work();
+		main_loading_idle();
+		c_map_manager* g_map_manager = map_manager_get();
+		g_map_manager->map_synchronize_process(true);
 
 		if (!shell_application_is_paused())
 		{
@@ -311,27 +276,22 @@ void main_loop_body(void)
 				wmv_update();
 			}
 
-			if (first_tick)
-			{
-				network_receive();
-				network_update();
-				simulation_update();
-				life_cycle_update();
-			}
+			network_receive();
+			network_update();
+			simulation_update();
+			life_cycle_update();
 
 			if (simulation_in_progress())
 			{
 				if (shell_command_line_flag_is_set(_shell_command_line_flag_custom_map_entry_test_map_name_instead_of_hash))
 				{
-
+					// ### TODO FIXME
 				}
+
 				game_time_update(world_dt, &game_dt, &target_game_ticks);
 				player_control_update(world_dt, game_dt);
 				game_update(target_game_ticks, &game_dt);
-				if (final_tick)
-				{
-					network_send();
-				}
+				network_send();
 				game_frame(game_dt);
 				director_update(world_dt);
 				observer_update(world_dt);
@@ -343,17 +303,14 @@ void main_loop_body(void)
 				network_send();
 				vibration_clear_all_now();
 			}
-				
-			if (final_tick)
-			{
-				achievement_live_interface_get()->start_upload();
-			}
-				
+
+			achievement_live_interface_get()->start_upload();
+
 			if (main_time_is_throttled())
 			{
 				vibration_clear_all_now();
 			}
-			else if (final_tick)
+			else
 			{
 				const uint32 time_before_render = system_milliseconds();
 				main_render();
@@ -376,14 +333,9 @@ void main_loop_body(void)
 			profile_attribute_exit(0, _profile_attribution_subsystem_0);
 			profile_end_frame();
 		}
-		if (++current_tick >= throttled_tick_count)
-		{
-			EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
-			return;
-		}
-	}
 
-	main_time_continue();
+		
+	}
 
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 	return;
