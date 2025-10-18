@@ -468,7 +468,10 @@ void __cdecl game_initialize_for_new_map(const s_game_options* options)
 
 void __cdecl game_frame(real32 dt)
 {
-	motion_sensor_update_with_delta(dt);
+	if (!shell_is_dedicated_server())
+	{
+		motion_sensor_update_with_delta(dt);
+	}
 	INVOKE(0x48CDC, 0x41F7D, game_frame, dt);
 	return;
 }

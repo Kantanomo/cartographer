@@ -334,8 +334,6 @@ void main_loop_body(void)
 			profile_attribute_exit(0, _profile_attribution_subsystem_0);
 			profile_end_frame();
 		}
-
-		
 	}
 
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
