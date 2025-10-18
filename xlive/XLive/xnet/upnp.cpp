@@ -2,7 +2,7 @@
 #include "upnp.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+
 #include "Xlive/xnet/IpManagement/XnIp.h"
 
 #include <miniupnpc/miniupnpc.h>
@@ -60,11 +60,12 @@ static void __cdecl xlive_upnp_forward_ports_proc(void* args)
 	UPNPDev* upnp_device = upnpDiscover(UPNP_DEVICE_DISCOVERY_TIMEOUT, NULL, NULL, UPNP_LOCAL_PORT_ANY, 0, UPNP_TTL, &discover_error);
 
 	UPNPDev* seek_device = upnp_device;
-	while (seek_device && seek_device->descURL)
+	while (seek_device)
 	{
-		addDebugText("found upnp_device: %s", seek_device->descURL);
+		if (seek_device->descURL)
+			LOG_INFO_NETWORK("found upnp_device: {}", seek_device->descURL);
 		seek_device = seek_device->pNext;
-	} 
+	}
 
 	if (discover_error == UPNPDISCOVER_SUCCESS && upnp_device)
 	{
@@ -88,7 +89,6 @@ static void __cdecl xlive_upnp_forward_ports_proc(void* args)
 				break;
 			}
 
-
 			const WORD port = H2Config_base_port + port_offset;
 			const bool res = xlive_upnp_forward_port(upnp_device, is_qos_port, port, port, rule_name);
 			
@@ -101,11 +101,9 @@ static void __cdecl xlive_upnp_forward_ports_proc(void* args)
 	}
 	else
 	{
-		addDebugText("Failed to discover a UPNP compatible device.");
+		LOG_INFO_NETWORK("Failed to discover a UPNP compatible device.");
 	}
 
-
-	_endthread();
 	return;
 }
 
@@ -123,7 +121,7 @@ static bool xlive_upnp_forward_port(UPNPDev* device, bool tcp, WORD externalport
 		char iport_str[6];
 		char eport_string[6];
 
-		addDebugText("Attempting to open port %s, int %hu, ext %hu, tcp %s, device %s", rule_name, internalport, externalport, tcp, device->descURL);
+		LOG_INFO_NETWORK("Attempting to open port {}, int {}, ext {}, tcp {}, device {}", rule_name, internalport, externalport, tcp, device->descURL);
 
 		if (_itoa_s(internalport, iport_str, 10) == ERROR_SUCCESS && _itoa_s(externalport, eport_string, 10) == ERROR_SUCCESS)
 		{
@@ -131,18 +129,18 @@ static bool xlive_upnp_forward_port(UPNPDev* device, bool tcp, WORD externalport
 			result = UPNP_AddPortMapping(urls.controlURL, data.first.servicetype, eport_string, iport_str, lanaddr, rule_name, proto, NULL, NULL);
 			if (result == UPNP_PORT_MAPPING_SUCCESS)
 			{
-				addDebugText("Successfully opened port %s %hu:%hu", rule_name, internalport, externalport);
+				LOG_INFO_NETWORK("Successfully opened port {} {}:{}", rule_name, internalport, externalport);
 				continue_forwarding = true;
 			}
 			else
 			{
-				addDebugText("Failed to open port %s %hu:%hu result code %d", rule_name, internalport, externalport, result);
+				LOG_INFO_NETWORK("Failed to open port {} {}:{} result code {}", rule_name, internalport, externalport, result);
 			}
 		}
 	}
 	else
 	{
-		addDebugText("UPNP IGD Error: %d on device %s", result, device->descURL);
+		LOG_INFO_NETWORK("UPNP IGD Error: {} on device {}", result, device->descURL);
 	}
 
 	FreeUPNPUrls(&urls);
