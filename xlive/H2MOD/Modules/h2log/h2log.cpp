@@ -102,7 +102,7 @@ h2log* h2log::create_console(const std::string& name, int debugLogLevel)
 
 #endif
 
-void h2logger_initialize()
+void h2log_initialize()
 {
 #ifndef SPDLOG_DISABLED
 	// prepare default log files if enabled, after we read the H2Config
@@ -131,7 +131,7 @@ void h2logger_initialize()
 	return;
 }
 
-void h2logger_dispose()
+void h2log_dispose()
 {
 #ifndef SPDLOG_DISABLED
 	delete g_xlive_log;

@@ -123,7 +123,7 @@ void exit_instance(void)
 	DeinitCustomLanguage();
 	DeinitH2Config();
 
-	h2logger_dispose();
+	h2log_dispose();
 
 #if CARTOGRAPHER_HEAP_DEBUG
 	_CrtDumpMemoryLeaks();

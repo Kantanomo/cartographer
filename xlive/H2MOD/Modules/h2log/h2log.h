@@ -386,6 +386,5 @@ do \
 
 #endif
 
-void h2logger_initialize();
-void h2logger_dispose();
-
+void h2log_initialize();
+void h2log_dispose();
