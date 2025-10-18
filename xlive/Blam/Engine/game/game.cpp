@@ -468,12 +468,7 @@ void __cdecl game_initialize_for_new_map(const s_game_options* options)
 
 void __cdecl game_frame(real32 dt)
 {
-	if (halo_frame_interpolator_enabled())
-	{
-		halo_interpolator_update_delta();
-		motion_sensor_update_with_delta(dt);
-	}
-
+	motion_sensor_update_with_delta(dt);
 	INVOKE(0x48CDC, 0x41F7D, game_frame, dt);
 	return;
 }

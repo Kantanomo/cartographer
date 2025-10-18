@@ -292,6 +292,7 @@ void main_loop_body(void)
 				player_control_update(world_dt, game_dt);
 				game_update(target_game_ticks, &game_dt);
 				network_send();
+				halo_interpolator_update_delta();
 				game_frame(game_dt);
 				director_update(world_dt);
 				observer_update(world_dt);
