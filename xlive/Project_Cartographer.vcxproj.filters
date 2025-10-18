@@ -1976,9 +1976,10 @@
     <ResourceCompile Include="resources\VersionRes.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="xlive.def" />
+    <Image Include="resources\bitmaps\crash_window_header.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\bitmaps\crash_window_header.bmp" />
+    <None Include="xlive_exports.def" />
+    <None Include="xlive_exports_debug.def" />
   </ItemGroup>
 </Project>

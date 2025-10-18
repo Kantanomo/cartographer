@@ -211,7 +211,7 @@
       <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
@@ -286,7 +286,7 @@
       <AdditionalDependencies>tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -360,7 +360,7 @@
       <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -434,7 +434,7 @@
       <AdditionalDependencies>tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\xlive_exports.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
@@ -504,7 +504,7 @@
     <Link>
       <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\xlive_exports_debug.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -563,7 +563,7 @@
     <Link>
       <AdditionalDependencies>imguilib$(Platform)$(Configuration).lib;tinyxmllib$(Platform)$(Configuration).lib;zlib$(Platform)$(Configuration).lib;iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;dxguid.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>.\xlive_exports_debug.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(IntDir)xlive.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -2534,14 +2534,15 @@
     <ClInclude Include="XLive\XStorage\XStorage.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="xlive.def" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
     <ResourceCompile Include="resources\VersionRes.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\bitmaps\crash_window_header.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="xlive_exports.def" />
+    <None Include="xlive_exports_debug.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
