@@ -387,6 +387,10 @@ void __cdecl game_tick(void)
 		observer_game_tick();
 		director_game_tick();
 	}
+	else
+	{
+		random_seed_disallow_use();
+	}
 
 	simulation_update_aftermath(&update);
 	if (update.simulation_in_progress)
