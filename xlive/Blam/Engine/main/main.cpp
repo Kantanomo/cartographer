@@ -285,7 +285,7 @@ void main_loop_body(void)
 			real32 dt = 0.f;
 			real32 world_dt = 0.f;
 			real32 game_dt = 0.f;
-			int32 game_ticks_elapsed = 0;
+			int32 target_game_ticks = 0;
 
 			dt = main_time_update();
 			world_dt = main_time_halted() ? 0.f : dt;
@@ -325,9 +325,9 @@ void main_loop_body(void)
 				{
 
 				}
-				game_time_update(world_dt, &game_dt, &game_ticks_elapsed);
+				game_time_update(world_dt, &game_dt, &target_game_ticks);
 				player_control_update(world_dt, game_dt);
-				game_update(game_ticks_elapsed, &game_dt);
+				game_update(target_game_ticks, &game_dt);
 				if (final_tick)
 				{
 					network_send();
@@ -405,13 +405,13 @@ void __cdecl main_loop_body_server(void)
 	cache_files_copy_do_work();
 	if (!shell_application_is_paused())
 	{
-		real32 updated_time = 0.f;
+		real32 dt = 0.f;
 		real32 world_dt = 0.f;
 		real32 game_dt = 0.f;
-		int32 game_ticks_elapsed = 0;
+		int32 target_game_ticks = 0;
 
-		updated_time = main_time_update();
-		world_dt = main_time_halted() ? 0.f : updated_time;
+		dt = main_time_update();
+		world_dt = main_time_halted() ? 0.f : dt;
 
 #ifdef TERMINAL_ENABLED
 #if false					// Disable on dedi because we can't render the terminal
@@ -427,9 +427,9 @@ void __cdecl main_loop_body_server(void)
 		network_search_update();
 		if (simulation_in_progress())
 		{
-			game_time_update(world_dt, &game_dt, &game_ticks_elapsed);
+			game_time_update(world_dt, &game_dt, &target_game_ticks);
 			player_control_update(world_dt, game_dt);
-			game_update(game_ticks_elapsed, &game_dt);
+			game_update(target_game_ticks, &game_dt);
 			network_send();
 			game_frame(game_dt);
 			director_update(world_dt);
