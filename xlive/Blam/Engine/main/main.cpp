@@ -100,6 +100,15 @@ void main_apply_patches(void)
 	{
 		PatchCall(Memory::GetAddress(0x0, 0xC684), main_loop_body_server);	// main_loop
 	}
+	else
+	{
+		// main_save_map_private patches, allow the function to update
+		// even when TestCooperativeLevel returns an error 
+		// nop cmp
+		NopFill(Memory::GetAddress(0x3978B), 2);
+		// then force jmp
+		WriteValue(Memory::GetAddress(0x3978D), (uint8)0xEB);
+	}
 	return;
 }
 

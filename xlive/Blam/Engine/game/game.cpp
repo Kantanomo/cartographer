@@ -68,16 +68,6 @@ void game_apply_pre_winmain_patches(void)
 	// inscrease the max player count to allow ragdolls and the ragdoll count
 	WriteValue<int8>(Memory::GetAddress(0x49CCC, 0x42F4A) + 2, k_game_maximum_players_to_allow_ragdolls_new);
 	WriteValue<int8>(Memory::GetAddress(0x49CDC, 0x42F5A) + 2, k_game_maximum_ragdolls_new);
-
-	// Get original game_frame function
-	if (!shell_is_dedicated_server())
-	{
-		// main_loop_process_global_state
-		// nop cmp
-		NopFill(Memory::GetAddress(0x3978B), 2);
-		// then force jmp
-		WriteValue(Memory::GetAddress(0x3978D), (uint8)0xEB);
-	}
 	return;
 }
 
