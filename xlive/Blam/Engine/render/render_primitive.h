@@ -30,7 +30,7 @@ public:
 	void backup_settings(void);
 	void restore_backup(void);
 
-	bool test_layer(e_render_layer layer_index) const;
+	bool empty(e_render_layer layer_index) const;
 };
 ASSERT_STRUCT_SIZE(c_render_primitive_list, 24);
 

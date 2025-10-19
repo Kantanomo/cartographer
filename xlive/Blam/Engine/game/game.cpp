@@ -68,16 +68,6 @@ void game_apply_pre_winmain_patches(void)
 	// inscrease the max player count to allow ragdolls and the ragdoll count
 	WriteValue<int8>(Memory::GetAddress(0x49CCC, 0x42F4A) + 2, k_game_maximum_players_to_allow_ragdolls_new);
 	WriteValue<int8>(Memory::GetAddress(0x49CDC, 0x42F5A) + 2, k_game_maximum_ragdolls_new);
-
-	// Get original game_frame function
-	if (!shell_is_dedicated_server())
-	{
-		// main_loop_process_global_state
-		// nop cmp
-		NopFill(Memory::GetAddress(0x3978B), 2);
-		// then force jmp
-		WriteValue(Memory::GetAddress(0x3978D), (uint8)0xEB);
-	}
 	return;
 }
 
@@ -387,6 +377,10 @@ void __cdecl game_tick(void)
 		observer_game_tick();
 		director_game_tick();
 	}
+	else
+	{
+		random_seed_disallow_use();
+	}
 
 	simulation_update_aftermath(&update);
 	if (update.simulation_in_progress)
@@ -464,12 +458,10 @@ void __cdecl game_initialize_for_new_map(const s_game_options* options)
 
 void __cdecl game_frame(real32 dt)
 {
-	if (halo_frame_interpolator_enabled())
+	if (!shell_is_dedicated_server())
 	{
-		halo_interpolator_update_delta();
 		motion_sensor_update_with_delta(dt);
 	}
-
 	INVOKE(0x48CDC, 0x41F7D, game_frame, dt);
 	return;
 }

@@ -83,7 +83,10 @@ void halo_interpolator_set_state(bool enabled)
 
 void halo_interpolator_update_delta(void)
 {
-	g_interpolator_delta = game_time_get_leftover();
+	if (halo_frame_interpolator_enabled())
+	{
+		g_interpolator_delta = game_time_get_leftover();
+	}
 	return;
 }
 

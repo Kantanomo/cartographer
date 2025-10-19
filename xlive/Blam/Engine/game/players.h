@@ -16,9 +16,9 @@ enum e_player_flags : int16
 #pragma pack(push, 1)
 struct player_datum
 {
-	uint16 datum_salt;
+	uint16 identifier;
 	uint16 flags;
-	s_player_identifier identifier;
+	s_player_identifier player_identifier;
 	int32 player_creation_tick;
 	s_machine_identifier machine_identifier;
 	int16 machine_index;

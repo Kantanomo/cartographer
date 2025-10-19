@@ -6,7 +6,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xlive", "xlive\Project_Cart
 	ProjectSection(ProjectDependencies) = postProject
 		{0A00117C-C1D6-4C5C-B241-694D7F87421F} = {0A00117C-C1D6-4C5C-B241-694D7F87421F}
 		{349AD4A3-7F10-438B-A15F-58F57A4D5F36} = {349AD4A3-7F10-438B-A15F-58F57A4D5F36}
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919} = {851424B7-9FAF-4572-B1C7-304EDAFD9919}
 		{ECCF965A-3A41-455C-A0C2-5829F00D03B8} = {ECCF965A-3A41-455C-A0C2-5829F00D03B8}
 	EndProjectSection
 EndProject
@@ -15,8 +14,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imguilib", "xlive\3rdparty\imgui\imguilib.vcxproj", "{349AD4A3-7F10-438B-A15F-58F57A4D5F36}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxmllib", "xlive\3rdparty\tinyxml\tinyxmllib.vcxproj", "{ECCF965A-3A41-455C-A0C2-5829F00D03B8}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spdloglib", "xlive\3rdparty\spdlog\spdloglib.vcxproj", "{851424B7-9FAF-4572-B1C7-304EDAFD9919}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "external_libraries", "external_libraries", "{F7C6A7FA-CF62-4F3E-B7BC-B97A5CE5996F}"
 EndProject
@@ -76,16 +73,6 @@ Global
 		{ECCF965A-3A41-455C-A0C2-5829F00D03B8}.release_min_msvc|x86.Build.0 = release_min_msvc|Win32
 		{ECCF965A-3A41-455C-A0C2-5829F00D03B8}.release_msvc|x86.ActiveCfg = release_msvc|Win32
 		{ECCF965A-3A41-455C-A0C2-5829F00D03B8}.release_msvc|x86.Build.0 = release_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.debug_llvm|x86.ActiveCfg = debug_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.debug_llvm|x86.Build.0 = debug_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.debug_msvc|x86.ActiveCfg = debug_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.debug_msvc|x86.Build.0 = debug_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.release_llvm|x86.ActiveCfg = release_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.release_llvm|x86.Build.0 = release_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.release_min_llvm|x86.ActiveCfg = release_min_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.release_min_msvc|x86.ActiveCfg = release_min_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.release_msvc|x86.ActiveCfg = release_msvc|Win32
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919}.release_msvc|x86.Build.0 = release_msvc|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,7 +81,6 @@ Global
 		{0A00117C-C1D6-4C5C-B241-694D7F87421F} = {F7C6A7FA-CF62-4F3E-B7BC-B97A5CE5996F}
 		{349AD4A3-7F10-438B-A15F-58F57A4D5F36} = {F7C6A7FA-CF62-4F3E-B7BC-B97A5CE5996F}
 		{ECCF965A-3A41-455C-A0C2-5829F00D03B8} = {F7C6A7FA-CF62-4F3E-B7BC-B97A5CE5996F}
-		{851424B7-9FAF-4572-B1C7-304EDAFD9919} = {F7C6A7FA-CF62-4F3E-B7BC-B97A5CE5996F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6DAC2B88-E92D-4630-A510-F749F197D188}

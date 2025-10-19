@@ -285,7 +285,7 @@ void main_menu_launch_force(void)
 
 static s_main_game_globals* main_game_globals_get(void)
 {
-	return Memory::GetAddress<s_main_game_globals*>(0x46DAE4);
+	return Memory::GetAddress<s_main_game_globals*>(0x46DAE4, 0x49E29C);
 }
 
 static void main_game_launch_setup_game_mode_details(void)

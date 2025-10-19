@@ -31,14 +31,15 @@ void render_submit_apply_patches(void)
 
 void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model_data)
 {
-	uint32 v1 = 0x40000;
+	uint32 v1 = FLAG(_render_layer_active_camo);
 
 	s_scenario_fog_result* g_fog_result = global_fog_result_get();
 	if (g_fog_result->patchy_fog_tag_index != NONE && !g_fog_result->field_96)
 	{
 		real32 result = (g_fog_result->field_88.lower > g_fog_result->field_88.upper ? g_fog_result->field_88.lower : g_fog_result->field_88.upper);
 
-		v1 = (result > 0.f ? 0xC0000 : v1);
+		if (result > 0.f)
+			v1 = FLAG(_render_layer_active_camo) | FLAG(_render_layer_selfibloomination);
 	}
 
 	s_render_layer_globals* render_layer_globals = render_layer_globals_get();
@@ -62,9 +63,9 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 	}
 
 
-	for (int8 i = 0; i < model_data->count; ++i)
+	for (int32 i = 0; i < (int32)model_data->count; ++i)
 	{
-		render_section_visibility_compute(0, NONE, model_data->model_group_index[i], 0x11818E, v1, INT16_MAX+1, 0x40000, false);
+		render_section_visibility_compute(0, NONE, model_data->model_group_index[i], 0x11818E, v1, FLAG(_render_layer_transparent), FLAG(_render_layer_active_camo), false);
 	}
 
 	bool* g_rasterizer_dx9_disable_stencil = rasterizer_dx9_disable_stencil_get();
@@ -132,7 +133,7 @@ void __cdecl render_submit_transparent_hologram_geometry(uint32* a1)
 			D3DTEXF_LINEAR);
 	}
 
-	render_section_visibility_compute(0, flags | ~48, (uint8)model_group_index, NONE, 0, NONE, 0, true);
+	render_section_visibility_compute(0, flags | ~48, (uint8)model_group_index, (uint32)_render_layer_mask_all, 0, (uint32)_render_layer_mask_all, 0, true);
 
 	render_scene_geometry(_collection_type_0, _render_layer_texture_accumulate);
 	render_scene_geometry(_collection_type_0, _render_layer_lightmap_indirect);

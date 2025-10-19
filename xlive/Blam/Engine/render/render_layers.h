@@ -2,7 +2,7 @@
 
 /* enums */
 
-enum e_render_layer : uint32
+enum e_render_layer : int32
 {
 	_render_layer_none = 0,
 	_render_layer_texture_accumulate = 1,
@@ -29,7 +29,13 @@ enum e_render_layer : uint32
 	_render_layer_error_report = 22,
 	_render_layer_debug_view = 23,
 	_render_layer_hud = 24,
+
 	k_number_of_render_layers
+};
+
+enum
+{
+	_render_layer_mask_all = NONE,
 };
 
 /* structures */

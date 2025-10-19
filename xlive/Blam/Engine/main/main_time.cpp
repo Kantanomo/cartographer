@@ -101,6 +101,8 @@ void __cdecl main_time_initialize(void)
 	main_time_globals->last_vblank_index = 0;
 	main_time_globals->temporary_throttle_control = 0;
 
+	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
+
 	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
 	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
 	// the game sets them already but only during the loading screen period, then it resets to system default when the loading screen ends 
@@ -265,7 +267,8 @@ bool main_time_halted(void)
 
 bool __cdecl main_time_should_reset(void)
 {
-	return INVOKE(0x286E1, 0x0, main_time_should_reset);
+	bool result = main_time_globals_get()->should_reset;
+	return result;
 }
 
 int32 __cdecl main_time_get_tickrate(void)

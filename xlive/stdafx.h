@@ -45,6 +45,7 @@
 #include <psapi.h>
 #include <TlHelp32.h>
 #include <iphlpapi.h>
+#include <errno.h>
 
 // initialize GUIDs locally
 #include <initguid.h>
@@ -74,6 +75,8 @@
 #include "xlivedefs.h"
 
 // cartographer includes
+
+#include "H2MOD/Modules/h2log/h2log.h"
 
 #include "version.h"
 

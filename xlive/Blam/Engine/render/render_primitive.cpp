@@ -22,7 +22,7 @@ void c_render_primitive_list::restore_backup(void)
 	return;
 }
 
-bool c_render_primitive_list::test_layer(e_render_layer layer_index) const
+bool c_render_primitive_list::empty(e_render_layer layer_index) const
 {
 	ASSERT(VALID_INDEX(layer_index, k_number_of_render_layers));
 	return !TEST_BIT(m_render_layer_flags, layer_index);

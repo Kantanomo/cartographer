@@ -7,7 +7,7 @@
 #include "networking/logic/life_cycle_manager.h"
 #include "shell/shell.h"
 
-#include <H2MOD/Modules/EventHandler/EventHandler.hpp>
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
 /* prototypes */
 
