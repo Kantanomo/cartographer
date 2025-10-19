@@ -644,8 +644,8 @@ render_postprocess:
 
 			if (water_enabled)
 			{
-				const c_render_primitive_list* list_type = render_primitive_get_by_primitive_list_type(0);
-				clear_target = list_type->test_layer(_render_layer_water_alpha_masks);
+				const c_render_primitive_list* primitive_list = render_primitive_get_by_primitive_list_type(0);
+				clear_target = primitive_list->empty(_render_layer_water_alpha_masks);
 				render_scene_geometry(_collection_type_0, _render_layer_water_alpha_masks);
 			}
 

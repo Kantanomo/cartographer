@@ -242,8 +242,8 @@ void main_loop_body(void)
 		shell_update();
 		cache_files_copy_do_work();
 		main_loading_idle();
-		c_map_manager* g_map_manager = map_manager_get();
-		g_map_manager->map_synchronize_process(true);
+		c_map_manager* map_manager = map_manager_get();
+		map_manager->map_synchronize_process(true);
 
 		if (!shell_application_is_paused())
 		{
