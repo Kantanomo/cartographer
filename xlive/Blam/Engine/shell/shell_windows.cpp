@@ -5,6 +5,7 @@
 #include "shell_windows_internals.h"
 #include "shell_windows_pcc.h"
 
+#include "input/input_windows.h"
 #include "main/main.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
@@ -437,6 +438,9 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 	switch (uMsg)
 	{
+	case WM_KEYUP:
+		input_windows_release_key((WCHAR)wParam);
+		break;
 	case WM_SETFOCUS:
 		g_custom_mouse_cursor_enabled = false;
 		break;
