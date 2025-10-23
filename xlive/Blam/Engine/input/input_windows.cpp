@@ -37,6 +37,8 @@ struct s_key_remap
 
 static void input_stop_removed_controller_handler_from_panicking(void);
 
+static void input_rewrite_button_timing_loop(void);
+
 static ascii_key* ascii_to_key_table_get(void);
 
 static e_input_key_code input_map_ascii_to_keycode(uint8 ascii);
@@ -44,6 +46,9 @@ static e_input_key_code input_map_ascii_to_keycode(uint8 ascii);
 static void input_windows_initialize_key_remapping(void);
 
 static void __cdecl update_button(uint8* frames, uint16* msec, bool* key_bool, bool down, int32 elapsed_msec);
+
+// Hook for update_button call in input_update
+static void __cdecl update_button_input_update_hook(uint8 * frames, uint16 * msec, bool* key_bool, bool down, int32 elapsed_msec);
 
 static int compare_device_compatibility(const void* p1, const void* p2);
 
@@ -93,6 +98,8 @@ static s_key_remap g_key_remap[REMAPPED_KEY_COUNT] =
 	{ _key_c_cedilla, L'\xE7', NONE }
 };
 
+static bool g_keyboard_input_state[NUMBER_OF_KEYS];
+
 bool g_should_offset_gamepad_indices = false;
 
 bool g_notified_to_change_mapping = false;
@@ -127,6 +134,8 @@ void input_windows_apply_patches(void)
 
 	PatchCall(Memory::GetAddress(0x621C5), input_get_mouse_state);
 	PatchCall(Memory::GetAddress(0x20780B), input_get_mouse_state);
+
+	input_rewrite_button_timing_loop();
 	return;
 }
 
@@ -215,6 +224,7 @@ void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 				break;
 			}
 			keystroke.key_code = input_map_ascii_to_keycode(key);
+			g_keyboard_input_state[keystroke.key_code] = true;
 		}
 		// Handle other characters
 		else if (msg == WM_CHAR || msg == WM_SYSCHAR)
@@ -229,6 +239,7 @@ void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 				keystroke.ascii_code = (int8)(upper_bit_exists ? NONE : wParam);
 				keystroke.utf16_code = (wchar_t)wParam;
 				keystroke.key_code = input_map_ascii_to_keycode(key);
+				g_keyboard_input_state[keystroke.key_code] = true;
 			}
 		}
 
@@ -536,6 +547,25 @@ void input_windows_notify_change_device_mapping()
 	g_should_offset_gamepad_indices = !g_should_offset_gamepad_indices;
 }
 
+void input_windows_release_key(WCHAR param)
+{
+	ASSERT(VALID_INDEX(param, NUMBER_OF_KEYS));
+
+	const e_input_key_code code = (e_input_key_code)PIN(param, 0, _key_not_a_key);
+	if (code)
+	{
+		update_button(
+			&input_globals->keyboard.frames_down[code],
+			&input_globals->keyboard.msec_down[code],
+			&input_globals->keyboard.key_bool[code],
+			false,
+			0
+		);
+		g_keyboard_input_state[code] = false;
+	}
+	return;
+}
+
 /* private code */
 
 static void input_stop_removed_controller_handler_from_panicking(void)
@@ -543,6 +573,14 @@ static void input_stop_removed_controller_handler_from_panicking(void)
 	PatchCall(Memory::GetAddress(0x208D3C), input_has_gamepad_hook);
 	PatchCall(Memory::GetAddress(0x2084B3), input_has_gamepad_hook);
 	PatchCall(Memory::GetAddress(0x20844A), input_has_gamepad_hook);
+	return;
+}
+
+static void input_rewrite_button_timing_loop(void)
+{
+	NopFill(Memory::GetAddressRelative(0x42FA8A), 3);	// Remove call to GetAsyncKeyState in input_update 
+	NopFill(Memory::GetAddressRelative(0x42FAB9), 8);	// Remove loop code
+	PatchCall(Memory::GetAddress(0x2FAAB), update_button_input_update_hook);
 	return;
 }
 
@@ -610,6 +648,21 @@ static void __cdecl update_button(uint8* frames, uint16* msec, bool* key_bool, b
 		down = false;
 	}
 	INVOKE(0x2E4C5, 0x0, update_button, frames, msec, key_bool, down, elapsed_msec);
+	return;
+}
+
+static void __cdecl update_button_input_update_hook(uint8 * frames, uint16 * msec, bool* key_bool, bool down, int32 elapsed_msec)
+{
+	for (size_t code = 0; code < NUMBER_OF_KEYS; ++code)
+	{
+		update_button(
+			&input_globals->keyboard.frames_down[code],
+			&input_globals->keyboard.msec_down[code],
+			&input_globals->keyboard.key_bool[code],
+			g_keyboard_input_state[code],
+			elapsed_msec
+		);
+	}
 	return;
 }
 

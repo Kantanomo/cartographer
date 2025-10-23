@@ -228,6 +228,8 @@ bool input_windows_processing_device_change();
 bool input_windows_has_split_device_active();
 void input_windows_notify_change_device_mapping();
 
+void input_windows_release_key(WCHAR param);
+
 void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right);
 
 

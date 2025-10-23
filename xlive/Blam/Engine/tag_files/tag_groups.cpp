@@ -20,7 +20,7 @@ static int32 g_string_id_table_count;
 
 static int32 g_string_id_block_offset;
 
-static int32 g_string_id_index_buffer[13478];
+static int32 g_string_id_index_buffer[0x6000];
 
 static char g_string_id_storage[k_maximum_string_id_storage];
 
