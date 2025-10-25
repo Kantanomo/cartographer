@@ -183,7 +183,8 @@ real32 __cdecl main_time_update(void)
 
 	// don't run the frame limiter when time step is fixed, because the code doesn't support it
 	// in case of fixed time step, frame limiter should be handled by the other frame limiter
-	if (main_time_is_throttled())
+	if (main_time_is_throttled()
+		|| g_main_game_time_frame_limiter_enabled)
 	{
 		if (game_time_initialized())
 		{

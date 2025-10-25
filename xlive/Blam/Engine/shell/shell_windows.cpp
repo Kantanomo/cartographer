@@ -520,7 +520,7 @@ static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_IN
 				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
 				NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
 
-				shell_system_set_timer_resolution_max(true);
+				// shell_system_set_timer_resolution_max(true);
 
 				if (10ll * system_yield_time_usec > ulMaximumResolution)
 				{
@@ -529,7 +529,7 @@ static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_IN
 					if (SetWaitableTimer(frame_limit_timer_handle, &liDueTime, 0, NULL, NULL, TRUE))
 					{
 						// Wait for the timer.
-						NtWaitForSingleObjectHelper(frame_limit_timer_handle, FALSE, &liDueTime);
+						NtWaitForSingleObjectHelper(frame_limit_timer_handle, FALSE, NULL);
 					}
 				}
 			}
