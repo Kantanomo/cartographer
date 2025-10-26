@@ -43,6 +43,8 @@ static bool g_custom_mouse_cursor_enabled = false;
 
 uint32 g_instance_number = 0;
 
+HANDLE g_frame_limit_system_waitable_timer_handle = NULL;
+
 /* prototypes */
 
 static DWORD WINAPI timeGetTime_hook();
@@ -65,7 +67,9 @@ static void shell_system_set_timer_resolution_max(bool enable);
 
 static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator);
 
-static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_time, int framerate);
+static void shell_windows_throttle_framerate_initialize();
+
+static void shell_windows_yield_thread(LARGE_INTEGER last_time, real32 desired_framerate);
 
 // Adjust name of window to display the instance number when we have more than 1 window open
 static void shell_windows_adjust_name(void);
@@ -116,6 +120,8 @@ bool shell_platform_initialize(void)
 	shell_windows_calculate_instance_num();
 
 	shell_windows_initialize_arguments();
+
+	shell_windows_throttle_framerate_initialize();
 
 	InitOnScreenDebugText();
 
@@ -234,54 +240,19 @@ unsigned long long shell_time_now_msec()
 	return shell_time_now(k_shell_time_msec_denominator);
 }
 
-void shell_windows_throttle_framerate(int desired_framerate)
+void shell_windows_throttle_framerate_initialize()
 {
-	static LARGE_INTEGER last_counter;
-	static int last_desired_framerate_setting = -1;
-	static bool frame_limiter_initialized = false;
+}
 
-	static HANDLE hFrameLimitTimer = NULL;
-
-	if (desired_framerate <= 0)
+void shell_windows_throttle_framerate(LARGE_INTEGER last_time, int desired_framerate)
+{
+	if (desired_framerate > 0)
 	{
-		last_desired_framerate_setting = MAX(desired_framerate, 15);
-		frame_limiter_initialized = false;
-		return;
+		desired_framerate = MAX(desired_framerate, 15);
+		shell_windows_yield_thread(last_time, (real32)desired_framerate);
 	}
 
-	if (last_desired_framerate_setting != desired_framerate)
-	{
-		last_desired_framerate_setting = desired_framerate;
-		frame_limiter_initialized = false;
-	}
-
-	if (!frame_limiter_initialized)
-	{
-		last_counter = shell_time_counter_now(NULL);
-		frame_limiter_initialized = true;
-
-		//shell_system_set_timer_resolution_max(true);
-
-		if (NULL == hFrameLimitTimer)
-		{
-			hFrameLimitTimer = CreateWaitableTimer(NULL, FALSE, NULL);
-
-			atexit([]() {
-				if (NULL != hFrameLimitTimer)
-					CloseHandle(hFrameLimitTimer);
-
-				// reset timer resolution back to default on exit
-				shell_system_set_timer_resolution_max(false);
-				});
-		}
-
-		// skip the first frame after init
-		return;
-	}
-
-	shell_windows_yield_thread(hFrameLimitTimer, last_counter, desired_framerate);
-
-	last_counter = shell_time_counter_now(NULL);
+	return;
 }
 
 bool __cdecl gfwl_gamestore_initialize(void)
@@ -513,57 +484,58 @@ static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long d
 	return shell_time_from_counter(counter, freq, denominator);
 }
 
-static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_time, int framerate)
+static void shell_windows_yield_thread(LARGE_INTEGER last_counter, real32 desired_framerate)
 {
-	const int threadWaitTimePercentage = 90;
-	const int min_time_to_suspend_exec_usec = 3000;
+	const int k_thread_sleep_api_time_slice_percentage = 70; // 70% of the time
+	const int k_thread_sleep_api_min_time_to_sleep_usec = 3000; // 3ms
 
-	unsigned long long min_frametime_usec = (unsigned long long)(1000000.f / (float)framerate);
-	unsigned long long dt_usec = shell_time_diff(last_time, k_shell_time_usec_denominator);
+	unsigned long long min_frametime_usec = (unsigned long long)((real32)k_shell_time_usec_denominator / desired_framerate);
+	unsigned long long dt_usec = shell_time_diff(last_counter, k_shell_time_usec_denominator);
 
 	if (dt_usec < min_frametime_usec)
 	{
 		unsigned long long sleep_time_usec = min_frametime_usec - dt_usec;
 
 		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
-		long long system_yield_time_usec = (threadWaitTimePercentage * sleep_time_usec) / 100;
+		unsigned long long system_yield_time_usec = (k_thread_sleep_api_time_slice_percentage * sleep_time_usec) / 100;
 
-		// sleep just the milliseconds part
-		// system_yield_time_usec = system_yield_time_usec - (system_yield_time_usec % 1000);
+		// sleep just milliseconds
+		system_yield_time_usec = system_yield_time_usec - (system_yield_time_usec % 1000);
 
-		// skip CPU yield if time is lower than 3ms
-		// because the system timer isn't precise enough for our needs
-		if (system_yield_time_usec > min_time_to_suspend_exec_usec)
+		// skip system thread sleep if time to sleep is lower than 3ms
+		// because the system timer isn't precise enough to guarantee the time slept is close to the one desired
+		if (system_yield_time_usec > k_thread_sleep_api_min_time_to_sleep_usec)
 		{
-			if (NULL != frame_limit_timer_handle)
+			ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+			NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+
+			// shell_system_set_timer_resolution_max(true);
+
+			if (10ll * system_yield_time_usec > ulMaximumResolution)
 			{
-				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
-				NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
-
-				shell_system_set_timer_resolution_max(true);
-
-				if (10ll * system_yield_time_usec > ulMaximumResolution)
-				{
-					LARGE_INTEGER liDueTime = {};
-					liDueTime.QuadPart = -10ll * system_yield_time_usec;
-					if (SetWaitableTimer(frame_limit_timer_handle, &liDueTime, 0, NULL, NULL, TRUE))
-					{
-						// Wait for the timer.
-						NtWaitForSingleObjectHelper(frame_limit_timer_handle, FALSE, &liDueTime);
-					}
-				}
+				LARGE_INTEGER liDueTime = {};
+				liDueTime.QuadPart = -10ll * system_yield_time_usec;
+				
+				// Wait for the timer.
+				NtWaitForSingleObjectHelper(GetCurrentThread(), FALSE, &liDueTime);
 			}
-
+			
 			/*int sleepTimeMs = system_yield_time_usec / 1000ll;
 			if (sleepTimeMs >= 0)
 				Sleep(sleepTimeMs);*/
 		}
 
-		// spin-lock the remaining slice of time
+		// spin-lock the remaining time slice
 		while (true)
 		{
-			if (shell_time_diff(last_time, k_shell_time_usec_denominator) >= min_frametime_usec)
+			if (shell_time_diff(last_counter, k_shell_time_usec_denominator) >= min_frametime_usec)
+			{
 				break;
+			}
+			else
+			{
+				_mm_pause();
+			}
 		}
 	}
 }

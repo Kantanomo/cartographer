@@ -19,9 +19,8 @@ enum e_bitstream_state : uint32
 
 class c_bitstream
 {
-public:
-	uint8* m_stream_buf;
-	int32 m_stream_buf_size_bytes;
+	uint8* m_data;
+	int32 m_data_size_bytes;
 	int32 m_data_size_alignment;
 	e_bitstream_state m_state;
 	int32 m_current_bit_position;
@@ -32,11 +31,12 @@ public:
 	int field_2C;
 	int field_30;
 
-	c_bitstream(uint8* stream, int32 stream_size_bytes)
+public:
+	c_bitstream(uint8* data, int32 data_size)
 	{
 		// field_15 = false;
 		m_data_size_alignment = k_bitstream_default_alignment;
-		set_data(stream, stream_size_bytes);
+		set_data(data, data_size);
 	}
 
 	~c_bitstream() = default;
@@ -66,12 +66,12 @@ public:
 
 	bool would_overflow(int32 bit_count) const
 	{
-		return bit_count + m_current_bit_position > m_stream_buf_size_bytes * 8;
+		return bit_count + m_current_bit_position > m_data_size_bytes * 8;
 	}
 
 	bool overflowed() const
 	{
-		return m_current_bit_position > m_stream_buf_size_bytes * 8;
+		return m_current_bit_position > m_data_size_bytes * 8;
 	}
 
 	bool error_occured() const
@@ -86,7 +86,7 @@ public:
 
 	int32 get_space_left_in_bits() const
 	{
-		return 8 * m_stream_buf_size_bytes - m_current_bit_position;
+		return 8 * m_data_size_bytes - m_current_bit_position;
 	}
 
 	int32 get_space_used_in_bytes() const

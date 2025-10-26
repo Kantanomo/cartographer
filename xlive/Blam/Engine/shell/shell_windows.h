@@ -59,7 +59,7 @@ unsigned long long shell_time_now_msec();
 
 unsigned long long shell_time_now(unsigned long long denominator);
 
-void shell_windows_throttle_framerate(int desired_framerate);
+void shell_windows_throttle_framerate(LARGE_INTEGER last_counter, int desired_framerate);
 
 bool __cdecl gfwl_gamestore_initialize(void);
 

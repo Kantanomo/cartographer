@@ -4,10 +4,10 @@
 
 #include "math/real_quantization.h"
 
-void c_bitstream::set_data(uint8* stream_buf, int32 stream_buf_size)
+void c_bitstream::set_data(uint8* data, int32 data_size)
 {
-	m_stream_buf = stream_buf;
-	m_stream_buf_size_bytes = stream_buf_size;
+	m_data = data;
+	m_data_size_bytes = data_size;
 	reset(_bitstream_state_none);
 }
 

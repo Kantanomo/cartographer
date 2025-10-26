@@ -178,12 +178,13 @@ real32 __cdecl main_time_update(void)
 	const LARGE_INTEGER freq = shell_time_counter_freq();
 
 	shell_update();
-	
+
 	dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
 
 	// don't run the frame limiter when time step is fixed, because the code doesn't support it
 	// in case of fixed time step, frame limiter should be handled by the other frame limiter
-	if (main_time_is_throttled())
+	if (main_time_is_throttled()
+		|| g_main_game_time_frame_limiter_enabled)
 	{
 		if (game_time_initialized())
 		{
@@ -215,11 +216,10 @@ real32 __cdecl main_time_update(void)
 	}
 	else
 	{
-		shell_windows_throttle_framerate(H2Config_fps_limit);
+		shell_windows_throttle_framerate(g_main_game_time_counter_last_time, H2Config_fps_limit);
 		dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
 	}
 	
-
 	s_main_time_globals* main_time_globals = main_time_globals_get();
 
 #ifdef MAIN_TIME_DEBUG
@@ -316,7 +316,7 @@ static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER
 	if (k_use_precise_counters)
 	{
 		// Precise dt
-		dt = main_time_get_delta_sec_precise(shell_time_counter_now(NULL), freq);
+		dt = main_time_get_delta_sec_precise(counter_now, freq);
 	}
 	else
 	{
