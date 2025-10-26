@@ -11,7 +11,7 @@
 /* constants */
 
 static const wchar_t k_crash_message_header_break[] = L"=============================================\n";
-const wchar_t* k_reports_path = L"\\reports\\";
+const wchar_t k_reports_path[] = L"reports\\";
 const wchar_t *const k_report_text_file_names[k_report_text_file_type_count] = { L"exception_info.txt", L"cpu_info.txt", L"game_options.txt", L"game_globals.txt", L"rasterizer.txt"};
 
 // globals
@@ -64,6 +64,7 @@ static void setup_cpu_info_text(const wchar_t* reports_path, const MINIDUMP_EXCE
 {
 	c_static_wchar_string<MAX_PATH>* report_info_path_cpu = &g_report_text_file_paths[_report_file_type_cpu];
 	report_info_path_cpu->set(reports_path);
+	report_info_path_cpu->append(L"\\");
 	report_info_path_cpu->append(k_reports_path);
 	report_info_path_cpu->append(k_report_text_file_names[_report_file_type_cpu]);
 
@@ -162,6 +163,7 @@ void setup_exception_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_
 {
 	c_static_wchar_string<MAX_PATH>* report_info_path_exception = &g_report_text_file_paths[_report_file_type_exception];
 	report_info_path_exception->set(reports_path);
+	report_info_path_exception->append(L"\\");
 	report_info_path_exception->append(k_reports_path);
 	report_info_path_exception->append(k_report_text_file_names[_report_file_type_exception]);
 
@@ -202,6 +204,7 @@ static void setup_game_options_text(const wchar_t* reports_path)
 {
 	c_static_wchar_string<MAX_PATH>* report_info_path_game_options = &g_report_text_file_paths[_report_file_type_game_options];
 	report_info_path_game_options->set(reports_path);
+	report_info_path_game_options->append(L"\\");
 	report_info_path_game_options->append(k_reports_path);
 	report_info_path_game_options->append(k_report_text_file_names[_report_file_type_game_options]);
 
@@ -350,6 +353,7 @@ static void setup_game_global_text(const wchar_t* reports_path)
 {
 	c_static_wchar_string<MAX_PATH>* report_info_path_game_globals = &g_report_text_file_paths[_report_file_type_game_globals];
 	report_info_path_game_globals->set(reports_path);
+	report_info_path_game_globals->append(L"\\");
 	report_info_path_game_globals->append(k_reports_path);
 	report_info_path_game_globals->append(k_report_text_file_names[_report_file_type_game_globals]);
 
@@ -415,6 +419,7 @@ static void setup_rasterizer_text(const wchar_t* reports_path)
 {
 	c_static_wchar_string<MAX_PATH>* report_info_path_game_globals = &g_report_text_file_paths[_report_file_type_rasterizer];
 	report_info_path_game_globals->set(reports_path);
+	report_info_path_game_globals->append(L"\\");
 	report_info_path_game_globals->append(k_reports_path);
 	report_info_path_game_globals->append(k_report_text_file_names[_report_file_type_rasterizer]);
 

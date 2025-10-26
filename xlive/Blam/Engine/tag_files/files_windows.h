@@ -35,7 +35,7 @@ enum e_file_open_flags : uint16
 	k_number_of_file_open_flags = FLAG(9)		// originally called NUMBER_OF_FILE_OPEN_FLAGS but we change it to maintain "some" code consistency
 };
 
-enum e_file_open_error : DWORD
+enum e_file_open_error : int32
 {
 	_file_open_error_success = 0,
 	_file_open_error_not_found = 1,

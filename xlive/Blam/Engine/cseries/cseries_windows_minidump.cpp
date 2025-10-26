@@ -64,7 +64,6 @@ void write_crash_dump_files(_EXCEPTION_POINTERS* ExceptionInfo, c_static_wchar_s
 		error(_error_log, "CreateFileW returned error: %d %ws", error_val, minidump_path.get_string());
 	}
 
-
 	MINIDUMP_EXCEPTION_INFORMATION minidump_info{};
 	minidump_info.ThreadId = GetCurrentThreadId();
 	minidump_info.ExceptionPointers = ExceptionInfo;
@@ -151,6 +150,7 @@ static void create_reports_path(c_static_wchar_string<MAX_PATH>* dump_path, c_st
 	// Make sure the reports path that will have our text files exists
 	c_static_wchar_string<MAX_PATH> reports_path;
 	reports_path.set(dump_path->get_string());
+	reports_path.append(L"\\");
 	reports_path.append(k_reports_path);
 	CreateDirectoryW(reports_path.get_string(), NULL);
 
