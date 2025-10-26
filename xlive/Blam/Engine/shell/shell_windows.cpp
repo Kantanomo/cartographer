@@ -43,8 +43,6 @@ static bool g_custom_mouse_cursor_enabled = false;
 
 uint32 g_instance_number = 0;
 
-HANDLE g_frame_limit_system_waitable_timer_handle = NULL;
-
 /* prototypes */
 
 static DWORD WINAPI timeGetTime_hook();

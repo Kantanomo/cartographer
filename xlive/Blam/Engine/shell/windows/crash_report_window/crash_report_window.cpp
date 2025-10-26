@@ -158,6 +158,7 @@ static size_t crash_report_get_text_total_size(const wchar_t* reports_path)
 	{
 		file_path.clear();
 		file_path.set(reports_path);
+		file_path.append(L"\\");
 		file_path.append(k_reports_path);
 		file_path.append(k_report_text_file_names[i]);
 
@@ -199,6 +200,7 @@ static void crash_window_set_text(const wchar_t* reports_path, wchar_t* crash_me
 	{
 		file_path.clear();
 		file_path.set(reports_path);
+		file_path.append(L"\\");
 		file_path.append(k_reports_path);
 		file_path.append(k_report_text_file_names[report_file_index]);
 
