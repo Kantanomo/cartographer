@@ -69,7 +69,7 @@ static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long d
 
 static void shell_windows_throttle_framerate_initialize();
 
-static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_time, real32 desired_framerate);
+static void shell_windows_yield_thread(LARGE_INTEGER last_time, real32 desired_framerate);
 
 // Adjust name of window to display the instance number when we have more than 1 window open
 static void shell_windows_adjust_name(void);
@@ -242,15 +242,6 @@ unsigned long long shell_time_now_msec()
 
 void shell_windows_throttle_framerate_initialize()
 {
-	if (NULL == g_frame_limit_system_waitable_timer_handle)
-	{
-		g_frame_limit_system_waitable_timer_handle = CreateWaitableTimer(NULL, FALSE, NULL);
-
-		atexit([]() -> void {
-			if (NULL != g_frame_limit_system_waitable_timer_handle)
-				CloseHandle(g_frame_limit_system_waitable_timer_handle);
-			});
-	}
 }
 
 void shell_windows_throttle_framerate(LARGE_INTEGER last_time, int desired_framerate)
@@ -258,7 +249,7 @@ void shell_windows_throttle_framerate(LARGE_INTEGER last_time, int desired_frame
 	if (desired_framerate > 0)
 	{
 		desired_framerate = MAX(desired_framerate, 15);
-		shell_windows_yield_thread(g_frame_limit_system_waitable_timer_handle, last_time, (real32)desired_framerate);
+		shell_windows_yield_thread(last_time, (real32)desired_framerate);
 	}
 
 	return;
@@ -493,7 +484,7 @@ static unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long d
 	return shell_time_from_counter(counter, freq, denominator);
 }
 
-static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_INTEGER last_counter, real32 desired_framerate)
+static void shell_windows_yield_thread(LARGE_INTEGER last_counter, real32 desired_framerate)
 {
 	const int k_thread_sleep_api_time_slice_percentage = 70; // 70% of the time
 	const int k_thread_sleep_api_min_time_to_sleep_usec = 3000; // 3ms
@@ -515,25 +506,20 @@ static void shell_windows_yield_thread(HANDLE frame_limit_timer_handle, LARGE_IN
 		// because the system timer isn't precise enough to guarantee the time slept is close to the one desired
 		if (system_yield_time_usec > k_thread_sleep_api_min_time_to_sleep_usec)
 		{
-			if (NULL != frame_limit_timer_handle)
+			ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+			NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+
+			// shell_system_set_timer_resolution_max(true);
+
+			if (10ll * system_yield_time_usec > ulMaximumResolution)
 			{
-				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
-				NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
-
-				// shell_system_set_timer_resolution_max(true);
-
-				if (10ll * system_yield_time_usec > ulMaximumResolution)
-				{
-					LARGE_INTEGER liDueTime = {};
-					liDueTime.QuadPart = -10ll * system_yield_time_usec;
-					if (SetWaitableTimer(frame_limit_timer_handle, &liDueTime, 0, NULL, NULL, TRUE))
-					{
-						// Wait for the timer.
-						NtWaitForSingleObjectHelper(frame_limit_timer_handle, FALSE, NULL);
-					}
-				}
+				LARGE_INTEGER liDueTime = {};
+				liDueTime.QuadPart = -10ll * system_yield_time_usec;
+				
+				// Wait for the timer.
+				NtWaitForSingleObjectHelper(GetCurrentThread(), FALSE, &liDueTime);
 			}
-
+			
 			/*int sleepTimeMs = system_yield_time_usec / 1000ll;
 			if (sleepTimeMs >= 0)
 				Sleep(sleepTimeMs);*/
