@@ -529,7 +529,13 @@ static void shell_windows_yield_thread(LARGE_INTEGER last_counter, real32 desire
 		while (true)
 		{
 			if (shell_time_diff(last_counter, k_shell_time_usec_denominator) >= min_frametime_usec)
+			{
 				break;
+			}
+			else
+			{
+				_mm_pause();
+			}
 		}
 	}
 }
