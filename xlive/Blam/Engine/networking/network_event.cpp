@@ -221,10 +221,10 @@ static void network_event_adjust_current_minimum_level(void)
 	network_event_globals.current_minimum_level = (current_min_greater_than_current_display ? network_event_globals.current_display_level : network_event_globals.current_minimum_level);
 
 	const bool current_min_greater_than_current_log = network_event_globals.current_minimum_level > network_event_globals.current_log_level;
-	network_event_globals.current_minimum_level = (current_min_greater_than_current_display ? network_event_globals.current_log_level : network_event_globals.current_minimum_level);
+	network_event_globals.current_minimum_level = (current_min_greater_than_current_log ? network_event_globals.current_log_level : network_event_globals.current_minimum_level);
 
 	const bool current_min_greater_than_current_remote_log = network_event_globals.current_minimum_level > network_event_globals.current_remote_log_level;
-	network_event_globals.current_minimum_level = (current_min_greater_than_current_display ? network_event_globals.current_remote_log_level : network_event_globals.current_minimum_level);
+	network_event_globals.current_minimum_level = (current_min_greater_than_current_remote_log ? network_event_globals.current_remote_log_level : network_event_globals.current_minimum_level);
 	return;
 }
 
