@@ -193,7 +193,8 @@ bool __cdecl rasterizer_dx9_fullscreen_default_with_window_location_build_vertex
 	void* output,
 	void* ctx)
 {
-	bool result = true;
+	bool result = false;
+
 	ASSERT(output);
 
 	switch (output_type)
@@ -203,16 +204,18 @@ bool __cdecl rasterizer_dx9_fullscreen_default_with_window_location_build_vertex
 		// make sure to set the viewport, otherwise it'll represent the entire surface
 		// which is not good during split-screen
 		rasterizer_dx9_viewport_calculate_position(location, 1.f, (real_vector4d*)output);
+		result = true;
 		break;
 	case _vertex_output_type_texcoord:
 		rasterizer_dx9_fullscreen_texture_window_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		result = true;
 		break;
 	case _vertex_output_type_color:
 		*(pixel32*)output = global_white_pixel32;
+		result = true;
 		break;
 	default:
 		unreachable();
-		result = false;
 	}
 
 	return result;
@@ -226,23 +229,24 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_color_ctx_cb(
 	void* ctx
 )
 {
-	bool result = true;
+	bool result = false;
 
 	switch (output_type)
 	{
 	case _vertex_output_type_position:
 		rasterizer_dx9_viewport_calculate_position(location, 1.f, (real_vector4d*)output);
+		result = true;
 		break;
 	case _vertex_output_type_texcoord:
 		rasterizer_dx9_fullscreen_texture_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		result = true;
 		break;
 	case _vertex_output_type_color:
 		*(pixel32*)output = *(pixel32*)ctx;
+		result = true;
 		break;
 	default:
 		unreachable();
-		result = false;
-		break;
 	}
 
 	return result;

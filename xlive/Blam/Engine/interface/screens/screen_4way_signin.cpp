@@ -436,31 +436,31 @@ void c_screen_4way_signin::initialize(s_screen_parameters* parameters)
 
 const void* c_screen_4way_signin::load_proc(void) const
 {
-	switch (this->m_call_context)
+	void* result = NULL;
+	switch (m_call_context)
 	{
 	case _4_way_signin_type_crossgame_invite:
-		return &c_screen_4way_signin::load_for_crossgame_invite;
+		result = &c_screen_4way_signin::load_for_crossgame_invite;
 		break;
 	case _4_way_signin_type_xbox_live:
-		return &c_screen_4way_signin::load_for_xbox_live;
+		result = &c_screen_4way_signin::load_for_xbox_live;
 		break;
 
 	case _4_way_signin_type_system_link:
-		return &c_screen_4way_signin::load_for_system_link;
+		result = &c_screen_4way_signin::load_for_system_link;
 		break;
 
 	case _4_way_signin_type_splitscreen:
-		return &c_screen_4way_signin::load_for_splitscreen;
+		result = &c_screen_4way_signin::load_for_splitscreen;
 		break;
 
 	case _4_way_signin_type_campaign:
-		return &c_screen_4way_signin::load_for_campaign;
+		result = &c_screen_4way_signin::load_for_campaign;
 		break;
-
 	default:
 		unreachable();
 	}
-	return NULL;
+	return result;
 }
 
 bool __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_index controller_index)

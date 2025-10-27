@@ -175,7 +175,7 @@ if (!(STATEMENT))						\
 #define ASSERT(STATEMENT)                                   (void)(#STATEMENT)
 
 #define vassert(...)	(void)(0)
-#define unreachable()	(void)(0)
+#define unreachable()	__assume(0)
 #define halt()			(void)(0)
 
 #endif // ASSERTS_ENABLED
