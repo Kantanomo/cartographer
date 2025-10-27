@@ -109,8 +109,8 @@ void Infection::sendTeamChange()
 				{
 					if (session->is_session_player_active(i))
 					{
-						e_game_team team = zombiePlayerIndex == i ? k_zombie_team : k_humans_team;
-						bool is_current_player_zombie = zombiePlayerIndex == i;
+						const bool is_current_player_zombie = zombiePlayerIndex == i;
+						const e_game_team team = is_current_player_zombie ? k_zombie_team : k_humans_team;
 
 						player_indexes[player_array_index] = i;
 						player_teams[player_array_index++] = team;
@@ -218,7 +218,7 @@ void Infection::preSpawnServerSetup() {
 	while (player_it.next())
 	{
 		player_datum* player = player_it.get_datum();
-		int32 currentPlayerIndex = player_it.get_absolute_index();
+		const int32 current_player_index = player_it.get_absolute_index();
 
 		uint64 id;
 		csmemcpy(&id, &player->player_identifier, sizeof(uint64));
@@ -234,14 +234,14 @@ void Infection::preSpawnServerSetup() {
 			isZombie = true;
 		}
 
-		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", currentPlayerIndex, isZombie, id, player->configuration.player_name);
+		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", current_player_index, isZombie, id, player->configuration.player_name);
 		if (isZombie) 
 		{
 			player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
 			if (player->configuration.team_index != k_zombie_team)
 			{
 				// prevent the fucks from switching to humans in the pre-game lobby after joining
-				session->switch_player_team(player_it.get_absolute_index(), k_zombie_team);
+				session->switch_player_team(current_player_index, k_zombie_team);
 			}
 		}
 		else 

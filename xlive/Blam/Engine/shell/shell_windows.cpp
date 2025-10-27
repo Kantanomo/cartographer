@@ -592,8 +592,6 @@ static void shell_windows_initialize_arguments(void)
 	const LPWSTR command_line = GetCommandLineW();
 	if (command_line)
 	{
-		const bool is_dedicated_server = shell_is_dedicated_server();
-
 		// Copy the buffer
 		wchar_t argument_buffer[INT16_MAX + 1];
 		ustrncpy(argument_buffer, command_line, NUMBEROF(argument_buffer));

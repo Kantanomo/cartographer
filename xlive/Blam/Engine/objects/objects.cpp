@@ -976,11 +976,7 @@ void* object_get_and_verify_type(datum object_index, int32 object_type_mask)
 	
 #ifdef ASSERTS_ENABLED
 	const e_object_type type = object->object.object_identifier.get_type();
-	if (!TEST_BIT(object_type_mask, type))
-	{
-		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "got an object type we didn't expect (expected one of 0x%08x but got #%d).", object_type_mask, type);
-		DISPLAY_ASSERT(string);
-	}
+	vassert(TEST_BIT(object_type_mask, type), "got an object type we didn't expect (expected one of 0x%08x but got #%d).", object_type_mask, type);
 #endif
 
 	return (void*)object;
@@ -1034,7 +1030,9 @@ void __cdecl object_set_hidden(datum object_index, bool hidden)
 	item_datum* object = (item_datum*)object_get_and_verify_type(object_index, _object_mask_all);
 	if (TEST_BIT(_object_mask_item, object_get_type(object_index)) && object->item.flags.test(_item_in_unit_inventory_bit))
 	{
+#ifdef ASSERTS_ENABLED
 		const bool hidden_in_inventory = object->item.flags.test(_item_hidden_in_unit_inventory_bit);
+#endif
 		if (unit_does_not_show_readied_weapon(object->item.inventory_owner_unit_index))
 		{
 			ASSERT(hidden || !hidden_in_inventory);

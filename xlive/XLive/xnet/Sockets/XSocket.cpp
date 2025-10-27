@@ -109,8 +109,7 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long* argp)
 {
 	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
-	const char* string = IOCTLSocket_cmd_string(cmd);
-	LOG_TRACE_NETWORK("XSocketIOCTLSocket() - cmd: {} - {}", string, cmd);
+	LOG_TRACE_NETWORK("XSocketIOCTLSocket() - cmd: {} - {}", IOCTLSocket_cmd_string(cmd), cmd);
 	int ret = ioctlsocket(xsocket->systemSocketHandle, cmd, argp);
 
 	if (ret == NO_ERROR)
@@ -136,9 +135,8 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char* optva
 {
 	XVirtualSocket* xsocket = (XVirtualSocket*)s;
 
-	const char* string = sockOpt_string(optname);
 	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {:x}, level = {}, optname = {} - {},  optlen = {})",
-		xsocket->systemSocketHandle, level, string, optname, optlen);
+		xsocket->systemSocketHandle, level, sockOpt_string(optname), optname, optlen);
 
 	if (optname == SO_SNDBUF
 		|| optname == SO_RCVBUF)
@@ -783,13 +781,14 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr* name, int namelen)
 
 		getsockname(xsocket->systemSocketHandle, &assignedAddr, &assignedAddrSize);
 
+#ifndef SPDLOG_DISABLED
 		sockaddr_in* assignedAddrIn = (sockaddr_in*)&assignedAddr;
-
 		LOG_TRACE_NETWORK("{}() - socket with virtual port: {} assigned system socket port: {}",
 			__FUNCTION__,
 			ntohs(virtual_port),
 			ntohs(assignedAddrIn->sin_port)
 		);
+#endif
 	}
 
 	return ret;
@@ -904,8 +903,7 @@ int XVirtualSocket::SetBufferSize(int optname, INT bufSize)
 		return SOCKET_ERROR;
 	}
 
-	const char* string = sockOpt_string(optname);
-	LOG_TRACE_NETWORK("{} - getsockopt() - {} - {}:{} - {}", __FUNCTION__, string, optname, bufOpt, bufSize);
+	LOG_TRACE_NETWORK("{} - getsockopt() - {} - {}:{} - {}", __FUNCTION__, sockOpt_string(optname), optname, bufOpt, bufSize);
 
 	// this may only affect Windows 7/Server 2008 R2 and below, as Windows 10 uses an 64K buffer already
 	if (bufOpt < bufSize)

@@ -412,12 +412,7 @@ static int32 network_event_parse_and_get_category_count(const char* event_name, 
 	}
 	while (!failed && !category_found);
 
-	if (failed)
-	{
-		const char* assert_string = csprintf(g_temporary, NUMBEROF(g_temporary), "failed to parse network event '%s'", event_name);
-		DISPLAY_ASSERT_EXCEPTION(assert_string, false);
-	}
-
+	vassert(!failed, "failed to parse network event '%s'", event_name);
 	return category_index;
 }
 

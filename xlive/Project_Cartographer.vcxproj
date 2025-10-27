@@ -189,7 +189,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>4505;4189;4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4100</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -264,7 +264,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DisableSpecificWarnings>4505;4189;4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4100</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <OmitFramePointers>true</OmitFramePointers>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -485,7 +485,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <DisableSpecificWarnings>4505;4189;4100</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4100</DisableSpecificWarnings>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>

@@ -157,6 +157,12 @@ if (!(STATEMENT))                                               \
 ASSERT_EXCEPTION(STATEMENT, true);	\
 (void)0
 
+#define vassert(STATEMENT, FORMAT, ...)	\
+if (!(STATEMENT))						\
+{									\
+	DISPLAY_ASSERT(csprintf(g_temporary, NUMBEROF(g_temporary), (FORMAT), __VA_ARGS__));	\
+}									\
+
 #define unreachable() DISPLAY_ASSERT("unreachable")
 
 #define halt() DISPLAY_ASSERT("halt()")
@@ -168,10 +174,11 @@ ASSERT_EXCEPTION(STATEMENT, true);	\
 #define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           (void)(#STATEMENT)
 #define ASSERT(STATEMENT)                                   (void)(#STATEMENT)
 
-#define unreachable() (void)(0)
-#define halt() (void)(0)
+#define vassert(...)	(void)(0)
+#define unreachable()	(void)(0)
+#define halt()			(void)(0)
 
-#endif // _DEBUG
+#endif // ASSERTS_ENABLED
 
 /* prototypes */
 

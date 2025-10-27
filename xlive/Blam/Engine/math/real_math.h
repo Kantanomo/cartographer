@@ -471,103 +471,56 @@ void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angle
 
 #ifdef VALIDATE_REAL_ENABLED
 #define assert_valid_real(value)	\
-if (!valid_real(value))				\
-{									\
-	const char* string = csnprintf(g_temporary, NUMBEROF(g_temporary), NUMBEROF(g_temporary), "%s: assert_valid_real(0x%08X %f)", #value, value, value);	\
-	DISPLAY_ASSERT(string);			\
-}									\
+vassert(valid_real(value), "%s: assert_valid_real(0x%08X %f)", #value, value, value);	\
 (void)0
 
 #define assert_valid_real_normal3d(normal)		\
-if (!valid_real_normal3d(normal))				\
-{												\
-	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_normal3d(%f, %f, %f)", #normal, (*normal).i, (*normal).j, (*normal).k);	\
-	DISPLAY_ASSERT(string);						\
-}												\
+vassert(valid_real_normal3d(normal), "%s: assert_valid_real_normal3d(%f, %f, %f)", #normal, (*normal).i, (*normal).j, (*normal).k);	\
 (void)0
 
 #define assert_valid_real_point3d(point)		\
-if (!valid_real_point3d(point))					\
-{												\
-	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_point3d(%f, %f, %f)", #point, (*point).x, (*point).y, (*point).z);	\
-	DISPLAY_ASSERT(string);						\
-}												\
+vassert(valid_real_point3d(point), "%s: assert_valid_real_point3d(%f, %f, %f)", #point, (*point).x, (*point).y, (*point).z);		\
 (void)0
 
-#define assert_valid_real_vector3d(vector)		\
-if (!valid_real_vector3d(vector))				\
-{												\
-	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_vector3d(%f, %f, %f)", #vector, (*vector).i, (*vector).j, (*vector).k);	\
-	DISPLAY_ASSERT(string);						\
-}												\
+#define assert_valid_real_vector3d(vector)	\
+vassert(valid_real_vector3d(vector), "%s: assert_valid_real_vector3d(%f, %f, %f)", #vector, (*vector).i, (*vector).j, (*vector).k);	\
 (void)0
 
 #define assert_valid_real_vector3d_axes2(forward, up)	\
-if (!valid_real_vector3d_axes2(forward, up))			\
-{														\
-	const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s, %s: assert_valid_real_vector3d_axes2(%f, %f, %f / %f, %f, %f)", #forward, #up, (*forward).i, (*forward).j, (*forward).k, (*up).i, (*up).j, (*up).k);	\
-	DISPLAY_ASSERT(string);								\
-}														\
+vassert(valid_real_vector3d_axes2(forward, up), "%s, %s: assert_valid_real_vector3d_axes2(%f, %f, %f / %f, %f, %f)", #forward, #up, (*forward).i, (*forward).j, (*forward).k, (*up).i, (*up).j, (*up).k);	\
 (void)0
 
 #define assert_valid_real_matrix4x3(matrix)		\
 if (!valid_real_matrix4x3(matrix))				\
 {												\
-	if (!valid_real(*matrix.scale))				\
-	{											\
-		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad scale %f", #matrix, *matrix.scale);	\
-		DISPLAY_ASSERT(string);					\
-	}											\
-	if (!valid_real_normal3d(matrix.vectors.forward))	\
-	{											\
-		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad forward (%f,%f,%f)", #matrix, *matrix.vectors.forward.i, *matrix.vectors.forward.j, *matrix.vectors.forward.k);	\
-		DISPLAY_ASSERT(string);					\
-	}											\
-	if (!valid_real_normal3d(matrix.vectors.left))		\
-	{											\
-		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad left (%f,%f,%f)", #matrix, *matrix.vectors.left.i, *matrix.vectors.left.j, *matrix.vectors.left.k);	\
-		DISPLAY_ASSERT(string);					\
-	}											\
-	if (!valid_real_normal3d(matrix.vectors.forward))	\
-	{											\
-		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad up (%f,%f,%f)", #matrix, *matrix.vectors.up.i, *matrix.vectors.up.j, *matrix.vectors.up.k);	\
-		DISPLAY_ASSERT(string);					\
-	}											\
-	if (!valid_real_point3d(matrix.position))	\
-	{											\
-		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a bad up (%f,%f,%f)", #matrix, *matrix.position.x, *matrix.position.y, *matrix.position.z);	\
-		DISPLAY_ASSERT(string);					\
-	}											\
-	if (!valid_realcmp(dot_product3d(matrix.vectors.forward, matrix.vectors.left), 0.0))	\
-	{											\
-		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a forward (%f,%f,%f) not perpendicular to left (%f,%f,%f)", \
-										#matrix,\
-										*matrix.vectors.forward.i, *matrix.vectors.forward.j, *matrix.vectors.forward.k,	\
-										*matrix.vectors.left.i, *matrix.vectors.left.j, *matrix.vectors.left.k);			\
-		DISPLAY_ASSERT(string);					\
-	}											\
-	if (!valid_realcmp(dot_product3d(matrix.vectors.up, matrix.vectors.left), 0.0))	\
-	{											\
-		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a up (%f,%f,%f) not perpendicular to left (%f,%f,%f)", \
-										#matrix,\
-										*matrix.vectors.up.i, *matrix.vectors.up.j, *matrix.vectors.up.k,			\
-										*matrix.vectors.left.i, *matrix.vectors.left.j, *matrix.vectors.left.k);	\
-		DISPLAY_ASSERT(string);					\
-	}											\
-	if (!valid_realcmp(dot_product3d(matrix.vectors.forward, matrix.vectors.up), 0.0))	\
-	{											\
-		const char* error_string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s had a forward (%f,%f,%f) not perpendicular to up (%f,%f,%f)", \
-										#matrix,\
-										*matrix.vectors.forward.i, *matrix.vectors.forward.j, *matrix.vectors.forward.k,	\
-										*matrix.vectors.up.i, *matrix.vectors.up.j, *matrix.vectors.up.k);					\
-		DISPLAY_ASSERT(error_string);			\
-	}											\
-	if (!valid_real_matrix4x3(matrix))			\
-	{											\
-		const char* string = csprintf(g_temporary, NUMBEROF(g_temporary), "%s: assert_valid_real_matrix4x3", #matrix);	\
-		DISPLAY_ASSERT(string);					\
-	}											\
-}												\
+	vassert(valid_real(*matrix.scale), "%s had a bad scale %f", #matrix, *matrix.scale);	\
+	vassert(valid_real_normal3d(matrix.vectors.forward), "%s had a bad forward (%f,%f,%f)", #matrix, *matrix.vectors.forward.i, *matrix.vectors.forward.j, *matrix.vectors.forward.k);	\
+	vassert(valid_real_normal3d(matrix.vectors.left), "%s had a bad left (%f,%f,%f)", #matrix, *matrix.vectors.left.i, *matrix.vectors.left.j, *matrix.vectors.left.k);					\
+	vassert(valid_real_normal3d(matrix.vectors.up), "%s had a bad up (%f,%f,%f)", #matrix, *matrix.vectors.up.i, *matrix.vectors.up.j, *matrix.vectors.up.k);							\
+	vassert(valid_real_point3d(matrix.position), "%s had a bad position (%f,%f,%f)", #matrix, *matrix.position.x, *matrix.position.y, *matrix.position.z);								\
+	vassert(																				\
+		valid_realcmp(dot_product3d(matrix.vectors.forward, matrix.vectors.left), 0.f),		\
+		"%s had a forward (%f,%f,%f) not perpendicular to left (%f,%f,%f)",					\
+		#matrix,																			\
+		*matrix.vectors.forward.i, *matrix.vectors.forward.j, *matrix.vectors.forward.k,	\
+		*matrix.vectors.left.i, *matrix.vectors.left.j, *matrix.vectors.left.k				\
+	);																						\
+	vassert(																				\
+		valid_realcmp(dot_product3d(matrix.vectors.up, matrix.vectors.left), 0.f),			\
+		"%s had a up (%f,%f,%f) not perpendicular to left (%f,%f,%f)",						\
+		#matrix,																			\
+		*matrix.vectors.up.i, *matrix.vectors.up.j, * matrix.vectors.up.k,					\
+		*matrix.vectors.left.i, *matrix.vectors.left.j, * matrix.vectors.left.k				\
+	);																						\
+	vassert(																				\
+		valid_realcmp(dot_product3d(matrix.vectors.forward, matrix.vectors.up), 0.f),		\
+		"%s had a forward (%f,%f,%f) not perpendicular to up (%f,%f,%f)",					\
+		#matrix,																			\
+		*matrix.vectors.forward.i, *matrix.vectors.forward.j, *matrix.vectors.forward.k,	\
+		*matrix.vectors.up.i, *matrix.vectors.up.j, *matrix.vectors.up.k					\
+	);																						\
+	vassert(valid_real_matrix4x3(matrix), "%s: assert_valid_real_matrix4x3", #matrix);		\
+}																							\
 (void)0
 #else
 #define assert_valid_real(value)						(void)0
