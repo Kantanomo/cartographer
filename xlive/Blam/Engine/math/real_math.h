@@ -378,10 +378,73 @@ inline real32 normalize3d(real_vector3d* v1)
 
 inline real_vector3d* cross_product3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* result)
 {
+#if _M_IX86_FP == 1 || _M_IX86_FP == 2 // SSE1/SSE2
+
+	// Move our vectors into the xmm registers
+	const __m128 a_xmm = { a->i, a->j, a->k, 0.f };
+	const __m128 b_xmm = { b->i, b->j, b->k, 0.f };
+
+	/* Shuffle vector a elements for multiplication;
+	* res[0] = in[1] (a->j)
+	* res[1] = in[2] (a->k)
+	* res[2] = in[0] (a->i)
+	* res[3] = in[3] (0)
+	*/
+	const __m128 shuffled_a = _mm_shuffle_ps(a_xmm, a_xmm, _MM_SHUFFLE(3, 0, 2, 1));
+
+	/* Shuffle vector b elements for multiplication:
+	* res[0] = in[2] (b->k)
+	* res[1] = in[0] (b->i)
+	* res[2] = in[1] (b->j)
+	* res[3] = in[3] (0)
+	*/
+	const __m128 shuffled_b = _mm_shuffle_ps(b_xmm, b_xmm, _MM_SHUFFLE(3, 1, 0, 2));
+	
+
+	/* Multiply vectors (right side):
+	* res[0] = a->j * b->i
+	* res[1] = a->k * b->j
+	* res[2] = a->i * b->k
+	* res[3] = 0
+	*/
+	const __m128 rs_result = _mm_mul_ps(shuffled_a, b_xmm);
+
+
+	/* Multiply vectors (left side):
+	* res[0] = a->j * b->k
+	* res[1] = a->k * b->i
+	* res[2] = a->i * b->j
+	* res[3] = 0
+	*/
+	const __m128 ls_result = _mm_mul_ps(shuffled_a, shuffled_b);
+
+	/* Shuffle right side multiply so we can perform the subtraction afterwards:
+	* res[0] = in[1] (a->k * b->j)
+	* res[1] = in[2] (a->i * b->k)
+	* res[2] = in[0] (a->j * b->i)
+	* res[3] = in[3] (0)
+	*/
+	const __m128 shuffled_rs_result = _mm_shuffle_ps(rs_result, rs_result, _MM_SHUFFLE(3, 0, 2, 1));
+	
+	/* Perform subtraction of the right side from the left:
+	* res[0] = (a->j * b->k) - (a->k * b->j)
+	* res[1] = (a->k * b->i) - (a->i * b->k)
+	* res[2] = (a->i * b->j) - (a->j * b->i)
+	* res[3] = 0
+	*/
+	const __m128 res = _mm_sub_ps(ls_result, shuffled_rs_result);
+	
+	// Move our result back into the result vector
+	result->i = res.m128_f32[0];
+	result->j = res.m128_f32[1];
+	result->k = res.m128_f32[2];
+	return result;
+#else
 	result->i = a->j * b->k - a->k * b->j;
 	result->j = a->k * b->i - a->i * b->k;
 	result->k = a->i * b->j - a->j * b->i;
 	return result;
+#endif
 }
 
 inline void set_real_point3d(real_point3d* point, real32 x, real32 y, real32 z)
