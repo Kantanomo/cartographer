@@ -158,10 +158,14 @@ ASSERT_EXCEPTION(STATEMENT, true);	\
 (void)0
 
 #define vassert(STATEMENT, FORMAT, ...)	\
-if (!(STATEMENT))						\
-{									\
-	DISPLAY_ASSERT(csprintf(g_temporary, NUMBEROF(g_temporary), (FORMAT), __VA_ARGS__));	\
-}									\
+do																								\
+{																								\
+	if (!(STATEMENT))																			\
+	{																							\
+		DISPLAY_ASSERT(csprintf(g_temporary, NUMBEROF(g_temporary), (FORMAT), __VA_ARGS__));	\
+	}																							\
+}																								\
+while(0)
 
 #define unreachable() DISPLAY_ASSERT("unreachable")
 
