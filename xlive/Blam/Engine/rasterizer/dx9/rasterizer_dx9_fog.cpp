@@ -243,15 +243,17 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
 	real32 atmospheric_distance;
 	real32 val;
 
-	bool result = true;
+	bool result = false;
 
 	switch (output_type)
 	{
 	case _rasterizer_dx9_atmospheric_fog_output_type_position:
 		rasterizer_dx9_viewport_calculate_position(location, 1.f, (real_vector4d*)output);
+		result = true;
 		break;
 	case _rasterizer_dx9_atmospheric_fog_output_type_texcoord:
 		rasterizer_dx9_fullscreen_texture_window_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		result = true;
 		break;
 	case _rasterizer_dx9_atmospheric_fog_output_type_plane_position:
 		global_window_parameters = global_window_parameters_get();
@@ -263,6 +265,7 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
 		((real_vector4d*)output)->j = 0.f;
 		((real_vector4d*)output)->k = -(global_window_parameters->fog_result.atmospheric_min_distance * val);
 		((real_vector4d*)output)->l = 0.f;
+		result = true;
 		break;
 	case _rasterizer_dx9_atmospheric_fog_output_type_secondary_plane_position:
 		global_window_parameters = global_window_parameters_get();
@@ -274,16 +277,18 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
 		((real_vector4d*)output)->j = 0.f;
 		((real_vector4d*)output)->k = -(global_window_parameters->fog_result.secondary_min_distance * val);
 		((real_vector4d*)output)->l = 0.f;
+		result = true;
 		break;
 	case _rasterizer_dx9_atmospheric_fog_output_type_screen_coordinates:
 		rasterizer_dx9_fullscreen_texture_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		result = true;
 		break;
 	case _rasterizer_dx9_atmospheric_fog_output_type_color:
 		*(pixel32*)output = global_white_pixel32;
+		result = true;
 		break;
 	default:
 		unreachable();
-		result = false;
 	}
 
 	return result;
@@ -343,7 +348,8 @@ bool __cdecl rasterizer_dx9_patchy_fog_apply_from_stencil_build_vertex_buffer(
 	void* output,
 	void* ctx)
 {
-	bool result = true;
+	bool result = false;
+
 	ASSERT(output);
 
 	switch (output_type)
@@ -353,16 +359,18 @@ bool __cdecl rasterizer_dx9_patchy_fog_apply_from_stencil_build_vertex_buffer(
 		// make sure to set the viewport, otherwise it'll represent the entire surface
 		// which is not good during split-screen
 		rasterizer_dx9_viewport_calculate_position(location, 1.f, (real_vector4d*)output);
+		result = true;
 		break;
 	case _vertex_output_type_texcoord:
 		rasterizer_dx9_fullscreen_texture_window_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		result = true;
 		break;
 	case _vertex_output_type_color:
 		*(pixel32*)output = global_white_pixel32;
+		result = true;
 		break;
 	default:
 		unreachable();
-		result = false;
 	}
 
 	return result;
@@ -375,19 +383,20 @@ bool __cdecl rasterizer_dx9_sky_only_fog_build_vertex_buffer(
 	void* output,
 	void* ctx)
 {
-	bool result = true;
+	bool result = false;
 
 	switch (output_type)
 	{
 	case _rasterizer_dx9_fog_sky_only_output_type_position:
 		rasterizer_dx9_viewport_calculate_position(location, 1.f, (real_vector4d*)output);
+		result = true;
 		break;
 	case _rasterizer_dx9_fog_sky_only_output_type_color:
 		*(pixel32*)output = global_white_pixel32;
+		result = true;
 		break;
 	default:
 		unreachable();
-		result = false;
 	}
 
 	return result;

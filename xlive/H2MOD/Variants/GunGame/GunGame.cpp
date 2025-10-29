@@ -190,7 +190,6 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_index, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
 {
 	const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
-	const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 
 	uint64 id;
 	s_player_identifier identifier = NetworkSession::GetPlayerId(player_index);
@@ -208,6 +207,9 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 		if (game_results_statistic == 7
 			&& !game_is_predicted())
 		{
+#ifdef EVENTS_ENABLED
+			const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
+#endif
 			event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws", __FUNCTION__, player_abs_index, player->configuration.player_name);
 
 			int32 level = gungamePlayers[id];

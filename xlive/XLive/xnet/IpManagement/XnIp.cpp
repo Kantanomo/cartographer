@@ -158,6 +158,7 @@ void XnIpManager::LogConnectionsErrorDetails(const sockaddr_in* address, int err
 				const XnIpPckTransportStats* pckStats;
 				if (xnIp->PckGetStats(&pckStats))
 				{
+#ifndef SPDLOG_DISABLED
 					float connectionLastInteractionSeconds = (float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
 					float connectionLastPacketReceivedSeconds = (float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
 					LOG_CRITICAL_NETWORK("{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds, time since last packet receive: {:.4f} seconds",
@@ -167,6 +168,7 @@ void XnIpManager::LogConnectionsErrorDetails(const sockaddr_in* address, int err
 						pckStats->pckRecvd,
 						connectionLastInteractionSeconds,
 						connectionLastPacketReceivedSeconds);
+#endif
 				}
 			}
 			else
@@ -839,7 +841,10 @@ void XnIp::SendXNetRequest(XVirtualSocket* xsocket, eXnip_ConnectRequestType req
 	m_connectionPacketsSentCount++;
 
 	m_requestContext = true;
-	int udp_send_result = xsocket->UdpSend((const char*)&reqPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
+#ifndef SPDLOG_DISABLED
+	const int udp_send_result = 
+#endif
+		xsocket->UdpSend((const char*)&reqPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
 	LOG_INFO_NETWORK("{} - request sent, result: {}, socket handle: {}, connection index: {}, connection id: {:x}, n0nceKey: {}",
 		__FUNCTION__,
 		udp_send_result,

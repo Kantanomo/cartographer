@@ -350,7 +350,6 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 
 	IDirect3DSurface9* d3d_surface = NULL;
 	IDirect3DSurface9* d3d_depth_buffer_stencil = NULL;
-	bool valid_target = true;
 	bool depth_provided = false;
 
 	int32 g_ps_index = *global_rasterizer_pixel_shader_index_get();
@@ -389,7 +388,6 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 		break;
 	case _rasterizer_target_frontbuffer:
 		DISPLAY_ASSERT("###ERROR### attempt to set front buffer as the render target");
-		valid_target = false;
 		break;
 	case _rasterizer_target_backbuffer:
 		d3d_surface = dx9_globals->global_d3d_surface_backbuffer;
@@ -412,7 +410,6 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 		break;
 	case _rasterizer_target_dynamic_gamma:
 		DISPLAY_ASSERT("_rasterizer_target_dynamic_gamma is no longer available");
-		valid_target = false;
 		break;
 	case _rasterizer_target_sun_glow_primary:
 		d3d_surface = dx9_globals->global_d3d_surface_sun_glow_primary;
@@ -475,10 +472,9 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 		break;
 	default:
 		unreachable();
-		valid_target = false;
 	}
 
-	if (valid_target && d3d_surface)
+	if (d3d_surface)
 	{
 		const s_frame* global_window_parameters = global_window_parameters_get();
 		real32 viewport_scale;
@@ -532,7 +528,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 			}
 			else
 			{
-				viewport_scale = 1.0;
+				viewport_scale = 1.f;
 				viewport.X = (DWORD)(global_window_parameters->camera.viewport_bounds.left * viewport_scale);
 				viewport.Y = (DWORD)(global_window_parameters->camera.viewport_bounds.top * viewport_scale);
 				viewport.Width = (DWORD)(viewport_width * viewport_scale);

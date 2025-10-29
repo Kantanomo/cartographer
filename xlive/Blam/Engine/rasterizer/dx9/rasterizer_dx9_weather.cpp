@@ -141,9 +141,11 @@ bool __cdecl rasterizer_dx9_weather_plate_build_vertex_buffer(
 	{
 	case _rasterizer_dx9_weather_plate_output_type_position:
 		rasterizer_dx9_viewport_calculate_position(location, 0.f, (real_vector4d*)output);
+		result = true;
 		break;
 	case _rasterizer_dx9_weather_plate_output_type_screen_texcoord:
 		rasterizer_dx9_fullscreen_texture_window_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		result = true;
 		break;
 	case _rasterizer_dx9_weather_plate_output_type_plane_position:
 		global_window_parameters = global_window_parameters_get();
@@ -155,6 +157,7 @@ bool __cdecl rasterizer_dx9_weather_plate_build_vertex_buffer(
 		((real_rectangle2d*)output)->x1 = 0.f;
 		((real_rectangle2d*)output)->y0 = -(ctx->depth_blend_z_bounds.lower * val);
 		((real_rectangle2d*)output)->y1 = 0.f;
+		result = true;
 		break;
 	case _rasterizer_dx9_weather_plate_output_type_texture_0_texcoord:
 	case _rasterizer_dx9_weather_plate_output_type_texture_1_texcoord:
@@ -166,13 +169,14 @@ bool __cdecl rasterizer_dx9_weather_plate_build_vertex_buffer(
 
 		((real_point2d*)output)->u = window_data->texture_positions[tex_num].u * ctx->texture_scale[tex_num] + val * location->i;
 		((real_point2d*)output)->v = window_data->texture_positions[tex_num].v * ctx->texture_scale[tex_num] + val * location->j;
+		result = true;
 		break;
 	case _rasterizer_dx9_weather_plate_output_type_color:
 		*(pixel32*)output = global_white_pixel32;
+		result = true;
 		break;
 	default:
 		unreachable();
-		result = false;
 	}
 
 	return result;

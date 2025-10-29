@@ -221,10 +221,10 @@ static void network_event_adjust_current_minimum_level(void)
 	network_event_globals.current_minimum_level = (current_min_greater_than_current_display ? network_event_globals.current_display_level : network_event_globals.current_minimum_level);
 
 	const bool current_min_greater_than_current_log = network_event_globals.current_minimum_level > network_event_globals.current_log_level;
-	network_event_globals.current_minimum_level = (current_min_greater_than_current_display ? network_event_globals.current_log_level : network_event_globals.current_minimum_level);
+	network_event_globals.current_minimum_level = (current_min_greater_than_current_log ? network_event_globals.current_log_level : network_event_globals.current_minimum_level);
 
 	const bool current_min_greater_than_current_remote_log = network_event_globals.current_minimum_level > network_event_globals.current_remote_log_level;
-	network_event_globals.current_minimum_level = (current_min_greater_than_current_display ? network_event_globals.current_remote_log_level : network_event_globals.current_minimum_level);
+	network_event_globals.current_minimum_level = (current_min_greater_than_current_remote_log ? network_event_globals.current_remote_log_level : network_event_globals.current_minimum_level);
 	return;
 }
 
@@ -412,12 +412,7 @@ static int32 network_event_parse_and_get_category_count(const char* event_name, 
 	}
 	while (!failed && !category_found);
 
-	if (failed)
-	{
-		const char* assert_string = csprintf(g_temporary, NUMBEROF(g_temporary), "failed to parse network event '%s'", event_name);
-		DISPLAY_ASSERT_EXCEPTION(assert_string, false);
-	}
-
+	vassert(!failed, "failed to parse network event '%s'", event_name);
 	return category_index;
 }
 

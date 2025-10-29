@@ -513,7 +513,7 @@ public:
 
 	bool established(void)
 	{
-		bool result;
+		bool result = false;
 		switch (current_local_state())
 		{
 		case _network_session_state_none:
@@ -533,7 +533,6 @@ public:
 			break;
 		default:
 			unreachable();
-			result = false;
 		}
 
 		return result;

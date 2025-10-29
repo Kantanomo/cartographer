@@ -329,12 +329,14 @@ void __cdecl game_tick(void)
 {
 	//INVOKE(0x4A4AF, 0x4372D, game_tick);
 
+#if ASSERTS_ENABLED
 	game_globals_storage* game_globals = get_main_game_globals();
 	ASSERT(game_globals && game_globals->map_active && game_globals->active_structure_bsp_index != NONE);
+#endif
 
 	struct simulation_update update;
 
-	//main_status("game_tick", "time %d", game_time_get());
+	main_status("game_tick", "time %d", game_time_get());
 
 	real_math_reset_precision();
 	simulation_build_update(&update);

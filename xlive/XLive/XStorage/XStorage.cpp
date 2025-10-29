@@ -1,10 +1,6 @@
 #include "stdafx.h"
 #include "XStorage.h"
 
-#include <filesystem>
-
-namespace filesystem = std::filesystem;
-
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
 // #5344: XStorageBuildServerPath
@@ -12,67 +8,62 @@ DWORD WINAPI XStorageBuildServerPath(DWORD dwUserIndex, XSTORAGE_FACILITY Storag
 	const void *pvStorageFacilityInfo, DWORD dwStorageFacilityInfoSize,
 	WCHAR* pwszItemName, WCHAR *pwszServerPath, DWORD *pdwServerPathLength)
 {
-	if (!pdwServerPathLength)
-		return ERROR_INVALID_PARAMETER;
+	DWORD result = ERROR_INVALID_PARAMETER;
 
-	LOG_TRACE_XLIVE(L"XStorageBuildServerPath  ( StorageFacility = {},  dwStorageFacilityInfoSize = {}, pwszItemName = {}, pwszServerPath = {}, pdwServerPathLength = {} )",
-		(int)StorageFacility, dwStorageFacilityInfoSize, (wchar_t*)pwszItemName, (wchar_t*)pwszServerPath, *pdwServerPathLength);
-
-	if (pwszServerPath)
+	if (pdwServerPathLength)
 	{
-		wchar_t userprofile[MAX_PATH];
-		
-		size_t required_count;
-		_wgetenv_s(&required_count, userprofile, L"USERPROFILE");
+		LOG_TRACE_XLIVE(L"XStorageBuildServerPath  ( StorageFacility = {},  dwStorageFacilityInfoSize = {}, pwszItemName = {}, pwszServerPath = {}, pdwServerPathLength = {} )",
+			(int)StorageFacility,
+			dwStorageFacilityInfoSize, 
+			(wchar_t*)pwszItemName,
+			(wchar_t*)pwszServerPath,
+			*pdwServerPathLength
+		);
 
-		XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
-
-		std::wstring itemName(pwszItemName);
-		std::wstring path(userprofile);
-		std::wstring xuidAsString = std::to_wstring(signedInUser->xuid);
-
-		path += L"\\AppData\\Local\\Microsoft\\Halo 2\\XLive\\";
-		path += xuidAsString;
-
-		bool createDirectoryTree = false;
-		try
+		if (pwszServerPath)
 		{
-			filesystem::create_directory(path);
-		}
-		catch (...)
-		{
-			createDirectoryTree = true;
-		}
+			const XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
+			wchar_t userprofile[MAX_PATH];
 
-		// create the directories only if we fail to create the last one in the tree
-		if (createDirectoryTree)
-		{
-			filesystem::create_directories(path);
+			size_t required_count;
+			_wgetenv_s(&required_count, userprofile, L"USERPROFILE");
+
+			std::wstring itemName(pwszItemName);
+			std::wstring path(userprofile);
+			std::wstring xuidAsString = std::to_wstring(signedInUser->xuid);
+
+			path += L"\\AppData\\Local\\Microsoft\\Halo 2\\XLive\\";
+			path += xuidAsString;
+
+			const int create_dir_res = SHCreateDirectoryEx(NULL, path.c_str(), NULL);
+			if (create_dir_res == ERROR_SUCCESS || ERROR_ALREADY_EXISTS || ERROR_FILE_EXISTS)
+			{
+				switch (StorageFacility)
+				{
+				case XSTORAGE_FACILITY_PER_TITLE:
+				case XSTORAGE_FACILITY_GAME_CLIP:
+				case XSTORAGE_FACILITY_PER_USER_TITLE:
+					path += L"\\" + itemName;
+					result = ERROR_SUCCESS;
+					break;
+				}
+
+				if (*pdwServerPathLength < path.length() + 1)
+				{
+					result = ERROR_INSUFFICIENT_BUFFER;
+				}
+
+				wcsncpy_s(pwszServerPath, *pdwServerPathLength, path.c_str(), MAX_PATH);
+				*pdwServerPathLength = path.length() + 1; // including the null char
+			}
+			else
+			{
+				result = create_dir_res;
+			}
 		}
-
-		switch (StorageFacility)
-		{
-		case XSTORAGE_FACILITY_PER_TITLE:
-		case XSTORAGE_FACILITY_GAME_CLIP:
-		case XSTORAGE_FACILITY_PER_USER_TITLE:
-			path += L"\\" + itemName;
-			break;
-
-		default:
-			return ERROR_INVALID_PARAMETER;
-		}
-
-		if (*pdwServerPathLength < path.length() + 1)
-		{
-			return ERROR_INSUFFICIENT_BUFFER;
-		}
-
-		wcsncpy_s(pwszServerPath, *pdwServerPathLength, path.c_str(), MAX_PATH);
-		*pdwServerPathLength = path.length() + 1; // including the null char
-		return ERROR_SUCCESS;
 	}
 
-	return ERROR_SUCCESS;
+	return result;
 }
 
 // #5305: XStorageUploadFromMemory
