@@ -15,8 +15,6 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
 
-#include <filesystem>
-
 /* constants */
 
 static const wchar_t k_client_process_name[] = L"Halo2Client";
@@ -153,15 +151,7 @@ void log_file_name_prepare(const wchar_t* logFileName, c_static_wchar_string<MAX
 	path->append(folders.get_string());
 
 	// try making logs directory
-	if (!std::filesystem::create_directories(path->get_string()) && !std::filesystem::is_directory(std::filesystem::status(path->get_string())))
-	{
-		// try locally if we didn't already
-		if (!g_h2_portable
-			&& std::filesystem::create_directories(folders.get_string()) || std::filesystem::is_directory(std::filesystem::status(folders.get_string())))
-			path->set(folders.get_string());
-		else
-			path->set(L""); // fine then
-	}
+	SHCreateDirectoryEx(NULL, path->get_string(), NULL);
 
 	path->append(L"\\");
 	path->append(logFileName);
