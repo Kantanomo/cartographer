@@ -855,7 +855,7 @@ __declspec(naked) static void update_biped_ground_mode_physics_constant(void)
 static void bipeds_physics_apply_patches(void)
 {
 	// fixes edge drop fast fall when using higher tickrates than 30
-	//PatchCall(Memory::GetAddress(0x1082B4, 0xFA5D4), biped_ground_mode_update_to_stdcall);
+	PatchCall(Memory::GetAddress(0x1082B4, 0xFA5D4), biped_ground_mode_update_to_stdcall);
 	Codecave(Memory::GetAddress(0x106E23, 0xF9143), update_biped_ground_mode_physics_constant, 3);
 
 	// melee physics mode hooks
