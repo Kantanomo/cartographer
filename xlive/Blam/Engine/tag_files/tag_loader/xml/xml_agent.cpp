@@ -63,7 +63,7 @@ void c_xml_definition_agent::init(tag_group type, const wchar_t* plugin_path)
 	return;
 }
 
-c_xml_definition_block* c_xml_definition_agent::get_definition(void)
+const c_xml_definition_block* c_xml_definition_agent::get_definition(void) const
 {
 	return &m_definition;
 }

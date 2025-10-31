@@ -100,12 +100,16 @@ s_tag_injecting_table_entry* c_tag_injection_table::get_entry_by_injected_index(
 
 bool c_tag_injection_table::has_entry_by_cache_index(datum datum_index) const
 {
-	for (uint16 i = 0; i < m_entry_count; i++)
+	bool result = false;
+	for (uint16 i = 0; i < m_entry_count; ++i)
 	{
 		if (m_table[i].cache_index == datum_index)
-			return &m_table[i].is_initialized;
+		{
+			result = &m_table[i].is_initialized;
+			break;
+		}
 	}
-	return false;
+	return result;
 }
 
 /* private code */

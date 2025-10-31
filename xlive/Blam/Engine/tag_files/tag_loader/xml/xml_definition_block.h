@@ -14,29 +14,29 @@ public:
 	c_xml_definition_block(const tinyxml2::XMLElement* base_element, uint32 offset, uint32 size);
 	~c_xml_definition_block(void) = default;
 
-	void reset_counts();
-	void get_element_counts();
-	void allocate_buffers();
-	void populate_buffers();
-	void clear();
+	void reset_counts(void);
+	void get_element_counts(void);
+	void allocate_buffers(void);
+	void populate_buffers(void);
+	void clear(void);
 
-	uint32 get_size() const;
-	uint32 get_offset() const;
-	const char* get_name() const;
+	uint32 get_size(void) const;
+	uint32 get_offset(void) const;
+	const char* get_name(void) const;
 
-	uint32 get_tag_references_count() const;
+	uint32 get_tag_references_count(void) const;
 	uint32 get_tag_reference_offset(uint32 index) const;
 
-	uint32 get_classless_tag_references_count() const;
+	uint32 get_classless_tag_references_count(void) const;
 	uint32 get_classless_tag_reference_offset(uint32 index) const;
 
-	uint32 get_data_references_count() const;
+	uint32 get_data_references_count(void) const;
 	uint32 get_data_reference_offset(uint32 index) const;
 
-	uint32 get_string_id_count() const;
+	uint32 get_string_id_count(void) const;
 	uint32 get_string_id_offset(uint32 index) const;
 
-	uint32 get_tag_block_count() const;
+	uint32 get_tag_block_count(void) const;
 	class c_xml_definition_block* get_tag_block(uint32 index) const;
 
 #if TAG_INJECTION_DEBUG

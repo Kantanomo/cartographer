@@ -18,23 +18,23 @@ enum
 class c_tag_injecting_manager
 {
 public:
-	c_tag_injecting_manager();
-	~c_tag_injecting_manager() = default;
+	c_tag_injecting_manager(void);
+	~c_tag_injecting_manager(void) = default;
 
-	void init_directories();
+	void init_directories(void);
 
 	void set_base_map_tag_data_size(uint32 size);
-	uint32 get_base_map_tag_data_size() const;
+	uint32 get_base_map_tag_data_size(void) const;
 	void set_instance_table(cache_file_tag_instance* table);
 
-	uint16 get_entry_count() const;
-	c_tag_injection_table* get_table();
+	uint16 get_entry_count(void) const;
+	c_tag_injection_table* get_table(void);
 
 	bool find_map(const wchar_t* map_name, c_static_wchar_string<MAX_PATH>* out_string) const;
 	void set_active_map(const wchar_t* map_name);
 	
-	bool get_active_map_verified() const;
-	void reset();
+	bool get_active_map_verified(void) const;
+	void reset(void);
 	datum get_tag_datum_by_name(e_tag_group group, const char* tag_name) const;
 	void get_name_by_tag_datum(e_tag_group group, datum cache_datum, char* out_name) const;
 
@@ -46,9 +46,11 @@ public:
 	static void load_tag_internal(c_tag_injecting_manager* manager, tag_group group, datum cache_datum, bool load_dependencies);
 	static void load_dependencies(c_tag_injecting_manager* manager, const s_tag_injecting_table_entry* new_entry);
 
-	void inject_tags();
+	void inject_tags(void);
 	void* extend_tag_block(void* block, uint32 entry_size, uint32 count);
 	void* reserve_space_in_cache_memory(uint32 size, uint32* out_data_offset);
+
+
 private:
 	c_tag_injection_table m_table;
 	c_static_flags<k_tag_group_count> m_agents_initialized;

@@ -16,8 +16,14 @@
 #define lazy_malloc_buffer(TYPE, COUNT)\
 	(TYPE*)malloc(sizeof(TYPE) * (COUNT))
 
-void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* file_handle, 
-	cache_file_header* cache_header, cache_file_tags_header* tags_header, uint32 scenario_instance_offset, datum cache_index)
+void c_xml_definition_loader::init(
+	const c_xml_definition_block* definition,
+	FILE* file_handle, 
+	cache_file_header* cache_header,
+	cache_file_tags_header* tags_header,
+	uint32 scenario_instance_offset,
+	datum cache_index
+)
 {
 	m_tag_reference_offsets = nullptr;
 	m_classless_tag_reference_offsets = nullptr;

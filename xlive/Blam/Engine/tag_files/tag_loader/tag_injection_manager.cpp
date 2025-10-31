@@ -30,20 +30,28 @@ extern bool g_force_cartographer_update;
 #define k_relative_mods_plugin_directory k_relative_mods_directory L"plugins\\"
 
 
-c_tag_injecting_manager::c_tag_injecting_manager():
-	m_agents{}, m_base_tag_data_size(0), m_injectable_used_size(0), m_instances(nullptr),
-	m_active_map_verified(false), m_active_map_cache_header(),
-	m_active_map_tags_header(), m_active_map_scenario_instance_offset(),
-	m_active_map_instance_table_offset(0), m_active_map_file_handle(nullptr)
+c_tag_injecting_manager::c_tag_injecting_manager(void):
+	m_agents{},
+	m_base_tag_data_size(0),
+	m_injectable_used_size(0),
+	m_instances(nullptr),
+	m_active_map_verified(false),
+	m_active_map_cache_header(),
+	m_active_map_tags_header(),
+	m_active_map_scenario_instance_offset(),
+	m_active_map_instance_table_offset(0),
+	m_active_map_file_handle(nullptr)
 {
 	m_agents_initialized.clear();
+	return;
 }
 
-void c_tag_injecting_manager::init_directories()
+void c_tag_injecting_manager::init_directories(void)
 {
 	m_base_map_directory.set(k_relative_maps_directory);
 	m_mods_map_directory.set(k_relative_mods_maps_directory);
 	m_plugins_directory.set(k_relative_mods_plugin_directory);
+	return;
 }
 
 void c_tag_injecting_manager::set_base_map_tag_data_size(const uint32 size)
@@ -51,7 +59,7 @@ void c_tag_injecting_manager::set_base_map_tag_data_size(const uint32 size)
 	m_base_tag_data_size = size;
 }
 
-uint32 c_tag_injecting_manager::get_base_map_tag_data_size() const
+uint32 c_tag_injecting_manager::get_base_map_tag_data_size(void) const
 {
 	return m_base_tag_data_size;
 }
@@ -59,31 +67,35 @@ uint32 c_tag_injecting_manager::get_base_map_tag_data_size() const
 void c_tag_injecting_manager::set_instance_table(cache_file_tag_instance* table)
 {
 	m_instances = table;
+	return;
 }
 
-uint16 c_tag_injecting_manager::get_entry_count() const
+uint16 c_tag_injecting_manager::get_entry_count(void) const
 {
 	return m_table.get_entry_count();
 }
 
-c_tag_injection_table* c_tag_injecting_manager::get_table()
+c_tag_injection_table* c_tag_injecting_manager::get_table(void)
 {
 	return &m_table;
 }
 
 bool c_tag_injecting_manager::find_map(const wchar_t* map_name, c_static_wchar_string<MAX_PATH>* out_string) const
 {
+	bool result = false;
+
 	c_static_wchar_string<MAX_PATH> test_path;
 	test_path.set(m_base_map_directory.get_string());
 	test_path.append(map_name);
 	test_path.append(L".map");
+	
 	if (PathFileExists(test_path.get_string()))
 	{
 		if (out_string)
 		{
 			out_string->set(test_path.get_string());
 		}
-		return true;
+		result = true;
 	}
 	else
 	{
@@ -97,16 +109,16 @@ bool c_tag_injecting_manager::find_map(const wchar_t* map_name, c_static_wchar_s
 			{
 				out_string->set(test_path.get_string());
 			}
-			return true;
+			result = true;
 		}
 		// Exit and create a popup if a map is missing
 		else
 		{
 			event(_event_error, "tags:injection: [%s] could not locate %ws.map in any valid content location", __FUNCTION__, map_name);
 			g_force_cartographer_update = true;
-			return false;
 		}
 	}
+	return result;
 }
 
 void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
@@ -156,9 +168,10 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 		file_seek_and_read(m_active_map_file_handle, m_active_map_instance_table_offset, sizeof(cache_file_tag_instance), 1, &temp_instance);
 		m_active_map_scenario_instance_offset = temp_instance.data_offset;
 	}
+	return;
 }
 
-bool c_tag_injecting_manager::get_active_map_verified() const
+bool c_tag_injecting_manager::get_active_map_verified(void) const
 {
 	return m_active_map_verified;
 }
@@ -181,9 +194,8 @@ void c_tag_injecting_manager::reset()
 	m_table.clear();
 
 	m_injectable_used_size = 0;
+	return;
 }
-
-
 
 cache_file_tag_instance c_tag_injecting_manager::get_tag_instance_from_cache(datum cache_datum) const
 {
@@ -294,40 +306,32 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 
 	*g_cache_handle_geometry_block_offset = previous_geometry_block_offset;
 	*g_cache_handle_geometry_block_size = previous_geometry_block_size;
+	return;
 }
 
 void c_tag_injecting_manager::apply_definition_fixup(e_tag_group group, datum injected_index)
 {
 	switch(group)
 	{
-		case _tag_group_biped:
-			{
-				biped_definitions_fixup(injected_index);
-				break;
-			}
-		case _tag_group_creature:
-			{
-				creature_definitions_fixup(injected_index);
-				break;
-			}
-		case _tag_group_vehicle:
-			{
-				vehicle_definitions_fixup(injected_index);
-				break;
-			}
-		case _tag_group_collision_model:
-			{
-				collision_model_definitions_fixup(injected_index);
-				break;
-			}
-		case _tag_group_physics_model:
-			{
-				physics_model_definitions_fixup(injected_index, false);
-				break;
-			}
-		default:
-			break;
+	case _tag_group_biped:
+		biped_definitions_fixup(injected_index);
+		break;
+	case _tag_group_creature:
+		creature_definitions_fixup(injected_index);
+		break;
+	case _tag_group_vehicle:
+		vehicle_definitions_fixup(injected_index);
+		break;
+	case _tag_group_collision_model:
+		collision_model_definitions_fixup(injected_index);
+		break;
+	case _tag_group_physics_model:
+		physics_model_definitions_fixup(injected_index, false);
+		break;
+	default:
+		break;
 	}
+	return;
 }
 
 void c_tag_injecting_manager::initialize_shader_template(datum injected_datum)
@@ -341,6 +345,7 @@ void c_tag_injecting_manager::initialize_shader_template(datum injected_datum)
 
 	stem_iterator->next_tag_index = injected_datum;
 	p_init_shader_template(1);
+	return;
 }
 
 datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const char* tag_name) const
@@ -351,70 +356,58 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 		return NONE;
 	}
 	
-	cache_file_tag_instance temp_instance;
-
-	int32 current_offset = 0;
-	int32 next_offset = 0;
-	uint32 current_size = 0;
-	char name_buffer[MAX_PATH] = {};
-	int32 start_index = 0;
+	const bool scenario_is_mp_shared = (e_scenario_type)m_active_map_cache_header.type == _scenario_type_multiplayer_shared;
 
 	// fix for multiplayer shared cache type, where the tag table was intentionally made to be pushed farther down to prevent collisions.
-	if ((e_scenario_type)m_active_map_cache_header.type == _scenario_type_multiplayer_shared)
-		start_index = FIRST_SHARED_TAG_INSTANCE_INDEX;
+	const int32 start_index = scenario_is_mp_shared ? FIRST_SHARED_TAG_INSTANCE_INDEX : 0;
 
-	for(int32 current_index = start_index; current_index < m_active_map_cache_header.debug_tag_name_count; ++current_index)
+	datum result = NONE;
+	for (int32 current_index = start_index; current_index < m_active_map_cache_header.debug_tag_name_count; ++current_index)
 	{
+		// Get the offset of the current index
+		int32 current_offset;
+		file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_offset + sizeof(uint32) * current_index, sizeof(uint32), 1, &current_offset);
 
+		uint32 current_size;
 		if (current_index + 1 != m_active_map_cache_header.debug_tag_name_count)
 		{
-			// Get the offset of the current index
-			file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_offset + sizeof(uint32) * current_index, sizeof(uint32), 1, &current_offset);
-
 			// If the current offset is -1 it means we have reached the end of the index table
 			if (current_offset == NONE)
+			{
 				break;
+			}
 
 			// Get the offset of the next index
+			int32 next_offset;
 			file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_offset + sizeof(uint32) * (current_index + 1), sizeof(uint32), 1, &next_offset);
 
 			// Current size is calculated using the offsets of the two indexes
 			// if next offset is none, the current offset is the end of the table and just read max path
-			if (next_offset == NONE)
-				current_size = MAX_PATH;
-			else
-				current_size = next_offset - current_offset;
-
-			// Read the current debug name
-			file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, &name_buffer);
-
-			if(csstricmp(tag_name, name_buffer) == 0)
-			{
-				file_seek_and_read(m_active_map_file_handle, m_active_map_instance_table_offset + (current_index * sizeof(cache_file_tag_instance)), sizeof(cache_file_tag_instance), 1, &temp_instance);
-				if (temp_instance.group_tag.group == group)
-					return temp_instance.tag_index;
-			}
+			current_size = next_offset == NONE ? MAX_PATH : next_offset - current_offset;
 		}
 		else
 		{
-			// Get the offset of the current index
-			file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_offset + sizeof(uint32) * current_index, sizeof(uint32), 1, &current_offset);
-
 			// Current size is calculated using the total size of the buffer and the current offset;
 			current_size = (m_active_map_cache_header.tag_name_offset + (m_active_map_cache_header.debug_tag_name_count * sizeof(uint32))) - current_offset;
+		}
 
-			// Read the current debug name
-			file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, &name_buffer);
+		// Read the current debug name
+		char name_buffer[MAX_PATH];
+		file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, &name_buffer);
 
-			if (csstricmp(tag_name, name_buffer) == 0)
+		if (csstricmp(tag_name, name_buffer) == 0)
+		{
+			cache_file_tag_instance temp_instance;
+			file_seek_and_read(m_active_map_file_handle, m_active_map_instance_table_offset + (current_index * sizeof(cache_file_tag_instance)), sizeof(cache_file_tag_instance), 1, &temp_instance);
+			if (temp_instance.group_tag.group == group)
 			{
-				file_seek_and_read(m_active_map_file_handle, m_active_map_instance_table_offset + (current_index * sizeof(cache_file_tag_instance)), sizeof(cache_file_tag_instance), 1, &temp_instance);
-				if (temp_instance.group_tag.group == group)
-					return temp_instance.tag_index;
+				result = temp_instance.tag_index;
+				break;
 			}
 		}
 	}
-	return NONE;
+
+	return result;
 }
 
 void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cache_datum, char* out_name) const
@@ -426,7 +419,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 		return;
 	}
 
-	uint16 absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(cache_datum);
+	const uint16 absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(cache_datum);
 
 	cache_file_tag_instance temp_instance;
 	file_seek_and_read(m_active_map_file_handle, m_active_map_instance_table_offset + (absolute_index * sizeof(cache_file_tag_instance)), sizeof(cache_file_tag_instance), 1, &temp_instance);
@@ -441,97 +434,90 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 	uint32 next_offset = 0;
 	uint32 current_size = 0;
 
+
+	// Get the offset of the cache index
+	file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_offset + sizeof(uint32) * absolute_index, sizeof(uint32), 1, &current_offset);
+
+	// If the current offset is NONE it means we have reached the end of the index table
+	if (current_offset == NONE)
+	{
+		out_name[0] = '\0';
+		return;
+	}
+
 	if (absolute_index + 1 != m_active_map_cache_header.debug_tag_name_count)
 	{
-		// Get the offset of the cache index
-		file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_offset + sizeof(uint32) * absolute_index, sizeof(uint32), 1, &current_offset);
-
-		// If the current offset is -1 it means we have reached the end of the index table
-		if (current_offset == NONE)
-		{
-			out_name[0] = '\0';
-			return;
-		}
-
 		// Get the offset of the next index
 		file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_offset + sizeof(uint32) * (absolute_index + 1), sizeof(uint32), 1, &next_offset);
 
 		// Current size is calculated using the offsets of the two indexes
 		// if next offset is none, the current offset is the end of the table and just read max path
 		current_size = (next_offset == NONE ? MAX_PATH : next_offset - current_offset);
-
-		// Read the current debug name
-		file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, out_name);
 	}
 	else
 	{
-		// Get the offset of the cache index
-		file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_offset + sizeof(uint32) * absolute_index, sizeof(uint32), 1, &current_offset);
-
-		// If the current offset is -1 it means we have reached the end of the index table
-		if (current_offset == NONE)
-		{
-			out_name[0] = '\0';
-			return;
-		}
-
 		// Current size is calculated using the total size of the buffer and the current offset;
 		current_size = (m_active_map_cache_header.tag_name_offset + (m_active_map_cache_header.debug_tag_name_count * sizeof(uint32))) - current_offset;
-
-		// Read the current debug name
-		file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, out_name);
 	}
 
+	// Read the current debug name
+	file_seek_and_read(m_active_map_file_handle, m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, out_name);
 	return;
 }
 
 bool c_tag_injecting_manager::initialize_agent(tag_group group)
 {
-	uint32 tag_group_index = tag_group_get_as_index(group);
+	bool result = false;
 
-	if(tag_group_index == NONE)
+	int32 tag_group_index = tag_group_get_as_index(group);
+	
+	const bool agent_initialized = m_agents_initialized.test(tag_group_index);	// check static flags if agent is already initialized
+	if (tag_group_index != NONE && !agent_initialized)
 	{
-		return false;
+		// non-terminated sting correction
+		// flip string and terminate
+		char tag_class[5];
+		tag_class[0] = group.string[3];
+		tag_class[1] = group.string[2];
+		tag_class[2] = group.string[1];
+		tag_class[3] = group.string[0];
+		tag_class[4] = '\0';
+
+		tag_class[3] = (tag_class[3] == ' ' ? '\0' : tag_class[3]);
+
+		wchar_t wide_tag_class[5];
+		utf8_string_to_wchar_string(tag_class, wide_tag_class, NUMBEROF(wide_tag_class));
+
+		c_static_wchar_string<MAX_PATH> plugin_path;
+		plugin_path.set(m_plugins_directory.get_string());
+		plugin_path.append(wide_tag_class);
+		plugin_path.append(L".xml");
+
+		// Exit and create a popup if a plugin is missing
+		if (!PathFileExists(plugin_path.get_string()))
+		{
+			event(_event_error, "tags:injection: [%s] Plugin file could not be located %ws", __FUNCTION__, plugin_path.get_string());
+			g_force_cartographer_update = true;
+		}
+		else
+		{
+			m_agents[tag_group_index].init(group, plugin_path.get_string());
+			m_agents_initialized.set(tag_group_index, true);
+			result = true;
+		}
+	}
+	else
+	{
+		result = agent_initialized;
 	}
 
-	// check static flags if agent is already initialized
-	if (m_agents_initialized.test(tag_group_index))
-		return true;
-
-	// non-terminated sting correction
-	// flip string and terminate
-	char tag_class[5];
-	tag_class[0] = group.string[3];
-	tag_class[1] = group.string[2];
-	tag_class[2] = group.string[1];
-	tag_class[3] = group.string[0];
-	tag_class[4] = '\0';
-
-	tag_class[3] = (tag_class[3] == ' ' ? '\0' : tag_class[3]);
-
-	wchar_t wide_tag_class[5];
-	utf8_string_to_wchar_string(tag_class, wide_tag_class, NUMBEROF(wide_tag_class));
-
-	c_static_wchar_string<MAX_PATH> plugin_path;
-	plugin_path.set(m_plugins_directory.get_string());
-	plugin_path.append(wide_tag_class);
-	plugin_path.append(L".xml");
-
-	// Exit and create a popup if a plugin is missing
-	if (!PathFileExists(plugin_path.get_string()))
-	{
-		event(_event_error, "tags:injection: [%s] Plugin file could not be located %ws", __FUNCTION__, plugin_path.get_string());
-		g_force_cartographer_update = true;
-		return false;
-	}
-	m_agents[tag_group_index].init(group, plugin_path.get_string());
-	m_agents_initialized.set(tag_group_index, true);
-	return true;
+	return result;
 }
 
 c_xml_definition_agent* c_tag_injecting_manager::get_agent(tag_group group)
 {
-	if(!initialize_agent(group))
+	c_xml_definition_agent* result = nullptr;
+	if (!initialize_agent(group))
 	{
 		// non-terminated sting correction
 		// flip string and terminate
@@ -543,59 +529,68 @@ c_xml_definition_agent* c_tag_injecting_manager::get_agent(tag_group group)
 		null_terminated_class[4] = '\0';
 
 		if (null_terminated_class[3] == ' ')
+		{
 			null_terminated_class[3] = '\0';
+		}
 
 		error(_error_immediate, "%s: failed to initialize agent for %s", __FUNCTION__, null_terminated_class);
-		return nullptr;
 	}
-	return &m_agents[tag_group_get_as_index(group)];
+	else
+	{
+		result = &m_agents[tag_group_get_as_index(group)];
+	}
+	return result;
 }
 
 datum c_tag_injecting_manager::load_tag(e_tag_group group, const char* tag_name, bool load_dependencies)
 {
-	datum cache_datum = get_tag_datum_by_name(group, tag_name);
+	const datum cache_datum = get_tag_datum_by_name(group, tag_name);
+	
+	datum result = NONE;
 	if (cache_datum != NONE)
 	{
 #if TAG_INJECTION_DEBUG
 		event(_event_verbose, "tags:injection: [%s] loading %s with depencies %d datum %x", __FUNCTION__, tag_name, load_dependencies, cache_datum);
 #endif
-
-		return load_tag(group, cache_datum, load_dependencies);
+		result = load_tag(group, cache_datum, load_dependencies);
 	}
-	return NONE;
+
+	return result;
 }
 
 datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bool load_dependencies)
 {
+	datum result = NONE;
 	if (m_table.has_entry_by_cache_index(cache_datum))
-		return m_table.get_entry_by_cache_index(cache_datum)->injected_index;
-
-	s_tag_injecting_table_entry* new_entry = m_table.init_entry(cache_datum, group);
-
-	c_xml_definition_agent* agent = get_agent({group});
-	
-	datum result;
-	if (agent)
 	{
-		new_entry->loaded_data->init(
-			agent->get_definition(),
-			m_active_map_file_handle,
-			&m_active_map_cache_header,
-			&m_active_map_tags_header,
-			m_active_map_scenario_instance_offset,
-			cache_datum);
-
-		if (load_dependencies)
-		{
-			c_tag_injecting_manager::load_dependencies(this, new_entry);
-		}
-		result = new_entry->injected_index;
+		result =  m_table.get_entry_by_cache_index(cache_datum)->injected_index;
 	}
-	// Force update if agent cannot be retrieved
 	else
 	{
-		g_force_cartographer_update = true;
-		result = NONE;
+		const s_tag_injecting_table_entry* new_entry = m_table.init_entry(cache_datum, group);
+		const c_xml_definition_agent* agent = get_agent({ group });
+
+		if (agent)
+		{
+			new_entry->loaded_data->init(
+				agent->get_definition(),
+				m_active_map_file_handle,
+				&m_active_map_cache_header,
+				&m_active_map_tags_header,
+				m_active_map_scenario_instance_offset,
+				cache_datum);
+
+			if (load_dependencies)
+			{
+				c_tag_injecting_manager::load_dependencies(this, new_entry);
+			}
+			result = new_entry->injected_index;
+		}
+		// Force update if agent cannot be retrieved
+		else
+		{
+			g_force_cartographer_update = true;
+		}
 	}
 
 	return result;
@@ -607,58 +602,55 @@ void c_tag_injecting_manager::load_tag_internal(
 	datum cache_datum,
 	bool load_dependencies)
 {
-	cache_file_tag_instance inst = manager->get_tag_instance_from_cache(cache_datum);
+	const cache_file_tag_instance inst = manager->get_tag_instance_from_cache(cache_datum);
 
-	if (inst.tag_index != cache_datum || inst.group_tag.group != group.group)
-		return;
-
-	if (inst.size == 0 || inst.data_offset == 0)
-		return;
-
-	if (manager->m_table.has_entry_by_cache_index(cache_datum))
-		return;
-
-#if TAG_INJECTION_DEBUG
-	c_static_string<MAX_PATH> name;
-	manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
-
-	char tag_class[5];
-	tag_class[0] = group.string[3];
-	tag_class[1] = group.string[2];
-	tag_class[2] = group.string[1];
-	tag_class[3] = group.string[0];
-	tag_class[4] = '\0';
-
-	event(_event_verbose, "tags:injection: [%s] loading dependency %s %s", __FUNCTION__, name.get_string(), tag_class);
-#endif
-
-	s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group.group);
-	c_xml_definition_agent* agent = manager->get_agent(group);
-	ASSERT(agent);
-	new_entry->loaded_data->init(
-		agent->get_definition(),
-		manager->m_active_map_file_handle,
-		&manager->m_active_map_cache_header,
-		&manager->m_active_map_tags_header,
-		manager->m_active_map_scenario_instance_offset,
-		cache_datum);
-
-	
-
-	if (load_dependencies)
+	if (
+		inst.tag_index == cache_datum && inst.group_tag.group == group.group &&
+		inst.size != 0 && inst.data_offset != 0 && 
+		!manager->m_table.has_entry_by_cache_index(cache_datum)
+	)
 	{
 #if TAG_INJECTION_DEBUG
-		event(_event_verbose, "tags:injection: [%s] loading dependencies for %s %s", __FUNCTION__, name.get_string(), tag_class);
+		c_static_string<MAX_PATH> name;
+		manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
+
+		char tag_class[5];
+		tag_class[0] = group.string[3];
+		tag_class[1] = group.string[2];
+		tag_class[2] = group.string[1];
+		tag_class[3] = group.string[0];
+		tag_class[4] = '\0';
+
+		event(_event_verbose, "tags:injection: [%s] loading dependency %s %s", __FUNCTION__, name.get_string(), tag_class);
 #endif
 
-		c_tag_injecting_manager::load_dependencies(manager, new_entry);
+		const s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group.group);
+		const c_xml_definition_agent* agent = manager->get_agent(group);
+		ASSERT(agent);
+		new_entry->loaded_data->init(
+			agent->get_definition(),
+			manager->m_active_map_file_handle,
+			&manager->m_active_map_cache_header,
+			&manager->m_active_map_tags_header,
+			manager->m_active_map_scenario_instance_offset,
+			cache_datum
+		);
+
+		if (load_dependencies)
+		{
+#if TAG_INJECTION_DEBUG
+			event(_event_verbose, "tags:injection: [%s] loading dependencies for %s %s", __FUNCTION__, name.get_string(), tag_class);
+#endif
+			c_tag_injecting_manager::load_dependencies(manager, new_entry);
+		}
 	}
+
 	return;
 }
 
 void c_tag_injecting_manager::load_dependencies(c_tag_injecting_manager* manager, const s_tag_injecting_table_entry* new_entry)
 {
-	for (uint32 i = 0; i < new_entry->loaded_data->get_tag_reference_count(); i++)
+	for (uint32 i = 0; i < new_entry->loaded_data->get_tag_reference_count(); ++i)
 	{
 		datum tag_index = new_entry->loaded_data->get_tag_reference(i);
 		tag_group t_group = manager->get_tag_group_by_datum(tag_index);
@@ -670,7 +662,7 @@ void c_tag_injecting_manager::load_dependencies(c_tag_injecting_manager* manager
 	return;
 }
 
-void c_tag_injecting_manager::inject_tags()
+void c_tag_injecting_manager::inject_tags(void)
 {
 #if TAG_INJECTION_DEBUG
 	for (uint16 i = 0; i < m_table.get_entry_count(); i++)
