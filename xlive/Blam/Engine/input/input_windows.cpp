@@ -226,14 +226,14 @@ void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 				break;
 			}
 			keystroke.key_code = input_map_ascii_to_keycode(key);
-			g_keyboard_input_state.set(keystroke.key_code, true);
+			g_keyboard_input_state.set(key, true);
 		}
 		// Handle other characters
 		else if (msg == WM_CHAR || msg == WM_SYSCHAR)
 		{
 			const HKL layout = GetKeyboardLayout(0);
 
-			key = (uint8)VkKeyScanExW((WCHAR)wParam, layout);
+			key = (uint8)(VkKeyScanExW((WCHAR)wParam, layout) & BYTE_MAX);	// & BYTE_MAX since we ignore the upper bit shift state
 			upper_bit_exists = (wParam & 0xFF00) != 0;
 
 			if (upper_bit_exists || wParam >= VK_SPACE)
@@ -241,7 +241,7 @@ void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 				keystroke.ascii_code = (int8)(upper_bit_exists ? NONE : wParam);
 				keystroke.utf16_code = (wchar_t)wParam;
 				keystroke.key_code = input_map_ascii_to_keycode(key);
-				g_keyboard_input_state.set(keystroke.key_code, true);
+				g_keyboard_input_state.set(key, true);
 			}
 		}
 
