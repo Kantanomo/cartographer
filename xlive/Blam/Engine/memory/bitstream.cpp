@@ -23,12 +23,12 @@ void c_bitstream::begin_reading()
 	{
 		// comment this line if you want to read debug streams
 		// but probably isn't recommended
-		m_error_stream_debug_mode_is_enabled = true;
+		m_data_error_detected = true;
 	}
 	else
 	{
 		m_current_bit_position = 0;
-		m_error_stream_debug_mode_is_enabled = false;
+		m_data_error_detected = false;
 	}
 }
 
@@ -56,7 +56,7 @@ void c_bitstream::reset(e_bitstream_state state)
 	m_state = state;
 	m_current_bit_position = 0;
 	m_position_stack_depth = 0;
-	m_error_stream_debug_mode_is_enabled = false;
+	m_data_error_detected = false;
 	if (writing())
 	{
 		// enable some debugging, not really required in release?
@@ -111,6 +111,7 @@ void c_bitstream::write_bool(const char* name, bool value)
 
 bool c_bitstream::read_bool(const char* name)
 {
+	ASSERT(reading());
 	typedef bool(__thiscall* read_bool_t)(c_bitstream*, const char*);
 	return INVOKE_TYPE(0xD1F47, 0xCE501, read_bool_t, this, name);
 }

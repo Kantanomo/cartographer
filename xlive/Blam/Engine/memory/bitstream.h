@@ -24,12 +24,12 @@ class c_bitstream
 	int32 m_data_size_alignment;
 	e_bitstream_state m_state;
 	int32 m_current_bit_position;
-	bool m_error_stream_debug_mode_is_enabled; // debug streams disabled in release mode
+	bool m_data_error_detected; // debug streams disabled in release mode
 	bool gap_15[3]; // these are other types of errors, currently disabled in release mode
-	int m_position_stack_depth;
-	int32 m_stack[4];
-	int field_2C;
-	int field_30;
+	int32 m_position_stack_depth;
+	int32 m_position_stack[4];
+	int32 m_number_of_bits_rewound;
+	int32 m_number_of_position_resets;
 
 public:
 	c_bitstream(uint8* data, int32 data_size)
@@ -69,17 +69,20 @@ public:
 		return bit_count + m_current_bit_position > m_data_size_bytes * 8;
 	}
 
-	bool overflowed() const
+	bool overflowed(void) const
 	{
+		ASSERT(reading() || writing());
 		return m_current_bit_position > m_data_size_bytes * 8;
 	}
 
-	bool error_occured() const
+	bool error_occurred() const
 	{
 		bool result = overflowed();
 		// debug mode in release mode should be disabled !!!
-		if (m_error_stream_debug_mode_is_enabled)
+		if (m_data_error_detected)
+		{
 			result = true;
+		}
 
 		return result;
 	}

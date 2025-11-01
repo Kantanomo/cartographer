@@ -10,98 +10,163 @@
 #include "game/game_engine.h"
 #include "game/players.h"
 #include "memory/bitstream.h"
+#include "networking/network_event.h"
 
-static void simulation_queue_global_event_allocate_and_insert(e_event_queue_type type, void* data, int32 data_size)
+/* prototypes */
+
+static bool game_is_synchronous_networking(void);
+
+static void simulation_queue_player_event_set_activation(int32 player_index, bool active);
+
+/* public code */
+
+bool simulation_queue_game_global_event_requires_cutoff(const s_simulation_queue_element* element)
 {
-	s_simulation_queue_element* element = NULL;
-	c_simulation_world* world = simulation_get_world();
-	world->simulation_queue_allocate(type, data_size, &element);
-	if (element)
+	bool result = false;
+	
+	ASSERT(element);
+	c_bitstream stream(element->data, element->data_size);
+	stream.begin_reading();
+	
+	e_simulation_queue_game_global_event_type type = (e_simulation_queue_game_global_event_type)stream.read_integer("global-event-type", k_simulation_queue_game_global_event_type_bits);
+	if (stream.error_occurred())
 	{
-		csmemcpy((void*)element->data, data, data_size);
-		world->simulation_queue_enqueue(element);
+		event(_event_error, "networking:simulation:queue: failed to decode global event");
 	}
-}
+	else
+	{
+		result = type >= _simulation_queue_game_global_event_main_reset_map && type <= _simulation_queue_game_global_event_main_save_and_exit_campaign;
+	}
 
-void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_type global_event_type)
+	stream.finish_reading();
+	return result;
+ }
+
+void simulation_queue_game_global_event_insert(e_simulation_queue_game_global_event_type game_global_event_type)
 {
-	if (!game_is_playback())
+	if (game_is_playback() || game_is_synchronous_networking() && !game_is_server())
+	{
+		event(_event_warning, "networking:simulation:queue: not allowed to insert global event type %d", game_global_event_type);
+	}
+	else
 	{
 		uint8 encoded_data[128];
 		c_bitstream stream(encoded_data, sizeof(encoded_data));
 		stream.begin_writing(1);
-		stream.write_integer("global-event-type", global_event_type, 3);
-		if (!stream.error_occured())
+		stream.write_integer("global-event-type", game_global_event_type, k_simulation_queue_game_global_event_type_bits);
+		
+		const int32 size = stream.get_space_used_in_bytes();
+		if (stream.error_occurred())
 		{
-			simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_game_global_event, encoded_data, stream.get_space_used_in_bytes());
+			event(_event_error, "networking:simulation:queue: failed to insert game global event type %d", game_global_event_type);
+		}
+		else
+		{
+			s_simulation_queue_element* element = NULL;
+			c_simulation_world* world = simulation_get_world();
+			world->simulation_queue_allocate(_simulation_queue_element_type_game_global_event, size, &element);
+			if (element)
+			{
+				csmemcpy(element->data, encoded_data, size);
+				world->simulation_queue_enqueue(element);
+			}
+			else
+			{
+				event(_event_fatal, "networking:simulation:queue: failed to allocate element for game global event insertion %d", size);
+			}
 		}
 		stream.finish_writing(NULL);
 	}
 	return;
 }
 
-bool simulation_queue_game_global_event_decode(const s_simulation_queue_element* element, e_simulation_queue_global_event_type* out_global_event_type)
-{
-	c_bitstream stream(element->data, element->data_size);
-	stream.begin_reading();
-	*out_global_event_type = (e_simulation_queue_global_event_type)stream.read_integer("global-event-type", 3);
-	bool result = !stream.error_occured();
-	stream.finish_reading();
-	return result;
-}
-
-bool simulation_queue_game_global_event_requires_cutoff(const s_simulation_queue_element* element)
-{
-	bool result = false;
-	e_simulation_queue_global_event_type type;
-	if (simulation_queue_game_global_event_decode(element, &type))
-	{
-		if (type >= _simulation_queue_game_global_event_main_reset_map
-			&& type <= _simulation_queue_game_global_event_main_save_and_exit_campaign)
-		{
-			result = true;
-		}
-	}
-
-	return result;
- }
-
+// TODO: finish the rest of the logic in this function
 void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, const struct simulation_update* update)
 {
-	e_simulation_queue_global_event_type type;
-	if (simulation_queue_game_global_event_decode(element, &type))
+	ASSERT(element);
+	ASSERT(element->type == _simulation_queue_element_type_game_global_event);
+
+	c_bitstream stream(element->data, element->data_size);
+	stream.begin_reading();
+
+	e_simulation_queue_game_global_event_type type = (e_simulation_queue_game_global_event_type)stream.read_integer("global-event-type", k_simulation_queue_game_global_event_type_bits);
+
+	if (stream.error_occurred())
+	{
+		event(_event_error, "networking:simulation:queue: failed to decode game global event");
+	}
+	else
 	{
 		switch (type)
 		{
 		case _simulation_queue_game_global_event_type_claim_authority:
+			event(_event_message, "networking:simulation:queue:global: claiming authority");
+			//c_simulation_world::claim_authority_gameworld();
 			break;
 		case _simulation_queue_game_global_event_type_set_simulation_to_distributed_server:
+			event(_event_message, "networking:simulation:queue:global: setting game simulation to dist. server");
+			//game_simulation_set(_game_simulation_distributed_server);
 			break;
 		case _simulation_queue_game_global_event_type_set_simulation_to_distributed_client:
+			event(_event_message, "networking:simulation:queue:global: setting game simulation to dist. client");
+			//game_simulation_set(_game_simulation_distributed_client);
 			break;
 		case _simulation_queue_game_global_event_type_game_won:
+			event(_event_verbose, "networking:simulation:queue:global: calling game won");
+			//game_won();
 			break;
 		case _simulation_queue_game_global_event_main_revert_map:
+			event(_event_message, "networking:simulation:queue:global: calling revert map");
+			//main_revert_map();
 			break;
 		case _simulation_queue_game_global_event_main_reset_map:
+			event(_event_message, "networking:simulation:queue:global: calling reset map");
 			main_reset_map();
-			//update->flush_gamestate = true;
 			break;
 		case _simulation_queue_game_global_event_main_save_and_exit_campaign:
+			/*
+			if (simulation_performed_main_save_and_exit_campaign_immediately_this_map())
+			{
+				event(_event_message, "networking:simulation:queue:global: redundant call to save and exit");
+			}
+			else
+			{
+				event(_event_message, "networking:simulation:queue:global: calling save and exit");
+				simulation_set_performed_main_save_and_exit_campaign_immediately_this_map(1);
+				main_save_and_exit_campaign_immediately();
+			}
+			*/
 			break;
 		case _simulation_queue_game_global_event_notify_reset_complete:
+			event(_event_message, "networking:simulation:queue:global: calling simulation_notify_reset_complete()");
 			simulation_notify_reset_complete();
 			break;
+		case _simulation_queue_game_global_event_type_simulation_reset_initiate:
+			event(_event_message, "networking:simulation:queue:global: calling simulation_notify_reset_initiate()");
+			simulation_notify_reset_initiate();
+			break;
+		case _simulation_queue_game_global_event_type_simulation_going_active:
+			event(_event_message, "networking:simulation:queue:global: calling simulation_notify_going_active()");
+			simulation_notify_going_active();
+			break;
 		default:
-			// DEBUG
+			event(_event_error, "networking:simulation:queue:global_events: unknown game global event type %d", type);
 			break;
 		}
 	}
+	return;
 }
 
 void simulation_queue_player_event_insert(e_simulation_queue_player_event_type event_type, datum player_index, const s_simulation_queue_player_event_data* event_data)
 {
-	if (!game_is_playback())
+	ASSERT(event_data);
+	ASSERT(player_index != NONE);
+
+	if (game_is_playback() || game_is_synchronous_networking() && !game_is_server())
+	{
+		event(_event_warning, "networking:simulation:queue: not allowed to insert simulation_queue_player_update_insert");
+	}
+	else
 	{
 		uint8 encoded_data[128];
 		c_bitstream stream(encoded_data, sizeof(encoded_data));
@@ -111,9 +176,28 @@ void simulation_queue_player_event_insert(e_simulation_queue_player_event_type e
 		stream.begin_writing(1);
 		stream.write_integer("player-index", abs_player_index, k_player_index_bit_count);
 		stream.write_bool("active", event_data->active);
-		if (!stream.error_occured())
+
+
+
+		const int32 size = stream.get_space_used_in_bytes();
+		if (stream.error_occurred())
 		{
-			simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_player_event, encoded_data, stream.get_space_used_in_bytes());
+			event(_event_error, "networking:simulation:queue: failed to insert player event type %d", event_type);
+		}
+		else
+		{
+			s_simulation_queue_element* element = NULL;
+			c_simulation_world* world = simulation_get_world();
+			world->simulation_queue_allocate(_simulation_queue_element_type_player_event, size, &element);
+			if (element)
+			{
+				csmemcpy(element->data, encoded_data, size);
+				world->simulation_queue_enqueue(element);
+			}
+			else
+			{
+				event(_event_fatal, "networking:simulation:queue: failed to allocate element for player event insertion %d", size);
+			}
 		}
 		stream.finish_writing(NULL);
 	}
@@ -122,25 +206,22 @@ void simulation_queue_player_event_insert(e_simulation_queue_player_event_type e
 
 void simulation_queue_player_event_apply(const s_simulation_queue_element* element)
 {
+	ASSERT(element);
+
 	c_bitstream stream(element->data, element->data_size);
 	stream.begin_reading();
 
 	const uint16 abs_player_index = (uint16)stream.read_integer("player-index", k_player_index_bit_count);
-	bool active = stream.read_bool("active");
 
-	if (!stream.error_occured())
+	const datum player_index = player_index_from_absolute_player_index(abs_player_index);
+	if (stream.error_occurred())
 	{
-		datum player_index = player_index_from_absolute_player_index(abs_player_index);
-		player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
-		if (TEST_BIT(player->flags, 0) != active)
-		{
-			SET_BIT(player->flags, 0, active);
-			if (active)
-			{
-				game_engine_player_activated(player_index);
-			}
-		}
-		simulation_action_game_engine_player_update(player_index, 0x200);
+		event(_event_error, "networking:simulation:queue: failed to decode player event");
+	}
+	else
+	{
+		const bool active = stream.read_bool("active");
+		simulation_queue_player_event_set_activation(player_index, active);
 	}
 
 	stream.finish_reading();
@@ -149,15 +230,34 @@ void simulation_queue_player_event_apply(const s_simulation_queue_element* eleme
 
 void simulation_queue_player_update_insert(const simulation_player_update* player_update)
 {
+	ASSERT(player_update);
+
 	if (!game_is_playback())
 	{
 		uint8 encoded_data[k_simulation_queue_element_data_size_max];
 		c_bitstream stream(encoded_data, sizeof(encoded_data));
 		stream.begin_writing(1);
 		simulation_player_update_encode(&stream, player_update);
-		if (!stream.error_occured())
+
+		const int32 size = stream.get_space_used_in_bytes();
+		if (stream.error_occurred())
 		{
-			simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_player_update_event, encoded_data, stream.get_space_used_in_bytes());
+			event(_event_error, "networking:simulation:queue: failed to insert player update");
+		}
+		else
+		{
+			s_simulation_queue_element* element = NULL;
+			c_simulation_world* world = simulation_get_world();
+			world->simulation_queue_allocate(_simulation_queue_element_type_player_update_event, size, &element);
+			if (element)
+			{
+				csmemcpy(element->data, encoded_data, size);
+				world->simulation_queue_enqueue(element);
+			}
+			else
+			{
+				event(_event_fatal, "networking:simulation:queue: failed to allocate element for player update insertion %d", size);
+			}
 		}
 		stream.finish_writing(NULL);
 	}
@@ -173,15 +273,39 @@ void simulation_queue_player_update_apply(const s_simulation_queue_element* elem
 	stream.begin_reading();
 	simulation_player_update_decode(&stream, &update);
 
-	if (stream.error_occured())
+	if (stream.error_occurred())
 	{
-		// ASSERT HERE
+		event(_event_error, "networking:simulation:queue: failed to decode player update");
 	}
 	else if (!simulation_players_apply_update(&update))
 	{
 		simulation_get_globals()->fatal_error = true;
+		event(_event_error, "networking:simulation:player_update_apply: failed to apply player update");
 	}
 
 	stream.finish_reading();
+	return;
+}
+
+/* private code */
+
+static bool game_is_synchronous_networking(void)
+{
+	const e_game_simulation type = game_simulation_get();
+	return IN_RANGE(type, _game_simulation_synchronous_client, _game_simulation_synchronous_server);
+}
+
+static void simulation_queue_player_event_set_activation(int32 player_index, bool active)
+{
+	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	if (TEST_BIT(player->flags, 0) != active)
+	{
+		SET_BIT(player->flags, 0, active);
+		if (active)
+		{
+			game_engine_player_activated(player_index);
+		}
+	}
+	simulation_action_game_engine_player_update(player_index, 0x200);
 	return;
 }

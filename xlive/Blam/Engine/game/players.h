@@ -163,4 +163,8 @@ void __cdecl players_update_before_game(const struct simulation_update* update);
 
 void __cdecl players_update_after_game(const struct simulation_update* update);
 
+void players_update_for_checkpoint(void);
+
+void players_joined_in_progress_allow_spawn(void);
+
 void players_apply_patches(void);

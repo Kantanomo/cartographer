@@ -89,6 +89,9 @@ int16 game_get_active_structure_bsp_index();
 bool game_is_campaign(void);
 bool game_is_multiplayer(void);
 bool game_is_ui_shell(void);
+
+bool game_is_cooperative(void);
+
 void __cdecl game_shell_set_in_progress(void);
 bool game_in_progress(void);
 bool game_is_active(void);

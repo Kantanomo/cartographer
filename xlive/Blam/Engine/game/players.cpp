@@ -586,6 +586,18 @@ void __cdecl players_update_after_game(const struct simulation_update* update)
 	return;
 }
 
+void players_update_for_checkpoint(void)
+{
+	players_joined_in_progress_allow_spawn();
+	return;
+}
+
+void players_joined_in_progress_allow_spawn(void)
+{
+	// TODO: implement
+	return;
+}
+
 void players_apply_patches(void)
 {
 	// Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant

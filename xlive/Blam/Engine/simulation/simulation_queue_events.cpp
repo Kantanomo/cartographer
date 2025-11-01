@@ -73,14 +73,14 @@ static bool encode_event_to_buffer(
 	// write the event data to the stream
 	sim_event_definition->encode(payload_size, payload, &stream);
 
-	bool result = !stream.error_occured();
+	bool result = !stream.error_occurred();
 	stream.finish_writing(NULL);
 
 	if (result)
 	{
 		SIM_EVENT_QUEUE_DBG("#####");
 		SIM_EVENT_QUEUE_DBG("event encoding, stream is fine? %d, encoded size: %d", 
-			!stream.error_occured(), 
+			!stream.error_occurred(), 
 			stream.get_space_used_in_bytes());
 		SIM_EVENT_QUEUE_DBG("event type: %d, reference count: %d", event_type, reference_count);
 	}
@@ -118,7 +118,7 @@ static bool decode_event_from_buffer(int32 encoded_size, uint8* encoded_data, s_
 		}
 	}
 
-	bool result = !stream.error_occured();
+	bool result = !stream.error_occurred();
 	stream.finish_reading();
 
 	SIM_EVENT_QUEUE_DBG("#####");
@@ -126,7 +126,7 @@ static bool decode_event_from_buffer(int32 encoded_size, uint8* encoded_data, s_
 	{
 		// everything is fine
 		SIM_EVENT_QUEUE_DBG("event decoding, stream is fine? %d, decoded size: %d, size of the payload: %d", 
-			!stream.error_occured(),
+			!stream.error_occurred(),
 			stream.get_space_used_in_bytes(), 
 			decode_out->data_size);
 		SIM_EVENT_QUEUE_DBG("event type: %d, reference count: %d", decode_out->event_type, decode_out->reference_count);

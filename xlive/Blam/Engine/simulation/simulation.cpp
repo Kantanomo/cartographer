@@ -59,7 +59,7 @@ bool simulation_starting_up(void)
 	return result;
 }
 
-void simulation_notify_reset_complete()
+void simulation_notify_reset_complete(void)
 {
 	s_simulation_globals* sim_globals = simulation_get_globals();
 	if (!game_is_playback())
@@ -67,6 +67,23 @@ void simulation_notify_reset_complete()
 		sim_globals->world->send_player_acknowledgements(true);
 	}
 	sim_globals->simulation_reset_in_progress = false;
+	return;
+}
+
+void simulation_notify_reset_initiate(void)
+{
+	s_simulation_globals* sim_globals = simulation_get_globals();
+	sim_globals->simulation_reset_in_progress = true;
+	return;
+}
+
+void simulation_notify_going_active(void)
+{
+	if (game_is_campaign() && game_is_cooperative())
+	{
+		players_update_for_checkpoint();
+	}
+	return;
 }
 
 void simulation_reset_immediate()

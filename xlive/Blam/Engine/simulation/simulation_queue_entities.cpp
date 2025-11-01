@@ -82,7 +82,7 @@ bool encode_simulation_queue_creation_to_buffer(
 
 	*out_encoded_size = stream.get_space_used_in_bytes();
 
-	const bool result = !stream.error_occured();
+	const bool result = !stream.error_occurred();
 	stream.finish_writing(NULL);
 	
 	return result;
@@ -135,7 +135,7 @@ bool decode_simulation_queue_creation_from_buffer(int32 encoded_size, uint8* enc
 							&stream
 						);
 					}
-					decode_success = !stream.error_occured();
+					decode_success = !stream.error_occurred();
 					stream.finish_reading();
 				}
 				else
@@ -375,7 +375,7 @@ bool encode_simulation_queue_update_to_buffer(
 	uint32 update_mask_written = 0;
 	entity_def->entity_update_encode(false, update_mask, &update_mask_written, data->state_data_size, data->state_data, NULL, &stream, 0);
 
-	bool result = !stream.error_occured();
+	bool result = !stream.error_occurred();
 	stream.finish_writing(NULL);
 
 	*out_encoded_size = stream.get_space_used_in_bytes();
@@ -422,7 +422,7 @@ bool decode_simulation_queue_update_from_buffer(int32 encoded_size, uint8* encod
 					out_decoded_data->state_data,
 					&stream))
 				{
-					decode_success = !stream.error_occured();
+					decode_success = !stream.error_occurred();
 					stream.finish_reading();
 				}
 				else
@@ -592,7 +592,7 @@ void simulation_queue_entity_deletion_insert(s_simulation_game_entity* entity)
 	simulation_gamestate_index_encode(&stream, entity->object_index);
 	int32 encoded_size = stream.get_space_used_in_bytes();
 
-	if (stream.error_occured())
+	if (stream.error_occurred())
 	{
 		event(
 			_event_error,
@@ -704,7 +704,7 @@ void simulation_queue_entity_promotion_insert(s_simulation_game_entity* entity)
 		simulation_entity_index_encode(&stream, entity->entity_index);
 		
 		int32 encoded_size = stream.get_space_used_in_bytes();
-		if (stream.error_occured())
+		if (stream.error_occurred())
 		{
 			event(_event_error, "networking:simulation:queue: failed to encode promotion for entity type %d", entity->entity_type);
 		}
