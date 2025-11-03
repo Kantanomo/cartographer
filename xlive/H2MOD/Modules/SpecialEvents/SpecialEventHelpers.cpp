@@ -5,7 +5,6 @@
 #include "items/weapon_definitions.h"
 #include "models/models.h"
 #include "models/render_model_definitions.h"
-#include "tag_files/global_string_ids.h"
 
 #include "tag_files/tag_loader/tag_injection.h"
 

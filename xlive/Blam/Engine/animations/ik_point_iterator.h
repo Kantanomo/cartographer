@@ -1,19 +1,26 @@
 #pragma once
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 
-#define k_max_ik_points 8
+/* constants */
+
+enum
+{
+	k_max_ik_points = 8
+};
+
+/* classes */
 
 class ik_point_iterator
 {
 public:
-	ik_point_iterator();
-	~ik_point_iterator() = default;
+	ik_point_iterator(void);
+	~ik_point_iterator(void) = default;
 	void clear(void);
 
 	string_id marker;
 	string_id attach_to_marker;
 	int16 weapon_ik_index;
-	int16 field_A;
-	string_id field_C;
-	string_id field_10;
+	int16 pass;
+	string_id mode_name;
+	string_id weapon_class_name;
 };

@@ -1,5 +1,5 @@
 #pragma once
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 #include "tag_files/tag_block.h"
 
 /* enums */
@@ -15,7 +15,7 @@ enum e_cs_point_set_flags : int
 // max count: 20
 struct cs_point
 {
-	char name[32];
+	char name[k_tag_string_length];
 	real_point3d position;
 	short pad;
 	int surface_index;
@@ -26,7 +26,7 @@ ASSERT_STRUCT_SIZE(cs_point, 60);
 // max count: 200
 struct cs_point_set
 {
-	char name[32];
+	char name[k_tag_string_length];
 	tag_block<cs_point> points;
 	int16 bsp_index;            // Block index: scenario_structure_bsp_reference
 	int16 manual_reference_frame;

@@ -13,8 +13,8 @@
 #include "scenario/scenario_definitions.h"
 #include "scenario/scenario.h"
 #include "sound/sound_manager.h"
-#include "tag_files/global_string_ids.h"
-#include "tag_files/string_id.h"
+
+#include "tag_files/tag_groups.h"
 #include "text/unicode.h"
 
 /* typedefs */

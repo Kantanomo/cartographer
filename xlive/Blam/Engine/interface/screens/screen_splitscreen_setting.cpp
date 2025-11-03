@@ -4,7 +4,7 @@
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_shared_globals.h"
 #include "render/render.h"
-#include "tag_files/global_string_ids.h"
+
 #include "text/text_group.h"
 
 #include "H2MOD/Modules/Shell/Config.h"

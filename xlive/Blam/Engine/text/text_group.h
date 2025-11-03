@@ -1,5 +1,5 @@
 #pragma once
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 
 #define k_max_strings_per_language 0x8000
 

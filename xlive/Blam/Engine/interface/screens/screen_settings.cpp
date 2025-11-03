@@ -19,7 +19,7 @@
 #include "interface/screens/screen_cartographer_menus.h"
 #include "networking/network_event.h"
 #include "networking/panorama/panorama_presence.h"
-#include "tag_files/global_string_ids.h"
+
 
 #include "tag_files/tag_loader/tag_injection.h"
 

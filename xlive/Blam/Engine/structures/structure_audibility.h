@@ -15,7 +15,7 @@ enum e_background_sound_scale_flags : int
 // max count: k_maximum_cluster_sound_palette_entries_per_structure 64
 struct structure_background_sound_palette_entry
 {
-	char name[32];
+	char name[k_tag_string_length];
 	tag_reference background_sound;         // lsnd
 
 	// Play only when player is inside cluster.
@@ -36,7 +36,7 @@ ASSERT_STRUCT_SIZE(structure_background_sound_palette_entry, 100);
 // max count: k_maximum_cluster_sound_palette_entries_per_structure 64
 struct structure_sound_environment_palette_entry
 {
-	char name[32];
+	char name[k_tag_string_length];
 	tag_reference sound_environment;    // snde
 	float cutoff_distance;
 	float interpolation_speed;          // 1 sec

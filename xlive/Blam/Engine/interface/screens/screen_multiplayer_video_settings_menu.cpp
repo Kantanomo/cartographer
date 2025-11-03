@@ -14,7 +14,7 @@
 #include "interface/user_interface_controller.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "render/render.h"
-#include "tag_files/global_string_ids.h"
+
 
 
 /* enums */

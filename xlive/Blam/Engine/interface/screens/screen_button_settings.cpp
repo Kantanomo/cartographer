@@ -6,7 +6,7 @@
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "saved_games/player_profile.h"
-#include "tag_files/global_string_ids.h"
+
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/text_group.h"
 

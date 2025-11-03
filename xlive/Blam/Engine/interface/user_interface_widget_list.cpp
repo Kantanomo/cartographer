@@ -4,7 +4,6 @@
 #include "user_interface_widget_text.h"
 
 #include "main/game_preferences.h"
-#include "tag_files/global_string_ids.h"
 
 c_list_widget::c_list_widget(uint16 user_flags)
 	: c_user_interface_widget(_widget_type_list, user_flags)

@@ -6,7 +6,7 @@
 #include "particle_location.h"
 #include "particle_system_definition.h"
 #include "game/game_time.h"
-#include "tag_files/global_string_ids.h"
+
 #include "render/render_visibility_collection.h"
 
 

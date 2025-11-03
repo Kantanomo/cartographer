@@ -7,8 +7,8 @@
 #include "filesys/pc_file_system.h"
 #include "networking/network_event.h"
 #include "tag_files/data_reference.h"
-#include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
+#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "tag_files/tag_loader/tag_injection_define.h"
@@ -475,7 +475,7 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 	{
 		s_offset_link* link = &m_tag_reference_offsets[i];
 		tag_reference* reference = (tag_reference*)(out_buffer + link->memory_offset - m_data);
-		datum resolved_index = tag_injection_resolve_cache_datum(reference->index);
+		const datum resolved_index = tag_injection_resolve_cache_datum(reference->index);
 
 #if TAG_INJECTION_DEBUG
 		event(_event_verbose, "tags:injection: [%s]: updating tag reference: %s from: %x to %x", __FUNCTION__, link->name, reference->index, resolved_index);
@@ -557,7 +557,7 @@ void c_xml_definition_loader::validate_data() const
 
 	if (res != 0)
 	{
-		error(0, "tags:injection: [%s] Base definition block is invalid", __FUNCTION__);
+		error(_error_immediate, "tags:injection: [%s] Base definition block is invalid", __FUNCTION__);
 	}
 	for (uint32 i = 0; i < m_data_reference_offset_count; i++)
 	{
@@ -567,7 +567,7 @@ void c_xml_definition_loader::validate_data() const
 		int _res = memcmp(data_data, (uint8*)m_data_reference_offsets[i].memory_offset, 1);
 		if (_res != 0)
 		{
-			error(0, "tags:injection: [%s] data_reference is invalid", __FUNCTION__);
+			error(_error_immediate, "tags:injection: [%s] data_reference is invalid", __FUNCTION__);
 		}
 		free(data_data);
 	}
@@ -579,7 +579,7 @@ void c_xml_definition_loader::validate_data() const
 		int _res = memcmp(block_data, (uint8*)m_tag_block_offsets[i].memory_offset, 1);
 		if (_res != 0)
 		{
-			error(0, "tags:injection: [%s] tag_block is invalid", __FUNCTION__);
+			error(_error_immediate, "tags:injection: [%s] tag_block is invalid", __FUNCTION__);
 		}
 		free(block_data);
 	}

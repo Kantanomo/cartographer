@@ -205,7 +205,7 @@ static void tag_fixes_misty_rain(void)
 
 	if (!strcmp(cache_header->name, "05a_deltaapproach"))
 	{
-		tag_injection_set_active_map(L"carto_shared");
+		tag_injection_set_active_map(k_carto_shared_map);
 		if (tag_injection_active_map_verified())
 		{
 			datum misty_rain_datum = tag_injection_load(_tag_group_weather_system, "scenarios\\skies\\solo\\deltatemple\\weather\\misty_rain", true);

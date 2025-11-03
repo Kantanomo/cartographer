@@ -2,7 +2,7 @@
 #include "user_interface_shared_globals.h"
 
 #include "math/color_math.h"
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 
@@ -592,7 +592,7 @@ ASSERT_STRUCT_SIZE(s_text_block_reference, 44);
 struct s_text_value_pair_block_UNUSED
 {
 	// Explaination("OBSOLETE", "this is all obsolete")
-	char name[32];
+	char name[k_tag_string_length];
 	tag_block<s_text_value_pair_reference_UNUSED> text_value_pairs;
 };
 ASSERT_STRUCT_SIZE(s_text_value_pair_block_UNUSED, 40);

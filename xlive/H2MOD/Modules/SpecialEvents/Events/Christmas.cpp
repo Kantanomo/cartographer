@@ -118,8 +118,8 @@ void christmas_event_map_load(void)
 			object_attachment_definition* attachment = sword_weapon->object.attachments[i];
 			attachment->type.index = NONE;
 			attachment->type.group.group = _tag_group_none;
-			attachment->marker = 0;
-			attachment->primary_scale = 0;
+			attachment->marker = _string_id_empty_string;
+			attachment->primary_scale = _string_id_empty_string;
 		}
 
 		// Change ghost to reindeer

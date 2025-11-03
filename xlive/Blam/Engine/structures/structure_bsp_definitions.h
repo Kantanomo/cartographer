@@ -122,7 +122,7 @@ ASSERT_STRUCT_SIZE(structure_weather_polyhedron, 24);
 // max count: MAXIMUM_WEATHER_PALETTE_ENTRIES_PER_STRUCTURE 32
 struct structure_weather_palette_entry
 {
-	char name[32];
+	char name[k_tag_string_length];
 	tag_reference weather_system;   // weat
 	short pad[2];
 	int pad1[8];
@@ -130,7 +130,7 @@ struct structure_weather_palette_entry
 	real_vector3d wind_direction;
 	float wind_magnitude;
 	int pad2;
-	char wind_scale_function[32];
+	char wind_scale_function[k_tag_string_length];
 };
 ASSERT_STRUCT_SIZE(structure_weather_palette_entry, 136);
 
@@ -246,7 +246,7 @@ struct structure_breakable_surface
 // max: MAXIMUM_MARKERS_PER_STRUCTURE
 struct structure_marker
 {
-	char name[32];
+	char name[k_tag_string_length];
 	real_quaternion rotation;
 	real_point3d position;
 };
@@ -265,14 +265,14 @@ ASSERT_STRUCT_SIZE(structure_environment_object_palette_entry, 20);
 // max: MAXIMUM_ENVIRONMENT_OBJECTS_PER_STRUCTURE
 struct structure_environment_object
 {
-	char name[32];
+	char name[k_tag_string_length];
 	real_quaternion rotation;
 	real_point3d translation;
 	// BlockIndex1("structure_bsp_environment_object_palette_block")
 	uint16 palette_index;
 	datum unique_id;
 	char exported_object_type[4];
-	char scenario_object_name[32];
+	char scenario_object_name[k_tag_string_length];
 };
 ASSERT_STRUCT_SIZE(structure_environment_object, 104);
 

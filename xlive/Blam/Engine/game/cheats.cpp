@@ -18,7 +18,7 @@
 #include "physics/collisions.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "sound/game_sound.h"
-#include "tag_files/global_string_ids.h"
+
 #include "units/bipeds.h"
 
 /* typedefs */

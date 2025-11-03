@@ -1,6 +1,7 @@
 #pragma once
+#include "tag_files/tag_groups.h"
 
-#include "tag_files/string_id.h"
+/* enums */
 
 enum e_unit_action : int32
 {
@@ -66,6 +67,8 @@ enum e_unit_action : int32
 	_unit_action_59,
 	k_unit_action_count,
 };
+
+/* structures */
 
 struct action_request
 {

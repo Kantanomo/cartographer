@@ -3,8 +3,8 @@
 
 #include "math/color_math.h"
 #include "math/integer_math.h"
-#include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
+#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 
 /* constants */
@@ -288,14 +288,14 @@ ASSERT_STRUCT_SIZE(s_shape_block_reference, 48);
 // max count: k_maximum_objects_per_ui_scene
 struct s_ui_object_reference
 {
-	char name[32];
+	char name[k_tag_string_length];
 };
 ASSERT_STRUCT_SIZE(s_ui_object_reference, 32);
 
 // max count: k_maximum_lights_per_ui_scene
 struct s_ui_light_reference
 {
-	char name[32];
+	char name[k_tag_string_length];
 };
 ASSERT_STRUCT_SIZE(s_ui_light_reference, 32);
 

@@ -2,9 +2,9 @@
 
 #include "effects/player_effects.h"
 #include "game/player_vibration.h"
-#include "tag_files/string_id.h"
-#include "tag_files/tag_reference.h"
 #include "tag_files/tag_block.h"
+#include "tag_files/tag_groups.h"
+#include "tag_files/tag_reference.h"
 
 enum e_damage_effect_flags
 {

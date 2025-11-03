@@ -3,7 +3,7 @@
 #include "cache/cache_files.h"
 #include "main/game_preferences.h"
 #include "game/game_globals.h"
-#include "tag_files/global_string_ids.h"
+
 
 
 /* structures */

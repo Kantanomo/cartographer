@@ -20,7 +20,7 @@
 #include "interface/user_interface_utilities.h"
 #include "networking/online/online_account_xbox.h"
 #include "shell/shell.h"
-#include "tag_files/global_string_ids.h"
+
 #include "text/unicode.h"
 
 /* enums */

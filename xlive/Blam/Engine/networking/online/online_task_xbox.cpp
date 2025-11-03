@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "online_task_xbox.h"
-#include "tag_files/global_string_ids.h"
+
 
 // stubbing these for now
 

@@ -6,7 +6,7 @@
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_text.h"
 #include "saved_games/player_profile.h"
-#include "tag_files/global_string_ids.h"
+
 
 /* enums */
 
@@ -80,7 +80,7 @@ void c_controller_settings_edit_list::update_list_items(c_list_item_widget* item
 					break;
 					//add jumpy text value to controller_settings menu
 				case _button_preset_jumpy:
-					value_string = _string_id_l_jumpy;
+					value_string = (string_id)_string_id_l_jumpy;
 					break;
 				}
 				break;

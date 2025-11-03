@@ -43,7 +43,7 @@ enum e_waypoint_flags : int
 #define MAXIMUM_NUMBER_OF_WAYPOINTS 16
 struct s_waypoint_arrows_block
 {
-	char name[32];
+	char name[k_tag_string_length];
 	int pad_0[2];
 	pixel32 color;
 	float opacity;

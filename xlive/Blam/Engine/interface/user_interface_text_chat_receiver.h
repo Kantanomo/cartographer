@@ -1,6 +1,6 @@
 #pragma once
 #include "user_interface_text_chat.h"
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 
 /* classes */
 

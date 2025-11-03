@@ -5,7 +5,7 @@
 
 #include "cache/cache_files.h"
 #include "simulation/game_interface/simulation_game_action.h"
-#include "tag_files/global_string_ids.h"
+
 
 /* prototypes */
 

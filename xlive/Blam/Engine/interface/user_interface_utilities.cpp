@@ -6,8 +6,8 @@
 #include "user_interface_shared_globals.h"
 #include "user_interface_widget_window.h"
 
-#include "render/render.h"
 #include "rasterizer/rasterizer_globals.h"
+#include "render/render.h"
 
 /* typedefs */
 
@@ -22,6 +22,12 @@ user_interface_get_cursor_position_scale_t p_user_interface_get_cursor_position;
 void user_interface_utilities_apply_patches(void)
 {
 	DETOUR_ATTACH(p_user_interface_get_cursor_position, Memory::GetAddress<user_interface_get_cursor_position_scale_t>(0x21D620), user_interface_get_cursor_position_scaled);
+	return;
+}
+
+void __cdecl user_interface_global_string_get(string_id id, c_maximum_interface_text* dest)
+{
+	INVOKE(0x21DC38, 0x6AA91, user_interface_global_string_get, id, dest);
 	return;
 }
 

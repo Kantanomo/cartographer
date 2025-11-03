@@ -3,7 +3,7 @@
 
 #include "animation_definitions.h"
 
-#include "tag_files/global_string_ids.h"
+
 
 c_animation_manager::c_animation_manager()
 {
