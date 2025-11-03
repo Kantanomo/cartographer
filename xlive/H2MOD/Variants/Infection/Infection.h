@@ -66,8 +66,8 @@ public:
 	static void preSpawnServerSetup();
 	static void resetWeaponInteractionAndEmblems();
 	static void sendTeamChange();
-	static void setPlayerAsHuman(int playerIndex);
-	static void setPlayerAsZombie(int playerIndex);
+	static void setPlayerAsHuman(int32 playerIndex);
+	static void setPlayerAsZombie(int32 playerIndex);
 	static void triggerSound(e_infection_sounds sound, int sleep);
 	static void onGameTick();
 	static void removeUnwantedItems();
