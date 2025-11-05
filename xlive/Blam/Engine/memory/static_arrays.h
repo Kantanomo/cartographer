@@ -85,6 +85,8 @@ protected:
 	t_type m_data[k_maximum_count];
 };
 
+
+
 template<typename t_type, typename t_storage_type, size_t k_count>
 class c_flags_no_init 
 {
@@ -616,3 +618,11 @@ typedef c_static_wchar_string<512> c_maximum_interface_text;
 #ifdef ASSERTS_ENABLED
 extern c_static_string<256> g_static_string_assert_text;
 #endif
+
+/* public code */
+
+template<typename T>
+inline bool tmpl_IN_RANGE(T value, T a, T b)
+{
+	return IN_RANGE(value, a, b);
+}
