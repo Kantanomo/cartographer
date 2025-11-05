@@ -102,6 +102,11 @@ void __cdecl real_math_reset_precision(void)
 	return;
 }
 
+int32 real_to_long_round(real32 v)
+{
+	return (int32)v;
+}
+
 real32 distance_squared2d(const real_point2d* a, const real_point2d* b)
 {
 	return (a->x - b->x) * (a->x - b->x) + (a->y - b->y) * (a->y - b->y);

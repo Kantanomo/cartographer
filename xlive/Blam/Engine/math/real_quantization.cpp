@@ -1,6 +1,9 @@
 #include "stdafx.h"
-
 #include "real_quantization.h"
+
+#include "networking/network_event.h"
+
+/* public code */
 
 int32 quantize_real(real32 value, real32 min_value, real32 max_value, int32 size_in_bits, bool exact_midpoint)
 {
@@ -68,13 +71,13 @@ int32 quantize_unit_vector(const real_vector3d* u)
 	return type | ((quantized_f1 | (quantize_real(f2, -1.0f, 1.0f, 8, true) << 8)) << 3);
 }
 
-void dequantize_unit_vector(int32 quantized_unit_vector, real_vector3d* out_unit_vector)
+void dequantize_unit_vector3d(int32 quantized_unit_vector, real_vector3d* out_unit_vector)
 {
-	real32 dequantized_f1 = dequantize_real((uint8)(quantized_unit_vector >>  3), -1.0f, 1.0f, 8, true);
-	real32 dequantized_f2 = dequantize_real((uint8)(quantized_unit_vector >> 11), -1.0f, 1.0f, 8, true);
+	real32 dequantized_f1 = dequantize_real((uint8)((quantized_unit_vector >>  3) & BYTE_MAX), -1.0f, 1.0f, 8, true);
+	real32 dequantized_f2 = dequantize_real((uint8)((quantized_unit_vector >> 11) & BYTE_MAX), -1.0f, 1.0f, 8, true);
 
-	int32 type = quantized_unit_vector & ((1 << 3) - 1);
-	switch (type)
+	const int32 face = quantized_unit_vector & ((1 << 3) - 1);
+	switch (face)
 	{
 	case 0:
 		*out_unit_vector = { 1.0f, dequantized_f1, dequantized_f2 };
@@ -96,8 +99,10 @@ void dequantize_unit_vector(int32 quantized_unit_vector, real_vector3d* out_unit
 		break;
 	default:
 		*out_unit_vector = *global_up3d;
+		event(_event_error, "%s: bad face value '%d' when reading unit vector", __FUNCTION__, face);
 		break;
 	}
 
 	normalize3d(out_unit_vector);
+	return;
 }

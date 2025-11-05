@@ -496,6 +496,8 @@ void __cdecl real_math_initialize(void);
 
 void __cdecl real_math_reset_precision(void);
 
+int32 real_to_long_round(real32 v);
+
 real32 distance_squared2d(const real_point2d* a, const real_point2d* b);
 
 real32 distance2d(const real_point2d* a, const real_point2d* b);
