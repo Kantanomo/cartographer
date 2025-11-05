@@ -151,6 +151,6 @@ ASSERT_STRUCT_SIZE(trigger_definition, 48);
 
 void __cdecl orders_initialize_for_new_map(void);
 
-bool orders_verify_script_references(orders_definition* orders, bool a2);
+bool orders_verify_script_references(orders_definition* orders, bool suppress_errors);
 
-bool trigger_verify_script_references(trigger_definition* trigger, bool a2);
+bool trigger_verify_script_references(trigger_definition* trigger, bool suppress_errors);

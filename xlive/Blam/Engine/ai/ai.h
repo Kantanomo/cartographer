@@ -64,7 +64,10 @@ ASSERT_STRUCT_SIZE(ai_globals_type, 884);
 
 void ai_apply_patches(void);
 
+ai_globals_type* ai_globals_get(void);
+
 void __cdecl ai_update(void);
 
-void __cdecl ai_initialize_for_new_map(void);
+void ai_reset(void);
 
+void __cdecl ai_initialize_for_new_map(void);

@@ -585,6 +585,7 @@
     <ClCompile Include="Blam\Engine\achievements\achievement_live_interface.cpp" />
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\ai\actor_dynamic_firing_position.cpp" />
+    <ClCompile Include="Blam\Engine\ai\actor_types.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai_debug.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai_dialogue.cpp" />
@@ -593,6 +594,7 @@
     <ClCompile Include="Blam\Engine\ai\ai_orders.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai_player.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai_script.cpp" />
+    <ClCompile Include="Blam\Engine\ai\behavior.cpp" />
     <ClCompile Include="Blam\Engine\ai\clumps.cpp" />
     <ClCompile Include="Blam\Engine\ai\cl_engine.cpp" />
     <ClCompile Include="Blam\Engine\ai\event_handling.cpp" />
@@ -897,6 +899,7 @@
     <ClInclude Include="Blam\Engine\ai\actor_dynamic_firing_position.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
     <ClInclude Include="Blam\Engine\ai\actor_moving.h" />
+    <ClInclude Include="Blam\Engine\ai\actor_types.h" />
     <ClInclude Include="Blam\Engine\ai\ai.h" />
     <ClInclude Include="Blam\Engine\ai\ai_debug.h" />
     <ClInclude Include="Blam\Engine\ai\ai_dialogue.h" />
@@ -907,6 +910,7 @@
     <ClInclude Include="Blam\Engine\ai\ai_player.h" />
     <ClInclude Include="Blam\Engine\ai\ai_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\ai\ai_script.h" />
+    <ClInclude Include="Blam\Engine\ai\behavior.h" />
     <ClInclude Include="Blam\Engine\ai\character_definitions.h" />
     <ClInclude Include="Blam\Engine\ai\clumps.h" />
     <ClInclude Include="Blam\Engine\ai\cl_engine.h" />

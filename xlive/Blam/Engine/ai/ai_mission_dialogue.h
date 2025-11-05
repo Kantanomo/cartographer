@@ -115,7 +115,7 @@ struct ai_conversation_participant
 
 	uint32 unused[3];
 	int16 dialogue_variants[6];
-	char ai_index_name[32];
+	char ai_index_name[k_tag_string_length];
 	int32 runtime_ai_index;
 	uint32 unused2[3];
 };
@@ -142,7 +142,7 @@ ASSERT_STRUCT_SIZE(ai_conversation_participant, 84);
 // max count: 128
 struct ai_conversation
 {
-	char name[32];
+	char name[k_tag_string_length];
 	c_flags_no_init<e_ai_conversation_flags, uint16, k_number_of_conversation_definition_flags> flags;
 	uint16 pad;
 
