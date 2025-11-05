@@ -43,6 +43,10 @@ enum e_game_team : int16
 	_game_team_observer = NONE
 };
 
+/* constants */
+
+extern const char* global_campaign_team_names[16];
+
 /* prototypes */
 
 void __cdecl game_allegiance_update(void);

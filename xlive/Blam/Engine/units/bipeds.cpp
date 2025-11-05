@@ -38,8 +38,8 @@ void biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector
 
 void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forward, datum object_index, real_point3d* camera_position, const real_vector3d* camera_up)
 {
-	biped_datum* biped = (biped_datum*)object_get_fast_unsafe(object_index);
-	biped_definition* biped_def = (biped_definition*)tag_get_fast(biped->definition_index);
+	const biped_datum* biped = (biped_datum*)object_get_fast_unsafe(object_index);
+	const biped_definition* biped_def = (biped_definition*)tag_get_fast(biped->definition_index);
 
 	ASSERT(camera_position);
 	ASSERT(camera_forward);
@@ -49,9 +49,9 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
 	{
 		real32 v1;
 		real32 angle_range = biped_def->biped.camera_interpolation_end - biped_def->biped.camera_interpolation_start;
-		if (camera_forward->k > -1.0f)
+		if (camera_forward->k > -1.f)
 		{
-			if (camera_forward->k >= 0.0f)
+			if (camera_forward->k >= 0.f)
 			{
 				v1 = 0.0f;
 			}
@@ -67,8 +67,8 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
 
 		ASSERT(angle_range > 0.f);
 
-		real32 function_value = (v1 - biped_def->biped.camera_interpolation_start) / angle_range;
-		real32 function_result = transition_function_evaluate(_transition_function_cosine, PIN(function_value, 0.0f, 1.0f));
+		const real32 function_value = (v1 - biped_def->biped.camera_interpolation_start) / angle_range;
+		real32 function_result = transition_function_evaluate(_transition_function_cosine, PIN(function_value, 0.f, 1.f));
 
 		if (function_result > 0.0f && biped->biped.field_3E0)
 		{

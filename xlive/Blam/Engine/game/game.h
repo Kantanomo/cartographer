@@ -128,3 +128,7 @@ void __cdecl game_initialize_for_new_map(const s_game_options* options);
 
 void __cdecl game_frame(real32 dt);
 
+/* globals */
+
+extern char const* global_campaign_difficulty_level_names[4];
+

@@ -651,6 +651,7 @@
     <ClCompile Include="Blam\Engine\cseries\threads_windows.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\recorded_animations.cpp" />
+    <ClCompile Include="Blam\Engine\debug\menu\debug_menu_main.cpp" />
     <ClCompile Include="Blam\Engine\editor\editor_stubs.cpp" />
     <ClCompile Include="Blam\Engine\effects\beam.cpp" />
     <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
@@ -675,6 +676,7 @@
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
     <ClCompile Include="Blam\Engine\game\game_results.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
+    <ClCompile Include="Blam\Engine\game\player_mapping.cpp" />
     <ClCompile Include="Blam\Engine\game\player_vibration.cpp" />
     <ClCompile Include="Blam\Engine\game\preferences.cpp" />
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
@@ -744,9 +746,11 @@
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\kablam\kablamsvc_client.cpp" />
     <ClCompile Include="Blam\Engine\kablam\kablam_config.cpp" />
     <ClCompile Include="Blam\Engine\kablam\kablam_log.cpp" />
     <ClCompile Include="Blam\Engine\main\console.cpp" />
+    <ClCompile Include="Blam\Engine\main\debug_keys.cpp" />
     <ClCompile Include="Blam\Engine\main\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
     <ClCompile Include="Blam\Engine\main\levels.cpp" />
@@ -791,6 +795,7 @@
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
     <ClCompile Include="Blam\Engine\memory\rockall_heap_manager.cpp" />
     <ClCompile Include="Blam\Engine\memory\static_arrays.cpp" />
+    <ClCompile Include="Blam\Engine\models\model_definitions.cpp" />
     <ClCompile Include="Blam\Engine\models\render_models.cpp" />
     <ClCompile Include="Blam\Engine\multithreading\synchronization.cpp" />
     <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
@@ -976,6 +981,7 @@
     <ClInclude Include="Blam\Engine\cutscene\cinematics_definitions.h" />
     <ClInclude Include="Blam\Engine\cutscene\recorded_animations.h" />
     <ClInclude Include="Blam\Engine\cutscene\recorded_animation_definitions.h" />
+    <ClInclude Include="Blam\Engine\debug\menu\debug_menu_main.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
@@ -985,6 +991,7 @@
     <ClInclude Include="Blam\Engine\editor\editor_flags.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
+    <ClInclude Include="Blam\Engine\editor\editor_stubs.h" />
     <ClInclude Include="Blam\Engine\effects\beam.h" />
     <ClInclude Include="Blam\Engine\effects\contrails.h" />
     <ClInclude Include="Blam\Engine\effects\decals.h" />
@@ -1024,6 +1031,7 @@
     <ClInclude Include="Blam\Engine\game\materials.h" />
     <ClInclude Include="Blam\Engine\game\multiplayer_globals.h" />
     <ClInclude Include="Blam\Engine\game\player_constants.h" />
+    <ClInclude Include="Blam\Engine\game\player_mapping.h" />
     <ClInclude Include="Blam\Engine\game\player_vibration.h" />
     <ClInclude Include="Blam\Engine\game\preferences.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
@@ -1130,9 +1138,11 @@
     <ClInclude Include="Blam\Engine\items\vehicle_collection_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\kablam\kablamsvc_client.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_config.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_log.h" />
     <ClInclude Include="Blam\Engine\main\console.h" />
+    <ClInclude Include="Blam\Engine\main\debug_keys.h" />
     <ClInclude Include="Blam\Engine\main\game_preferences.h" />
     <ClInclude Include="Blam\Engine\main\interpolator.h" />
     <ClInclude Include="Blam\Engine\main\levels.h" />
@@ -1159,6 +1169,7 @@
     <ClInclude Include="Blam\Engine\memory\rockall_heap_manager.h" />
     <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
     <ClInclude Include="Blam\Engine\models\models.h" />
+    <ClInclude Include="Blam\Engine\models\model_definitions.h" />
     <ClInclude Include="Blam\Engine\models\render_models.h" />
     <ClInclude Include="Blam\Engine\models\render_model_definitions.h" />
     <ClInclude Include="Blam\Engine\multithreading\synchronization.h" />
@@ -1299,6 +1310,7 @@
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_group_dependencies.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.cpp" />
@@ -2398,6 +2410,8 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_block.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_files.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_group_access.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_group_dependencies.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_define.h" />

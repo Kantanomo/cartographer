@@ -392,7 +392,7 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 {
 	bool* window_in_focus = Memory::GetAddress<bool*>(0x46DAD9);
 	bool* shell_window_proc_game_message_during_map_load = Memory::GetAddress<bool*>(0x46DAD8);
-	WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
+	const WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
 
 #ifndef IMGUI_DISABLE
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
@@ -447,7 +447,9 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	}
 
 	if (exec_base_wndproc)
+	{
 		result = g_WndProc(hWnd, uMsg, wParam, lParam);
+	}
 
 	return result;
 }
