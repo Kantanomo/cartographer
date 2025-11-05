@@ -2607,6 +2607,12 @@ struct s_tag_block
 	int32 data;
 };
 
+/* constants */
+
+#ifdef HS_COMPILER_ENABLED
+extern const char* global_tag_group_names[];
+#endif
+
 /* macros */
 
 #define TAG_BLOCK_GET_ELEMENT(block_address, index, type) ((type*)tag_block_get_element_with_size((block_address), (index), sizeof(type)))
@@ -2625,4 +2631,10 @@ void __cdecl tag_group_set_data_info(uint32 tag_data, uint32 tag_data_size);
 
 bool string_id_load_strings(const struct cache_file_header* header);
 
-const char* string_id_get_string_const(int32 id);
+char* string_id_get_string(int32 index, char(&buffer)[128]);
+
+const char* string_id_get_string_const(string_id index);
+
+void string_id_convert_string(char* string);
+
+string_id string_id_exists(const char* in_string);

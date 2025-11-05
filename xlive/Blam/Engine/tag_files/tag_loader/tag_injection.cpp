@@ -5,6 +5,11 @@
 #include "networking/network_event.h"
 #include "shell/shell.h"
 
+/* constants */
+
+extern const wchar_t* k_carto_shared_map = L"carto_shared";
+extern const wchar_t* k_events_map = k_carto_shared_map;
+
 /* globals */
 
 c_tag_injecting_manager* g_tag_injection_manager = NULL;
