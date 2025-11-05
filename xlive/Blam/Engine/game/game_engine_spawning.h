@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game/game_engine.h"
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 
 #define k_maximum_number_of_dynamic_spawn_zones 32
 #define MAXIMUM_STATIC_SPAWN_ZONES_PER_SCENARIO 128

@@ -39,7 +39,7 @@ ASSERT_STRUCT_SIZE(s_sky_animation, 36);
 struct s_sky_shader_function
 {
 	int8 pad[4];
-	char global_function_name[32];
+	char global_function_name[k_tag_string_length];
 };
 ASSERT_STRUCT_SIZE(s_sky_shader_function, 36);
 

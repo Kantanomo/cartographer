@@ -129,6 +129,11 @@ bool game_is_ui_shell(void)
 	return game_options_get()->game_mode == _game_mode_ui_shell;
 }
 
+bool game_is_cooperative(void)
+{
+	return game_options_get()->game_mode == _game_mode_campaign && game_options_get()->coop;
+}
+
 bool game_is_distributed(void)
 {
 	const e_game_simulation simulation_type = game_options_get()->game_simulation;

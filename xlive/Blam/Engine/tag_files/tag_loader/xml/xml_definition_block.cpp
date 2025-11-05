@@ -49,16 +49,17 @@ c_xml_definition_block::c_xml_definition_block(const tinyxml2::XMLElement* base_
 	return;
 }
 
-void c_xml_definition_block::reset_counts()
+void c_xml_definition_block::reset_counts(void)
 {
 	m_tag_reference_count = 0;
 	m_classless_tag_reference_count = 0;
 	m_string_id_count = 0;
 	m_data_reference_count = 0;
 	m_tag_block_count = 0;
+	return;
 }
 
-void c_xml_definition_block::get_element_counts()
+void c_xml_definition_block::get_element_counts(void)
 {
 	const tinyxml2::XMLElement* element = m_element->FirstChildElement();
 	while (element)
@@ -100,9 +101,10 @@ void c_xml_definition_block::get_element_counts()
 
 		element = element->NextSiblingElement();
 	}
+	return;
 }
 
-void c_xml_definition_block::allocate_buffers()
+void c_xml_definition_block::allocate_buffers(void)
 {
 	if (m_tag_reference_count)
 		m_tag_references = (uint32*)malloc(sizeof(uint32) * m_tag_reference_count);
@@ -132,9 +134,10 @@ void c_xml_definition_block::allocate_buffers()
 	if (m_tag_block_count)
 		m_tag_block_names = new c_static_string<64>[m_tag_block_count];
 #endif
+	return;
 }
 
-void c_xml_definition_block::populate_buffers()
+void c_xml_definition_block::populate_buffers(void)
 {
 	const tinyxml2::XMLElement* element = m_element->FirstChildElement();
 	while (element)
@@ -212,9 +215,10 @@ void c_xml_definition_block::populate_buffers()
 		}
 		element = element->NextSiblingElement();
 	}
+	return;
 }
 
-void c_xml_definition_block::clear()
+void c_xml_definition_block::clear(void)
 {
 	if (m_tag_reference_count)
 		free(m_tag_references);
@@ -252,24 +256,25 @@ void c_xml_definition_block::clear()
 	}
 
 	reset_counts();
+	return;
 }
 
-uint32 c_xml_definition_block::get_size() const
+uint32 c_xml_definition_block::get_size(void) const
 {
 	return m_size;
 }
 
-uint32 c_xml_definition_block::get_offset() const
+uint32 c_xml_definition_block::get_offset(void) const
 {
 	return m_offset;
 }
 
-const char* c_xml_definition_block::get_name() const
+const char* c_xml_definition_block::get_name(void) const
 {
 	return m_name.get_string();
 }
 
-uint32 c_xml_definition_block::get_tag_references_count() const
+uint32 c_xml_definition_block::get_tag_references_count(void) const
 {
 	return m_tag_reference_count;
 }
@@ -279,7 +284,7 @@ uint32 c_xml_definition_block::get_tag_reference_offset(uint32 index) const
 	return m_tag_references[index];
 }
 
-uint32 c_xml_definition_block::get_classless_tag_references_count() const
+uint32 c_xml_definition_block::get_classless_tag_references_count(void) const
 {
 	return m_classless_tag_reference_count;
 }
@@ -289,7 +294,7 @@ uint32 c_xml_definition_block::get_classless_tag_reference_offset(uint32 index) 
 	return m_classless_tag_references[index];
 }
 
-uint32 c_xml_definition_block::get_data_references_count() const
+uint32 c_xml_definition_block::get_data_references_count(void) const
 {
 	return m_data_reference_count;
 }
@@ -299,7 +304,7 @@ uint32 c_xml_definition_block::get_data_reference_offset(uint32 index) const
 	return m_data_references[index];
 }
 
-uint32 c_xml_definition_block::get_string_id_count() const
+uint32 c_xml_definition_block::get_string_id_count(void) const
 {
 	return m_string_id_count;
 }
@@ -309,7 +314,7 @@ uint32 c_xml_definition_block::get_string_id_offset(uint32 index) const
 	return m_string_ids[index];
 }
 
-uint32 c_xml_definition_block::get_tag_block_count() const
+uint32 c_xml_definition_block::get_tag_block_count(void) const
 {
 	return m_tag_block_count;
 }

@@ -180,7 +180,7 @@ static bool decode_map_file_name_message(c_bitstream* stream, int a2, s_network_
 	stream->read_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
 	stream->read_string_wchar("map-file-name", data->file_name, ARRAYSIZE(data->file_name));
 	data->map_download_id = stream->read_integer("map-download-id", SIZEOF_BITS(data->map_download_id));
-	return stream->error_occured() == false;
+	return stream->error_occurred() == false;
 }
 
 static void encode_request_map_filename_message(c_bitstream* stream, int a2, const s_network_message_request_map_filename* data)
@@ -196,7 +196,7 @@ static bool decode_request_map_filename_message(c_bitstream* stream, int a2, s_n
 	stream->read_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
 	stream->read_raw_data("user-identifier", &data->player_id, SIZEOF_BITS(data->player_id));
 	data->map_download_id = stream->read_integer("map-download-id", SIZEOF_BITS(data->map_download_id));
-	return stream->error_occured() == false;
+	return stream->error_occurred() == false;
 }
 
 static void encode_rank_change_message(c_bitstream* stream, int a2, const s_network_message_rank_change* data)
@@ -209,7 +209,7 @@ static bool decode_rank_change_message(c_bitstream* stream, int a2, s_network_me
 {
 	stream->read_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
 	data->rank = (int8)stream->read_integer("rank", SIZEOF_BITS(data->rank));
-	return stream->error_occured() == false;
+	return stream->error_occurred() == false;
 }
 
 static void encode_anti_cheat_message(c_bitstream* stream, int a2, const s_network_message_anti_cheat* data)
@@ -222,7 +222,7 @@ static bool decode_anti_cheat_message(c_bitstream* stream, int a2, s_network_mes
 {
 	stream->read_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
 	data->enabled = stream->read_bool("");
-	return stream->error_occured() == false;
+	return stream->error_occurred() == false;
 }
 
 static void encode_custom_variant_settings(c_bitstream* stream, int a2, s_network_message_session_custom_variant_settings* data)
@@ -236,5 +236,5 @@ static bool decode_custom_variant_settings(c_bitstream* stream, int a2, s_networ
 {
 	stream->read_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
 	CustomVariantSettings::DecodeVariantSettings(stream, a2, &data->settings);
-	return stream->error_occured() == false;
+	return stream->error_occurred() == false;
 }

@@ -97,7 +97,7 @@ struct error_reports_block
 	e_error_report_flags flags;
 
 	data_reference text;    // Data size: 8192
-	char source_filename[32];
+	char source_filename[k_tag_string_length];
 	int32 source_line_number;
 	tag_block<error_report_vertex> vertices;
 	tag_block<error_report_vector> vectors;

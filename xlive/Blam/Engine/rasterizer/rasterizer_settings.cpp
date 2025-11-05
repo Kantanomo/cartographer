@@ -4,11 +4,10 @@
 #include "rasterizer_globals.h"
 
 #include "interface/user_interface_text.h"
-#include "math/math.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
-#include "tag_files/global_string_ids.h"
+
 
 /* typedefs */
 

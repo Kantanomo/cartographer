@@ -1,6 +1,6 @@
 #pragma once
 #include "ai_scenario_definitions.h"
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 
 /* constants */
 

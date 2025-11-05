@@ -1,20 +1,20 @@
 #pragma once
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 
 /* structs */
 
 struct s_event_scenery_placement
 {
-	short type;
-	short variant_id;
+	int16 type;
+	int16 variant_id;
 	real_point3d position;
 	real_euler_angles3d rotation;
-	float scale;
+	real32 scale;
 };
 
 /* globals */
 
-const string_id new_elite_head_marker(0xFEE01234);
+const string_id new_elite_head_marker = (string_id)0xFEE01234;
 
 /* prototypes */
 

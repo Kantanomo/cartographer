@@ -16,7 +16,7 @@
 #include "networking/network_event.h"
 #include "networking/Session/network_session.h"
 #include "saved_games/game_variant.h"
-#include "tag_files/global_string_ids.h"
+
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/text_group.h"
 

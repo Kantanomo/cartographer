@@ -61,6 +61,8 @@ enum
 	SHORT_MAX = 32767,
 	k_unsigned_short_max = 0xffff,
 	NONE = -1,
+
+	k_tag_string_length = 32,
 };
 
 #define EOL_STRING "\r\n"

@@ -7,8 +7,8 @@
 #include "filesys/pc_file_system.h"
 #include "networking/network_event.h"
 #include "tag_files/data_reference.h"
-#include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
+#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "tag_files/tag_loader/tag_injection_define.h"
@@ -16,116 +16,122 @@
 #define lazy_malloc_buffer(TYPE, COUNT)\
 	(TYPE*)malloc(sizeof(TYPE) * (COUNT))
 
-void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* file_handle, 
-	cache_file_header* cache_header, cache_file_tags_header* tags_header, uint32 scenario_instance_offset, datum cache_index)
+void c_xml_definition_loader::init(
+	const c_xml_definition_block* definition,
+	FILE* file_handle, 
+	cache_file_header* cache_header,
+	cache_file_tags_header* tags_header,
+	uint32 scenario_instance_offset,
+	datum cache_index
+)
 {
-	this->m_tag_reference_offsets = nullptr;
-	this->m_classless_tag_reference_offsets = nullptr;
-	this->m_data_reference_offsets = nullptr;
-	this->m_string_id_offsets = nullptr;
-	this->m_tag_block_offsets = nullptr;
-	this->m_data = nullptr;
+	m_tag_reference_offsets = nullptr;
+	m_classless_tag_reference_offsets = nullptr;
+	m_data_reference_offsets = nullptr;
+	m_string_id_offsets = nullptr;
+	m_tag_block_offsets = nullptr;
+	m_data = nullptr;
 
-	this->m_used_data = 0;
-	this->m_definition = definition;
-	this->m_file_handle = file_handle;
-	this->m_cache_header = cache_header;
-	this->m_tags_header = tags_header;
-	this->m_scenario_instance_offset = scenario_instance_offset;
+	m_used_data = 0;
+	m_definition = definition;
+	m_file_handle = file_handle;
+	m_cache_header = cache_header;
+	m_tags_header = tags_header;
+	m_scenario_instance_offset = scenario_instance_offset;
 
-	this->m_cache_index = cache_index;
-	this->m_total_data_size = this->m_definition->get_size();
+	m_cache_index = cache_index;
+	m_total_data_size = m_definition->get_size();
 
-	this->load_cache_info();
+	load_cache_info();
 
-	this->reset_counts();
+	reset_counts();
 	// set the initial size of the data_loader
-	this->calculate_total_data_size(this->m_definition, this->m_file_offset, 1);
+	calculate_total_data_size(m_definition, m_file_offset, 1);
 
 	// seen some tags that have an instance size greater than the computed size? failsafe?
-	if (this->m_instance.size > this->m_total_data_size)
+	if (m_instance.size > m_total_data_size)
 	{
 #if TAG_INJECTION_DEBUG
-		event(_event_verbose, "tags:injection: [%s] computed size: %u instance size: %u", __FUNCTION__, this->m_total_data_size, this->m_instance.size);
+		event(_event_verbose, "tags:injection: [%s] computed size: %u instance size: %u", __FUNCTION__, m_total_data_size, m_instance.size);
 #endif
-		this->m_total_data_size = this->m_instance.size;
+		m_total_data_size = m_instance.size;
 	}
 
-	this->initialize_arrays();
-	this->load_tag_data();
+	initialize_arrays();
+	load_tag_data();
 
 #if TAG_INJECTION_DEBUG
-	event(_event_verbose, "tags:injection: [%s] %x - %x", __FUNCTION__, this->m_instance.data_offset, this->m_instance.data_offset + this->m_instance.size);
+	event(_event_verbose, "tags:injection: [%s] %x - %x", __FUNCTION__, m_instance.data_offset, m_instance.data_offset + m_instance.size);
 #endif
 }
 
 void c_xml_definition_loader::load_cache_info()
 {
-	uint32 instance_table_offset = this->m_cache_header->tag_offset + sizeof(s_tag_group_link) * this->m_tags_header->tag_group_link_set_count + sizeof(cache_file_tags_header);
-	uint32 tag_data_start_offset = this->m_cache_header->tag_offset + this->m_cache_header->data_offset;
+	uint32 instance_table_offset = m_cache_header->tag_offset + sizeof(s_tag_group_link) * m_tags_header->tag_group_link_set_count + sizeof(cache_file_tags_header);
+	uint32 tag_data_start_offset = m_cache_header->tag_offset + m_cache_header->data_offset;
 
-	uint32 tag_instance_offset = instance_table_offset + sizeof(cache_file_tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(this->m_cache_index);
+	uint32 tag_instance_offset = instance_table_offset + sizeof(cache_file_tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(m_cache_index);
 
 	cache_file_tag_instance instance;
 	// read requested tag instance from file
-	file_seek_and_read(this->m_file_handle, tag_instance_offset, sizeof(cache_file_tag_instance), 1, &instance);
+	file_seek_and_read(m_file_handle, tag_instance_offset, sizeof(cache_file_tag_instance), 1, &instance);
 
-	this->m_instance = instance;
-	this->m_file_offset = tag_data_start_offset + this->m_instance.data_offset - this->m_scenario_instance_offset;
+	m_instance = instance;
+	m_file_offset = tag_data_start_offset + m_instance.data_offset - m_scenario_instance_offset;
 
 
 #if TAG_INJECTION_DEBUG
-	event(_event_verbose, "tags:injection: [%s] instance class %s data-offset %x file-offset %x", __FUNCTION__, this->m_instance.group_tag.string, this->m_instance.data_offset, this->m_file_offset);
+	event(_event_verbose, "tags:injection: [%s] instance class %s data-offset %x file-offset %x", __FUNCTION__, m_instance.group_tag.string, m_instance.data_offset, m_file_offset);
 #endif
 }
 
 uint32 c_xml_definition_loader::resolve_cache_tag_data_offset(uint32 offset) const
 {
-	return (this->m_cache_header->tag_offset + this->m_cache_header->data_offset) + (offset - this->m_scenario_instance_offset);
+	return (m_cache_header->tag_offset + m_cache_header->data_offset) + (offset - m_scenario_instance_offset);
 }
 
 void c_xml_definition_loader::reset_counts(void)
 {
-	this->m_tag_reference_offset_count = 0;
-	this->m_classless_tag_reference_offset_count = 0;
-	this->m_data_reference_offset_count = 0;
-	this->m_string_id_offset_count = 0;
-	this->m_tag_block_offset_count = 0;
-	this->m_tag_reference_count = 0;
+	m_tag_reference_offset_count = 0;
+	m_classless_tag_reference_offset_count = 0;
+	m_data_reference_offset_count = 0;
+	m_string_id_offset_count = 0;
+	m_tag_block_offset_count = 0;
+	m_tag_reference_count = 0;
 	return;
 }
 
 void c_xml_definition_loader::clear(void)
 {
-	if (this->m_tag_reference_offset_count)
+	if (m_tag_reference_offset_count)
 	{
-		free(this->m_tag_reference_offsets);
+		free(m_tag_reference_offsets);
 	}
-	if (this->m_classless_tag_reference_offset_count)
+	if (m_classless_tag_reference_offset_count)
 	{
-		free(this->m_classless_tag_reference_offsets);
+		free(m_classless_tag_reference_offsets);
 	}
-	if (this->m_data_reference_offset_count)
+	if (m_data_reference_offset_count)
 	{
-		free(this->m_data_reference_offsets);
+		free(m_data_reference_offsets);
 	}
-	if (this->m_string_id_offset_count)
+	if (m_string_id_offset_count)
 	{
-		free(this->m_string_id_offsets);
+		free(m_string_id_offsets);
 	}
-	if (this->m_tag_block_offset_count)
+	if (m_tag_block_offset_count)
 	{
-		free(this->m_tag_block_offsets);
+		free(m_tag_block_offsets);
 	}
-	if (this->m_tag_reference_count)
+	if (m_tag_reference_count)
 	{
-		free(this->m_tag_references);
+		free(m_tag_references);
 	}
-	if (this->m_data)
+	if (m_data)
 	{
-		free(this->m_data);
+		free(m_data);
 	}
-	this->reset_counts();
+	reset_counts();
 	return;
 }
 
@@ -184,27 +190,27 @@ void c_xml_definition_loader::initialize_arrays_internal(c_xml_definition_loader
 
 void c_xml_definition_loader::initialize_arrays(void)
 {
-	this->initialize_arrays_internal(this, this->m_definition, this->m_file_offset, 1);
+	initialize_arrays_internal(this, m_definition, m_file_offset, 1);
 
-	if (this->m_tag_reference_offset_count)
-		this->m_tag_reference_offsets = lazy_malloc_buffer(s_offset_link, this->m_tag_reference_offset_count);
+	if (m_tag_reference_offset_count)
+		m_tag_reference_offsets = lazy_malloc_buffer(s_offset_link, m_tag_reference_offset_count);
 
-	if (this->m_classless_tag_reference_offset_count)
-		this->m_classless_tag_reference_offsets = lazy_malloc_buffer(s_offset_link, this->m_classless_tag_reference_offset_count);
+	if (m_classless_tag_reference_offset_count)
+		m_classless_tag_reference_offsets = lazy_malloc_buffer(s_offset_link, m_classless_tag_reference_offset_count);
 
-	if (this->m_data_reference_offset_count)
-		this->m_data_reference_offsets = lazy_malloc_buffer(s_memory_link, this->m_data_reference_offset_count);
+	if (m_data_reference_offset_count)
+		m_data_reference_offsets = lazy_malloc_buffer(s_memory_link, m_data_reference_offset_count);
 
-	if (this->m_string_id_offset_count)
-		this->m_string_id_offsets = lazy_malloc_buffer(s_offset_link, this->m_string_id_offset_count);
+	if (m_string_id_offset_count)
+		m_string_id_offsets = lazy_malloc_buffer(s_offset_link, m_string_id_offset_count);
 
-	if (this->m_tag_block_offset_count)
-		this->m_tag_block_offsets = lazy_malloc_buffer(s_memory_link, this->m_tag_block_offset_count);
+	if (m_tag_block_offset_count)
+		m_tag_block_offsets = lazy_malloc_buffer(s_memory_link, m_tag_block_offset_count);
 
-	if (this->m_tag_reference_offset_count + this->m_classless_tag_reference_offset_count)
-		this->m_tag_references = lazy_malloc_buffer(datum, (this->m_tag_reference_offset_count + this->m_classless_tag_reference_offset_count));
+	if (m_tag_reference_offset_count + m_classless_tag_reference_offset_count)
+		m_tag_references = lazy_malloc_buffer(datum, (m_tag_reference_offset_count + m_classless_tag_reference_offset_count));
 
-	this->m_data = (int8*)calloc(this->m_total_data_size, sizeof(int8));
+	m_data = (int8*)calloc(m_total_data_size, sizeof(int8));
 
 
 #if TAG_INJECTION_DEBUG
@@ -221,20 +227,20 @@ void c_xml_definition_loader::initialize_arrays(void)
 
 int8* c_xml_definition_loader::reserve_data(uint32 size)
 {
-	if (this->m_used_data + size > this->m_total_data_size)
+	if (m_used_data + size > m_total_data_size)
 	{
 		DISPLAY_ASSERT("[c_xml_definition_loader::reserve_data]: RAN OUT OF SPACE");
 	}
-	ASSERT(this->m_data);
+	ASSERT(m_data);
 
-	const uint32 old_size = this->m_used_data;
-	this->m_used_data += size;
+	const uint32 old_size = m_used_data;
+	m_used_data += size;
 
 #if TAG_INJECTION_DEBUG
-	event(_event_verbose, "tags:injection: [%s] data: %x requested: %x used: %x total: %x", __FUNCTION__, (uint32)this->m_data, size, this->m_used_data, this->m_total_data_size);
+	event(_event_verbose, "tags:injection: [%s] data: %x requested: %x used: %x total: %x", __FUNCTION__, (uint32)m_data, size, m_used_data, m_total_data_size);
 #endif
 
-	return &this->m_data[old_size];
+	return &m_data[old_size];
 }
 
 void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* loader, const c_xml_definition_block* definition, uint32 file_offset, int8* buffer, uint32 block_count)
@@ -375,14 +381,14 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 
 void c_xml_definition_loader::load_tag_data()
 {
-	this->reset_counts();
+	reset_counts();
 
-	int8* buffer = this->reserve_data(this->m_definition->get_size());
+	int8* buffer = reserve_data(m_definition->get_size());
 
-	this->load_tag_data_internal(this, this->m_definition, this->m_file_offset, buffer, 1);
+	load_tag_data_internal(this, m_definition, m_file_offset, buffer, 1);
 
 #if TAG_INJECTION_DEBUG
-	this->validate_data();
+	validate_data();
 #endif
 }
 
@@ -396,12 +402,12 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 		{
 			data_reference reference;
 
-			file_seek_and_read(this->m_file_handle, calc_offset + definition->get_data_reference_offset(i), sizeof(data_reference), 1, &reference);
+			file_seek_and_read(m_file_handle, calc_offset + definition->get_data_reference_offset(i), sizeof(data_reference), 1, &reference);
 			if (reference.size != 0)
 			{
-				this->m_total_data_size += reference.size;
+				m_total_data_size += reference.size;
 #if TAG_INJECTION_DEBUG
-				bool in_bounds = (this->m_instance.data_offset < (uint32)reference.data && this->m_instance.data_offset + this->m_instance.size > (uint32)reference.data);
+				bool in_bounds = (m_instance.data_offset < (uint32)reference.data && m_instance.data_offset + m_instance.size > (uint32)reference.data);
 				event(_event_verbose, "tags:injection: [%s] %x data_reference  %d %d %x %d", __FUNCTION__, base_offset, definition->get_data_reference_offset(i), reference.size, reference.data, in_bounds);
 #endif
 			}
@@ -414,13 +420,13 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 
 			const c_xml_definition_block* definition_block = definition->get_tag_block(i);
 
-			file_seek_and_read(this->m_file_handle, calc_offset + definition_block->get_offset(), sizeof(tag_block<>), 1, &block);
+			file_seek_and_read(m_file_handle, calc_offset + definition_block->get_offset(), sizeof(tag_block<>), 1, &block);
 			if (block.count != 0 && block.data != 0 && block.count != -1 && block.data != -1)
 			{
-				this->m_total_data_size += definition_block->get_size() * block.count;
+				m_total_data_size += definition_block->get_size() * block.count;
 
 #if TAG_INJECTION_DEBUG
-				bool in_bounds = (this->m_instance.data_offset < (uint32)block.data && this->m_instance.data_offset + this->m_instance.size > (uint32)block.data);
+				bool in_bounds = (m_instance.data_offset < (uint32)block.data && m_instance.data_offset + m_instance.size > (uint32)block.data);
 				event(_event_verbose,
 					"tags:injection: [%s] %x %s %x %d %x %d",
 					__FUNCTION__,
@@ -432,7 +438,7 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 					in_bounds);
 #endif
 
-				this->calculate_total_data_size(definition->get_tag_block(i), resolve_cache_tag_data_offset(block.data), block.count);
+				calculate_total_data_size(definition->get_tag_block(i), resolve_cache_tag_data_offset(block.data), block.count);
 			}
 		}
 	}
@@ -441,35 +447,35 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 
 uint32 c_xml_definition_loader::get_total_size() const
 {
-	return this->m_total_data_size;
+	return m_total_data_size;
 }
 
 int8* c_xml_definition_loader::get_data() const
 {
-	return this->m_data;
+	return m_data;
 }
 
 uint32 c_xml_definition_loader::get_tag_reference_count(void) const
 {
-	return this->m_tag_reference_count;
+	return m_tag_reference_count;
 }
 
 datum c_xml_definition_loader::get_tag_reference(uint32 index) const
 {
-	return this->m_tag_references[index];
+	return m_tag_references[index];
 }
 
 void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset)
 {
 	// copy the data into the out buffer
-	csmemcpy(out_buffer, this->m_data, this->m_total_data_size);
+	csmemcpy(out_buffer, m_data, m_total_data_size);
 
 	// resolve and update tag references
-	for (uint32 i = 0; i < this->m_tag_reference_offset_count; i++)
+	for (uint32 i = 0; i < m_tag_reference_offset_count; i++)
 	{
-		s_offset_link* link = &this->m_tag_reference_offsets[i];
-		tag_reference* reference = (tag_reference*)(out_buffer + link->memory_offset - this->m_data);
-		datum resolved_index = tag_injection_resolve_cache_datum(reference->index);
+		s_offset_link* link = &m_tag_reference_offsets[i];
+		tag_reference* reference = (tag_reference*)(out_buffer + link->memory_offset - m_data);
+		const datum resolved_index = tag_injection_resolve_cache_datum(reference->index);
 
 #if TAG_INJECTION_DEBUG
 		event(_event_verbose, "tags:injection: [%s]: updating tag reference: %s from: %x to %x", __FUNCTION__, link->name, reference->index, resolved_index);
@@ -479,10 +485,10 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 	}
 
 	// resolve and update classless tag references
-	for (uint32 i = 0; i < this->m_classless_tag_reference_offset_count; i++)
+	for (uint32 i = 0; i < m_classless_tag_reference_offset_count; i++)
 	{
-		s_offset_link* link = &this->m_classless_tag_reference_offsets[i];
-		datum* reference = (datum*)(out_buffer + link->memory_offset - this->m_data);
+		s_offset_link* link = &m_classless_tag_reference_offsets[i];
+		datum* reference = (datum*)(out_buffer + link->memory_offset - m_data);
 		datum resolved_index = tag_injection_resolve_cache_datum(*reference);
 
 #if TAG_INJECTION_DEBUG
@@ -498,43 +504,43 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 	}
 
 	// update data references
-	for (uint32 i = 0; i < this->m_data_reference_offset_count; i++)
+	for (uint32 i = 0; i < m_data_reference_offset_count; i++)
 	{
-		s_memory_link* link = &this->m_data_reference_offsets[i];
-		data_reference* reference = (data_reference*)(out_buffer + link->memory_offset - this->m_data);
-		uint32 resolved_offset = ((uint32)link->data - (uint32)this->m_data);
+		s_memory_link* link = &m_data_reference_offsets[i];
+		data_reference* reference = (data_reference*)(out_buffer + link->memory_offset - m_data);
+		uint32 resolved_offset = ((uint32)link->data - (uint32)m_data);
 		reference->data = (uint32)base_offset + resolved_offset;
 
 #if TAG_INJECTION_DEBUG
-		bool in_bounds = (resolved_offset + link->size <= this->m_total_data_size);
+		bool in_bounds = (resolved_offset + link->size <= m_total_data_size);
 		event(_event_verbose, "tags:injection: [%s]: rebase tag_block: %s base_offset: %x block_offset %x block_size: %x total size: %x in bounds: %d",
 			__FUNCTION__,
 			link->name,
 			base_offset,
 			resolved_offset,
 			link->size,
-			this->m_total_data_size,
+			m_total_data_size,
 			in_bounds);
 #endif
 	}
 
 	// update tag blocks
-	for (uint32 i = 0; i < this->m_tag_block_offset_count; i++)
+	for (uint32 i = 0; i < m_tag_block_offset_count; i++)
 	{
-		s_memory_link* link = &this->m_tag_block_offsets[i];
-		tag_block<>* reference = (tag_block<>*)(out_buffer + link->memory_offset - this->m_data);
-		uint32 resolved_offset = ((uint32)link->data - (uint32)this->m_data);
+		s_memory_link* link = &m_tag_block_offsets[i];
+		tag_block<>* reference = (tag_block<>*)(out_buffer + link->memory_offset - m_data);
+		uint32 resolved_offset = ((uint32)link->data - (uint32)m_data);
 		reference->data = (uint32)base_offset + resolved_offset;
 
 #if TAG_INJECTION_DEBUG
-		bool in_bounds = (resolved_offset + link->size <= this->m_total_data_size);
+		bool in_bounds = (resolved_offset + link->size <= m_total_data_size);
 		event(_event_verbose, "tags:injection: [%s]: rebase tag_block: %s base_offset: %x block_offset %x block_size: %x total size: %x in bounds: %d",
 			__FUNCTION__,
 			link->name,
 			base_offset,
 			resolved_offset,
 			link->size,
-			this->m_total_data_size,
+			m_total_data_size,
 			in_bounds);
 #endif
 	}
@@ -543,37 +549,37 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 #if TAG_INJECTION_DEBUG
 void c_xml_definition_loader::validate_data() const
 {
-	int8* cache_data = (int8*)malloc(this->m_definition->get_size());
+	int8* cache_data = (int8*)malloc(m_definition->get_size());
 
-	file_seek_and_read(this->m_file_handle, this->m_file_offset, this->m_definition->get_size(), 1, cache_data);
+	file_seek_and_read(m_file_handle, m_file_offset, m_definition->get_size(), 1, cache_data);
 
-	int res = memcmp(cache_data, this->m_data, this->m_definition->get_size());
+	int res = memcmp(cache_data, m_data, m_definition->get_size());
 
 	if (res != 0)
 	{
-		error(0, "tags:injection: [%s] Base definition block is invalid", __FUNCTION__);
+		error(_error_immediate, "tags:injection: [%s] Base definition block is invalid", __FUNCTION__);
 	}
-	for (uint32 i = 0; i < this->m_data_reference_offset_count; i++)
+	for (uint32 i = 0; i < m_data_reference_offset_count; i++)
 	{
-		int8* data_data = (int8*)malloc(this->m_data_reference_offsets[i].size);
+		int8* data_data = (int8*)malloc(m_data_reference_offsets[i].size);
 
-		file_seek_and_read(this->m_file_handle, this->m_data_reference_offsets[i].cache_offset, this->m_data_reference_offsets[i].size, 1, data_data);
-		int _res = memcmp(data_data, (uint8*)this->m_data_reference_offsets[i].memory_offset, 1);
+		file_seek_and_read(m_file_handle, m_data_reference_offsets[i].cache_offset, m_data_reference_offsets[i].size, 1, data_data);
+		int _res = memcmp(data_data, (uint8*)m_data_reference_offsets[i].memory_offset, 1);
 		if (_res != 0)
 		{
-			error(0, "tags:injection: [%s] data_reference is invalid", __FUNCTION__);
+			error(_error_immediate, "tags:injection: [%s] data_reference is invalid", __FUNCTION__);
 		}
 		free(data_data);
 	}
-	for (uint32 i = 0; i < this->m_tag_block_offset_count; i++)
+	for (uint32 i = 0; i < m_tag_block_offset_count; i++)
 	{
-		int8* block_data = (int8*)malloc(this->m_tag_block_offsets[i].size);
+		int8* block_data = (int8*)malloc(m_tag_block_offsets[i].size);
 
-		file_seek_and_read(this->m_file_handle, this->m_tag_block_offsets[i].cache_offset, this->m_tag_block_offsets[i].size, 1, block_data);
-		int _res = memcmp(block_data, (uint8*)this->m_tag_block_offsets[i].memory_offset, 1);
+		file_seek_and_read(m_file_handle, m_tag_block_offsets[i].cache_offset, m_tag_block_offsets[i].size, 1, block_data);
+		int _res = memcmp(block_data, (uint8*)m_tag_block_offsets[i].memory_offset, 1);
 		if (_res != 0)
 		{
-			error(0, "tags:injection: [%s] tag_block is invalid", __FUNCTION__);
+			error(_error_immediate, "tags:injection: [%s] tag_block is invalid", __FUNCTION__);
 		}
 		free(block_data);
 	}

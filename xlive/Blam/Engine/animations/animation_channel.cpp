@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "animation_channel.h"
 
-#include "tag_files/global_string_ids.h"
+
 
 void c_animation_channel::initialize()
 {
@@ -19,7 +19,7 @@ c_animation_channel::~c_animation_channel()
 {
 	this->animation_ids[0].clear();
 	this->animation_ids[1].clear();
-	this->animation_string = NONE;
+	this->animation_string = _string_id_invalid;
 	this->field_10 = 0;
 	return;
 }

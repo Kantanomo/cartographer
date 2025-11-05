@@ -44,7 +44,7 @@ enum e_area_flags : int
 // max count: 64
 struct area_definition
 {
-	char name[32];
+	char name[k_tag_string_length];
 	e_area_flags area_flags;
 
 	// The below fields are populated on cache compile
@@ -71,7 +71,7 @@ ASSERT_STRUCT_SIZE(area_definition, 136);
 // max count: 128
 struct zone_definition
 {
-	char name[32];
+	char name[k_tag_string_length];
 	e_zone_definition_flags flags;
 	short manual_bsp;       // Block index: scenario_structure_bsp_reference
 	short pad;

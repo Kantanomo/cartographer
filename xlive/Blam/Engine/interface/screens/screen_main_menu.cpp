@@ -15,7 +15,7 @@
 #include "Networking/online/online_account_xbox.h"
 #include "Networking/transport/transport.h"
 #include "Networking/panorama/panorama_friends.h"
-#include "tag_files/global_string_ids.h"
+
 #include "shell/shell.h"
 
 /* enums */

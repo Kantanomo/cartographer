@@ -1,6 +1,6 @@
 #pragma once
 #include "game/game_allegiance.h"
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 
@@ -75,7 +75,7 @@ enum e_initial_movement_mode : short
 // max count: 100
 struct squad_group_definition
 {
-	char name[32];
+	char name[k_tag_string_length];
 	int16 parent;           // Block index: squad_groups_definition
 	int16 initial_orders;   // Block index: orders_definition
 };
@@ -104,7 +104,7 @@ struct actor_starting_location_definition
 	float initial_movement_distance;        // before doing anything else, the actor will travel the given distance in its forward direction
 	short emitter_vehicle;                  // Block index: scenario_vehicle
 	e_initial_movement_mode initial_movement_mode;
-	char placement_script[32];
+	char placement_script[k_tag_string_length];
 	short placement_script_index;
 	short unk;
 };
@@ -113,7 +113,7 @@ ASSERT_STRUCT_SIZE(actor_starting_location_definition, 100);
 // max count: 335
 struct squad_definition
 {
-	char name[32];
+	char name[k_tag_string_length];
 	e_squad_definition_flags flags;
 	e_game_team team;
 	short parent;                           // Block index: squad_group_definition
@@ -135,7 +135,7 @@ struct squad_definition
 	short initial_order;                    // Block index: orders
 	string_id vehicle_variant;
 	tag_block<actor_starting_location_definition> starting_locations;
-	char placement_script[32];
+	char placement_script[k_tag_string_length];
 	short placement_script_index;
 	short unk;
 };
@@ -144,7 +144,7 @@ ASSERT_STRUCT_SIZE(squad_definition, 116);
 // max count: 128
 struct ai_animation_reference_definition
 {
-	char animation_name[32];
+	char animation_name[k_tag_string_length];
 	// leave this blank to use the unit's normal animation graph
 	tag_reference animation_graph;   // jmad
 	int padding540[3];
@@ -154,7 +154,7 @@ ASSERT_STRUCT_SIZE(ai_animation_reference_definition, 52);
 // max count: 128
 struct ai_script_reference_definition
 {
-	char script_name[32];
+	char script_name[k_tag_string_length];
 	int64_t pad;
 };
 ASSERT_STRUCT_SIZE(ai_script_reference_definition, 40);
@@ -162,7 +162,7 @@ ASSERT_STRUCT_SIZE(ai_script_reference_definition, 40);
 // max count: 128
 struct ai_recording_reference_definition
 {
-	char recording_name[32];
+	char recording_name[k_tag_string_length];
 	int64_t pad;
 };
 ASSERT_STRUCT_SIZE(ai_recording_reference_definition, 40);

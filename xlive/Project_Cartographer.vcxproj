@@ -1295,7 +1295,6 @@
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
-    <ClCompile Include="Blam\Engine\tag_files\string_id.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection.cpp" />
@@ -2418,7 +2417,6 @@
     <ClInclude Include="Blam\Engine\units\biped_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\units\dialogue_definitions.h" />
     <ClInclude Include="Blam\Engine\units\units.h" />
-    <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
     <ClInclude Include="Blam\Engine\math\integer_math.h" />
     <ClInclude Include="Blam\Engine\math\real_math.h" />
@@ -2488,7 +2486,6 @@
     <ClInclude Include="3rdparty\SimpleIni\SimpleIni.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />

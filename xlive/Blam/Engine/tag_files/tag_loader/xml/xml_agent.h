@@ -13,7 +13,7 @@ public:
 	c_xml_definition_agent(void) = default;
 	~c_xml_definition_agent(void);
 	void init(tag_group type, const wchar_t* plugin_path);
-	c_xml_definition_block* get_definition(void);
+	const c_xml_definition_block* get_definition(void) const;
 
 	static void log(const char* function_name, const char* format, ...);
 

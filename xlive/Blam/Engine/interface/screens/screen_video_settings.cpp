@@ -17,7 +17,7 @@
 #include "interface/user_interface_shared_globals.h"
 #include "interface/user_interface_utilities.h"
 #include "rasterizer/rasterizer_settings.h"
-#include "tag_files/global_string_ids.h"
+
 #include "tag_files/tag_loader/tag_injection.h"
 
 #include "H2MOD/Modules/Shell/Config.h"

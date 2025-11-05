@@ -1,8 +1,8 @@
 #pragma once
 #include "math/color_math.h"
 #include "render/render_cameras.h"
-#include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
+#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 
 #define MAXIMUM_ATMOSPHERIC_FOG_PALETTE_ENTRIES_PER_SCENARIO 127

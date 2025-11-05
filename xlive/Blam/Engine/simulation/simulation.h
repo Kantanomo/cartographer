@@ -56,7 +56,12 @@ bool simulation_reset_in_progress();
 void __cdecl simulation_update(void);
 
 bool simulation_starting_up(void);
-void simulation_notify_reset_complete();
+
+void simulation_notify_reset_complete(void);
+
+void simulation_notify_reset_initiate(void);
+
+void simulation_notify_going_active(void);
 
 bool simulation_in_progress(void);
 void simulation_destroy_update(void);

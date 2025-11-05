@@ -25,7 +25,7 @@ public:
 	c_xml_definition_loader(void) = default;
 	~c_xml_definition_loader(void) = default;
 	void init(
-		c_xml_definition_block* definition,
+		const c_xml_definition_block* definition,
 		FILE* file_handle,
 		cache_file_header* cache_header,
 		cache_file_tags_header* tags_header,
@@ -48,7 +48,7 @@ private:
 	int8* m_data;
 	uint32 m_used_data;
 	uint32 m_total_data_size;
-	c_xml_definition_block* m_definition;
+	const c_xml_definition_block* m_definition;
 
 	FILE* m_file_handle;
 

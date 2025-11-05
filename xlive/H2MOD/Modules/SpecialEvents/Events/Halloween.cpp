@@ -131,11 +131,11 @@ static void halloween_game_life_cycle_update(e_game_life_cycle state)
 					break;
 				case 1:
 					object_placement_data_new(&placement, candle_datum, -1, 0);
-					placement.variant_name = 0;
+					placement.variant_name = _string_id_empty_string;
 					break;
 				case 2:
 					object_placement_data_new(&placement, large_candle_datum, -1, 0);
-					placement.variant_name = 0;
+					placement.variant_name = _string_id_empty_string;
 					break;
 				}
 				// Set location orientation and scale
@@ -160,7 +160,7 @@ static void halloween_game_life_cycle_update(e_game_life_cycle state)
 					break;
 				case 1:
 					object_placement_data_new(&placement, candle_datum, -1, 0);
-					placement.variant_name = 0;
+					placement.variant_name = _string_id_empty_string;
 					break;
 				}
 				// Set location orientation and scale

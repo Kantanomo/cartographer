@@ -99,13 +99,13 @@ struct order_ending_definition
 struct orders_definition
 {
 	/* filt */
-	char name[32];
+	char name[k_tag_string_length];
 	int16 style;            // Block Index: style_palette_block
 	int16 pad;
 	e_order_flags flags;
 	e_force_combat_status force_combat_status;
 	int16 pad1;
-	char entry_script[32];
+	char entry_script[k_tag_string_length];
 	int16 entry_script_index;
 	int16 follow_squad;      // Block Index: squads_block
 	real32 follow_radius;
@@ -128,7 +128,7 @@ struct order_completion_condition_definition
 	real32 x;
 	int16 trigger_volume;    // Block Index: scenario_trigger_volume_block
 	int16 pad;
-	char exit_condition_script[32];
+	char exit_condition_script[k_tag_string_length];
 	int16 exit_condition_script_index;
 	int16 pad1;
 	e_order_completion_condition_flags flags;
@@ -139,7 +139,7 @@ ASSERT_STRUCT_SIZE(order_completion_condition_definition, 56);
 struct trigger_definition
 {
 	/* filt */
-	char name[32];
+	char name[k_tag_string_length];
 	e_trigger_flags trigger_flags;
 	e_combination_rule combination_rule;
 	int16 pad;

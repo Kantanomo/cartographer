@@ -36,7 +36,7 @@ DWORD WINAPI XStorageBuildServerPath(DWORD dwUserIndex, XSTORAGE_FACILITY Storag
 			path += xuidAsString;
 
 			const int create_dir_res = SHCreateDirectoryEx(NULL, path.c_str(), NULL);
-			if (create_dir_res == ERROR_SUCCESS || ERROR_ALREADY_EXISTS || ERROR_FILE_EXISTS)
+			if (create_dir_res == ERROR_SUCCESS || create_dir_res == ERROR_ALREADY_EXISTS || create_dir_res == ERROR_FILE_EXISTS)
 			{
 				switch (StorageFacility)
 				{

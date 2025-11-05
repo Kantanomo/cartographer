@@ -8,11 +8,10 @@
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
-#include "tag_files/global_string_ids.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-#include "tag_files/tag_loader/tag_injection.h"
 
 /* structures */
 
@@ -138,7 +137,7 @@ static void game_globals_prepare_skeleton_representation(s_game_globals_custom_r
 		result->third_person_unit = skele_datum;
 		result->first_person_hands = skele_fp_datum;
 		result->first_person_body = skele_body_datum;
-		result->variant = NONE;
+		result->variant = _string_id_invalid;
 	}
 	return;
 }
@@ -162,7 +161,7 @@ static void game_globals_prepare_flood_representation(s_game_globals_custom_repr
 		result->third_person_unit = flood_datum;
 		result->first_person_hands = flood_arms_datum;
 		result->first_person_body = flood_body_datum;
-		result->variant = NONE;
+		result->variant = _string_id_invalid;
 	}
 	return;
 }
@@ -181,7 +180,7 @@ static void game_globals_prepare_lmao_representation(s_game_globals_custom_repre
 		s_model_definition* mode_chief_mp = (s_model_definition*)tag_get_fast(mode_chief_mp_datum);
 		s_model_variant* base_variant = mode_chief_mp->variants[0];
 		s_model_variant* new_variant = (s_model_variant*)tag_injection_extend_block(&mode_chief_mp->variants, mode_chief_mp->variants.type_size(), 1);
-		new_variant->name = 0xABABABA;
+		new_variant->name = (string_id)0xABABABA;
 		new_variant->dialogue.group = base_variant->dialogue.group;
 		new_variant->dialogue.index = base_variant->dialogue.index;
 		csmemcpy(new_variant->runtime_model_region_index, base_variant->runtime_model_region_index, sizeof(new_variant->runtime_model_region_index));

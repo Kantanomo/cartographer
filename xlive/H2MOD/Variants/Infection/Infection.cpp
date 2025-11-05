@@ -251,14 +251,14 @@ void Infection::preSpawnServerSetup() {
 	}
 }
 
-void Infection::setPlayerAsHuman(int player_index)
+void Infection::setPlayerAsHuman(int32 player_index)
 {
 	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 	player->configuration.profile_traits.profile.player_character_type = infection_human_get_player_type();
 	player->unit_speed = k_human_unit_speed;
 }
 
-void Infection::setPlayerAsZombie(int player_index)
+void Infection::setPlayerAsZombie(int32 player_index)
 {
 	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 	player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
@@ -483,7 +483,9 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 
 void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 {
+#ifdef EVENTS_ENABLED
 	const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
+#endif
 	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 
 	switch (execTime)
@@ -561,11 +563,11 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 				event(_event_verbose, "h2mod:infection: Spawn player server index=%d, unit team index=%d", player_abs_index, (int16)team);
 				if (team == k_humans_team)
 				{
-					Infection::setPlayerAsHuman(player_abs_index);
+					Infection::setPlayerAsHuman(player_index);
 				}
 				else if (team == k_zombie_team)
 				{
-					Infection::setPlayerAsZombie(player_abs_index);
+					Infection::setPlayerAsZombie(player_index);
 				}
 			}
 		}

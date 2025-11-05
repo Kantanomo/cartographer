@@ -5,7 +5,7 @@
 // max count: MAXIMUM_RECORDED_ANIMATIONS_PER_MAP 1024
 struct recorded_animation_definition
 {
-	char name[32];
+	char name[k_tag_string_length];
 	byte version;
 	byte raw_animation_data;
 	byte unit_control_data_version;

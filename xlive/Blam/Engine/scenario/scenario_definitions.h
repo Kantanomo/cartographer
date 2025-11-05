@@ -1,9 +1,8 @@
 #pragma once
 #include "game/game_allegiance.h"
 #include "math/periodic_functions.h"
-#include "objects/object_identifier.h"
 #include "tag_files/data_reference.h"
-#include "tag_files/string_id.h"
+#include "tag_files/tag_groups.h"
 #include "tag_files/tag_reference.h"
 
 /* constants */
@@ -108,7 +107,7 @@ ASSERT_STRUCT_SIZE(scenario_child_scenario_reference, 24);
 struct scenario_function
 {
 	e_scenario_function_flags flags;
-	char name[32];
+	char name[k_tag_string_length];
 	real32 period_seconds;               // Period for above function (lower values make function oscillate quickly; higher values make it oscillate slowly).
 	
 	// Multiply this function by above period
@@ -168,7 +167,7 @@ ASSERT_STRUCT_SIZE(scenario_environment_object, 64);
 // max count: MAXIMUM_OBJECT_NAMES_PER_SCENARIO 640
 struct scenario_object_name
 {
-	char name[32];
+	char name[k_tag_string_length];
 	int16/*e_object_type*/ runtime_object_type;
 	int16 runtime_scenario_datum_index;
 };
@@ -185,7 +184,7 @@ ASSERT_STRUCT_SIZE(pathfinding_object_index_list, 4);
 // max count: MAXIMUM_SCENARIO_PLAYERS_PER_BLOCK 256
 struct scenario_starting_profile
 {
-	char name[32];
+	char name[k_tag_string_length];
 	real32 starting_health_damage;
 	real32 starting_shield_damage;
 	tag_reference primary_weapon;    // weap
@@ -422,7 +421,7 @@ ASSERT_STRUCT_SIZE(character_palette_entry, 8);
 // max count: k_maximum_hs_scripts_per_scenario 1024
 struct hs_script
 {
-	char name[32];
+	char name[k_tag_string_length];
 	int16 script_type;	// e_hs_script_type
 	int16 return_type;	// e_hs_type
 	int32 root_expression_index;
@@ -433,7 +432,7 @@ ASSERT_STRUCT_SIZE(hs_script, 40);
 struct scenario_cutscene_flag
 {
 	int32 pad;
-	char name[32];
+	char name[k_tag_string_length];
 	real_point3d position;
 	real_euler_angles2d facing;
 };
@@ -457,7 +456,7 @@ struct scenario_cutscene_camera_point
 {
 	e_cutscene_camera_point_flags flags;
 	e_cutscene_camera_point_type type;
-	char name[32];
+	char name[k_tag_string_length];
 
 	/* cmed */
 	int32 pad;

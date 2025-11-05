@@ -7,7 +7,7 @@
 struct tag_import_file
 {
 	char path[256];
-	char modification_date[32];
+	char modification_date[k_tag_string_length];
 	int8 pad[8];
 	int8 pad1[88];
 	int32 checksum_crc32;
@@ -22,10 +22,10 @@ struct tag_import_info
 {
 	int32 build;
 	char version[256];
-	char import_date[32];
-	char culprit[32];
+	char import_date[k_tag_string_length];
+	char culprit[k_tag_string_length];
 	int8 pad[96];
-	char import_time[32];
+	char import_time[k_tag_string_length];
 	int32 pad1;
 	tag_block<tag_import_file> files;
 	int8 pad2[128];

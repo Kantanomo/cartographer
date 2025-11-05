@@ -10,14 +10,16 @@
 #include "game/players.h"
 #include "interface/hud_messaging.h"
 #include "math/random_math.h"
+#ifdef TERMINAL_ENABLED
 #include "main/console.h"
+#endif
 #include "objects/object_definition.h"
 #include "objects/objects.h"
 #include "physics/collisions.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "sound/game_sound.h"
-#include "tag_files/global_string_ids.h"
-#include "units/units.h"
+
+#include "units/bipeds.h"
 
 /* typedefs */
 
@@ -112,6 +114,7 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 			unspatialized_impulse_sound_new(sound_datum, 1.f);
 		}
 	}
+	return;
 }
 
 void cheat_drop_tag_name(const char* name)
@@ -217,71 +220,71 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 
 static bool cheat_place_tag(const real_vector3d* forward, datum tag_index, const real_point3d* position, const char* tag_name, uint32 tag_group, datum shader_tag_index)
 {
-	if (game_is_predicted())
+	bool result = false;
+	if (!game_is_predicted())
 	{
-		return false;
-	}
-
-	if (tag_index == NONE)
-	{
-		if (tag_group == _tag_group_shader)
+		if (tag_index == NONE)
 		{
-			error(_error_silent, "### ERROR couldn't load drop-shader object '%s.scenery'", k_shader_drop_object_name);
-			return 0;
-		}
-		if (tag_group == _tag_group_object)
-		{
-			error(_error_silent, "### ERROR couldn't load object '%s.%s' to drop it", tag_name, "unknown");
-		}
-		return false;
-	}
-
-	const object_definition* object = (object_definition*)tag_get_fast(/*_tag_group_object,*/ tag_index);
-	
-	object_placement_data placement_data;
-	object_placement_data_new(&placement_data, tag_index, NONE, NULL);
-	point_from_line3d(position, forward, object->object.bounding_radius + 1.f, &placement_data.position);
-	
-	const datum object_index = object_new(&placement_data);
-	
-	bool result;
-	if (object_index == NONE)
-	{
-		error(_error_silent, "### ERROR couldn't place '%s.%s'", tag_name, "unknown");
-		result = false;
-	}
-	else
-	{
-		object_force_inside_bsp(object_index, position, NONE);
-#ifdef OBJECT_OVERRIDE_ENABLED
-		if (shader_tag_index != NONE)
-		{
-			object_override_set_shader(object_index, shader_tag_index);
-		}
-#endif
-
-		if (object_get_type(object_index) == _object_type_biped && ((unit_datum*)object_get_and_verify_type(object_index, _object_mask_biped))->unit.weapon_index == NONE)
-		{
-			tag_iterator weapon_iterator;
-			tag_iterator_new(&weapon_iterator, _tag_group_weapon);
-			for (datum i = tag_iterator_next(&weapon_iterator); i != NONE; i = tag_iterator_next(&weapon_iterator))
+			if (tag_group == _tag_group_shader)
 			{
-				object_placement_data weapon_placement_data;
-				object_placement_data_new(&weapon_placement_data, i, NONE, NULL);
-				const datum weapon_index = object_new(&weapon_placement_data);
-				if (weapon_index != NONE)
-				{
-					if (unit_add_weapon_to_inventory(object_index, weapon_index, _weapon_addition_method_one))
-					{
-						break;
-					}
-					object_delete(weapon_index);
-				}
+				error(_error_silent, "### ERROR couldn't load drop-shader object '%s.scenery'", k_shader_drop_object_name);
+				return 0;
+			}
+			if (tag_group == _tag_group_object)
+			{
+				error(_error_silent, "### ERROR couldn't load object '%s.%s' to drop it", tag_name, "unknown");
 			}
 		}
-		simulation_action_object_create(object_index);
-		console_printf("placed '%s.%s'", tag_name, "unknown");
-		result = true;
+		else
+		{
+			object_definition* object = (object_definition*)tag_get_fast(/*_tag_group_object,*/ tag_index);
+
+			object_placement_data placement_data;
+			object_placement_data_new(&placement_data, tag_index, NONE, NULL);
+			point_from_line3d(position, forward, object->object.bounding_radius + 1.f, &placement_data.position);
+
+			const datum object_index = object_new(&placement_data);
+
+			if (object_index == NONE)
+			{
+				error(_error_silent, "### ERROR couldn't place '%s.%s'", tag_name, "unknown");
+			}
+			else
+			{
+				object_force_inside_bsp(object_index, position, NONE);
+	#ifdef OBJECT_OVERRIDE_ENABLED
+				if (shader_tag_index != NONE)
+				{
+					object_override_set_shader(object_index, shader_tag_index);
+				}
+	#endif
+
+				if (object->object.object_type == _object_type_biped && biped_get(object_index)->unit.weapon_index == NONE)
+				{
+					tag_iterator weapon_iterator;
+					tag_iterator_new(&weapon_iterator, _tag_group_weapon);
+					for (datum i = tag_iterator_next(&weapon_iterator); i != NONE; i = tag_iterator_next(&weapon_iterator))
+					{
+						object_placement_data weapon_placement_data;
+						object_placement_data_new(&weapon_placement_data, i, NONE, NULL);
+						const datum weapon_index = object_new(&weapon_placement_data);
+						if (weapon_index != NONE)
+						{
+							if (unit_add_weapon_to_inventory(object_index, weapon_index, _weapon_addition_method_one))
+							{
+								break;
+							}
+							object_delete(weapon_index);
+						}
+					}
+				}
+				simulation_action_object_create(object_index);
+	#ifdef TERMINAL_ENABLED
+				console_printf("placed '%s.%s'", tag_name, "unknown");
+	#endif
+				result = true;
+			}
+		}
 	}
 
 	return result;

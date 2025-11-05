@@ -27,7 +27,7 @@ struct game_state_header
 	uint32 alloc_checksum;
 	void* base_address;
 	char scenario_name[256];
-	char game_build[32];
+	char game_build[k_tag_string_length];
 	uint32 map_checksum;
 	int32 field_12C;
 	s_game_options options;
