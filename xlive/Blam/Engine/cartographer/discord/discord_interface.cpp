@@ -435,14 +435,20 @@ static unsigned __stdcall discord_thread_proc(void* pArguments)
 		discord.activities->register_command(discord.activities, "halo2.exe");
 
 		// Main loop
-		while (!g_discord_globals.should_stop)
+		int32 current_timeout = 0;
+		while (!g_discord_globals.should_stop && current_timeout < k_thread_close_wait_time_ms)
 		{
-			Sleep(discord_update(&discord));
+			const int32 timeout = discord_update(&discord);
+			current_timeout += timeout;
+			Sleep(timeout);
 		}
 
 		// Cleanup
-		discord.activities->clear_activity(discord.activities, &discord, on_rich_presence_updated);
-		discord.core->destroy(discord.core);
+		if (current_timeout < k_thread_close_wait_time_ms)
+		{
+			discord.activities->clear_activity(discord.activities, &discord, on_rich_presence_updated);
+			discord.core->destroy(discord.core);
+		}
 	}
 	else
 	{
