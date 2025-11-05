@@ -135,6 +135,11 @@ bool shell_initialize(void)
 #endif
 	{
 		SYSTEM_DEBUG_MEMORY(shell_platform_initialize());
+		
+#ifdef ERRORS_ENABLED
+		errors_initialize();
+		SYSTEM_DEBUG_MEMORY(errors_initialize());
+#endif
 
 		if (shell_command_line_flag_is_set(_shell_command_line_flag_unk26))
 		{
@@ -201,9 +206,9 @@ void __cdecl shell_dispose(void)
 	return;
 }
 
-void __cdecl shell_update(void)
+void __cdecl shell_idle(void)
 {
-	INVOKE(0x7902, 0xBA18, shell_update);
+	INVOKE(0x7902, 0xBA18, shell_idle);
 	return;
 }
 

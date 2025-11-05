@@ -249,7 +249,7 @@ void main_loop_body(void)
 		global_preferences_update();
 		font_idle();
 		async_idle();
-		shell_update();
+		shell_idle();
 		cache_files_copy_do_work();
 		main_loading_idle();
 		c_map_manager* map_manager = map_manager_get();

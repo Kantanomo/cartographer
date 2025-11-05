@@ -177,8 +177,8 @@ real32 __cdecl main_time_update(void)
 	const int32 game_time = game_in_progress() ? game_time_get() : 0;
 	const LARGE_INTEGER freq = shell_time_counter_freq();
 
-	shell_update();
-
+	shell_idle();
+	
 	dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
 
 	// don't run the frame limiter when time step is fixed, because the code doesn't support it

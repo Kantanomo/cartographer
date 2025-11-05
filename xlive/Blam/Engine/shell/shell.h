@@ -67,7 +67,7 @@ bool shell_initialize(void);
 
 void __cdecl shell_dispose(void);
 
-void __cdecl shell_update(void);
+void __cdecl shell_idle(void);
 
 void __cdecl timing_initialize(int32 a1);
 

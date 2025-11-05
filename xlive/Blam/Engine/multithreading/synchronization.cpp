@@ -15,3 +15,15 @@ c_critical_section_scope::~c_critical_section_scope(void)
 	LeaveCriticalSection(m_critical_section);
 	return;
 }
+
+LPCRITICAL_SECTION mutex_create(void)
+{
+	LPCRITICAL_SECTION mutex = new CRITICAL_SECTION;
+	InitializeCriticalSection(mutex);
+	return mutex;
+}
+
+bool mutex_valid(LPCRITICAL_SECTION section)
+{
+	return section != NULL;
+}
