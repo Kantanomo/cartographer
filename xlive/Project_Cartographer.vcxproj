@@ -778,7 +778,6 @@
     <ClCompile Include="Blam\Engine\main\main_time.cpp" />
     <ClCompile Include="Blam\Engine\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
-    <ClCompile Include="Blam\Engine\math\math.cpp" />
     <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
     <ClCompile Include="Blam\Engine\math\periodic_functions.cpp" />
     <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
@@ -1145,7 +1144,6 @@
     <ClInclude Include="Blam\Engine\main\main_time.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
-    <ClInclude Include="Blam\Engine\math\math.h" />
     <ClInclude Include="Blam\Engine\math\matrix_math.h" />
     <ClInclude Include="Blam\Engine\math\periodic_functions.h" />
     <ClInclude Include="Blam\Engine\math\random_direction_table.h" />

@@ -89,6 +89,19 @@ extern bool g_catch_exceptions;
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
 #define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
 
+// Returns the maximum of the two values
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+// Returns the minimum of the two values
+#define MIN(a, b) ((a) > (b) ? (b) : (a))
+
+// Ensure a value stays within a certain range
+#define PIN(v, v_min, v_max) MAX(v_min, MIN(v, v_max))
+
+#define CLAMP_LOWER(x, low, high) ((x) >= (high) - (low) ? (x) - (high) : (low))
+
+#define CLAMP_UPPER(x, low, high) ((x) <= (high) - (low) ? (x) + (low) : (high))
+
 #define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)(((_salt) << 16) | (_absolute_index))
 #define DATUM_INDEX_TO_ABSOLUTE_INDEX(_datum_index) ((uint16)((_datum_index) & k_unsigned_short_max))
 #define DATUM_INDEX_TO_IDENTIFIER(_datum_index) ((uint16)(((_datum_index) >> 16) & k_unsigned_short_max))
