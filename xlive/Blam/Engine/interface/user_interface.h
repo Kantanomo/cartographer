@@ -322,13 +322,18 @@ enum e_user_interface_channel_type
 
 enum e_user_interface_render_window
 {
-	_window_0,
+	_first_render_window,
+	_window_0 = _first_render_window,
 	_window_1,
 	_window_2,
 	_window_3,
 	_window_4,
+	_last_render_window = _window_4,
 
-	k_number_of_render_windows = 5
+	_window_5,
+	_window_6,
+
+	k_number_of_render_windows = _last_render_window + 1
 };
 
 /* typedefs */
@@ -356,14 +361,14 @@ struct s_screen_parameters
 
 	void data_new(uint16 flags, uint16 user_flags, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, proc_ui_screen_load_cb_t load_cb)
 	{
-		this->m_flags = flags;
-		this->m_user_flags = user_flags;
-		this->m_channel_type = channel_type;
-		this->m_window_index = window_index;
+		m_flags = flags;
+		m_user_flags = user_flags;
+		m_channel_type = channel_type;
+		m_window_index = window_index;
 		m_screen_state.field_0 = NONE;
 		m_screen_state.m_last_focused_item_order = NONE;
 		m_screen_state.m_last_focused_item_index = NONE;
-		this->m_load_function = load_cb;
+		m_load_function = load_cb;
 	}
 
 	void* ui_screen_load_proc_exec()
@@ -398,10 +403,16 @@ enum e_user_interface_screen_id : uint32;
 
 bool __cdecl user_interface_automation_is_active(void);
 uint32 __cdecl user_interface_milliseconds(void);
+
+class c_user_interface_channel* __fastcall user_interface_get_channel(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index);
+
 bool __cdecl user_interface_error_display_allowed(void);
 bool __cdecl user_interface_has_responding_controller(int32 user_index);
 bool __cdecl user_interface_channel_is_busy(e_user_interface_channel_type channel_type);
 bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id);
+
+int32 __cdecl user_interface_get_screen_tag_index_by_id(e_user_interface_screen_id id);
+
 bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id screen_id);
 bool __cdecl user_interface_error_screen_is_active(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index, e_ui_error_types error_code);
 
@@ -420,15 +431,31 @@ void __cdecl user_interface_update(real32 dt);
 
 uint32 user_interface_set_context_presence(uint32 game_mode);
 
-void user_interface_debug_load_main_menu();
+#ifdef UI_DEBUG
+void user_interface_debug_load_main_menu(void);
+
 void user_interface_debug_text_bounds(bool value);
-void user_interface_debug_show_title_safe_bounds(bool value);
-void user_interface_debug_element_bounds(bool value);
-void user_interface_transition_out_console_window();
-void user_interface_set_beta(bool value);
+
+void debug_render_title_safe_bounds(bool value);
+
+void set_debug_frame_element_bounds(bool value);
+
+void user_interface_test_screen(const char* screen);
+
+void user_interface_test_transition_out_console_screen(void);
+
+void set_debug_show_screen_tag_path(bool value);
+
+void user_interface_show_current_screen_tag(const char* path);
+
+void debug_set_ui_beta(bool value);
+
 void user_interface_test_error_ok(int16 id);
+
 void user_interface_test_error_ok_cancel(int16 id);
+
 void user_interface_test_confirmation(int16 id);
+#endif
 
 bool __cdecl user_interface_globals_is_beta_build();
 int32 __cdecl user_interface_globals_get_game_difficulty();

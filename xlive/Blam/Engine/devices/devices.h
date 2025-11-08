@@ -1,5 +1,7 @@
 #pragma once
+#include "animations/animation_channel.h"
 #include "objects/object_definition.h"
+#include "objects/objects.h"
 #include "tag_files/tag_reference.h"
 
 /* enums */
@@ -15,6 +17,14 @@ enum e_device_lightmap_flags : int16
 {
 	_lightmap_dont_use_in_lightmap = FLAG(0),
 	_lightmap_dont_use_in_lightprobe = FLAG(1),
+};
+
+enum e_device_group_flags
+{
+	_device_group_can_change_only_once_bit = 0,
+	_device_group_changed_once_bit,
+	_device_group_runtime_bit,
+	NUMBER_OF_DEVICE_GROUP_FLAGS,
 };
 
 /* structures */
@@ -85,3 +95,24 @@ struct device_datum
 	c_animation_channel power_and_overlay_track_channel;
 };
 ASSERT_STRUCT_SIZE(device_datum, 460);
+
+struct device_group_datum
+{
+	int16 identifier;
+	uint16 flags;
+	real32 desired_value;
+	real32 initial_value;
+};
+ASSERT_STRUCT_SIZE(device_group_datum, 12);
+
+/* macros */
+
+#define device_group_get(index) (device_group_datum*)datum_get(device_groups_data_get(), index)
+
+
+/* prototypes */
+
+struct data_array* device_groups_data_get(void);
+
+int32 device_group_get_from_scenario_index(int16 scenario_device_group_index);
+

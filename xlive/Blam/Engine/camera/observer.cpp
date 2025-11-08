@@ -43,7 +43,7 @@ static void observer_update_command_to_usercall(int32 user_index);
 
 static void __cdecl observer_postcheck(int32 user_index);
 
-static void observer_update_internal(int32 user_index);
+static void observer_apply_camera_effect(int32 user_index);
 
 /* public code */
 
@@ -64,7 +64,7 @@ void __cdecl observer_game_tick(void)
 	return;
 }
 
-void __cdecl observer_update(real32 dt)
+void observer_update(real32 dt)
 {
 	bool* g_observer_intitial_update = observer_get_initial_update();
 	real32* observer_speed_dt = observer_get_speed_dt();
@@ -90,7 +90,7 @@ void __cdecl observer_update(real32 dt)
 
 			s_location bsp_point;
 			observer_postcheck(user_index);
-			observer_update_internal(user_index);
+			observer_apply_camera_effect(user_index);
 			scenario_location_from_point(&bsp_point, &observer->result.position);
 			if (!cinematic_in_progress())
 			{
@@ -183,7 +183,7 @@ static bool* observer_get_initial_update(void)
 
 static void observer_pass_time_to_usercall(int32 user_index)
 {
-	void* observer_pass_time_usercall = Memory::GetAddress<void*>(0x838A1);
+	void* observer_pass_time_usercall = Memory::GetAddress<void*>(0x838A1, 0x47714);
 	__asm
 	{
 		mov edi, user_index
@@ -193,7 +193,7 @@ static void observer_pass_time_to_usercall(int32 user_index)
 
 static void observer_update_command_to_usercall(int32 user_index)
 {
-	void* observer_update_command = Memory::GetAddress<void*>(0x82B7F);
+	void* observer_update_command = Memory::GetAddress<void*>(0x82B7F, 0x469F2);
 	__asm 
 	{
 		mov eax, user_index
@@ -207,7 +207,7 @@ static void __cdecl observer_postcheck(int32 user_index)
 	return;
 }
 
-static void observer_update_internal(int32 user_index)
+static void observer_apply_camera_effect(int32 user_index)
 {
 	real_matrix4x3 camera_effect_matrix = *global_identity4x3;
 	s_observer* observer = observer_get_from_user(user_index);
@@ -217,7 +217,9 @@ static void observer_update_internal(int32 user_index)
 		{
 			first_person_weapon_apply_camera_effect(user_index, &camera_effect_matrix);
 		}
-		if (!game_time_get_paused())
+		if (
+
+			!game_time_get_paused())
 		{
 			int32 perspective = director_get_perspective(user_index);
 			if (perspective == _director_mode_game || perspective == _director_mode_editor)

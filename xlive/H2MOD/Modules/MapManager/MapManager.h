@@ -6,10 +6,9 @@
 */
 class MapDownloadQuery {
 public:
-	MapDownloadQuery(const std::wstring& _mapToDownload, unsigned int _downloadId);
+	MapDownloadQuery(const wchar_t* _mapToDownload, unsigned int _downloadId);
 	~MapDownloadQuery() = default;
 
-	void SetMapNameToDownload(const std::wstring& mapNameToDownload);
 	void SetMapNameToDownload(const wchar_t* mapNameToDownload);
 
 	int GetDownloadPercentage(void) const;
@@ -21,7 +20,7 @@ public:
 	bool ShouldStopDownload();
 	void StopDownload();
 
-	std::wstring m_clientMapFilenameWide;
+	wchar_t m_clientMapFilenameWide[32];
 	std::atomic<bool> m_downloadFinished = false;
 	std::atomic<bool> m_readyToDownload = false;
 
@@ -46,7 +45,7 @@ public:
 
 	static bool GetMapFilename(std::wstring& buffer);
 
-	std::shared_ptr<MapDownloadQuery> AddDownloadQuery(const std::wstring& mapToDownload)
+	std::shared_ptr<MapDownloadQuery> AddDownloadQuery(const wchar_t* mapToDownload)
 	{
 		m_mapDownloadQueryList.push_back(std::make_shared<MapDownloadQuery>(mapToDownload, rand()));
 		return GetLastDownloadQueryAdded();

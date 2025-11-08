@@ -392,10 +392,7 @@ datum __cdecl object_new(object_placement_data* data)
 			const datum found_object_index = data->object_identifier.find_object_index();
 			if (found_object_index != NONE)
 			{
-#ifdef ASSERTS_ENABLED
-				const char* string = g_static_string_assert_text.print("object_new creating duplicate of 0x%x", found_object_index);
-				DISPLAY_ASSERT(string);
-#endif
+				DISPLAY_ASSERT(g_static_string_assert_text.print("object_new creating duplicate of 0x%x", found_object_index));
 			}
 		}
 

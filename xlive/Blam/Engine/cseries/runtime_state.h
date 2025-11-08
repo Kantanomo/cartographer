@@ -22,3 +22,11 @@ ASSERT_STRUCT_SIZE(runtime_state_globals, 20);
 /* prototypes */
 
 void __cdecl runtime_state_initialize(void);
+
+uintptr_t address_from_pointer(const void* pointer);
+
+void* pointer_from_address(uintptr_t address);
+
+uintptr_t align_address(uintptr_t address, int32 alignment_bits);
+
+void* align_pointer(void* pointer, int32 alignment_bits);

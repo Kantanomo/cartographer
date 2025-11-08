@@ -28,12 +28,6 @@ void __cdecl datum_delete(data_array* data_array, datum datum_index)
 	return;
 }
 
-size_t align_address(size_t size, int32 alignment_bits)
-{
-	int32 bit = FLAG(alignment_bits);
-	return ~(bit - 1) & (bit - 1 + size);
-}
-
 int32 data_allocation_size(int32 maximum_count, int32 size, int32 alignment_bits)
 {
 	ASSERT(maximum_count > 0 && maximum_count <= k_unsigned_short_max);

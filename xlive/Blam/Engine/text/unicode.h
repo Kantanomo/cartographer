@@ -393,7 +393,7 @@ void __cdecl wchar_string_to_utf32_string(const wchar_t* string, utf32* utf32_st
 
 /* public code */
 
-template<typename t_storage_type>
+template <typename t_storage_type>
 void string_to_utf32_string(
     const t_storage_type* in_src,
     utf32* in_dst,

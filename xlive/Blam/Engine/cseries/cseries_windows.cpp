@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "cseries_windows.h"
 
+#include "main/main.h"
+
 /* globals */
 
-static bool g_debugger_flag_0 = false;
-static bool g_debugger_flag_1 = false;
-static bool g_debugger_flag_2 = false;
+static bool g_set_always_a_debugger_present = false;
+static bool g_set_never_a_debugger_present = false;
 
 /* public code */
 
@@ -20,8 +21,8 @@ void cseries_windows_tool_apply_patches(void)
 
 bool is_debugger_present(void)
 {
-	bool present = g_debugger_flag_0 || IsDebuggerPresent();
-	return !g_debugger_flag_1 && !g_debugger_flag_2 && present;
+	bool present = g_set_always_a_debugger_present || IsDebuggerPresent();
+	return !g_set_never_a_debugger_present && !force_crash_uploads && present;
 }
 
 void display_debug_string(const char* format)
@@ -72,9 +73,57 @@ void system_get_date_and_time(char* string, int16 size, bool exclude_millisecond
 	return;
 }
 
-void handle_fatal_error(int32 a1, const char* str)
+void handle_fatal_error(int32 code, const char* error)
 {
-	// TODO: implement
+	char string[512];
+	csprintf(
+		string,
+		NUMBEROF(string),
+		"%s\nWould you like a programmer to debug this?\n(You can also view more extensive error messages in debug.txt)",
+		error != NULL ? error : "<unknown error>"
+	);
+
+	char env[2];
+	if (!GetEnvironmentVariableA("DONT_TREAD_ON_ME_WITH_DEBUGGING_DIALOGS", env, NUMBEROF(env)))
+	{
+		if (MessageBoxA(NULL, string, code == NONE ? "ASSERTION FAILED" : "FATAL EXECUTION ERROR", MB_YESNO | MB_TASKMODAL) == IDYES)
+		{
+			char dir[512] = {};
+			GetCurrentDirectoryA(NUMBEROF(dir), dir);
+			
+			const int32 reason = code != NONE ? code : EXCEPTION_BREAKPOINT;
+			csnappendf(dir, NUMBEROF(dir), "\\bin\\windbg.exe.lnk -p %ld -e %ld -c \"~000 S\"", GetCurrentProcessId(), reason);
+			if (!system(dir))
+			{
+				while (true)
+				{
+					bool result = false;
+					const HMODULE h_kernel32 = LoadLibraryA("Kernel32.dll");
+					if (h_kernel32)
+					{
+						decltype(&IsDebuggerPresent) IsDebuggerPresentProc = ((decltype(&IsDebuggerPresent))
+							GetProcAddress(
+								h_kernel32,
+								"IsDebuggerPresent"
+							)
+						);
+						if (IsDebuggerPresentProc)
+						{
+							result = IsDebuggerPresentProc() != false;
+						}
+						FreeLibrary(h_kernel32);
+					}
+
+					if (!force_crash_uploads && !g_set_never_a_debugger_present && (g_set_always_a_debugger_present || result))
+					{
+						break;
+					}
+
+					Sleep(0);
+				}
+			}
+		}
+	}
 	return;
 }
 

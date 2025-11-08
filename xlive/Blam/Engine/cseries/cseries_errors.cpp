@@ -128,7 +128,7 @@ void errors_initialize(void)
 
 	if (!mutex_valid(error_globals.system_mutex))
 	{
-		DISPLAY_ASSERT_EXCEPTION("### WARNING: failed to create error system mutex...", false);
+		ASSERT_EXCEPTION("### WARNING: failed to create error system mutex...", false);
 	}
 
 	error_globals.message_buffer_size = 0;

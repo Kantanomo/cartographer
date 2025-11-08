@@ -12,6 +12,7 @@
 #include "user_interface_text_chat_sender.h"
 #include "user_interface_widget_window.h"
 
+#include "cache/cache_files.h"
 #include "cutscene/cinematics.h"
 #include "game/game.h"
 #include "interface/screens/screen_error_dialog.h"
@@ -44,9 +45,9 @@ struct s_user_interface_globals
 	int32 field_C;
 	/*e_scenario_type*/int8 map_type;
 	int8 gap_11[3];
-	float m_near_clip_distance;
-	float m_projection_plane_distance;
-	float m_far_clip_distance;
+	real32 near_clip_distance;
+	real32 projection_plane_distance;
+	real32 far_clip_distance;
 	int32 field_20;
 	int32 field_24;
 	int32 field_28;
@@ -415,6 +416,12 @@ uint32 __cdecl user_interface_milliseconds(void)
 {
 	return INVOKE(0x2096AE, 0x0, user_interface_milliseconds);
 }
+
+c_user_interface_channel* __fastcall user_interface_get_channel(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index)
+{
+	return INVOKE(0x209957, 0x0, user_interface_get_channel, channel_index, window_index);
+}
+
 bool __cdecl user_interface_error_display_allowed(void)
 {
 	//return INVOKE(0x21D441, 0x0, user_interface_error_display_allowed);
@@ -473,6 +480,11 @@ bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel
 	return INVOKE(0x209850, 0x0, user_interface_back_out_from_channel_by_id, channel_type, window_index, id);
 }
 
+int32 __cdecl user_interface_get_screen_tag_index_by_id(e_user_interface_screen_id id)
+{
+	return INVOKE(0x20C701, 0x0, user_interface_get_screen_tag_index_by_id, id);
+}
+
 void __cdecl user_interface_enter_game_shell(int32 context)
 {
 	INVOKE(0x20CE70, 0x0, user_interface_enter_game_shell, context);
@@ -510,38 +522,127 @@ uint32 user_interface_set_context_presence(uint32 game_mode)
 	return XUserSetContext(0, X_CONTEXT_PRESENCE, game_mode);
 }
 
-void user_interface_debug_load_main_menu()
+#ifdef UI_DEBUG
+void user_interface_debug_load_main_menu(void)
 {
 	user_interface_enter_game_shell(0);
+	return;
 }
 
 void user_interface_debug_text_bounds(bool value)
 {
 	*Memory::GetAddress<bool*>(0x977370) = value;
+	return;
 }
 
-void user_interface_debug_show_title_safe_bounds(bool value)
+void debug_render_title_safe_bounds(bool value)
 {
 	user_interface_globals_get()->render_title_safe_bounds = value;
+	return;
 }
 
-void user_interface_debug_element_bounds(bool value)
+void set_debug_frame_element_bounds(bool value)
 {
 	user_interface_globals_get()->render_element_bounds = value;
+	return;
 }
 
-void user_interface_transition_out_console_window()
+void user_interface_test_screen(const char* screen)
+{
+	// TODO: implement
+	return;
+}
+
+void user_interface_test_transition_out_console_screen(void)
 {
 	if (user_interface_globals_get()->gameshell_channel[_window_4].active_or_incoming_screen_exists())
 		user_interface_globals_get()->gameshell_channel[_window_4].transition_out();
 
 	if (user_interface_globals_get()->gameshell_background_channel.active_or_incoming_screen_exists())
 		user_interface_globals_get()->gameshell_background_channel.transition_out();
+	return;
 }
 
-void user_interface_set_beta(bool value)
+void set_debug_show_screen_tag_path(bool value)
+{
+	user_interface_globals_get()->render_screen_tag_path = value;
+	return;
+}
+
+void user_interface_show_current_screen_tag(const char* path)
+{
+	char destination[128];
+	csstrncpy(destination, path, NUMBEROF(destination));
+	
+	e_user_interface_render_window window_index = (e_user_interface_render_window)NONE;
+	if (!csstrcmp(destination, "hardware") || !csstrcmp(destination, "hardware_error") || !csstrcmp(destination, ""))
+	{
+		window_index = _window_0;
+	}
+	else if (!csstrcmp(destination, "error") || !csstrcmp(destination, "game_error") || !csstrcmp(destination, "1"))
+	{
+		window_index = _window_1;
+	}
+	else if (!csstrcmp(destination, "keyboard") || !csstrcmp(destination, "virtual_keyboard") || !csstrcmp(destination, "2"))
+	{
+		window_index = _window_2;
+	}
+	else if (!csstrcmp(destination, "dialog") || !csstrcmp(destination, "gameshell_dialog") || !csstrcmp(destination, "3"))
+	{
+		window_index = _window_3;
+	}
+	else if (!csstrcmp(destination, "screen") || !csstrcmp(destination, "gameshell_screen") || !csstrcmp(destination, "5"))
+	{
+		window_index = _window_5;
+	}
+	else if (!csstrcmp(destination, "background") || !csstrcmp(destination, "gameshell_background") || !csstrcmp(destination, "6"))
+	{
+		window_index = _window_6;
+	}
+
+	if (window_index != NONE)
+	{
+		c_user_interface_channel* channel = user_interface_get_channel(_user_interface_channel_type_gameshell_dialog_history, window_index);
+		if (channel)
+		{
+			c_screen_widget* screen = channel->incoming_screen_get();
+			if (screen)
+			{
+				const e_user_interface_screen_id screen_id = screen->screen_id_get();
+				if (screen_id == _screen_none)
+				{
+					console_printf("%d: current_id: %d", window_index, NONE);
+				}
+				else
+				{
+					const int32 tag_index = user_interface_get_screen_tag_index_by_id(screen_id);
+					if (tag_index == NONE)
+					{
+						console_printf("%d: tag_index: %d");
+					}
+					else
+					{
+						console_printf("%d: %s", window_index, tag_get_name(tag_index));
+					}
+				}
+			}
+			else
+			{
+				console_printf("%d: no active screen");
+			}
+		}
+		else
+		{
+			console_printf("invalid channel");
+		}
+	}
+	return;
+}
+
+void debug_set_ui_beta(bool value)
 {
 	user_interface_globals_get()->build_is_beta = value;
+	return;
 }
 
 void user_interface_test_error_ok(int16 id)
@@ -557,6 +658,8 @@ void user_interface_test_confirmation(int16 id)
 {
 	ui_test_error_code((e_ui_error_types)id, false, true);
 }
+#endif
+
 
 bool __cdecl user_interface_globals_is_beta_build()
 {

@@ -298,8 +298,8 @@ static void crash_window_create_text(PAINTSTRUCT* ps, HDC hdc)
 	DWORD color = GetSysColor(COLOR_BTNFACE);
 	SetBkColor(hdc, color);
 
-	HFONT header_font = CreateFont(24, 0, 0, 0, FW_BLACK, FALSE, FALSE, FALSE, 0, 0, CLEARTYPE_QUALITY, ANTIALIASED_QUALITY, 0, TEXT("Arial"));
-	HFONT reg_font = CreateFont(16, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE, 0, 0, CLEARTYPE_QUALITY, ANTIALIASED_QUALITY, 0, TEXT("Arial"));
+	HFONT header_font = CreateFont(24, 0, 0, 0, FW_BLACK, FALSE, FALSE, FALSE, 0, 0, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, 0, TEXT("Arial"));
+	HFONT reg_font = CreateFont(16, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE, 0, 0, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, 0, TEXT("Arial"));
 	HFONT h_font_original = (HFONT)SelectObject(hdc, header_font);
 
 	TextOutW(hdc, 20, 100, k_crash_header_text, NUMBEROF(k_crash_header_text));

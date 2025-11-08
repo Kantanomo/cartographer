@@ -505,7 +505,7 @@ static int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tok
 	}
 
 	std::wstring fileNameToDownload(std::wstring(tokens[1].begin(), tokens[1].end()));
-	auto downloadQuery = mapManager->AddDownloadQuery(fileNameToDownload);
+	auto downloadQuery = mapManager->AddDownloadQuery(fileNameToDownload.c_str());
 	downloadQuery->StartMapDownload(); // since we have the map name, start the download
 	return 0;
 }
@@ -1129,7 +1129,7 @@ static int CommandCollection::ui_debug_show_title_safe_bounds(const std::vector<
 		return 0;
 	}
 
-	user_interface_debug_show_title_safe_bounds(value);
+	debug_render_title_safe_bounds(value);
 	return 0;
 }
 
@@ -1151,7 +1151,7 @@ static int CommandCollection::ui_debug_element_bounds(const std::vector<std::str
 		return 0;
 	}
 
-	user_interface_debug_element_bounds(value);
+	set_debug_frame_element_bounds(value);
 	return 0;
 }
 
@@ -1163,7 +1163,7 @@ static int CommandCollection::ui_transition_out_console_window(const std::vector
 		return 0;
 	}
 
-	user_interface_transition_out_console_window();
+	user_interface_test_transition_out_console_screen();
 	return 0;
 }
 
@@ -1185,7 +1185,7 @@ static int CommandCollection::ui_set_beta(const std::vector<std::string>& tokens
 		return 0;
 	}
 
-	user_interface_set_beta(value);
+	debug_set_ui_beta(value);
 	return 0;
 }
 

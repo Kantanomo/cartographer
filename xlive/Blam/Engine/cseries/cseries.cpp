@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "cseries.h"
 
+#include "stack_walk_windows.h"
+
 #include "main/main.h"
 #include "shell/shell.h"
 
@@ -38,7 +40,7 @@ void display_assert(const char* condition, char const* file, int32 line, bool as
 	if (assertion_failed && !is_debugger_present())
 	{
 		error(_error_log, "");
-		// sub_402370(1);
+		stack_walk(1);
 	}
 
 	error(_error_log, "");
@@ -66,7 +68,7 @@ void display_assert(const char* condition, char const* file, int32 line, bool as
 		{
 			RaiseException(0x73746Bu, 0, 0, 0);
 			main_halt_and_catch_fire();
-			// cseries_windows_trigger_debug_window(-1, condition);
+			handle_fatal_error(NONE, condition);
 		}
 	}
 	return;

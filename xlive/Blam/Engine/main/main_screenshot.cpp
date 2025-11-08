@@ -9,6 +9,7 @@
 #include "cache/pc_texture_cache.h"
 
 #include "game/game_time.h"
+#include "main/console.h"
 #include "main/main.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/rasterizer_main.h"
@@ -18,9 +19,12 @@
 
 /* constants */
 
-#define k_screenshot_cubemap_size 256
-#define k_screenshot_cubemap_resolution_multiplier_width 4
-#define k_screenshot_cubemap_resolution_multiplier_height 3
+enum
+{
+	k_screenshot_cubemap_size = 256,
+	k_screenshot_cubemap_resolution_multiplier_width = 4,
+	k_screenshot_cubemap_resolution_multiplier_height = 3,
+};
 
 /* prototypes */
 
@@ -506,9 +510,13 @@ bool __cdecl screenshot_render(window_bound* window)
 		{
 			++movie_globals->recording_frame_index;
 			if (movie_globals->recording_stop_tick > game_time_get())
+			{
 				result = false;
+			}
 			else
+			{
 				movie_globals->in_progress = false;
+			}
 		}
 		screenshot_globals->taking_screenshot = false;
 		screenshot_globals->take_screenshot = false;

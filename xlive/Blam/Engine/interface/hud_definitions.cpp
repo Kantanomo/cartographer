@@ -1,6 +1,17 @@
 #include "stdafx.h"
 #include "hud_definitions.h"
 
+/* globals */
+
+const char* global_hud_anchor_names[5]
+{
+	"top_left",
+	"top_right",
+	"bottom_left",
+	"bottom_right",
+	"center"
+};
+
 /* public code */
 
 hud_globals_definition* get_hud_globals(void)

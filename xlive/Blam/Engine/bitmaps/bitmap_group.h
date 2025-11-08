@@ -97,9 +97,9 @@ enum e_bitmap_type : int16
 #define MAXIMUM_SPRITES_PER_SEQUENCE 64
 struct bitmap_group_sprite
 {
-	short bitmap_index;
-	short pad0;
-	DWORD pad1;
+	int16 bitmap_index;
+	int16 pad0;
+	uint32 pad1;
 	real_rectangle2d bounds;
 	real_point2d registrationPoint;
 };
@@ -108,10 +108,10 @@ ASSERT_STRUCT_SIZE(bitmap_group_sprite, 32);
 #define MAXIMUM_SEQUENCES_PER_BITMAP_GROUP 256
 struct bitmap_group_sequence
 {
-	char name[32];
+	char name[k_tag_string_length];
 	short first_bitmap_index;
 	short bitmap_count;
-	DWORD pad[4];
+	uint32 pad[4];
 	tag_block<bitmap_group_sprite> sprites;
 };
 ASSERT_STRUCT_SIZE(bitmap_group_sequence, 0x3C);

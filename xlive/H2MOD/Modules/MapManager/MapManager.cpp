@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "MapManager.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -347,8 +346,7 @@ void MapDownloadQuery::StopDownload() {
 	m_forceStopDownload = true;
 };
 
-MapDownloadQuery::MapDownloadQuery(const std::wstring& _mapToDownload, unsigned int _downloadId) {
-	id = _downloadId;
+MapDownloadQuery::MapDownloadQuery(const wchar_t* _mapToDownload, unsigned int _downloadId) {
 	SetMapNameToDownload(_mapToDownload);
 }
 
@@ -371,7 +369,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 	CURLcode res;
 
 	c_static_wchar_string<MAX_PATH> map_path(get_custom_map_folder_path());
-	map_path.append(m_clientMapFilenameWide.c_str());
+	map_path.append(m_clientMapFilenameWide);
 
 	curl = curl_interface_init_no_verify();
 	if (curl) {
@@ -383,7 +381,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 		}
 
 		utf8 utf8_path[MAX_PATH * 2];
-		wchar_string_to_utf8_string(m_clientMapFilenameWide.c_str(), utf8_path, NUMBEROF(utf8_path));
+		wchar_string_to_utf8_string(m_clientMapFilenameWide, utf8_path, NUMBEROF(utf8_path));
 
 		char* url_encoded_map_filename = curl_easy_escape(curl, utf8_path, csstrnlen(utf8_path, NUMBEROF(utf8_path)));
 		url.append(url_encoded_map_filename);
@@ -443,7 +441,7 @@ void MapDownloadQuery::StartMapDownload()
 		*mapDownloadStatus = NONE;
 
 		if (m_readyToDownload) {
-			event(_event_status, "h2mod:map_manager: map file to download: %ws", m_clientMapFilenameWide.c_str());
+			event(_event_status, "h2mod:map_manager: map file to download: %ws", m_clientMapFilenameWide);
 
 			//TODO: set map filesize
 			//TODO: if downloading from repo files, try p2p
@@ -477,18 +475,14 @@ void MapDownloadQuery::StartMapDownload()
 }
 
 
-void MapDownloadQuery::SetMapNameToDownload(const std::wstring& _mapNameToDownloadWide)
-{
-	if (!_mapNameToDownloadWide.empty())
-	{
-		m_clientMapFilenameWide = _mapNameToDownloadWide;
-		m_readyToDownload = true;
-	}
-}
-
 void MapDownloadQuery::SetMapNameToDownload(const wchar_t* _mapNameToDownload)
 {
-	SetMapNameToDownload(std::wstring(_mapNameToDownload));
+	if (ustrnlen(_mapNameToDownload, 32) > 0)
+	{
+		ustrncpy(m_clientMapFilenameWide, _mapNameToDownload, NUMBEROF(m_clientMapFilenameWide));
+		m_readyToDownload = true;
+	}
+	return;
 }
 
 int MapDownloadQuery::GetDownloadPercentage(void) const

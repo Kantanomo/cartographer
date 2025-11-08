@@ -90,6 +90,7 @@ static void __cdecl main_game_reset_map_blue_screen_detection(void);
 
 bool debug_no_drawing = false;
 bool debug_console_pauses_game = true;
+bool force_crash_uploads = false;
 
 /* public code */
 

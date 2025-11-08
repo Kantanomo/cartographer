@@ -8,20 +8,35 @@ enum
 {
 	MAXIMUM_NUMBER_OF_FIRST_PERSON_MODELS = 4,
 	MAXIMUM_NODES_PER_FIRST_PERSON_MODEL = 64,
-	k_first_person_max_weapons = 2,
 };
 
 /* enums */
+
+enum e_first_person_weapons
+{
+	k_first_person_primary_weapon = 0,
+	k_first_person_secondary_weapon,
+	k_first_person_max_weapons,
+};
+
+enum e_first_person_weapon_flags
+{
+	_first_person_facing_valid_bit = 0,
+	_first_person_node_orientations_valid_bit,
+	_first_person_attachment_suspended_bit,
+	_first_person_attachment_pending_bit,
+	_first_person_lowering_weapon_bit,
+	_first_person_raising_weapon_bit,
+	_first_person_weapon_lowered_bit,
+	_first_person_waiting_for_custom_animation_bit,
+	_first_person_waiting_for_scripting_bit,
+	_first_person_waiting_for_claw_bit,
+};
 
 enum e_first_person_weapon_data_flags : uint32
 {
 	_weapon_node_table_valid_bit = 1,
 	_arm_node_table_valid_bit = 2,
-};
-
-enum e_first_person_weapon_flags : uint32
-{
-	_first_person_weapon_valid_adjustment_matrix_bit = 2
 };
 
 /* structures */
@@ -34,9 +49,9 @@ struct s_first_person_model_data
 	real_matrix4x3 nodes[MAXIMUM_NODES_PER_FIRST_PERSON_MODEL];
 };
 
-struct s_first_person_weapon_data
+struct first_person_weapon_data
 {
-	e_first_person_weapon_data_flags flags;
+	/*e_first_person_weapon_data_flags*/ uint32 flags;
 	datum weapon_index;
 	c_animation_manager animation_manager;
 	int8 gap_90[12];	// unused? maybe a real_point3d?
@@ -64,28 +79,28 @@ struct s_first_person_weapon_data
 	int16 field_1004;
 	int16 pad;
 };
-ASSERT_STRUCT_SIZE(s_first_person_weapon_data, 4112);
+ASSERT_STRUCT_SIZE(first_person_weapon_data, 4112);
 
-struct s_first_person_weapon
+struct first_person_weapon
 {
 	/*e_first_person_weapon_flags*/ uint32 flags;
 	datum unit_index;
 	e_character_type character_type;
 	int8 pad[3];
-	s_first_person_weapon_data weapons[k_first_person_max_weapons];
+	first_person_weapon_data weapon[k_first_person_max_weapons];
 	c_interpolator_control rate_interpolator_control;
-	real_euler_angles2d pos;
-	real_euler_angles2d field_2038;
-	real_euler_angles2d turn;
-	real_euler_angles2d field_2048;
-	real_euler_angles2d player_facing;
-	real_euler_angles2d field_2058;
-	real_matrix4x3 identity_matrix; // probably not identity matrix
+	real_vector2d position;
+	real_vector2d position_velocity;
+	real_vector2d turn;
+	real_vector2d turning_velocity;
+	real_euler_angles2d facing_angles;
+	real_euler_angles2d facing_angles_delta;
+	real_matrix4x3 estimated_root_matrix; // probably not identity matrix
 	int32 adjustment_matrix_index;
 	real_matrix4x3 adjustment_matrix;
 };
-ASSERT_STRUCT_SIZE(s_first_person_weapon, 8396);
-ASSERT_STRUCT_OFFSET(s_first_person_weapon, identity_matrix, 8288);
+ASSERT_STRUCT_SIZE(first_person_weapon, 8396);
+ASSERT_STRUCT_OFFSET(first_person_weapon, estimated_root_matrix, 8288);
 
 struct s_first_person_orientations
 {
