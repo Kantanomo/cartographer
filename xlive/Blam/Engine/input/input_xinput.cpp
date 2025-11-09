@@ -83,12 +83,15 @@ void input_clear_all_rumblers(void)
 
 void input_xinput_update_rumble_state(void)
 {
-	bool global_suppress_rumble = false;
-
-	if (input_globals->feedback_suppress
+	bool global_suppress_rumble = 
+		input_globals->feedback_suppress
 		|| input_globals->input_suppressed
-		|| !game_in_progress()
-		|| game_time_get_paused())
+#ifdef TERMINAL_ENABLED
+		|| console_is_active()
+#endif
+		;
+
+	if (!game_in_progress() || game_time_get_paused())
 	{
 		global_suppress_rumble = true;
 	}

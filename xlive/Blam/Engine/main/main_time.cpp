@@ -5,10 +5,14 @@
 #include "main.h"
 #include "main_screenshot.h"
 
+#include "camera/camera.h"
 #include "game/game.h"
 #include "game/game_time.h"
 #include "game/player_control.h"
 #include "rasterizer/rasterizer_globals.h"
+#include "rasterizer/rasterizer_text.h"
+#include "text/draw_string.h"
+#include "text/font_group.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
 
@@ -18,7 +22,9 @@
 
 enum
 {
+	k_target_framerate = 30,
 	k_maximum_ticks_per_frame = 8,
+	k_flip_delta_count = 15,
 };
 
 #define k_use_precise_counters true
@@ -61,7 +67,7 @@ static s_main_time_globals* main_time_globals_get(void);
 
 static real32 main_time_get_delta_sec_precise(LARGE_INTEGER counter_now, LARGE_INTEGER freq);
 
-static uint64 __cdecl main_time_get_absolute_milliseconds(void);
+static uint64 main_time_get_absolute_milliseconds(void);
 
 static real32 main_time_delta_calculate(LARGE_INTEGER counter_now, LARGE_INTEGER freq);
 
@@ -76,6 +82,8 @@ static s_main_time_debug g_main_game_time_debug;
 
 static t_main_time_reset p_main_time_reset;
 
+static int8 g_next_flip_delta_index;
+static int16 g_flip_deltas[k_flip_delta_count];
 
 bool display_framerate = false;
 bool display_frame_deltas = false;
@@ -100,6 +108,9 @@ void __cdecl main_time_initialize(void)
 	main_time_globals->should_reset = false;
 	main_time_globals->last_vblank_index = 0;
 	main_time_globals->temporary_throttle_control = 0;
+
+	csmemset(g_flip_deltas, 0, sizeof(g_flip_deltas));
+
 
 	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
 
@@ -245,15 +256,16 @@ real32 __cdecl main_time_update(void)
 	last_framerate_time = dt_sec;
 	main_time_globals->last_milliseconds = main_time_get_absolute_milliseconds();
 	main_time_globals->last_game_time = game_time;
-	main_time_globals->last_vblank_index = *Memory::GetAddress<int64*>(0xA3E440, 0x4905C8);
-	main_time_globals->last_initial_vblank_index = *Memory::GetAddress<int64*>(0xA3E440, 0x4905C8);
+
+	const int64 last_initial_vblank_index = *Memory::GetAddress<int64*>(0xA3E440, 0x4905C8);
+	main_time_globals->last_vblank_index = last_initial_vblank_index;
+	main_time_globals->last_initial_vblank_index = last_initial_vblank_index;
 	return dt_sec;
 }
 
 bool main_time_halted(void)
 {
 	bool result = shell_application_is_paused();
-	/*
 #if TERMINAL_ENABLED
 	if (debug_console_pauses_game
 		&& console_is_active()
@@ -261,7 +273,7 @@ bool main_time_halted(void)
 	{
 		result = true;
 	}
-#endif*/
+#endif
 	return result;
 }
 
@@ -274,6 +286,84 @@ bool __cdecl main_time_should_reset(void)
 int32 __cdecl main_time_get_tickrate(void)
 {
 	return INVOKE(0x28707, 0x2489B, main_time_get_tickrate);
+}
+
+void main_time_frame_rate_display(void)
+{
+	if (display_framerate)
+	{
+		const real32 frame_time = last_framerate_time;
+		const real32 framerate = 1.f / frame_time;
+		const int32 framerate_rounded = real_to_long_round(framerate);
+
+		char string[64];
+		csprintf(string, NUMBEROF(string), "[%.1f] %d", (real32)framerate_rounded, framerate_rounded);
+		
+		const render_camera* camera = get_global_camera();
+		const int16 width = rectangle2d_width(&camera->window_bounds);
+		const int16 height = rectangle2d_height(&camera->window_bounds);
+
+		rectangle2d rect;
+		rasterizer_get_screen_bounds(&rect);
+		
+		// Scale the offsets so we don't end up with different placement based on the resolution
+		const int16 scaled_width_offset = 150 * (width / 640);
+		const int16 scaled_height_offset = 50 * (height / 480);
+
+		// If we play at a resolution lower than 640 x 480 use the original offsets (scaled offsets will be 0)
+		const int16 width_offset = MAX(scaled_width_offset, 150);	
+		const int16 height_offset = MAX(scaled_height_offset, 50);
+
+		rect.left = rect.right - width_offset;
+		rect.top = rect.bottom - height_offset;
+		
+		draw_string_set_format(NONE, 0, 0, true);	// We wrap horizontally since we can display more than 2 sig figures 
+		const real_argb_color* color = framerate_rounded < k_target_framerate ? global_real_argb_red : global_real_argb_green;
+		draw_string_set_color(color);
+		draw_string_set_font(_font_id_6);
+		rasterizer_draw_string(&rect, 0, 0, 0, string);
+	}
+
+	// This code doesn't technically work on PC but i've restored it anyways
+	if (display_frame_deltas)
+	{
+		rectangle2d rect;
+		rasterizer_get_frame_bounds(&rect);
+
+		const render_camera* camera = get_global_camera();
+		const int16 width = rectangle2d_width(&camera->window_bounds);
+		const int16 height = rectangle2d_height(&camera->window_bounds);
+
+		// Scale the offsets so we don't end up with different placement based on the resolution
+		// Make sure we select 1 if the result is 0 (or less?)
+		const int16 width_scale_factor = MAX((width / 640), 1);
+		const int16 height_scale_factor = MAX((height / 480), 1);
+
+		const int16 scaled_width_offset = 50 * width_scale_factor;
+		const int16 scaled_height_offset = 50 * height_scale_factor;
+
+		rect.left = rect.right - scaled_width_offset;
+		rect.top = rect.bottom - scaled_height_offset;
+
+		for (
+			int8 delta_index = (g_next_flip_delta_index + (k_flip_delta_count - 1)) % k_flip_delta_count;
+			delta_index != g_next_flip_delta_index;
+			delta_index = (delta_index + (k_flip_delta_count - 1)) % k_flip_delta_count
+		)
+		{
+			rect.top -= (20 * height_scale_factor);
+			rect.bottom -= (20 * height_scale_factor);
+			char string[4];
+			csprintf(string, NUMBEROF(string), "%d", g_flip_deltas[delta_index]);
+			draw_string_set_format(NONE, 1, 0, false);
+			draw_string_set_font(_font_id_6);
+			const real_argb_color* color = g_flip_deltas[delta_index] < 2 ? global_real_argb_red : global_real_argb_green;
+			draw_string_set_color(color);
+			rasterizer_draw_string(&rect, 0, 0, 0, string);
+		}
+	}
+
+	return;
 }
 
 /* private code */
@@ -289,7 +379,7 @@ static real32 main_time_get_delta_sec_precise(LARGE_INTEGER counter_now, LARGE_I
 	return result;
 }
 
-static uint64 __cdecl main_time_get_absolute_milliseconds(void)
+static uint64 main_time_get_absolute_milliseconds(void)
 {
 	uint64 milliseconds = system_milliseconds();
 	s_main_time_globals* main_time_globals = main_time_globals_get();

@@ -174,7 +174,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -325,7 +325,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -469,7 +469,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -530,7 +530,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -652,6 +652,7 @@
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\recorded_animations.cpp" />
     <ClCompile Include="Blam\Engine\debug\menu\debug_menu_main.cpp" />
+    <ClCompile Include="Blam\Engine\devices\devices.cpp" />
     <ClCompile Include="Blam\Engine\dialogs\edit_text.cpp" />
     <ClCompile Include="Blam\Engine\editor\editor_stubs.cpp" />
     <ClCompile Include="Blam\Engine\effects\beam.cpp" />
@@ -681,6 +682,11 @@
     <ClCompile Include="Blam\Engine\game\player_vibration.cpp" />
     <ClCompile Include="Blam\Engine\game\preferences.cpp" />
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs_compile.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs_function.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs_globals_external.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs_runtime.cpp" />
+    <ClCompile Include="Blam\Engine\hs\object_lists.cpp" />
     <ClCompile Include="Blam\Engine\input\controllers.cpp" />
     <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
     <ClCompile Include="Blam\Engine\input\input_process.cpp" />
@@ -722,6 +728,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_video_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_vsync_setting.cpp" />
+    <ClCompile Include="Blam\Engine\interface\terminal.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_bitmap_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_channel.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
@@ -945,6 +952,7 @@
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_utilities.h" />
     <ClInclude Include="Blam\Engine\bitmaps\targa_file.h" />
     <ClInclude Include="Blam\Engine\bitmaps\tiff_file.h" />
+    <ClInclude Include="Blam\Engine\cache\cache_files_windows.h" />
     <ClInclude Include="Blam\Engine\cache\cache_file_verification.h" />
     <ClInclude Include="Blam\Engine\cache\pc_geometry_cache.h" />
     <ClInclude Include="Blam\Engine\cache\pc_texture_cache.h" />
@@ -1038,8 +1046,14 @@
     <ClInclude Include="Blam\Engine\game\preferences.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_definitions_new.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_compile.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_function.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_globals_external.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_library_internal_compile.h" />
     <ClInclude Include="Blam\Engine\hs\hs_library_internal_runtime.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_runtime.h" />
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
+    <ClInclude Include="Blam\Engine\hs\object_lists.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\input\input_abstraction.h" />
     <ClInclude Include="Blam\Engine\input\input_constants.h" />
@@ -1099,6 +1113,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager_strings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_vsync_setting.h" />
     <ClInclude Include="Blam\Engine\interface\signal_slot.h" />
+    <ClInclude Include="Blam\Engine\interface\terminal.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_bitmap_block.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_channel.h" />
@@ -1246,6 +1261,7 @@
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cartographer_ingame_ui.cpp" />
     <ClCompile Include="Blam\Engine\render\render_contrails.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_debug.cpp" />
     <ClCompile Include="Blam\Engine\render\render_first_person.cpp" />
     <ClCompile Include="Blam\Engine\render\render_layers.cpp" />
     <ClCompile Include="Blam\Engine\render\render_lights.cpp" />
@@ -2305,6 +2321,7 @@
     <ClInclude Include="Blam\Engine\render\render.h" />
     <ClInclude Include="Blam\Engine\render\render_cartographer_ingame_ui.h" />
     <ClInclude Include="Blam\Engine\render\render_contrails.h" />
+    <ClInclude Include="Blam\Engine\render\render_debug.h" />
     <ClInclude Include="Blam\Engine\render\render_debug_structure.h" />
     <ClInclude Include="Blam\Engine\render\render_first_person.h" />
     <ClInclude Include="Blam\Engine\render\render_layers.h" />

@@ -24,6 +24,7 @@
 #include "game/multiplayer_globals.h"
 #include "game/player_control.h"
 #include "hs/hs.h"
+#include "hs/hs_runtime.h"
 #include "input/input_xinput.h"
 #include "input/input_windows.h"
 #include "input/input_abstraction.h"
@@ -674,6 +675,7 @@ static void h2mod_apply_hooks(void)
 		PatchCall(Memory::GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
 		hs_apply_patches();
+		hs_runtime_apply_patches();
 
 		new_hud_apply_patches();
 		motion_sensor_apply_patches();

@@ -217,6 +217,10 @@ bool __cdecl screenshot_render(window_bound* window)
 				bitmap_1->base_address &&
 				(!screenshot_globals->web_map || bitmap_secondary))
 			{
+#ifdef CONSOLE_ENABLED
+				console_clear();
+				console_close();
+#endif
 				geometry_cache_block_for_one_frame(2);
 				texture_cache_block_for_one_frame(2);
 				bool rendered_bloom_screenshot = render_bloom_screenshot(bitmap_0->width, bitmap_0->height, window);

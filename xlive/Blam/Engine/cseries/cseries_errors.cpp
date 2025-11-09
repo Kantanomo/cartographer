@@ -5,7 +5,7 @@
 #include "stack_walk_windows.h"
 
 #ifdef TERMINAL_ENABLED
-//#include "interface/terminal.h"
+#include "interface/terminal.h"
 #endif
 #include "math/color_math.h"
 #include "multithreading/synchronization.h"
@@ -232,7 +232,7 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 						{
 							color.rgb = *global_real_rgb_red;
 						}
-						//terminal_printf(&color, "%s", string);
+						terminal_printf(&color, "%s", string);
 #endif
 					}
 				}

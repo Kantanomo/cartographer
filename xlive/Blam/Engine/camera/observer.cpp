@@ -9,6 +9,7 @@
 #include "game/players.h"
 #include "interface/first_person_weapons.h"
 #include "math/matrix_math.h"
+#include "main/console.h"
 #include "physics/collisions.h"
 #include "render/render_visibility_collection.h"
 #include "scenario/scenario.h"
@@ -218,7 +219,9 @@ static void observer_apply_camera_effect(int32 user_index)
 			first_person_weapon_apply_camera_effect(user_index, &camera_effect_matrix);
 		}
 		if (
-
+#ifdef TERMINAL_ENABLED 
+			!console_is_active() && 
+#endif
 			!game_time_get_paused())
 		{
 			int32 perspective = director_get_perspective(user_index);

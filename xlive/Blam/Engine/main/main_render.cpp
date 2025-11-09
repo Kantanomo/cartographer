@@ -4,6 +4,7 @@
 #include "main_screenshot.h"
 
 #include "cutscene/cinematics.h"
+#include "game/player_mapping.h"
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/rasterizer_main.h"
@@ -13,11 +14,12 @@
 
 /* globals */
 
+bool debug_render_freeze = false;
+bool debug_render_horizontal_splitscreen = false;
+bool debug_force_all_player_views_to_default_player = false;
+
 // TODO: figure out why having this global instead of window_bound_get breaks bloom
 //window_bound g_window_bounds[6];
-
-bool g_debug_render_horizontal_splitscreen = false;
-bool g_debug_force_all_player_views_to_default = false;
 
 /*  prototypes */
 
@@ -68,7 +70,7 @@ void __cdecl main_render_player_view(void)
 		player_window_count = 1;
 	}
 
-	int32 window_count = player_window_count + 1;
+	const int32 window_count = player_window_count + 1;
 
 	ASSERT(player_window_count <= MAXIMUM_PLAYER_WINDOWS);
 	ASSERT(window_count <= MAXIMUM_RENDERED_WINDOWS);
@@ -91,7 +93,7 @@ void __cdecl main_render_player_view(void)
 			display_split_type = rasterizer_get_display_type() == _display_type_4_by_3 ? _display_split_type_horizontal : _display_split_type_vertical;
 		}
 
-		display_split_type = g_debug_render_horizontal_splitscreen ? _display_split_type_horizontal : display_split_type;
+		display_split_type = debug_render_horizontal_splitscreen ? _display_split_type_horizontal : display_split_type;
 	}
 
 	window_bound* g_window_bounds = window_bound_get();
@@ -101,33 +103,29 @@ void __cdecl main_render_player_view(void)
 	for (int32 window_num = 0; window_num < player_window_count; ++window_num)
 	{
 		s_observer_result* observer_result = NULL;
-		if (g_debug_force_all_player_views_to_default)
+		if (debug_force_all_player_views_to_default_player)
 		{
-			break;
+			user_index = player_mapping_first_active_output_user();
 		}
-
 		// TODO: another debug global condition here:
-
-		user_index += 1;
-		if (user_index < k_number_of_users)
-		{
-			while (!players_user_is_active(user_index))
-			{
-				if (++user_index >= k_number_of_users)
-				{
-					user_index = NONE;
-					break;
-				}
-			}
-
-			if (user_index != NONE)
-			{
-				observer_result = observer_get_camera(user_index);
-			}
-		}
 		else
 		{
-			user_index = NONE;
+			++user_index;
+			while (user_index < k_number_of_users && !players_user_is_active(user_index))
+			{
+				++user_index;
+			}
+
+			if (user_index >= k_number_of_users)
+			{
+				user_index = NONE;
+			}
+		}
+		
+		if (user_index != NONE)
+		{
+			observer_result = observer_get_camera(user_index);
+			ASSERT(observer_result != NULL);
 		}
 
 		compute_window_bounds_to_usercall(&player_windows[window_num], 0, user_index, window_num, player_window_count, display_split_type, observer_result);
@@ -142,7 +140,11 @@ void __cdecl main_render_player_view(void)
 		&window->rasterizer_camera.window_bounds);
 	render_camera_build(&window->rasterizer_camera, 0, 0, 0);
 
-	window->render_camera = window->rasterizer_camera;
+	if (!debug_render_freeze || window->single_view)
+	{
+		window->render_camera = window->rasterizer_camera;
+	}
+
 	if (screenshot_render(&g_window_bounds[1]))
 	{
 		render_frame(3, window_count, player_window_count, display_split_type, &g_window_bounds[1]);
@@ -165,8 +167,12 @@ void __cdecl main_render_previous_backbuffer(int32 a1, int32 a2)
 
 	render_camera_build(&g_window_bounds[0].rasterizer_camera, 0, 0, 0);
 	
-	g_window_bounds[0].render_camera = g_window_bounds[0].rasterizer_camera;
-	render_nonplayer_frame(g_window_bounds);
+	if (!debug_render_freeze || g_window_bounds[0].single_view)
+	{
+		g_window_bounds[0].render_camera = g_window_bounds[0].rasterizer_camera;
+	}
+
+	render_nonplayer_frame(&g_window_bounds[0]);
 
 
 	s_rasterizer_dx9_main_globals* rasterizer_dx9_globals = rasterizer_dx9_main_globals_get();

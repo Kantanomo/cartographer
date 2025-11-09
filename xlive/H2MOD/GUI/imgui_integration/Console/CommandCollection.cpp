@@ -7,21 +7,15 @@
 #include "CommandsUtil.h"
 #include "ComVar.h"
 
-#include "game/cheats.h"
 #include "game/game.h"
 #include "game/players.h"
-#include "interface/user_interface.h"
 #include "main/main.h"
-#include "main/main_game.h"
 #include "main/main_time.h"
-#include "main/main_render.h"
-#include "main/main_screenshot.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/messages/network_messages_cartographer.h"
 #include "networking/session/network_session.h"
 #include "networking/session/network_observer.h"
 #include "networking/network_event.h"
-#include "objects/objects.h"
 #include "shell/shell.h"
 #include "text/unicode.h"
 
@@ -33,11 +27,6 @@
 // for XNet connection logging
 #include "tag_files/tag_loader/tag_injection.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
-
-
-std::mutex commandInsertMtx;
-
-bool readObjectIds = true;
 
 static const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
@@ -52,7 +41,6 @@ namespace CommandCollection
 
 	static int RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
@@ -65,49 +53,16 @@ namespace CommandCollection
 	static int ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int SetMaxPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int WarpFixCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int drop(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 
-	static int Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int game_coop_players(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int game_multiplayer(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int game_splitscreen(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int game_mode(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int change_player_team(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int quit(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	static int _screenshot_cubemap(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int SetAddressBroadcastIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
 	static int SetPortNumber(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-#ifdef OBJECT_DEBUG
-	static int _objects_dump_memory(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-#endif
-#ifdef EVENTS_ENABLED
-	static int net_event_display_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int net_event_log_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int net_event_list_categories_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-#endif
-#ifdef UI_DEBUG
-	static int ui_debug_load_main_menu(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int ui_debug_text_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int ui_debug_show_title_safe_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int ui_debug_element_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int ui_transition_out_console_window(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int ui_set_beta(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int ui_test_error_ok(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int ui_test_error_ok_cancel(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-	static int ui_test_confirmation(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx);
-#endif
-
-	// misc
-	static void DeleteObject(datum objectDatumIdx);
 
 	TEST_N_DEF(CC5);
 }
@@ -122,9 +77,6 @@ extern real32 g_rumble_factor;
 ComVarFromPtr(rumble_var_cmd, real32, &g_rumble_factor,
 	"var_rumble_scale", "change controller vibration strength (0.0 to 1.0), 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
 
-ComVarFromPtr(debug_render_horizontal_splitscreen, bool, &g_debug_render_horizontal_splitscreen,
-	"var_debug_render_horizontal_splitscreen", "force horizontal spliscreen split", 0, 1, CommandCollection::BoolVarHandlerCmd);
-
 ComVarFromPtr(h2config_set_base_port, unsigned short, &H2Config_base_port,
 	"var_network_port", "change the network port used to connect over the network", 1, 1, CommandCollection::SetPortNumber);
 
@@ -138,8 +90,12 @@ ComVarFromPtrIpv4(h2config_set_broadcast_ipv4_address, &H2Config_ip_broadcast_ov
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
 std::vector<ConsoleCommand*> CommandCollection::commandTable;
 
+CRITICAL_SECTION g_command_insert_section;
+
 void CommandCollection::InitializeCommands()
 {
+	InitializeCriticalSection(&g_command_insert_section);
+
 	static bool InitializeCommandsMap_initialized = false;
 	if (InitializeCommandsMap_initialized) return;
 	InitializeCommandsMap_initialized = true;
@@ -148,7 +104,6 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand(network_stats_overlay_var_cmd));
 	InsertCommand(new ConsoleCommand(og_frame_limiter_var_cmd));
 	InsertCommand(new ConsoleCommand(rumble_var_cmd));
-	InsertCommand(new ConsoleCommand(debug_render_horizontal_splitscreen));
 	InsertCommand(new ConsoleCommand(h2config_set_lan_ipv4_address));
 	InsertCommand(new ConsoleCommand(h2config_set_broadcast_ipv4_address));
 	InsertCommand(new ConsoleCommand(h2config_set_base_port));
@@ -163,43 +118,13 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand("log_map_file_name", "logs selected map filename, 0 parameter(s)", 0, 0, CommandCollection::LogSelectedMapFilenameCmd));
 	InsertCommand(new ConsoleCommand("request_map_file", "requests map file name from host, 0 parameter(s)", 0, 0, CommandCollection::RequestFileNameCmd));
 	InsertCommand(new ConsoleCommand("max_players", "set maximum players that can join, 1 parameter(s): <int>", 1, 1, CommandCollection::SetMaxPlayersCmd));
-	InsertCommand(new ConsoleCommand("delete_object", "deletes an object, 1 parameter(s): <int>: object datum index", 1, 1, CommandCollection::DestroyObjectCmd));
 	InsertCommand(new ConsoleCommand("warp_fix", "(EXPERIMENTAL) increases client position update control threshold", 1, 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden));
 	InsertCommand(new ConsoleCommand("log_xnet_connections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden));
-	InsertCommand(new ConsoleCommand("drop", "drops the named tag e.g. objects\\vehicles\\banshee\\banshee.vehicle", 1, 1, CommandCollection::drop));
-	InsertCommand(new ConsoleCommand("spawn_reload_command_list", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd));
 	InsertCommand(new ConsoleCommand("tag_inject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden));
-	InsertCommand(new ConsoleCommand("crash", "crashes the game", 0, 0, CommandCollection::Crash));
-	InsertCommand(new ConsoleCommand("map_name", "load a map with the following name, 1 parameter(s): <string>", 1, 1, CommandCollection::map_name));
-	InsertCommand(new ConsoleCommand("game_difficulty", "set the difficulty when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_difficulty));
-	InsertCommand(new ConsoleCommand("game_coop_players", "set the coop player count when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_coop_players));
-	InsertCommand(new ConsoleCommand("game_multiplayer", "sets the multiplayer variant for the next map, 1 parameter(s): <string>", 1, 1, CommandCollection::game_multiplayer));
-	InsertCommand(new ConsoleCommand("game_splitscreen", "sets the number of multiplayer splitscreen players for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_splitscreen));
-	InsertCommand(new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode));
 	InsertCommand(new ConsoleCommand("invite", "creates a invite code that you can send to people for direct connecting", 0, 0, CommandCollection::invite));
 	InsertCommand(new ConsoleCommand("connect", "lets you directly connect to a session with an invite code", 1, 1, CommandCollection::connect));
 	InsertCommand(new ConsoleCommand("sv_change_player_team", "changes the player team to the specivied team", 2, 2, CommandCollection::change_player_team));
 	InsertCommand(new ConsoleCommand("quit", "quits the game to desktop", 0, 0, CommandCollection::quit));
-	InsertCommand(new ConsoleCommand("screenshot_cubemap", "takes a cubemap screenshot and saves as <name>.tif", 1, 1, CommandCollection::_screenshot_cubemap));
-#ifdef OBJECT_DEBUG
-	InsertCommand(new ConsoleCommand("objects_dump_memory", "debugs object memory usage", 0, 0, CommandCollection::_objects_dump_memory));
-#endif
-#ifdef EVENTS_ENABLED
-	InsertCommand(new ConsoleCommand("net_event_display_category", "sets the display level for a named category of network events", 2, 2, net_event_display_category_evaluate));
-	InsertCommand(new ConsoleCommand("net_event_log_category", "sets the log level for a named category of network events", 2, 2, net_event_log_category_evaluate));
-	InsertCommand(new ConsoleCommand("net_event_list_categories", "lists all categories that exist under a particular category string", 1, 1, net_event_list_categories_evaluate));
-#endif
-#ifdef UI_DEBUG
-	InsertCommand(new ConsoleCommand("ui_debug_load_main_menu", "loads the main menu screen", 0, 0, CommandCollection::ui_debug_load_main_menu));
-	InsertCommand(new ConsoleCommand("ui_debug_text_bounds", "toggle rendering of ui text boundaries", 1, 1, CommandCollection::ui_debug_text_bounds));
-	InsertCommand(new ConsoleCommand("ui_debug_show_title_safe_bounds", "toggle display of title safe boundary", 1, 1, CommandCollection::ui_debug_show_title_safe_bounds));
-	InsertCommand(new ConsoleCommand("ui_debug_element_bounds", "toggle rendering of widget tag block bounds ", 1, 1, CommandCollection::ui_debug_element_bounds));
-	InsertCommand(new ConsoleCommand("ui_transition_out_console_window", "transition out any ui on the console window", 0, 0, CommandCollection::ui_transition_out_console_window));
-	InsertCommand(new ConsoleCommand("ui_set_beta", "set ui beta testing on/off", 1, 1, CommandCollection::ui_set_beta));
-	InsertCommand(new ConsoleCommand("ui_test_error_ok", "test error code display w/ ok dialog", 1, 1, CommandCollection::ui_test_error_ok));
-	InsertCommand(new ConsoleCommand("ui_test_error_ok_cancel", "test error code display w/ ok-cancel dialog", 1, 1, CommandCollection::ui_test_error_ok_cancel));
-	InsertCommand(new ConsoleCommand("ui_test_confirmation", "test confirmation dialog display", 1, 1, CommandCollection::ui_test_confirmation));
-#endif
 
 
 	atexit([]() -> void {
@@ -210,37 +135,47 @@ void CommandCollection::InitializeCommands()
 
 		commandTable.clear();
 	});
+
+	DeleteCriticalSection(&g_command_insert_section);
+	return;
 }
 
 void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
 {
-	std::scoped_lock lock(commandInsertMtx);
+	EnterCriticalSection(&g_command_insert_section);
 
 	for (auto command : commandTable)
 	{
 		if (!strcmp(newCommand->GetName(), command->GetName()))
 		{
 			event(_event_error, "h2mod:commands: %s - command %s already present!", __FUNCTION__, newCommand->GetName());
+			LeaveCriticalSection(&g_command_insert_section);
 			return;
 		}
 	}
 
 	commandTable.emplace_back(newCommand);
+
+	LeaveCriticalSection(&g_command_insert_section);
+	return;
 }
 
 static ConsoleCommand* CommandCollection::GetCommandByName(const std::string& name)
 {
-	std::scoped_lock lock(commandInsertMtx);
+	EnterCriticalSection(&g_command_insert_section);
 
+	ConsoleCommand* result = nullptr;
 	for (auto command : commandTable)
 	{
 		if (!strcmp(name.c_str(), command->GetName()))
 		{
-			return command;
+			result = command;
+			break;
 		}
 	}
 
-	return nullptr;
+	LeaveCriticalSection(&g_command_insert_section);
+	return result;
 }
 
 // in case your variable needs to be set/updated
@@ -361,18 +296,6 @@ static int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& 
 	}
 
 	return 0;
-}
-
-static int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	return BoolVarHandlerCmd(tokens, ctx);
 }
 
 static int CommandCollection::LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
@@ -747,47 +670,6 @@ static int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens,
 	return 0;
 }
 
-static int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	datum datumIdx;
-
-	std::string exception;
-	if (!ComVar(&datumIdx).SetFromStr(tokens[1], 0, exception))
-	{
-		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "\t%s", exception.c_str());
-		return 0;
-	}
-
-	void* object_data = (void*)object_try_and_get_and_verify_type(datumIdx, _object_mask_all);
-	if (object_data != NULL)
-	{
-		DeleteObject(datumIdx);
-		outputCb(StringFlag_None, "# deleted object idx: 0x%X", datumIdx);
-	}
-	else
-	{
-		outputCb(StringFlag_None, "# failed to delete object idx: 0x%X", datumIdx);
-	}
-
-	return 0;
-}
-
-static int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	outputCb(StringFlag_None, "# object ids reset next time spawn is used");
-	readObjectIds = false;
-	return 0;
-}
-
-static int CommandCollection::drop(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	cheat_drop_tag_name(tokens[1].c_str());
-	return 0;
-}
-
 static int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
@@ -817,78 +699,9 @@ static int CommandCollection::InjectTagCmd(const std::vector<std::string>& token
 	return 0;
 }
 
-static int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	int* test = nullptr;
-#pragma warning( push )
-#pragma warning( disable : 6011 )
-	return *test++;
-#pragma warning( pop )
-}
-
 //////////////////////////////////////////////////////////////////////////
 //	commands end
 //////////////////////////////////////////////////////////////////////////
-
-static void CommandCollection::DeleteObject(datum objectDatumIdx)
-{
-	if (objectDatumIdx != NONE)
-	{
-		object_delete(objectDatumIdx);
-	}
-}
-
-static int CommandCollection::map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	main_game_launch(tokens[1].c_str());
-	return 0;
-}
-
-static int CommandCollection::game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	int difficulty;
-	std::string exception;
-	ComVar(&difficulty).SetFromStr(tokens[1], 0, exception);
-
-	main_game_launch_set_difficulty((int16)difficulty);
-	return 0;
-}
-
-static int CommandCollection::game_coop_players(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	int player_count;
-	std::string exception;
-	ComVar(&player_count).SetFromStr(tokens[1], 0, exception);
-
-	main_game_launch_set_coop_player_count(player_count);
-	return 0;
-}
-
-static int CommandCollection::game_multiplayer(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	main_game_launch_set_multiplayer_variant(tokens[1].c_str());
-	return 0;
-}
-
-static int CommandCollection::game_splitscreen(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	int player_count;
-	std::string exception;
-	ComVar(&player_count).SetFromStr(tokens[1], 0, exception);
-
-	main_game_launch_set_multiplayer_splitscreen_count(player_count);
-	return 0;
-}
-
-static int CommandCollection::game_mode(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	int game_mode;
-	std::string exception;
-	ComVar(&game_mode).SetFromStr(tokens[1], 0, exception);
-
-	main_game_launch_set_game_mode(game_mode);
-	return 0;
-}
 
 static int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
@@ -972,13 +785,6 @@ static int CommandCollection::quit(const std::vector<std::string>& tokens, Conso
 	return 0;
 }
 
-static int CommandCollection::_screenshot_cubemap(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	ImGuiHandler::ToggleWindow("console");	// Close the console window so it doesn't appear in the cubemap screenshot
-	screenshot_cubemap(tokens[1].c_str());
-	return 0;
-}
-
 static int CommandCollection::SetAddressLANIpv4(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
@@ -1043,200 +849,6 @@ static int CommandCollection::SetPortNumber(const std::vector<std::string>& toke
 
 	return 0;
 }
-
-#ifdef OBJECT_DEBUG
-static int CommandCollection::_objects_dump_memory(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	objects_dump_memory();
-	return 0;
-}
-#endif
-
-#ifdef EVENTS_ENABLED
-static int CommandCollection::net_event_display_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	int32 level;
-	ComVar(&level).SetFromStr(tokens[2]);
-	network_event_display_category(tokens[1].c_str(), (e_event_level)level);
-	return 0;
-}
-
-static int CommandCollection::net_event_log_category_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	int32 level;
-	ComVar(&level).SetFromStr(tokens[2]);
-	network_event_log_category(tokens[1].c_str(), (e_event_level)level);
-	return 0;
-}
-
-static int CommandCollection::net_event_list_categories_evaluate(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	network_event_dump_categories(tokens[1].c_str());
-	return 0;
-}
-#endif
-
-#ifdef UI_DEBUG
-static int CommandCollection::ui_debug_load_main_menu(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	user_interface_debug_load_main_menu();
-	return 0;
-}
-
-static int CommandCollection::ui_debug_text_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	bool value;
-
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	std::string exception;
-	if (!ComVar(&value).SetFromStr(tokens[1], exception))
-	{
-		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "\t%s", exception.c_str());
-		return 0;
-	}
-
-	user_interface_debug_text_bounds(value);
-	return 0;
-}
-
-static int CommandCollection::ui_debug_show_title_safe_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	bool value;
-
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	std::string exception;
-	if (!ComVar(&value).SetFromStr(tokens[1], exception))
-	{
-		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "\t%s", exception.c_str());
-		return 0;
-	}
-
-	debug_render_title_safe_bounds(value);
-	return 0;
-}
-
-static int CommandCollection::ui_debug_element_bounds(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	bool value;
-
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	std::string exception;
-	if (!ComVar(&value).SetFromStr(tokens[1], exception))
-	{
-		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "\t%s", exception.c_str());
-		return 0;
-	}
-
-	set_debug_frame_element_bounds(value);
-	return 0;
-}
-
-static int CommandCollection::ui_transition_out_console_window(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	user_interface_test_transition_out_console_screen();
-	return 0;
-}
-
-static int CommandCollection::ui_set_beta(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	bool value;
-
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	std::string exception;
-	if (!ComVar(&value).SetFromStr(tokens[1], exception))
-	{
-		outputCb(StringFlag_None, command_error_bad_arg);
-		outputCb(StringFlag_None, "\t%s", exception.c_str());
-		return 0;
-	}
-
-	debug_set_ui_beta(value);
-	return 0;
-}
-
-static int CommandCollection::ui_test_error_ok(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	int32 error_id;
-	std::string exception;
-	ComVar(&error_id).SetFromStr(tokens[1], 0, exception);
-
-	user_interface_test_error_ok((int16)error_id);
-	return 0;
-}
-
-static int CommandCollection::ui_test_error_ok_cancel(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	int32 error_id;
-	std::string exception;
-	ComVar(&error_id).SetFromStr(tokens[1], 0, exception);
-
-	user_interface_test_error_ok_cancel((int16)error_id);
-	return 0;
-}
-
-static int CommandCollection::ui_test_confirmation(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
-{
-	TextOutputCb* outputCb = ctx.outputCb;
-	if (shell_is_dedicated_server()) {
-		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
-		return 0;
-	}
-
-	int32 error_id;
-	std::string exception;
-	ComVar(&error_id).SetFromStr(tokens[1], 0, exception);
-
-	user_interface_test_confirmation((int16)error_id);
-	return 0;
-}
-#endif
 
 TEST_N_DEF(CC4);
 

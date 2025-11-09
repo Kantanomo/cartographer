@@ -41,3 +41,5 @@ bool main_time_halted(void);
 bool __cdecl main_time_should_reset(void);
 
 int32 __cdecl main_time_get_tickrate(void);
+
+void main_time_frame_rate_display(void);

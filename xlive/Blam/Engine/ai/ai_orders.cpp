@@ -39,13 +39,12 @@ bool trigger_verify_script_references(trigger_definition* trigger, bool suppress
 
 static void orders_verify_script_indices(const char* script_name, int16 script_index)
 {
-	/*
 	vassert(
 		script_index == NONE || script_index == hs_find_script_by_name(script_name),
 		"script '%s'(%d) doesn't match actual script index '%d'",
 		script_name,
 		script_index,
 		hs_find_script_by_name(script_name)
-	);*/
+	);
 	return;
 }

@@ -2,6 +2,7 @@
 #include "render.h"
 
 #include "render_contrails.h"
+#include "render_debug.h"
 #include "render_first_person.h"
 #include "render_lights.h"
 #include "render_primitive.h"
@@ -19,8 +20,10 @@
 #include "game/game_engine.h"
 #include "game/players.h"
 #include "interface/hud.h"
+#include "interface/terminal.h"
 #include "interface/user_interface.h"
 #include "math/color_math.h"
+#include "main/main_time.h"
 #include "objects/lights.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "rasterizer/dx9/rasterizer_dx9_decals.h"
@@ -105,6 +108,10 @@ void render_apply_patches(void)
 {
 	PatchCall(Memory::GetAddress(0x19224A), render_window);
 	PatchCall(Memory::GetAddress(0x19DA7C), render_window);
+#ifdef TERMINAL_ENABLED
+	PatchCall(Memory::GetAddress(0x190E3B), terminal_draw);
+	PatchCall(Memory::GetAddress(0x190E45), main_time_frame_rate_display);
+#endif
 	return;
 }
 
@@ -852,6 +859,7 @@ void render_view(
 
 #ifndef NDEBUG
 			rasterizer_dx9_perf_event_begin("debug", NULL);
+			render_debug();
 			rasterizer_dx9_perf_event_end("debug");
 #endif
 
