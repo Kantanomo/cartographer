@@ -231,12 +231,6 @@ static void setup_game_options_text(const wchar_t* reports_path)
 		case _game_mode_ui_shell:
 			fwprintf(file, L"Main Menu");
 			break;
-		case _game_mode_mutiplayer_shared:
-			fwprintf(file, L"Shared");
-			break;
-		case _game_mode_single_player_shared:
-			fwprintf(file, L"Singleplayer Shared");
-			break;
 		default:
 			fwprintf(file, L"None");
 			break;
@@ -285,7 +279,7 @@ static void setup_game_options_text(const wchar_t* reports_path)
 		fwprintf(file, L"Is Custom Map: ");
 		print_bool_to_file(file, game_options->is_custom_map);
 
-		fwprintf(file, L"Custom Map Name: %ls\n", game_options->custom_map_name);
+		fwprintf(file, L"Custom Map Name: %ls\n", game_options->custom_map_id.map_name);
 
 		fwprintf(file, L"Campaign ID: ");
 		fwprintf(file, L"%d\n", game_options->campaign_id);

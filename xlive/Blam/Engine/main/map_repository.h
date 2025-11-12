@@ -1,9 +1,7 @@
 #pragma once
+#include "map_manager.h"
 
-#define k_max_map_name_size 32
 #define k_map_file_path_size (255 + 1)
-
-#define k_sha256_hash_size 32
 
 #define k_maximum_number_of_custom_multiplayer_maps_default 50u
 
@@ -23,18 +21,11 @@ enum e_directory_id
 	_custom_map_data_dir = 7
 };
 
-struct s_custom_map_id
-{
-	wchar_t map_name[k_max_map_name_size];
-	BYTE map_sha256_hash[k_sha256_hash_size];
-};
-static_assert(sizeof(s_custom_map_id) == k_sha256_hash_size + sizeof(wchar_t) * k_max_map_name_size);
-
 #pragma pack(push, 4)
 struct s_custom_map_entry
 {
-	BYTE map_sha256_hash[k_sha256_hash_size];
-	wchar_t map_name[k_max_map_name_size]; // actually the name displayed
+	BYTE hash[k_sha256_hash_size_bytes];
+	wchar_t map_name[k_custom_map_name_length]; // actually the name displayed
 	wchar_t field_60[9][128];
 	// one header might have the compressed thumbnail, and the other the uncompressed one
 	uint8* preview_bitmap_header[2]; 
@@ -122,13 +113,13 @@ public:
 	// and removes custom maps cached entries that are not present anymore in the folder
 	void __thiscall start_map_synchronize();
 
-	uint32 __thiscall get_custom_map_list_ids(s_custom_map_id* out_ids, uint32 out_ids_count);
-	uint32 __thiscall get_custom_map_list_ids_by_map_name(const wchar_t* map_name, s_custom_map_id* out_ids, uint32 out_ids_count);
+	uint32 __thiscall get_custom_map_list_ids(s_secure_map_id* out_ids, uint32 out_ids_count);
+	uint32 __thiscall get_custom_map_list_ids_by_map_name(const wchar_t* map_name, s_secure_map_id* out_ids, uint32 out_ids_count);
 	uint32 __thiscall find_matching_entries_by_file_path(const wchar_t* file_path, s_custom_map_entry** out_custom_map_entries, uint32 out_custom_map_entries_count);
 	uint32 __thiscall find_matching_entries_by_sha256_hash(const BYTE* hash, s_custom_map_entry** out_custom_map_entries, uint32 out_custom_map_entries_count);
 	uint32 __thiscall find_matching_entries_by_map_name_and_hash(const wchar_t* map_name, const BYTE* sha256_hash, s_custom_map_entry** out_custom_map_entries, uint32 out_custom_map_entries_count);
 	uint32 __thiscall find_matching_entries_by_map_name(const wchar_t* map_name, s_custom_map_entry** out_custom_map_entries, uint32 out_custom_map_entries_count);
-	bool __thiscall get_entry_by_id(const s_custom_map_id* custom_map_id, s_custom_map_entry** out_entry);
+	bool __thiscall get_entry_by_id(const s_secure_map_id* custom_map_id, s_custom_map_entry** out_entry);
 
 	bool __thiscall entry_is_duplicate(const s_custom_map_entry* entry);
 	bool __thiscall validate_entry_data(const s_custom_map_entry* entry, uint32 count);

@@ -1173,7 +1173,9 @@
     <ClInclude Include="Blam\Engine\items\items.h" />
     <ClInclude Include="Blam\Engine\items\weapons.h" />
     <ClInclude Include="Blam\Engine\main\main_time.h" />
+    <ClInclude Include="Blam\Engine\main\map_manager.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
+    <ClInclude Include="Blam\Engine\math\crypto_windows.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\math\matrix_math.h" />
     <ClInclude Include="Blam\Engine\math\periodic_functions.h" />

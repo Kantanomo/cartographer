@@ -1,4 +1,5 @@
 #pragma once
+#include "main/map_manager.h"
 
 /*
 * Class used to define a map download query
@@ -20,7 +21,7 @@ public:
 	bool ShouldStopDownload();
 	void StopDownload();
 
-	wchar_t m_clientMapFilenameWide[32];
+	wchar_t m_clientMapFilenameWide[k_custom_map_name_length];
 	std::atomic<bool> m_downloadFinished = false;
 	std::atomic<bool> m_readyToDownload = false;
 

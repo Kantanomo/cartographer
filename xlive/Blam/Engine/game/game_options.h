@@ -1,29 +1,34 @@
 #pragma once
 #include "game/player_constants.h"
+#include "main/map_manager.h"
 #include "networking/session/network_session.h"
 #include "saved_games/game_variant.h"
 #include "simulation/machine_id.h"
 
+/* enums */
+
 enum e_game_simulation : int8
 {
 	_game_simulation_none = 0,
-	_game_simulation_local = 1,
-	_game_simulation_synchronous_client = 2,
-	_game_simulation_synchronous_server = 3,
-	_game_simulation_distributed_client = 4,
-	_game_simulation_distributed_server = 5,
+	_game_simulation_local,
+	_game_simulation_synchronous_client,
+	_game_simulation_synchronous_server,
+	_game_simulation_distributed_client,
+	_game_simulation_distributed_server,
 	k_game_simulation_count,
 };
 
 enum e_game_mode : int32
 {
-	_game_mode_campaign = 1,
-	_game_mode_multiplayer = 2,
-	_game_mode_ui_shell = 3,
-	_game_mode_mutiplayer_shared = 4,
-	_game_mode_single_player_shared = 5,
+	_game_mode_none = 0,
+	_game_mode_campaign,
+	_game_mode_multiplayer,
+	_game_mode_ui_shell,
+	_game_mode_tool,
 	k_game_mode_count
 };
+
+/* structures */
 
 #pragma pack(push, 1)
 struct game_player_options
@@ -54,7 +59,7 @@ struct s_game_options
 	int32 random_seed;
 	bool is_custom_map;
 	uint8 field_1D;
-	wchar_t custom_map_name[48];
+	s_secure_map_id custom_map_id;
 	int16 pad_7E;
 	int32 campaign_id;						// This should always be 1, since there can be multiple "camapaigns". However, this isn't taken advantage of in the retail game 
 	int32 map_id;
@@ -81,6 +86,8 @@ struct s_game_options
 	game_player_options players[k_maximum_players]; 
 };
 ASSERT_STRUCT_SIZE(s_game_options, 4488);
+
+/* prototypes */
 
 // Initializes game options
 void __cdecl game_options_new(s_game_options* game_options);
