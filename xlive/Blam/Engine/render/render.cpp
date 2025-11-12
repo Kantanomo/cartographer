@@ -235,6 +235,12 @@ void render_scene_geometry(e_collection_type collection_type, e_render_layer ren
 	return;
 }
 
+void render_frame_present(bitmap_data* bitmap)
+{
+	rasterizer_dx9_present(bitmap, false);
+	return;
+}
+
 void __cdecl render_frame(
 	uint32 frame_render_type,
 	int32 window_count,

@@ -1,7 +1,6 @@
 #pragma once
 #include "rasterizer_globals.h"
 
-#include "bitmaps/bitmap_group.h"
 #include "math/color_math.h"
 
 /* structures */
@@ -89,7 +88,7 @@ struct s_rasterizer_debug_options
 	bool field_119;
 	bool transparent_pixel_counter;
 	int32 render_layer_view_5;
-	bitmap_data* rasterizer_debug_display_bitmap;
+	struct bitmap_data* rasterizer_debug_display_bitmap;
 	int16 pad4;
 	bool shaders_enabled;
 	bool karma_events;
@@ -208,10 +207,8 @@ ASSERT_STRUCT_SIZE(s_rasterizer_debug_options, 736);
 
 void rasterizer_main_apply_patches(void);
 
-s_rasterizer_debug_options* rasterizer_debug_options_get(void);
+struct s_rasterizer_debug_options* rasterizer_debug_options_get(void);
 
-void rasterizer_present_frame_wrapper(bitmap_data* bitmap);
-
-void rasterizer_present_frame_screenshot_wrapper(bitmap_data* bitmap);
+void rasterizer_present_frame_screenshot_wrapper(struct bitmap_data* bitmap);
 
 e_display_type rasterizer_get_display_type(void);

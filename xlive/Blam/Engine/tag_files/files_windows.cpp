@@ -51,7 +51,7 @@ bool __cdecl file_read(s_file_reference* file_reference, uint32 bytes_to_read, b
 	return INVOKE(0x63C60, 0x65F3C, file_read, file_reference, bytes_to_read, suppress_errors, data_buffer);
 }
 
-bool __cdecl file_write(s_file_reference* file_reference, uint32 data_size, void* data)
+bool __cdecl file_write(s_file_reference* file_reference, uint32 data_size, const void* data)
 {
 	return INVOKE(0x63CBC, 0x65F98, file_write, file_reference, data_size, data);
 }

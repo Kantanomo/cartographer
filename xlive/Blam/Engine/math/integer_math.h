@@ -51,7 +51,6 @@ inline rectangle2d* set_rectangle2d(rectangle2d* rectangle, int16 x0, int16 y0, 
 inline rectangle2d* offset_rectangle2d(rectangle2d* rectangle, int16 dx, int16 dy)
 {
 	rectangle->left += dx;
-	rectangle->left += dx;
 	rectangle->right += dx;
 	rectangle->top += dy;
 	rectangle->bottom += dy;

@@ -71,7 +71,7 @@ On failure, if hide_errors_from_user is set to false an error is displayed to th
 bool __cdecl file_read(s_file_reference* file_reference, uint32 bytes_to_read, bool suppress_errors, void* data_buffer);
 
 /* Returns success */
-bool __cdecl file_write(s_file_reference* file_reference, uint32 data_size, void* data);
+bool __cdecl file_write(s_file_reference* file_reference, uint32 data_size, const void* data);
 
 /* */
 bool __cdecl file_get_size(s_file_reference* file_reference, uint32* size);

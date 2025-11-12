@@ -139,27 +139,30 @@ static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET "
 #ifdef ASSERTS_ENABLED
 
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, FILE, LINE, IS_EXCEPTION)	\
-display_assert(STATEMENT, FILE, LINE, IS_EXCEPTION);			\
-if (is_debugger_present())												\
-	__debugbreak();														\
-else if (!g_catch_exceptions)											\
-	exit(-1);															\
-(void)0
+do																		\
+{																		\
+	display_assert(STATEMENT, FILE, LINE, IS_EXCEPTION);				\
+	if (is_debugger_present())											\
+		__debugbreak();													\
+	else if (!g_catch_exceptions)										\
+		exit(-1);														\
+}																		\
+while(0)
 
-#define DISPLAY_ASSERT(STATEMENT)			\
-DISPLAY_ASSERT_EXCEPTION(STATEMENT, __FILE__, __LINE__, true);	\
-(void)0
+#define DISPLAY_ASSERT(STATEMENT) DISPLAY_ASSERT_EXCEPTION(STATEMENT, __FILE__, __LINE__, true)
 
-#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)							\
-if (!(STATEMENT))															\
-{																			\
-	DISPLAY_ASSERT_EXCEPTION(#STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);	\
-}																			\
-(void)0
 
-#define ASSERT(STATEMENT)			\
-ASSERT_EXCEPTION(STATEMENT, true);	\
-(void)0
+#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)								\
+do																				\
+{																				\
+	if (!(STATEMENT))															\
+	{																			\
+		DISPLAY_ASSERT_EXCEPTION(#STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);	\
+	}																			\
+}																				\
+while(0)
+
+#define ASSERT(STATEMENT) ASSERT_EXCEPTION(STATEMENT, true)
 
 #define assert_return(pointer) assert_return_internal(pointer, #pointer, __FILE__, __LINE__)
 

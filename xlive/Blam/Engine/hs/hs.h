@@ -310,10 +310,6 @@ extern int32 g_error_buffer_length;
 #define HS_GLOBAL_EXTERNAL_GET(index) hs_global_external_get((index))
 #define HS_GLOBAL_INTERNAL_GET(index) (TAG_BLOCK_GET_ELEMENT((&(global_scenario_get()->hs_globals)), (index), hs_global_internal))
 
-#define HS_GLOBAL_EXTERNAL_GET_VERIFY(index) assert_return(HS_GLOBAL_EXTERNAL_GET(HS_GLOBAL_INDEX(index)))
-
-#define HS_GLOBAL_INTERNAL_GET_VERIFY(index) assert_return(HS_GLOBAL_INTERNAL_GET(HS_GLOBAL_INDEX((index))))
-
 #define hs_type_valid(type) ((type) >= FIRST_HS_TYPE && (type) < NUMBER_OF_HS_NODE_TYPES)
 
 #define HS_TYPE_IS_ENUM(type) IN_RANGE((type), FIRST_HS_ENUM_TYPE, NOT_LAST_HS_ENUM_TYPE)
@@ -334,35 +330,47 @@ void __cdecl hs_update(void);
 
 #ifdef HS_COMPILER_ENABLED
 
+// Takes in a hs expression and compiles the expression into a series of hs syntax nodes
 bool hs_compile_and_evaluate(const char* expression, bool interactive);
 
+// Print out an error in the hs statement after attempting to compile it into hs syntax nodes
 void hs_compile_source_error(const char* file_name, const char* error_message, char* error_source, const char* source);
 
 // Takes a function name and prints out the respective description to the console
 void hs_help(const char* function_name);
 
+// Rebuild hs from source
 bool hs_rebuild_and_compile(char* error, int32 length);
+
 #endif
 
 // Performs garbage collection on halo script nodes
 void hs_node_gc(void);
 
+// Get a function definition from an index passed
 const struct hs_function_definition* hs_function_get(int16 function_index);
 
+// Find the script index given a specific script name
 int16 hs_find_script_by_name(const char* name);
 
+// Get a hs global from an index
 const struct hs_global_external* hs_global_external_get(int16 global_index);
 
+// Get the hs type of a 
 int16 hs_global_get_type(int16 designator);
 
 #ifdef HS_COMPILER_ENABLED
 
+// Given a hs global designator we return the name of a global
 const char* hs_global_get_name(int16 designator);
 
+// Given a hs global name we return an index to the global
 int16 hs_find_global_by_name(const char* name);
 
+// Given a hs function name and the parameter count for that function we return an index to the function
 int16 hs_find_function_by_name(const char* name, int16 count);
 
+// Given a substring, return the number and a list of autocomplete results
 int16 hs_tokens_enumerate(const char* substring, int32 type_flags, const char** results, int16 maximum_count);
 
 #endif

@@ -170,7 +170,7 @@ void __cdecl render_screen_flash(int32 player_index, s_screen_flash* screen_flas
 
     // TODO: rewrite
     
-#ifdef CONSOLE_ENABLED
+#ifdef TERMINAL_ENABLED
     if (!console_is_active())
 #endif
     {

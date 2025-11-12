@@ -5,28 +5,19 @@ template<typename t_storage_type, size_t k_count>
 class c_static_array
 {
 public:
+	size_t get_count(void) const { return k_count; }
+	bool valid(int32 index) const { return index < k_count; }
+
 	const t_storage_type& operator[](int32 index) const
 	{
 		ASSERT(valid(index));
-
 		return m_storage[index];
 	}
 
 	t_storage_type& operator[](int32 index)
 	{
 		ASSERT(valid(index));
-
 		return m_storage[index];
-	}
-
-	/*t_storage_type* operator &()
-	{
-		return m_storage;
-	}*/
-
-	bool valid(int32 index) const
-	{
-		return index < k_count;
 	}
 
 protected:
@@ -34,31 +25,15 @@ protected:
 };
 
 template<typename t_type, size_t k_maximum_count>
-class c_static_array_tracked
+class c_static_stack
 {
 public:
-	void clear(void)
-	{
-		m_count = 0;
-		csmemset(m_data, 0, sizeof(t_type) * k_maximum_count);
-		return;
-	}
-	
-	bool valid(void) const
-	{
-		return m_count <= k_count;
-	}
-
-	bool full(void)
-	{
-		ASSERT(valid());
-		return m_count == k_maximum_count;
-	}
-	
-	bool empty(void)
-	{
-		return m_count == 0;
-	}
+	c_static_stack(void) : m_count(0) {}
+	bool valid(void) const { return m_count <= k_maximum_count; }
+	void push(void) { ASSERT(!full()); m_count++; }
+	bool full(void) const { ASSERT(valid()); return m_count == k_maximum_count; }
+	bool empty(void) const { return m_count == 0; }
+	int32 top(void) const { ASSERT(!empty()); return m_count - 1; }
 
 	uint32 get_total_size(void)
 	{
@@ -75,13 +50,25 @@ public:
 		return m_count;
 	}
 	
-	t_type* operator[](uint32 index)
+	const t_type& operator[](int32 index) const
 	{
-		ASSERT(index < k_maximum_count);
-		return &m_data[index];
+		ASSERT(VALID_INDEX(index, k_maximum_count));
+		return m_data[index];
 	}
+
+	t_type& operator[](int32 index)
+	{
+		ASSERT(VALID_INDEX(index, k_maximum_count));
+		return m_data[index];
+	}
+
+	t_type* get_top(void)
+	{
+		return &this->operator[](top());
+	}
+
 protected:
-	uint32 m_count = 0;
+	int32 m_count;
 	t_type m_data[k_maximum_count];
 };
 

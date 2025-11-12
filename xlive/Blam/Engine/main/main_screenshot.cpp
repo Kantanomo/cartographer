@@ -217,7 +217,7 @@ bool __cdecl screenshot_render(window_bound* window)
 				bitmap_1->base_address &&
 				(!screenshot_globals->web_map || bitmap_secondary))
 			{
-#ifdef CONSOLE_ENABLED
+#ifdef TERMINAL_ENABLED
 				console_clear();
 				console_close();
 #endif
@@ -349,7 +349,7 @@ bool __cdecl screenshot_render(window_bound* window)
 						if (should_render_frame)
 						{
 							render_frame(frame_render_type, 1, 1, 0, window);
-							rasterizer_present_frame_wrapper(bitmap_0);
+							render_frame_present(bitmap_0);
 							if (screenshot_globals->web_map)
 							{
 								rasterizer_present_frame_screenshot_wrapper(bitmap_secondary);
@@ -564,7 +564,7 @@ static bool render_bloom_screenshot(int16 width, int16 height, window_bound* win
 		{
 			result = true;
 			render_frame(6, 1, 1, 0, window_bound);
-			rasterizer_present_frame_wrapper(screenshot_globals->bloom_bitmap);
+			render_frame_present(screenshot_globals->bloom_bitmap);
 		}
 	}
 

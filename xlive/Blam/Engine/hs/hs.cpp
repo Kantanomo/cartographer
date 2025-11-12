@@ -348,6 +348,7 @@ static void hs_get_function_parameters_string(int16 function_index, char* buffer
 
 #ifdef HS_COMPILER_ENABLED
 
+// Array of functions that enumerates through all instances of a specific type and adds autocomplete results to the terminal
 static void(*hs_token_enumerators[])(void) =
 {
 	&hs_enumerate_special_form_names,
@@ -450,8 +451,9 @@ bool hs_compile_and_evaluate(const char* expression, bool interactive)
 {
 	bool result = false;
 
-	char string[1024];
 	random_seed_allow_use();
+	
+	char string[1024];
 	csstrncpy(string, expression, NUMBEROF(string));
 	csstrnlwr(string, NUMBEROF(string));
 	if (strchr(string, ';'))
@@ -750,11 +752,12 @@ int16 hs_global_get_type(int16 designator)
 	int16 result;
 	if (designator < 0)
 	{
-		result = HS_GLOBAL_EXTERNAL_GET_VERIFY(designator)->type;
+		
+		result = assert_return(HS_GLOBAL_EXTERNAL_GET(HS_GLOBAL_INDEX(designator)))->type;
 	}
 	else
 	{
-		result = (int16)HS_GLOBAL_INTERNAL_GET_VERIFY(designator)->script_type;
+		result = (int16)assert_return(HS_GLOBAL_INTERNAL_GET(HS_GLOBAL_INDEX((designator))))->script_type;
 	}
 	return result;
 }
@@ -766,11 +769,11 @@ const char* hs_global_get_name(int16 designator)
 	const char* result;
 	if (designator < 0)
 	{
-		result = HS_GLOBAL_EXTERNAL_GET_VERIFY(designator)->name;
+		result = assert_return(HS_GLOBAL_EXTERNAL_GET(HS_GLOBAL_INDEX(designator)))->name;
 	}
 	else
 	{
-		result = HS_GLOBAL_INTERNAL_GET_VERIFY(designator)->name;
+		result = assert_return(HS_GLOBAL_INTERNAL_GET(HS_GLOBAL_INDEX((designator))))->name;
 	}
 	return result;
 }
@@ -779,13 +782,34 @@ const char* hs_global_get_name(int16 designator)
 int16 hs_find_global_by_name(const char* name)
 {
 	int16 result = NONE;
-	for (int16 i = 0; i < k_hs_external_global_count; ++i)
+	bool global_found = false;
+
+	for (int16 global_index = 0; global_index < k_hs_external_global_count; ++global_index)
 	{
-		const hs_global_external* global = HS_GLOBAL_EXTERNAL_GET_VERIFY(i);
+		const hs_global_external* global = assert_return(HS_GLOBAL_EXTERNAL_GET(HS_GLOBAL_INDEX(global_index)));
 		if (!csstricmp(name, global->name))
 		{
-			result = HS_GLOBAL_INDEX(i) | 0x8000;
+			result = HS_GLOBAL_INDEX(global_index) | MASK(SHORT_BITS);
+			global_found = true;
 			break;
+		}
+	}
+
+	// If we don't find an external global start looking through the internal globals
+	if (!global_found)
+	{
+		if (global_scenario_index_get() != NONE)
+		{
+			for (int16 global_index = 0; global_index < k_hs_external_global_count; ++global_index)
+			{
+				const hs_global_internal* global = assert_return(HS_GLOBAL_INTERNAL_GET(global_index));
+				if (!csstricmp(name, global->name))
+				{
+					result = HS_GLOBAL_INDEX(global_index) | MASK(SHORT_BITS);
+					global_found = true;
+					break;
+				}
+			}
 		}
 	}
 	return result;
@@ -819,6 +843,7 @@ int16 hs_tokens_enumerate(const char* substring, int32 type_flags, const char** 
 	enumeration_results = results;
 	enumeration_substring = substring ? substring : "";
 	
+	// Go through every token enumerator and get our autocomplete results
 	for (int32 type_index = 0; type_index < NUMBEROF(hs_token_enumerators); ++type_index)
 	{
 		ASSERT(hs_token_enumerators[type_index]);
@@ -828,8 +853,9 @@ int16 hs_tokens_enumerate(const char* substring, int32 type_flags, const char** 
 		}
 	}
 
+	// Sort the enumeration results
 	qsort_4byte(results, enumeration_count, sort_by_found_index, 0);
-	enumeration_results = 0;
+	enumeration_results = NULL;
 	return enumeration_count;
 }
 

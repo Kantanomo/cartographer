@@ -24,6 +24,8 @@ enum
 	k_begin_random_max_arguments = 32
 };
 
+static const char whitespace_characters[2] = { ' ', '\t' };
+
 /* enums */
 
 enum e_skip_whitespace_state
@@ -154,9 +156,7 @@ static bool hs_parse_tag_block_element(int32 expression_index, int32 offset, int
 
 static bool hs_parse_tag_block_element_string_id(int32 expression_index, int32 offset, int32 tag_index, s_tag_block* block, int32 element_size);
 
-/* constants */
-
-static const char whitespace_characters[2] = { ' ', '\t' };
+/* globals */
 
 static bool (*hs_type_primitive_parsers[NUMBER_OF_HS_NODE_TYPES])(int32) =
 {
@@ -223,8 +223,6 @@ static bool (*hs_type_primitive_parsers[NUMBER_OF_HS_NODE_TYPES])(int32) =
 	hs_parse_object_name,
 	hs_parse_object_name
 };
-
-/* globals */
 
 static s_hs_compile_globals hs_compile_globals;
 
@@ -364,6 +362,7 @@ int32 hs_compile_expression(int32 source_size, const char* source_data, const ch
 
 void hs_compile_source(bool fail_on_error)
 {
+	// TODO: reimplement
 	return;
 }
 

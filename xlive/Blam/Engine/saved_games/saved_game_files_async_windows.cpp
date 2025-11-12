@@ -164,7 +164,7 @@ static bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_i
 		// largest structure that can be stored in the default save files static_array is.
 		if (abs_index <= last_index && buffer_size <= sizeof(s_saved_game_player_profile))
 		{
-			csmemcpy(buffer, saved_game_globals->default_save_files[abs_index]->buffer, buffer_size);
+			csmemcpy(buffer, saved_game_globals->default_save_files[abs_index].buffer, buffer_size);
 			in_out_completion->unk_2 = true;
 			in_out_completion->unk_4 = 0;
 			in_out_completion->completed = true;

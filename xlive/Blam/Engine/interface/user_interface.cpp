@@ -417,9 +417,9 @@ uint32 __cdecl user_interface_milliseconds(void)
 	return INVOKE(0x2096AE, 0x0, user_interface_milliseconds);
 }
 
-c_user_interface_channel* __fastcall user_interface_get_channel(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index)
+c_user_interface_channel* __fastcall user_interface_get_channel(e_user_interface_render_window window_index, e_user_interface_channel_type channel_index)
 {
-	return INVOKE(0x209957, 0x0, user_interface_get_channel, channel_index, window_index);
+	return INVOKE(0x209957, 0x0, user_interface_get_channel, window_index, channel_index);
 }
 
 bool __cdecl user_interface_error_display_allowed(void)
@@ -574,35 +574,35 @@ void user_interface_show_current_screen_tag(const char* path)
 	char destination[128];
 	csstrncpy(destination, path, NUMBEROF(destination));
 	
-	e_user_interface_render_window window_index = (e_user_interface_render_window)NONE;
+	e_user_interface_channel_type ui_channel = (e_user_interface_channel_type)NONE;
 	if (!csstrcmp(destination, "hardware") || !csstrcmp(destination, "hardware_error") || !csstrcmp(destination, ""))
 	{
-		window_index = _window_0;
+		ui_channel = _user_interface_channel_type_hardware_error;
 	}
 	else if (!csstrcmp(destination, "error") || !csstrcmp(destination, "game_error") || !csstrcmp(destination, "1"))
 	{
-		window_index = _window_1;
+		ui_channel = _user_interface_channel_type_game_error;
 	}
 	else if (!csstrcmp(destination, "keyboard") || !csstrcmp(destination, "virtual_keyboard") || !csstrcmp(destination, "2"))
 	{
-		window_index = _window_2;
+		ui_channel = _user_interface_channel_type_virtual_keyboard;
 	}
 	else if (!csstrcmp(destination, "dialog") || !csstrcmp(destination, "gameshell_dialog") || !csstrcmp(destination, "3"))
 	{
-		window_index = _window_3;
+		ui_channel = _user_interface_channel_type_gameshell_dialog;
 	}
 	else if (!csstrcmp(destination, "screen") || !csstrcmp(destination, "gameshell_screen") || !csstrcmp(destination, "5"))
 	{
-		window_index = _window_5;
+		ui_channel = _user_interface_channel_type_gameshell_screen;
 	}
 	else if (!csstrcmp(destination, "background") || !csstrcmp(destination, "gameshell_background") || !csstrcmp(destination, "6"))
 	{
-		window_index = _window_6;
+		ui_channel = _user_interface_channel_type_gameshell_background;
 	}
 
-	if (window_index != NONE)
+	if (ui_channel != NONE)
 	{
-		c_user_interface_channel* channel = user_interface_get_channel(_user_interface_channel_type_gameshell_dialog_history, window_index);
+		c_user_interface_channel* channel = user_interface_get_channel(_window_4, ui_channel);
 		if (channel)
 		{
 			c_screen_widget* screen = channel->incoming_screen_get();
@@ -611,7 +611,7 @@ void user_interface_show_current_screen_tag(const char* path)
 				const e_user_interface_screen_id screen_id = screen->screen_id_get();
 				if (screen_id == _screen_none)
 				{
-					console_printf("%d: current_id: %d", window_index, NONE);
+					console_printf("%d: current_id: %d", ui_channel, NONE);
 				}
 				else
 				{
@@ -622,7 +622,7 @@ void user_interface_show_current_screen_tag(const char* path)
 					}
 					else
 					{
-						console_printf("%d: %s", window_index, tag_get_name(tag_index));
+						console_printf("%d: %s", ui_channel, tag_get_name(tag_index));
 					}
 				}
 			}
@@ -725,7 +725,7 @@ static s_user_interface_globals* user_interface_globals_get(void)
 
 static const char* user_interface_error_codes_get_name(e_ui_error_types error_code)
 {
-	ASSERT(IN_RANGE(error_code, _ui_error_unknown, k_last_ui_error_code));
+	ASSERT(VALID_INDEX(error_code, k_last_ui_error_code));
 	ASSERT(table[error_code].error_code == error_code);
 	return table[error_code].string;
 }

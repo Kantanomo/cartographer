@@ -329,11 +329,7 @@ enum e_user_interface_render_window
 	_window_3,
 	_window_4,
 	_last_render_window = _window_4,
-
-	_window_5,
-	_window_6,
-
-	k_number_of_render_windows = _last_render_window + 1
+	k_number_of_render_windows,
 };
 
 /* typedefs */
@@ -404,7 +400,7 @@ enum e_user_interface_screen_id : uint32;
 bool __cdecl user_interface_automation_is_active(void);
 uint32 __cdecl user_interface_milliseconds(void);
 
-class c_user_interface_channel* __fastcall user_interface_get_channel(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index);
+class c_user_interface_channel* __fastcall user_interface_get_channel(e_user_interface_render_window window_index, e_user_interface_channel_type channel_index);
 
 bool __cdecl user_interface_error_display_allowed(void);
 bool __cdecl user_interface_has_responding_controller(int32 user_index);
