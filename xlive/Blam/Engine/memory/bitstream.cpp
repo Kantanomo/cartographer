@@ -197,7 +197,7 @@ uint64 c_bitstream::read_long_integer(const char* name, int size_in_bits)
 CLASS_HOOK_DECLARE_LABEL(c_bitstream__write_unit_vector, c_bitstream::write_unit_vector);
 void c_bitstream::write_unit_vector(const char* name, const real_vector3d* unit_vector)
 {
-	int32 quantized_vector = quantize_unit_vector(unit_vector);
+	int32 quantized_vector = quantize_unit_vector3d(unit_vector);
 	write_integer("unit-vector", quantized_vector, 19);
 }
 
@@ -225,7 +225,7 @@ void bitstream_serialization_apply_patches()
 	WriteJmpTo(Memory::GetAddress(0xD20F4, 0xCE6AE), jmp_read_unit_vector);
 
 	// write_axes
-	PatchCall(Memory::GetAddress(0xD1DF7, 0xCE3B1), (void*)quantize_unit_vector);
+	PatchCall(Memory::GetAddress(0xD1DF7, 0xCE3B1), (void*)quantize_unit_vector3d);
 	WriteValue(Memory::GetAddress(0xD1E05, 0xCE3BF) + 2, (int32)(1 << 19));
 	WriteValue(Memory::GetAddress(0xD1E0D, 0xCE3C7) + 1, (int32)(1 << 19));
 	WriteValue(Memory::GetAddress(0xD1E2A, 0xCE3E4) + 1, (int8)19);
