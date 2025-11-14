@@ -800,7 +800,8 @@ int16 hs_find_global_by_name(const char* name)
 	{
 		if (global_scenario_index_get() != NONE)
 		{
-			for (int16 global_index = 0; global_index < k_hs_external_global_count; ++global_index)
+			const scenario* scnr = global_scenario_get();
+			for (int16 global_index = 0; global_index < scnr->hs_globals.count; ++global_index)
 			{
 				const hs_global_internal* global = assert_return(HS_GLOBAL_INTERNAL_GET(global_index));
 				if (!csstricmp(name, global->name))
