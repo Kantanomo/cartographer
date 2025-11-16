@@ -1347,6 +1347,7 @@
     <ClCompile Include="Blam\Engine\units\biped_definitions.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
+    <ClCompile Include="Blam\Engine\units\vehicles.cpp" />
     <ClCompile Include="Blam\Engine\units\vehicle_definitions.cpp" />
     <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
     <ClCompile Include="Blam\Engine\widgets\liquid.cpp" />
@@ -2462,6 +2463,7 @@
     <ClInclude Include="Blam\Engine\units\unit_definitions.h" />
     <ClInclude Include="Blam\Engine\units\unit_dialogue.h" />
     <ClInclude Include="Blam\Engine\units\unit_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\units\vehicles.h" />
     <ClInclude Include="Blam\Engine\units\vehicle_definitions.h" />
     <ClInclude Include="Blam\Engine\units\vehicle_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\widgets\cloth.h" />

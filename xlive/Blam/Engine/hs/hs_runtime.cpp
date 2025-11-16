@@ -339,9 +339,7 @@ void hs_thread_main(int32 thread_index)
 		hs_thread_assert(script->script_type != _hs_script_static && script->script_type != _hs_script_stub, "found a static script at toplevel.", thread_index);
 	}
 
-#ifdef ASSERTS_ENABLED
 	const data_array* hs_thread_data = hs_thread_data_get();
-#endif
 	hs_thread_assert(valid_thread(thread), "corrupted stack.", thread_index);
 
 	thread->sleep_until = 0;
@@ -423,10 +421,7 @@ void hs_evaluate(int32 thread_index, int32 expression_index, int32* destination)
 	hs_thread* thread = hs_thread_get(thread_index);
 	hs_syntax_node* node = hs_syntax_get(expression_index);
 
-#ifdef ASSERTS_ENABLED
 	const data_array* hs_thread_data = hs_thread_data_get();
-#endif
-
 	hs_thread_assert(valid_thread(thread), "corrupted stack.", thread_index);
 	ASSERT(destination);
 
@@ -776,9 +771,7 @@ static void* hs_stack_allocate(int32 thread_index, int32 size)
 	const hs_thread* thread = hs_thread_get(thread_index);
 	hs_stack_frame* frame = thread->stack;
 
-#ifdef ASSERTS_ENABLED
 	const data_array* hs_thread_data = hs_thread_data_get();
-#endif
 	hs_thread_assert(valid_thread(thread), "corrupted stack.", thread_index);
 	hs_thread_assert(size, "attempt to allocate zero space from the stack.", thread_index);
 	hs_thread_assert(frame->data + frame->size + size <= thread->stack_data + HS_THREAD_STACK_SIZE, "stack overflow.", thread_index);
@@ -1214,14 +1207,14 @@ static void hs_global_reconcile_write(int16 global_designator)
 			int32 reference;
 			for (int32 i = object_list_get_first(absolute->long_value, &reference); i != NONE; i = object_list_get_next(absolute->long_value, &reference))
 			{
-				object_datum* object = (object_datum*)object_get_and_verify_type(i, NONE);
+				object_datum* object = object_get(i);
 				object->object.flags.set(_object_ever_referenced_by_hs_bit, true);
 			}
 		}
 	}
 	else if (absolute->long_value != NONE)
 	{
-		object_datum* object = (object_datum*)object_get_and_verify_type(absolute->long_value, NONE);
+		object_datum* object = object_get(absolute->long_value);
 		object->object.flags.set(_object_ever_referenced_by_hs_bit, true);
 	}
 	return;

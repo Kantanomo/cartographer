@@ -98,38 +98,41 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password, e_carto
 	if (rtn_code <= 0)
 	{
 		addDebugText("ERROR Account Create: %d", rtn_code);
+
 		// ### TODO FIXME move this handling trash out of here
-		if (rtn_code == 0 
-			|| rtn_code == ERROR_CODE_CURL_SOCKET_FAILED 
-			|| rtn_code == ERROR_CODE_CURL_HANDLE 
-			|| rtn_code == ERROR_CODE_CURL_EASY_PERF
-			|| rtn_code == ERROR_CODE_INVALID_PARAM) {
-			*out_account_create_cartographer_error_id = _cartographer_error_id_internal_error;
+		e_cartographer_error_id err = _cartographer_error_id_unknown_unhandled_error;
+		switch (rtn_code)
+		{
+		case 0:
+		case ERROR_CODE_CURL_SOCKET_FAILED:
+		case ERROR_CODE_CURL_HANDLE:
+		case ERROR_CODE_CURL_EASY_PERF:
+		case ERROR_CODE_INVALID_PARAM:
+			err = _cartographer_error_id_internal_error;
+			break;
+		case ERROR_CODE_INVALID_EMAIL:
+			err = _cartographer_error_id_account_create_invalid_email;
+			break;
+		case ERROR_CODE_INVALID_USERNAME:
+			err = _cartographer_error_id_account_create_invalid_username;
+			break;
+		case ERROR_CODE_INVALID_PASSWORD:
+			err = _cartographer_error_id_account_create_invalid_password;
+			break;
+		case ERROR_CODE_TAKEN_EMAIL:
+			err = _cartographer_error_id_account_create_email_already_used;
+			break;
+		case ERROR_CODE_TAKEN_USERNAME:
+			err = _cartographer_error_id_account_create_username_taken;
+			break;
+		case ERROR_CODE_BANNED_EMAIL_DOMAIN:
+			err = _cartographer_error_id_account_create_blacklisted_email_provider;
+			break;
 		}
-		else if (rtn_code == ERROR_CODE_INVALID_EMAIL) {
-			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_invalid_email;
-		}
-		else if (rtn_code == ERROR_CODE_INVALID_USERNAME) {
-			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_invalid_username;
-		}
-		else if (rtn_code == ERROR_CODE_INVALID_PASSWORD) {
-			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_invalid_password;
-		}
-		else if (rtn_code == ERROR_CODE_TAKEN_EMAIL) {
-			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_email_already_used;
-		}
-		else if (rtn_code == ERROR_CODE_TAKEN_USERNAME) {
-			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_username_taken;
-		}
-		else if (rtn_code == ERROR_CODE_BANNED_EMAIL_DOMAIN) {
-			*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_blacklisted_email_provider;
-		}
-		else {
-			//unknown error!
-			*out_account_create_cartographer_error_id = _cartographer_error_id_unknown_unhandled_error;
-		}
+		*out_account_create_cartographer_error_id = err;
 	}
-	else {
+	else
+	{
 		*out_account_create_cartographer_error_id = _cartographer_error_id_account_create_success;
 	}
 	return result;

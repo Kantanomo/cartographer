@@ -951,12 +951,10 @@ static bool hs_parse_string_id(int32 expression_index)
 
 static bool hs_parse_seat_mapping(int32 expression_index)
 {
-#ifdef ASSERTS_ENABLED
 	hs_syntax_node* expression = hs_syntax_get(expression_index);
 
 	ASSERT(expression->type == _hs_type_unit_seat_mapping);
 	ASSERT(expression->constant_type == expression->type);
-#endif
 
 	// TODO: implement
 	return false;

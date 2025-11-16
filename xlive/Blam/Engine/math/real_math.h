@@ -534,7 +534,6 @@ void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angle
 
 /* macros */
 
-#ifdef VALIDATE_REAL_ENABLED
 #define assert_valid_real(value)															\
 do																							\
 {																							\
@@ -605,12 +604,3 @@ do																								\
 	}																							\
 }																								\
 while(0)
-
-#else
-#define assert_valid_real(value)						(void)0
-#define assert_valid_real_normal3d(normal)				(void)0
-#define assert_valid_real_point3d(normal)				(void)0
-#define assert_valid_real_vector3d(normal)				(void)0
-#define assert_valid_real_vector3d_axes2(forward, up)	(void)0
-#define assert_valid_real_matrix4x3(matrix)				(void)0
-#endif

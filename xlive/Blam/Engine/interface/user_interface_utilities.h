@@ -11,8 +11,6 @@ void user_interface_utilities_apply_patches(void);
 
 void __cdecl user_interface_global_string_get(string_id id, c_maximum_interface_text* dest);
 
-datum __cdecl user_interface_get_widget_tag_index_from_screen_id(e_user_interface_screen_id screen_id);
-
 bool __cdecl user_interface_exit_to_dash();
 
 bool __cdecl user_interface_save_map_and_exit();

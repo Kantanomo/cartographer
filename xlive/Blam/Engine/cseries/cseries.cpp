@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "cseries.h"
 
+#ifdef ASSERTS_ENABLED
 #include "stack_walk_windows.h"
 
 #include "main/main.h"
 #include "shell/shell.h"
+#endif
 
 /* constants */
 
@@ -19,10 +21,9 @@ enum
 
 /* globals */
 
-// TODO: figure out a decent way to strip this from release builds
+#ifdef ASSERTS_ENABLED
 char g_temporary[256] = {};
 
-#ifdef ASSERTS_ENABLED
 bool g_catch_exceptions = true;
 #endif
 
@@ -86,14 +87,12 @@ void memmove_guarded(void* write_start, const void* src, size_t size, void* boun
 {
 	if (size > 0)
 	{
-#ifdef ASSERTS_ENABLED
 		const void* write_end = (int8*)write_start + size - 1;
 		const void* bounds_upper = (int8*)bounds_lower + bounds_size - 1;
 		ASSERT(bounds_upper >= bounds_lower);
 		ASSERT(bounds_size > 0);
 		ASSERT((write_start >= bounds_lower) && (write_start <= bounds_upper));
 		ASSERT((write_end >= bounds_lower) && (write_end <= bounds_upper));
-#endif
 		memmove(write_start, src, size);
 	}
 	return;

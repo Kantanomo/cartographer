@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "cseries_windows_minidump.h"
 
 #include "cseries_windows_minidump_logs.h"

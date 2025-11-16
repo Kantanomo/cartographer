@@ -19,7 +19,7 @@ bool simulation_object_variant_should_sync(s_simulation_object_creation_data* cr
 // Builds creation data for objects
 void __stdcall c_simulation_object_entity_definition__object_build_creation_data(void* _this, datum object_index, s_simulation_object_creation_data* creation_data)
 {
-	object_datum* object = object_get_fast_unsafe<object_datum>(object_index);
+	const object_datum* object = object_get(object_index);
 	creation_data->object_definition_index = object->definition_index;
 	creation_data->object_scenario_datum_index = object->object.placement_index;
 	creation_data->multiplayer_spawn_monitor_index = object->object.netgame_equipment_index;

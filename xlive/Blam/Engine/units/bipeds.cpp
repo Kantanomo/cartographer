@@ -38,7 +38,7 @@ void biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector
 
 void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forward, datum object_index, real_point3d* camera_position, const real_vector3d* camera_up)
 {
-	const biped_datum* biped = (biped_datum*)object_get_fast_unsafe(object_index);
+	const biped_datum* biped = biped_get(object_index);
 	const biped_definition* biped_def = (biped_definition*)tag_get_fast(biped->definition_index);
 
 	ASSERT(camera_position);
@@ -146,7 +146,7 @@ void __cdecl biped_get_sight_position(
 		object_get_origin_interpolated(biped_index, sight_position);
 	}
 
-	biped_datum* biped = (biped_datum*)object_get_and_verify_type(biped_index, _object_mask_biped);
+	biped_datum* biped = biped_get(biped_index);
 	ASSERT(biped);
 
 	struct biped_definition* biped_definition = (struct biped_definition*)tag_get_fast(biped->definition_index);

@@ -57,27 +57,25 @@ real32 __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera
 
 bool unit_is_dual_wielding(datum unit_index)
 {
-	unit_datum* unit = (unit_datum*)object_get_fast_unsafe(unit_index);
+	unit_datum* unit = unit_get(unit_index);
 	return unit->unit.weapon_indices[0] != NONE && unit->unit.weapon_indices[1] != NONE;
 }
 
 bool unit_in_vehicle(datum unit_index) 
 {
-	unit_datum* unit = (unit_datum*)object_get_fast_unsafe(unit_index);
+	unit_datum* unit = unit_get(unit_index);
 	return unit->unit.parent_seat_index != NONE;
 }
 
 datum player_index_from_unit_index(datum unit_index)
 {
-	unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);
-
+	const unit_datum* unit = unit_try_and_get(unit_index);
 	return (unit ? unit->unit.controlling_player_index : NONE);
 }
 
 void __cdecl unit_get_head_position_interpolated(datum unit_index, real_point3d* position)
 {
 	object_marker marker;
-
 	object_get_markers_by_string_id(unit_index, _string_id_head, &marker, 1);
 	*position = marker.matrix.position;
 	return;
@@ -96,7 +94,7 @@ void __cdecl unit_control(datum unit_index, const unit_control_data* control_dat
 
 e_game_team unit_get_team_index(datum unit_index)
 {
-	const unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);
+	const unit_datum* unit = unit_try_and_get(unit_index);
 	return (unit ? unit->unit.unit_team : _game_team_observer);
 }
 
@@ -107,7 +105,7 @@ bool __cdecl unit_desires_tight_camera_track(datum unit_index)
 
 bool unit_does_not_show_readied_weapon(datum unit_index)
 {
-	const unit_datum* unit = (unit_datum*)object_get_and_verify_type(unit_index, _object_mask_unit);
+	const unit_datum* unit = unit_get(unit_index);
 	const struct unit_definition* unit_definition = (struct unit_definition*)tag_get_fast(unit->definition_index);
 	ASSERT(unit_definition);
 

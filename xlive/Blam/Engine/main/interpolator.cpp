@@ -284,7 +284,7 @@ void halo_interpolator_object_populate_interpolation_data(
 
 		if (abs_object_index < k_maximum_objects_per_map)
 		{
-			object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+			object_datum* object = object_get(object_index);
 
 			// interpolate position of hidden bipeds, in a vehicle seat (tanks)
 			// for smooth death camera when spectating them specifically
@@ -301,7 +301,7 @@ void halo_interpolator_object_populate_interpolation_data(
 			else
 			{
 				ASSERT(VALID_INDEX(nodes_count, MAXIMUM_NODES_PER_MODEL));
-				const unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(object_index, _object_mask_unit);
+				const unit_datum* unit = unit_try_and_get(object_index);
 				if (unit)
 				{
 					const datum player_index = player_index_from_unit_index(object_index);
@@ -583,7 +583,7 @@ static object_datum* halo_interpolator_object_can_interpolate(datum object_index
 	}
 	else
 	{
-		result = (object_datum*)object_try_and_get_and_verify_type(object_index, _object_mask_all);
+		result = object_get(object_index);
 	}
 	return result;
 }

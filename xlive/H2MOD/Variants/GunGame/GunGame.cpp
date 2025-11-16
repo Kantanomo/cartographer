@@ -6,7 +6,7 @@
 #include "game/players.h"
 #include "networking/network_event.h"
 #include "simulation/game_interface/simulation_game_action.h"
-#include "units/units.h"
+#include "units/bipeds.h"
 
 #include "H2MOD.h"
 
@@ -138,9 +138,8 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 		{
 			event(_event_verbose, "h2mod:gungame: %s player index: %d, player name: %ws", __FUNCTION__, player_abs_index, player->configuration.player_name);
 
-			void* unit_object = object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
-			if (unit_object) {
-
+			if (biped_try_and_get(player->unit_index))
+			{
 				int level = 0;
 				uint64 id;
 				s_player_identifier identifier = NetworkSession::GetPlayerId(player_abs_index);

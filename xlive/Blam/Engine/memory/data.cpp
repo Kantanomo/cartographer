@@ -10,13 +10,8 @@ static int32 data_next_absolute_index(data_array* data, int32 index);
 
 /* macros */
 
-#ifdef ASSERTS_ENABLED
 #define DATA_HEADER_GET(data, index) \
 ((s_datum_header*)(((char*)assert_return((data))->data) + (assert_return((data))->size * DATUM_INDEX_TO_ABSOLUTE_INDEX(index))))
-#else
-#define DATA_HEADER_GET(data, index) \
-((s_datum_header*)(((char*)(data)->data) + ((data)->size * DATUM_INDEX_TO_ABSOLUTE_INDEX(index))))
-#endif
 
 /* public code */
 

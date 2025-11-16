@@ -274,7 +274,7 @@ void hs_evaluate_object_cast_up(int16 function_index, int32 thread_index, bool i
 	}
 	else
 	{
-		const object_datum* object = (object_datum*)object_get_and_verify_type(stack[0], _object_mask_all);
+		const object_datum* object = object_get(stack[0]);
 		const int16 type_index = (function_index - (_hs_function_object_to_unit - 1));
 		if (TEST_BIT(hs_object_type_masks[type_index], object->object.object_identifier.get_type()))
 		{

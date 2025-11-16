@@ -46,5 +46,13 @@ struct weapon_datum
 };
 ASSERT_STRUCT_SIZE(weapon_datum, 604);
 
+/* prototypes */
+
 int32 __cdecl weapon_get_rounds_total(datum object_index, int32 magazine_index, bool a3);
+
 void __cdecl weapons_fire_barrels(void);
+
+/* macros */
+
+#define weapon_get(index) ((weapon_datum*)(object_get_and_verify_type((index), _object_mask_weapon)))
+#define weapon_try_and_get(index) ((weapon_datum*)(object_try_and_get_and_verify_type((index), _object_mask_weapon)))

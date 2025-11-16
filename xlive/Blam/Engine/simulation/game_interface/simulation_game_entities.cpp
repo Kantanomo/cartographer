@@ -7,8 +7,7 @@
 
 bool simulation_object_index_valid(datum object_index)
 {
-	bool result = object_index != NONE && object_try_and_get_and_verify_type(object_index, _object_mask_all) != NULL;
-	return result;
+	return object_index != NONE && object_get(object_index) != NULL;
 }
 
 void simulation_entity_indices_to_object_index(int32* entity_references, int32 entity_reference_count, datum* out_object_index, int32 out_object_index_count)

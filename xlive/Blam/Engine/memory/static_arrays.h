@@ -29,6 +29,7 @@ class c_static_stack
 {
 public:
 	c_static_stack(void) : m_count(0) {}
+	void clear(void) { m_count = 0; }
 	bool valid(void) const { return m_count <= k_maximum_count; }
 	void push(void) { ASSERT(!full()); m_count++; }
 	bool full(void) const { ASSERT(valid()); return m_count == k_maximum_count; }

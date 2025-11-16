@@ -95,7 +95,7 @@ enum e_object_type : int32
 struct object_type_definition
 {
 	const char* name;
-	tag_group group;
+	tag_group group_tag;
 	int16 datum_size;
 	int16 placement_tag_block_offset;
 	int16 palette_tag_block_offset;
@@ -139,8 +139,6 @@ ASSERT_STRUCT_SIZE(object_type_definition, 0xC8);
 object_type_definition** get_object_type_definitions(void);
 
 object_type_definition* object_type_definition_get(e_object_type object_type);
-
-object_type_definition* get_game_object_type_definition(datum object_datum);
 
 void __cdecl object_types_initialize_for_new_map(void);
 

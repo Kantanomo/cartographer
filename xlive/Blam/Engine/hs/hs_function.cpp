@@ -6311,7 +6311,9 @@ static void user_interface_test_error_ok_evaluate(int16 function_index, int32 th
 #ifdef UI_DEBUG
 		user_interface_test_error_ok(*(int16*)&arguments[0]);
 #endif
+		hs_return(thread_index, 0);
 	}
+
 	return;
 }
 
@@ -6323,6 +6325,7 @@ static void user_interface_test_error_ok_cancel_evaluate(int16 function_index, i
 #ifdef UI_DEBUG
 		user_interface_test_error_ok_cancel(*(int16*)&arguments[0]);
 #endif
+		hs_return(thread_index, 0);
 	}
 	return;
 }

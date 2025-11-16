@@ -14,12 +14,18 @@ object_type_definition** get_object_type_definitions(void)
 
 object_type_definition* object_type_definition_get(e_object_type object_type)
 {
-	return get_object_type_definitions()[object_type];
-}
+	object_type_definition** object_type_definitions = get_object_type_definitions();
 
-object_type_definition* get_game_object_type_definition(datum object_datum)
-{
-	return object_type_definition_get(object_get_fast_unsafe(object_datum)->object.object_identifier.get_type());
+	vassert(
+		VALID_INDEX(object_type, k_object_types_count),
+		"#%d isn't a valid object type in [#0,#%d)",
+		object_type,
+		k_object_types_count
+	);
+	ASSERT(object_type_definitions[object_type]);
+	ASSERT(object_type_definitions[object_type]->group_tag.group);
+
+	return object_type_definitions[object_type];
 }
 
 void __cdecl object_types_initialize_for_new_map(void)
@@ -36,8 +42,10 @@ void __cdecl object_type_adjust_placement(object_placement_data* placement_data)
 
 bool object_type_new(datum object_index, object_placement_data* placement_data, bool* a3)
 {
-	const object_type_definition* object_type = get_game_object_type_definition(object_index);
 	bool object_created = true;
+
+	const object_datum* object = object_get(object_index);
+	const object_type_definition* object_type = object_type_definition_get(object->object.object_identifier.get_type());
 
 	for (uint8 i = 0; object_type->part_definitions[i]; i++)
 	{
@@ -52,7 +60,8 @@ bool object_type_new(datum object_index, object_placement_data* placement_data, 
 
 void object_type_create_children(datum object_index)
 {
-	const object_type_definition* object_type = get_game_object_type_definition(object_index);
+	const object_datum* object = object_get(object_index);
+	const object_type_definition* object_type = object_type_definition_get(object->object.object_identifier.get_type());
 
 	for (uint8 i = 0; object_type->part_definitions[i]; ++i)
 	{
@@ -65,49 +74,53 @@ void object_type_create_children(datum object_index)
 	return;
 }
 
-void object_type_delete(datum object_datum)
+void object_type_delete(datum object_index)
 {
-	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_datum* object = object_get(object_index);
+	const object_type_definition* object_type = object_type_definition_get(object->object.object_identifier.get_type());
 
 	for (uint8 i = 0; object_type->part_definitions[i]; i++)
 	{
 		object_delete_t object_delete = object_type->part_definitions[i]->object_delete;
 		if (object_delete)
 		{
-			object_delete(object_datum);
+			object_delete(object_index);
 		}
 	}
 
 	return;
 }
 
-bool object_type_compute_activation(datum object_datum, s_game_cluster_bit_vectors* cluster_activation, bool* a3)
+bool object_type_compute_activation(datum object_index, s_game_cluster_bit_vectors* cluster_activation, bool* a3)
 {
 	bool result = false;
-	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
+
+	const object_datum* object = object_get(object_index);
+	const object_type_definition* object_type = object_type_definition_get(object->object.object_identifier.get_type());
 
 	for (uint8 i = 0; object_type->part_definitions[i] && !result; i++)
 	{
 		object_compute_activation_t object_compute_activation = object_type->part_definitions[i]->object_compute_activation;
 		if (object_compute_activation)
 		{
-			result = object_compute_activation(object_datum, cluster_activation, a3);
+			result = object_compute_activation(object_index, cluster_activation, a3);
 		}
 	}
 
 	return result;
 }
 
-void object_type_postprocess_node_matrices(datum object_datum, int32 node_count, real_matrix4x3* node_matracies)
+void object_type_postprocess_node_matrices(datum object_index, int32 node_count, real_matrix4x3* node_matracies)
 {
-	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_datum* object = object_get(object_index);
+	const object_type_definition* object_type = object_type_definition_get(object->object.object_identifier.get_type());
 
 	for (uint8 i = 0; object_type->part_definitions[i]; i++)
 	{
 		object_postprocess_node_matrices_t object_postprocess_node_matrices = object_type->part_definitions[i]->object_postprocess_node_matrices;
 		if (object_postprocess_node_matrices)
 		{
-			object_postprocess_node_matrices(object_datum, node_count, node_matracies);
+			object_postprocess_node_matrices(object_index, node_count, node_matracies);
 		}
 	}
 	return;

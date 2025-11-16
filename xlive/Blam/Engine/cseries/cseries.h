@@ -80,9 +80,11 @@ enum
 
 /* globals */
 
+#ifdef ASSERTS_ENABLED
 extern char g_temporary[256];
 
 extern bool g_catch_exceptions;
+#endif
 
 /* macros */
 
@@ -118,6 +120,9 @@ extern bool g_catch_exceptions;
 #define SET_BIT(flags, bit, value)( (value) ? ((flags) |= FLAG(bit)) : ((flags) &= ~FLAG(bit)) )
 #define SWAP_FLAG(flags, bit)			( (flags) ^=FLAG(bit) )
 #define FLAG_RANGE(first_bit, last_bit)	( (FLAG( (last_bit)+1 - (first_bit) )-1) << (first_bit) )
+
+// Make sure no bits outside of the bit count are set within the mask
+#define VALID_BITS(mask, bit_count) (!((mask) >> bit_count))
 
 #define BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT) (((BIT_COUNT) + (LONG_BITS - 1)) / LONG_BITS)
 #define BIT_VECTOR_SIZE_IN_BYTES(BIT_COUNT) (4 * BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT))
@@ -181,16 +186,15 @@ while(0)
 #define halt() DISPLAY_ASSERT("halt()")
 
 #else
-#define ASSERT_TRIGGER_EXCEPTION()							(void)(0)
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)   (void)(#STATEMENT)
 #define DISPLAY_ASSERT(STATEMENT)                           (void)(#STATEMENT)
-#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           (void)(#STATEMENT)
-#define ASSERT(STATEMENT)                                   (void)(#STATEMENT)
+#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           __assume(STATEMENT)
+#define ASSERT(STATEMENT)                                   __assume(STATEMENT)
 
-#define assert_return(pointer)	(pointer)
-#define vassert(...)			(void)(0)
-#define unreachable()			__assume(0)
-#define halt()					(void)(0)
+#define assert_return(pointer)		assert_return_internal(pointer)
+#define vassert(STATEMENT, ...)		__assume((STATEMENT))
+#define unreachable()				__assume(0)
+#define halt()						__assume(0)
 
 #endif // ASSERTS_ENABLED
 
@@ -262,14 +266,20 @@ char* strchr(char* str, int32 ch);
 
 /* public code */
 
-#ifdef ASSERTS_ENABLED
 template <typename T>
+#ifdef ASSERTS_ENABLED
 T* assert_return_internal(T* pointer, const char* statement, const char* file, int32 line)
 {
 	if (!pointer)
 	{
 		DISPLAY_ASSERT_EXCEPTION(statement, file, line, true);
 	}
+	return pointer;
+}
+#else
+__forceinline T* assert_return_internal(T* pointer)
+{
+	__assume(pointer);
 	return pointer;
 }
 #endif

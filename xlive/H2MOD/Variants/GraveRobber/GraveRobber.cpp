@@ -206,7 +206,7 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum player_index)
 
 bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx)
 {
-	const weapon_datum* weapon = object_get_fast_unsafe<weapon_datum>(objectIdx);
+	const weapon_datum* weapon = weapon_get(objectIdx);
 
 	bool handled = false;
 

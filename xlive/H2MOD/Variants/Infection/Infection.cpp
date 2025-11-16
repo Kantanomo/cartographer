@@ -14,7 +14,7 @@
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
-#include "units/units.h"
+#include "units/bipeds.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -452,8 +452,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 			// host code
 			if (!game_is_predicted())
 			{
-				unit_datum* unit_object = (unit_datum*)object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
-				if (unit_object)
+				if (biped_try_and_get(player->unit_index))
 				{
 					if (unit_get_team_index(player->unit_index) != k_zombie_team)
 					{
@@ -555,8 +554,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 		if (!game_is_predicted())
 		{
 			event(_event_verbose, "h2mod:infection: Spawn player server index=%d", player_abs_index);
-			void* unit_object = object_try_and_get_and_verify_type(player->unit_index, _object_mask_biped);
-			if (unit_object)
+			if (biped_try_and_get(player->unit_index))
 			{
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 				e_game_team team = unit_get_team_index(player->unit_index);

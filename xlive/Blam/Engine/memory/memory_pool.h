@@ -24,4 +24,8 @@ uint32 memory_pool_get_free_size(const s_memory_pool* memory_pool);
 
 uint32 memory_pool_get_contiguous_free_size(const s_memory_pool* memory_pool);
 
+bool memory_pool_block_reallocate(s_memory_pool* pool, void** ptr, int32 new_size);
+
+bool memory_pool_block_reallocate(s_memory_pool* pool, void** ptr, int32 new_size, const char* file, int32 line);
+
 int32 __cdecl memory_pool_block_free(s_memory_pool* memory_pool, void** payload_data);

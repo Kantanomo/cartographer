@@ -39,7 +39,7 @@ void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index,
 	{
 		// Obtain the actor index so we can determine whether or not to disable damage
 		// If object is a unit then we can grab the actor index
-		const unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(damage_data->owner.owner_object_index, _object_mask_unit);
+		const unit_datum* unit = unit_try_and_get(damage_data->owner.owner_object_index);
 		const datum actor_index = unit != NULL ? unit->unit.actor_datum : NONE;
 
 		// Disable damage if all are true:

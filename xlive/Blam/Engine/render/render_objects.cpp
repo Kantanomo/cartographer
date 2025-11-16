@@ -42,7 +42,7 @@ void render_object_get_model_node_data(
 	}
 	else
 	{
-		datum tag_index = object_get_fast_unsafe(object_index)->definition_index;
+		datum tag_index = object_get(object_index)->definition_index;
 		object_definition* object_def = (object_definition*)tag_get_fast(tag_index);
 		ASSERT(object_def);
 		s_model_definition* model = (s_model_definition*)tag_get_fast(object_def->object.model.index);
