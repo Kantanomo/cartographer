@@ -200,8 +200,8 @@ void c_network_squad_list::populate_servers(void)
 
 		bool valid = m_list[0].get_last_data_index() == NONE || actual_count != m_list_data->actual_count;
 
-		// Go through every entry and make sure it's not NULL
-		for (int32 i = 0; i < m_list_count && m_list[i].last_data_index_valid() && valid; ++i)
+		// If we don't contain an empty entry at first, loop until we do
+		for (int32 i = 0; i < m_list_count && m_list[i].last_data_index_valid() && !valid; ++i)
 		{
 			valid = datum_try_and_get(m_list_data, m_list[i].get_last_data_index()) == NULL;
 		}
