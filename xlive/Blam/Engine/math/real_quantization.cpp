@@ -35,7 +35,7 @@ int32 quantize_real(real32 value, real32 min_value, real32 max_value, int32 size
 	const real32 step = (max_value - min_value) / (real32)step_count;
 	ASSERT(step > 0.0f);
 
-	const int32 quantized_value = (int32)(((value - min_value) / step));
+	const int32 quantized_value = real_to_long_round(((value - min_value) / step));
 	ASSERT(IN_RANGE(quantized_value, 0, step_count));
 	return quantized_value;
 }
