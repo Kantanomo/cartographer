@@ -9,6 +9,7 @@
 #include "cache/pc_texture_cache.h"
 
 #include "game/game_time.h"
+#include "main/console.h"
 #include "main/main.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/rasterizer_main.h"
@@ -18,9 +19,12 @@
 
 /* constants */
 
-#define k_screenshot_cubemap_size 256
-#define k_screenshot_cubemap_resolution_multiplier_width 4
-#define k_screenshot_cubemap_resolution_multiplier_height 3
+enum
+{
+	k_screenshot_cubemap_size = 256,
+	k_screenshot_cubemap_resolution_multiplier_width = 4,
+	k_screenshot_cubemap_resolution_multiplier_height = 3,
+};
 
 /* prototypes */
 
@@ -213,6 +217,10 @@ bool __cdecl screenshot_render(window_bound* window)
 				bitmap_1->base_address &&
 				(!screenshot_globals->web_map || bitmap_secondary))
 			{
+#ifdef TERMINAL_ENABLED
+				console_clear();
+				console_close();
+#endif
 				geometry_cache_block_for_one_frame(2);
 				texture_cache_block_for_one_frame(2);
 				bool rendered_bloom_screenshot = render_bloom_screenshot(bitmap_0->width, bitmap_0->height, window);
@@ -341,7 +349,7 @@ bool __cdecl screenshot_render(window_bound* window)
 						if (should_render_frame)
 						{
 							render_frame(frame_render_type, 1, 1, 0, window);
-							rasterizer_present_frame_wrapper(bitmap_0);
+							render_frame_present(bitmap_0);
 							if (screenshot_globals->web_map)
 							{
 								rasterizer_present_frame_screenshot_wrapper(bitmap_secondary);
@@ -506,9 +514,13 @@ bool __cdecl screenshot_render(window_bound* window)
 		{
 			++movie_globals->recording_frame_index;
 			if (movie_globals->recording_stop_tick > game_time_get())
+			{
 				result = false;
+			}
 			else
+			{
 				movie_globals->in_progress = false;
+			}
 		}
 		screenshot_globals->taking_screenshot = false;
 		screenshot_globals->take_screenshot = false;
@@ -552,7 +564,7 @@ static bool render_bloom_screenshot(int16 width, int16 height, window_bound* win
 		{
 			result = true;
 			render_frame(6, 1, 1, 0, window_bound);
-			rasterizer_present_frame_wrapper(screenshot_globals->bloom_bitmap);
+			render_frame_present(screenshot_globals->bloom_bitmap);
 		}
 	}
 

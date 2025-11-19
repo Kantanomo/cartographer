@@ -94,7 +94,7 @@
 #include "cseries/cseries_system_memory.h"
 #include "cseries/cseries_windows.h"
 
-#include "math/math.h"
+#include "math/crypto_windows.h"
 #include "math/integer_math.h"
 #include "math/real_math.h"
 #include "memory/static_arrays.h"

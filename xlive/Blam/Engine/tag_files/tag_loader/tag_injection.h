@@ -4,8 +4,8 @@
 
 /* constants */
 
-#define k_carto_shared_map L"carto_shared"
-#define k_events_map k_carto_shared_map
+extern const wchar_t* k_carto_shared_map;
+extern const wchar_t* k_events_map;
 
 /* globals */
 

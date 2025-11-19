@@ -4,7 +4,6 @@
 #ifdef TERMINAL_ENABLED
 
 #include "CommandCollection.h"
-
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
 #include <imgui.h>
@@ -44,8 +43,14 @@ CartographerConsole::CartographerConsole() :
 
 	// you can pass nullptr to ImGui_ConsoleVar if you can get the variable from context data
 	console_opacity_var_cmd.SetCommandVarPtr(&m_console_opacity_comvar);
+
+	InitializeCriticalSection(&g_command_insert_section);
+
 	CommandCollection::InsertCommand(&console_opacity_var_cmd);
 	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, 0, CartographerConsole::clear_cb));
+	
+	DeleteCriticalSection(&g_command_insert_section);
+	return;
 }
 
 int CartographerConsole::LogToMainTabCb(StringHeaderFlags flags, const char* fmt, ...)

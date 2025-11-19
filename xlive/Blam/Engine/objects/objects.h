@@ -159,7 +159,7 @@ struct _object_datum
 {
 	c_flags_no_init<e_object_data_flags, uint32, k_object_data_flags_count> flags;
 	void* object_header_block;
-	datum next_index;
+	datum next_object_index;
 	datum current_weapon_datum;
 	datum parent_object_index;
 	uint8 matrix_index;
@@ -244,7 +244,7 @@ struct object_marker
 	int16 region_index;
 	real_matrix4x3 node_matrix;
 	real_matrix4x3 matrix;
-	int32 field_6C;
+	real32 radius;
 };
 ASSERT_STRUCT_SIZE(object_marker, 112);
 
@@ -256,7 +256,11 @@ ASSERT_STRUCT_SIZE(object_damage_section, 8);
 
 struct object_region_information
 {
-	int8 gap0[8];
+	int8 variant_permutation_index;
+	int8 region_state;
+	uint8 region_state_properties;
+	uint8 pad;
+	int32 looping_effect_index;
 };
 ASSERT_STRUCT_SIZE(object_region_information, 8);
 
@@ -311,15 +315,6 @@ private:
 
 /* prototypes */
 
-// Get the object fast, with no validation from datum index
-// TODO: remove and replace with proper OBJECT_GET macro
-template<typename T = object_datum>
-static T* object_get_fast_unsafe(datum object_idx)
-{
-	object_header_datum* header = (object_header_datum*)datum_get(object_header_data_get(), object_idx);
-	return (T*)header->datum;
-}
-
 data_array* object_header_data_get(void);
 
 void objects_apply_patches(void);
@@ -333,7 +328,7 @@ void __cdecl object_iterator_new(object_iterator* iterator, int32 type_flags, ui
 
 void* __cdecl object_iterator_next(object_iterator* iterator);
 
-void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference);
+void* object_header_block_get(const datum object_index, const object_header_block_reference* reference);
 
 void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count);
 
@@ -341,11 +336,11 @@ void __cdecl object_placement_data_new(object_placement_data* object_placement_d
 
 int32 __cdecl object_index_from_name_index(int16 name_index);
 
-bool __cdecl object_is_connected_to_map(datum object_index);
+bool object_is_connected_to_map(datum object_index);
 
 void __cdecl object_update_collision_culling(datum object_datum);
 
-bool __cdecl object_header_block_allocate(datum object_datum, int16 offset, int16 padded_size, int16 alignment_bits);
+bool object_header_block_allocate(datum object_index, int16 block_reference_offset, int16 size, uint16 alignment_bits);
 
 e_object_type object_get_type(datum object_index);
 
@@ -388,7 +383,7 @@ real_matrix4x3* object_get_node_matrix(datum object_datum, int16 node_index);
 
 real_matrix4x3* object_try_get_node_matrix_interpolated(datum object_index, int16 node_index, real_matrix4x3* out_mat);
 
-real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count);
+real_matrix4x3* object_get_node_matrices(datum object_index, int32* out_node_count);
 
 int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_matrix_count, const real_matrix4x3* object_skinning_matrices, real_matrix4x3* out_object_skinning_matrices);
 
@@ -396,7 +391,15 @@ datum object_get_damage_owner(datum damaged_unit_index);
 
 int32 object_get_entity_index(datum object_idx);
 
-void __cdecl object_apply_function_overlay_node_orientations(datum object_index,
+void object_get_region_information(
+	int32 object_index,
+	int32* region_count,
+	int8** region_permutation_indices,
+	int8** region_render_permutation_indices,
+	object_region_information** region_information);
+
+void __cdecl object_apply_function_overlay_node_orientations(
+	datum object_index,
 	struct render_model_definition* render_model,
 	class c_animation_manager* animation_manager,
 	int32 a4,
@@ -451,3 +454,9 @@ datum object_override_get_shader(datum object_index);
 #ifdef OBJECT_DEBUG
 void objects_dump_memory(void);
 #endif
+
+/* macros */
+
+#define object_header_get(index) ((object_header_datum*)datum_get(object_header_data_get(), index))
+
+#define object_get(index) ((struct object_datum*)(object_get_and_verify_type((index), _object_mask_all)))

@@ -256,5 +256,5 @@ void unit_add_grenade_type_to_inventory(datum unit_index, int16 grenade_type, in
 
 /* macros */
 
-#define unit_get(index) ((unit_datum*)object_get_and_verify_type(index, _object_mask_unit))
-#define unit_try_and_get(index) ((unit_datum*)object_try_and_get_and_verify_type(index, _object_mask_unit))
+#define unit_get(index) ((unit_datum*)object_get_and_verify_type((index), _object_mask_unit))
+#define unit_try_and_get(index) ((unit_datum*)object_try_and_get_and_verify_type((index), _object_mask_unit))

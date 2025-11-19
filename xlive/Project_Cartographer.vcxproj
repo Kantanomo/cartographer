@@ -174,7 +174,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;EVENTS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -325,7 +325,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ERRORS_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -469,7 +469,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;_ALLOW_RTCc_IN_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -530,7 +530,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;LLVM;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_DEBUG;_WINDOWS;_USRDLL;TERMINAL_ENABLED;ASSERTS_ENABLED;EVENTS_ENABLED;ERRORS_ENABLED;DEBUG_MEMORY_ENABLED;RASTERIZER_PROFILE_ENABLED;VALIDATE_REAL_ENABLED;OBJECT_OVERRIDE_ENABLED;OBJECT_DEBUG;UI_DEBUG;DEBUG_MENU_ENABLED;HS_COMPILER_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -585,6 +585,7 @@
     <ClCompile Include="Blam\Engine\achievements\achievement_live_interface.cpp" />
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\ai\actor_dynamic_firing_position.cpp" />
+    <ClCompile Include="Blam\Engine\ai\actor_types.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai_debug.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai_dialogue.cpp" />
@@ -593,6 +594,7 @@
     <ClCompile Include="Blam\Engine\ai\ai_orders.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai_player.cpp" />
     <ClCompile Include="Blam\Engine\ai\ai_script.cpp" />
+    <ClCompile Include="Blam\Engine\ai\behavior.cpp" />
     <ClCompile Include="Blam\Engine\ai\clumps.cpp" />
     <ClCompile Include="Blam\Engine\ai\cl_engine.cpp" />
     <ClCompile Include="Blam\Engine\ai\event_handling.cpp" />
@@ -649,6 +651,9 @@
     <ClCompile Include="Blam\Engine\cseries\threads_windows.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\recorded_animations.cpp" />
+    <ClCompile Include="Blam\Engine\debug\menu\debug_menu_main.cpp" />
+    <ClCompile Include="Blam\Engine\devices\devices.cpp" />
+    <ClCompile Include="Blam\Engine\dialogs\edit_text.cpp" />
     <ClCompile Include="Blam\Engine\editor\editor_stubs.cpp" />
     <ClCompile Include="Blam\Engine\effects\beam.cpp" />
     <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
@@ -673,9 +678,15 @@
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
     <ClCompile Include="Blam\Engine\game\game_results.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
+    <ClCompile Include="Blam\Engine\game\player_mapping.cpp" />
     <ClCompile Include="Blam\Engine\game\player_vibration.cpp" />
     <ClCompile Include="Blam\Engine\game\preferences.cpp" />
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs_compile.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs_function.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs_globals_external.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs_runtime.cpp" />
+    <ClCompile Include="Blam\Engine\hs\object_lists.cpp" />
     <ClCompile Include="Blam\Engine\input\controllers.cpp" />
     <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
     <ClCompile Include="Blam\Engine\input\input_process.cpp" />
@@ -717,6 +728,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_video_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_vsync_setting.cpp" />
+    <ClCompile Include="Blam\Engine\interface\terminal.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_bitmap_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_channel.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
@@ -742,9 +754,11 @@
     <ClCompile Include="Blam\Engine\items\projectiles.cpp" />
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\kablam\kablamsvc_client.cpp" />
     <ClCompile Include="Blam\Engine\kablam\kablam_config.cpp" />
     <ClCompile Include="Blam\Engine\kablam\kablam_log.cpp" />
     <ClCompile Include="Blam\Engine\main\console.cpp" />
+    <ClCompile Include="Blam\Engine\main\debug_keys.cpp" />
     <ClCompile Include="Blam\Engine\main\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
     <ClCompile Include="Blam\Engine\main\levels.cpp" />
@@ -778,7 +792,6 @@
     <ClCompile Include="Blam\Engine\main\main_time.cpp" />
     <ClCompile Include="Blam\Engine\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
-    <ClCompile Include="Blam\Engine\math\math.cpp" />
     <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
     <ClCompile Include="Blam\Engine\math\periodic_functions.cpp" />
     <ClCompile Include="Blam\Engine\math\random_direction_table.cpp" />
@@ -790,6 +803,7 @@
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
     <ClCompile Include="Blam\Engine\memory\rockall_heap_manager.cpp" />
     <ClCompile Include="Blam\Engine\memory\static_arrays.cpp" />
+    <ClCompile Include="Blam\Engine\models\model_definitions.cpp" />
     <ClCompile Include="Blam\Engine\models\render_models.cpp" />
     <ClCompile Include="Blam\Engine\multithreading\synchronization.cpp" />
     <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
@@ -898,6 +912,7 @@
     <ClInclude Include="Blam\Engine\ai\actor_dynamic_firing_position.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
     <ClInclude Include="Blam\Engine\ai\actor_moving.h" />
+    <ClInclude Include="Blam\Engine\ai\actor_types.h" />
     <ClInclude Include="Blam\Engine\ai\ai.h" />
     <ClInclude Include="Blam\Engine\ai\ai_debug.h" />
     <ClInclude Include="Blam\Engine\ai\ai_dialogue.h" />
@@ -908,6 +923,7 @@
     <ClInclude Include="Blam\Engine\ai\ai_player.h" />
     <ClInclude Include="Blam\Engine\ai\ai_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\ai\ai_script.h" />
+    <ClInclude Include="Blam\Engine\ai\behavior.h" />
     <ClInclude Include="Blam\Engine\ai\character_definitions.h" />
     <ClInclude Include="Blam\Engine\ai\clumps.h" />
     <ClInclude Include="Blam\Engine\ai\cl_engine.h" />
@@ -936,6 +952,7 @@
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_utilities.h" />
     <ClInclude Include="Blam\Engine\bitmaps\targa_file.h" />
     <ClInclude Include="Blam\Engine\bitmaps\tiff_file.h" />
+    <ClInclude Include="Blam\Engine\cache\cache_files_windows.h" />
     <ClInclude Include="Blam\Engine\cache\cache_file_verification.h" />
     <ClInclude Include="Blam\Engine\cache\pc_geometry_cache.h" />
     <ClInclude Include="Blam\Engine\cache\pc_texture_cache.h" />
@@ -973,15 +990,18 @@
     <ClInclude Include="Blam\Engine\cutscene\cinematics_definitions.h" />
     <ClInclude Include="Blam\Engine\cutscene\recorded_animations.h" />
     <ClInclude Include="Blam\Engine\cutscene\recorded_animation_definitions.h" />
+    <ClInclude Include="Blam\Engine\debug\menu\debug_menu_main.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
     <ClInclude Include="Blam\Engine\devices\device_controls.h" />
     <ClInclude Include="Blam\Engine\devices\device_light_fixture.h" />
     <ClInclude Include="Blam\Engine\devices\device_machines.h" />
+    <ClInclude Include="Blam\Engine\dialogs\edit_text.h" />
     <ClInclude Include="Blam\Engine\editor\editor_flags.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
+    <ClInclude Include="Blam\Engine\editor\editor_stubs.h" />
     <ClInclude Include="Blam\Engine\effects\beam.h" />
     <ClInclude Include="Blam\Engine\effects\contrails.h" />
     <ClInclude Include="Blam\Engine\effects\decals.h" />
@@ -1021,12 +1041,19 @@
     <ClInclude Include="Blam\Engine\game\materials.h" />
     <ClInclude Include="Blam\Engine\game\multiplayer_globals.h" />
     <ClInclude Include="Blam\Engine\game\player_constants.h" />
+    <ClInclude Include="Blam\Engine\game\player_mapping.h" />
     <ClInclude Include="Blam\Engine\game\player_vibration.h" />
     <ClInclude Include="Blam\Engine\game\preferences.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_definitions_new.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_compile.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_function.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_globals_external.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_library_internal_compile.h" />
     <ClInclude Include="Blam\Engine\hs\hs_library_internal_runtime.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_runtime.h" />
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
+    <ClInclude Include="Blam\Engine\hs\object_lists.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\input\input_abstraction.h" />
     <ClInclude Include="Blam\Engine\input\input_constants.h" />
@@ -1086,6 +1113,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager_strings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_vsync_setting.h" />
     <ClInclude Include="Blam\Engine\interface\signal_slot.h" />
+    <ClInclude Include="Blam\Engine\interface\terminal.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_bitmap_block.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_channel.h" />
@@ -1127,9 +1155,11 @@
     <ClInclude Include="Blam\Engine\items\vehicle_collection_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\kablam\kablamsvc_client.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_config.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_log.h" />
     <ClInclude Include="Blam\Engine\main\console.h" />
+    <ClInclude Include="Blam\Engine\main\debug_keys.h" />
     <ClInclude Include="Blam\Engine\main\game_preferences.h" />
     <ClInclude Include="Blam\Engine\main\interpolator.h" />
     <ClInclude Include="Blam\Engine\main\levels.h" />
@@ -1143,9 +1173,10 @@
     <ClInclude Include="Blam\Engine\items\items.h" />
     <ClInclude Include="Blam\Engine\items\weapons.h" />
     <ClInclude Include="Blam\Engine\main\main_time.h" />
+    <ClInclude Include="Blam\Engine\main\map_manager.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
+    <ClInclude Include="Blam\Engine\math\crypto_windows.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
-    <ClInclude Include="Blam\Engine\math\math.h" />
     <ClInclude Include="Blam\Engine\math\matrix_math.h" />
     <ClInclude Include="Blam\Engine\math\periodic_functions.h" />
     <ClInclude Include="Blam\Engine\math\random_direction_table.h" />
@@ -1157,6 +1188,7 @@
     <ClInclude Include="Blam\Engine\memory\rockall_heap_manager.h" />
     <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
     <ClInclude Include="Blam\Engine\models\models.h" />
+    <ClInclude Include="Blam\Engine\models\model_definitions.h" />
     <ClInclude Include="Blam\Engine\models\render_models.h" />
     <ClInclude Include="Blam\Engine\models\render_model_definitions.h" />
     <ClInclude Include="Blam\Engine\multithreading\synchronization.h" />
@@ -1231,6 +1263,7 @@
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cartographer_ingame_ui.cpp" />
     <ClCompile Include="Blam\Engine\render\render_contrails.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_debug.cpp" />
     <ClCompile Include="Blam\Engine\render\render_first_person.cpp" />
     <ClCompile Include="Blam\Engine\render\render_layers.cpp" />
     <ClCompile Include="Blam\Engine\render\render_lights.cpp" />
@@ -1297,6 +1330,7 @@
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_group_dependencies.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.cpp" />
@@ -1313,6 +1347,7 @@
     <ClCompile Include="Blam\Engine\units\biped_definitions.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
+    <ClCompile Include="Blam\Engine\units\vehicles.cpp" />
     <ClCompile Include="Blam\Engine\units\vehicle_definitions.cpp" />
     <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
     <ClCompile Include="Blam\Engine\widgets\liquid.cpp" />
@@ -2289,6 +2324,7 @@
     <ClInclude Include="Blam\Engine\render\render.h" />
     <ClInclude Include="Blam\Engine\render\render_cartographer_ingame_ui.h" />
     <ClInclude Include="Blam\Engine\render\render_contrails.h" />
+    <ClInclude Include="Blam\Engine\render\render_debug.h" />
     <ClInclude Include="Blam\Engine\render\render_debug_structure.h" />
     <ClInclude Include="Blam\Engine\render\render_first_person.h" />
     <ClInclude Include="Blam\Engine\render\render_layers.h" />
@@ -2396,6 +2432,8 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_block.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_files.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_group_access.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_group_dependencies.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_define.h" />
@@ -2425,6 +2463,7 @@
     <ClInclude Include="Blam\Engine\units\unit_definitions.h" />
     <ClInclude Include="Blam\Engine\units\unit_dialogue.h" />
     <ClInclude Include="Blam\Engine\units\unit_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\units\vehicles.h" />
     <ClInclude Include="Blam\Engine\units\vehicle_definitions.h" />
     <ClInclude Include="Blam\Engine\units\vehicle_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\widgets\cloth.h" />

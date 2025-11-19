@@ -1,5 +1,4 @@
 #pragma once
-#include "math/color_math.h"
 
 /* enums */
 
@@ -37,21 +36,18 @@ enum e_error_category : int32
 	k_error_category_count
 };
 
-/* structures */
-
-struct s_error_category
-{
-	e_error_category category;
-	const char* name;
-	real_rgb_color color;
-	const char* path;
-};
-
-
 /* prototypes */
+
+#ifdef ERRORS_ENABLED
+void errors_initialize(void);
+#endif
 
 // TODO implement this properly (using spdlog as a temp solution)
 void error(e_error_priority priority, const char* format, ...);
 
 // TODO implement this properly (using spdlog as a temp solution)
 void error(e_error_category category, e_error_priority priority, const char* format, ...);
+
+void error_va(e_error_category category, e_error_priority priority, const char* format, char* ap);
+
+void write_to_error_file(e_error_category category, e_error_priority priority, const char* string, bool append_time);

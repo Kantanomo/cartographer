@@ -83,12 +83,15 @@ void input_clear_all_rumblers(void)
 
 void input_xinput_update_rumble_state(void)
 {
-	bool global_suppress_rumble = false;
-
-	if (input_globals->feedback_suppress
+	bool global_suppress_rumble = 
+		input_globals->feedback_suppress
 		|| input_globals->input_suppressed
-		|| !game_in_progress()
-		|| game_time_get_paused())
+#ifdef TERMINAL_ENABLED
+		|| console_is_active()
+#endif
+		;
+
+	if (!game_in_progress() || game_time_get_paused())
 	{
 		global_suppress_rumble = true;
 	}
@@ -224,11 +227,8 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 		uint8& frames_down = gamepad_state->button_frames_down[button_index];
 		uint16& msec_down = gamepad_state->button_msec_down[button_index];
 		
-		bool button_down = TEST_FLAG(gamepad_buttons, k_xinput_button_flags[button_index]);
-		//if (button_down)
-		//	LOG_DEBUG_FUNC(" down {}", button_index);
-		if (button_down)
-			any_button_pressed = true;
+		const bool button_down = TEST_FLAG(gamepad_buttons, k_xinput_button_flags[button_index]);
+		any_button_pressed = button_down ? true : any_button_pressed;
 
 		input_xinput_update_button(&frames_down, &msec_down, button_down, (uint16)duration_ms);
 	}

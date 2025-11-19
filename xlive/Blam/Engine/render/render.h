@@ -140,6 +140,8 @@ bool __cdecl render_structure_find_camera(real_point3d* point, int32* out_cluste
 
 e_screen_split_type get_screen_split_type(int32 render_user_index);
 
+void render_frame_present(struct bitmap_data* bitmap);
+
 void __cdecl render_frame(
 	uint32 frame_render_type,
 	int32 window_count,

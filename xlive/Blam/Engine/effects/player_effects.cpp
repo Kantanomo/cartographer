@@ -3,6 +3,7 @@
 
 #include "game/game_time.h"
 #include "game/player_vibration.h"
+#include "main/console.h"
 #include "main/interpolator.h"
 #include "math/matrix_math.h"
 #include "math/random_math.h"
@@ -165,7 +166,16 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 
 void __cdecl render_screen_flash(int32 player_index, s_screen_flash* screen_flash)
 {
-    INVOKE(0xA408F, 0x0, render_screen_flash, player_index, screen_flash);
+    ASSERT(screen_flash);
+
+    // TODO: rewrite
+    
+#ifdef TERMINAL_ENABLED
+    if (!console_is_active())
+#endif
+    {
+        INVOKE(0xA408F, 0x0, render_screen_flash, player_index, screen_flash);
+    }
     return;
 }
 

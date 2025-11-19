@@ -243,7 +243,7 @@ c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 
 	linker_type2.link(&this->m_slot);
 
-	const datum vkbd_screen_tag_index = user_interface_get_widget_tag_index_from_screen_id(_screen_virtual_keyboard);
+	const datum vkbd_screen_tag_index = user_interface_get_screen_tag_index_by_id(_screen_virtual_keyboard);
 	const s_user_interface_screen_widget_definition* vkbd_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(vkbd_screen_tag_index);
 
 	c_maximum_interface_text tmp_string;

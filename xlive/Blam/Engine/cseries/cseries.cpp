@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include "cseries.h"
 
+#ifdef ASSERTS_ENABLED
+#include "stack_walk_windows.h"
+
 #include "main/main.h"
 #include "shell/shell.h"
+#endif
 
 /* constants */
 
@@ -17,10 +21,9 @@ enum
 
 /* globals */
 
-// TODO: figure out a decent way to strip this from release builds
+#ifdef ASSERTS_ENABLED
 char g_temporary[256] = {};
 
-#ifdef ASSERTS_ENABLED
 bool g_catch_exceptions = true;
 #endif
 
@@ -38,7 +41,7 @@ void display_assert(const char* condition, char const* file, int32 line, bool as
 	if (assertion_failed && !is_debugger_present())
 	{
 		error(_error_log, "");
-		// sub_402370(1);
+		stack_walk(1);
 	}
 
 	error(_error_log, "");
@@ -66,7 +69,7 @@ void display_assert(const char* condition, char const* file, int32 line, bool as
 		{
 			RaiseException(0x73746Bu, 0, 0, 0);
 			main_halt_and_catch_fire();
-			// cseries_windows_trigger_debug_window(-1, condition);
+			handle_fatal_error(NONE, condition);
 		}
 	}
 	return;
@@ -84,14 +87,12 @@ void memmove_guarded(void* write_start, const void* src, size_t size, void* boun
 {
 	if (size > 0)
 	{
-#ifdef ASSERTS_ENABLED
 		const void* write_end = (int8*)write_start + size - 1;
 		const void* bounds_upper = (int8*)bounds_lower + bounds_size - 1;
 		ASSERT(bounds_upper >= bounds_lower);
 		ASSERT(bounds_size > 0);
 		ASSERT((write_start >= bounds_lower) && (write_start <= bounds_upper));
 		ASSERT((write_end >= bounds_lower) && (write_end <= bounds_upper));
-#endif
 		memmove(write_start, src, size);
 	}
 	return;

@@ -59,7 +59,12 @@ void network_event_display_category(const char* category_string, e_event_level l
 
 void network_event_log_category(const char* category_string, e_event_level level);
 
+/* globals */
+
+extern const char* k_event_level_names[k_network_event_level_count];
+
+extern const char* k_event_level_severity_strings[k_network_event_level_count];
+
 #else
 #define event(severity, format, ...) (void)(0)
-
 #endif

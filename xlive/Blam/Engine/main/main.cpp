@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "main.h"
 
-//#include "console.h"
+#include "console.h"
 #include "game_preferences.h"
 #include "interpolator.h"
 #include "loading.h"
@@ -29,7 +29,7 @@
 #include "game/game_time.h"
 #include "game/player_vibration.h"
 #include "input/input_windows.h"
-//#include "interface/terminal.h"
+#include "interface/terminal.h"
 #include "interface/user_interface.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/logic/network_search.h"
@@ -90,6 +90,7 @@ static void __cdecl main_game_reset_map_blue_screen_detection(void);
 
 bool debug_no_drawing = false;
 bool debug_console_pauses_game = true;
+bool force_crash_uploads = false;
 
 /* public code */
 
@@ -139,7 +140,7 @@ void main_loop(void)
 	main_game_unload_and_prepare_for_next_game();
 	game_dispose();
 #ifdef TERMINAL_ENABLED
-	//console_dispose();
+	console_dispose();
 #endif
 	main_loading_dispose();
 	return;
@@ -249,7 +250,7 @@ void main_loop_body(void)
 		global_preferences_update();
 		font_idle();
 		async_idle();
-		shell_update();
+		shell_idle();
 		cache_files_copy_do_work();
 		main_loading_idle();
 		c_map_manager* map_manager = map_manager_get();
@@ -266,8 +267,8 @@ void main_loop_body(void)
 			world_dt = main_time_halted() ? 0.f : dt;
 
 #ifdef TERMINAL_ENABLED
-			//terminal_update(world_dt);
-			//console_update(world_dt);
+			terminal_update(world_dt);
+			console_update(world_dt);
 #endif
 
 #ifdef XBOX
@@ -467,14 +468,14 @@ static void main_loop_initialize(void)
 	main_time_initialize();
 	SYSTEM_DEBUG_MEMORY(main_time_initialize());
 #ifdef TERMINAL_ENABLED
-	//console_initialize();
-	//SYSTEM_DEBUG_MEMORY(console_initialize());
+	console_initialize();
+	SYSTEM_DEBUG_MEMORY(console_initialize());
 #endif
 	game_initialize();
 	SYSTEM_DEBUG_MEMORY(game_initialize());
 #ifdef TERMINAL_ENABLED
-	//console_execute_initial_commands();
-	//SYSTEM_DEBUG_MEMORY(console_execute_initial_commands());
+	console_execute_initial_commands();
+	SYSTEM_DEBUG_MEMORY(console_execute_initial_commands());
 #endif
 
 	c_map_manager* g_map_manager = map_manager_get();

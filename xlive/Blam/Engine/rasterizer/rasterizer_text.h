@@ -8,3 +8,5 @@ void __cdecl rasterizer_draw_unicode_string(rectangle2d const* bounds, wchar_t c
 bool __cdecl rasterizer_text_cache_initialize(void);
 
 void __cdecl rasterizer_draw_string(const rectangle2d* bounds, const wchar_t* string, real32 scale);
+
+void rasterizer_draw_string(const rectangle2d* bounds, const rectangle2d* secondary_bounds, const point2d* cursor_reference, int16 height_adjust, const char* string, const struct s_dynamic_geometry_map_color_parameters* color = NULL);

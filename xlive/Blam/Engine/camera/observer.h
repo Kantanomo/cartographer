@@ -111,7 +111,7 @@ s_observer* observer_get_from_user(int32 user_index);
 
 void __cdecl observer_game_tick(void);
 
-void __cdecl observer_update(real32 dt);
+void observer_update(real32 dt);
 
 void __cdecl observer_validate_camera_command(s_observer_command* observer_command);
 

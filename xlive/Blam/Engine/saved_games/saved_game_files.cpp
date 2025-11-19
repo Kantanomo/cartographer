@@ -75,7 +75,7 @@ bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* ou
 			auto last_index = saved_game_main_menu_globals->save_files.get_count() - 1;
 			if ((abs_index <= last_index || abs_index == last_index))
 			{
-				csmemcpy(out_info, saved_game_main_menu_globals->save_files[abs_index], saved_game_main_menu_globals->save_files.get_type_size());
+				csmemcpy(out_info, &saved_game_main_menu_globals->save_files[abs_index], saved_game_main_menu_globals->save_files.get_type_size());
 				return true;
 			}
 		}
@@ -84,9 +84,9 @@ bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* ou
 	{
 		for (uint32 i = 0; i < saved_game_files_globals->cached_save_files.get_count(); ++i)
 		{
-			if (enumerated_index == saved_game_files_globals->cached_save_files[i]->enumerated_index)
+			if (enumerated_index == saved_game_files_globals->cached_save_files[i].enumerated_index)
 			{
-				csmemcpy(out_info, &saved_game_files_globals->cached_save_files[i]->file_info, sizeof(s_saved_game_main_menu_globals_save_file_info));
+				csmemcpy(out_info, &saved_game_files_globals->cached_save_files[i].file_info, sizeof(s_saved_game_main_menu_globals_save_file_info));
 				return true;
 			}
 		}
@@ -122,7 +122,7 @@ void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name
 		uint32 last_index = saved_game_main_menu_globals->default_save_files.get_count() - 1;
 		if (absolute_index <= last_index || absolute_index == last_index)
 		{
-			s_saved_game_main_menu_globals_default_save_file* default_save = saved_game_main_menu_globals->default_save_files[absolute_index];
+			s_saved_game_main_menu_globals_default_save_file* default_save = &saved_game_main_menu_globals->default_save_files[absolute_index];
 			if ((enumerated_index & 0xF) != 0)
 			{
 				if ((enumerated_index & 0xF) <= 9)
@@ -168,16 +168,18 @@ static void saved_games_load_save_file_information_from_disk(c_static_array<s_sa
 
 static void saved_game_main_menu_globals_initialize(void)
 {
+	// TODO: properly implement this
+
 	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
 
 	s_saved_game_main_menu_globals* saved_game_main_menu_globals = (s_saved_game_main_menu_globals*)c_physical_memory::allocate(sizeof(s_saved_game_main_menu_globals));
 
 	ASSERT(saved_game_main_menu_globals);
 
-	if(saved_game_main_menu_globals)
+	if (saved_game_main_menu_globals)
 	{
-		saved_game_main_menu_globals->default_save_files.clear();
-		saved_game_main_menu_globals->save_files.clear();
+		//saved_game_main_menu_globals->default_save_files.clear();
+		//saved_game_main_menu_globals->save_files.clear();
 	}
 	else
 	{
@@ -186,7 +188,7 @@ static void saved_game_main_menu_globals_initialize(void)
 
 	saved_game_main_menu_globals->saved_game_file_index_salt = saved_game_files_globals->unk_6;
 
-	saved_game_files_globals->unk_6 = (saved_game_files_globals->unk_6 + 1) % 200;
+	saved_game_files_globals->unk_6 = (saved_game_files_globals->unk_6 + 1) % 512;
 	saved_game_files_globals->unk_3 = 3;
 
 	saved_game_main_menu_globals_set(saved_game_main_menu_globals);
@@ -197,10 +199,8 @@ static void saved_game_files_memory_initialize(int32 unk)
 {
 	s_saved_game_files_globals* saved_game_files_globals = saved_game_files_globals_get();
 
-#ifdef ASSERTS_ENABLED
 	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
 	ASSERT(saved_game_main_menu_globals);
-#endif
 
 	ASSERT(saved_game_files_globals->memory_initialized_for_game);
 	

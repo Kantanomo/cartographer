@@ -24,15 +24,18 @@
 
 /* prototypes */
 
-static ai_globals_type* ai_globals_get(void);
-
 /* public code */
 
 void ai_apply_patches(void)
 {
-    // Replace function so we can initialize ai in MP
-    WritePointer((uintptr_t)&get_game_systems()[59].initialize_for_new_map_proc, ai_initialize_for_new_map);
-    return;
+	// Replace function so we can initialize ai in MP
+	WritePointer((uintptr_t)&get_game_systems()[59].initialize_for_new_map_proc, ai_initialize_for_new_map);
+	return;
+}
+
+ai_globals_type* ai_globals_get(void)
+{
+	return *Memory::GetAddress<ai_globals_type**>(0xA965CC, 0x9A1C4C);
 }
 
 void __cdecl ai_update(void)
@@ -41,43 +44,45 @@ void __cdecl ai_update(void)
 	return;
 }
 
+void ai_reset(void)
+{
+	// TODO:
+	return;
+}
+
 void __cdecl ai_initialize_for_new_map(void)
 {
-    ai_globals_type* ai_globals = ai_globals_get();
+	ai_globals_type* ai_globals = ai_globals_get();
 
-    ai_players_initialize_for_new_map();
+	ai_players_initialize_for_new_map();
 
 #ifdef AI_DEBUG
-    ai_debug_initialize_for_new_map();
+	ai_debug_initialize_for_new_map();
 #endif
-    actors_initialize_for_new_map();
-    swarms_initialize_for_new_map();
-    props_initialize_for_new_map();
-    
-    //nullsub();
-    
-    squads_initialize_for_new_map();
-    orders_initialize_for_new_map();
-    clumps_initialize_for_new_map();
-    joint_behavior_initialize_for_new_map();
-    dynamic_firing_sets_initialize_for_new_map();
-    cs_initialize_for_new_map();
-    ai_script_initialize_for_new_map();
-    ai_dialogue_initialize_for_new_map();
-    ai_scenes_initialize_for_new_map();
-    flocks_initialize_for_new_map();
-    gravemind_initialize_for_new_map();
+	actors_initialize_for_new_map();
+	swarms_initialize_for_new_map();
+	props_initialize_for_new_map();
+	
+	//nullsub();
+	
+	squads_initialize_for_new_map();
+	orders_initialize_for_new_map();
+	clumps_initialize_for_new_map();
+	joint_behavior_initialize_for_new_map();
+	dynamic_firing_sets_initialize_for_new_map();
+	cs_initialize_for_new_map();
+	ai_script_initialize_for_new_map();
+	ai_dialogue_initialize_for_new_map();
+	ai_scenes_initialize_for_new_map();
+	flocks_initialize_for_new_map();
+	gravemind_initialize_for_new_map();
 
-    ai_globals->spatial_effects_last_index = 0;
-    ai_globals->spatial_effects_first_index = 0;
-    csmemset(ai_globals->spatial_effects, 0, sizeof(ai_globals->spatial_effects));
-    ai_globals->ai_initialized_for_map = true;
+	ai_globals->spatial_effects_last_index = 0;
+	ai_globals->spatial_effects_first_index = 0;
+	csmemset(ai_globals->spatial_effects, 0, sizeof(ai_globals->spatial_effects));
+	ai_globals->ai_initialized_for_map = true;
 	return;
 }
 
 /* private code */
 
-static ai_globals_type* ai_globals_get(void)
-{
-    return *Memory::GetAddress<ai_globals_type**>(0xA965CC, 0x9A1C4C);
-}

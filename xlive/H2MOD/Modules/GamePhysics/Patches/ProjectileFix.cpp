@@ -24,7 +24,7 @@ projectile_update_t p_projectile_update;
 // determines whether the projectile should be updated in a 30hz context or not
 real32 projectile_get_update_tick_length(datum projectile_index, bool projectile_instant_update)
 {
-	object_datum* object = object_get_fast_unsafe(projectile_index);
+	object_datum* object = object_get(projectile_index);
 	const _projectile_definition* projectile_definition = (const struct _projectile_definition*)tag_get_fast(object->definition_index);
 
 	if (TEST_BIT(projectile_definition->flags, 5) // check if travels instantaneously flag is set in the projectile flags
@@ -43,7 +43,7 @@ real32 projectile_get_update_tick_length(datum projectile_index, bool projectile
 // sets the tick when the projectile has been created
 inline void projectile_set_creation_tick(datum projectile_datum_index)
 {
-	uint8* object_data = (uint8*)object_get_fast_unsafe(projectile_datum_index);
+	uint8* object_data = (uint8*)object_get(projectile_datum_index);
 	*(uint32*)(object_data + 428) = game_time_get(); // store the projectile creation tick count
 }
 
@@ -134,7 +134,7 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 {
 	auto p_matrix4x3_transform_point = Memory::GetAddressRelative<void(__cdecl*)(void*, real_vector3d*, real_vector3d*)>(0x47795A);
 
-	BYTE* projectile = (BYTE*)object_get_fast_unsafe(trigger_projectile_datum_index);
+	BYTE* projectile = (BYTE*)object_get(trigger_projectile_datum_index);
 
 	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - original values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
 

@@ -3,9 +3,6 @@
 
 #include "game/game.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
-#include "shell/shell_windows.h"
-
-#include "H2MOD/Modules/Shell/Config.h"
 
 /* prototypes */
 
@@ -24,12 +21,6 @@ void rasterizer_main_apply_patches(void)
 s_rasterizer_debug_options* rasterizer_debug_options_get(void)
 {
 	return Memory::GetAddress<s_rasterizer_debug_options*>(0x46816C);
-}
-
-void rasterizer_present_frame_wrapper(bitmap_data* bitmap)
-{
-	rasterizer_dx9_present(bitmap, false);
-	return;
 }
 
 void rasterizer_present_frame_screenshot_wrapper(bitmap_data* bitmap)

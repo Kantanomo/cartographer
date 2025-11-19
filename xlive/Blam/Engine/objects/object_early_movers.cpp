@@ -13,7 +13,7 @@ s_object_early_movers_globals* object_early_movers_globals_get(void)
 
 void object_early_mover_new(datum object_index)
 {
-	object_datum* object = object_get_fast_unsafe(object_index);
+	object_datum* object = object_get(object_index);
 	const object_definition* object_def = (object_definition*)tag_get_fast(object->definition_index);
 	s_object_early_movers_globals* object_early_movers_globals = object_early_movers_globals_get();
 

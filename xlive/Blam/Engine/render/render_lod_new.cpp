@@ -393,7 +393,7 @@ void __cdecl object_build_render_cache_and_info(
         if (object_render_valid)
         {
             ++info->object_count;
-            const object_datum* render_object = object_get_fast_unsafe(info->object_index[render_model_storage_index]);
+            const object_datum* render_object = object_get(info->object_index[render_model_storage_index]);
             if (render_object->object.cached_render_state_index != NONE)
             {
                 uint8* cached_object_render_state = (uint8*)datum_get(get_cached_object_render_states_array(), render_object->object.cached_render_state_index);

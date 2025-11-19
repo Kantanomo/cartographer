@@ -80,18 +80,33 @@ enum
 
 /* globals */
 
+#ifdef ASSERTS_ENABLED
 extern char g_temporary[256];
 
 extern bool g_catch_exceptions;
+#endif
 
 /* macros */
 
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
 #define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
 
+// Returns the maximum of the two values
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+// Returns the minimum of the two values
+#define MIN(a, b) ((a) > (b) ? (b) : (a))
+
+// Ensure a value stays within a certain range
+#define PIN(v, v_min, v_max) MAX(v_min, MIN(v, v_max))
+
+#define CLAMP_LOWER(x, low, high) ((x) >= (high) - (low) ? (x) - (high) : (low))
+
+#define CLAMP_UPPER(x, low, high) ((x) <= (high) - (low) ? (x) + (low) : (high))
+
 #define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)(((_salt) << 16) | (_absolute_index))
 #define DATUM_INDEX_TO_ABSOLUTE_INDEX(_datum_index) ((uint16)((_datum_index) & k_unsigned_short_max))
-#define DATUM_INDEX_TO_IDENTIFIER(_datum_index) ((uint16)(((_datum_index) >> 16) & k_unsigned_short_max))
+#define DATUM_INDEX_TO_IDENTIFIER(_datum_index) ((uint16)((_datum_index) >> 16))
 
 #define NUMBEROF(_array) (sizeof(_array) / sizeof(*_array))
 #define IN_RANGE(value, begin, end) (((value) >= (begin)) && ((value) <= (end)))
@@ -105,6 +120,9 @@ extern bool g_catch_exceptions;
 #define SET_BIT(flags, bit, value)( (value) ? ((flags) |= FLAG(bit)) : ((flags) &= ~FLAG(bit)) )
 #define SWAP_FLAG(flags, bit)			( (flags) ^=FLAG(bit) )
 #define FLAG_RANGE(first_bit, last_bit)	( (FLAG( (last_bit)+1 - (first_bit) )-1) << (first_bit) )
+
+// Make sure no bits outside of the bit count are set within the mask
+#define VALID_BITS(mask, bit_count) (!((mask) >> bit_count))
 
 #define BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT) (((BIT_COUNT) + (LONG_BITS - 1)) / LONG_BITS)
 #define BIT_VECTOR_SIZE_IN_BYTES(BIT_COUNT) (4 * BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT))
@@ -124,40 +142,34 @@ static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") e
 static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET ") for " #FIELD " is invalid");
 
 #ifdef ASSERTS_ENABLED
-#define ASSERT_TRIGGER_EXCEPTION(IS_EXCEPTION)	\
-if (IS_EXCEPTION)								\
-{												\
-	if (is_debugger_present())					\
-		__debugbreak();							\
-	else if (!g_catch_exceptions)				\
-		exit(-1);								\
-}												\
-else											\
-{												\
-	if (is_debugger_present())					\
-		__debugbreak();							\
-}												\
-(void)0
 
-#define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)		\
-display_assert(STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);	\
-ASSERT_TRIGGER_EXCEPTION(IS_EXCEPTION);							\
-(void)0
+#define DISPLAY_ASSERT_EXCEPTION(STATEMENT, FILE, LINE, IS_EXCEPTION)	\
+do																		\
+{																		\
+	display_assert(STATEMENT, FILE, LINE, IS_EXCEPTION);				\
+	if (is_debugger_present())											\
+		__debugbreak();													\
+	else if (!g_catch_exceptions)										\
+		exit(-1);														\
+}																		\
+while(0)
 
-#define DISPLAY_ASSERT(STATEMENT)			\
-DISPLAY_ASSERT_EXCEPTION(STATEMENT, true);	\
-(void)0
+#define DISPLAY_ASSERT(STATEMENT) DISPLAY_ASSERT_EXCEPTION(STATEMENT, __FILE__, __LINE__, true)
 
-#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)               \
-if (!(STATEMENT))                                               \
-{																\
-	DISPLAY_ASSERT_EXCEPTION(#STATEMENT, IS_EXCEPTION);			\
-}                                                               \
-(void)0
 
-#define ASSERT(STATEMENT)			\
-ASSERT_EXCEPTION(STATEMENT, true);	\
-(void)0
+#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)								\
+do																				\
+{																				\
+	if (!(STATEMENT))															\
+	{																			\
+		DISPLAY_ASSERT_EXCEPTION(#STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);	\
+	}																			\
+}																				\
+while(0)
+
+#define ASSERT(STATEMENT) ASSERT_EXCEPTION(STATEMENT, true)
+
+#define assert_return(pointer) assert_return_internal(pointer, #pointer, __FILE__, __LINE__)
 
 #define vassert(STATEMENT, FORMAT, ...)	\
 do																								\
@@ -174,15 +186,15 @@ while(0)
 #define halt() DISPLAY_ASSERT("halt()")
 
 #else
-#define ASSERT_TRIGGER_EXCEPTION()							(void)(0)
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)   (void)(#STATEMENT)
 #define DISPLAY_ASSERT(STATEMENT)                           (void)(#STATEMENT)
-#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           (void)(#STATEMENT)
-#define ASSERT(STATEMENT)                                   (void)(#STATEMENT)
+#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           __assume(STATEMENT)
+#define ASSERT(STATEMENT)                                   __assume(STATEMENT)
 
-#define vassert(...)	(void)(0)
-#define unreachable()	__assume(0)
-#define halt()			(void)(0)
+#define assert_return(pointer)		assert_return_internal(pointer)
+#define vassert(STATEMENT, ...)		__assume((STATEMENT))
+#define unreachable()				__assume(0)
+#define halt()						__assume(0)
 
 #endif // ASSERTS_ENABLED
 
@@ -251,3 +263,23 @@ int32 csstrncmp(const char* s1, const char* s2, size_t size);
 char* csstrnlwr(char* s, size_t size);
 
 char* strchr(char* str, int32 ch);
+
+/* public code */
+
+template <typename T>
+#ifdef ASSERTS_ENABLED
+T* assert_return_internal(T* pointer, const char* statement, const char* file, int32 line)
+{
+	if (!pointer)
+	{
+		DISPLAY_ASSERT_EXCEPTION(statement, file, line, true);
+	}
+	return pointer;
+}
+#else
+__forceinline T* assert_return_internal(T* pointer)
+{
+	__assume(pointer);
+	return pointer;
+}
+#endif

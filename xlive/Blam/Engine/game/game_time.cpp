@@ -41,11 +41,9 @@ uint32 game_time_get(void)
 
 void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_game_dt)
 {
-#if ASSERTS_ENABLED
 	s_time_globals* game_time_globals = time_globals_get();
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
-#endif
 	ASSERT(desired_ticks > 0);
 	ASSERT(actual_ticks < desired_ticks);
 	ASSERT(elapsed_game_dt);

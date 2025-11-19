@@ -363,7 +363,7 @@ void __thiscall c_map_manager::start_map_synchronize(void)
 	return;
 }
 
-uint32 __thiscall c_map_manager::get_custom_map_list_ids(s_custom_map_id* out_ids, uint32 out_ids_count)
+uint32 __thiscall c_map_manager::get_custom_map_list_ids(s_secure_map_id* out_ids, uint32 out_ids_count)
 {
 	c_critical_section_scope lock(m_lock);
 	for (uint16 i = 0; i < m_map_count; i++)
@@ -374,8 +374,8 @@ uint32 __thiscall c_map_manager::get_custom_map_list_ids(s_custom_map_id* out_id
 		{
 			if (i < out_ids_count)
 			{
-				csmemcpy(out_ids[i].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
-				ustrncpy(out_ids[i].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
+				csmemcpy(out_ids[i].hash, m_new_custom_map_entry_list_buffer[i].hash, k_sha256_hash_size_bytes);
+				ustrncpy(out_ids[i].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_custom_map_name_length);
 			}
 		}
 	}
@@ -385,7 +385,7 @@ uint32 __thiscall c_map_manager::get_custom_map_list_ids(s_custom_map_id* out_id
 }
 
 CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__get_custom_map_list_ids_by_map_name, c_map_manager::get_custom_map_list_ids_by_map_name);
-uint32 __thiscall c_map_manager::get_custom_map_list_ids_by_map_name(const wchar_t* map_name, s_custom_map_id* out_ids, uint32 out_ids_count)
+uint32 __thiscall c_map_manager::get_custom_map_list_ids_by_map_name(const wchar_t* map_name, s_secure_map_id* out_ids, uint32 out_ids_count)
 {
 	c_critical_section_scope lock(m_lock);
 
@@ -394,7 +394,7 @@ uint32 __thiscall c_map_manager::get_custom_map_list_ids_by_map_name(const wchar
 	// used by dedicated server
 	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, k_max_map_name_size))
+		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, k_custom_map_name_length))
 		{
 			m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 			if (out_ids != nullptr
@@ -402,8 +402,8 @@ uint32 __thiscall c_map_manager::get_custom_map_list_ids_by_map_name(const wchar
 			{
 				if (matching_count_found < out_ids_count)
 				{
-					csmemcpy(out_ids[matching_count_found].map_sha256_hash, m_new_custom_map_entry_list_buffer[i].map_sha256_hash, k_sha256_hash_size);
-					ustrncpy(out_ids[matching_count_found].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_max_map_name_size);
+					csmemcpy(out_ids[matching_count_found].hash, m_new_custom_map_entry_list_buffer[i].hash, k_sha256_hash_size_bytes);
+					ustrncpy(out_ids[matching_count_found].map_name, m_new_custom_map_entry_list_buffer[i].map_name, k_custom_map_name_length);
 				}
 			}
 
@@ -461,7 +461,7 @@ uint32 __thiscall c_map_manager::find_matching_entries_by_sha256_hash(const BYTE
 
 	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!memcmp(m_new_custom_map_entry_list_buffer[i].map_sha256_hash, hash, k_sha256_hash_size))
+		if (!memcmp(m_new_custom_map_entry_list_buffer[i].hash, hash, k_sha256_hash_size_bytes))
 		{
 			m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
@@ -490,7 +490,7 @@ uint32 __thiscall c_map_manager::find_matching_entries_by_map_name_and_hash(cons
 
 	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!memcmp(m_new_custom_map_entry_list_buffer[i].map_sha256_hash, sha256_hash, k_sha256_hash_size) && !_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, k_max_map_name_size))
+		if (!memcmp(m_new_custom_map_entry_list_buffer[i].hash, sha256_hash, k_sha256_hash_size_bytes) && !_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, k_custom_map_name_length))
 		{
 			m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
@@ -519,7 +519,7 @@ uint32 __thiscall c_map_manager::find_matching_entries_by_map_name(const wchar_t
 
 	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, k_max_map_name_size))
+		if (!_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, map_name, k_custom_map_name_length))
 		{
 			m_new_custom_map_entry_list_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
@@ -536,13 +536,13 @@ uint32 __thiscall c_map_manager::find_matching_entries_by_map_name(const wchar_t
 }
 
 CLASS_HOOK_DECLARE_LABEL(c_custom_map_manager__get_entry_by_id, c_map_manager::get_entry_by_id);
-bool __thiscall c_map_manager::get_entry_by_id(const s_custom_map_id* custom_map_id, s_custom_map_entry** out_entry)
+bool __thiscall c_map_manager::get_entry_by_id(const s_secure_map_id* custom_map_id, s_custom_map_entry** out_entry)
 {
 	// custom_scenario_test_map_name_instead_of_hash
 	if (shell_command_line_flag_is_set(_shell_command_line_flag_custom_map_entry_test_map_name_instead_of_hash))
 		return find_matching_entries_by_map_name(custom_map_id->map_name, out_entry, 1) != 0;
 	else
-		return find_matching_entries_by_sha256_hash(custom_map_id->map_sha256_hash, out_entry, 1) != 0;
+		return find_matching_entries_by_sha256_hash(custom_map_id->hash, out_entry, 1) != 0;
 }
 
 bool __thiscall c_map_manager::entry_is_duplicate(const s_custom_map_entry* entry)
@@ -552,7 +552,7 @@ bool __thiscall c_map_manager::entry_is_duplicate(const s_custom_map_entry* entr
 	bool duplicate = false;
 
 	if (find_matching_entries_by_file_path(entry->file_path, 0, 0) > 0u
-		|| find_matching_entries_by_map_name_and_hash(entry->map_name, entry->map_sha256_hash, 0, 0) > 0u)
+		|| find_matching_entries_by_map_name_and_hash(entry->map_name, entry->hash, 0, 0) > 0u)
 	{
 		duplicate = true;
 	}
@@ -615,8 +615,8 @@ bool __thiscall c_map_manager::remove_duplicates_by_map_name_and_hash(const s_cu
 	bool removed = false;
 	for (uint16 i = 0; i < m_map_count; i++)
 	{
-		if (!memcmp(m_new_custom_map_entry_list_buffer[i].map_sha256_hash, entry->map_sha256_hash, k_sha256_hash_size) 
-			&& !_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, entry->map_name, k_max_map_name_size))
+		if (!memcmp(m_new_custom_map_entry_list_buffer[i].hash, entry->hash, k_sha256_hash_size_bytes) 
+			&& !_wcsnicmp(m_new_custom_map_entry_list_buffer[i].map_name, entry->map_name, k_custom_map_name_length))
 		{
 			//LOG_TRACE_GAME(L"{} - removed: {} from cache matching cached entry: map name: {} map path: {}",
 				//__FUNCTIONW__, entry->file_path, new_custom_map_entries_buffer[i].map_name, new_custom_map_entries_buffer[i].file_path);
@@ -818,22 +818,22 @@ public:
 
 		// first we get the map count
 		*custom_map_menu_list = nullptr;
-		s_custom_map_id* map_ids_buffer = nullptr;
+		s_secure_map_id* map_ids_buffer = nullptr;
 		uint32 custom_map_available_count = map_manager_get()->get_custom_map_list_ids(nullptr, 0);
 
 		if (custom_map_available_count > 0)
 		{
-			*custom_map_menu_list = ui_list_data_new("custom game custom maps", custom_map_available_count, sizeof(s_custom_map_id));
+			*custom_map_menu_list = ui_list_data_new("custom game custom maps", custom_map_available_count, sizeof(s_secure_map_id));
 			data_make_valid(*custom_map_menu_list);
-			map_ids_buffer = new s_custom_map_id[custom_map_available_count];
+			map_ids_buffer = new s_secure_map_id[custom_map_available_count];
 			map_manager_get()->get_custom_map_list_ids(map_ids_buffer, custom_map_available_count);
 
 			// ### FIXME ugly...
 			for (uint32 i = custom_map_available_count; i-- > 0; )
 			{
-				s_custom_map_id* list_entry
-					= &((s_custom_map_id*)(*custom_map_menu_list)->data)[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_new(*custom_map_menu_list))];
-				csmemcpy(list_entry, &map_ids_buffer[i], sizeof(s_custom_map_id));
+				s_secure_map_id* list_entry
+					= &((s_secure_map_id*)(*custom_map_menu_list)->data)[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_new(*custom_map_menu_list))];
+				csmemcpy(list_entry, &map_ids_buffer[i], sizeof(s_secure_map_id));
 			}
 		}
 
@@ -935,7 +935,7 @@ static bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom
 		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
 		return false;
 	}
-	if (strnlen_s(header.name, k_max_map_name_size) >= 32 || strnlen_s(header.version_string, 32) >= 32)
+	if (strnlen_s(header.name, k_custom_map_name_length) >= 32 || strnlen_s(header.version_string, 32) >= 32)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;

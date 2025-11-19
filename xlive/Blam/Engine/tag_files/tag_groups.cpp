@@ -10,13 +10,143 @@ enum
 	k_maximum_string_id_storage = 0x60000
 };
 
+static const uint32 k_string_id_length_shift = 24;
+
+static const uint32 k_string_id_index_mask = 0xFFFFFF;	// First 24 bits set to 1
+
+#ifdef HS_COMPILER_ENABLED
+const char* global_tag_group_names[]
+{
+	"model",
+	"render_model",
+	"collision_model",
+	"physics_model",
+	"bitmap",
+	"color_table",
+	"multilingual_unicode_string_list",
+	"unit",
+	"biped",
+	"vehicle",
+	"scenery",
+	"crate",
+	"creature",
+	"physics",
+	"object",
+	"contrail",
+	"weapon",
+	"light",
+	"effect",
+	"particle",
+	"particle_model",
+	"particle_physics",
+	"globals",
+	"sound",
+	"sound_looping",
+	"item",
+	"equipment",
+	"antenna",
+	"light_volume",
+	"liquid",
+	"cellular_automata",
+	"cellular_automata2d",
+	"stereo_system",
+	"camera_track",
+	"projectile",
+	"device",
+	"device_machine",
+	"device_control",
+	"device_light_fixture",
+	"point_physics",
+	"scenario_structure_lightmap",
+	"scenario_structure_bsp",
+	"scenario",
+	"shader",
+	"shader_template",
+	"shader_light_response",
+	"shader_pass",
+	"vertex_shader",
+	"pixel_shader",
+	"decorator_set",
+	"decorators",
+	"sky",
+	"wind",
+	"sound_environment",
+	"lens_flare",
+	"planar_fog",
+	"patchy_fog",
+	"meter",
+	"decal",
+	"colony",
+	"damage_effect",
+	"dialogue",
+	"item_collection",
+	"vehicle_collection",
+	"weapon_hud_interface",
+	"grenade_hud_interface",
+	"unit_hud_interface",
+	"new_hud_definition",
+	"hud_number",
+	"hud_globals",
+	"multiplayer_scenario_description",
+	"detail_object_collection",
+	"sound_scenery",
+	"hud_message_text",
+	"user_interface_screen_widget_definition",
+	"user_interface_list_skin_definition",
+	"user_interface_globals_definition",
+	"user_interface_shared_globals_definition",
+	"text_value_pair_definition",
+	"multiplayer_variant_settings_interface_definition",
+	"material_effects",
+	"garbage",
+	"style",
+	"character",
+	"ai_dialogue_globals",
+	"ai_mission_dialogue",
+	"scenario_scenery_resource",
+	"scenario_bipeds_resource",
+	"scenario_vehicles_resource",
+	"scenario_equipment_resource",
+	"scenario_weapons_resource",
+	"scenario_sound_scenery_resource",
+	"scenario_lights_resource",
+	"scenario_devices_resource",
+	"scenario_decals_resource",
+	"scenario_cinematics_resource",
+	"scenario_trigger_volumes_resource",
+	"scenario_cluster_data_resource",
+	"scenario_creature_resource",
+	"scenario_decorators_resource",
+	"scenario_structure_lighting_resource",
+	"scenario_hs_source_file",
+	"scenario_ai_resource",
+	"scenario_comments_resource",
+	"breakable_surface",
+	"material_physics",
+	"sound_classes",
+	"multiplayer_globals",
+	"sound_effect_template",
+	"sound_effect_collection",
+	"chocolate_mountain",
+	"model_animation_graph",
+	"cloth",
+	"screen_effect",
+	"weather_system",
+	"sound_mix",
+	"sound_dialogue_constants",
+	"sound_cache_file_gestalt",
+	"cache_file_sound",
+	"mouse_cursor_definition"
+};
+#endif
+
 /* typedefs */
 
 typedef int32(__cdecl* subtract_function_t)(uint32 a1, uint32 a2, uint32 a3);
 
 /* globals */
 
-static int32 g_string_id_table_count;
+static int32 g_string_id_count;
 
 static int32 g_string_id_block_offset;
 
@@ -214,13 +344,33 @@ void tag_group_set_data_info(uint32 tag_data, uint32 tag_data_size)
 	return;
 }
 
+void string_id_convert_string(char* string)
+{
+	for (size_t i = 0; string[i] != '\0'; ++i)
+	{
+		// Convert upper to lowercase
+		if (IN_RANGE(string[i], 'A', 'Z'))
+		{
+			string[i] -= 'A';
+			string[i] += 'a';
+		}
+
+		// Convert spaces and dashes to underscores
+		if (string[i] == ' ' || string[i] == '-')
+		{
+			*string = '_';
+		}
+	}
+	return;
+}
+
 bool string_id_load_strings(const cache_file_header* header)
 {
 	const int32 string_idx_offset = header->string_idx_offset;
 	g_string_id_block_offset = header->string_block_offset;
-	g_string_id_table_count = header->string_table_count;
+	g_string_id_count = header->string_table_count;
 
-	uint32 read_count = cache_file_align_read_size_to_cache_page(sizeof(string_id) * g_string_id_table_count);
+	uint32 read_count = cache_file_align_read_size_to_cache_page(sizeof(string_id) * g_string_id_count);
 	ASSERT(read_count < sizeof(g_string_id_index_buffer));
 
 	const bool result = cache_file_blocking_read(NONE, string_idx_offset, read_count, g_string_id_index_buffer);
@@ -232,12 +382,23 @@ bool string_id_load_strings(const cache_file_header* header)
 	return result;
 }
 
-const char* string_id_get_string_const(int32 id)
+char* string_id_get_string(int32 index, char(& buffer)[128])
+{
+	ASSERT(index < g_string_id_count);
+
+	csmemset(buffer, 0, sizeof(buffer));
+	const int32 storage_index = g_string_id_index_buffer[index];
+
+	ASSERT(VALID_INDEX(storage_index, k_maximum_string_id_storage));
+	return csstrncpy(buffer, &g_string_id_storage[storage_index], sizeof(buffer));
+}
+
+const char* string_id_get_string_const(string_id id)
 {
 	const char* result = NULL;
-	if ((id & 0xFFFFFF) < g_string_id_table_count)
+	if ((id & k_string_id_index_mask) < (uint32)g_string_id_count)
 	{
-		uint32 storage_index = g_string_id_index_buffer[id & 0xFFFFFF];
+		int32 storage_index = g_string_id_index_buffer[id & k_string_id_index_mask];
 		
 		ASSERT(VALID_INDEX(storage_index, k_maximum_string_id_storage));
 		result = &g_string_id_storage[storage_index];
@@ -245,3 +406,25 @@ const char* string_id_get_string_const(int32 id)
 
 	return result;
 }
+
+string_id string_id_exists(const char* in_string)
+{
+	char string[128];
+	csstrncpy(string, in_string, NUMBEROF(string));
+	string_id_convert_string(string);
+
+	string_id result = _string_id_invalid;
+	for (int32 i = 0; i < g_string_id_count; ++i)
+	{
+		char string_id_string[128];
+		string_id_get_string(i, string_id_string);
+		if (csstrcmp(string, string_id_string) == 0)
+		{
+			const int32 length = (int32)cstrlen(string);
+			result = (string_id)(i | (length << k_string_id_length_shift));
+		}
+	}
+	return result;
+}
+
+/* private code */

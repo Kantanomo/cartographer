@@ -31,8 +31,15 @@
 #include "sound/game_sound_deterministic.h"
 #include "text/unicode.h"
 
-/* typedefs */
+/* constants */
 
+char const* global_campaign_difficulty_level_names[4]
+{
+	"easy",
+	"normal",
+	"heroic",
+	"legendary"
+};
 
 /* structures */
 
@@ -53,7 +60,7 @@ static void __cdecl game_finished_update(void);
 
 static void __cdecl game_save_update(void);
 
-/* globals */
+/* public code */
 
 void game_apply_pre_winmain_patches(void)
 {

@@ -48,7 +48,17 @@ enum
 	k_event_category_string_length = 64,
 };
 
-static const char* k_event_level_severity_strings[6] =
+const char* k_event_level_names[k_network_event_level_count]
+{
+	"verbose",
+	"status",
+	"message",
+	"warning",
+	"error",
+	"critical"
+};
+
+const char* k_event_level_severity_strings[k_network_event_level_count] =
 {
 	"verbose",
 	"status ",
@@ -56,21 +66,6 @@ static const char* k_event_level_severity_strings[6] =
 	"WARNING",
 	"-ERROR-",
 	"-FATAL-"
-};
-
-/* globals */
-
-static s_network_event_globals network_event_globals =
-{
-	false,			// initialized
-	true,			// net_event
-	{0, 0},			// pad
-	_event_warning,	// current_display_level
-	_event_message,	// current_log_level
-	_event_message,	// current_remote_log_level
-	_event_invalid,	// current_minimum_level
-	_event_invalid,	// current_minimum_category_level
-	NULL			// categories
 };
 
 static bool g_network_event_print_critical_errors = false;
@@ -96,6 +91,21 @@ static void network_event_log_cateory_recursive(datum network_category_index, e_
 static void network_event_format_category_string(datum category_index, char* buffer, int32 buffer_length);
 
 static void network_event_iterate_categories(void);
+
+/* globals */
+
+static s_network_event_globals network_event_globals =
+{
+	false,			// initialized
+	true,			// net_event
+	{0, 0},			// pad
+	_event_warning,	// current_display_level
+	_event_message,	// current_log_level
+	_event_message,	// current_remote_log_level
+	_event_invalid,	// current_minimum_level
+	_event_invalid,	// current_minimum_category_level
+	NULL			// categories
+};
 
 /* public code */
 

@@ -11,3 +11,9 @@ public:
 private:
 	LPCRITICAL_SECTION m_critical_section;
 };
+
+/* prototypes */
+
+LPCRITICAL_SECTION mutex_create(void);
+
+bool mutex_valid(LPCRITICAL_SECTION section);

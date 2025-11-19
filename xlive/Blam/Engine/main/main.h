@@ -1,10 +1,5 @@
 #pragma once
 
-/* globals */
-
-extern bool debug_no_drawing;
-extern bool debug_console_pauses_game;
-
 /* prototypes */
 
 void main_apply_patches(void);
@@ -34,3 +29,9 @@ void main_status(const char* status_type, const char* format, ...);
 void main_halt_and_catch_fire(void);
 
 void main_crash(const char* str);
+
+/* globals */
+
+extern bool debug_no_drawing;
+extern bool debug_console_pauses_game;
+extern bool force_crash_uploads;

@@ -80,10 +80,8 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
 {
 	ASSERT(entity_index != NONE);
 
-#ifdef ASSERTS_ENABLED
 	const uint32 absolute_index = ENTITY_INDEX_TO_ABSOLUTE_INDEX(entity_index);
 	ASSERT(VALID_INDEX(absolute_index, k_simulation_entity_database_maximum_entities));
-#endif
 
 	ASSERT(m_entity_manager);
 	//ASSERT(m_entity_manager->is_entity_allocated(entity_index));
@@ -113,12 +111,11 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
 	entity->state_data = blocks[_entity_creation_block_order_simulation_entity_state].block_data;
 	entity->state_data_size = blocks[_entity_creation_block_order_simulation_entity_state].block_size;
 
-#ifdef ASSERTS_ENABLED
 	const uint32 creation_data_size = blocks[_entity_creation_block_order_simulation_entity_creation].block_size;
 	const void* creation_data = blocks[_entity_creation_block_order_simulation_entity_creation].block_data;
 	const uint32 state_data_size = blocks[_entity_creation_block_order_simulation_entity_state].block_size;
 	const void* state_data = blocks[_entity_creation_block_order_simulation_entity_state].block_data;
-#endif
+
 	// TODO when we implement this
 	// datum gamestate_index = *(datum*)blocks[_entity_creation_block_order_gamestate_index].block_data;
 	s_simulation_queue_element* simulation_queue_element = *(s_simulation_queue_element**)blocks[_entity_creation_block_order_forward_memory_queue_element].block_data;
@@ -129,7 +126,6 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
 
 	csmemset(blocks, 0, sizeof(s_replication_allocation_block) * block_count);
 
-#ifdef ASSERTS_ENABLED
 	const c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(entity_type);
 	
 	ASSERT(entity_definition != NULL);
@@ -139,7 +135,6 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
 	ASSERT((state_data == NULL) == (state_data_size == 0));
 	//ASSERT(gamestate_index != NONE);
 	ASSERT(simulation_queue_element != NULL);
-#endif
 
 	// ### TODO FIXME create objects during game tick
 	// works-around an issue where desync could occur because the entity wouldn't get an object index allocated 
@@ -168,12 +163,10 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 	s_replication_allocation_block* blocks,
 	c_bitstream* packet)
 {
-#ifdef ASSERTS_ENABLED
 	const uint16 absolute_index = ENTITY_INDEX_TO_ABSOLUTE_INDEX(entity_index);
 
 	ASSERT(VALID_INDEX(absolute_index, k_simulation_entity_database_maximum_entities));
 	ASSERT(packet);
-#endif
 
 	uint32 result = 3;
 	e_simulation_entity_type entity_type = (e_simulation_entity_type)packet->read_integer("entity-type", 5);

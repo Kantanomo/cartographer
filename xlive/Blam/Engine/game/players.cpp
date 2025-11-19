@@ -465,11 +465,10 @@ void __cdecl player_find_action_context(datum player_index, s_player_interaction
 	out_action_context->field_4 = NONE;
 	out_action_context->field_8 = NONE;
 
-	datum unit_index = player->unit_index;
-
+	const datum unit_index = player->unit_index;
 	if (unit_index != NONE)
 	{
-		biped_datum* player_unit = (biped_datum*)object_get_fast_unsafe(unit_index);
+		biped_datum* player_unit = biped_get(unit_index);
 
 		if (player_unit->object.parent_object_index == NONE)
 		{
@@ -512,7 +511,7 @@ void __cdecl player_find_action_context(datum player_index, s_player_interaction
 				for (int16 object_num = 0; object_num < nearby_object_num; object_num++)
 				{
 					const datum nearby_object_index = nearby_objects[object_num];
-					const object_datum* object = (object_datum*)object_get_fast_unsafe(nearby_object_index);
+					const object_datum* object = object_get(nearby_object_index);
 					const e_object_type type = object->object.object_identifier.get_type();
 					
 					// If our object is not one of the objects we want to ignore
@@ -553,9 +552,9 @@ void __cdecl player_find_action_context(datum player_index, s_player_interaction
 										break;
 									}
 
-									object_datum* t_object = object_get_fast_unsafe(current_weapon_datum);
+									const object_datum* weapon_object = object_get(current_weapon_datum);
 									nearby_objects[nearby_object_num] = current_weapon_datum;
-									current_weapon_datum = t_object->object.next_index;
+									current_weapon_datum = weapon_object->object.next_object_index;
 								}
 								break;
 							}

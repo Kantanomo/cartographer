@@ -39,6 +39,34 @@ inline int16 rectangle2d_height(const rectangle2d* rect)
 	return rect->bottom - rect->top;
 }
 
+inline rectangle2d* set_rectangle2d(rectangle2d* rectangle, int16 x0, int16 y0, int16 x1, int16 y1)
+{
+	rectangle->x0 = x0;
+	rectangle->y0 = y0;
+	rectangle->x1 = x1;
+	rectangle->y1 = y1;
+	return rectangle;
+}
+
+inline rectangle2d* offset_rectangle2d(rectangle2d* rectangle, int16 dx, int16 dy)
+{
+	rectangle->left += dx;
+	rectangle->right += dx;
+	rectangle->top += dy;
+	rectangle->bottom += dy;
+	return rectangle;
+}
+
+
+inline void rectangle2d_scale(rectangle2d* rect, int16 scale)
+{
+	rect->v[0] *= scale;
+	rect->v[1] *= scale;
+	rect->v[2] *= scale;
+	rect->v[3] *= scale;
+	return;
+}
+
 inline void rectangle2d_to_rect(const rectangle2d* rect2d, RECT* rect)
 {
 	const int16 width = rectangle2d_width(rect2d);
@@ -51,12 +79,4 @@ inline void rectangle2d_to_rect(const rectangle2d* rect2d, RECT* rect)
 		rect2d->top + height
 	};
 	return;
-}
-
-inline void rectangle2d_scale(rectangle2d* rect, int16 scale)
-{
-	rect->v[0] *= scale;
-	rect->v[1] *= scale;
-	rect->v[2] *= scale;
-	rect->v[3] *= scale;
 }

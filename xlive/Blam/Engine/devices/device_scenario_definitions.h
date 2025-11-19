@@ -18,11 +18,6 @@ enum e_scenario_control_datum_flags : int32
 	_control_usable_from_both_sides_bit = 0
 };
 
-enum e_device_group_flags : int32
-{
-	_device_group_flag_can_change_only_once_bit = 0
-};
-
 enum e_scenario_machine_datum_flags : int32
 {
 	_scenario_machine_datum_flag_does_not_operate_automatically_bit = 0,
@@ -71,7 +66,7 @@ ASSERT_STRUCT_SIZE(s_scenario_control, 68);
 // max count: MAXIMUM_DEVICE_GROUPS_PER_SCENARIO 128
 struct scenario_device_group
 {
-	char name[32];
+	char name[k_tag_string_length];
 	real32 initial_value;
 	e_device_group_flags flags;
 };

@@ -146,9 +146,9 @@ bool simulation_in_progress(void)
 	return result;
 }
 
-bool simulation_query_object_is_predicted(datum object_datum)
+bool simulation_query_object_is_predicted(datum object_index)
 {
-	return game_is_predicted() && object_get_fast_unsafe(object_datum)->object.simulation_entity_index != NONE;
+	return game_is_predicted() && object_get(object_index)->object.simulation_entity_index != NONE;
 }
 
 void __cdecl simulation_process_input(uint32 player_action_mask, const player_action* player_actions)
@@ -188,7 +188,7 @@ void __cdecl simulation_apply_before_game(const struct simulation_update* update
 	for (int32 i = 0; i < k_maximum_players; i++)
 	{
 		datum control_unit_index = update->control_unit_index[i];
-		if (TEST_BIT(update->unit_control_mask, i) && object_try_and_get_and_verify_type(control_unit_index, _object_mask_unit))
+		if (TEST_BIT(update->unit_control_mask, i) && unit_try_and_get(control_unit_index))
 		{
 			unit_control(control_unit_index, &update->unit_control[i]);
 		}

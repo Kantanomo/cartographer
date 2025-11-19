@@ -219,17 +219,17 @@ void __cdecl rasterizer_settings_update_window_position(void)
 		{
 			const HMONITOR monitor_handle = global_d3d_interface->GetAdapterMonitor(shell_windows_get_monitor_index());
 
-			tagMONITORINFO mi;
-			mi.cbSize = sizeof(tagMONITORINFO);
-			if (monitor_handle && GetMonitorInfoA(monitor_handle, &mi))
+			MONITORINFO mi;
+			mi.cbSize = sizeof(MONITORINFO);
+			const BOOL monitor_res = GetMonitorInfoA(monitor_handle, &mi);
+
+			if (monitor_handle && monitor_res)
 			{
-				rect.right = mi.rcMonitor.right;
-				rect.left = mi.rcMonitor.left;
-				rect.top = mi.rcMonitor.top;
-				rect.bottom = mi.rcMonitor.bottom;
+				rect = mi.rcMonitor;
 			}
 			else
 			{
+				DISPLAY_ASSERT("false");
 				rect.right = rasterizer_settings->screen_width;
 				rect.top = 0;
 				rect.left = 0;

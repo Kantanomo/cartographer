@@ -10,8 +10,8 @@
 #include "game/player_control.h"
 #include "math/matrix_math.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
-#include "units/units.h"
 #include "units/unit_definitions.h"
+#include "units/vehicles.h"
 #include "units/vehicle_definitions.h"
 
 /* typedefs */
@@ -55,15 +55,17 @@ static void __cdecl first_person_camera_build_observer_command(datum player_unit
 
 	if (player_unit_index != NONE)
 	{
-		unit_datum* player_unit = (unit_datum*)object_get_fast_unsafe(player_unit_index);
+		unit_datum* player_unit = unit_get(player_unit_index);
 		unit_get_camera_position(player_unit_index, &result->position.position);
 		object_get_velocities(player_unit_index, &result->velocity, nullptr);
-		if(player_unit->object.parent_object_index)
+		if (player_unit->object.parent_object_index != NONE)
 		{
-			unit_datum* vehicle_unit = (unit_datum*)object_try_and_get_and_verify_type(player_unit->object.parent_object_index, _object_mask_vehicle);
-			if(vehicle_unit)
+			vehicle_datum* vehicle_unit = vehicle_get(player_unit->object.parent_object_index);
+			if (vehicle_unit)
 			{
 				const struct vehicle_definition* vehicle_definition = (const struct vehicle_definition*)tag_get_fast(vehicle_unit->definition_index);
+
+				ASSERT(vehicle_definition);
 
 				if (vehicle_definition->unit.seats[player_unit->unit.parent_seat_index]->flags.test(_unit_seat_definition_first_person_camera_slaved_to_gun))
 				{

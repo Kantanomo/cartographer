@@ -16,9 +16,12 @@ extern LRESULT IMGUI_IMPL_API ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 static HWND H2hWnd;
 static D3DPRESENT_PARAMETERS g_d3dPresentParameters;
 static IDirect3DDevice9Ex* g_xlive_d3d_device;
+static CRITICAL_SECTION g_render_section;
 
 void XLiveRendering::InitializeD3D9(D3DPRESENT_PARAMETERS* presentParameters)
 {
+	InitializeCriticalSection(&g_render_section);
+
 	g_d3dPresentParameters = *presentParameters;
 
 #ifndef IMGUI_DISABLE
@@ -63,7 +66,8 @@ int WINAPI XLiveUninitialize()
 	LOG_TRACE_XLIVE("XLiveUninitialize");
 	
 	XLiveRendering::D3D9ReleaseResources();
-
+	
+	DeleteCriticalSection(&g_render_section);
 	return 0;
 }
 
@@ -82,10 +86,8 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
 	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
 
-#ifndef IMGUI_DISABLE
-	ImGuiHandler::release_motd_texture();
-	ImGui_ImplDX9_InvalidateDeviceObjects();
-#endif
+	XLiveRendering::D3D9ReleaseResources();
+
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;
 }
@@ -93,10 +95,6 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
-#ifndef IMGUI_DISABLE
-	ImGuiHandler::release_motd_texture();
-	ImGui_ImplDX9_InvalidateDeviceObjects();
-#endif
 	XLiveRendering::D3D9ReleaseResources();
 	
 	//LOG_TRACE_XLIVE("XLiveOnDestroyDevice");
@@ -132,22 +130,25 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 // #5002: XLiveRender
 HRESULT WINAPI XLiveRender()
 {
-	static std::mutex renderMtx;
-	std::lock_guard lg(renderMtx);
+	EnterCriticalSection(&g_render_section);
 
 	if (!g_xlive_d3d_device)
 	{
+		LeaveCriticalSection(&g_render_section);
 		return E_UNEXPECTED;
 	}
 
 	if (FAILED(g_xlive_d3d_device->TestCooperativeLevel())) 
 	{
+		LeaveCriticalSection(&g_render_section);
 		return E_UNEXPECTED;
 	}
 
 #ifndef IMGUI_DISABLE
 	ImGuiHandler::DrawImgui();
 #endif
+
+	LeaveCriticalSection(&g_render_section);
 	return S_OK;
 }
 

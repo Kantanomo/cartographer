@@ -259,7 +259,7 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 		params.m_load_function = &c_screen_restore_video_defaults_setting_menu::load;
 		break;
 	default:
-		DISPLAY_ASSERT("unreachable");
+		unreachable();
 	}
 
 	if (params.m_load_function != nullptr)

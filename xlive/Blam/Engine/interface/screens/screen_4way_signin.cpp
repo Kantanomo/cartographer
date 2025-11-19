@@ -425,7 +425,7 @@ void c_screen_4way_signin::initialize(s_screen_parameters* parameters)
 	layout.panes_count = 1;
 
 
-	datum widget_tag_datum = user_interface_get_widget_tag_index_from_screen_id(this->m_screen_id);
+	datum widget_tag_datum = user_interface_get_screen_tag_index_by_id(this->m_screen_id);
 	if (widget_tag_datum != NONE)
 	{
 		this->verify_and_load_from_layout(widget_tag_datum, &layout);

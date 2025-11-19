@@ -197,7 +197,7 @@ uint64 c_bitstream::read_long_integer(const char* name, int size_in_bits)
 CLASS_HOOK_DECLARE_LABEL(c_bitstream__write_unit_vector, c_bitstream::write_unit_vector);
 void c_bitstream::write_unit_vector(const char* name, const real_vector3d* unit_vector)
 {
-	int32 quantized_vector = quantize_unit_vector(unit_vector);
+	int32 quantized_vector = quantize_unit_vector3d(unit_vector);
 	write_integer("unit-vector", quantized_vector, 19);
 }
 
@@ -205,7 +205,7 @@ CLASS_HOOK_DECLARE_LABEL(c_bitstream__read_unit_vector, c_bitstream::read_unit_v
 void c_bitstream::read_unit_vector(const char* name, real_vector3d* out_unit_vector)
 {
 	int32 quantized_vector = read_integer("unit-vector", 19);
-	dequantize_unit_vector(quantized_vector, out_unit_vector);
+	dequantize_unit_vector3d(quantized_vector, out_unit_vector);
 }
 
 __declspec(naked) void jmp_write_unit_vector()
@@ -220,18 +220,18 @@ __declspec(naked) void jmp_read_unit_vector()
 void bitstream_serialization_apply_patches()
 {
 	WriteValue(Memory::GetAddress(0xD215C, 0xCE716) + 1, (int8)19);
-	PatchCall(Memory::GetAddress(0xD216B, 0xCE725), (void*)dequantize_unit_vector);
+	PatchCall(Memory::GetAddress(0xD216B, 0xCE725), (void*)dequantize_unit_vector3d);
 	WriteJmpTo(Memory::GetAddress(0xD1BD9, 0xCE193), jmp_write_unit_vector);
 	WriteJmpTo(Memory::GetAddress(0xD20F4, 0xCE6AE), jmp_read_unit_vector);
 
 	// write_axes
-	PatchCall(Memory::GetAddress(0xD1DF7, 0xCE3B1), (void*)quantize_unit_vector);
+	PatchCall(Memory::GetAddress(0xD1DF7, 0xCE3B1), (void*)quantize_unit_vector3d);
 	WriteValue(Memory::GetAddress(0xD1E05, 0xCE3BF) + 2, (int32)(1 << 19));
 	WriteValue(Memory::GetAddress(0xD1E0D, 0xCE3C7) + 1, (int32)(1 << 19));
 	WriteValue(Memory::GetAddress(0xD1E2A, 0xCE3E4) + 1, (int8)19);
-	PatchCall(Memory::GetAddress(0xD1E3A, 0xCE3F4), (void*)dequantize_unit_vector);
+	PatchCall(Memory::GetAddress(0xD1E3A, 0xCE3F4), (void*)dequantize_unit_vector3d);
 
 	// read_axes
 	WriteValue(Memory::GetAddress(0xD2243, 0xCE7FD) + 1, (int8)19);
-	PatchCall(Memory::GetAddress(0xD2252, 0xCE80C), (void*)dequantize_unit_vector);
+	PatchCall(Memory::GetAddress(0xD2252, 0xCE80C), (void*)dequantize_unit_vector3d);
 }

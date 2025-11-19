@@ -180,8 +180,7 @@ void objects_apply_patches(void)
 
 void c_object_iterator_base::object_iterator_begin_internal(int32 type_flags, uint8 flags)
 {
-	// TOOD: implement
-	// data_verify(object_header_data_get());
+	data_verify(object_header_data_get());
 	m_iterator.signature = 0x86868686;
 	m_iterator.type_flags = type_flags != 0 ? type_flags : _object_mask_all;
 	m_iterator.flags = flags;
@@ -240,13 +239,22 @@ void* __cdecl object_iterator_next(object_iterator* iterator)
 	return INVOKE(0x130574, 0x11F437, object_iterator_next, iterator);
 }
 
-void* object_header_block_get(datum object_datum, const object_header_block_reference* reference)
+void* object_header_block_get(datum object_index, const object_header_block_reference* reference)
 {
-	return (void*)((char*)object_get_fast_unsafe(object_datum) + reference->offset);
+	object_header_datum* object_header = object_header_get(object_index);
+	void* object = object_get(object_index);
+
+	ASSERT(reference->offset > 0);
+	ASSERT(reference->size > 0);
+	ASSERT(reference->offset + reference->size <= object_header->data_size);
+	return (uint8*)object + reference->offset;
 }
 
 void* object_header_block_get_with_count(datum object_index, const object_header_block_reference* reference, uint32 element_size, int32* element_count)
 {
+	ASSERT(element_count);
+
+
 	void* block;
 	if (reference->offset == NONE)
 	{
@@ -256,6 +264,9 @@ void* object_header_block_get_with_count(datum object_index, const object_header
 	else
 	{
 		block = (void*)object_header_block_get(object_index, reference);
+		
+		ASSERT(reference->size % element_size == 0);
+
 		*element_count = reference->size / element_size;
 	}
 
@@ -278,9 +289,10 @@ int32 __cdecl object_index_from_name_index(int16 name_index)
 	return INVOKE(0x1335FB, 0x0, object_index_from_name_index, name_index);
 }
 
-bool __cdecl object_is_connected_to_map(datum object_index)
+bool object_is_connected_to_map(datum object_index)
 {
-	return INVOKE(0x132922, 0x1217F2, object_is_connected_to_map, object_index);
+	const datum parent = object_get_ultimate_parent(object_index);
+	return object_header_get(parent)->flags.test(_object_header_connected_to_map_bit);
 }
 
 void __cdecl object_update_collision_culling(datum object_datum)
@@ -289,15 +301,55 @@ void __cdecl object_update_collision_culling(datum object_datum)
 	return;
 }
 
-bool __cdecl object_header_block_allocate(datum object_datum, int16 offset, int16 padded_size, int16 alignment_bits)
+bool object_header_block_allocate(datum object_index, int16 block_reference_offset, int16 size, uint16 alignment_bits)
 {
-	return INVOKE(0x130BC6, 0x11FA89, object_header_block_allocate, object_datum, offset, padded_size, alignment_bits);
+	bool result = false;
+	object_header_datum* object_header = object_header_get(object_index);
+
+	ASSERT(size >= 0);
+	ASSERT(object_header->data_size + size <= SHORT_MAX);
+	ASSERT(alignment_bits >= 0 && alignment_bits < 8);
+
+	ASSERT(block_reference_offset >= 0);
+	ASSERT(block_reference_offset + sizeof(struct object_header_block_reference) <= (uint16)object_header->data_size);
+	
+	if (size > 0)
+	{
+		const int32 alignment_size = (1 << alignment_bits) - 1;
+		const int32 padded_size = alignment_size + size;
+		ASSERT(padded_size >= size);
+		if (memory_pool_block_reallocate(object_memory_pool_get(), &object_header->datum, padded_size + object_header->data_size))
+		{
+			const int32 offset = object_header->data_size;
+			object_header->data_size = (int16)(padded_size + offset);
+			
+			object_header_block_reference* block = (object_header_block_reference*)(
+				block_reference_offset + (int8*)object_get(object_index)
+			);
+			block->offset = ~(uint16)alignment_size & (alignment_size + offset);
+			block->size = size;
+
+			ASSERT(block->offset >= offset);
+			ASSERT((block->offset - offset) + size <= padded_size);
+			csmemset((int8*)object_header->datum + offset, 0, padded_size);
+			result = true;
+		}
+	}
+	else
+	{
+		object_header_block_reference* block = (object_header_block_reference*)(
+			block_reference_offset + (int8*)object_get(object_index)
+		);
+		block->offset = NONE;
+		block->size = 0;
+		result = true;
+	}
+	return result;
 }
 
 e_object_type object_get_type(datum object_index)
 {
-	const object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
-	return (e_object_type)object_header->type;
+	return (e_object_type)object_header_get(object_index)->type;
 }
 
 bool __cdecl object_is_prt_and_lightmapped(datum object_datum, datum* mode_tag_index, datum* coll_tag_index)
@@ -392,10 +444,7 @@ datum __cdecl object_new(object_placement_data* data)
 			const datum found_object_index = data->object_identifier.find_object_index();
 			if (found_object_index != NONE)
 			{
-#ifdef ASSERTS_ENABLED
-				const char* string = g_static_string_assert_text.print("object_new creating duplicate of 0x%x", found_object_index);
-				DISPLAY_ASSERT(string);
-#endif
+				DISPLAY_ASSERT(g_static_string_assert_text.print("object_new creating duplicate of 0x%x", found_object_index));
 			}
 		}
 
@@ -413,8 +462,8 @@ datum __cdecl object_new(object_placement_data* data)
 		else
 		{
 			halo_interpolator_setup_new_object(object_index);
-			object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
-			object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+			object_header_datum* object_header = object_header_get(object_index);
+			object_datum* object = object_get(object_index);
 
 			bool object_animation_and_attachments_cleared = false;
 			bool object_type_created = false;
@@ -464,7 +513,7 @@ datum __cdecl object_new(object_placement_data* data)
 			location_invalidate(&object->object.location);
 			object->object.first_cluster_reference = NONE;
 			object->object.parent_object_index = NONE;
-			object->object.next_index = NONE;
+			object->object.next_object_index = NONE;
 			object->object.current_weapon_datum = NONE;
 			object->object.name_list_index = NONE;
 			object->object.netgame_equipment_index = NONE;
@@ -500,26 +549,36 @@ datum __cdecl object_new(object_placement_data* data)
 
 			if (model_definition)
 			{
-				if (model_definition->nodes.count < 1)
+				if (model_definition->runtime_nodes.count < 1)
 				{
-					const char* model_name = tag_get_name(object_model_index);
-					const char* object_name = tag_get_name(data->definition_index);
-					error(_error_category_objects, _error_silent, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
+					error(
+						_error_category_objects,
+						_error_silent,
+						"object '%s' model '%s' has invalid node count %d!",
+						tag_get_name(data->definition_index),
+						tag_get_name(object_model_index),
+						model_definition->runtime_nodes.count
+					);
 				}
 				else
 				{
-					node_count = model_definition->nodes.count;
+					node_count = model_definition->runtime_nodes.count;
 				}
 
-				if (model_definition->collision_regions.count < 1)
+				if (model_definition->runtime_regions.count < 1)
 				{
-					const char* model_name = tag_get_name(object_model_index);
-					const char* object_name = tag_get_name(data->definition_index);
-					error(_error_category_objects, _error_silent, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
+					error(
+						_error_category_objects,
+						_error_silent,
+						"object '%s' model '%s' has invalid region count %d!",
+						tag_get_name(data->definition_index),
+						tag_get_name(object_model_index),
+						model_definition->runtime_regions.count
+					);
 				}
 				else
 				{
-					region_count = model_definition->collision_regions.count;
+					region_count = model_definition->runtime_regions.count;
 				}
 
 				if (model_definition->new_damage_info.count > 0 && model_definition->new_damage_info.data != NONE)
@@ -547,11 +606,13 @@ datum __cdecl object_new(object_placement_data* data)
 					}
 					else
 					{
-						const char* model_path = tag_get_name(object_model_index);
-						const char* model_name = tag_name_strip_path(model_path);
-						const char* graph_path = tag_get_name(model_definition->animation_graph.index);
-						const char* graph_name = tag_name_strip_path(graph_path);
-						error(_error_category_animation, _error_silent, "graph '%s' is not compatible with model '%s'", graph_name, model_name);
+						error(
+							_error_category_animation,
+							_error_silent,
+							"graph '%s' is not compatible with model '%s'",
+							tag_name_strip_path(tag_get_name(model_definition->animation_graph.index)),
+							tag_name_strip_path(tag_get_name(object_model_index))
+						);
 					}
 				}
 			}
@@ -588,7 +649,7 @@ datum __cdecl object_new(object_placement_data* data)
 			out_of_objects = !can_create_object;
 
 			// Get the object, we do this so we can verify that we're able to retrieve it in the future
-			object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+			object = object_get(object_index);
 			
 			if (can_create_object)
 			{
@@ -628,7 +689,7 @@ datum __cdecl object_new(object_placement_data* data)
 				can_create_object = object_type_new(object_index, data, &out_of_objects);
 				object_type_created = true;
 				// Get the object, we do this so we can verify that we're able to retrieve it in the future
-				object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+				object = object_get(object_index);
 			}
 
 			if (can_create_object)
@@ -725,10 +786,13 @@ datum __cdecl object_new(object_placement_data* data)
 
 	if (object_index == NONE && data->definition_index != NONE)
 	{
-		const char* message = out_of_objects ? "OUT OF OBJECTS" : "OBJECT CREATION FAILED";
-		const char* object_path = tag_get_name(data->definition_index);
-		const char* object_name = tag_name_strip_path(object_path);
-		error(_error_category_objects, _error_log, "%s: cannot create %s", message, object_name);
+		error(
+			_error_category_objects,
+			_error_log,
+			"%s: cannot create %s",
+			out_of_objects ? "OUT OF OBJECTS" : "OBJECT CREATION FAILED",
+			tag_name_strip_path(tag_get_name(data->definition_index))
+		);
 
 #ifdef OBJECT_DEBUG
 		if (debug_last_out_of_memory_dump_game_time == NONE || (debug_last_out_of_memory_dump_game_time + game_seconds_integer_to_ticks(5) >= (int32)game_time_get()))
@@ -757,7 +821,7 @@ void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool
 {
 	real_point3d point;
 	real_point3d interpolated_object_position;
-	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+	const object_datum* object = object_get(object_index);
 	if (interpolated && halo_interpolator_interpolate_object_position(object_index, &interpolated_object_position))
 	{
 		point = interpolated_object_position;
@@ -782,6 +846,7 @@ void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool
 		}
 		matrix4x3_transform_point(transform_matrix, &interpolated_object_position, point_out);
 	}
+	return;
 }
 
 void __cdecl object_get_origin_interpolated(datum object_index, real_point3d* point_out)
@@ -792,7 +857,10 @@ void __cdecl object_get_origin_interpolated(datum object_index, real_point3d* po
 
 real_matrix4x3* object_get_node_matrix(datum object_index, int16 node_index)
 {
-	real_matrix4x3* nodes = (real_matrix4x3*)object_header_block_get(object_index, &object_get_fast_unsafe(object_index)->object.nodes_block);
+	int32 node_count;
+	real_matrix4x3* nodes = (real_matrix4x3*)object_get_node_matrices(object_index, &node_count);
+
+	ASSERT(VALID_INDEX(node_index, node_count));
 	return &nodes[node_index];
 }
 
@@ -805,9 +873,14 @@ real_matrix4x3* object_try_get_node_matrix_interpolated(datum object_index, int1
 	return out_mat;
 }
 
-real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count)
+real_matrix4x3* object_get_node_matrices(datum object_index, int32* out_node_count)
 {
-	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->object.nodes_block, sizeof(real_matrix4x3), out_node_count);
+	object_datum* object = object_get(object_index);
+	
+	ASSERT(out_node_count);
+	ASSERT(object);
+
+	return (real_matrix4x3*)object_header_block_get_with_count(object_index, &object->object.nodes_block, sizeof(real_matrix4x3), out_node_count);
 }
 
 int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_matrix_count, const real_matrix4x3* object_skinning_matrices, real_matrix4x3* out_object_skinning_matrices)
@@ -817,13 +890,47 @@ int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_ma
 
 datum object_get_damage_owner(datum object_index)
 {
-	object_datum* object = (object_datum*)object_try_and_get_and_verify_type(object_index, _object_mask_all);
+	object_datum* object = object_get(object_index);
 	return object->object.damage_owner_object_index;
 }
 
 int32 object_get_entity_index(datum object_idx)
 {
-	return object_get_fast_unsafe(object_idx)->object.simulation_entity_index;
+	return object_get(object_idx)->object.simulation_entity_index;
+}
+
+void object_get_region_information(
+	int32 object_index,
+	int32* region_count,
+	int8** region_permutation_indices,
+	int8** region_render_permutation_indices,
+	object_region_information** region_information)
+{
+	const object_datum* object = object_get(object_index);
+
+	ASSERT(region_count);
+
+	object_region_information* regions = (object_region_information*)object_header_block_get_with_count(
+		object_index,
+		&object->object.collision_regions_block,
+		1,
+		region_count
+	);
+
+	*region_count /= 10;
+	if (region_information)
+	{
+		*region_information = regions;
+	}
+	if (region_permutation_indices)
+	{
+		*region_permutation_indices = &regions->variant_permutation_index + *region_count;
+	}
+	if (region_render_permutation_indices)
+	{
+		*region_render_permutation_indices = &regions->variant_permutation_index + 2 * *region_count;
+	}
+	return;
 }
 
 void __cdecl object_apply_function_overlay_node_orientations(
@@ -919,7 +1026,8 @@ void __cdecl objects_post_update(void)
 
 	while (object_header)
 	{
-		object_datum* object = object_get_fast_unsafe(iterator.index);
+		const datum object_index = iterator.index;
+		object_datum* object = object_get(object_index);
 
 		object_header->flags.set(_object_header_do_not_update_bit, false);
 
@@ -929,12 +1037,21 @@ void __cdecl objects_post_update(void)
 			&& !object_header->flags.test(_object_header_being_deleted_bit)
 			)
 		{
+			ASSERT(object_get(object_index)->object.parent_object_index == NONE);
+			ASSERT(object_get(object_index)->object.next_object_index == NONE);
+
+
 			object_header->flags.set(_object_header_post_update_bit, false);
 			
 			object_update(iterator.index);
 
 			if (object_header->flags.test(_object_header_requires_motion_bit))
+			{
+				ASSERT(object_header->flags.test(_object_header_active_bit));
+				ASSERT(object_header->flags.test(_object_header_awake_bit));
+
 				object_move(iterator.index);
+			}
 		}
 
 		if (object_header->flags.test(_object_header_active_bit)
@@ -971,14 +1088,11 @@ bool __cdecl object_force_inside_bsp(datum object_index, const real_point3d* kno
 
 void* object_get_and_verify_type(datum object_index, int32 object_type_mask)
 {
-	const object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	const object_header_datum* object_header = object_header_get(object_index);
 	const object_datum* object = (object_datum*)object_header->datum;
 	
-#ifdef ASSERTS_ENABLED
 	const e_object_type type = object->object.object_identifier.get_type();
 	vassert(TEST_BIT(object_type_mask, type), "got an object type we didn't expect (expected one of 0x%08x but got #%d).", object_type_mask, type);
-#endif
-
 	return (void*)object;
 }
 
@@ -988,7 +1102,7 @@ datum object_get_ultimate_parent(datum object_index)
 	while (object_index != NONE)
 	{
 		result = object_index;
-		object_index =  ((object_datum*)object_get_and_verify_type(object_index, _object_mask_all))->object.parent_object_index;
+		object_index = object_get(object_index)->object.parent_object_index;
 	}
 	return result;
 }
@@ -1027,12 +1141,10 @@ void __cdecl object_set_hidden(datum object_index, bool hidden)
 {
 	//INVOKE(0x1362C9, 0x125199, object_set_hidden, object_index, hidden);
 	
-	item_datum* object = (item_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+	item_datum* object = (item_datum*)object_get(object_index);
 	if (TEST_BIT(_object_mask_item, object_get_type(object_index)) && object->item.flags.test(_item_in_unit_inventory_bit))
 	{
-#ifdef ASSERTS_ENABLED
 		const bool hidden_in_inventory = object->item.flags.test(_item_hidden_in_unit_inventory_bit);
-#endif
 		if (unit_does_not_show_readied_weapon(object->item.inventory_owner_unit_index))
 		{
 			ASSERT(hidden || !hidden_in_inventory);
@@ -1139,7 +1251,7 @@ void objects_dump_memory(void)
 			}
 		}
 
-		const object_header_datum* header = (object_header_datum*)datum_get(object_header_data_get(), object_iterator.get_index());
+		const object_header_datum* header = object_header_get(object_iterator.get_index());
 		if (index != NONE)
 		{
 			object_add_to_dump(object_iterator.get_index(), &dumps[index]);
@@ -1282,7 +1394,7 @@ static datum object_allocate_header(datum tag_definition_index)
 
 static void free_object_memory(datum object_index)
 {
-	object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	object_header_datum* object_header = object_header_get(object_index);
 	object_header->flags.set_unsafe(0);
 	if (object_header->datum != NULL)
 	{
@@ -1294,10 +1406,12 @@ static void free_object_memory(datum object_index)
 
 static void object_postprocess_node_matrices(datum object_index)
 {
-	const object_datum* object = object_get_fast_unsafe(object_index);
-	const object_definition* object_tag = (object_definition*)tag_get_fast(object->definition_index);
+	const object_datum* object = object_get(object_index);
+	const struct object_definition* object_definition = (struct object_definition*)tag_get_fast(object->definition_index);
+	
+	ASSERT(object_definition);
 
-	const datum model_index = object_tag->object.model.index;
+	const datum model_index = object_definition->object.model.index;
 	if (model_index != NONE)
 	{
 		const s_model_definition* model_tag = (s_model_definition*)tag_get_fast(model_index);
@@ -1313,7 +1427,7 @@ static void object_postprocess_node_matrices(datum object_index)
 
 static void object_initialize_effects(datum object_index)
 {
-	const object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	const object_header_datum* object_header = object_header_get(object_index);
 	object_datum* object = (object_datum*)object_header->datum;
 
 	if (object_header->type == _object_type_projectile)
@@ -1342,7 +1456,7 @@ static void __cdecl object_cleanup_havok(datum object_index)
 
 static bool set_object_position_if_in_cluster(s_location* location, datum object_index)
 {
-	object_datum* object = object_get_fast_unsafe(object_index);
+	object_datum* object = object_get(object_index);
 
 	ASSERT(object->object.parent_object_index == NONE);
 
@@ -1379,7 +1493,7 @@ static void __cdecl update_object_region_information(datum object_datum, int32 r
 
 static void object_variant_index_update(datum object_index, string_id variant)
 {
-	object_datum* object = object_get_fast_unsafe(object_index);
+	object_datum* object = object_get(object_index);
 	object->object.model_variant_id = object_lookup_variant_index_from_name(object_index, variant);
 	return;
 }
@@ -1392,7 +1506,7 @@ static int8 __cdecl object_lookup_variant_index_from_name(datum object_index, st
 static bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bit_vectors* cluster_activation)
 {
 	bool result = false;
-	object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	object_header_datum* object_header = object_header_get(object_index);
 	const object_datum* object = (object_datum*)object_header->datum;
 
 	if (object->object.flags.test(_object_always_active_bit))
@@ -1408,7 +1522,7 @@ static bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bi
 
 static void object_reconnect_to_map(s_location* location, datum object_index)
 {
-	object_header_datum* object_header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
+	object_header_datum* object_header = object_header_get(object_index);
 	object_datum* object = (object_datum*)object_header->datum;
 	bool cluster_index_is_null = object_header->cluster_index == NONE;
 
@@ -1479,8 +1593,12 @@ static void object_reconnect_to_map(s_location* location, datum object_index)
 
 	if (cluster_overflow)
 	{
-		const char* name = tag_get_name(object->definition_index);
-		error(_error_category_objects, _error_silent, "### WARNING object %s touched too many clusters", name);
+		error(
+			_error_category_objects,
+			_error_silent,
+			"### WARNING object %s touched too many clusters",
+			tag_get_name(object->definition_index)
+		);
 	}
 
 	object_connect_lights_recursive(object_index, false, true, false, false);
@@ -1508,7 +1626,7 @@ static void object_reconnect_to_map(s_location* location, datum object_index)
 
 static void object_get_payload(datum object_index, s_object_payload* payload)
 {
-	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+	const object_datum* object = object_get(object_index);
 	uint16 object_collision_cull_flags = 0;
 	if (object->object.flags.test(_object_uses_collidable_list_bit))
 	{
@@ -1543,7 +1661,7 @@ static bool __cdecl object_update(datum object_index)
 
 static void object_initialize_for_interpolation(datum object_index)
 {
-	object_datum* object = object_get_fast_unsafe(object_index);
+	object_datum* object = object_get(object_index);
 	object_definition* object_def = (object_definition*)tag_get_fast(object->definition_index);
 
 	if (object_def->object.model.index == NONE)
@@ -1587,7 +1705,7 @@ static void object_initialize_for_interpolation(datum object_index)
 
 static void object_reset_interpolation(datum object_index)
 {
-	const object_datum* object = object_get_fast_unsafe(object_index);
+	const object_datum* object = object_get(object_index);
 
 	ASSERT(object);
 
@@ -1597,7 +1715,7 @@ static void object_reset_interpolation(datum object_index)
 	return;
 }
 
-static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count, bool is_unit)
+static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 maximum_marker_count, bool is_unit)
 {
 	int32 marker_index = 0;
 
@@ -1609,34 +1727,42 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 
 	if (index != NONE)
 	{
-		object_datum* object = object_get_fast_unsafe(index);
-		object_definition* object_def = (object_definition*)tag_get_fast(object->definition_index);
+		object_datum* object = object_get(index);
+		struct object_definition* object_definition = (struct object_definition*)tag_get_fast(object->definition_index);
+		
+		ASSERT(object_definition);
 
-		const datum object_model_index = object_def->object.model.index;
+		const datum object_model_index = object_definition->object.model.index;
 		if (object_model_index != NONE)
 		{
-			s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_model_index);
+			s_model_definition* model_definition = (s_model_definition*)tag_get_fast(object_model_index);
 
 			int32 node_count;
 			const real_matrix4x3* node_matrices;
 
+			int32 region_count;
+			int8* region_permutation_indices;
+			object_get_region_information(object_index, &region_count, &region_permutation_indices, NULL, NULL);
 			if (!halo_interpolator_interpolate_object_node_matrices(object_index, &node_matrices, &node_count))
 			{
 				node_matrices = object_get_node_matrices(object_index, &node_count);
 			}
 
-			void* collision_regions = (real_matrix4x3*)object_header_block_get(object_index, &object->object.collision_regions_block);
+			ASSERT(region_count == model_definition->runtime_regions.count);
+			ASSERT(node_count == model_definition->runtime_nodes.count);
 
-			marker_index = render_model_get_markers_by_name(model_def->render_model.index,
+			marker_index = render_model_get_markers_by_name(
+				model_definition->render_model.index,
 				marker,
-				collision_regions,
+				region_permutation_indices,
 				NONE,
 				NULL,
 				node_count,
 				node_matrices,
 				object->object.flags.test(_object_mirrored_bit),
 				marker_object,
-				count);
+				maximum_marker_count
+			);
 
 			if (marker_index)
 			{
@@ -1645,7 +1771,9 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 		}
 	}
 
-	object_datum* object = object_get_fast_unsafe(object_index);
+	object_datum* object = object_get(object_index);
+	ASSERT(maximum_marker_count > 0);
+
 	marker_object->node_index = 0;
 	matrix4x3_identity(&marker_object->node_matrix);
 
@@ -1654,7 +1782,7 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 		marker_object->matrix = *object_get_node_matrix(object_index, 0);
 	}
 
-	marker_object->field_6C = 0;
+	marker_object->radius = 0.f;
 	if (object->object.flags.test(_object_mirrored_bit))
 	{
 		scale_vector3d(&marker_object->matrix.vectors.left, -1.0f, &marker_object->matrix.vectors.left);
@@ -1678,7 +1806,7 @@ static s_object_override_data* object_override_data_get(size_t override_index)
 
 static int32 object_find_override_index(datum object_index)
 {
-	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, NONE);
+	const object_datum* object = object_get(object_index);
 	int32 override_index = NONE;
 	
 	if (object->object.flags.test(_object_has_override_bit))
@@ -1702,7 +1830,7 @@ static int32 object_find_override_index(datum object_index)
 
 static int32 object_get_override_index(datum object_index)
 {
-	object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+	object_datum* object = object_get(object_index);
 	int32 override_index = object_find_override_index(object_index);
 	if (override_index == NONE)
 	{
@@ -1729,7 +1857,7 @@ static int32 object_get_override_index(datum object_index)
 			ASSERT(override->object_index != NONE);
 
 			// This specific call to object_get_and_verify_type was inlined by default for some reason?
-			object_datum* override_object = (object_datum*)object_get_and_verify_type(g_object_override_data[0].object_index, _object_mask_all);
+			object_datum* override_object = object_get(g_object_override_data[0].object_index);
 			if (override_object)
 			{
 				override_object->object.flags.set(_object_has_override_bit, false);
@@ -1759,8 +1887,8 @@ static int32 object_get_override_index(datum object_index)
 #ifdef OBJECT_DEBUG
 static void object_add_to_dump(datum object_index, dump_datum* dump)
 {
-	const object_header_datum* header = (object_header_datum*)datum_get(object_header_data_get(), object_index);
-	const object_datum* object = (object_datum*)object_get_and_verify_type(object_index, _object_mask_all);
+	const object_header_datum* header = object_header_get(object_index);
+	const object_datum* object = object_get(object_index);
 	
 	if (header->data_size > dump->maximum_size)
 	{
@@ -1790,7 +1918,7 @@ static void object_add_to_dump(datum object_index, dump_datum* dump)
 		++dump->at_rest_count;
 	}
 
-	const object_datum* parent = (object_datum*)object_get_and_verify_type(object_get_ultimate_parent(object_index), _object_mask_all);
+	const object_datum* parent = object_get(object_get_ultimate_parent(object_index));
 	if (parent->object.flags.test(_object_outside_of_map_bit) || parent->object.location.cluster_index == NONE)
 	{
 		++dump->outside_map_count;
