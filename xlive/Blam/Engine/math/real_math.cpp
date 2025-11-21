@@ -88,6 +88,10 @@ const real_orientation* const global_identity_orientation = &private_identity_or
 const real_rectangle2d* const global_null_rectangle2d = (const real_rectangle2d* const)&private_null_rectangle;
 const real_rectangle3d* const global_null_rectangle3d = &private_null_rectangle;
 
+/* prototypes */
+
+static bool real_math_valid_control_register_configuration();
+
 /* public code */
 
 void __cdecl real_math_initialize(void)
@@ -104,7 +108,8 @@ void __cdecl real_math_reset_precision(void)
 
 int32 real_to_long_round(real32 v)
 {
-	return (int32)v;
+	ASSERT(real_math_valid_control_register_configuration());
+	return lrintf(v);
 }
 
 real32 distance_squared2d(const real_point2d* a, const real_point2d* b)
@@ -227,18 +232,18 @@ bool limit3d(real_vector3d* v, real32 limit)
 	return true;
 }
 
+real32 scalars_interpolate(real32 a, real32 b, real32 t, real32* result)
+{
+	*result = a * (1.f - t) + (b * t);
+	return *result;
+}
+
 real_point3d* points_interpolate(const real_point3d* a, const real_point3d* b, real32 t, real_point3d* result)
 {
 	result->x = (a->x * (1.f - t)) + (b->x * t);
 	result->y = (a->y * (1.f - t)) + (b->y * t);
 	result->z = (a->z * (1.f - t)) + (b->z * t);
 	return result;
-}
-
-real32 scale_interpolate(real32 previous_scale, real32 current_scale, real32 fractional_tick, real32* out_scale)
-{
-	*out_scale = previous_scale * (1.0f - fractional_tick) + (current_scale * fractional_tick);
-	return *out_scale;
 }
 
 real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out)
@@ -274,4 +279,13 @@ void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angle
 	forward->i = cosine(angles->yaw) * horizontal_projection;
 	forward->j = sine(angles->yaw) * horizontal_projection;
 	forward->k = sine(angles->pitch);
+}
+
+/* private code */
+
+static bool real_math_valid_control_register_configuration()
+{
+	unsigned int current_control;
+	_controlfp_s(&current_control, 0, 0);
+	return (current_control & _MCW_RC) == _RC_NEAR;
 }

@@ -177,7 +177,7 @@ int32 game_seconds_to_ticks_round(real32 seconds)
 	ASSERT(game_time_globals);
 	ASSERT(game_time_globals->initialized);
 
-	return (int32)((real32)game_time_globals->tick_rate * seconds);
+	return real_to_long_round((real32)game_time_globals->tick_rate * seconds);
 }
 
 real32 game_time_get_max_frame_time(void)

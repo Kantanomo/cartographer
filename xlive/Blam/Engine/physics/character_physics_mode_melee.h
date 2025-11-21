@@ -4,9 +4,9 @@
 
 // in practice the actual acceleration takes place in just 3 ticks, but it is defined as 5 for some reason
 #define k_acceleration_ticks_real 5.0f
-#define k_acceleration_ticks ((int32)k_acceleration_ticks_real)
+#define k_acceleration_ticks (real_to_long_round(k_acceleration_ticks_real))
 #define k_deceleration_ticks_real 4.0f
-#define k_deceleration_ticks ((int32)k_deceleration_ticks_real)
+#define k_deceleration_ticks (real_to_long_round(k_deceleration_ticks_real))
 
 struct alignas(4) s_melee_animation_datum
 {
@@ -65,7 +65,7 @@ struct alignas(4) c_character_physics_mode_melee_datum
 
 	void set_time_to_target(real32 ticks)
 	{
-		m_time_to_target = (int32)ticks;
+		m_time_to_target = real_to_long_round(ticks);
 	}
 
 	bool pin_localized_velocity(real_vector3d* output, real_vector3d* localized_velocity);

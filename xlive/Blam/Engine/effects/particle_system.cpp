@@ -9,8 +9,7 @@
 
 #include "render/render_visibility_collection.h"
 
-
-int particle_system_game_time[k_max_particle_systems];
+int32 particle_system_game_time[k_max_particle_systems];
 real32 particle_system_accumulated_time[k_max_particle_systems];
 
 c_particle_system_definition* c_particle_system::get_definition() const
@@ -108,16 +107,8 @@ c_particle_system_frame_advance_t p_c_particle_system_frame_advance;
 
 bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32 dt)
 {
-	if (thisx->flags.test(_particle_system_bit_9) && thisx->flags.test(_particle_system_bit_5))
-		thisx->flags.set(_particle_system_bit_11, true);
-	else
-		thisx->flags.set(_particle_system_bit_11, false);
-
-	if (thisx->flags.test(_particle_system_bit_8))
-		thisx->flags.set(_particle_system_bit_9, true);
-	else
-		thisx->flags.set(_particle_system_bit_9, false);
-
+	thisx->flags.set(_particle_system_bit_11, thisx->flags.test(_particle_system_bit_9) && thisx->flags.test(_particle_system_bit_5));
+	thisx->flags.set(_particle_system_bit_9, thisx->flags.test(_particle_system_bit_8));
 	thisx->flags.set(_particle_system_bit_8, false);
 
 	if (!thisx->flags.test(_particle_system_bit_5)

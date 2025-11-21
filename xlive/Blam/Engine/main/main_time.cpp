@@ -209,7 +209,7 @@ real32 __cdecl main_time_update(void)
 
 				if (fMsSleep >= 2.0f + k_real_epsilon)
 				{
-					yield_time_msec = real_to_long_round(fMsSleep);
+					yield_time_msec = (int32)fMsSleep;
 
 					// TODO FIXME to reduce stuttering, spend some of the time to sleep by CPU spinning,
 					// Sleep is not precise since Windows is not a RTOS

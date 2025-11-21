@@ -290,7 +290,7 @@ void matrix4x3_interpolate(const real_matrix4x3* previous, const real_matrix4x3*
 	// and convert back to matrix format, since that's what the game uses
 	matrix4x3_rotation_from_quaternion(out_mat, &q3_interpolated);
 	// interpolate scale and the position of the node
-	scale_interpolate(previous->scale, target->scale, fractional_ticks, &out_mat->scale);
+	scalars_interpolate(previous->scale, target->scale, fractional_ticks, &out_mat->scale);
 	points_interpolate(&previous->position, &target->position, fractional_ticks, &out_mat->position);
 	return;
 }
