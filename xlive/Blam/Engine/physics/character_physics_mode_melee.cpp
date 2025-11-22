@@ -179,7 +179,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 				m_initial_position = *position;
 				m_has_target = true;
-				m_maximum_counter = (int32)((m_weapon_is_sword ? 7.f : 1.f) + lunge_tick_count_adjusted);
+				m_maximum_counter = real_to_long_round((m_weapon_is_sword ? 7.f : 1.f) + lunge_tick_count_adjusted);
 
 				if (target_velocity_vector_length > k_valid_real_epsilon)
 				{

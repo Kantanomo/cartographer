@@ -520,9 +520,9 @@ real32 distance3d(const real_point3d* p1, const real_point3d* p2);
 
 bool limit3d(real_vector3d* v, real32 limit);
 
-real_point3d* points_interpolate(const real_point3d* a, const real_point3d* b, real32 t, real_point3d* result);
+real32 scalars_interpolate(real32 a, real32 b, real32 t, real32* result);
 
-real32 scale_interpolate(real32 previous_scale, real32 current_scale, real32 fractional_tick, real32* out_scale);
+real_point3d* points_interpolate(const real_point3d* a, const real_point3d* b, real32 t, real_point3d* result);
 
 real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out);
 

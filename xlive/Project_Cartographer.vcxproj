@@ -197,7 +197,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SDLCheck>true</SDLCheck>
@@ -272,7 +272,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SDLCheck>true</SDLCheck>
@@ -423,7 +423,7 @@
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalOptions>/DPSAPI_VERSION=1 /utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>

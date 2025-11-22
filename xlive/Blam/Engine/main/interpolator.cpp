@@ -509,7 +509,7 @@ bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_
 			if (distance < k_interpolation_distance_cutoff)
 			{
 				interpolate_object = true;
-				scale_interpolate(g_previous_interpolation_frame_data->crouch[player->user_index], g_target_interpolation_frame_data->crouch[player->user_index], g_interpolator_delta, out_crouch);
+				scalars_interpolate(g_previous_interpolation_frame_data->crouch[player->user_index], g_target_interpolation_frame_data->crouch[player->user_index], g_interpolator_delta, out_crouch);
 			}
 		}
 		
