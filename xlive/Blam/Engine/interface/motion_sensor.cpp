@@ -163,7 +163,7 @@ void __cdecl motion_sensor_render_update(real_point2d* position, real32 pulse)
 
 	position->x -= global_camera->viewport_bounds.left;
 	position->x -= global_camera->window_bounds.left;
-	position->x += abs(global_camera->viewport_bounds.left - global_camera->window_bounds.left);
+	position->x += ::abs(global_camera->viewport_bounds.left - global_camera->window_bounds.left);
 
 	position->y -= global_camera->viewport_bounds.top;
 	position->y -= global_camera->window_bounds.bottom;
