@@ -20,6 +20,12 @@ void __cdecl main_loop_pregame(int32 a1, int32 a2);
 
 void __cdecl main_reset_map_immediate(void);
 
+void main_load_core();
+void main_load_core_name(const char* name);
+
+void main_save_core();
+void main_save_core_name(const char* name);
+
 void main_loop_body(void);
 
 void __cdecl main_loop_body_server(void);

@@ -10,6 +10,8 @@
 #include "game/game_options.h"
 #include "interface/damaged_media.h"
 #include "interface/user_interface.h"
+#include "networking/network_event.h"
+#include "saved_games/game_state.h"
 #include "saved_games/game_variant.h"
 
 #include <XLive/XAM/xam.h>
@@ -44,6 +46,15 @@ struct s_main_game_globals
 	bool unk_2;
 	s_game_options pending_game_options;
 };
+
+// not compiled in the public version
+typedef struct
+{
+	bool load_core_on_game_launch;
+	char core_name[255];
+} s_main_game_globals_debug;
+
+s_main_game_globals_debug g_main_game_globals_debug;
 
 /* prototypes */
 
@@ -139,6 +150,35 @@ void main_game_launch_set_map_name(const char* map_name)
 {
 	MultiByteToWideChar(CP_UTF8, 0, map_name, -1, g_main_game_launch_options.scenario_path, 260);
 	return;
+}
+
+void main_game_load_from_core()
+{
+	main_game_load_from_core_name("core");
+}
+
+void main_game_load_from_core_name(const char* core_name)
+{
+	s_game_options game_options;
+	if (game_state_get_game_options_from_core(core_name, &game_options))
+	{
+		csstrncpy(g_main_game_globals_debug.core_name, core_name, ARRAYSIZE(g_main_game_globals_debug.core_name));
+		g_main_game_globals_debug.load_core_on_game_launch = true;
+		main_game_change(&game_options);
+	}
+	else
+	{
+		event(_event_message, "Failed to get game options from core (so I can't load it!)");
+	}
+}
+
+void main_game_load_post_game_launch()
+{
+	if (g_main_game_globals_debug.load_core_on_game_launch)
+	{
+		main_load_core_name(g_main_game_globals_debug.core_name);
+		g_main_game_globals_debug.load_core_on_game_launch = false;
+	}
 }
 
 // TODO rewrite the obfuscated function

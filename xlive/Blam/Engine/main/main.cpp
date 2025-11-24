@@ -37,6 +37,7 @@
 #include "physics/collision_usage.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "saved_games/game_state.h"
 #include "saved_games/saved_game_files.h"
 #include "shell/shell.h"
 #include "shell/shell_windows.h"
@@ -178,6 +179,38 @@ void __cdecl main_reset_map_immediate()
 	return;
 }
 
+void main_load_core()
+{
+	s_main_globals* main_globals = main_globals_get();
+	csstrncpy(main_globals->core_file_name, "core", ARRAYSIZE(main_globals->core_file_name));
+	main_globals->load_core = true;
+	return;
+}
+
+void main_load_core_name(const char* name)
+{
+	s_main_globals* main_globals = main_globals_get();
+	csstrncpy(main_globals->core_file_name, name, ARRAYSIZE(main_globals->core_file_name));
+	main_globals->load_core = true;
+	return;
+}
+
+void main_save_core()
+{
+	s_main_globals* main_globals = main_globals_get();
+	csstrncpy(main_globals->core_file_name, "core", ARRAYSIZE(main_globals->core_file_name));
+	main_globals->save_core = true;
+	return;
+}
+
+void main_save_core_name(const char* name)
+{
+	s_main_globals* main_globals = main_globals_get();
+	csstrncpy(main_globals->core_file_name, name, ARRAYSIZE(main_globals->core_file_name));
+	main_globals->save_core = true;
+	return;
+}
+
 void main_loop_body(void)
 {
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
@@ -227,6 +260,15 @@ void main_loop_body(void)
 		{
 			return;
 		}
+
+		main_game_load_post_game_launch();
+
+		if (main_globals->save_core)
+		{
+			game_state_save_core(main_globals->core_file_name);
+			main_globals->save_core = false;
+		}
+
 		main_save_map_private();
 	}
 

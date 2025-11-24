@@ -24,6 +24,12 @@ bool  __cdecl main_game_change_update(void);
 // Set the difficulty for the map launched with the map_name command
 void main_game_launch_set_map_name(const char* map_name);
 
+void main_game_load_from_core();
+
+void main_game_load_from_core_name(const char* core_name);
+
+void main_game_load_post_game_launch();
+
 // Starts a new game with the options provided
 bool __cdecl main_game_change(const struct s_game_options* options);
 

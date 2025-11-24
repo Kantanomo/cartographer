@@ -47,7 +47,7 @@ static const hs_function_definition (global_name) = \
 	evaluate,										\
 	parameters,										\
 	formal_parameter_count,							\
-	{(__VA_ARGS__)}									\
+	{__VA_ARGS__}									\
 }
 #endif
 
@@ -170,6 +170,17 @@ static void main_game_launch_set_coop_player_count_evaluate(int16 function_index
 
 static void scripted_player_effect_screen_fade_in_evaluate(int16 function_index, int32 thread_index, bool initialize);
 
+static void main_load_core_evaluate(int16 function_index, int32 thread_index, bool initialize);
+
+static void main_load_core_name_evaluate(int16 function_index, int32 thread_index, bool initialize);
+
+static void main_save_core_evaluate(int16 function_index, int32 thread_index, bool initialize);
+
+static void main_save_core_name_evaluate(int16 function_index, int32 thread_index, bool initialize);
+
+static void main_game_load_from_core_evaluate(int16 function_index, int32 thread_index, bool initialize);
+
+static void main_game_load_from_core_name_evaluate(int16 function_index, int32 thread_index, bool initialize);
 
 static void user_interface_enter_game_shell_evaluate(int16 function_index, int32 thread_index, bool initialize);
 
@@ -3230,31 +3241,87 @@ HS_FUNCTION_DEFINITION_CREATE(
 HS_FUNCTION_DEFINITION_CREATE(
 	king_set_hill_definition,
 );
+*/
 
 HS_FUNCTION_DEFINITION_CREATE(
 	core_load_definition,
+	_hs_type_void,
+	"core_load",
+	0,
+	&hs_macro_function_parse,
+	&main_load_core_evaluate,
+	"loads debug game state from core\\core.bin",
+	NULL,
+	0,
+	_hs_unparsed
 );
 
 HS_FUNCTION_DEFINITION_CREATE(
 	core_load_name_definition,
+	_hs_type_void,
+	"core_load_name",
+	0,
+	&hs_macro_function_parse,
+	&main_load_core_name_evaluate,
+	"loads debug game state from core\\<path>",
+	NULL,
+	1,
+	_hs_type_string
 );
 
 HS_FUNCTION_DEFINITION_CREATE(
 	core_save_definition,
+	_hs_type_void,
+	"core_save",
+	0,
+	&hs_macro_function_parse,
+	&main_save_core_evaluate,
+	"saves debug game state to core\\core.bin",
+	NULL,
+	0,
+	_hs_unparsed
 );
 
 HS_FUNCTION_DEFINITION_CREATE(
 	core_save_name_definition,
+	_hs_type_void,
+	"core_save_name",
+	0,
+	&hs_macro_function_parse,
+	&main_save_core_name_evaluate,
+	"saves debug game state to core\\<path>",
+	NULL,
+	1,
+	_hs_type_string
 );
 
 HS_FUNCTION_DEFINITION_CREATE(
 	core_load_game_definition,
+	_hs_type_void,
+	"core_load_game",
+	0,
+	&hs_macro_function_parse,
+	&main_game_load_from_core_evaluate,
+	"loads level and game state from core\\core.bin",
+	NULL,
+	0,
+	_hs_unparsed
 );
 
 HS_FUNCTION_DEFINITION_CREATE(
 	core_load_game_name_definition,
+	_hs_type_void,
+	"core_load_game_name",
+	0,
+	&hs_macro_function_parse,
+	&main_game_load_from_core_name_evaluate,
+	"loads level and game state from core\\<path>",
+	NULL,
+	1,
+	_hs_type_string
 );
 
+/*
 HS_FUNCTION_DEFINITION_CREATE(
 	core_regular_upload_to_debug_server_definition,
 );
@@ -5389,12 +5456,14 @@ const hs_function_definition* hs_function_table[] =
 	&game_save_unsafe_definition,
 	&debug_spawning_definition,
 	&king_set_hill_definition,
+*/
 	&core_load_definition,
 	&core_load_name_definition,
 	&core_save_definition,
 	&core_save_name_definition,
 	&core_load_game_definition,
 	&core_load_game_name_definition,
+/*
 	&core_regular_upload_to_debug_server_definition,
 	&core_set_upload_option_definition,
 	&film_play_hack_definition,
@@ -6152,6 +6221,59 @@ static void scripted_player_effect_screen_fade_in_evaluate(int16 function_index,
 	return;
 }
 
+static void main_load_core_evaluate(int16 function_index, int32 thread_index, bool initialize)
+{
+	main_load_core();
+	hs_return(thread_index, 0);
+	return;
+}
+
+static void main_load_core_name_evaluate(int16 function_index, int32 thread_index, bool initialize)
+{
+	int32* arguments = (int32*)hs_macro_function_evaluate(function_index, thread_index, initialize);
+	if (arguments)
+	{
+		main_load_core_name((const char*)arguments[0]);
+		hs_return(thread_index, 0);
+	}
+	return;
+}
+
+static void main_save_core_evaluate(int16 function_index, int32 thread_index, bool initialize)
+{
+	main_save_core();
+	hs_return(thread_index, 0);
+	return;
+}
+
+static void main_save_core_name_evaluate(int16 function_index, int32 thread_index, bool initialize)
+{
+	int32* arguments = (int32*)hs_macro_function_evaluate(function_index, thread_index, initialize);
+	if (arguments)
+	{
+		main_save_core_name((const char*)arguments[0]);
+		hs_return(thread_index, 0);
+	}
+	return;
+}
+
+static void main_game_load_from_core_evaluate(int16 function_index, int32 thread_index, bool initialize)
+{
+	main_game_load_from_core();
+	hs_return(thread_index, 0);
+	return;
+}
+
+static void main_game_load_from_core_name_evaluate(int16 function_index, int32 thread_index, bool initialize)
+{
+	int32* arguments = (int32*)hs_macro_function_evaluate(function_index, thread_index, initialize);
+	if (arguments)
+	{
+		main_game_load_from_core_name((const char*)arguments[0]);
+		hs_return(thread_index, 0);
+	}
+	return;
+}
 
 static void user_interface_enter_game_shell_evaluate(int16 function_index, int32 thread_index, bool initialize)
 {

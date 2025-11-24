@@ -7,12 +7,14 @@
 
 enum
 {
+	k_game_state_count = 2,
+
 	k_game_state_cpu_size = 0x3BE000,
 
 	// xbox specific when memory was unified?
 	k_game_state_gpu_size = 0x40000,
 
-	k_game_state_count = 2,
+	k_game_state_size = k_game_state_cpu_size + k_game_state_gpu_size,
 };
 
 class c_gamestate_allocation : public c_allocation_base
@@ -82,3 +84,10 @@ void __cdecl game_state_initialize(void);
 void* __cdecl game_state_malloc(const char* name, const char* description, uint32 size);
 
 s_game_state_globals* game_state_globals_get();
+
+void game_state_save_core(const char* name);
+
+bool game_state_read_core(const char* name, void* buffer, uint32 buffer_size);
+bool game_state_write_core(const char* name, void* buffer, uint32 buffer_size);
+
+bool game_state_get_game_options_from_core(const char* core_name, s_game_options* options);

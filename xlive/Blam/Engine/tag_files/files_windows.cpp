@@ -31,6 +31,11 @@ bool __cdecl file_open(s_file_reference* file_reference, e_file_open_flags flags
 	return INVOKE(0x638BF, 0x65BBF, file_open, file_reference, flags, out_error_code);
 }
 
+bool __cdecl file_exists(s_file_reference* file_reference)
+{
+	return INVOKE(0x637AD, 0x0, file_exists, file_reference);
+}
+
 bool __cdecl file_close(s_file_reference* file_reference)
 {
 	return INVOKE(0x63B66, 0x65E66, file_close, file_reference);
