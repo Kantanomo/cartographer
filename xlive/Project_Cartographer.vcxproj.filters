@@ -789,7 +789,6 @@
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
     <ClInclude Include="Blam\Engine\physics\collisions.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
-    <ClInclude Include="Blam\Engine\math\math.h" />
     <ClInclude Include="Blam\Engine\math\integer_math.h" />
     <ClInclude Include="Blam\Engine\math\real_math.h" />
     <ClInclude Include="Blam\Engine\math\matrix_math.h" />

@@ -649,7 +649,7 @@ static void input_abstraction_update_dead_zones(const point2d* thumb, real_euler
 	real_point2d thumbstick_points = { (real32)thumb->x, (real32)thumb->y };
 	real_angle angle = arctangent(thumbstick_points.y, thumbstick_points.x);
 
-	real32 magnitude = MAX(abs(sine(angle)), abs(cosine(angle)));
+	real32 magnitude = MAX(::abs(sine(angle)), ::abs(cosine(angle)));
 	real32 inverse_magnitude = 1.0f / magnitude;
 
 	out_stick_euler_angles->yaw = (real32)(thumbstick_points.x * inverse_magnitude) * normalize_scale;
@@ -701,13 +701,13 @@ static void input_abstraction_post_update_throttle(real_euler_angles2d* stick, r
 	real_vector2d vec = { stick->yaw,stick->pitch };
 	real32 magnitude = magnitude2d(&vec);
 
-	real32 delta = abs(angle - k_gamepad_stick_angles[index]);
+	real32 delta = ::abs(angle - k_gamepad_stick_angles[index]);
 	real_angle min_delta = stick_index == _abstract_gamepad_stick_right ? DEGREES_TO_RADIANS(10.0f) : DEGREES_TO_RADIANS(35.0f);
 
 	if (delta >= min_delta)
 	{
 		real32 sign = 0.0f;
-		if (abs(stick->yaw) <= abs(stick->pitch))
+		if (::abs(stick->yaw) <= ::abs(stick->pitch))
 		{
 			sign = (stick->pitch >= 0.0f) ? 1.0f : -1.0f;
 
@@ -726,7 +726,7 @@ static void input_abstraction_post_update_throttle(real_euler_angles2d* stick, r
 	{
 		constexpr real32 normalize_scale = 1.0f / DEGREES_TO_RADIANS(35.0f);
 
-		real_angle angle_abs = abs(angle);
+		real_angle angle_abs = ::abs(angle);
 		real32 sign = 0.f;
 		if (angle_abs < DEGREES_TO_RADIANS(45.0f) || (angle_abs > DEGREES_TO_RADIANS(135.0f)))
 		{

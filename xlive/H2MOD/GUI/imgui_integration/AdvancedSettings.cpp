@@ -120,9 +120,9 @@ namespace ImGuiHandler {
 						Center.x + THUMBSTICK_POINT_TO_PERCENTAGE(state->thumb_right.x),
 						Center.y - THUMBSTICK_POINT_TO_PERCENTAGE(state->thumb_right.y));
 					int axial_invalid = 0;
-					if (abs(state->thumb_right.x) <= THUMBSTICK_PERCENTAGE_TO_POINT(g_advanced_settings_current_cartographer_profile->deadzone_axial.x))
+					if (::abs(state->thumb_right.x) <= THUMBSTICK_PERCENTAGE_TO_POINT(g_advanced_settings_current_cartographer_profile->deadzone_axial.x))
 						axial_invalid++;
-					if (abs(state->thumb_right.y) <= THUMBSTICK_PERCENTAGE_TO_POINT(g_advanced_settings_current_cartographer_profile->deadzone_axial.y))
+					if (::abs(state->thumb_right.y) <= THUMBSTICK_PERCENTAGE_TO_POINT(g_advanced_settings_current_cartographer_profile->deadzone_axial.y))
 						axial_invalid++;
 					bool radial_invalid = false;
 

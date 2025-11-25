@@ -55,6 +55,8 @@ void __cdecl file_create_parent_directories_if_not_present(s_file_reference* fil
 /* Returns success */
 bool __cdecl file_open(s_file_reference* file_reference, e_file_open_flags flags, e_file_open_error* out_error_code);
 
+bool __cdecl file_exists(s_file_reference* file_reference);
+
 /* Returns success */
 bool __cdecl file_close(s_file_reference* file_reference);
 

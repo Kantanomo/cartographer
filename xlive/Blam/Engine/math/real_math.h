@@ -2,6 +2,11 @@
 
 /* constants */
 
+#define _REAL_MATH_USE_LEGACY_FPU_INSTRUCTIONS 1
+
+// faster than actual calls to trig functions
+#define _REAL_MATH_USE_LEGACY_TRIG_INSTRUCTIONS 1
+
 #define _real_epsilon 0.0001f
 #define k_real_epsilon _real_epsilon
 
@@ -196,7 +201,20 @@ extern const real_rectangle3d* const global_null_rectangle3d;
 
 inline real32 square_root(real32 f)
 {
+#if _REAL_MATH_USE_LEGACY_FPU_INSTRUCTIONS 
+	real32 result;
+
+	__asm
+	{
+		fld f
+		fsqrt
+		fstp result
+	}
+
+	return result;
+#else
 	return ::sqrtf(f);
+#endif
 }
 
 inline real32 reciprocal_square_root(real32 f)
@@ -378,8 +396,7 @@ inline real32 normalize3d(real_vector3d* v1)
 
 inline real_vector3d* cross_product3d(const real_vector3d* a, const real_vector3d* b, real_vector3d* result)
 {
-#if _M_IX86_FP == 1 || _M_IX86_FP == 2 // SSE1/SSE2
-
+#if defined(_M_IX86_FP) && (_M_IX86_FP == 1 || _M_IX86_FP == 2) // SSE1/SSE2
 	// Move our vectors into the xmm registers
 	const __m128 a_xmm = { a->i, a->j, a->k, 0.f };
 	const __m128 b_xmm = { b->i, b->j, b->k, 0.f };
@@ -455,19 +472,67 @@ inline void set_real_point3d(real_point3d* point, real32 x, real32 y, real32 z)
 	return;
 }
 
-inline real32 cosine(real32 x)
-{
-	return ::cos(x);
-}
-
 inline real32 sine(real32 x)
 {
-	return ::sin(x);
+#if _REAL_MATH_USE_LEGACY_TRIG_INSTRUCTIONS
+	real32 result;
+
+	__asm
+	{
+		fld x
+		fsin
+		fstp result
+	}
+
+	return result;
+#else
+	return ::sinf(x);
+#endif
+}
+
+inline real32 cosine(real32 x)
+{
+#if _REAL_MATH_USE_LEGACY_TRIG_INSTRUCTIONS
+	real32 result;
+
+	__asm
+	{
+		fld x
+		fcos
+		fstp result
+	}
+
+	return result;
+#else
+	return ::cosf(x);
+#endif
 }
 
 inline real32 tangent(real32 x)
 {
-	return ::tan(x);
+#if _REAL_MATH_USE_LEGACY_TRIG_INSTRUCTIONS
+	real32 result;
+
+	__asm
+	{
+		fld x
+		fptan
+		fstp result
+	}
+
+	return result;
+#else
+	return ::tanf(x);
+#endif
+}
+
+inline real32 arcsine(real32 x)
+{
+	ASSERT(x >= -1.f - k_real_epsilon && x <= +1.f + k_real_epsilon);
+	x = PIN(x, -1.f, 1.0f);
+
+	// Pin parameter between -1 and 1
+	return ::asinf(x);
 }
 
 inline real32 arccosine(real32 x)
@@ -475,22 +540,15 @@ inline real32 arccosine(real32 x)
 	ASSERT(x >= -1.f - k_real_epsilon && x <= +1.f + k_real_epsilon);
 
 	// Pin parameter between -1 and 1
-	return ::acos(PIN(x, -1.f, 1.f));
-}
+	x = PIN(x, -1.f, 1.f);
 
-inline real32 arcsine(real32 x)
-{
-	ASSERT(x >= -1.f - k_real_epsilon && x <= +1.f + k_real_epsilon);
-
-	// Pin parameter between -1 and 1
-	return ::asin(PIN(x, -1.f, 1.0f));
+	return ::acosf(x);
 }
 
 inline real32 arctangent(real32 a, real32 b)
 {
-	return ::atan2(a, b);
+	return ::atan2f(a, b);
 }
-
 
 void __cdecl real_math_initialize(void);
 
