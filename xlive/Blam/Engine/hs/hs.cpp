@@ -25,14 +25,12 @@
 
 #include "game/game.h"
 
-#ifdef TERMINAL_ENABLED
 #include "interface/hud_definitions.h"
 #include "interface/hud_messaging.h"
 #include "interface/interface.h"
 #include "interface/terminal.h"
 #include "main/console.h"
 #include "math/random_math.h"
-#endif
 
 #ifdef HS_COMPILER_ENABLED
 #include "models/model_definitions.h"
@@ -43,9 +41,7 @@
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 
-#ifdef TERMINAL_ENABLED
 #include "scenario/scenario_kill_trigger_volumes.h"
-#endif
 
 /* constants */
 
@@ -835,7 +831,7 @@ int16 hs_find_function_by_name(const char* name, int16 count)
 	return result;
 }
 
-int16 hs_tokens_enumerate(const char* substring, int32 type_flags, const char** results, int16 maximum_count)
+int16 hs_tokens_enumerate(const char* substring, uint32 type_flags, const char** results, int16 maximum_count)
 {
 	ASSERT(!enumeration_results);
 
@@ -866,9 +862,7 @@ int16 hs_tokens_enumerate(const char* substring, int32 type_flags, const char** 
 
 static void __cdecl hs_print(const char* text)
 {
-#ifdef TERMINAL_ENABLED 
 	terminal_printf(global_real_argb_green, text);
-#endif
 	return;
 }
 

@@ -69,7 +69,7 @@ void console_initialize(void)
 		console_globals.input_state.color = k_console_input_color;
 		console_globals.status_render = true;
 		csstrncpy(console_globals.input_state.prompt, "halo( ", NUMBEROF(console_globals.input_state.prompt));
-		console_globals.input_state.result[0] = 0;
+		console_globals.input_state.result[0] = '\0';
 		console_globals.newest_previous_command_index = NONE;
 		console_globals.previous_command_count = 0;
 		console_globals.selected_previous_command_index = NONE;
@@ -152,7 +152,7 @@ void console_open(bool open_debug_menu)
 		}
 		else
 		{
-			console_globals.input_state.result[0] = '\0';
+			csmemset(console_globals.input_state.result, 0, sizeof(console_globals.input_state.result));
 			console_globals.active = terminal_gets_begin(&console_globals.input_state);
 		}
 
@@ -167,6 +167,7 @@ void console_close(void)
 	if (console_globals.active)
 	{
 		terminal_gets_end(&console_globals.input_state);
+		console_globals.selected_previous_command_index = NONE;
 		console_globals.open_timeout_seconds = 0.1f;
 		console_globals.active = false;
 		
@@ -279,9 +280,7 @@ void console_update(real32 dt)
 					break;
 				}
 				console_process_command(console_globals.input_state.result, true);
-				console_globals.input_state.result[0] = '\0';
-
-				csmemset(console_globals.input_state.result, 0, NUMBEROF(console_globals.input_state.result));
+				csmemset(console_globals.input_state.result, 0, sizeof(console_globals.input_state.result));
 				edit_text_selection_reset(&console_globals.input_state.edit);
 				break;
 			case _key_up_arrow:
@@ -359,8 +358,10 @@ static void console_complete(void)
 {
 	const char* matching_items[256];
 
+	uint32 enumeration_type_flags = (uint32)NONE;
+
 	char* token = console_get_token();
-	const int16 count = hs_tokens_enumerate(token, NONE, matching_items, NUMBEROF(matching_items));
+	const int16 count = hs_tokens_enumerate(token, enumeration_type_flags, matching_items, NUMBEROF(matching_items));
 
 	if (count > 0)
 	{
