@@ -16,13 +16,13 @@ class c_kablam_config
 class c_kablam_config_live
 {
 public:
-	wchar_t live_id[256];
-	wchar_t description[32];
-	wchar_t owner[16];
-	int32 privacy_type;
-	bool enable_multiple_instances;
-	int32 override_port;
-	void* kablam_registry_key;
+	wchar_t m_live_id[256];
+	wchar_t m_description[32];
+	wchar_t m_owner[16];
+	int32 m_privacy_type;
+	bool m_enable_multiple_instances;
+	int32 m_override_port;
+	void* m_kablam_registry_key;
 };
 
 /* prototypes */
