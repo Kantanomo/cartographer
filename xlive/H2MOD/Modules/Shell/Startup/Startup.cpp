@@ -147,7 +147,15 @@ void log_file_name_prepare(const wchar_t* logFileName, c_static_wchar_string<MAX
 	folders.append(instance_string);
 
 	// Place logs in server folder when portable or dedi
-	path->set(g_h2_portable || is_dedi ? L"\\" : g_h2_appdata_local_path);
+	if (g_h2_portable || is_dedi)
+	{
+		path->set(g_h2_process_file_path);
+		path->append(L"\\");
+	}
+	else
+	{
+		path->set(g_h2_appdata_local_path);
+	}
 	path->append(folders.get_string());
 
 	// try making logs directory
