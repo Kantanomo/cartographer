@@ -254,7 +254,6 @@ void* object_header_block_get_with_count(datum object_index, const object_header
 {
 	ASSERT(element_count);
 
-
 	void* block;
 	if (reference->offset == NONE)
 	{
@@ -904,13 +903,13 @@ void object_get_region_information(
 	int32* region_count,
 	int8** region_permutation_indices,
 	int8** region_render_permutation_indices,
-	object_region_information** region_information)
+	int8** region_information)
 {
 	const object_datum* object = object_get(object_index);
 
 	ASSERT(region_count);
 
-	object_region_information* regions = (object_region_information*)object_header_block_get_with_count(
+	int8* regions_indices = (int8*)object_header_block_get_with_count(
 		object_index,
 		&object->object.collision_regions_block,
 		1,
@@ -918,17 +917,17 @@ void object_get_region_information(
 	);
 
 	*region_count /= 10;
-	if (region_information)
-	{
-		*region_information = regions;
-	}
 	if (region_permutation_indices)
 	{
-		*region_permutation_indices = &regions->variant_permutation_index + *region_count;
+		*region_permutation_indices = regions_indices;
 	}
 	if (region_render_permutation_indices)
 	{
-		*region_render_permutation_indices = &regions->variant_permutation_index + 2 * *region_count;
+		*region_render_permutation_indices = regions_indices + *region_count;
+	}
+	if (region_information)
+	{
+		*region_information = regions_indices + 2 * *region_count;
 	}
 	return;
 }
@@ -1733,7 +1732,7 @@ static int16 __cdecl internal_object_get_markers_by_string_id(
 	{
 		object_datum* object = object_get(object_index);
 		struct object_definition* object_definition = (struct object_definition*)tag_get_fast(object->definition_index);
-		
+
 		ASSERT(object_definition);
 
 		const datum object_model_index = object_definition->object.model.index;
