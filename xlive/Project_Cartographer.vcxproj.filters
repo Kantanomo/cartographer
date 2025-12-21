@@ -542,6 +542,7 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_network_search.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_ground.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\cartographer.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_loading.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2045,6 +2046,7 @@
     <ClInclude Include="Blam\Engine\networking\logic\network_logic.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_ground.h" />
     <ClInclude Include="Blam\Engine\cartographer\cartographer.h" />
+    <ClInclude Include="Blam\Engine\networking\network_loading.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -176,7 +176,7 @@ void __cdecl simulation_apply_before_game(const struct simulation_update* update
 
 	// only during distributed system or server synchronous
 	// but not client synchronous
-		// transfer the elements to the
+	// transfer the elements to the 
 	if (sim_world->runs_simulation())
 	{
 		sim_world->attach_simulation_queues_to_update(

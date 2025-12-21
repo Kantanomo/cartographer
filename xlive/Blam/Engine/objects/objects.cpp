@@ -1770,6 +1770,7 @@ static int16 __cdecl internal_object_get_markers_by_string_id(
 		}
 	}
 
+	// Fallback if we weren't able to get a marker using the parent index
 	if (!marker_index)
 	{
 		object_datum* object = object_get(object_index);

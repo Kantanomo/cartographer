@@ -54,6 +54,7 @@
 #include "networking/network_utilities.h"
 #include "networking/network_memory.h"
 #include "networking/network_configuration.h"
+#include "networking/network_loading.h"
 #include "physics/character_physics_mode_ground.h"
 #include "units/bipeds.h"
 #include "rasterizer/rasterizer_lens_flares.h"
@@ -654,6 +655,9 @@ static void h2mod_apply_hooks(void)
 	// would race with the newtork update in the function that waits for the loading network thread to finish just 1000 milliseconds
 	// instead of waiting it to process everything then exit
 	WriteValue<int32>(Memory::GetAddress(0x1AEA75, 0x1AD61C) + 1, INFINITE);
+
+	// also call simulation_update() when loading the map
+	network_loading_apply_patches();
 
 	// below hooks applied to specific executables
 	if (!shell_is_dedicated_server())
