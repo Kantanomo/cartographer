@@ -254,7 +254,6 @@ void* object_header_block_get_with_count(datum object_index, const object_header
 {
 	ASSERT(element_count);
 
-
 	void* block;
 	if (reference->offset == NONE)
 	{
@@ -904,13 +903,13 @@ void object_get_region_information(
 	int32* region_count,
 	int8** region_permutation_indices,
 	int8** region_render_permutation_indices,
-	object_region_information** region_information)
+	int8** region_information)
 {
 	const object_datum* object = object_get(object_index);
 
 	ASSERT(region_count);
 
-	object_region_information* regions = (object_region_information*)object_header_block_get_with_count(
+	int8* regions_indices = (int8*)object_header_block_get_with_count(
 		object_index,
 		&object->object.collision_regions_block,
 		1,
@@ -918,17 +917,17 @@ void object_get_region_information(
 	);
 
 	*region_count /= 10;
-	if (region_information)
-	{
-		*region_information = regions;
-	}
 	if (region_permutation_indices)
 	{
-		*region_permutation_indices = &regions->variant_permutation_index + *region_count;
+		*region_permutation_indices = regions_indices;
 	}
 	if (region_render_permutation_indices)
 	{
-		*region_render_permutation_indices = &regions->variant_permutation_index + 2 * *region_count;
+		*region_render_permutation_indices = regions_indices + *region_count;
+	}
+	if (region_information)
+	{
+		*region_information = regions_indices + 2 * *region_count;
 	}
 	return;
 }
@@ -1724,16 +1723,17 @@ static int16 __cdecl internal_object_get_markers_by_string_id(
 {
 	int16 marker_index = 0;
 
+	datum parent_object_index = object_index;
 	if (!local_markers_only)
 	{
-		object_index = object_get_parent_recursive(object_index);
+		parent_object_index = object_get_parent_recursive(parent_object_index);
 	}
 
-	if (object_index != NONE)
+	if (parent_object_index != NONE)
 	{
-		object_datum* object = object_get(object_index);
-		struct object_definition* object_definition = (struct object_definition*)tag_get_fast(object->definition_index);
-		
+		object_datum* parent_object = object_get(parent_object_index);
+		struct object_definition* object_definition = (struct object_definition*)tag_get_fast(parent_object->definition_index);
+
 		ASSERT(object_definition);
 
 		const datum object_model_index = object_definition->object.model.index;
@@ -1746,10 +1746,10 @@ static int16 __cdecl internal_object_get_markers_by_string_id(
 
 			int32 region_count = 0;
 			int8* region_permutation_indices;
-			object_get_region_information(object_index, &region_count, &region_permutation_indices, NULL, NULL);
-			if (!halo_interpolator_interpolate_object_node_matrices(object_index, &node_matrices, &node_count))
+			object_get_region_information(parent_object_index, &region_count, &region_permutation_indices, NULL, NULL);
+			if (!halo_interpolator_interpolate_object_node_matrices(parent_object_index, &node_matrices, &node_count))
 			{
-				node_matrices = object_get_node_matrices(object_index, &node_count);
+				node_matrices = object_get_node_matrices(parent_object_index, &node_count);
 			}
 
 			ASSERT(region_count == model_definition->runtime_regions.count);
@@ -1763,13 +1763,14 @@ static int16 __cdecl internal_object_get_markers_by_string_id(
 				NULL,
 				node_count,
 				node_matrices,
-				object->object.flags.test(_object_mirrored_bit),
+				parent_object->object.flags.test(_object_mirrored_bit),
 				markers,
 				maximum_marker_count
 			);
 		}
 	}
 
+	// Fallback if we weren't able to get a marker using the parent index
 	if (!marker_index)
 	{
 		object_datum* object = object_get(object_index);

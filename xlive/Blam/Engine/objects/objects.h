@@ -396,7 +396,7 @@ void object_get_region_information(
 	int32* region_count,
 	int8** region_permutation_indices,
 	int8** region_render_permutation_indices,
-	object_region_information** region_information);
+	int8** region_information);
 
 void __cdecl object_apply_function_overlay_node_orientations(
 	datum object_index,
