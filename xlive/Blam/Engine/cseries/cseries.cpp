@@ -64,7 +64,7 @@ void display_assert(const char* condition, char const* file, int32 line, bool as
 
 	if (assertion_failed)
 	{
-		// cseries_error_callbacks_run();
+		call_fatal_error_callbacks();
 		if (!is_debugger_present())
 		{
 			RaiseException(0x73746Bu, 0, 0, 0);

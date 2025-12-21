@@ -9,6 +9,12 @@ void stack_walk_initialize(void)
 	return;
 }
 
+void stack_walk_dispose(void)
+{
+	// TODO: implement
+	return;
+}
+
 void stack_walk(int16 levels_to_ignore)
 {
 	// TODO: implement

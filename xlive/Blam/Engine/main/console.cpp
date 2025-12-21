@@ -13,6 +13,7 @@
 #include "interface/terminal.h"
 #include "interface/user_interface_guide.h"
 #include "shell/shell.h"
+#include "shell/shell_windows.h"
 
 /* constants */
 
@@ -50,6 +51,10 @@ static void console_complete(void);
 
 static bool console_process_command(const char* command, bool interactive);
 
+static void status_string_internal(const char* format_string, char* string);
+
+static void status_printf_va(const char* format, char* argument_list);
+
 /* globals */
 
 static s_console_globals console_globals;
@@ -59,7 +64,24 @@ static bool g_dispose_console = true;
 bool console_dump_to_file = false;
 bool console_dump_to_debug_display = false;
 
+s_status_line* g_status_line_head;
+
+s_status_line* g_status_line_tail;
+
+s_status_string g_status_strings[k_error_category_count];
+
 /* public code */
+
+void status_printf(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	if (is_main_thread())
+	{
+		status_string_internal(format, args);
+	}
+	return;
+}
 
 void console_initialize(void)
 {
@@ -441,6 +463,47 @@ static bool console_process_command(const char* command, bool interactive)
 		main_status("console_command", NULL);
 	}
 	return result;
+}
+
+static void status_string_internal(const char* format_string, char* string)
+{
+	bool string_set = false;
+	for (size_t i = 0; i < NUMBEROF(g_status_strings); ++i)
+	{
+		s_status_string* status_string = &g_status_strings[i];
+		if (!status_string->line.text.is_empty() && status_string->format_string.is_equal(format_string))
+		{
+			status_string->time_created = system_milliseconds();
+			status_string->line.text.set(string);
+			string_set = true;
+			break;
+		}
+	}
+
+	if (!string_set)
+	{
+		for (size_t i = 0; i < NUMBEROF(g_status_strings); ++i)
+		{
+			s_status_string* status_string = &g_status_strings[i];
+			if (status_string->line.text.is_empty())
+			{
+				status_string->time_created = system_milliseconds();
+				status_string->line.text.set(string);
+				status_string->format_string.set(string);
+				break;
+			}
+		}
+	}
+
+	return;
+}
+
+static void status_printf_va(const char* format, char* argument_list)
+{
+	char string[1024];
+	vsprintf(string, NUMBEROF(string), format, argument_list);
+	status_string_internal(format, string);
+	return;
 }
 
 #endif

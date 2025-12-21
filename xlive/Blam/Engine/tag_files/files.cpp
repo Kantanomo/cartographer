@@ -14,11 +14,11 @@ s_file_reference_info* file_reference_get_info(s_file_reference* info)
 	return info;
 }
 
-void file_read_into_memory(s_file_reference* reference, size_t size)
+void file_trim(s_file_reference* reference, size_t max_size)
 {
 	bool opened_file = false;
 
-	void* buffer = CSERIES_MALLOC(size);
+	void* buffer = CSERIES_MALLOC(max_size);
 	if (buffer)
 	{
 		e_file_open_error error;
@@ -27,17 +27,17 @@ void file_read_into_memory(s_file_reference* reference, size_t size)
 		if (opened_file)
 		{
 			const size_t eof_val = file_get_eof(reference);
-			if (eof_val > size)
+			if (eof_val > max_size)
 			{
-				if (file_set_position(reference, eof_val - size, 0))
+				if (file_set_position(reference, eof_val - max_size, 0))
 				{
-					if (file_read(reference, size, 0, buffer))
+					if (file_read(reference, max_size, 0, buffer))
 					{
 						if (file_set_position(reference, 0, 0))
 						{
-							if (file_write(reference, size, buffer))
+							if (file_write(reference, max_size, buffer))
 							{
-								file_set_eof(reference, size);
+								file_set_eof(reference, max_size);
 							}
 						}
 					}

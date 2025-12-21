@@ -295,6 +295,9 @@ void main_loop_body(void)
 		font_idle();
 		async_idle();
 		shell_idle();
+#ifdef ERRORS_ENABLED
+		error_idle();
+#endif
 		cache_files_copy_do_work();
 		main_loading_idle();
 		c_map_manager* map_manager = map_manager_get();

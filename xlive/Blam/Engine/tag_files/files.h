@@ -42,4 +42,4 @@ ASSERT_STRUCT_SIZE(s_file_reference, 272);
 
 s_file_reference_info* file_reference_get_info(s_file_reference* info);
 
-void file_read_into_memory(s_file_reference* reference, size_t size);
+void file_trim(s_file_reference* reference, size_t max_size);

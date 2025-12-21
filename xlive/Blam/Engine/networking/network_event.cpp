@@ -2,9 +2,11 @@
 #include "network_event.h"
 
 #ifdef EVENTS_ENABLED
+
 #include "network_globals.h"
 #include "network_time.h"
 
+#include "data_mining/data_mining.h"
 #include "game/game.h"
 #include "game/game_time.h"
 #include "main/console.h"
@@ -68,7 +70,6 @@ const char* k_event_level_severity_strings[k_network_event_level_count] =
 	"-FATAL-"
 };
 
-static bool g_network_event_print_critical_errors = false;
 
 /* prototypes */
 
@@ -107,6 +108,8 @@ static s_network_event_globals network_event_globals =
 	NULL			// categories
 };
 
+static bool g_network_event_print_critical_errors = false;
+
 /* public code */
 
 bool c_event::query(e_event_level event_level)
@@ -132,8 +135,7 @@ void c_event::generate(const char* event_name, ...)
 
 void network_event_initialize(void)
 {
-	// TODO: error stuff
-	// sub_423170(_error_category_networking, 0);
+	error_category_write_to_primary_log(_error_category_networking, false);
 
 	network_event_globals.categories = DATA_NEW("network events", k_network_event_count, sizeof(s_network_event_datum), 0, normal_allocation_global_get());
 	ASSERT(network_event_globals.categories);
@@ -348,8 +350,7 @@ static void network_event_print(const char* format, e_event_level event_level, i
 
 		if (TEST_BIT(flags, 2))
 		{
-			// TODO: implement
-			//data_mine_add_event(event_level, event_text);
+			data_mine_add_event(event_level, event_text);
 		}
 
 		if (TEST_BIT(flags, 3) && !g_network_event_print_critical_errors)
@@ -605,4 +606,5 @@ static void network_event_iterate_categories(void)
 	}
 	return;
 }
+
 #endif
