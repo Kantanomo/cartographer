@@ -5,7 +5,7 @@
 #include "cseries/cseries_windows.h"
 #include "cseries/cseries_windows_minidump_logs.h"
 #include "text/unicode.h"
-#include "tag_files/files_windows.h"
+#include "tag_files/files.h"
 
 #include "resources/resource.h"
 

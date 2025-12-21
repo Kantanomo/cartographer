@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef PROFILE_ENABLED
+
 /* enums */
 
 enum e_profile_attribution_subsystem
@@ -54,12 +56,51 @@ struct s_profile_section
 	int8 gap[1544];
 };
 
+/* classes */
+
+class c_stop_watch
+{
+public:
+	c_stop_watch(void);
+	c_stop_watch(bool start_paused);
+	~c_stop_watch(void) = default;
+
+	int64 start(void);
+
+	int64 hold(void);
+
+	int64 reset(void);
+
+	int64 stop(void);
+
+	real32 cycles_to_seconds(int64 cycles) const;
+	
+	int64 total_elapsed_time_in_cycles(void) const;
+
+	real32 total_elapsed_time_in_seconds(void) const;
+
+	int64 get_current_delta(void) const;
+
+private:
+	int64 m_total_time;
+	int64 m_start_time;
+	bool m_paused;
+};
+
 /* prototypes */
 
-void profile_begin_frame(void);
+bool profile_active(void);
 
-void profile_end_frame(void);
+void profile_frame_start(void);
+
+void profile_frame_end(void);
 
 void profile_attribute_enter(int32 a1, e_profile_attribution_subsystem subsystem);
 
 void profile_attribute_exit(int32 a1, e_profile_attribution_subsystem subsystem);
+
+int64 get_performance_counter(void);
+
+int64 get_performance_frequency(void);
+
+#endif

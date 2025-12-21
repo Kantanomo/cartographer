@@ -272,9 +272,11 @@ void main_loop_body(void)
 		main_save_map_private();
 	}
 
-	profile_begin_frame();
+#ifdef PROFILE_ENABLED
+	profile_frame_start();
 	profile_attribute_enter(0, _profile_attribution_subsystem_0);
 	collision_log_begin_frame();
+#endif
 
 	if (main_time_should_reset())
 	{
@@ -383,9 +385,12 @@ void main_loop_body(void)
 			}
 
 			exceptions_update();
+
+#ifdef PROFILE_ENABLED
 			collision_log_end_frame();
 			profile_attribute_exit(0, _profile_attribution_subsystem_0);
-			profile_end_frame();
+			profile_frame_end();
+#endif
 		}
 	}
 

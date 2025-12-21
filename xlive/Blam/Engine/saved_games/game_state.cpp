@@ -4,12 +4,14 @@
 #include "game/game.h"
 #include "game_state_procs.h"
 
-#include "tag_files/files_windows.h"
-
 #include "main/console.h"
+#include "tag_files/files.h"
 
 /* prototypes */
+
 static bool string_is_absolute_path(const char* string);
+
+/* public code */
 
 void __cdecl game_state_initialize(void)
 {
