@@ -25,24 +25,25 @@ void __cdecl render_model_apply_two_bone_ik(
 
 int32 __cdecl render_model_get_markers_by_name(
 	datum render_model_index,
-	string_id marker_string,
-	void* collision_region_block,
-	int32 a4,
-	int32* node_remapping_table,
+	string_id name,
+	const int8* region_permutation_indices,
+	int32 node_remap_count,
+	const int32* node_remapping_table,
 	int32 node_count,
 	const real_matrix4x3* node_matrices,
-	bool object_is_mirrored,
+	bool mirrored_flag,
 	object_marker* markers,
-	int32 count)
+	int32 maximum_marker_count)
 {
-	return INVOKE(0x37A525, 0x325295, render_model_get_markers_by_name, render_model_index,
-		marker_string,
-		collision_region_block,
-		a4,
+	return INVOKE(0x37A525, 0x325295, render_model_get_markers_by_name,
+		render_model_index,
+		name,
+		region_permutation_indices,
+		node_remap_count,
 		node_remapping_table,
 		node_count,
 		node_matrices,
-		object_is_mirrored,
+		mirrored_flag,
 		markers,
-		count);
+		maximum_marker_count);
 }

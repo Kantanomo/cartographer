@@ -31,12 +31,12 @@ void __cdecl render_model_apply_two_bone_ik(
 
 int32 __cdecl render_model_get_markers_by_name(
 	datum render_model_index,
-	string_id marker_string,
-	void* collision_region_block,
-	int32 a4,
-	int32* node_remapping_table,
+	string_id name,
+	const int8* region_permutation_indices,
+	int32 node_remap_count,
+	const int32* node_remapping_table,
 	int32 node_count,
-	const real_matrix4x3* node_matrices,
-	bool object_is_mirrored,
+	const struct real_matrix4x3* node_matrices,
+	bool mirrored_flag,
 	struct object_marker* markers,
-	int32 count);
+	int32 maximum_marker_count);

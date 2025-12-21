@@ -1715,19 +1715,23 @@ static void object_reset_interpolation(datum object_index)
 	return;
 }
 
-static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 maximum_marker_count, bool is_unit)
+static int16 __cdecl internal_object_get_markers_by_string_id(
+	datum object_index,
+	string_id name,
+	object_marker* markers,
+	int16 maximum_marker_count, 
+	bool local_markers_only)
 {
-	int32 marker_index = 0;
+	int16 marker_index = 0;
 
-	datum index = object_index;
-	if (!is_unit)
+	if (!local_markers_only)
 	{
-		index = object_get_parent_recursive(index);
+		object_index = object_get_parent_recursive(object_index);
 	}
 
-	if (index != NONE)
+	if (object_index != NONE)
 	{
-		object_datum* object = object_get(index);
+		object_datum* object = object_get(object_index);
 		struct object_definition* object_definition = (struct object_definition*)tag_get_fast(object->definition_index);
 		
 		ASSERT(object_definition);
@@ -1737,10 +1741,10 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 		{
 			s_model_definition* model_definition = (s_model_definition*)tag_get_fast(object_model_index);
 
-			int32 node_count;
+			int32 node_count = 0;
 			const real_matrix4x3* node_matrices;
 
-			int32 region_count;
+			int32 region_count = 0;
 			int8* region_permutation_indices;
 			object_get_region_information(object_index, &region_count, &region_permutation_indices, NULL, NULL);
 			if (!halo_interpolator_interpolate_object_node_matrices(object_index, &node_matrices, &node_count))
@@ -1751,44 +1755,47 @@ static int16 __cdecl internal_object_get_markers_by_string_id(datum object_index
 			ASSERT(region_count == model_definition->runtime_regions.count);
 			ASSERT(node_count == model_definition->runtime_nodes.count);
 
-			marker_index = render_model_get_markers_by_name(
+			marker_index = (int16)render_model_get_markers_by_name(
 				model_definition->render_model.index,
-				marker,
+				name,
 				region_permutation_indices,
 				NONE,
 				NULL,
 				node_count,
 				node_matrices,
 				object->object.flags.test(_object_mirrored_bit),
-				marker_object,
+				markers,
 				maximum_marker_count
 			);
-
-			if (marker_index)
-			{
-				return (int16)marker_index;
-			}
 		}
 	}
 
-	object_datum* object = object_get(object_index);
-	ASSERT(maximum_marker_count > 0);
-
-	marker_object->node_index = 0;
-	matrix4x3_identity(&marker_object->node_matrix);
-
-	if (!halo_interpolator_interpolate_object_node_matrix(object_index, 0, &marker_object->matrix))
+	if (!marker_index)
 	{
-		marker_object->matrix = *object_get_node_matrix(object_index, 0);
+		object_datum* object = object_get(object_index);
+		ASSERT(maximum_marker_count > 0);
+
+		markers->node_index = 0;
+		matrix4x3_identity(&markers->node_matrix);
+
+		if (!halo_interpolator_interpolate_object_node_matrix(object_index, 0, &markers->matrix))
+		{
+			markers->matrix = *object_get_node_matrix(object_index, 0);
+		}
+
+		markers->radius = 0.f;
+		if (object->object.flags.test(_object_mirrored_bit))
+		{
+			negate_vector3d(&markers->matrix.vectors.left, &markers->matrix.vectors.left);
+		}
+
+		if (name == _string_id_empty_string)
+		{
+			marker_index = 1;
+		}
 	}
 
-	marker_object->radius = 0.f;
-	if (object->object.flags.test(_object_mirrored_bit))
-	{
-		scale_vector3d(&marker_object->matrix.vectors.left, -1.0f, &marker_object->matrix.vectors.left);
-	}
-
-	return (marker != 0 ? (int16)marker_index : 1);
+	return marker_index;
 }
 
 static void object_disconnect_from_map(datum object_index, bool disconnect_this_object, bool reconnect_this_object)
