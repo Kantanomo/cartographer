@@ -1723,15 +1723,16 @@ static int16 __cdecl internal_object_get_markers_by_string_id(
 {
 	int16 marker_index = 0;
 
+	datum parent_object_index = object_index;
 	if (!local_markers_only)
 	{
-		object_index = object_get_parent_recursive(object_index);
+		parent_object_index = object_get_parent_recursive(parent_object_index);
 	}
 
-	if (object_index != NONE)
+	if (parent_object_index != NONE)
 	{
-		object_datum* object = object_get(object_index);
-		struct object_definition* object_definition = (struct object_definition*)tag_get_fast(object->definition_index);
+		object_datum* parent_object = object_get(parent_object_index);
+		struct object_definition* object_definition = (struct object_definition*)tag_get_fast(parent_object->definition_index);
 
 		ASSERT(object_definition);
 
@@ -1745,10 +1746,10 @@ static int16 __cdecl internal_object_get_markers_by_string_id(
 
 			int32 region_count = 0;
 			int8* region_permutation_indices;
-			object_get_region_information(object_index, &region_count, &region_permutation_indices, NULL, NULL);
-			if (!halo_interpolator_interpolate_object_node_matrices(object_index, &node_matrices, &node_count))
+			object_get_region_information(parent_object_index, &region_count, &region_permutation_indices, NULL, NULL);
+			if (!halo_interpolator_interpolate_object_node_matrices(parent_object_index, &node_matrices, &node_count))
 			{
-				node_matrices = object_get_node_matrices(object_index, &node_count);
+				node_matrices = object_get_node_matrices(parent_object_index, &node_count);
 			}
 
 			ASSERT(region_count == model_definition->runtime_regions.count);
@@ -1762,7 +1763,7 @@ static int16 __cdecl internal_object_get_markers_by_string_id(
 				NULL,
 				node_count,
 				node_matrices,
-				object->object.flags.test(_object_mirrored_bit),
+				parent_object->object.flags.test(_object_mirrored_bit),
 				markers,
 				maximum_marker_count
 			);
