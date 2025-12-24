@@ -53,8 +53,8 @@ enum e_object_data_flags : uint32
 enum e_object_physics_flags : uint16
 {
 	_object_allocated_havok_component_bit = 0,
-	_object_physics_bit_1 = 1,
-	_object_physics_bit_2 = 2,
+	_object_was_in_local_physics_bit = 1,
+	_object_in_local_physics_bit = 2,
 	_object_is_early_mover_bit = 3,
 	_object_is_early_mover_child_bit = 4,
 	_object_physics_bit_5 = 5,
@@ -125,17 +125,6 @@ struct object_header_block_reference
 	int16 offset;
 };
 ASSERT_STRUCT_SIZE(object_header_block_reference, 4);
-
-struct object_header_datum
-{
-	int16 identifier;
-	c_flags_no_init<e_object_header_flags, uint8, k_object_header_flags> flags;
-	int8/*e_object_type*/ type;
-	int16 cluster_index;
-	int16 data_size;
-	void* datum;
-};
-ASSERT_STRUCT_SIZE(object_header_datum, 12);
 
 struct s_object_payload
 {
@@ -237,6 +226,17 @@ struct object_datum
 	_object_datum object;
 };
 ASSERT_STRUCT_SIZE(object_datum, 300);
+
+struct object_header_datum
+{
+	int16 identifier;
+	c_flags_no_init<e_object_header_flags, uint8, k_object_header_flags> flags;
+	int8/*e_object_type*/ type;
+	int16 cluster_index;
+	int16 data_size;
+	object_datum* datum;
+};
+ASSERT_STRUCT_SIZE(object_header_datum, 12);
 
 struct object_marker
 {
