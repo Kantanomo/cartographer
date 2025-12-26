@@ -43,5 +43,6 @@ enum e_damage_reporting_type : int8
 	_damage_reporting_type_tank = 38,
 	_damage_reporting_type_sentinel_beam = 39,
 	_damage_reporting_type_sentinel_rpg = 40,
-	_damage_reporting_type_teleporter = 41
+	_damage_reporting_type_teleporter = 41,
+	k_damage_reporting_type_count
 };
