@@ -13,6 +13,15 @@ enum e_player_flags : int16
 	_player_first_spawn_bit = 3,
 };
 
+struct s_player_shot_info
+{
+	int16 shot_id;
+	// (((projectile.prediction_type == instant) ^ damage_reporting_type) & 0x3F ^ (prediction_type == instant)) & 0x3F
+	int8 damage_reporting_info; 
+	int32 game_time;
+};
+ASSERT_STRUCT_SIZE(s_player_shot_info, 8);
+
 #pragma pack(push, 1)
 struct player_datum
 {
@@ -59,8 +68,7 @@ struct player_datum
 	int8 gap_198[2];
 	int32 field_19C;
 	int8 gap_19E[30];
-	int32 field_1BC;
-	int8 gap_1C0[60];
+	s_player_shot_info shot_info[8];
 	int16 random_index;
 	int8 gap_1FE[2];
 	int32 is_chatting;
