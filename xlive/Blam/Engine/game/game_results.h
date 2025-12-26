@@ -5,12 +5,14 @@
 #include "saved_games/game_variant.h"
 #include "simulation/machine_id.h"
 
-/* enums */
+/* constants */
 
 enum
 {
 	k_game_results_maximum_game_events = 1000
 };
+
+/* enums */
 
 enum e_game_results_player_statistic : int32
 {
@@ -130,14 +132,14 @@ struct s_game_results_globals
 	bool recording_paused;
 	bool updating;
 	bool pad;
-	int next_game_event_index;
-	int game_event_timer;
+	int32 next_game_event_index;
+	int32 game_event_timer;
 };
 ASSERT_STRUCT_SIZE(s_game_results_globals, 12);
 
 struct s_integer_statistic_definition
 {
-	char* name;
+	const char* name;
 	int8 unused[4];
 	int16 minimum_value;
 	int16 maximum_value;
@@ -246,7 +248,7 @@ public:
 	int64 m_random_data;
 	s_game_variant m_game_variant;
 	int32 m_map_id;
-	wchar_t m_scenario_path[260];
+	wchar_t m_scenario_path[MAX_PATH];
 	bool m_started;
 	int32 m_start_time;
 	bool m_finished;
