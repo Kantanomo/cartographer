@@ -209,7 +209,7 @@ union s_game_results_event_data
 		int32 score_type;
 		datum weapon_index;
 
-	} medal_event;
+	} score_event;
 
 	struct s_game_results_event_carry
 	{
