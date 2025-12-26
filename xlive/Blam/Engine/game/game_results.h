@@ -1,4 +1,6 @@
 #pragma once
+#include "game_allegiance.h"
+#include "player_constants.h"
 #include "networking/network_game_definitions.h"
 #include "saved_games/game_variant.h"
 #include "simulation/machine_id.h"
@@ -250,10 +252,10 @@ public:
 	bool m_finished;
 	int32 m_finish_time;
 	int32 m_player_count_maybe;
-	s_game_results_player_data m_players[16];
-	s_game_results_team_data m_teams[16];
-	s_game_results_player_statistics m_player_statistics[16];
-	s_game_results_player_vs_player_statistics m_pvp_statistics[16][16];
+	s_game_results_player_data m_players[k_maximum_players];
+	s_game_results_team_data m_teams[k_maximum_teams];
+	s_game_results_player_statistics m_player_statistics[k_maximum_players];
+	s_game_results_player_vs_player_statistics m_pvp_statistics[k_maximum_players][k_maximum_players];
 	s_game_results_event m_game_events[k_game_results_maximum_game_events];
 
 private:
