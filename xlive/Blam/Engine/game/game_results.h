@@ -64,6 +64,13 @@ enum e_game_results_player_statistic : int32
 	k_game_results_player_statistic_count
 };
 
+enum e_game_results_player_vs_player_statistic : int32
+{
+	_game_results_player_vs_player_statistic_kills,
+	_game_results_player_vs_player_statistic_deaths,
+	k_game_results_player_vs_player_statistic_count
+};
+
 enum e_game_results_damage_statistic : int32
 {
 	_game_results_damage_statistic_kills,
@@ -123,7 +130,6 @@ enum e_game_results_event_type : int8
 	k_game_results_event_type_count,
 };
 
-
 /* structures */
 
 struct s_game_results_globals
@@ -143,7 +149,7 @@ struct s_integer_statistic_definition
 	int8 unused[4];
 	int16 minimum_value;
 	int16 maximum_value;
-	int32 unknown_value;
+	int32 encoding_bits;
 };
 ASSERT_STRUCT_SIZE(s_integer_statistic_definition, 16);
 
@@ -154,22 +160,22 @@ struct s_integer_statistic
 };
 ASSERT_STRUCT_SIZE(s_integer_statistic, 2);
 
-
 struct s_game_results_player_data
 {
 	bool exists;
 	bool machine_exists;
-	int8 padding[2];
+	int8 unk_02[2];
 	s_machine_identifier machine;
 	s_player_configuration player_configuration;
-	int32 player_place;
+	int16 player_place;
+	int16 score;
 };
 ASSERT_STRUCT_SIZE(s_game_results_player_data, 148);
 
 struct s_game_results_team_data
 {
 	bool exists;
-	int8 standing;
+	int8 place;
 	int16 score;
 	int8 pad[20];
 };
@@ -193,23 +199,29 @@ ASSERT_STRUCT_SIZE(s_game_results_player_statistics, 874);
 
 struct s_game_results_player_vs_player_statistics
 {
-	s_integer_statistic statistic[2];
+	s_integer_statistic statistic[k_game_results_player_vs_player_statistic_count];
 };
 ASSERT_STRUCT_SIZE(s_game_results_player_vs_player_statistics, 4);
+
+struct s_game_results_team_statistics
+{
+	s_integer_statistic statistics[k_game_results_player_statistic_count];
+};
+ASSERT_STRUCT_SIZE(s_game_results_team_statistics, 90);
 
 union s_game_results_event_data
 {
 	struct s_game_results_event_kill
 	{
-		real_vector3d killer_position;
-		real_vector3d killed_position;
+		real_point3d killer_position;
+		real_point3d killed_position;
 		int32 damage_reporting_type;
 
 	} kill_event;
 
 	struct s_game_results_event_score
 	{
-		real_vector3d scorer_position;
+		real_point3d scorer_position;
 		int32 score_type;
 		datum weapon_index;
 
@@ -217,7 +229,7 @@ union s_game_results_event_data
 
 	struct s_game_results_event_carry
 	{
-		real_vector3d carrier_position;
+		real_point3d carrier_position;
 		int32 carry_type;
 		datum weapon_index;
 
@@ -237,6 +249,16 @@ struct s_game_results_event
 };
 ASSERT_STRUCT_SIZE(s_game_results_event, 0x24);
 
+struct s_game_results_machine_data
+{
+	s_machine_identifier machine;
+	bool exists;
+	char pad;
+	bool host;
+	int8 data[2];
+};
+ASSERT_STRUCT_SIZE(s_game_results_machine_data, 11);
+
 class c_game_results
 {
 public:
@@ -250,19 +272,18 @@ public:
 	int32 m_map_id;
 	wchar_t m_scenario_path[MAX_PATH];
 	bool m_started;
-	int32 m_start_time;
+	uint32 m_start_time;
 	bool m_finished;
-	int32 m_finish_time;
+	uint32 m_finish_time;
 	int32 m_player_count_maybe;
 	s_game_results_player_data m_players[k_maximum_players];
 	s_game_results_team_data m_teams[k_maximum_teams];
 	s_game_results_player_statistics m_player_statistics[k_maximum_players];
 	s_game_results_player_vs_player_statistics m_pvp_statistics[k_maximum_players][k_maximum_players];
+	s_game_results_team_statistics m_team_statistics[k_maximum_teams];
 	s_game_results_event m_game_events[k_game_results_maximum_game_events];
-
-private:
-	// todo: a very weird storage for s_machine_identifiers everything is accessed in a shifted pattern needs more work in the future
-	int8 gap[1796];
+	s_game_results_machine_data m_machines[17];
+	int8 gap_DBC1[168];
 };
 ASSERT_STRUCT_SIZE(c_game_results, 0xDC68);
 
@@ -276,4 +297,31 @@ void game_results_start_updating(void);
 void game_results_stop_updating(void);
 
 void __cdecl game_results_update(void);
+
 c_game_results* game_results_get(void);
+
+int32 game_results_get_recording_statistic(int32 player_index, int32 team_index, e_game_results_player_statistic statistic);
+int32 game_results_get_finalized_statistic(int32 player_index, int32 team_index, e_game_results_player_statistic statistic);
+int32 game_results_get_finalized_damage_statistic(int32 player_index, e_game_results_damage_statistic statistic, e_damage_reporting_type damage_type);
+int32 game_results_get_finalized_medal_statistic(int32 player_index, e_game_results_medal_statistic medal);
+int32 game_results_get_finalized_pvp_statistic(int32 player_index, int32 vs_player_index, e_game_results_player_vs_player_statistic statistic);
+int32 game_results_get_finalized_player_score(int32 player_index);
+int32 game_results_get_finalized_player_place(int32 player_index);
+s_player_configuration* game_results_get_finalized_player_configuration(int32 player_index);
+int8* game_results_get_finalized_player_unknown_02(int32 player_index);
+e_game_team game_results_get_finalized_player_team(int32 player_index);
+void game_results_get_finalized_player_profile_traits(int32 player_index, s_player_profile_traits* profile_traits);
+bool game_results_get_player_position(real_point3d* position, int32 player_index);
+int32 game_results_get_finalized_team_score(e_game_team team);
+int32 game_results_get_finalized_team_place(e_game_team team);
+
+void game_results_set_statistic(int32 player_index, e_game_team team, e_game_results_player_statistic statistic, int32 value);
+void game_results_increment_statistic(int32 player_index, e_game_team team, e_game_results_player_statistic statistic, int32 amount);
+void game_results_increment_pvp_statistic(int32 player_index, int32 vs_player_index, e_game_results_player_vs_player_statistic statistic, int32 amount);
+void game_results_increment_damage_statistic(int32 player_index, e_game_results_damage_statistic statistic, e_damage_reporting_type damage_type, int32 amount);
+void game_results_increment_medal_statistic(int32 player_index, e_game_results_medal_statistic medal, int32 amount);
+
+void game_results_insert_event(const s_game_results_event* event);
+void game_results_insert_kill_event(int16 player_index, int16 killed_player_index, int8 damage_reporting_info);
+void game_results_insert_score_event(int16 player_index, int32 score_type, datum weapon_index);
+void game_results_insert_carry_event(int16 player_index, datum weapon_index, int32 carry_type);

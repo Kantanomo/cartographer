@@ -47,6 +47,8 @@ void shell_windows_initialize();
 
 uint32 __cdecl system_milliseconds(void);
 
+__time64_t __cdecl system_seconds();
+
 LARGE_INTEGER shell_time_counter_freq();
 
 LARGE_INTEGER shell_time_counter_now(LARGE_INTEGER* freq);
