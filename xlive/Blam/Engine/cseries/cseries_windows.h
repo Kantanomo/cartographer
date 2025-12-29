@@ -17,3 +17,5 @@ void __cdecl system_get_user_name(char* name, int16 size);
 
 // Center window from hwnd
 void center_window(HWND hwnd);
+
+uint32 __cdecl system_seconds();

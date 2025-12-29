@@ -7,8 +7,7 @@
 
 /* constants */
 
-static constexpr real_point3d g_game_results_invalid_player_location{ 0, 0, 500.f };
-static constexpr int32 k_game_results_event_cooldown = 3;
+static const real_point3d g_game_results_invalid_player_location{ 0, 0, 500.f };
 
 /* prototypes */
 
@@ -229,14 +228,11 @@ void game_results_get_finalized_player_profile_traits(int32 player_index, s_play
 
 	if (game_results->m_initialized && player_index != NONE && game_results->m_players[player_index].exists)
 	{
-		csmemcpy(
-			profile_traits, 
-			&game_results->m_players[player_index].player_configuration.profile_traits, 
-			sizeof(s_player_profile_traits));
+		*profile_traits = game_results->m_players[player_index].player_configuration.profile_traits;
 	}
 	else
 	{
-		csmemset(profile_traits, 0, sizeof(s_player_profile_traits));
+		player_profile_traits_initialize(profile_traits);
 	}
 }
 
@@ -442,7 +438,7 @@ void game_results_insert_kill_event(int16 player_index, int16 killed_player_inde
 		event.type = _game_results_event_type_kill;
 		event.player_references[0] = (int8)player_index;
 		event.player_references[1] = (int8)killed_player_index;
-		event.time = (uint32)system_seconds() - game_results->m_start_time;
+		event.time = system_seconds() - game_results->m_start_time;
 		event.data.kill_event.damage_reporting_type = (int32)damage_reporting_info;
 
 		real_point3d player_position = g_game_results_invalid_player_location;
@@ -472,7 +468,7 @@ void game_results_insert_score_event(int16 player_index, int32 score_type, datum
 		event.type = _game_results_event_type_score;
 		event.player_references[0] = (int8)player_index;
 		event.player_references[1] = NONE;
-		event.time = (uint32)system_seconds() - game_results->m_start_time;
+		event.time = system_seconds() - game_results->m_start_time;
 		event.data.score_event.score_type = score_type;
 		event.data.score_event.weapon_index = weapon_index;
 
@@ -495,7 +491,7 @@ void game_results_insert_carry_event(int16 player_index, datum weapon_index, int
 
 	if (game_results_globals->recording && !game_results_globals->recording_paused)
 	{
-		int32 current_time = (int32)system_seconds();
+		uint32 current_time = system_seconds();
 		if (game_results_globals->game_event_timer - current_time > k_game_results_event_cooldown)
 		{
 			s_game_results_event event{};
@@ -503,7 +499,7 @@ void game_results_insert_carry_event(int16 player_index, datum weapon_index, int
 			event.type = _game_results_event_type_carry;
 			event.player_references[0] = (int8)player_index;
 			event.player_references[1] = NONE;
-			event.time = (uint32)system_seconds() - game_results->m_start_time;
+			event.time = system_seconds() - game_results->m_start_time;
 			event.data.carry_event.weapon_index = weapon_index;
 			event.data.carry_event.carry_type = carry_type;
 

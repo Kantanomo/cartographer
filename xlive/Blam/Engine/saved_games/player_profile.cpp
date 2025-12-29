@@ -90,3 +90,17 @@ bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_p
 		return saved_game_player_profile_read_file(enumerated_file_index, profile);
 	}
 }
+
+void player_profile_traits_initialize(s_player_profile_traits* profile_traits)
+{
+	profile_traits->profile.primary_color = _player_color_white;
+	profile_traits->profile.secondary_color = _player_color_white;
+	profile_traits->profile.tertiary_color = _player_color_white;
+	profile_traits->profile.quaternary_color = _player_color_white;
+	profile_traits->profile.player_character_type = _character_type_masterchief;
+	profile_traits->profile.emblem_info.foreground_emblem = _emblem_foreground_seventh_column;
+	profile_traits->profile.emblem_info.background_emblem = _emblem_background_solid;
+	profile_traits->profile.emblem_info.emblem_flags.clear();
+	profile_traits->gap_48 = 0;
+	profile_traits->gap_4C = 0;
+}

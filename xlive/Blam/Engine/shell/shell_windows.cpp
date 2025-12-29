@@ -196,11 +196,6 @@ uint32 __cdecl system_milliseconds(void)
 	return INVOKE(0x37E51, 0x2B4CE, system_milliseconds);
 }
 
-__time64_t system_seconds()
-{
-	return _time64(0);
-}
-
 LARGE_INTEGER shell_time_counter_freq()
 {
 	LARGE_INTEGER freq;

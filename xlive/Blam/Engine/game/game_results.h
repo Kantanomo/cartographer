@@ -2,6 +2,7 @@
 #include "game_allegiance.h"
 #include "player_constants.h"
 #include "networking/network_game_definitions.h"
+#include "networking/session/network_session.h"
 #include "saved_games/game_variant.h"
 #include "simulation/machine_id.h"
 
@@ -9,6 +10,7 @@
 
 enum
 {
+	k_game_results_event_cooldown = 3,
 	k_game_results_maximum_game_events = 1000
 };
 
@@ -138,8 +140,8 @@ struct s_game_results_globals
 	bool recording_paused;
 	bool updating;
 	bool pad;
-	int32 next_game_event_index;
-	int32 game_event_timer;
+	uint32 next_game_event_index;
+	uint32 game_event_timer;
 };
 ASSERT_STRUCT_SIZE(s_game_results_globals, 12);
 
@@ -282,7 +284,7 @@ public:
 	s_game_results_player_vs_player_statistics m_pvp_statistics[k_maximum_players][k_maximum_players];
 	s_game_results_team_statistics m_team_statistics[k_maximum_teams];
 	s_game_results_event m_game_events[k_game_results_maximum_game_events];
-	s_game_results_machine_data m_machines[17];
+	s_game_results_machine_data m_machines[k_network_maximum_machines_per_session];
 	int8 gap_DBC1[168];
 };
 ASSERT_STRUCT_SIZE(c_game_results, 0xDC68);
