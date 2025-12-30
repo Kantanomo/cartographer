@@ -158,3 +158,8 @@ void center_window(HWND hwnd)
 
 	return;
 }
+
+uint32 system_seconds()
+{
+	return (uint32)_time64(0);
+}

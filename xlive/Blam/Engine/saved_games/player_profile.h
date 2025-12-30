@@ -168,3 +168,5 @@ bool saved_game_player_profile_read_file(uint32 enumerated_file_index, s_saved_g
 bool __cdecl saved_game_player_profile_read_post_verify_profile_traits(s_player_profile_traits* profile);
 
 bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_player_profile* profile);
+
+void player_profile_traits_initialize(s_player_profile_traits* profile_traits);

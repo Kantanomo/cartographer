@@ -106,13 +106,14 @@ enum e_emblem_background : uint8
 
 enum e_emblem_flags : uint8
 {
-
+	_emblem_flag_hide_icon_secondary,
+	k_emblem_flag_count
 };
 
 struct s_emblem_info
 {
 	e_emblem_foreground foreground_emblem;
 	e_emblem_background background_emblem;
-	e_emblem_flags emblem_flags;
+	c_flags<e_emblem_flags, uint8, k_emblem_flag_count> emblem_flags;
 };
 ASSERT_STRUCT_SIZE(s_emblem_info, 3);
