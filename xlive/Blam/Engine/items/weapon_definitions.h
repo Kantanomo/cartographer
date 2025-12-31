@@ -6,6 +6,17 @@
 #include "math/periodic_functions.h"
 #include "objects/damage_reporting.h"
 
+/* constants */
+
+enum
+{
+	k_weapon_barrel_count = 2,
+	k_weapon_trigger_count = 2,
+	MAXIMUM_NUMBER_OF_MAGAZINES_PER_WEAPON = 2,
+	MAXIMUM_NUMBER_OF_MAGAZINE_OBJECTS_PER_MAGAZINE = 8,
+	k_weapon_barrel_effect_count = 3
+};
+
 /* enums */
 
 enum e_weapon_definition_flags : int32

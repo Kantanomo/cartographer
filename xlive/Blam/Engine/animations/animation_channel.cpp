@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "animation_channel.h"
 
-
+extern const uint32 k_animation_playback_default_flags = 63;
 
 void c_animation_channel::initialize()
 {

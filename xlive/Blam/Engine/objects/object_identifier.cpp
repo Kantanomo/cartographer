@@ -54,6 +54,11 @@ bool c_object_identifier::is_scenario_object(void) const
 	return TEST_BIT(get_source(), _object_source_legacy);
 }
 
+bool c_object_identifier::is_of_type(e_object_type type) const
+{
+	return TEST_BIT(get_type(), type);
+}
+
 datum c_object_identifier::find_object_index(void) const
 {
 	return INVOKE_TYPE(0x134CFC, 0x123BCC, datum(__thiscall*)(const c_object_identifier*), this);

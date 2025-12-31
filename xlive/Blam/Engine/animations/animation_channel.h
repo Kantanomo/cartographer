@@ -3,6 +3,8 @@
 
 #include "tag_files/tag_groups.h"
 
+extern const uint32 k_animation_playback_default_flags;
+
 // TODO populate flags
 enum e_animation_state_flag_bits : int8
 {

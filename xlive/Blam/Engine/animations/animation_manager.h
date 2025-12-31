@@ -32,7 +32,7 @@ public:
 		int16 child_node_index,
 		int16 alternate_parent_node_index);
 	bool reset_graph(datum jmad_tag_index, datum hlmt_tag_index, bool some_bool);
-	bool set_goal(string_id a2, string_id a3, string_id a4, string_id a5, uint32 a6, int32 a7);
+	bool set_goal(string_id a2, string_id a3, string_id a4, string_id a5, uint32 animation_flags, uint32 playback_flags);
 	bool setup_animation_channel_by_index(c_animation_channel* animation_channel, c_animation_id animation_id, uint32 a4);
 	bool valid(void) const;
 	bool validate_graph(datum jmad_tag_index, datum hlmt_tag_index);

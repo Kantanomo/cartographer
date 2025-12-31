@@ -1105,6 +1105,13 @@ datum object_get_ultimate_parent(datum object_index)
 	return result;
 }
 
+bool object_has_animation_manager(datum object_index)
+{
+	object_datum* object = object_get(object_index);
+
+	return (object->object.animation_manager_block.offset != NONE);
+}
+
 #ifdef OBJECT_DEBUG
 void objects_information_get(objects_information* information)
 {

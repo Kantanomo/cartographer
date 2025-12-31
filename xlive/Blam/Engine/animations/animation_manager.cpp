@@ -95,11 +95,11 @@ bool c_animation_manager::reset_graph(datum jmad_tag_index, datum hlmt_tag_index
 	return c_animation_manager__reset_graph(this, jmad_tag_index, hlmt_tag_index, some_bool);
 }
 
-bool c_animation_manager::set_goal(string_id a2, string_id a3, string_id a4, string_id a5, uint32 a6, int32 a7)
+bool c_animation_manager::set_goal(string_id a2, string_id a3, string_id a4, string_id a5, uint32 animation_flags, uint32 playback_flags)
 {
 	typedef bool(__thiscall* c_animation_manager__set_goal_t)(c_animation_manager*, string_id, string_id, string_id, string_id, uint32, int32);
 	auto c_animation_manager__set_goal = Memory::GetAddress<c_animation_manager__set_goal_t>(0xF5435, 0xF6CA5);
-	return c_animation_manager__set_goal(this, a2, a3, a4, a5, a6, a7);
+	return c_animation_manager__set_goal(this, a2, a3, a4, a5, animation_flags, playback_flags);
 }
 
 bool c_animation_manager::setup_animation_channel_by_index(c_animation_channel* animation_channel, c_animation_id animation_id, uint32 a4)

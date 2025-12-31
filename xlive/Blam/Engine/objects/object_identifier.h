@@ -30,6 +30,7 @@ public:
 	int32 get_unique_id(void) const;
 
 	bool is_scenario_object(void) const;
+	bool is_of_type(e_object_type type) const;
 	datum find_object_index(void) const;
 };
 ASSERT_STRUCT_SIZE(c_object_identifier, 8);

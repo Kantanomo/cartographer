@@ -136,6 +136,80 @@ void unit_add_grenade_type_to_inventory(datum unit_index, int16 grenade_type, in
 	return;
 }
 
+void unit_handle_weapon_state_change(datum unit_index, datum weapon_index, e_weapon_state weapon_state)
+{
+	ASSERT(VALID_INDEX(weapon_state, k_weapon_state_count));
+
+	if (weapon_state)
+	{
+		unit_datum* unit = unit_try_and_get(unit_index);
+
+		ASSERT(unit);
+
+		datum unit_primary_weapon = unit->unit.weapon_object_indices[unit->unit.weapon_indices[0]];
+		datum unit_secondary_weapon = unit->unit.weapon_object_indices[unit->unit.weapon_indices[1]];
+
+		e_unit_action action_type = k_unit_action_invalid;
+
+		if (weapon_index == unit_primary_weapon)
+		{
+			switch (weapon_state)
+			{
+				case _weapon_state_fire_primary:
+					action_type = _action_primary_weapon_primary_recoil;
+					break;
+				case _weapon_state_fire_secondary:
+					action_type = _action_primary_weapon_secondary_recoil;
+					break;
+				case _weapon_state_chamber_primary:
+					action_type = _action_primary_weapon_primary_chamber;
+					break;
+				case _weapon_state_chamber_secondary:
+					action_type = _action_primary_weapon_secondary_chamber;
+					break;
+				case _weapon_state_charged_primary:
+					action_type = _action_primary_weapon_primary_charged;
+					break;
+				case _weapon_state_charged_secondary:
+					action_type = _action_primary_weapon_secondary_charged;
+					break;
+			}
+		}
+		else if (weapon_index == unit_secondary_weapon)
+		{
+			switch (weapon_state)
+			{
+				case _weapon_state_fire_primary:
+					action_type = _action_secondary_weapon_primary_recoil;
+					break;
+				case _weapon_state_fire_secondary:
+					action_type = _action_secondary_weapon_secondary_recoil;
+					break;
+				case _weapon_state_chamber_primary:
+					action_type = _action_secondary_weapon_primary_chamber;
+					break;
+				case _weapon_state_chamber_secondary:
+					action_type = _action_secondary_weapon_secondary_chamber;
+					break;
+				case _weapon_state_charged_primary:
+					action_type = _action_secondary_weapon_primary_charged;
+					break;
+				case _weapon_state_charged_secondary:
+					action_type = _action_secondary_weapon_secondary_charged;
+					break;
+			}
+		}
+
+		if (action_type != k_unit_action_invalid)
+		{
+			action_submit(unit_index, action_type);
+
+			if (unit->unit.gunner_index != NONE)
+				action_submit(unit->unit.gunner_index, action_type);
+		}
+	}
+}
+
 /* private code */
 
 // Replace calls to use interpolated functions

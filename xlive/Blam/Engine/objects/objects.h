@@ -439,6 +439,8 @@ void* object_get_and_verify_type(datum object_index, int32 object_type_mask);
 
 datum object_get_ultimate_parent(datum object_index);
 
+bool object_has_animation_manager(datum object_index);
+
 #ifdef OBJECT_DEBUG
 void objects_information_get(objects_information* information);
 #endif

@@ -1,6 +1,7 @@
 #pragma once
 #include "game/aim_assist.h"
 #include "game/game_allegiance.h"
+#include "items/weapons.h"
 #include "objects/objects.h"
 
 /* constants */
@@ -253,6 +254,8 @@ bool unit_does_not_show_readied_weapon(datum unit_index);
 void unit_set_desired_grenade_type(datum unit_index, int16 grenade_type);
 
 void unit_add_grenade_type_to_inventory(datum unit_index, int16 grenade_type, int16 grenade_count);
+
+void unit_handle_weapon_state_change(datum unit_index, datum weapon_index, e_weapon_state weapon_state);
 
 /* macros */
 
