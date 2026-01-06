@@ -251,7 +251,7 @@ int rasterizer_dx9_draw_primitive_dynamic_geometry(
 		else if (g_dynamic_geometry_print_message)
 		{
 			g_dynamic_geometry_print_message = false;
-			error(_error_silent, "DrawPrimitiveUP was given too much data to swallow, skipping");
+			error(_error_delayed, "DrawPrimitiveUP was given too much data to swallow, skipping");
 		}
 #endif
 	}

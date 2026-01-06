@@ -300,7 +300,7 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	bool pcc_result = shell_windows_pcc_initialize();
 	if (!pcc_result)
 	{
-		error(_error_silent, "Failed to get PCC info / insufficient system resources");
+		error(_error_delayed, "Failed to get PCC info / insufficient system resources");
 		
 		// ### TODO change this?
 		std::thread([]() {
@@ -322,7 +322,7 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	}
 	else if (int32 g_fatal_error_id = *fatal_error_id_get(); g_fatal_error_id)
 	{
-		error(_error_silent, "shell_initialize failed!");
+		error(_error_delayed, "shell_initialize failed!");
 		show_fatal_error(g_fatal_error_id);
 	}
 
@@ -359,7 +359,7 @@ static void destroy_windows(void)
 
 static void __cdecl show_fatal_error(int32 error_id)
 {
-	error(_error_silent, "error_id: %d", error_id);
+	error(_error_delayed, "error_id: %d", error_id);
 	INVOKE(0x4A2E, 0x0, show_fatal_error, error_id);
 	return;
 }

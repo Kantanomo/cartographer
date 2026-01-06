@@ -570,7 +570,7 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 						int16 frame_count = weapon_state_animation->get_frame_count();
 						if (frame_count < 9)
 						{
-							error(_error_silent, "### first-person overlays animation has %d frames (needs to be %d)", frame_count, 9);
+							error(_error_delayed, "### first-person overlays animation has %d frames (needs to be %d)", frame_count, 9);
 							weapon_data->overlay_animation_id.clear();
 						}
 						else

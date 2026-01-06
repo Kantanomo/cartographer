@@ -589,7 +589,7 @@ void hs_compile_source_error(const char* file_name, const char* error_message, c
 		}
 
 		const char* string = error_source ? error_source : "";
-		error(_error_category_design, _error_log, "[%s line %d] %s: %s", file_name, line, error_message, string);
+		error(_error_category_design, _error_immediate, "[%s line %d] %s: %s", file_name, line, error_message, string);
 		if (g_error_output_buffer)
 		{
 			csnappendf(
@@ -606,7 +606,7 @@ void hs_compile_source_error(const char* file_name, const char* error_message, c
 	else
 	{
 		const char* string = error_source ? error_source : "";
-		error(_error_category_design, _error_log, "%s: %s", error_message, string);
+		error(_error_category_design, _error_immediate, "%s: %s", error_message, string);
 		if (g_error_output_buffer)
 		{
 			csnappendf(

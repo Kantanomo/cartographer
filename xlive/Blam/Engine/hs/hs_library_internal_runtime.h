@@ -285,7 +285,7 @@ void hs_evaluate_object_cast_up(int16 function_index, int32 thread_index, bool i
 #ifdef ERRORS_ENABLED
 			const char* type_name = hs_type_names[type_index + FIRST_HS_OBJECT_TYPE];
 			const char* tag_name = tag_get_name(object->definition_index);
-			error(_error_silent, "attempt to convert object %s to type %s", tag_name, type_name);
+			error(_error_delayed, "attempt to convert object %s to type %s", tag_name, type_name);
 #endif
 			hs_return(thread_index, NONE);
 		}

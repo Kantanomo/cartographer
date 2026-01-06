@@ -24,6 +24,9 @@ enum
 	k_error_category_log_time_slice_msec = 10000,
 	k_error_category_maximum_logs_per_timeslice = 5,
 	k_error_category_time_slice_per_log = k_error_category_log_time_slice_msec / k_error_category_maximum_logs_per_timeslice,
+
+	k_error_log_entry_max_count= 1024,
+	k_error_file_cache_size= SHORT_MAX+1,
 };
 
 static const char k_too_many_errors_msg[] = "[...too many errors to print...]\r\n";
@@ -64,8 +67,8 @@ struct s_error_entry
 struct s_error_file_cache
 {
 	c_static_flags_no_init<k_error_category_count> entry_mask;
-	c_static_stack<s_error_entry, 1024> entry_stack;
-	char buffer[32768];
+	c_static_stack<s_error_entry, k_error_log_entry_max_count> entry_stack;
+	char buffer[k_error_file_cache_size];
 	uint32 current_size;
 	c_static_array<c_error_file, k_error_category_count> file_entries;
 };
@@ -78,7 +81,8 @@ struct error_global_data
 	bool recursion_lock;
 	bool overflow_suppression;
 	bool suppress_all;
-	bool developer_mode;
+	// Idles and collects logs before dumping them at a specific interval, or when something immediate needs to be logged
+	bool idle_logging_and_caching;
 	bool editing_tools;
 	int16 message_buffer_size;
 	char message_buffer[k_error_message_buffer_maximum_size];
@@ -106,34 +110,34 @@ struct s_error_category
 
 static e_error_category error_get_category_from_string(const char* category_string);
 
-static void write_to_error_file_internal(e_error_category category, const char* string, const char* time, bool append_time);
+static void write_to_error_file_internal(e_error_category category, const char* string, const char* time, bool write_immediate);
 
 static void error_write_string_to_file(
 	c_static_array<c_error_file, k_error_category_count>* file,
 	e_error_category category,
 	const char* string,
 	const char* time,
-	bool append_time);
+	bool write_immediate);
 
 static void error_write_string_to_file_internal(
 	c_static_array<c_error_file, k_error_category_count>* files,
 	e_error_category category,
 	const char* string,
 	const char* time,
-	bool append_time);
+	bool write_immediate);
 
 static void write_string_to_error_file(
 	c_error_file* file,
 	e_error_category category,
 	const char* string,
 	const char* time,
-	bool append_time);
+	bool write_immediate);
 
 static void error_write_to_file(void);
 
 static s_file_reference* error_category_file_entry_get(e_error_category category);
 
-static void error_category_file_entry_close(e_error_category category, bool append_time);
+static void error_category_file_entry_close(e_error_category category, bool write_immediate);
 
 /* globals */
 
@@ -283,7 +287,7 @@ void errors_initialize(void)
 {
 	error_globals.output_to_debug_file = true;
 	error_globals.suppress_all = false;
-	error_globals.developer_mode = false;
+	error_globals.idle_logging_and_caching = true;
 	error_globals.overflow_suppression = shell_application_type() != _shell_application_tool;
 	error_globals.editing_tools = shell_application_type() == _shell_application_tool;
 
@@ -315,7 +319,7 @@ void errors_dispose(void)
 {
 	error_write_to_file();
 	stack_walk_dispose();
-	error_globals.delayed = 0;
+	error_globals.delayed = false;
 	return;
 }
 
@@ -430,11 +434,11 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 			ASSERT(VALID_INDEX(priority, k_error_priority_count));
 			ASSERT(format);
 
-			if (priority < _error_log)
+			if (priority < _error_immediate)
 			{
 				if (!error_category_enabled(category))
 				{
-					priority = MAX(priority, _error_delayed);
+					priority = MAX(priority, _error_silent);
 				}
 
 
@@ -481,7 +485,7 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 					if (g_error_category_log_count_per_time_slice[category] >= k_error_category_maximum_logs_per_timeslice)
 					{
 						status_printf("suppressing errors");
-						priority = MIN(priority, _error_delayed);
+						priority = MIN(priority, _error_silent);
 					}
 				}
 			}
@@ -495,7 +499,7 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 
 				display_debug_string(string);
 				csstrncat(string, "\r\n", 1027);
-				if (priority > _error_delayed)
+				if (priority > _error_silent)
 				{
 					if (error_globals.editing_tools)
 					{
@@ -504,7 +508,7 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 					else
 					{
 						real_argb_color color = *global_real_argb_white;
-						if (priority < _error_log)
+						if (priority < _error_immediate)
 						{
 							real_rgb_color category_color;
 							color.rgb = *error_category_color(&category_color, category);
@@ -518,7 +522,7 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 				}
 
 				write_to_error_file(category, priority, string, true);
-				if (priority >= _error_silent)
+				if (priority >= _error_delayed)
 				{
 					const int32 copy_size = cstrlen(string);
 					if ((copy_size + error_globals.message_buffer_size) >= k_error_message_buffer_maximum_size)
@@ -644,7 +648,7 @@ void error_message_write_and_flush(void)
 
 void error_idle(void)
 {
-	if (error_globals.developer_mode && system_milliseconds() - error_globals.last_time >= 5000)
+	if (error_globals.idle_logging_and_caching && system_milliseconds() - error_globals.last_time >= 5000)
 	{
 		error_write_to_file();
 	}
@@ -653,6 +657,8 @@ void error_idle(void)
 
 void write_to_error_file(e_error_category category, e_error_priority priority, const char* string, bool append_time)
 {
+	const bool write_immediate= priority>_error_delayed;
+
 	ASSERT_EXCEPTION(_error_category_internal_full != category, false);
 	ASSERT(_error_category_internal_subfolder != category);
 
@@ -660,11 +666,11 @@ void write_to_error_file(e_error_category category, e_error_priority priority, c
 	{
 		char time[256];
 		system_get_date_and_time(time, NUMBEROF(time), false);
-		write_to_error_file_internal(category, string, time, append_time);
+		write_to_error_file_internal(category, string, time, write_immediate);
 	}
 	else
 	{
-		write_to_error_file_internal(category, string, "", append_time);
+		write_to_error_file_internal(category, string, "", write_immediate);
 	}
 	return;
 }
@@ -685,7 +691,7 @@ static e_error_category error_get_category_from_string(const char* category_stri
 	return result;
 }
 
-static void write_to_error_file_internal(e_error_category category, const char* string, const char* time, bool append_time)
+static void write_to_error_file_internal(e_error_category category, const char* string, const char* time, bool write_immediate)
 {
 	ASSERT(string);
 
@@ -699,8 +705,8 @@ static void write_to_error_file_internal(e_error_category category, const char* 
 		DISPLAY_ASSERT("arithmetic overflow error");
 	}
 
-	if (append_time
-		|| !error_globals.developer_mode
+	if (write_immediate
+		|| !error_globals.idle_logging_and_caching
 		|| g_error_file_cache.entry_stack.full()
 		|| string_size + time_size + g_error_file_cache.current_size > NUMBEROF(g_error_file_cache.buffer))
 	{
@@ -709,13 +715,13 @@ static void write_to_error_file_internal(e_error_category category, const char* 
 
 	ASSERT(!g_error_file_cache.entry_stack.full());
 
-	if (append_time
-		|| !error_globals.developer_mode
+	if (write_immediate
+		|| !error_globals.idle_logging_and_caching
 		|| g_error_file_cache.entry_stack.full()
 		|| string_size + time_size + g_error_file_cache.current_size > NUMBEROF(g_error_file_cache.buffer))
 	{
 		ASSERT(g_error_file_cache.entry_stack.empty());
-		error_write_string_to_file(NULL, category, string, time, append_time);
+		error_write_string_to_file(NULL, category, string, time, write_immediate);
 	}
 	// Update entry and error state
 	else
@@ -750,21 +756,21 @@ static void error_write_string_to_file(
 	e_error_category category,
 	const char* string,
 	const char* time,
-	bool append_time)
+	bool write_immediate)
 {
 	if (!category || !error_globals.prevent_write_to_primary_log[category])
 	{
-		error_write_string_to_file_internal(files, _error_category_generic, string, time, append_time);
-		error_write_string_to_file_internal(files, _error_category_internal_full, string, time, append_time);
+		error_write_string_to_file_internal(files, _error_category_generic, string, time, write_immediate);
+		error_write_string_to_file_internal(files, _error_category_internal_full, string, time, write_immediate);
 	}
 
 	if (category)
 	{
-		error_write_string_to_file_internal(files, category, string, time, append_time);
+		error_write_string_to_file_internal(files, category, string, time, write_immediate);
 	}
 	else if (error_globals.error_subdirectory[0])
 	{
-		error_write_string_to_file_internal(files, _error_category_internal_subfolder, string, time, append_time);
+		error_write_string_to_file_internal(files, _error_category_internal_subfolder, string, time, write_immediate);
 	}
 	return;
 }
@@ -774,7 +780,7 @@ static void error_write_string_to_file_internal(
 	e_error_category category,
 	const char* string,
 	const char* time,
-	bool append_time)
+	bool write_immediate)
 {
 	c_critical_section_scope scope(error_globals.system_mutex);
 	c_error_file* file = (files != NULL ? &files->operator[](category) : NULL);
@@ -783,27 +789,27 @@ static void error_write_string_to_file_internal(
 	if (g_error_category_written_to_state[category] == false)
 	{
 		g_error_category_written_to_state[category] = true;
-		write_string_to_error_file(file, category, "\r\n\r\n", NULL, append_time);
+		write_string_to_error_file(file, category, "\r\n\r\n", NULL, write_immediate);
 		write_string_to_error_file(
 			file,
 			category,
 			"============================================================================================\r\n",
 			NULL,
-			append_time
+			write_immediate
 		);
-		write_string_to_error_file(file, category, shell_get_version(), time, append_time);
-		write_string_to_error_file(file, category, "\r\n", NULL, append_time);
+		write_string_to_error_file(file, category, shell_get_version(), time, write_immediate);
+		write_string_to_error_file(file, category, "\r\n", NULL, write_immediate);
 		write_string_to_error_file(
 			file,
 			category,
 			"============================================================================================\r\n",
 			NULL,
-			append_time
+			write_immediate
 		);
-		write_string_to_error_file(file, category, "\r\n\r\n", NULL, append_time);
+		write_string_to_error_file(file, category, "\r\n\r\n", NULL, write_immediate);
 	}
 	// Write the actual error now
-	write_string_to_error_file(file, category, string, time, append_time);
+	write_string_to_error_file(file, category, string, time, write_immediate);
 	return;
 }
 
@@ -812,7 +818,7 @@ static void write_string_to_error_file(
 	e_error_category category,
 	const char* output_string,
 	const char* time,
-	bool append_time)
+	bool write_immediate)
 {
 	if (error_globals.output_to_debug_file)
 	{
@@ -837,7 +843,7 @@ static void write_string_to_error_file(
 			s_file_reference* reference = error_category_file_entry_get(category);
 			const size_t length = cstrlen(output_string);
 			file_write(reference, length, output_string);
-			error_category_file_entry_close(category, append_time);
+			error_category_file_entry_close(category, write_immediate);
 		}
 	}
 	return;
@@ -871,9 +877,9 @@ static void error_write_to_file(void)
 		if (i != _error_category_internal_subfolder || error_globals.error_subdirectory[0])
 		{
 			s_file_reference* reference = error_category_file_entry_get((e_error_category)i);
-			c_error_file file = g_error_file_cache.file_entries[i];
+			c_error_file* file = &g_error_file_cache.file_entries[i];
 
-			file.set_file_reference(reference);
+			file->set_file_reference(reference);
 
 			SET_BIT(category_mask, i, true);
 		}
@@ -958,9 +964,9 @@ static s_file_reference* error_category_file_entry_get(e_error_category category
 	return result;
 }
 
-static void error_category_file_entry_close(e_error_category category, bool append_time)
+static void error_category_file_entry_close(e_error_category category, bool write_immediate)
 {
-	if (append_time || error_globals.suppress_all)
+	if (write_immediate || error_globals.suppress_all)
 	{
 		if (g_error_category_file_currently_open[category])
 		{

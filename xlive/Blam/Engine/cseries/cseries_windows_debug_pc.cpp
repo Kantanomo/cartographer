@@ -94,7 +94,7 @@ static LONG WINAPI debug_unhandled_exception_cb(_In_ struct _EXCEPTION_POINTERS*
 		int32 result = SHFileOperationW(&file_op);
 		if (result)
 		{
-			error(_error_immediate, "SHFileOperationW failed to delete folder %ws with error %d", reports_path.get_string(), result);
+			error(_error_log, "SHFileOperationW failed to delete folder %ws with error %d", reports_path.get_string(), result);
 		}
 	}
 

@@ -370,7 +370,7 @@ static void file_error(const char* function_name, const s_file_reference* file)
 		0
 	);
 
-	error(_error_silent, "%s('%s') error 0x%08x '%s'", function_name, validated_file->path, error_val, message);
+	error(_error_delayed, "%s('%s') error 0x%08x '%s'", function_name, validated_file->path, error_val, message);
 	SetLastError(0);	// Reset error back to zero
 	return;
 }

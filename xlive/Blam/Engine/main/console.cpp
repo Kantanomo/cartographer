@@ -225,7 +225,7 @@ void console_printf(const char* format, ...)
 		if (console_dump_to_file)
 		{
 			csstrncat(string, EOL_STRING, NUMBEROF(string) - 2);
-			write_to_error_file(_error_category_generic, _error_delayed, string, true);
+			write_to_error_file(_error_category_generic, _error_silent, string, true);
 		}
 
 		if (console_dump_to_debug_display)
@@ -253,7 +253,7 @@ void console_warning(const char* format, ...)
 		{
 			ASSERT(strlen(EOL_STRING) <= 2);
 			csstrncat(string, EOL_STRING, NUMBEROF(string) - 2);
-			write_to_error_file(_error_category_generic, _error_silent, string, true);
+			write_to_error_file(_error_category_generic, _error_delayed, string, true);
 		}
 	}
 	return;

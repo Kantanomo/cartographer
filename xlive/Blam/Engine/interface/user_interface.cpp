@@ -732,7 +732,7 @@ static void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool 
 {
 	if (error_id > k_last_ui_error_code)
 	{
-		error(_error_silent, "error code must be between 0 & %d", (int32)k_last_ui_error_code);
+		error(_error_delayed, "error code must be between 0 & %d", (int32)k_last_ui_error_code);
 	}
 	else
 	{

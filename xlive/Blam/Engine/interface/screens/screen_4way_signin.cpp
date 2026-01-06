@@ -637,7 +637,7 @@ bool c_screen_4way_signin::handle_automation_event(s_event_record* event)
 
 	if (!IN_RANGE(automation_mode, 2, 11))
 	{
-		error(_error_immediate, "unhandled automation type %s ", automation_mode);
+		error(_error_log, "unhandled automation type %s ", automation_mode);
 	}
 	else
 	{
@@ -763,7 +763,7 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 
 	if (main_widget_datum_index == NONE || player_skins_datum_index == NONE)
 	{
-		error(_error_immediate, "bad datum found");
+		error(_error_log, "bad datum found");
 		return;
 	}
 

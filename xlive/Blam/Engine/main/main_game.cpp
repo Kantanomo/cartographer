@@ -210,7 +210,7 @@ void main_game_launch_set_coop_player_count(int32 player_count)
 	}
 	else
 	{
-		error(_error_silent, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
+		error(_error_delayed, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
 	}
 	return;
 }
@@ -229,7 +229,7 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 	}
 	else
 	{
-		error(_error_silent, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
+		error(_error_delayed, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
 	}
 	return;
 }
@@ -247,7 +247,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 
 	if (i == k_variant_count)
 	{
-		error(_error_silent, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
+		error(_error_delayed, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
 		game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
 	}
 	else
@@ -268,7 +268,7 @@ void main_game_launch_set_game_mode(int32 game_mode)
 	}
 	else
 	{
-		error(_error_silent, "%s: invalid game mode [%d] provided", __FUNCTION__, game_mode);
+		error(_error_delayed, "%s: invalid game mode [%d] provided", __FUNCTION__, game_mode);
 	}
 	return;
 }
@@ -349,7 +349,7 @@ static void main_game_launch_setup_game_mode_details(void)
 	}
 	default:
 	{
-		error(_error_silent, "%s: unknown game mode %d!", __FUNCTION__, (int32)g_main_game_launch_options.game_mode);
+		error(_error_delayed, "%s: unknown game mode %d!", __FUNCTION__, (int32)g_main_game_launch_options.game_mode);
 	}
 	}
 
@@ -411,8 +411,8 @@ static void main_game_load_panic(void)
 	static bool x_recursion_lock = false;
 	if (debug_load_panic_to_main_menu)
 	{
-		error(_error_log, "### ERROR main_game_load_panic: recursion lock triggered (we must have failed to load the main menu from a panic state)");
-		error(_error_log, "### ERROR main game load failed, unable to recover, aborting to pregame");
+		error(_error_immediate, "### ERROR main_game_load_panic: recursion lock triggered (we must have failed to load the main menu from a panic state)");
+		error(_error_immediate, "### ERROR main game load failed, unable to recover, aborting to pregame");
 		main_game_internal_pregame_load();
 		main_halt_and_display_errors();
 	}
@@ -420,7 +420,7 @@ static void main_game_load_panic(void)
 	{
 		if (x_recursion_lock)
 		{
-			error(_error_log, "### ERROR main game load failed, unable to recover, aborting to pregame");
+			error(_error_immediate, "### ERROR main game load failed, unable to recover, aborting to pregame");
 			main_game_internal_pregame_load();
 			main_halt_and_display_errors();
 		}

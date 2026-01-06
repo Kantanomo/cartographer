@@ -552,7 +552,7 @@ datum __cdecl object_new(object_placement_data* data)
 				{
 					error(
 						_error_category_objects,
-						_error_silent,
+						_error_delayed,
 						"object '%s' model '%s' has invalid node count %d!",
 						tag_get_name(data->definition_index),
 						tag_get_name(object_model_index),
@@ -568,7 +568,7 @@ datum __cdecl object_new(object_placement_data* data)
 				{
 					error(
 						_error_category_objects,
-						_error_silent,
+						_error_delayed,
 						"object '%s' model '%s' has invalid region count %d!",
 						tag_get_name(data->definition_index),
 						tag_get_name(object_model_index),
@@ -607,7 +607,7 @@ datum __cdecl object_new(object_placement_data* data)
 					{
 						error(
 							_error_category_animation,
-							_error_silent,
+							_error_delayed,
 							"graph '%s' is not compatible with model '%s'",
 							tag_name_strip_path(tag_get_name(model_definition->animation_graph.index)),
 							tag_name_strip_path(tag_get_name(object_model_index))
@@ -786,7 +786,7 @@ datum __cdecl object_new(object_placement_data* data)
 	{
 		error(
 			_error_category_objects,
-			_error_log,
+			_error_immediate,
 			"%s: cannot create %s",
 			out_of_objects ? "OUT OF OBJECTS" : "OBJECT CREATION FAILED",
 			tag_name_strip_path(tag_get_name(data->definition_index))
@@ -1597,7 +1597,7 @@ static void object_reconnect_to_map(datum object_index, s_location* location)
 	{
 		error(
 			_error_category_objects,
-			_error_silent,
+			_error_delayed,
 			"### WARNING object %s touched too many clusters",
 			tag_get_name(object->definition_index)
 		);

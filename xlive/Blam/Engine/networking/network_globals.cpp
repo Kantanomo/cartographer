@@ -196,13 +196,13 @@ void network_initialize(void)
 			}
 			else
 			{
-				error(_error_silent, "%s(): failed to initialize networking", __FUNCTION__);
+				error(_error_delayed, "%s(): failed to initialize networking", __FUNCTION__);
 				network_dispose();
 			}
 		}
 		else
 		{
-			error(_error_silent, "%s(): failed to initialize base networking memory layer", __FUNCTION__);
+			error(_error_delayed, "%s(): failed to initialize base networking memory layer", __FUNCTION__);
 		}
 	}
 	return;
