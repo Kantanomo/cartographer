@@ -73,7 +73,7 @@ void game_apply_pre_winmain_patches(void)
 	PatchCall(Memory::GetAddress(0x1DD394, 0x1C4848), game_tick);	// c_simulation_world::time_set_immediate_update
 	PatchCall(Memory::GetAddress(0x1DD49A, 0x1C495A), game_tick);	// c_simulation_world::handle_synchronous_update
 
-	// inscrease the max player count to allow ragdolls and the ragdoll count
+	// increase the max player count to allow ragdolls and the ragdoll count
 	WriteValue<int8>(Memory::GetAddress(0x49CCC, 0x42F4A) + 2, k_game_maximum_players_to_allow_ragdolls_new);
 	WriteValue<int8>(Memory::GetAddress(0x49CDC, 0x42F5A) + 2, k_game_maximum_ragdolls_new);
 	
