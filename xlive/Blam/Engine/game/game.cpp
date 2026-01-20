@@ -511,7 +511,7 @@ static void game_info_initialize_for_new_map(const s_game_options* options)
 	random_math_set_seed(game_globals->options.random_seed);
 	game_globals->game_is_lost = false;
 	game_globals->game_is_finished = false;
-	game_globals->pvs_object_is_set = 0;
+	game_globals->pvs_activation_mode = 0;
 	game_globals->game_ragdoll_count = 0;
 	return;
 }

@@ -1204,19 +1204,19 @@ datum object_override_get_shader(datum object_index)
 #ifdef OBJECT_DEBUG
 void objects_dump_memory(void)
 {
-	dump_datum object_type_dumps[NUMBER_OF_OBJECT_TYPES];
 	dump_datum dumps[k_maximum_objects_per_map];
+	dump_datum dumps_by_type[NUMBER_OF_OBJECT_TYPES];
 
 	int16 object_count = 0;
 	int16 overflowed_object_count = 0;
 
 	csmemset(dumps, 0, sizeof(dumps));
-	csmemset(object_type_dumps, 0, sizeof(object_type_dumps));
+	csmemset(dumps_by_type, 0, sizeof(dumps_by_type));
 
-	for (e_object_type type = _object_type_biped; type < NUMBEROF(object_type_dumps); ++type)
+	for (e_object_type type = _object_type_biped; type < NUMBEROF(dumps_by_type); ++type)
 	{
-		object_type_dumps[type].object_type = type;
-		object_type_dumps[type].definition_index = NONE;
+		dumps_by_type[type].object_type = type;
+		dumps_by_type[type].definition_index = NONE;
 	}
 
 	c_object_iterator<object_datum> object_iterator;
@@ -1237,15 +1237,15 @@ void objects_dump_memory(void)
 
 		if (index == NONE)
 		{
-			if (object_count >= k_maximum_objects_per_map)
-			{
-				++overflowed_object_count;
-			}
-			else
+			if (object_count<k_maximum_objects_per_map)
 			{
 				index = object_count++;
 				dumps[index].object_type = _object_type_none;
 				dumps[index].definition_index = object->definition_index;
+			}
+			else
+			{
+				++overflowed_object_count;
 			}
 		}
 
@@ -1256,11 +1256,11 @@ void objects_dump_memory(void)
 		}
 
 		ASSERT((header->type >= 0) && (header->type < NUMBER_OF_OBJECT_TYPES));
-		object_add_to_dump(object_iterator.get_index(), &object_type_dumps[(uint8)header->type]);
+		object_add_to_dump(object_iterator.get_index(), &dumps_by_type[(uint8)header->type]);
 	}
 
 	qsort(dumps, object_count, sizeof(dump_datum), (_CoreCrtNonSecureSearchSortCompareFunction)sort_dumps);
-	qsort(object_type_dumps, NUMBEROF(object_type_dumps), sizeof(dump_datum), (_CoreCrtNonSecureSearchSortCompareFunction)sort_dumps);
+	qsort(dumps_by_type, NUMBEROF(dumps_by_type), sizeof(dump_datum), (_CoreCrtNonSecureSearchSortCompareFunction)sort_dumps);
 
 	const char* tag_path = tag_get_name(global_scenario_index_get());
 	const char* tag_name = tag_name_strip_path(tag_path);
@@ -1281,9 +1281,9 @@ void objects_dump_memory(void)
 		fprintf(file, "OBJECTS BY TYPE\n");
 		fprintf(file, "number (active) [garbage/   dead/outside/at-rest] maxsize totsize\n");
 		
-		for (int16 type_num = 0; type_num < NUMBEROF(object_type_dumps); ++type_num)
+		for (int16 type_num = 0; type_num < NUMBEROF(dumps_by_type); ++type_num)
 		{
-			object_dump_print_info(file, &object_type_dumps[type_num]);
+			object_dump_print_info(file, &dumps_by_type[type_num]);
 		}
 
 		fprintf(file, "\n");
@@ -1980,6 +1980,6 @@ static int sort_dumps(const dump_datum* dump1, const dump_datum* dump2)
 		result = 0;
 	}
 
-	return NONE;
+	return result;
 }
 #endif

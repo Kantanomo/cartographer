@@ -399,7 +399,7 @@ static void setup_game_global_text(const wchar_t* reports_path)
 		fwprintf(file, L"Enable Scripted Camera PVS: ");
 		print_bool_to_file(file, game_globals->enable_scripted_camera_pvs);
 
-		fwprintf(file, L"PVS Object Is Set: %hu\n", game_globals->pvs_object_is_set);
+		fwprintf(file, L"PVS Object Is Set: %hu\n", game_globals->pvs_activation_mode);
 
 		fwprintf(file, L"PVS Object Datum: %d\n", game_globals->pvs_object_datum);
 
