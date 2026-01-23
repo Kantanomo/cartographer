@@ -5,7 +5,7 @@
     <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-nointro -windowed -novsync</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-windowed</LocalDebuggerCommandArguments>
     <LocalDebuggerCommandArgumentsHistory>-nointro -windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">

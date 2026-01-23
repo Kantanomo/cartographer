@@ -15,6 +15,7 @@
 #include "hs/hs.h"
 #include "interface/hud.h"
 #include "interface/motion_sensor.h"
+#include "interface/user_interface_controller.h"
 #include "interface/user_interface_networking.h"
 #include "math/random_math.h"
 #include "main/interpolator.h"
@@ -41,6 +42,11 @@ char const* global_campaign_difficulty_level_names[4]
 	"heroic",
 	"legendary"
 };
+
+/* globals */
+
+bool g_do_auto_join_session = false;
+XSESSION_INFO g_auto_join_session{};
 
 /* structures */
 
@@ -411,6 +417,8 @@ void __cdecl game_tick(void)
 		game_time_advance();
 	}
 
+	game_check_auto_join();
+
 	//main_status("game_tick", NULL);
 
 	return;
@@ -487,6 +495,15 @@ void __cdecl game_frame(real32 dt)
 	}
 	INVOKE(0x48CDC, 0x41F7D, game_frame, dt);
 	return;
+}
+
+void game_check_auto_join()
+{
+	if (g_do_auto_join_session && user_interface_controller_get_signed_in_controller_count())
+	{
+		game_direct_connect_to_session(g_auto_join_session.sessionID, g_auto_join_session.keyExchangeKey, &g_auto_join_session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+		g_do_auto_join_session = false;
+	}
 }
 
 /* private code */

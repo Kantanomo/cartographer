@@ -1317,6 +1317,7 @@
     <ClCompile Include="Blam\Engine\shell\shell.cpp" />
     <ClCompile Include="Blam\Engine\shell\shell_windows.cpp" />
     <ClCompile Include="Blam\Engine\shell\shell_windows_internals.cpp" />
+    <ClCompile Include="Blam\Engine\shell\shell_windows_ipc.cpp" />
     <ClCompile Include="Blam\Engine\shell\shell_windows_pcc.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_action.cpp" />
@@ -2402,6 +2403,7 @@
     <ClInclude Include="Blam\Engine\shell\shell.h" />
     <ClInclude Include="Blam\Engine\shell\shell_windows.h" />
     <ClInclude Include="Blam\Engine\shell\shell_windows_internals.h" />
+    <ClInclude Include="Blam\Engine\shell\shell_windows_ipc.h" />
     <ClInclude Include="Blam\Engine\shell\shell_windows_pcc.h" />
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_action.h" />

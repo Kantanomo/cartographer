@@ -2,6 +2,11 @@
 #include "game_options.h"
 #include "structures/cluster_partitions.h"
 
+/* globals */
+
+extern bool g_do_auto_join_session;
+extern XSESSION_INFO g_auto_join_session;
+
 /* constants */
 
 enum
@@ -129,6 +134,8 @@ void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt);
 void __cdecl game_initialize_for_new_map(const s_game_options* options);
 
 void __cdecl game_frame(real32 dt);
+
+void game_check_auto_join();
 
 /* globals */
 
