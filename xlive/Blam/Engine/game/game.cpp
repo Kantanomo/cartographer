@@ -33,7 +33,8 @@
 #include "sound/game_sound_deterministic.h"
 #include "text/unicode.h"
 
-/* constants */
+
+/* globals */
 
 char const* global_campaign_difficulty_level_names[4]
 {
@@ -43,13 +44,7 @@ char const* global_campaign_difficulty_level_names[4]
 	"legendary"
 };
 
-/* globals */
-
-bool g_do_auto_join_session = false;
-XSESSION_INFO g_auto_join_session{};
-
-/* structures */
-
+s_game_auto_join_globals g_game_auto_join;
 
 /* prototypes */
 
@@ -499,10 +494,10 @@ void __cdecl game_frame(real32 dt)
 
 void game_check_auto_join()
 {
-	if (g_do_auto_join_session && user_interface_controller_get_signed_in_controller_count())
+	if (g_game_auto_join.do_auto_join && user_interface_controller_get_signed_in_controller_count())
 	{
-		game_direct_connect_to_session(g_auto_join_session.sessionID, g_auto_join_session.keyExchangeKey, &g_auto_join_session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
-		g_do_auto_join_session = false;
+		game_direct_connect_to_session(g_game_auto_join.auto_join_session.sessionID, g_game_auto_join.auto_join_session.keyExchangeKey, &g_game_auto_join.auto_join_session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+		g_game_auto_join.do_auto_join = false;
 	}
 }
 

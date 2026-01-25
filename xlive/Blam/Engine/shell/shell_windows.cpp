@@ -170,12 +170,12 @@ bool shell_platform_initialize(void)
 // mess around with xlive (not calling XLiveInitialize etc)
 bool* should_initilize_xlive_get(void)
 {
-	return Memory::GetAddress<bool*>(0x4FAD98);
+	return Memory::GetAddress<bool*>(0x4FAD98, 0x520AC8);
 }
 
 bool* xlive_initilized_get(void)
 {
-	return Memory::GetAddress<bool*>(0x4FAD99);
+	return Memory::GetAddress<bool*>(0x4FAD99, 0x520AC9);
 }
 
 int32* fatal_error_id_get(void)
@@ -583,7 +583,7 @@ static void shell_windows_calculate_instance_num(void)
 	return;
 }
 
-void shell_windows_url_decode_command_line_buffer(wchar_t* argument_buffer)
+static void shell_windows_url_decode_command_line_buffer(wchar_t* argument_buffer)
 {
 	if (!argument_buffer) return;
 
@@ -593,7 +593,7 @@ void shell_windows_url_decode_command_line_buffer(wchar_t* argument_buffer)
 	// the only thing that should ever need to be encoded is a space (%20)
 
 	int32 read_index = 0;
-    int32 write_index = 0;
+	int32 write_index = 0;
 	while (argument_buffer[read_index])
 	{
 		if (argument_buffer[read_index] == L'%' && argument_buffer[read_index + 1] == L'2' && argument_buffer[read_index + 2] == L'0')
@@ -718,11 +718,11 @@ static void shell_windows_initialize_arguments(void)
 				{
 					// another instance of the game is open and the session info was forwarded to it
 					// we can just close the game gracefully
-					exit(0);
+					main_quit();
 				}
 
-				g_do_auto_join_session = true;
-				g_auto_join_session = join_session;
+				g_game_auto_join.do_auto_join = true;
+				g_game_auto_join.auto_join_session = join_session;
 			}
 		}
 	}
@@ -774,7 +774,7 @@ static BOOL WINAPI CryptUnprotectDataHook(
 	return TRUE;
 }
 
-void shell_windows_setup_cartographer_protocol()
+static void shell_windows_setup_cartographer_protocol()
 {
 	// create and reset the registry class every time the game is run
 	// in case someone moves their games install or has multiple installs (different versions for devs mostly)

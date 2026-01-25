@@ -2,11 +2,6 @@
 #include "game_options.h"
 #include "structures/cluster_partitions.h"
 
-/* globals */
-
-extern bool g_do_auto_join_session;
-extern XSESSION_INFO g_auto_join_session;
-
 /* constants */
 
 enum
@@ -79,6 +74,12 @@ struct s_date_and_time
 	int32 second;
 };
 
+struct s_game_auto_join_globals
+{
+	bool do_auto_join;
+	XSESSION_INFO auto_join_session;
+};
+
 /* prototypes */
 
 void game_apply_pre_winmain_patches(void);
@@ -140,4 +141,6 @@ void game_check_auto_join();
 /* globals */
 
 extern char const* global_campaign_difficulty_level_names[4];
+
+extern s_game_auto_join_globals g_game_auto_join;
 

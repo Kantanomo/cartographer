@@ -322,7 +322,6 @@ void __cdecl rasterizer_settings_process_display_changes(bool force_update_param
 	INVOKE(0x26444C, 0x0, rasterizer_settings_process_display_changes, force_update_params, display_blackness);
 }
 
-
 int32 rasterizer_settings_get_refresh_rate(void)
 {
 	return rasterizer_settings_get()->refresh_rate;
