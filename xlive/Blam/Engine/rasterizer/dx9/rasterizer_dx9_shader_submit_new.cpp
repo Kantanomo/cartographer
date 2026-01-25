@@ -104,7 +104,7 @@ void c_shader_submission_interface_new::stage_texture(
 			{
 				const char* string = "spherical light using gel texture extern! (or no light def?)";
 				DISPLAY_ASSERT(string);
-				error(_error_silent, string);
+				error(_error_delayed, string);
 				g_spherical_light_error_displayed = true;
 			}
 #endif

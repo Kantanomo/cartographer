@@ -106,6 +106,14 @@ enum e_object_header_flags : uint8
 	k_object_header_flags
 };
 
+enum
+{
+	_pvs_activation_normal = 0,
+	_pvs_activation_object,
+	_pvs_activation_cluster,
+	NUMBER_OF_OBJECT_PVS_ACTIVATION_TYPES,
+};
+
 /* structures */
 
 struct object_iterator

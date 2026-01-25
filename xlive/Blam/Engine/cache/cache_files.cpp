@@ -210,7 +210,7 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 		}
 		else if (!custom_map)
 		{
-			error(_error_log, "the cache file '%s' belongs to an incompatible build (%s)", cache_file_memory_globals->header.name, cache_file_memory_globals->header.version_string);
+			error(_error_immediate, "the cache file '%s' belongs to an incompatible build (%s)", cache_file_memory_globals->header.name, cache_file_memory_globals->header.version_string);
 		}
 	}
 
@@ -226,9 +226,9 @@ bool __cdecl scenario_tags_load_internal(const char* scenario_path)
 
 	if(!cache_file_memory_globals->tag_cache_base_address)
 	{
-		error(_error_log, "failed to allocate the physical memory for the tags");
+		error(_error_immediate, "failed to allocate the physical memory for the tags");
 cache_file_header_invalid:
-		error(_error_log, "cache file header is invalid");
+		error(_error_immediate, "cache file header is invalid");
 		goto scenario_tags_load_internal_end;
 	}
 
@@ -245,7 +245,7 @@ cache_file_header_invalid:
 	if (!is_compatible)
 	{
 		global_preferences_flag_dirty();
-		error(_error_log, "failed to read the tags header, instances, and names section");
+		error(_error_immediate, "failed to read the tags header, instances, and names section");
 		event(_event_error, "failed to read the tags header, instances, and names section [%s]", scenario_path);
 		goto cache_file_header_invalid;
 	}
@@ -257,7 +257,7 @@ cache_file_header_invalid:
 	if(!is_compatible)
 	{
 		global_preferences_flag_dirty();
-		error(_error_log, "failed to read the tag data section");
+		error(_error_immediate, "failed to read the tag data section");
 		event(_event_error, "failed to read the tag data section [%s]", scenario_path);
 		goto cache_file_header_invalid;
 	}
@@ -267,7 +267,7 @@ cache_file_header_invalid:
 	if(!tag_header->tag_instances || tag_header->tag_count <= 0 || tag_header->signature != 'tags')
 	{
 		global_preferences_flag_dirty();
-		error(_error_log, "tag header is invalid");
+		error(_error_immediate, "tag header is invalid");
 		event(_event_error, "tag header is invalid [%s]", scenario_path);
 		goto cache_file_header_invalid;
 	}
@@ -324,7 +324,7 @@ cache_file_header_invalid:
 
 	if(tag_header->tag_count >= FIRST_SHARED_TAG_INSTANCE_INDEX && !scenario_tags_load_process_shared_tags())
 	{
-		error(_error_log, "failed to load shared tag instances");
+		error(_error_immediate, "failed to load shared tag instances");
 		is_compatible = false;
 	}
 
@@ -333,7 +333,7 @@ cache_file_header_invalid:
 scenario_tags_load_internal_end:
 	if (!is_compatible)
 	{
-		error(_error_log, "failed to load tags for cache file");
+		error(_error_immediate, "failed to load tags for cache file");
 
 		if (cache_file_memory_globals->tag_cache_base_address)
 		{

@@ -8,7 +8,7 @@
 #include "multithreading/synchronization.h"
 #include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
-#include "tag_files/files_windows.h"
+#include "tag_files/files.h"
 #include "text/unicode.h"
 
 /* prototypes */
@@ -246,7 +246,7 @@ bool c_map_manager::write_custom_map_data_cache_to_file(const utf8* path, s_cust
 		LOG_TRACE_GAME("{} - saved custom map data cache, map count: {}, write size: {}",
 			__FUNCTION__, custom_map_data_cache->entry_count, size_to_write);
 
-		if (!file_set_eof(&cache_file))
+		if (!file_set_eof(&cache_file, cache_file.api_result))
 		{
 			LOG_ERROR_GAME("{} - failed to set custom map cache file size!",
 				__FUNCTION__);

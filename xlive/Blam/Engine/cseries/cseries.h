@@ -204,7 +204,6 @@ while(0)
 void cseries_initialize(void);
 
 #ifdef ASSERTS_ENABLED
-// TODO implement
 void display_assert(char const* condition, char const* file, int32 line, bool assertion_failed);
 #endif
 

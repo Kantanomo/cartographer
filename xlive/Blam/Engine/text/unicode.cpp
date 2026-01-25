@@ -544,7 +544,7 @@ static utf32 wchar_escape_character_to_utf32(wchar_t character, char* out_found_
 				if (time > g_last_escape_character_error_time)
 				{
 					g_last_escape_character_error_time = time + 60000;
-					error(_error_silent, "found an unknown escape sequence '|%c'", character);
+					error(_error_delayed, "found an unknown escape sequence '|%c'", character);
 				}
 			}
 		}

@@ -130,7 +130,7 @@ void cheat_drop_tag_name(const char* name)
 	{
 		if (i >= NUMBEROF(k_cheat_drop_tag_groups))
 		{
-			error(_error_silent, "could not find any tags named '%s' to drop", tag_name);
+			error(_error_delayed, "could not find any tags named '%s' to drop", tag_name);
 			break;
 		}
 	}
@@ -144,7 +144,7 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 	{
 		if (!ignore_error)
 		{
-			error(_error_silent, "### ERROR couldn't load tag '%s.%s' to place", name, "unknown");
+			error(_error_delayed, "### ERROR couldn't load tag '%s.%s' to place", name, "unknown");
 		}
 		return false;
 	}
@@ -206,7 +206,7 @@ bool cheat_drop_tag(tag_group group, const char* name, bool ignore_error)
 		}
 		else
 		{
-			error(_error_silent, "### ERROR don't know how to place tags of type '%s'", "unknown");
+			error(_error_delayed, "### ERROR don't know how to place tags of type '%s'", "unknown");
 		}
 	}
 
@@ -225,12 +225,12 @@ static bool cheat_place_tag(const real_vector3d* forward, datum tag_index, const
 		{
 			if (tag_group == _tag_group_shader)
 			{
-				error(_error_silent, "### ERROR couldn't load drop-shader object '%s.scenery'", k_shader_drop_object_name);
+				error(_error_delayed, "### ERROR couldn't load drop-shader object '%s.scenery'", k_shader_drop_object_name);
 				return 0;
 			}
 			if (tag_group == _tag_group_object)
 			{
-				error(_error_silent, "### ERROR couldn't load object '%s.%s' to drop it", tag_name, "unknown");
+				error(_error_delayed, "### ERROR couldn't load object '%s.%s' to drop it", tag_name, "unknown");
 			}
 		}
 		else
@@ -245,7 +245,7 @@ static bool cheat_place_tag(const real_vector3d* forward, datum tag_index, const
 
 			if (object_index == NONE)
 			{
-				error(_error_silent, "### ERROR couldn't place '%s.%s'", tag_name, "unknown");
+				error(_error_delayed, "### ERROR couldn't place '%s.%s'", tag_name, "unknown");
 			}
 			else
 			{
@@ -294,7 +294,7 @@ static bool cheat_drop_effect(datum tag_index, const real_vector3d* forward, con
 
 	if (tag_index == NONE)
 	{
-		error(_error_silent, "### ERROR couldn't load effect '%s.effect' to drop it", tag_name);
+		error(_error_delayed, "### ERROR couldn't load effect '%s.effect' to drop it", tag_name);
 	}
 	else
 	{
@@ -315,7 +315,7 @@ static bool cheat_drop_effect(datum tag_index, const real_vector3d* forward, con
 		}
 		else
 		{
-			error(_error_silent, "### WARNING couldn't find location to drop effect '%s.effect'", tag_name);
+			error(_error_delayed, "### WARNING couldn't find location to drop effect '%s.effect'", tag_name);
 		}
 	}
 

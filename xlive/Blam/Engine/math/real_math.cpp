@@ -5,38 +5,36 @@
 
 /* constants */
 
-const real_vector3d private_zero_vector[2] =
+static const real_vector3d private_zero_vector[2] =
 {
 	{ 0.f, 0.f, 0.f },
 	{ 0.f, 0.f, 0.f }
 };
 
-const real_orientation private_identity_orientation =
+static const real_orientation private_identity_orientation =
 {
 	{ 0.f, 0.f, 0.f, 1.f },
 	{ 0.f, 0.f, 0.f },
 	1.f
 };
 
-const real_matrix4x3 private_identity4x3 =
+static const real_matrix4x3 private_identity4x3 =
 {
 	1.f,
 	{
-		{ 1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f }
+		{ 1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f }
 	},
-	{ 0.f, 0.f, 0.f }
 };
 
-const real_matrix4x3 private_negative_identity4x3 =
+static const real_matrix4x3 private_negative_identity4x3 =
 {
 	1.f,
 	{
-		{ -1.f, 0.f, 0.f,  0.f, -1.f, 0.f, 0.f, 0.f, -1.f }
-	},
-	{ 0.f, 0.f, 0.f }
+		{ -1.f, 0.f, 0.f,  0.f, -1.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f},
+	}
 };
 
-const real_rectangle3d private_null_rectangle =
+static const real_rectangle3d private_null_rectangle =
 {
 	{ 3.4028235e38f, -3.4028235e38f, 3.4028235e38f, -3.4028235e38f, 3.4028235e38f, -3.4028235e38f }
 };

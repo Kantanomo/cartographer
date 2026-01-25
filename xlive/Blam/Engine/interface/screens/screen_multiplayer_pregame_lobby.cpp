@@ -638,7 +638,7 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 
 	if (main_widget_datum_index == NONE)
 	{
-		error(_error_immediate, "bad datum found");
+		error(_error_log, "bad datum found");
 		return;
 	}
 

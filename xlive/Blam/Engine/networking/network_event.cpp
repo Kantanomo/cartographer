@@ -2,9 +2,11 @@
 #include "network_event.h"
 
 #ifdef EVENTS_ENABLED
+
 #include "network_globals.h"
 #include "network_time.h"
 
+#include "data_mining/data_mining.h"
 #include "game/game.h"
 #include "game/game_time.h"
 #include "main/console.h"
@@ -68,7 +70,6 @@ const char* k_event_level_severity_strings[k_network_event_level_count] =
 	"-FATAL-"
 };
 
-static bool g_network_event_print_critical_errors = false;
 
 /* prototypes */
 
@@ -107,6 +108,8 @@ static s_network_event_globals network_event_globals =
 	NULL			// categories
 };
 
+static bool g_network_event_print_critical_errors = false;
+
 /* public code */
 
 bool c_event::query(e_event_level event_level)
@@ -132,8 +135,7 @@ void c_event::generate(const char* event_name, ...)
 
 void network_event_initialize(void)
 {
-	// TODO: error stuff
-	// sub_423170(_error_category_networking, 0);
+	error_category_write_to_primary_log(_error_category_networking, false);
 
 	network_event_globals.categories = DATA_NEW("network events", k_network_event_count, sizeof(s_network_event_datum), 0, normal_allocation_global_get());
 	ASSERT(network_event_globals.categories);
@@ -177,11 +179,11 @@ void network_event_dump_categories(const char* event_name)
 
 	if (category_index == NONE)
 	{
-		error(_error_silent, "### ERROR category '%s' not found", event_name);
+		error(_error_delayed, "### ERROR category '%s' not found", event_name);
 	}
 	else
 	{
-		error(_error_silent, "dumping categories:");
+		error(_error_delayed, "dumping categories:");
 		network_event_dump_categories_recursive(category_index);
 	}
 	return;
@@ -192,7 +194,7 @@ void network_event_display_category(const char* category_string, e_event_level l
 	const datum category_index = network_event_find_category(category_string, 1);
 	if (category_index == NONE || level > _event_fatal)
 	{
-		error(_error_silent, "### ERROR invalid network event category '%s'", category_string);
+		error(_error_delayed, "### ERROR invalid network event category '%s'", category_string);
 	}
 	else
 	{
@@ -208,7 +210,7 @@ void network_event_log_category(const char* category_string, e_event_level level
 	const datum category_index = network_event_find_category(category_string, 1);
 	if (category_index == NONE || level > _event_fatal)
 	{
-		error(_error_silent, "### ERROR invalid network event category '%s'", category_string);
+		error(_error_delayed, "### ERROR invalid network event category '%s'", category_string);
 	}
 	else
 	{
@@ -343,13 +345,12 @@ static void network_event_print(const char* format, e_event_level event_level, i
 
 		if (TEST_BIT(flags, 1))
 		{
-			error(_error_category_networking, _error_delayed, "NET %s %s %s", severity, dst, event_text);
+			error(_error_category_networking, _error_silent, "NET %s %s %s", severity, dst, event_text);
 		}
 
 		if (TEST_BIT(flags, 2))
 		{
-			// TODO: implement
-			//data_mine_add_event(event_level, event_text);
+			data_mine_add_event(event_level, event_text);
 		}
 
 		if (TEST_BIT(flags, 3) && !g_network_event_print_critical_errors)
@@ -395,7 +396,7 @@ static int32 network_event_parse_and_get_category_count(const char* event_name, 
 			}
 			else
 			{
-				error(_error_silent, "### ERROR network event category substring #%d '%s' exceeded %d characters", category_index, category_substring, string_buffer_size);
+				error(_error_delayed, "### ERROR network event category substring #%d '%s' exceeded %d characters", category_index, category_substring, string_buffer_size);
 				failed = true;
 			}
 		}
@@ -414,7 +415,7 @@ static int32 network_event_parse_and_get_category_count(const char* event_name, 
 				}
 				else
 				{
-					error(_error_silent, "### ERROR network event category #%d '%s' exceeded %d category substrings", category_index, category_substring, max_category_count);
+					error(_error_delayed, "### ERROR network event category #%d '%s' exceeded %d category substrings", category_index, category_substring, max_category_count);
 					failed = true;
 				}
 			}
@@ -451,7 +452,7 @@ static datum network_event_find_category_recursive(datum category_index, int8 le
 		result = new_category_index;
 		if (new_category_index == NONE)
 		{
-			error(_error_silent, "### ERROR %s: ran out of categories creating '%s'", __FUNCTION__, category_names[0]);
+			error(_error_delayed, "### ERROR %s: ran out of categories creating '%s'", __FUNCTION__, category_names[0]);
 		}
 		else
 		{
@@ -605,4 +606,5 @@ static void network_event_iterate_categories(void)
 	}
 	return;
 }
+
 #endif

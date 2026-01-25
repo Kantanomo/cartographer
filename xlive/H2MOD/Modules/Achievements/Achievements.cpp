@@ -100,12 +100,12 @@ void GetAchievements(unsigned long long xuid)
 					}
 					else
 					{
-						error(_error_immediate, "invalid achievement index provided: %d", id);
+						error(_error_log, "invalid achievement index provided: %d", id);
 					}
 				}
 				else
 				{
-					error(_error_immediate, "invalid data type in achievements array");
+					error(_error_log, "invalid data type in achievements array");
 				}
 			}
 		}

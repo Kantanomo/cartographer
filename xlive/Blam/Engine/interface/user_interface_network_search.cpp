@@ -43,7 +43,7 @@ s_network_squad_status_data* user_interface_available_squad_get_status(int32 ses
 	{
 		if (session->status_data.game_details.player_count > k_maximum_players)
 		{
-			error(_error_silent, "%s: got invalid status_data", __FUNCTION__);
+			error(_error_delayed, "%s: got invalid status_data", __FUNCTION__);
 		}
 		else
 		{

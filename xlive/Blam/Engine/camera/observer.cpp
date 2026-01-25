@@ -246,7 +246,7 @@ static void observer_apply_camera_effect(int32 user_index)
 		normalize3d_with_default(&up, global_forward3d);
 		if (!valid_real_vector3d_axes2(&forward, &up))
 		{
-			error(_error_silent, "camera effect matrix was bad, cannot recover");
+			error(_error_delayed, "camera effect matrix was bad, cannot recover");
 			forward = *global_forward3d;
 			up = *global_up3d;
 		}

@@ -113,11 +113,11 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 			// ### TODO: fix this
 			if (g_bloom_info_log_timer == 4096)
 			{
-				error(_error_log, ">>> BLOOM BLUR AMOUNT= %f", k_bloom_blur_amount);
-				error(_error_log, ">>> BLOOM THRESHOLD=   %f", bloom_threshold);
-				error(_error_log, ">>> BLOOM BRIGHTNESS=  %f", brightness);
-				error(_error_log, ">>> BLOOM BOXFACTOR=   %f", k_bloom_box_factor);
-				error(_error_log, ">>> BLOOM MAXFACTOR=   %f", k_bloom_max_factor);
+				error(_error_immediate, ">>> BLOOM BLUR AMOUNT= %f", k_bloom_blur_amount);
+				error(_error_immediate, ">>> BLOOM THRESHOLD=   %f", bloom_threshold);
+				error(_error_immediate, ">>> BLOOM BRIGHTNESS=  %f", brightness);
+				error(_error_immediate, ">>> BLOOM BOXFACTOR=   %f", k_bloom_box_factor);
+				error(_error_immediate, ">>> BLOOM MAXFACTOR=   %f", k_bloom_max_factor);
 				g_bloom_info_log_timer = 0;
 			}
 

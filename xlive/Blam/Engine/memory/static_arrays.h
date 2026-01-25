@@ -304,6 +304,12 @@ public:
 	char* set(const char* src);
 	size_t length(void) const;
 	size_t max_length(void) const;
+
+	bool is_empty(void) const
+	{
+		return m_string[0] == '\0';
+	}
+
 	char* append(const char* src);
 	int index_of(const char* src) const;
 	int next_index_of(const char* src, size_t starting_index) const;
@@ -338,6 +344,12 @@ public:
 	wchar_t* set(const wchar_t* src);
 	size_t length(void) const;
 	size_t max_length(void) const;
+	
+	bool is_empty(void) const
+	{
+		return m_string[0] == L'\0';
+	}
+
 	wchar_t* append(const wchar_t* src);
 	int index_of(const wchar_t* src) const;
 	int next_index_of(const wchar_t* src, size_t starting_index) const;

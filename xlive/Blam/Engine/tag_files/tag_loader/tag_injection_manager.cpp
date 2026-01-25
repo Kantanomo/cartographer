@@ -236,7 +236,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 	//fail safe
 	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->tag_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index))
 	{
-		error(_error_immediate, "[tag_loader] failed to resolve datum to correct instance, game will crash");
+		error(_error_log, "[tag_loader] failed to resolve datum to correct instance, game will crash");
 	}
 
 #if TAG_INJECTION_DEBUG
@@ -352,7 +352,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 {
 	if(!m_active_map_verified)
 	{
-		error(_error_immediate, "[%s] active map has not be set for tag: %s", __FUNCTION__, tag_name);
+		error(_error_log, "[%s] active map has not be set for tag: %s", __FUNCTION__, tag_name);
 		return NONE;
 	}
 	
@@ -414,7 +414,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 {
 	if (!m_active_map_verified)
 	{
-		error(_error_immediate, "[%s] active map has not be set for tag: %x", __FUNCTION__, cache_datum);
+		error(_error_log, "[%s] active map has not be set for tag: %x", __FUNCTION__, cache_datum);
 		out_name[0] = '\0';
 		return;
 	}
@@ -533,7 +533,7 @@ c_xml_definition_agent* c_tag_injecting_manager::get_agent(tag_group group)
 			null_terminated_class[3] = '\0';
 		}
 
-		error(_error_immediate, "%s: failed to initialize agent for %s", __FUNCTION__, null_terminated_class);
+		error(_error_log, "%s: failed to initialize agent for %s", __FUNCTION__, null_terminated_class);
 	}
 	else
 	{

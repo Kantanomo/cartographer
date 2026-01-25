@@ -544,6 +544,9 @@
     <ClCompile Include="Blam\Engine\cartographer\cartographer.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_loading.cpp" />
     <ClCompile Include="Blam\Engine\units\vehicles.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\files.cpp" />
+    <ClCompile Include="Blam\Engine\units\vehicles.cpp" />
+    <ClCompile Include="Blam\Engine\data_mining\data_mining.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2052,9 +2055,13 @@
     <ClInclude Include="Blam\Engine\math\crypto_windows.h" />
     <ClInclude Include="Blam\Engine\units\vehicles.h" />
     <ClInclude Include="Blam\Engine\networking\network_constants.h" />
+    <ClInclude Include="Blam\Engine\math\crypto_windows.h" />
+    <ClInclude Include="Blam\Engine\tag_files\files.h" />
     <ClInclude Include="3rdparty\havok\hkbase\memory\hkMemory.h" />
     <ClInclude Include="3rdparty\havok\hkbase\memoryclasses\hkMemoryClasses.h" />
     <ClInclude Include="3rdparty\havok\hkbase\types\hkBaseTypes.h" />
+    <ClInclude Include="Blam\Engine\units\vehicles.h" />
+    <ClInclude Include="Blam\Engine\data_mining\data_mining.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

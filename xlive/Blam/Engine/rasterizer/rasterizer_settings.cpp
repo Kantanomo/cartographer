@@ -552,7 +552,7 @@ void create_new_display_setting_array(void)
 
 	if (count == 0)
 	{
-		error(_error_immediate, "Display Option count is 0, something is definitely wrong here");
+		error(_error_log, "Display Option count is 0, something is definitely wrong here");
 		exit(EXIT_FAILURE);
 	}
 	else

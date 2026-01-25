@@ -360,7 +360,7 @@ void hs_thread_main(int32 thread_index)
 	{
 		if (thread->type == _hs_syntax_node_variable_bit && !hs_syntax_node_exists(thread->stack->expression_index))
 		{
-			error(_error_silent, "terminating console script unexpectedly");
+			error(_error_delayed, "terminating console script unexpectedly");
 			terminate_thread = true;
 			break;
 		}
@@ -481,7 +481,7 @@ int32 hs_runtime_evaluate(datum expression_index, bool display_expression_result
 			const datum thread_index = hs_thread_new(_hs_thread_type_runtime_evaluate, NONE);
 			if (thread_index == NONE)
 			{
-				error(_error_log, "### ERROR %s: could not allocate thread to execute a command!", __FUNCTION__);
+				error(_error_immediate, "### ERROR %s: could not allocate thread to execute a command!", __FUNCTION__);
 			}
 			else
 			{
@@ -502,7 +502,7 @@ int32 hs_runtime_evaluate(datum expression_index, bool display_expression_result
 		}
 		else
 		{
-			error(_error_silent, "unable to initialize scripting system to execute that command.");
+			error(_error_delayed, "unable to initialize scripting system to execute that command.");
 		}
 
 		if (dispose)
@@ -1261,7 +1261,7 @@ static bool script_error(int32 thread_index, const char* message, const char* co
 	bool result = false;	// Always fail on error
 
 	error(
-		_error_silent,
+		_error_delayed,
 		"script %s needs to be recompiled. (%s: %s)",
 		hs_thread_format(thread_index),
 		message ? message : "no reason given.",

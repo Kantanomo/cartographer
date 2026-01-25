@@ -321,7 +321,7 @@ void c_screen_video_settings::apply_patches_on_map_load()
 
 	if (main_widget_datum_index == NONE)
 	{
-		error(_error_immediate, "bad datum found");
+		error(_error_log, "bad datum found");
 		return;
 	}
 	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);

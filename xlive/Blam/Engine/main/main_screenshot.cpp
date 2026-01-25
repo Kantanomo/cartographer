@@ -16,7 +16,7 @@
 #include "rasterizer/rasterizer_main.h"
 #include "render/render.h"
 #include "shell/shell.h"
-#include "tag_files/files_windows.h"
+#include "tag_files/files.h"
 
 /* constants */
 

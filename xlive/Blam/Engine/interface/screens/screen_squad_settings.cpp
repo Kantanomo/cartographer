@@ -827,7 +827,7 @@ void c_screen_squad_settings::apply_patches_on_map_load()
 	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
 	if (main_widget_datum_index == NONE)
 	{
-		error(_error_immediate, "bad datum found");
+		error(_error_log, "bad datum found");
 		return;
 	}
 
