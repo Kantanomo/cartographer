@@ -151,7 +151,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 					real_matrix4x3 camera_matrix;
 					render_camera* global_camera = &render_get()->camera;
 					matrix4x3_from_point_and_vectors(&camera_matrix, &global_camera->point, &global_camera->forward, &global_camera->up);
-					if (TEST_BIT(first_person_data->flags, 2))
+					if (TEST_BIT(first_person_data->flags, _first_person_attachment_suspended_bit))
 					{
 						// Get the interpolated matrix and use it if we can interpolate
 						real_matrix4x3 interpolated_adjustment_matrix;

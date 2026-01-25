@@ -143,8 +143,27 @@ ASSERT_STRUCT_SIZE(real_matrix3x3, 36);
 struct real_matrix4x3
 {
 	real32 scale;
-	real_matrix3x3 vectors;
-	real_point3d position;
+	union
+	{
+		real32 n[4][3];
+		struct
+		{
+			real_matrix3x3 vectors;
+			real_point3d position;
+		};
+		struct
+		{
+			real_vector3d basis[3];
+			real_point3d position;
+		};
+		struct
+		{
+			real_vector3d forward;
+			real_vector3d left;
+			real_vector3d up;
+		};
+
+	};
 };
 ASSERT_STRUCT_SIZE(real_matrix4x3, 52);
 
