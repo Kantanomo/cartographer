@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "shell_windows_ipc.h"
-#include "game/game.h"
+#include "interface/user_interface_networking.h"
 
 /* constants */
 
@@ -13,6 +13,7 @@ enum
 	k_ipc_connect_timeout = 5000,
 	k_ipc_send_retry_count = 10,
 	k_ipc_send_retry_delay = 100,
+	k_ipc_thread_sleep_time = 1000
 };
 
 /* globals */
@@ -174,12 +175,13 @@ static HANDLE shell_windows_ipc_create_server_pipe()
 static bool shell_windows_ipc_wait_for_client(HANDLE pipe)
 {
 	bool result = ConnectNamedPipe(pipe, NULL);
-	uint32 error = GetLastError();
 
 	if (result)
 	{
 		return true;
 	}
+
+	uint32 error = GetLastError();
 
 	if (error == ERROR_PIPE_CONNECTED)
 	{
@@ -218,7 +220,7 @@ static DWORD WINAPI shell_windows_ipc_server_thread(LPVOID param)
 
 		if (pipe == INVALID_HANDLE_VALUE)
 		{
-			Sleep(1000);
+			Sleep(k_ipc_thread_sleep_time);
 			continue;
 		}
 

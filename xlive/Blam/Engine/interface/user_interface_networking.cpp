@@ -3,10 +3,20 @@
 
 #include "user_interface.h"
 #include "user_interface_controller.h"
+#include "user_interface_guide.h"
+#include "game/game.h"
 
 #include "game/player_constants.h"
+#include "main/main_game.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "networking/online/online_account_xbox.h"
 #include "networking/session/network_session.h"
+
+/* globals */
+
+s_game_auto_join_globals g_game_auto_join;
+
+/* public code */
 
 bool* byte_D6840E_get(void)
 {
@@ -123,7 +133,6 @@ void __cdecl user_interface_set_desired_multiplayer_mode(int32 desired_mode)
 	INVOKE(0x217138, 0x0, user_interface_set_desired_multiplayer_mode, desired_mode);
 }
 
-
 void user_interface_networking_join_game(XSESSION_INFO* session, int32 user_index, bool from_game_invite)
 {
 	//INVOKE(0x2161E1, 0x1FD827, user_interface_networking_join_game, session_info, a2, from_game_invite);
@@ -158,5 +167,99 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 user_inde
 		user_interface_networking_open_join_screen();
 
 		return;
+	}
+}
+
+void user_interface_networking_join_game_direct(XNKID kid, XNKEY key, const XNADDR* addr, int8 exe_type, int32 exe_version, int32 comp_version)
+{
+	c_game_life_cycle_handler_joining* handler = 
+		(c_game_life_cycle_handler_joining*)c_game_life_cycle_manager::get()->m_life_cycle_handlers[_life_cycle_joining];
+
+	handler->joining_xnkid = kid;
+	handler->joining_xnkey = key;
+	handler->joining_xnaddr = *addr;
+
+	if (exe_type != EXECUTABLE_TYPE || exe_version != EXECUTABLE_VERSION || comp_version != COMPATIBLE_VERSION)
+	{
+		handler->join_attempt_result_code = 9;
+	}
+	else
+	{
+		c_game_life_cycle_handler_joining::check_joining_capability();
+		wchar_t local_usernames[k_number_of_users][XUSER_NAME_SIZE] = {};
+		s_player_identifier local_identifiers[k_number_of_users] = {};
+
+		size_t valid_local_player_count = 0;
+
+		for (int32 i = 0; i < k_number_of_users; i++)
+		{
+			s_player_identifier temp_identifier;
+			s_player_configuration temp_properties;
+			if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties(i, 0, &temp_properties, 0, 0))
+			{
+				ustrncpy(local_usernames[valid_local_player_count], temp_properties.player_name, NUMBEROF(temp_properties.player_name));
+				local_identifiers[valid_local_player_count] = temp_identifier;
+				++valid_local_player_count;
+			}
+		}
+
+		user_interface_networking_reset_player_counts();
+		network_globals_switch_environment(2, 1);
+		csmemcpy(&handler->player_identifiers, local_identifiers, sizeof(local_identifiers));
+		csmemcpy(&handler->player_names, local_usernames, sizeof(local_usernames));
+		handler->field_11 = 0; //Always 0 in the original function
+		handler->field_12 = 0; //Always 0 in the original function
+		handler->field_14 = 1;
+		handler->joining_user_count = valid_local_player_count;
+		handler->field_54 = 2; //Always 2 in original function
+		handler->field_10 = true; //Always true in original function
+
+		handler->join_attempt_result_code = 0; //Force valid result code, leave the denying the connection up to the host.
+	}
+
+	c_game_life_cycle_manager::get()->request_state_change(_life_cycle_joining, 0, 0);
+	game_shell_set_in_progress();
+}
+
+void user_interface_networking_update_auto_join()
+{
+	if (g_game_auto_join.do_auto_join && user_interface_controller_get_signed_in_controller_count())
+	{
+		if (game_is_ui_shell())
+		{
+			if (online_connected_to_xbox_live())
+			{
+				user_interface_networking_join_game_direct(g_game_auto_join.auto_join_session.sessionID, g_game_auto_join.auto_join_session.keyExchangeKey, &g_game_auto_join.auto_join_session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+				g_game_auto_join.do_auto_join = false;
+			}
+			else 
+			{
+				if (transport_available())
+				{
+					user_interface_guide_state_manager_get()->add_user_signin_task(true, nullptr);
+				}
+				else
+				{
+					screen_error_ok_dialog_show(
+						_user_interface_channel_type_game_error,
+						_ui_error_xblive_cannot_access_service,
+						_window_4,
+						0,
+						nullptr,
+						nullptr);
+				}
+			}
+		}
+		else
+		{
+			if (network_life_cycle_in_squad_session(NULL))
+			{
+				NetworkSession::LeaveSession();
+			}
+			else if (game_is_campaign())
+			{
+				main_menu_launch(0);
+			}
+		}
 	}
 }

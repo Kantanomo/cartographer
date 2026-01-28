@@ -20,6 +20,7 @@
 #include "math/random_math.h"
 #include "main/interpolator.h"
 #include "main/main.h"
+#include "main/main_game.h"
 #include "main/main_time.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/session/network_session.h"
@@ -44,7 +45,6 @@ char const* global_campaign_difficulty_level_names[4]
 	"legendary"
 };
 
-s_game_auto_join_globals g_game_auto_join;
 
 /* prototypes */
 
@@ -247,54 +247,6 @@ void game_time_get_date_and_time(s_date_and_time* date_and_time)
 	return;
 }
 
-void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, int8 exe_type, int32 exe_version, int32 comp_version)
-{
-	auto handler = (c_game_life_cycle_handler_joining*)c_game_life_cycle_manager::get()->m_life_cycle_handlers[_life_cycle_joining];
-	handler->joining_xnkid = kid;
-	handler->joining_xnkey = key;
-	handler->joining_xnaddr = *addr;
-	if (exe_type != EXECUTABLE_TYPE || exe_version != EXECUTABLE_VERSION || comp_version != COMPATIBLE_VERSION)
-	{
-		handler->join_attempt_result_code = 9;
-	}
-	else
-	{
-		c_game_life_cycle_handler_joining::check_joining_capability();
-		wchar_t local_usernames[k_number_of_users][XUSER_NAME_SIZE] = {};
-		s_player_identifier local_identifiers[k_number_of_users] = {};
-		
-		size_t valid_local_player_count = 0;
-		
-		for (int32 i = 0; i < k_number_of_users; i++)
-		{
-			s_player_identifier temp_identifier;
-			s_player_configuration temp_properties;
-			if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties(i, 0, &temp_properties, 0, 0))
-			{
-				ustrncpy(local_usernames[valid_local_player_count], temp_properties.player_name, NUMBEROF(temp_properties.player_name));
-				local_identifiers[valid_local_player_count] = temp_identifier;
-				++valid_local_player_count;
-			}
-		}
-
-		user_interface_networking_reset_player_counts();
-		network_globals_switch_environment(2, 1);
-		csmemcpy(&handler->player_identifiers, local_identifiers, sizeof(local_identifiers));
-		csmemcpy(&handler->player_names, local_usernames, sizeof(local_usernames));
-		handler->field_11 = 0; //Always 0 in the original function
-		handler->field_12 = 0; //Always 0 in the original function
-		handler->field_14 = 1;
-		handler->joining_user_count = valid_local_player_count;
-		handler->field_54 = 2; //Always 2 in original function
-		handler->field_10 = true; //Always true in original function
-
-		handler->join_attempt_result_code = 0; //Force valid result code, leave the denying the connection up to the host.
-	}
-	c_game_life_cycle_manager::get()->request_state_change(_life_cycle_joining, 0, 0);
-	game_shell_set_in_progress();
-}
-
-
 void __cdecl game_initialize(void)
 {
 	game_state_initialize();
@@ -322,19 +274,19 @@ void __cdecl game_initialize(void)
 
 void __cdecl game_dispose(void)
 {
-    set_main_game_globals(NULL);
-    s_game_systems* g_game_systems = get_game_systems();
-    for (int32 system_index = k_game_system_count; system_index >= 0; --system_index)
-    {
-        ASSERT(g_game_systems[system_index].dispose_proc);
-        g_game_systems[system_index].dispose_proc();
-    }
-    
+	set_main_game_globals(NULL);
+	s_game_systems* g_game_systems = get_game_systems();
+	for (int32 system_index = k_game_system_count; system_index >= 0; --system_index)
+	{
+		ASSERT(g_game_systems[system_index].dispose_proc);
+		g_game_systems[system_index].dispose_proc();
+	}
+	
 	halo_interpolator_dispose();
 
-    // Reset time resolution to system default on game exit
-    timeEndPeriod(k_system_timer_resolution_ms);
-    return;
+	// Reset time resolution to system default on game exit
+	timeEndPeriod(k_system_timer_resolution_ms);
+	return;
 }
 
 bool __cdecl main_events_pending(void)
@@ -412,8 +364,6 @@ void __cdecl game_tick(void)
 		game_time_advance();
 	}
 
-	game_check_auto_join();
-
 	//main_status("game_tick", NULL);
 
 	return;
@@ -490,15 +440,6 @@ void __cdecl game_frame(real32 dt)
 	}
 	INVOKE(0x48CDC, 0x41F7D, game_frame, dt);
 	return;
-}
-
-void game_check_auto_join()
-{
-	if (g_game_auto_join.do_auto_join && user_interface_controller_get_signed_in_controller_count())
-	{
-		game_direct_connect_to_session(g_game_auto_join.auto_join_session.sessionID, g_game_auto_join.auto_join_session.keyExchangeKey, &g_game_auto_join.auto_join_session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
-		g_game_auto_join.do_auto_join = false;
-	}
 }
 
 /* private code */

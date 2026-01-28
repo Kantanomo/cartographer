@@ -5,11 +5,11 @@
 #include "shell_windows_internals.h"
 #include "shell_windows_ipc.h"
 #include "shell_windows_pcc.h"
-#include "game/game.h"
 
 #include "input/input_windows.h"
 #include "main/main.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "interface/user_interface_networking.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -718,7 +718,9 @@ static void shell_windows_initialize_arguments(void)
 				{
 					// another instance of the game is open and the session info was forwarded to it
 					// we can just close the game gracefully
-					main_quit();
+					// not using main_exit() because using that will let the game still create the game window
+					// and then close
+					exit(0);
 				}
 
 				g_game_auto_join.do_auto_join = true;

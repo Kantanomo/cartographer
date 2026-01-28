@@ -13,6 +13,14 @@ enum e_session_protocol
 	_session_protocol_xbox_live_optimatch = 0x6,
 };
 
+/* structures */
+
+struct s_game_auto_join_globals
+{
+	bool do_auto_join;
+	XSESSION_INFO auto_join_session;
+};
+
 /* public methods */
 
 bool session_protocol_has_coop(e_session_protocol protocol);
@@ -32,3 +40,9 @@ void __cdecl user_interface_squad_set_campaign_difficulty(int32 difficulty);
 void __cdecl user_interface_set_desired_multiplayer_mode(int32 desired_mode);
 
 void user_interface_networking_join_game(XSESSION_INFO* session, int32 a2, bool from_game_invite);
+void user_interface_networking_join_game_direct(XNKID kid, XNKEY key, const XNADDR* addr, int8 exe_type, int32 exe_version, int32 comp_version);
+void user_interface_networking_update_auto_join();
+
+/* globals */
+
+extern s_game_auto_join_globals g_game_auto_join;

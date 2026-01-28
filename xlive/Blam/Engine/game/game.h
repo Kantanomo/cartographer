@@ -74,12 +74,6 @@ struct s_date_and_time
 	int32 second;
 };
 
-struct s_game_auto_join_globals
-{
-	bool do_auto_join;
-	XSESSION_INFO auto_join_session;
-};
-
 /* prototypes */
 
 void game_apply_pre_winmain_patches(void);
@@ -120,8 +114,6 @@ void __cdecl game_options_setup_default_players(int32 player_count, s_game_optio
 
 void game_time_get_date_and_time(s_date_and_time* date_and_time);
 
-void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, int8 exe_type, int32 exe_version, int32 comp_version);
-
 void __cdecl game_initialize(void);
 
 void __cdecl game_dispose(void);
@@ -136,11 +128,9 @@ void __cdecl game_initialize_for_new_map(const s_game_options* options);
 
 void __cdecl game_frame(real32 dt);
 
-void game_check_auto_join();
-
 /* globals */
 
 extern char const* global_campaign_difficulty_level_names[4];
 
-extern s_game_auto_join_globals g_game_auto_join;
+
 
