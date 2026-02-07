@@ -21,7 +21,8 @@ namespace playlist_loader
 		infinite_grenades,
 		spawn_protection,
 		hill_set,
-		forced_fov
+		forced_fov,
+		disable_dub_shot
 	};
 
 	struct s_custom_setting_data
@@ -41,7 +42,8 @@ namespace playlist_loader
 		{L"Infinite Grenades", e_custom_setting::infinite_grenades},
 		{L"Hill Set", e_custom_setting::hill_set},
 		{L"Spawn Protection", e_custom_setting::spawn_protection},
-		{L"Forced FOV", e_custom_setting::forced_fov}
+		{L"Forced FOV", e_custom_setting::forced_fov},
+		{L"Disable Dubshot", e_custom_setting::disable_dub_shot}
 	};
 
 	e_custom_setting get_custom_setting_index(wchar_t* Name)
@@ -218,6 +220,9 @@ namespace playlist_loader
 					break;
 				case spawn_protection:
 					settings->spawnProtection = custom_settings_integer_check<byte>(playlist_entry, property_value);
+					break;
+				case disable_dub_shot:
+					settings->disable_dub_shot = custom_setting_boolean_check(playlist_entry, property_value);
 					break;
 				case none:
 				default:

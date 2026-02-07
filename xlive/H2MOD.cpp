@@ -111,6 +111,7 @@
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "items/weapons.h"
 
 /* typedefs */
 
@@ -753,6 +754,8 @@ static void h2mod_apply_hooks(void)
 		new_hud_draw_apply_patches();
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
+
+		weapons_apply_patches();
 	}
 	return;
 }
