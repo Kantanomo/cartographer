@@ -2062,6 +2062,9 @@
     <ClInclude Include="3rdparty\havok\hkbase\types\hkBaseTypes.h" />
     <ClInclude Include="Blam\Engine\units\vehicles.h" />
     <ClInclude Include="Blam\Engine\data_mining\data_mining.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_direction.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_path.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_destination.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
