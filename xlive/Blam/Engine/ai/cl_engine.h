@@ -41,7 +41,18 @@ struct cs_script_data
 };
 ASSERT_STRUCT_SIZE(cs_script_data, 128);
 
-/* prototypes */
+struct cs_control
+{
+	int16 ticks;
+	uint8 atom_flags;
+	uint8 control_flags;
+	int16 cl_layer;
+	int8 pad_10[2];
+	int16 delay_ticks;
+	real_vector3d direction;
+	real_point3d origin;
+};
+ASSERT_STRUCT_SIZE(cs_control, 0x24);
 
 struct command_script_datum
 {
