@@ -45,14 +45,14 @@ bool havok_can_allocate_space_for_instance_of_object_definition(datum tag_index)
 		{
 			const data_array* g_havok_component_data = havok_components_get();
 
-			ASSERT(g_havok_component_data->maximum_count == c_havok_component::k_maximum_havok_component_count);
+			ASSERT(g_havok_component_data->maximum_count == k_maximum_havok_component_count);
 			ASSERT(g_havok_game_state->havok_components_allocated == g_havok_component_data->actual_count);
 
 			result = g_havok_component_data->actual_count < g_havok_component_data->maximum_count;
 		}
 		else
 		{
-			result = g_havok_game_state->havok_components_allocated < c_havok_component::k_maximum_havok_component_count;
+			result = g_havok_game_state->havok_components_allocated < k_maximum_havok_component_count;
 		}
 	}
 
