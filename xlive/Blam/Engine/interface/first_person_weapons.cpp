@@ -540,7 +540,7 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 					if (weapon_data->jitter_animation_channel.valid())
 					{
 						weapon_data->jitter_animation_channel.apply_weighted_node_orientations(0.f,
-							(weapon->weapon.field_188 + 0.5f) * ratio,
+							(weapon->weapon.field_1C + 0.5f) * ratio,
 							0.f,
 							weapon_data->node_orientations_count,
 							fp_orientations->weapon_orientations,
@@ -730,13 +730,13 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 					)
 				)
 				{
-					int16 rounds_loaded_maximum = weapon->weapon.magazines[0].rounds_loaded_maximum;
-					int16 ammunition_result = weapon->weapon.magazines[0].field_4 - weapon->weapon.magazines[0].field_2;
+					int16 rounds_loaded_maximum = weapon->weapon.magazines[0].rounds_loaded;
+					int16 ammunition_result = weapon->weapon.magazines[0].original_time - weapon->weapon.magazines[0].state_timer;
 
 					int16 ammunition_frame_position;
 					if (ammunition_result < k_fp_needler_animation_max_rounds_loaded)
 					{
-						ammunition_frame_position = weapon->weapon.magazines[0].rounds_loaded_maximum;
+						ammunition_frame_position = weapon->weapon.magazines[0].rounds_loaded;
 					}
 					else
 					{
@@ -758,7 +758,7 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 				else
 				{
 					const int16 frame_count = weapon_state_animation->get_frame_count();
-					position = (real32)PIN(weapon->weapon.magazines[0].rounds_loaded_maximum, 0, frame_count - 1);
+					position = (real32)PIN(weapon->weapon.magazines[0].rounds_loaded, 0, frame_count - 1);
 				}
 				weapon_channel.set_frame_position(position);
 				weapon_channel.apply_node_orientations(0.f, 0.f, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, 0, 0);
