@@ -34,21 +34,22 @@ struct s_character_physics_update_output_datum
 };
 ASSERT_STRUCT_SIZE(s_character_physics_update_output_datum, 0x70);
 
-struct alignas(4) c_character_physics_mode_melee_datum
+class c_character_physics_mode_melee_datum
 {
+public:
 	int32 m_time_to_target;
 	int32 m_counter;
 	int32 m_maximum_counter;
 	bool m_weapon_is_sword;
 	bool m_has_target;
-	bool field_E;
+	bool m_beyond_maximum_distance;
 	bool field_F;
 	real_point3d m_initial_position;
 	real_vector3d m_target_expected_velocity_vector;
 	real32 m_initial_target_velocity_dot_vector;
 	real32 m_target_distance;
 	real_point3d m_target_position;
-	real_vector3d m_initial_aiming_vector;
+	real_vector3d m_target_vector;
 	real32 m_maximum_distance;
 	bool m_started_decelerating;
 
@@ -56,12 +57,11 @@ struct alignas(4) c_character_physics_mode_melee_datum
 
 	real32 m_velocity_to_decelerate;
 	real32 m_distance_to_target_point_before_deceleration;
-	real_vector3d field_58;
-	int32 field_64;
-	int32 field_68;
-	real32 field_6C;
-	int32 field_70;
-	char gap_74[20];
+	real_vector3d m_initial_aiming_vector;
+
+public:
+	void initialize();
+	void dispose();
 
 	void set_time_to_target(real32 ticks)
 	{
@@ -85,8 +85,8 @@ struct alignas(4) c_character_physics_mode_melee_datum
 
 	static void apply_hooks();
 };
-ASSERT_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x88);
-ASSERT_STRUCT_OFFSET(c_character_physics_mode_melee_datum, m_initial_aiming_vector, 0x3C);
+ASSERT_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x64);
+ASSERT_STRUCT_OFFSET(c_character_physics_mode_melee_datum, m_target_vector, 0x3C);
 
 void call_character_melee_physics_input_update_internal();
 
