@@ -164,7 +164,7 @@ void __cdecl biped_get_sight_position(
 		{
 			if (!halo_interpolator_interpolate_biped_crouch(biped_index, &crouching))
 			{
-				crouching = biped->unit.crouching;
+				crouching = biped->unit.crouch;
 			}
 		}
 	}

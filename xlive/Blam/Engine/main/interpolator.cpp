@@ -310,7 +310,7 @@ void halo_interpolator_object_populate_interpolation_data(
 						const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 						if (player->user_index != NONE)
 						{
-							g_target_interpolation_frame_data->crouch[player->user_index] = unit->unit.crouching;
+							g_target_interpolation_frame_data->crouch[player->user_index] = unit->unit.crouch;
 
 							// during game update/tick, this will return the current sight position of the biped
 							// ### TODO a proper fix, remove all this backwards camera nonsense

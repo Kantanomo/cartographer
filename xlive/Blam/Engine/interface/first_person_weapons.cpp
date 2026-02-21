@@ -905,7 +905,7 @@ static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_
 		const unit_datum* unit = unit_get(unit_index);
 		ASSERT(unit);
 
-		c_interpolator_control* interpolator_controls = (c_interpolator_control*)((uint8*)object_header_block_get(unit_index, &unit->unit.weapon_raised_block) + 128);
+		c_interpolator_control* interpolator_controls = (c_interpolator_control*)((uint8*)object_header_block_get(unit_index, &unit->unit.animation_storage) + 128);
 		if (fp_data->weapon[k_first_person_primary_weapon].animation_manager.valid())
 		{
 			if (interpolator_controls[0].enabled())

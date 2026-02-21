@@ -70,7 +70,7 @@ bool unit_in_vehicle(datum unit_index)
 datum player_index_from_unit_index(datum unit_index)
 {
 	const unit_datum* unit = unit_try_and_get(unit_index);
-	return (unit ? unit->unit.controlling_player_index : NONE);
+	return (unit ? unit->unit.player_index : NONE);
 }
 
 void __cdecl unit_get_head_position_interpolated(datum unit_index, real_point3d* position)
