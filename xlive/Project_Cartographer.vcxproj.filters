@@ -2073,6 +2073,7 @@
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_dead.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_flying.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_sentinel.h" />
+    <ClInclude Include="Blam\Engine\creatures\creatures.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

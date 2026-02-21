@@ -984,6 +984,7 @@
     <ClInclude Include="Blam\Engine\cartographer\config\endpoints.h" />
     <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
+    <ClInclude Include="Blam\Engine\creatures\creatures.h" />
     <ClInclude Include="Blam\Engine\creatures\creature_definitions.h" />
     <ClInclude Include="Blam\Engine\creatures\creature_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\cseries\async.h" />
