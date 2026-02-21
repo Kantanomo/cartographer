@@ -162,7 +162,8 @@ struct _object_datum
 	uint8 matrix_index;
 	uint8 inhibited_flags;
 	int16 placement_index;
-	uint8 gap_1C[8];
+	int32 next_recycling_object_index;
+	int32 recycling_time;
 	s_emblem_info emblem_info;
 	uint8 pad;
 	s_location location;
@@ -189,13 +190,13 @@ struct _object_datum
 	int8 field_b3;
 	datum havok_datum;
 	datum early_mover_index;
-	uint32 unkBC;
+	uint32 last_motion_time;
 	c_flags_no_init<e_object_physics_flags, uint16, k_object_physics_flags_count> physics_flags;
 	uint16 damage_owner_target_model_abs_index;
 	datum damage_owner_owner_index;
 	datum damage_owner_object_index;
 	datum cached_render_state_index;
-	int16 field_D0;
+	int16 structure_bsp_fake_lightprobe_index;
 	int8 model_variant_id;					// hlmt variant tag_block index
 	int8 gap_D3;
 	int32 simulation_entity_index;
@@ -214,8 +215,8 @@ struct _object_datum
 	real32 recent_body_damage;
 	int16 shield_stun_ticks;
 	int16 body_stun_ticks;
-	int8 byte_108;
-	int8 byte_109;
+	int8 shield_damage_decay_timer;
+	int8 body_damage_decay_timer;
 	c_flags_no_init<e_object_damage_flags, uint16, k_object_damage_flags_count> object_damage_flags;
 	object_header_block_reference original_orientation_block;
 	object_header_block_reference node_orientation_block;
