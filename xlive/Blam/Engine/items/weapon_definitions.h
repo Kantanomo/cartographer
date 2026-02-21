@@ -119,23 +119,25 @@ enum e_weapon_trigger_definition_prediction : int16
 	_weapon_trigger_prediction_charge = 2
 };
 
-enum e_weapon_barrel_definition_flags : int32
+enum e_weapon_barrel_definition_flags : uint32
 {
-	_weapon_barrel_definition_tracks_fired_projectile = FLAG(0),        // Poo Poo Ca Ca Pee Pee 
-	_weapon_barrel_definition_random_firing_effects = FLAG(1),          // Rather Than Being Chosen Sequentially Firing Effects Are Picked Randomly
-	_weapon_barrel_definition_can_fire_with_partial_ammo = FLAG(2),     // Allows A Weapon To Be Fired As Long As There Is A Nonzero Amount Of Ammunition Loaded
-	_weapon_barrel_definition_projectiles_use_weapon_origin = FLAG(3),  // Instead Of Coming Out Of The Magic First Person Camera Origin The Projectiles For This Weapon Actually Come Out Of The Gun          
-	_weapon_barrel_definition_ejects_during_chamber = FLAG(4),          // This Triggers Ejection Port Is Started During The Key Frame Of Its Chamber Animation
-	_weapon_barrel_definition_use_error_when_unzoomed = FLAG(5),
-	_weapon_barrel_definition_projectile_vector_cannot_be_adjusted = FLAG(6),   // Projectiles Fired By This Weapon Cannot Have Their Direction Adjusted By The AI To Hit The Target
-	_weapon_barrel_definition_projectiles_have_identical_error = FLAG(7),   
-	_weapon_barrel_definition_projectiles_fire_parallel = FLAG(8),              // If There Are Multiple Guns For This Trigger The Projectiles Emerge In Parallel Beams rather Than Independant Aiming
-	_weapon_barrel_definition_cant_fire_when_others_firing = FLAG(9),
-	_weapon_barrel_definition_cant_fire_when_others_recovering = FLAG(10),
-	_weapon_barrel_definition_dont_clear_fire_bit_after_recovering = FLAG(11),
-	_weapon_barrel_definition_stagger_fire_across_multiple_markers = FLAG(12),
-	_weapon_barrel_definition_fires_locked_projectiles = FLAG(13)
+	_weapon_barrel_definition_tracks_fired_projectile = 0,        // Poo Poo Ca Ca Pee Pee 
+	_weapon_barrel_definition_random_firing_effects = 1,          // Rather Than Being Chosen Sequentially Firing Effects Are Picked Randomly
+	_weapon_barrel_definition_can_fire_with_partial_ammo = 2,     // Allows A Weapon To Be Fired As Long As There Is A Nonzero Amount Of Ammunition Loaded
+	_weapon_barrel_definition_projectiles_use_weapon_origin = 3,  // Instead Of Coming Out Of The Magic First Person Camera Origin The Projectiles For This Weapon Actually Come Out Of The Gun          
+	_weapon_barrel_definition_ejects_during_chamber = 4,          // This Triggers Ejection Port Is Started During The Key Frame Of Its Chamber Animation
+	_weapon_barrel_definition_use_error_when_unzoomed = 5,
+	_weapon_barrel_definition_projectile_vector_cannot_be_adjusted = 6,   // Projectiles Fired By This Weapon Cannot Have Their Direction Adjusted By The AI To Hit The Target
+	_weapon_barrel_definition_projectiles_have_identical_error = 7,   
+	_weapon_barrel_definition_projectiles_fire_parallel = 8,              // If There Are Multiple Guns For This Trigger The Projectiles Emerge In Parallel Beams rather Than Independant Aiming
+	_weapon_barrel_definition_cant_fire_when_others_firing = 9,
+	_weapon_barrel_definition_cant_fire_when_others_recovering = 10,
+	_weapon_barrel_definition_dont_clear_fire_bit_after_recovering = 11,
+	_weapon_barrel_definition_stagger_fire_across_multiple_markers = 12,
+	_weapon_barrel_definition_fires_locked_projectiles = 13,
+	k_weapon_barrel_definition_flags_count
 };
+typedef c_flags_no_init<e_weapon_barrel_definition_flags, uint32, k_weapon_barrel_definition_flags_count> c_weapon_barrel_definition_flags;
 
 enum e_barrel_prediction_type : int16
 {
@@ -315,7 +317,7 @@ ASSERT_STRUCT_SIZE(barrel_firing_effect, 52);
 // max count: k_weapon_barrel_count
 struct weapon_barrel_definition
 {
-	e_weapon_barrel_definition_flags flags;
+	c_weapon_barrel_definition_flags  flags;
 	// Explaination("firing", "")
 	
 	real_bounds rounds_per_second;      // the number of firing effects created per second

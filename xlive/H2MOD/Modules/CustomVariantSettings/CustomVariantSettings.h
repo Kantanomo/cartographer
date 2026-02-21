@@ -29,6 +29,7 @@ namespace CustomVariantSettings
 		bool spawnProtection = true;
 		uint8 predefinedHillSet[16] = {};
 		uint8 forced_fov = 0;
+		bool disable_dub_shot = false;
 
 		real32 ComputedGravity() const
 		{

@@ -34,6 +34,7 @@ namespace CustomVariantSettings
 		stream->write_integer("hill rotation", (int32)data->hillRotation, 8);
 		stream->write_bool("infinite grenades", data->infiniteGrenades);
 		stream->write_integer("forced field of view", data->forced_fov, sizeof(data->forced_fov) * CHAR_BIT);
+		stream->write_bool("disable dub shot", data->disable_dub_shot);
 	}
 	void DecodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data)
 	{
@@ -45,6 +46,7 @@ namespace CustomVariantSettings
 		data->hillRotation = (e_hill_rotation)stream->read_integer("hill rotation", 8);
 		data->infiniteGrenades = stream->read_bool("infinite grenades");
 		data->forced_fov = (uint8)stream->read_integer("forced field of view", sizeof(data->forced_fov) * CHAR_BIT);
+		data->disable_dub_shot = stream->read_bool("disable dub shot");
 	}
 
 	void UpdateCustomVariantSettings(const s_variant_settings* data)
