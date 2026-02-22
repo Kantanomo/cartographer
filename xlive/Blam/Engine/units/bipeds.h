@@ -1,5 +1,6 @@
 #pragma once
 #include "units.h"
+#include "physics/character_physics.h"
 
 #define k_contact_point_count 3
 
@@ -14,21 +15,50 @@ enum e_biped_physics_mode : uint8
 	_mode_last = 7
 };
 
-enum e_biped_flags : uint32
+enum e_biped_flags : uint16
 {
 
 };
 
 struct _biped_datum
 {
-	e_biped_flags biped_flags;
-	int8 gap364[124];
-	bool field_3E0;
-	int8 pad[3];
-	real_vector3d vector_3E4;
-	int8 gap3F0[4];
-	e_biped_physics_mode biped_movement_type;
-	int8 gap1[139];
+	e_biped_flags flags;
+	int8 movement_category;
+	int8 ragdoll_flag;
+	int16 pathfinding_structure_index;
+	int32 pathfinding_surface_index;
+	int32 pathfinding_sector;
+	int32 pathfinding_instanced_geometry_index;
+	int32 pathfinding_object_index;
+	uint32 pathfinding_bsp_reference;
+	int32 pathfinding_time;
+	real_point3d pathfinding_point;
+	real_vector3d pathfinding_ground_collision_normal;
+	real_point3d pathfinding_ground_collision_point;
+	uint32 last_falling_communication_time;
+	uint32 melee_target_unit_index;
+	uint32 bump_object_index;
+	uint8 bump_ticks;
+	uint8 jump_control_ticks;
+	uint8 slip_control_ticks;
+	uint8 last_known_speed_scale;
+	uint8 airborne_ticks;
+	uint8 stun_ticks;
+	uint8 jump_delay_ticks;
+	real32 lean;
+	real32 lean_fraction;
+	uint8 stationary_ticks;
+	uint8 physics_movement_category;
+	uint8 crouch_transition_ticks;
+	uint8 falling_danger_ticks;
+	real_vector3d max_analog_movement_controller;
+	real_vector3d next_analog_movement_controller;
+	int32 analog_movement_controller_age;
+	bool first_person_camera_initialized;
+	real_vector3d first_person_camera_offset;
+	int32 field_90;
+	c_character_physics_component physics;
+	object_header_block_reference simulation_interpolation_storage;
 };
 
 struct biped_datum

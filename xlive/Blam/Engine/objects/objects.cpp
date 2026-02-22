@@ -516,8 +516,8 @@ datum __cdecl object_new(object_placement_data* data)
 			object->object.current_weapon_datum = NONE;
 			object->object.name_list_index = NONE;
 			object->object.netgame_equipment_index = NONE;
-			object->object.byte_108 = NONE;
-			object->object.byte_109 = NONE;
+			object->object.shield_damage_decay_timer = NONE;
+			object->object.body_damage_decay_timer = NONE;
 			object->object.placement_policy = data->placement_policy;
 
 			if (object_definition->object.flags.test(_object_definition_does_not_cast_shadow_bit))
@@ -532,7 +532,7 @@ datum __cdecl object_new(object_placement_data* data)
 			object->object.damage_owner_object_index = data->damage_owner.owner_object_index;
 			object->object.model_variant_id = NONE;
 			object->object.cached_render_state_index = NONE;
-			object->object.field_D0 = NONE;
+			object->object.structure_bsp_fake_lightprobe_index = NONE;
 			object->object.physics_flags.clear();
 			object->object.physics_flags.set(_object_physics_bit_8, TEST_BIT(data->flags, 3));
 			object->object.havok_datum = NONE;

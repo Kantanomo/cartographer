@@ -66,10 +66,10 @@ ASSERT_STRUCT_SIZE(scenery_definition, 196);
 struct _scenery_datum
 {
 	uint32 flags;
-	int16 field_4;
+	int16 pathfinding_references_index;
 	e_scenery_pathfinding_policy pathfinding_policy;
 	int32 lightmapping_policy;	// e_scenery_lightmapping_policy
-	int32 field_C;
+	int32 animation_relative_object_index;
 };
 
 struct scenery_datum

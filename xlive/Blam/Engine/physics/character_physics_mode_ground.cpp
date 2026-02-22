@@ -33,6 +33,25 @@ __declspec(naked) static void c_character_physics_mode_ground_datum__update_inte
 
 /* public code */
 
+void c_character_physics_mode_ground_datum::initialize()
+{
+	this->m_last_time_animation_velocity = NONE;
+	this->m_last_localized_physics_velocity = *global_zero_vector3d;
+	this->m_ground_physics_update_ticks = 0;
+	this->m_ground_plane = *global_up3d;
+	this->m_ground_material_type = NONE;
+	this->m_surface_index = NONE;
+	this->m_landing_velocity = 0.f;
+	this->m_support_object_index = NONE;
+	this->m_support_havok_component_index = NONE;
+	this->m_support_havok_component_rigid_body_index = NONE;
+	this->m_support_havok_component_matrix = *global_identity4x3;
+}
+
+void c_character_physics_mode_ground_datum::dispose()
+{
+}
+
 void character_physics_mode_ground_apply_patches(void)
 {
 	// fixes edge drop fast fall when using higher tickrates than 30

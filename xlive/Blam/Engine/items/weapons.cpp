@@ -41,7 +41,7 @@ void weapon_barrel_idle(uint32 weapon_index, uint16 barrel_index)
     ASSERT(weapon);
     ASSERT(weapon_def);
 
-    s_weapon_datum_barrel* weapon_barrel = &weapon->weapon.barrels[barrel_index];
+    weapon_barrel* weapon_barrel = &weapon->weapon.barrels[barrel_index];
     weapon_barrel_definition* barrel_def = weapon_def->weapon.barrels[barrel_index];
 
     weapon_barrel->field_4 = false;
@@ -52,7 +52,7 @@ void weapon_barrel_idle(uint32 weapon_index, uint16 barrel_index)
 
     if (!barrel_def->flags.test(_weapon_barrel_definition_dont_clear_fire_bit_after_recovering) || dub_shot_test)
     {
-        weapon_barrel->flags.set(_weapon_datum_barrel_fire_barrel_next_update, false);
+        weapon_barrel->flags.set(_weapon_barrel_fire_bit, false);
     }
 }
 

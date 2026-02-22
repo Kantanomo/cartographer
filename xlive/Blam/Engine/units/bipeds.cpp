@@ -70,7 +70,7 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
 		const real32 function_value = (v1 - biped_def->biped.camera_interpolation_start) / angle_range;
 		real32 function_result = transition_function_evaluate(_transition_function_cosine, PIN(function_value, 0.f, 1.f));
 
-		if (function_result > 0.0f && biped->biped.field_3E0)
+		if (function_result > 0.0f && biped->biped.first_person_camera_initialized)
 		{
 			real_vector2d forward_out;
 			real_vector2d up_out;
@@ -94,9 +94,9 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
 			real32 forward_product = dot_product2d((real_vector2d*)&camera_diff, &forward_out);
 			real32 up_product = dot_product2d((real_vector2d*)&camera_diff, &up_out);
 
-			real_vector3d biped_vector = biped->biped.vector_3E4;
+			real_vector3d biped_vector = biped->biped.first_person_camera_offset;
 
-			if (biped->biped.vector_3E4.i <= biped_def->biped.camera_exclusion_distance)
+			if (biped->biped.first_person_camera_offset.i <= biped_def->biped.camera_exclusion_distance)
 			{
 				biped_vector.i = biped_def->biped.camera_exclusion_distance;
 			}
@@ -164,7 +164,7 @@ void __cdecl biped_get_sight_position(
 		{
 			if (!halo_interpolator_interpolate_biped_crouch(biped_index, &crouching))
 			{
-				crouching = biped->unit.crouching;
+				crouching = biped->unit.crouch;
 			}
 		}
 	}

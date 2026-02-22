@@ -869,7 +869,11 @@
     <ClCompile Include="Blam\Engine\objects\object_identifier.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
     <ClCompile Include="Blam\Engine\objects\widgets\widgets.cpp" />
+    <ClCompile Include="Blam\Engine\physics\character_physics.cpp" />
+    <ClCompile Include="Blam\Engine\physics\character_physics_mode_dead.cpp" />
+    <ClCompile Include="Blam\Engine\physics\character_physics_mode_flying.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_ground.cpp" />
+    <ClCompile Include="Blam\Engine\physics\character_physics_mode_sentinel.cpp" />
     <ClCompile Include="Blam\Engine\physics\collisions.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_model_definitions.cpp" />
@@ -980,6 +984,7 @@
     <ClInclude Include="Blam\Engine\cartographer\config\endpoints.h" />
     <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
+    <ClInclude Include="Blam\Engine\creatures\creatures.h" />
     <ClInclude Include="Blam\Engine\creatures\creature_definitions.h" />
     <ClInclude Include="Blam\Engine\creatures\creature_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\cseries\async.h" />
@@ -1538,8 +1543,12 @@
     <ClInclude Include="Blam\Engine\objects\widgets\antenna_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\widgets.h" />
     <ClInclude Include="Blam\Engine\physics\breakable_surface_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics_mode_dead.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics_mode_flying.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_ground.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics_mode_sentinel.h" />
     <ClInclude Include="Blam\Engine\physics\collisions.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\objects\damage_reporting.h" />
