@@ -16,11 +16,37 @@ enum
 	k_ipc_thread_sleep_time = 1000
 };
 
-/* globals */
+/* enum */
 
-static shell_windows_ipc_state g_ipc_state;
+enum e_shell_windows_ipc_message_type : uint8
+{
+	_shell_windows_ipc_message_type_join = 0,
 
-static CRITICAL_SECTION g_ipc_message_lock;
+	k_shell_windows_ipc_message_type_count
+};
+
+/* structures */
+
+struct shell_windows_ipc_state
+{
+	HANDLE mutex;
+	HANDLE server_thread;
+	volatile bool shutdown_requested;
+	bool is_server;
+};
+
+#pragma pack(push, 1)
+struct shell_windows_ipc_message_header
+{
+	e_shell_windows_ipc_message_type type;
+};
+
+struct shell_windows_ipc_join_message
+{
+	shell_windows_ipc_message_header header;
+	XSESSION_INFO session;
+};
+#pragma pack(pop)
 
 /* prototypes */
 
@@ -37,6 +63,12 @@ static bool shell_windows_ipc_send_raw(uint8* data_buffer, uint32 data_size);
 static bool shell_windows_ipc_send_with_retry(uint8* data_buffer, uint32 data_size);
 static void shell_windows_ipc_handle_message(uint8* data_buffer, uint32 buffer_size);
 static void shell_windows_ipc_handle_join_message(uint8* session_buffer, uint32 buffer_size);
+
+/* globals */
+
+static shell_windows_ipc_state g_ipc_state;
+
+static CRITICAL_SECTION g_ipc_message_lock;
 
 /* public code */
 
