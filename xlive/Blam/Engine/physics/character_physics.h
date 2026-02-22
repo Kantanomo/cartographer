@@ -9,12 +9,6 @@
 
 constexpr real32 k_character_physics_collision_immunity_duration = 0.3f;
 
-enum
-{
-	// todo: when all physics mode datum types are made do a sizeof(largest)?
-	k_character_physics_mode_datum_buffer_size = 120,
-};
-
 /* enums */
 
 enum e_character_physics_mode : uint8
@@ -37,14 +31,26 @@ enum e_character_physics_mode : uint8
 class c_character_physics_component
 {
 private:
+	struct datum_buffer
+	{
+		union
+		{
+			c_character_physics_mode_ground_datum ground;
+			c_character_physics_mode_flying_datum flying;
+			c_character_physics_mode_dead_datum dead;
+			c_character_physics_mode_sentinel_datum sentinel;
+			c_character_physics_mode_melee_datum melee;
+		};
+		int32 pad;
+	};
+
 	e_character_physics_mode m_mode;
 	uint8 m_collision_damage_immunity_counter;
 	datum m_object_index;
 	datum m_early_mover_object_index;
 	datum m_accepted_early_mover_object_index;
 
-	// doesn't seem to be a union just a buffer sized to the largest physics mode class
-	int8 m_mode_datum_buffer[k_character_physics_mode_datum_buffer_size];
+	int8 m_mode_datum_buffer[sizeof(datum_buffer)];
 
 public:
 	void initialize(datum object_index);
