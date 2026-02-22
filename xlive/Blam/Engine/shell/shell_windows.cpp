@@ -3,11 +3,13 @@
 
 #include "shell.h"
 #include "shell_windows_internals.h"
+#include "shell_windows_ipc.h"
 #include "shell_windows_pcc.h"
 
 #include "input/input_windows.h"
 #include "main/main.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "interface/user_interface_networking.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -74,6 +76,8 @@ static void shell_windows_adjust_name(void);
 
 static void shell_windows_calculate_instance_num(void);
 
+static void shell_windows_url_decode_command_line_buffer(wchar_t* argument_buffer);
+
 static void shell_windows_tokenize_command_line_buffer(const wchar_t* argument_buffer, wchar_t** args, int32 max_arg_count, int32* arg_count);
 
 static void shell_windows_initialize_arguments(void);
@@ -104,6 +108,8 @@ static BOOL WINAPI CryptUnprotectDataHook(
 	_Out_      DATA_BLOB* pDataOut
 );
 
+static void shell_windows_setup_cartographer_protocol();
+
 /* public code */
 
 s_window_globals* window_globals_get(void)
@@ -116,6 +122,13 @@ bool shell_platform_initialize(void)
 	const bool is_dedi = shell_is_dedicated_server();
 
 	shell_windows_calculate_instance_num();
+
+	if (!is_dedi)
+	{
+		shell_windows_setup_cartographer_protocol();
+
+		shell_windows_ipc_initialize();
+	}
 
 	shell_windows_initialize_arguments();
 
@@ -157,12 +170,12 @@ bool shell_platform_initialize(void)
 // mess around with xlive (not calling XLiveInitialize etc)
 bool* should_initilize_xlive_get(void)
 {
-	return Memory::GetAddress<bool*>(0x4FAD98);
+	return Memory::GetAddress<bool*>(0x4FAD98, 0x520AC8);
 }
 
 bool* xlive_initilized_get(void)
 {
-	return Memory::GetAddress<bool*>(0x4FAD99);
+	return Memory::GetAddress<bool*>(0x4FAD99, 0x520AC9);
 }
 
 int32* fatal_error_id_get(void)
@@ -318,6 +331,7 @@ static int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	if (shell_initialize())
 	{
 		main_loop();		// actually run game
+		shell_windows_ipc_shutdown(); // end and shutdown the IPC thread
 		shell_dispose();	// cleanup
 	}
 	else if (int32 g_fatal_error_id = *fatal_error_id_get(); g_fatal_error_id)
@@ -569,6 +583,32 @@ static void shell_windows_calculate_instance_num(void)
 	return;
 }
 
+static void shell_windows_url_decode_command_line_buffer(wchar_t* argument_buffer)
+{
+	if (!argument_buffer) return;
+
+	// read the argument buffer and replace instances of %20 with a space
+	// this is for the custom protocol launching of the application which
+	// is URI encoded, doing a full URI decode shouldn't be necessary as
+	// the only thing that should ever need to be encoded is a space (%20)
+
+	int32 read_index = 0;
+	int32 write_index = 0;
+	while (argument_buffer[read_index])
+	{
+		if (argument_buffer[read_index] == L'%' && argument_buffer[read_index + 1] == L'2' && argument_buffer[read_index + 2] == L'0')
+		{
+			argument_buffer[write_index++] = L' ';
+			read_index += 3;
+		}
+		else
+		{
+			argument_buffer[write_index++] = argument_buffer[read_index++];
+		}
+	}
+	argument_buffer[write_index] = L'\0';
+}
+
 static void shell_windows_tokenize_command_line_buffer(const wchar_t* argument_buffer, wchar_t** args, int32 max_arg_count, int32* arg_count)
 {
 	void* p_shell_windows_tokenize_command_line_buffer = Memory::GetAddress<void*>(0x1014, 0x1000);
@@ -596,11 +636,15 @@ static void shell_windows_initialize_arguments(void)
 	{
 		// Copy the buffer
 		wchar_t argument_buffer[INT16_MAX + 1];
+
 		ustrncpy(argument_buffer, command_line, NUMBEROF(argument_buffer));
 
 		// Initialize our list of args
 		wchar_t* args[1024];
 		csmemset(args, 0, sizeof(args));
+
+		// URL decode
+		shell_windows_url_decode_command_line_buffer(argument_buffer);
 
 		// Tokenize the argument buffer into our list of args
 		int32 arg_count;
@@ -609,6 +653,13 @@ static void shell_windows_initialize_arguments(void)
 		for (int32 i = 0; i < arg_count; i++)
 		{
 			const wchar_t* current_argument = args[i];
+
+			// if the game is launched from the custom protocol the first argument will start with carto:
+			// adjust the pointer by 6 to move past the protocol
+			if (_wcsnicmp(current_argument, L"carto:", 6) == 0)
+			{
+				current_argument = &args[i][6];
+			}
 
 			if (_wcsicmp(current_argument, L"-windowed") == 0)
 			{
@@ -650,6 +701,31 @@ static void shell_windows_initialize_arguments(void)
 				shell_command_line_flag_set((e_shell_command_line_flags)PIN(0, flag_id, k_number_of_shell_command_line_flags - 1), 1);
 			}
 #endif
+			else if (_wcsnicmp(current_argument, L"-join:", 6) == 0)
+			{
+				const wchar_t* session_code = &current_argument[6];
+				XSESSION_INFO join_session;
+				uint8* session_bytes = (uint8*)&join_session;
+
+				for (uint32_t j = 0; j < sizeof(XSESSION_INFO); j++)
+				{
+					uint32 v = 0;
+					swscanf_s(session_code + (j * 2), L"%02X", &v);
+					session_bytes[j] = (uint8)(v & 0xFF);
+				}
+
+				if (shell_windows_ipc_notify_session_info(&join_session))
+				{
+					// another instance of the game is open and the session info was forwarded to it
+					// we can just close the game gracefully
+					// not using main_exit() because using that will let the game still create the game window
+					// and then close
+					exit(0);
+				}
+
+				g_game_auto_join.do_auto_join = true;
+				g_game_auto_join.auto_join_session = join_session;
+			}
 		}
 	}
 	return;
@@ -698,4 +774,102 @@ static BOOL WINAPI CryptUnprotectDataHook(
 	}
 
 	return TRUE;
+}
+
+static void shell_windows_setup_cartographer_protocol()
+{
+	// create and reset the registry class every time the game is run
+	// in case someone moves their games install or has multiple installs (different versions for devs mostly)
+	// the exe path is resolved from any potential symbolic junctions (dev shit)
+	// or if someone is crazy enough to play the game from a UNC network folder
+	//
+	// the custom windows launch protocol is created in the CurrentUser registry hive
+	// so that elevated permissions aren't required to create it for the system
+
+	c_static_wchar_string<MAX_PATH> exe_path;
+
+	GetModuleFileNameW(NULL, exe_path.get_buffer(), MAX_PATH);
+
+	HANDLE file_handle = CreateFileW(exe_path.get_string(), 0,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	ASSERT(file_handle != INVALID_HANDLE_VALUE);
+
+	uint32 len = GetFinalPathNameByHandleW(file_handle, nullptr, 0, 0);
+
+	exe_path.clear();
+
+	GetFinalPathNameByHandleW(file_handle, exe_path.get_buffer(), len, 0);
+
+	CloseHandle(file_handle);
+
+	c_static_wchar_string<MAX_PATH> final_path;
+
+	if (wcsncmp(exe_path.get_string(), L"\\\\?\\UNC\\", 8) == 0)
+	{
+		final_path.set(L"\\\\");
+		final_path.append(&exe_path.get_string()[8]);
+	}
+	else if (wcsncmp(exe_path.get_string(), L"\\\\?\\", 4) == 0)
+	{
+		final_path.set(&exe_path.get_string()[4]);
+	}
+
+	HKEY hKey = NULL;
+	wchar_t buffer[MAX_PATH + 32];
+
+	RegOpenKeyExW(
+		HKEY_CURRENT_USER,
+		L"SOFTWARE\\Classes\\carto",
+		0,
+		KEY_READ,
+		&hKey
+	);
+
+	RegCreateKeyExW(
+		HKEY_CURRENT_USER,
+		L"SOFTWARE\\Classes\\carto",
+		0, NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_WRITE,
+		NULL,
+		&hKey,
+		NULL
+	);
+
+	const wchar_t* protocolDesc = L"URL:Cartographer Protocol";
+	RegSetValueExW(hKey, NULL, 0, REG_SZ, (const BYTE*)protocolDesc, (DWORD)(wcslen(protocolDesc) + 1) * sizeof(wchar_t));
+	RegSetValueExW(hKey, L"URL Protocol", 0, REG_SZ, (const BYTE*)L"", sizeof(wchar_t));
+	RegCloseKey(hKey);
+
+	RegCreateKeyExW(
+		HKEY_CURRENT_USER,
+		L"SOFTWARE\\Classes\\carto\\DefaultIcon",
+		0, NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_WRITE,
+		NULL,
+		&hKey,
+		NULL
+	);
+
+	_snwprintf_s(buffer, _countof(buffer), L"\"%s,1\"", final_path.get_buffer());
+	RegSetValueExW(hKey, NULL, 0, REG_SZ, (const BYTE*)buffer, (DWORD)(wcslen(buffer) + 1) * sizeof(wchar_t));
+	RegCloseKey(hKey);
+
+	RegCreateKeyExW(
+		HKEY_CURRENT_USER,
+		L"SOFTWARE\\Classes\\carto\\shell\\open\\command",
+		0, NULL,
+		REG_OPTION_NON_VOLATILE,
+		KEY_WRITE,
+		NULL,
+		&hKey,
+		NULL
+	);
+
+	_snwprintf_s(buffer, _countof(buffer), L"\"%s\" %%1", final_path.get_buffer());
+	RegSetValueExW(hKey, NULL, 0, REG_SZ, (const BYTE*)buffer, (DWORD)(wcslen(buffer) + 1) * sizeof(wchar_t));
+	RegCloseKey(hKey);
 }

@@ -547,6 +547,7 @@
     <ClCompile Include="Blam\Engine\tag_files\files.cpp" />
     <ClCompile Include="Blam\Engine\units\vehicles.cpp" />
     <ClCompile Include="Blam\Engine\data_mining\data_mining.cpp" />
+    <ClCompile Include="Blam\Engine\shell\shell_windows_ipc.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_dead.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_flying.cpp" />
@@ -2069,6 +2070,7 @@
     <ClInclude Include="Blam\Engine\ai\ai_direction.h" />
     <ClInclude Include="Blam\Engine\ai\ai_path.h" />
     <ClInclude Include="Blam\Engine\ai\ai_destination.h" />
+    <ClInclude Include="Blam\Engine\shell\shell_windows_ipc.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_dead.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_flying.h" />

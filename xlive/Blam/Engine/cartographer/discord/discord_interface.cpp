@@ -3,6 +3,7 @@
 
 #include "game/game.h"
 #include "game/game_globals.h"
+#include "interface/user_interface_networking.h"
 #include "networking/logic/life_cycle_manager.h" 
 #include "networking/session/network_session.h"
 #include "networking/session/network_observer.h"
@@ -13,6 +14,8 @@
 #include "H2MOD/Modules/Shell/Config.h"
 
 #include <discord_game_sdk.h>
+
+
 
 /* constants */
 
@@ -573,7 +576,7 @@ static void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secr
 		(void)sscanf_s(&secret[2 * i], "%02hhX", &session_bytes[i]);
 	}
 
-	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, &session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+	user_interface_networking_join_game_direct(session.sessionID, session.keyExchangeKey, &session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
 	return;
 }
 

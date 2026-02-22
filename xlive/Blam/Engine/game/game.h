@@ -114,8 +114,6 @@ void __cdecl game_options_setup_default_players(int32 player_count, s_game_optio
 
 void game_time_get_date_and_time(s_date_and_time* date_and_time);
 
-void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, int8 exe_type, int32 exe_version, int32 comp_version);
-
 void __cdecl game_initialize(void);
 
 void __cdecl game_dispose(void);
@@ -133,4 +131,6 @@ void __cdecl game_frame(real32 dt);
 /* globals */
 
 extern char const* global_campaign_difficulty_level_names[4];
+
+
 

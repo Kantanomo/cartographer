@@ -25,6 +25,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 
 // for XNet connection logging
+#include "interface/user_interface_networking.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 
@@ -750,7 +751,7 @@ static int CommandCollection::connect(const std::vector<std::string>& tokens, Co
 		(void)sscanf_s(&tokens[1].c_str()[2 * i], "%02hhX", &session_bytes[i]);
 	}
 
-	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, &session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+	user_interface_networking_join_game_direct(session.sessionID, session.keyExchangeKey, &session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
 
 	return 0;
 }

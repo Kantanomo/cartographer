@@ -23,6 +23,8 @@
 
 #include <XLive/xbox/xbox.h>
 
+#include "user_interface_networking.h"
+
 /* macros */
 
 #define ERROR_STRING_CREATE(_value)\
@@ -512,6 +514,9 @@ void __cdecl user_interface_update(real32 dt)
 	}
 
 	INVOKE(0x20CA7D, 0x0, user_interface_update, dt);
+
+	// move to user_interface_networking_update when rewritten
+	user_interface_networking_update_auto_join();
 	return;
 }
 
