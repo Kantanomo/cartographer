@@ -5,21 +5,17 @@
 #include "character_physics_mode_melee.h"
 #include "character_physics_mode_sentinel.h"
 
-/* constants */
-
-constexpr real32 k_character_physics_collision_immunity_duration = 0.3f;
-
 /* enums */
 
 enum e_character_physics_mode : uint8
 {
 	_character_physics_mode_none = 0,
-	_character_physics_mode_ground = 1,
-	_character_physics_mode_flying = 2,
-	_character_physics_mode_dead = 3,
-	_character_physics_mode_sentinel = 4,
-	_character_physics_mode_sentinel_climbing = 5,
-	_character_physics_mode_melee = 6,
+	_character_physics_mode_ground,
+	_character_physics_mode_flying,
+	_character_physics_mode_dead,
+	_character_physics_mode_sentinel,
+	_character_physics_mode_sentinel_climbing,
+	_character_physics_mode_melee,
 
 	k_character_physics_mode_count,
 	k_character_physics_mode_first = _character_physics_mode_ground,
@@ -49,7 +45,6 @@ private:
 	datum m_object_index;
 	datum m_early_mover_object_index;
 	datum m_accepted_early_mover_object_index;
-
 	int8 m_mode_datum_buffer[sizeof(datum_buffer)];
 
 public:

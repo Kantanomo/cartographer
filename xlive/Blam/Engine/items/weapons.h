@@ -16,7 +16,7 @@ enum
 
 enum e_weapon_barrel_state : uint8
 {
-	_weapon_barrel_state_idle,
+	_weapon_barrel_state_idle = 0,
 	_weapon_barrel_state_firing,
 	_weapon_barrel_state_locked_recovering,
 	_weapon_barrel_state_locked_recovering_empty,
@@ -26,7 +26,7 @@ enum e_weapon_barrel_state : uint8
 
 enum e_weapon_barrel_flags : uint16
 {
-	_weapon_barrel_fire_bit,
+	_weapon_barrel_fire_bit = 0,
 	_weapon_barrel_create_projectiles_bit,
 	_weapon_barrel_destroyed_bit,
 	_weapon_barrel_blurred_bit,
@@ -39,7 +39,7 @@ enum e_weapon_barrel_flags : uint16
 
 enum e_weapon_trigger_state : uint8
 {
-	_weapon_trigger_state_idle,
+	_weapon_trigger_state_idle = 0,
 	_weapon_trigger_state_charging,
 	_weapon_trigger_state_charged,
 	_weapon_trigger_state_tracking,
@@ -52,7 +52,7 @@ enum e_weapon_trigger_state : uint8
 
 enum e_weapon_trigger_flags : uint16
 {
-	_weapon_trigger_released_since_last_shot_bit,
+	_weapon_trigger_released_since_last_shot_bit = 0,
 	_weapon_trigger_destroyed_bit,
 	_weapon_trigger_fired_before_charging_bit,
 	_weapon_trigger_did_primary_autofire_action_bit,
@@ -67,7 +67,7 @@ enum e_weapon_trigger_flags : uint16
 
 enum e_weapon_magazine_state : uint16
 {
-	_magazine_idle,
+	_magazine_idle = 0,
 	_magazine_reloading_single,
 	_magazine_reloading_continuous_starting,
 	_magazine_reloading_continuous_underway,
@@ -83,26 +83,17 @@ enum e_weapon_magazine_state : uint16
 
 struct weapon_barrel
 {
-	int8 firing_idle_ticks;
-	e_weapon_barrel_state state;
-	int16 state_timer;
+	//todo: go back through this structure
+	int8 data_0[4];
+	bool field_4;
+	bool field_5;
+	int8 data_6[2];
 	c_flags_no_init<e_weapon_barrel_flags, uint16, k_weapon_barrel_flag_count> flags;
-	uint16 fire_count;
-	uint16 firing_effects_used_flags;
-	int16 firing_effect_index;
-	int16 firing_effect_shots_remaining;
-	int16 sequential_non_tracer_rounds;
-	real32 rate_of_fire;
-	real32 ejection_port_position;
-	real32 illumination;
-	real32 current_error;
-	real32 angle_change_scale;
-	real32 bonus_shot_fraction;
-	real32 recovery_overflow;
-	uint16 bonus_shot_count;
-	uint8 staggered_marker_offset;
-	uint8 predicted_recovery_timer;
-	int32 effect_index;
+	int16 field_A;
+	int8 data3[4];
+	int32 recovery_timer;
+	real32 reload_ticks_maybe;
+	int8 data2[28];
 };
 
 struct weapon_trigger

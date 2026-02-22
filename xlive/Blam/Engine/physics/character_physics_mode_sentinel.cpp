@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "character_physics_mode_sentinel.h"
 
+/* public code */
 
 void c_character_physics_mode_sentinel_datum::initialize(bool climbing, real_point3d* sentinel_physics_position)
 {

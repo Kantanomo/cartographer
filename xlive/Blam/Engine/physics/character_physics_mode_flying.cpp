@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "character_physics_mode_flying.h"
 
+/* public code */
+
 void c_character_physics_mode_flying_datum::initialize()
 {
 	this->m_turning_disabled_counter = 0;

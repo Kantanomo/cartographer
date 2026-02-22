@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "character_physics_mode_dead.h"
 
+/* public code */
+
 void c_character_physics_mode_dead_datum::initialize()
 {
 	this->m_resting_surface_normal = *global_up3d;

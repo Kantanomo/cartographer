@@ -4,6 +4,13 @@
 #include "game/game_time.h"
 #include "objects/objects.h"
 
+
+/* constants */
+
+constexpr real32 k_character_physics_collision_immunity_duration = 0.3f;
+
+/* public code */
+
 void c_character_physics_component::initialize(datum object_index)
 {
 	this->m_object_index = object_index;
