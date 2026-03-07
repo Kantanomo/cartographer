@@ -58,27 +58,22 @@ void XUserSetupGuests(XUID primary_xuid, bool online)
 {
 	for (DWORD dwUserIndex = 1; dwUserIndex < 4; dwUserIndex++)
 	{
+		g_xUserSignInInfo[dwUserIndex].dwGuestNumber = dwUserIndex;
+		g_xUserSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
+		g_xUserSignInInfo[dwUserIndex].xuid = primary_xuid | ((unsigned long long)dwUserIndex << 62);
+		g_xUserSignInInfo[dwUserIndex].xuid |= ((unsigned long long)0xC << 48);
+		
 		if (online)
 		{
+			g_xUserSignInInfo[dwUserIndex].xuid |= ((unsigned long long)0x9 << 48);
 			g_xUserSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED | XUSER_INFO_FLAG_GUEST;
 			g_xUserSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInToLive;
-			// primary_xuid in ONLINE is sure to have last 2 bits 0
-			// we can just use OR operator to append the guest_index to make them different
-			// this is then used to create online_guest_names which are tied to this guest_index
-			g_xUserSignInInfo[dwUserIndex].xuid = primary_xuid | dwUserIndex;
 		}
 		else
 		{
 			g_xUserSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_GUEST;
 			g_xUserSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInLocally;
-			// primary_xuid in OFFLINE is returned by rand() and we have no idea which bits are set
-			// in this case we will just add the local_user_index to make the xuids slightly different
-			// offline_guest_names are determined by profile names so it doesnt matter what we set the xuid as
-			g_xUserSignInInfo[dwUserIndex].xuid = primary_xuid + dwUserIndex;
 		}
-
-		g_xUserSignInInfo[dwUserIndex].dwGuestNumber = dwUserIndex;
-		g_xUserSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 	}
 }
 
@@ -89,9 +84,10 @@ void XUserSetup(
 	unsigned long xnaddr,
 	unsigned long lanaddr,
 	unsigned short baseport,
-	const char* abEnet,
-	const char* abOnline,
-	bool online)
+	const BYTE* abEnet,
+	const BYTE* abOnline,
+	bool online
+)
 {
 	// GFWL supports only 1 user logged in at the time
 	if (dwUserIndex != 0)

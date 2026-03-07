@@ -490,7 +490,7 @@ public:
 	static u_short GetQoSPort();
 
 	static void UnregisterLocalConnectionInfo();
-	static void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* machineUID, const char* abOnline);
+	static void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const BYTE* abEnet, const BYTE* abOnline);
 
 	// Performance counters
 	void UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount) const;

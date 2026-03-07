@@ -368,7 +368,7 @@ uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(
 			if (!ONLINE_USER_VALID(compare_id))
 				continue;
 
-			if ((compare_id & ~0x3ULL) == (master_identifier & ~0x3ULL))
+			if (online_xuid_same_account(compare_id, master_identifier))
 				count++;
 		}
 
