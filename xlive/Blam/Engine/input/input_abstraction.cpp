@@ -689,7 +689,7 @@ static void input_abstraction_apply_raw_mouse_update(e_controller_index controll
 	}
 	else
 	{
-		input_abstraction_set_mouse_look_sensitivity(controller, cartographer_player_profile_get_by_user_index(0)->mouse_sensitivity);
+		input_abstraction_set_mouse_look_sensitivity(controller, cartographer_player_profile->mouse_sensitivity);
 	}
 	return;
 }

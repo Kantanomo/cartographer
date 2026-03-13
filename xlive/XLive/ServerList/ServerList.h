@@ -117,6 +117,8 @@ public:
 
 	static DWORD Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
 
+	HRESULT EnumerateTaskUpdate(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
+
 	// basic functions 
 	static void GetServerCounts(PXOVERLAPPED);
 	static void RemoveServer(DWORD dwUserIndex, PXOVERLAPPED pOverlapped);
@@ -144,11 +146,11 @@ public:
 	int GetItemLeftCount() const;
 	int GetValidItemsFoundCount() const;
 
-	void CancelOperation() {
-		// before canceling the operation 
+	void CancelTask() {
+		// before canceling the task 
 		// first wait for the i/o to finish
 		std::lock_guard lg(m_ioWriteMutex);
-		m_cancelOperation = true;
+		m_shouldCancelTask = true;
 	}
 
 	void EnumerateFromHttp();
@@ -162,19 +164,30 @@ public:
 
 	enum
 	{
-		OperationPending,
-		OperationIncomplete,
-		OperationFailed,
-		OperationFinished,
+		_eTaskPending,
+		_eTaskIncomplete,
+		_eTaskFailed,
+		_eTaskFinished,
 	};
+
+	// mainly used for resource discard
+	std::mutex m_itemQueryMutex;
+	std::mutex m_ioWriteMutex;
+
+private:
+	
+	bool ShouldCancelTask() const
+	{
+		return m_shouldCancelTask;
+	}
 
 	PXOVERLAPPED m_pOverlapped = nullptr;
 	std::atomic<int> m_itemsLeftInDoc = 0;
-	std::atomic<int> m_operationState = OperationPending;
+	std::atomic<int> m_taskState = _eTaskPending;
 
 	int m_itemsPerPageCount;
 	std::atomic<int> m_pageItemsFoundCount = 0;
-	
+
 	DWORD m_searchPropertiesIdCount = 0;
 	DWORD* m_pSearchPropertyIds = nullptr;
 
@@ -183,18 +196,8 @@ public:
 
 	std::string m_serverListToDownload;
 
-	std::atomic<bool> m_cancelOperation = false;
-	std::atomic<bool> m_operationOnPause = false;
-
-	// mainly used for resource discard
-	std::mutex m_itemQueryMutex;
-	std::mutex m_ioWriteMutex;
-
-private:
-	bool ShouldCancelOperation() const
-	{
-		return m_cancelOperation;
-	}
+	std::atomic<bool> m_shouldCancelTask = false;
+	std::atomic<bool> m_taskPaused = false;
 
 #pragma endregion ServerListQuery
 

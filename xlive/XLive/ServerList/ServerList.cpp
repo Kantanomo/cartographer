@@ -16,7 +16,6 @@
 
 using namespace rapidjson;
 
-
 /* constants */
 
 static const char k_cartographer_add_server_url[] = k_cartographer_url_https"/live/add_server.php";
@@ -27,9 +26,9 @@ static const char k_cartographer_dedi_count_url[] = k_cartographer_url_https"/li
 
 /* prototypes */
 
-static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock);
+static CServerList* GetServerListTaskByHandle(HANDLE hHandle);
 
-static bool RemoveServerListQueryByPtr(CServerList* serverListQuery);
+static bool RemoveServerListTask(CServerList* serverListQuery);
 
 /* globals */
 
@@ -49,13 +48,13 @@ bool CServerList::CountResultsUpdated = false;
 
 /* public code */
 
-void ServerListQueryCancelAll()
+void ServerListTaskCancelAll()
 {
 	std::lock_guard lg(serverListRequestMutex);
 
 	for (auto& request : serverListRequests)
 	{
-		request.second->CancelOperation();
+		request.second->CancelTask();
 		XCloseHandle(request.first);
 	}
 
@@ -376,9 +375,7 @@ void ServerlistWorkerThread(CServerList* serverListQuery)
 {
 	serverListQuery->EnumerateFromHttp();
 
-#ifndef SPDLOG_DISABLED
 	const HANDLE handle = serverListQuery->m_handle;
-#endif
 
 	// hacky/unsafe as fuck, because we delete the resource
 	// while still practically in the class' execution ctx 
@@ -386,7 +383,7 @@ void ServerlistWorkerThread(CServerList* serverListQuery)
 	// as long as no member of the function is accesed after this
 	// releases the resources, it should be fine
 
-	RemoveServerListQueryByPtr(serverListQuery);
+	RemoveServerListTask(serverListQuery);
 
 	// delete the object only after the thread is about to exit
 	serverListQuery->m_itemQueryMutex.lock();
@@ -403,7 +400,7 @@ void CServerList::EnumerateFromHttp()
 	CURLcode curl_res;
 
 	DWORD outStringBufferSize = 0;
-	int itemsLeftToDownload, validItemsFound = 0;
+	DWORD itemsLeftToDownload, validItemsFound = 0;
 
 	m_pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 	m_pOverlapped->InternalHigh = 0;
@@ -435,7 +432,7 @@ void CServerList::EnumerateFromHttp()
 	// this counter count even bad servers
 	itemsLeftToDownload = document["servers"].Size();
 	// in case we have just 1 serverlist 'page' to download
-	int itemListMaxQueryCount = (std::min)(itemsLeftToDownload, XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN);
+	DWORD itemListMaxQueryCount = (std::min)(itemsLeftToDownload, (DWORD)XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN);
 
 	if (ComputeXLocatorServerEnumeratorBufferSize(itemListMaxQueryCount, m_searchPropertiesIdCount, m_pSearchPropertyIds, &outStringBufferSize) > m_resultBufferSize)
 	{
@@ -470,28 +467,28 @@ void CServerList::EnumerateFromHttp()
 
 		_clock::time_point tpBeforePause = _clock::now();
 
-		while (m_operationOnPause)
+		while (m_taskPaused)
 		{
 			Sleep(100);
 
 			if (_clock::now() - tpBeforePause > 5s)
 			{
-				CancelOperation();
+				CancelTask();
 				LOG_INFO_XLIVE("{} - resume I/O timeout reached, canceling!", __FUNCTION__);
 			}
 
-			if (ShouldCancelOperation())
+			if (ShouldCancelTask())
 				break;
 		}
 
-		if (ShouldCancelOperation())
+		if (ShouldCancelTask())
 		{
 			LOG_INFO_XLIVE("{} - signaled to cancel I/0", __FUNCTION__);
 			break;
 		}
 
 		// this starts from where it left off
-		int serverQueryIdx = 0;
+		DWORD serverQueryIdx = 0;
 		for (; xuidStrItr != serverXuidArray.End(); ++xuidStrItr)
 		{
 			// we reached max ITEM download size, break out and download the servers
@@ -604,7 +601,7 @@ void CServerList::EnumerateFromHttp()
 			}
 		}
 
-		m_operationOnPause = true;
+		m_taskPaused = true;
 	}
 
 	for (auto& itemQuery : itemsToDownloadQuery)
@@ -656,37 +653,32 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 	}
 }
 
-DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
+HRESULT CServerList::EnumerateTaskUpdate(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
-	bool lockQuery = true;
+	std::lock_guard lg(m_itemQueryMutex);
 
-	CServerList* serverListQuery = GetServerListQueryByHandle(hHandle, lockQuery);
-	if (serverListQuery == nullptr)
-		return ERROR_INVALID_HANDLE;
+	m_pOverlapped = pOverlapped;
+	SetNewPageBuffer(cbBuffer, pvBuffer);
 
-	switch (serverListQuery->m_operationState)
+	switch (m_taskState)
 	{
-	case OperationPending:
-		serverListQuery->m_operationState = OperationIncomplete;
-		serverListQuery->SetNewPageBuffer(cbBuffer, pvBuffer);
-		serverListQuery->m_pOverlapped = pOverlapped;
-		std::thread(&ServerlistWorkerThread, serverListQuery).detach();
+	case _eTaskPending:
+		m_taskState = _eTaskIncomplete;
+		std::thread(&ServerlistWorkerThread, this).detach();
 		break;
 
-	case OperationIncomplete:
+	case _eTaskIncomplete:
 		// update:
 		// this notifies the serverlist thread to download the next serverlist "page"
 
-		if (serverListQuery->GetItemLeftCount() > 0)
+		if (GetItemLeftCount() > 0)
 		{
-			serverListQuery->m_pOverlapped = pOverlapped;
-			serverListQuery->SetNewPageBuffer(cbBuffer, pvBuffer);
-			pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-			pOverlapped->InternalHigh = 0;
-			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
+			m_pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
+			m_pOverlapped->InternalHigh = 0;
+			m_pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 			// continue writing servers
-			serverListQuery->m_operationOnPause = false;
+			m_taskPaused = false;
 
 			// break if we still have servers to write
 			break;
@@ -694,32 +686,38 @@ DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 		else
 		{
 			// if not, set the operation state to finished
-			// and go to OperationFinished handler
-			serverListQuery->m_operationState = OperationFinished;
+			// and go to _eTaskFinished handler
+			m_taskState = _eTaskFinished;
 		}
 
-	case OperationFailed:
-	case OperationFinished:
+	case _eTaskFailed:
+	case _eTaskFinished:
 		// this query has finished, report back to the game
 		// TODO maybe add support to release the resources in the thread after a timeout
 		// in case the game doesn't check for the state anymore
-		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
-		pOverlapped->InternalHigh = 0;
-		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
-		serverListQuery->CancelOperation();
-		LOG_INFO_XLIVE("{} - query Id: {:X} I/O finished, removing query from list", __FUNCTION__, serverListQuery->m_handle);
+		m_pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
+		m_pOverlapped->InternalHigh = 0;
+		m_pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
+		CancelTask();
+		LOG_INFO_XLIVE("{} - query Id: {:X} I/O finished, removing query from list", __FUNCTION__, m_handle);
 
-		RemoveServerListQueryByPtr(serverListQuery);
+		RemoveServerListTask(this);
 		break;
 
 	default:
-		assert(0);
+		assert(false);
 	}
 
-	if (lockQuery)
-		serverListQuery->m_itemQueryMutex.unlock();
-
 	return ERROR_IO_PENDING;
+}
+
+DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pxOverlapped)
+{
+	CServerList* serverListQuery = GetServerListTaskByHandle(hHandle);
+	if (serverListQuery == nullptr)
+		return ERROR_INVALID_HANDLE;
+
+	return serverListQuery->EnumerateTaskUpdate(cbBuffer, pvBuffer, pxOverlapped);
 }
 
 void CServerList::RemoveServer(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
@@ -1023,7 +1021,7 @@ DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 {
 	LOG_TRACE_XLIVE("XLocatorServiceUnInitialize(a1 = {})", xlocatorhandle);
 
-	ServerListQueryCancelAll();
+	ServerListTaskCancelAll();
 	XCloseHandle(xlocatorhandle);
 
 	g_hXLocatorHandle = INVALID_HANDLE_VALUE;
@@ -1033,7 +1031,7 @@ DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 
 /* private code */
 
-static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
+static CServerList* GetServerListTaskByHandle(HANDLE hHandle)
 {
 	std::lock_guard lg(serverListRequestMutex);
 	CServerList* result = nullptr;
@@ -1042,13 +1040,6 @@ static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 	{
 		if (request.first == hHandle)
 		{
-			// ugly af but it'll do for now
-			// don't forget to UNLOCK after when you finish working with this
-			// mainly used to prevent the worker thread from discarding the memory
-			// when the game attempts to retrieve info about the query
-			if (lock)
-				request.second->m_itemQueryMutex.lock();
-
 			result = request.second;
 			break;
 		}
@@ -1057,7 +1048,7 @@ static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 	return result;
 }
 
-static bool RemoveServerListQueryByPtr(CServerList* serverListQuery)
+static bool RemoveServerListTask(CServerList* serverListQuery)
 {
 	// remove from the list, to note memory doesn't get released
 	// because async I/O might still be in progress
