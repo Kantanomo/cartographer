@@ -194,18 +194,18 @@ do \
 
 // to note this is not thread safe
 // you might see the max log count reached message more than once in a row
-#define LIMITED_LOG(log_limit, logger, ...) \
+#define LIMITED_LOG(log_limit, logger, msg, ...) \
 do \
 { \
 	static unsigned int _logged_times_count; \
 	if (_logged_times_count < log_limit) { \
-		logger(__VA_ARGS__); \
+		logger(msg, __VA_ARGS__); \
 		_logged_times_count++; \
 	} \
 	else if (_logged_times_count == log_limit) \
 	{ \
 		logger("	reached max log count of {} for: ", log_limit); \
-		logger(__VA_ARGS__); \
+		logger(msg, __VA_ARGS__); \
 		_logged_times_count++; \
 	} \
 } while(0)
@@ -225,6 +225,8 @@ do \
 		_logged_times_count++; \
 	} \
 } while(0)
+
+#define LOG_UNUSED(var)
 
 // Generic logging
 // For the most unimportant stuff
@@ -335,52 +337,60 @@ do \
 
 #else
 
-#define LIMITED_LOG(log_limit, logger, ...) (void)0
+#define LOG_STUB(msg, args) \
+while (0)					\
+{							\
+	(void)msg;				\
+}
 
-#define LOG_TRACE(logger, msg, ...) (void)0
-#define LOG_DEBUG(logger, msg, ...) (void)0
-#define LOG_INFO(logger, msg, ...) (void)0
-#define LOG_WARNING(logger, msg, ...) (void)0
-#define LOG_ERROR(logger, msg, ...) (void)0
-#define LOG_CRITICAL(logger, msg, ...) (void)0
+#define LOG_UNUSED(var) (void)var
+
+#define LIMITED_LOG(log_limit, logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
+
+#define LOG_TRACE(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_DEBUG(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_INFO(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_WARNING(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_ERROR(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_CRITICAL(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
 
 // Mod-specific logging
-#define LOG_TRACE_GAME(msg, ...) (void)0
-#define LOG_DEBUG_GAME(msg, ...) (void)0
-#define LOG_INFO_GAME(msg, ...) (void)0
-#define LOG_WARNING_GAME(msg, ...) (void)0
-#define LOG_ERROR_GAME(msg, ...) (void)0
-#define LOG_CRITICAL_GAME(msg, ...) (void)0
+#define LOG_TRACE_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_DEBUG_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_INFO_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_WARNING_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_ERROR_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_CRITICAL_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
 
 // Function calls
-#define LOG_TRACE_FUNC(msg, ...) (void)0
-#define LOG_TRACE_FUNCW(msg, ...) (void)0
-#define LOG_DEBUG_FUNC(msg, ...) (void)0
-#define LOG_DEBUG_FUNCW(msg, ...) (void)0
-#define LOG_INFO_FUNC(msg, ...) (void)0
-#define LOG_INFO_FUNCW(msg, ...) (void)0
-#define LOG_WARNING_FUNC(msg, ...) (void)0
-#define LOG_WARNING_FUNCW(msg, ...) (void)0
-#define LOG_ERROR_FUNC(msg, ...) (void)0
-#define LOG_ERROR_FUNCW(msg, ...) (void)0
-#define LOG_CRITICAL_FUNC(msg, ...) (void)0
-#define LOG_CRITICAL_FUNCW(msg, ...) (void)0
+#define LOG_TRACE_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_TRACE_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_DEBUG_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_DEBUG_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_INFO_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_INFO_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_WARNING_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_WARNING_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_ERROR_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_ERROR_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_CRITICAL_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_CRITICAL_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
 
 // Networking
-#define LOG_TRACE_NETWORK(msg, ...) (void)0
-#define LOG_DEBUG_NETWORK(msg, ...) (void)0
-#define LOG_INFO_NETWORK(msg, ...) (void)0
-#define LOG_WARNING_NETWORK(msg, ...) (void)0
-#define LOG_ERROR_NETWORK(msg, ...) (void)0
-#define LOG_CRITICAL_NETWORK(msg, ...) (void)0
+#define LOG_TRACE_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_DEBUG_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_INFO_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_WARNING_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_ERROR_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_CRITICAL_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
 
 // xLiveLess
-#define LOG_TRACE_XLIVE(msg, ...) (void)0
-#define LOG_DEBUG_XLIVE(msg, ...) (void)0
-#define LOG_INFO_XLIVE(msg, ...) (void)0
-#define LOG_WARNING_XLIVE(msg, ...) (void)0
-#define LOG_ERROR_XLIVE(msg, ...) (void)0
-#define LOG_CRITICAL_XLIVE(msg, ...) (void)0
+#define LOG_TRACE_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_DEBUG_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_INFO_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_WARNING_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_ERROR_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_CRITICAL_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
 
 #define LOG_CHECK(...) (__VA_ARGS__)
 

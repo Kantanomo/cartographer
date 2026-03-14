@@ -376,6 +376,7 @@ void ServerlistWorkerThread(CServerList* serverListQuery)
 	serverListQuery->EnumerateFromHttp();
 
 	const HANDLE handle = serverListQuery->m_handle;
+	LOG_UNUSED(handle);
 
 	// hacky/unsafe as fuck, because we delete the resource
 	// while still practically in the class' execution ctx 

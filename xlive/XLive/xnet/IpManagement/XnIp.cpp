@@ -843,10 +843,9 @@ void XnIp::SendXNetRequest(XVirtualSocket* xsocket, eXnip_ConnectRequestType req
 	m_connectionPacketsSentCount++;
 
 	m_requestContext = true;
-#ifndef SPDLOG_DISABLED
 	const int udp_send_result = 
-#endif
 		xsocket->UdpSend((const char*)&reqPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
+	LOG_UNUSED(udp_send_result);
 	LOG_INFO_NETWORK("{} - request sent, result: {}, socket handle: {}, connection index: {}, connection id: {:x}, n0nceKey: {}",
 		__FUNCTION__,
 		udp_send_result,
