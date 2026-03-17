@@ -3,6 +3,17 @@
 
 #include "networking/session/network_session.h"
 #include "networking/session/network_session_manager.h"
+#include "shell/shell_windows.h"
+
+/* structures */
+
+struct s_network_time_globals
+{
+	bool network_time_locked;
+	int8 pad[3];
+	uint32 time_locked_timestamp;
+	class c_network_session_manager* session_manager;
+};
 
 /* prototypes */
 
@@ -10,7 +21,10 @@ static s_network_time_globals* network_time_globals_get(void);
 
 /* public code */
 
-bool network_session_time_get_id_and_time(int32 session_id, s_transport_secure_identifier* id, uint32* time)
+bool network_session_time_get_id_and_time(
+	int32 session_id,
+	s_transport_secure_identifier* id,
+	uint32* time)
 {
 	s_network_time_globals* network_time_globals = network_time_globals_get();
 
@@ -30,12 +44,32 @@ bool network_session_time_get_id_and_time(int32 session_id, s_transport_secure_i
 	return result;
 }
 
-uint32 __cdecl network_time_get_exact(void)
+int32 network_time_get(
+	void)
+{
+	const s_network_time_globals* network_time_globals = network_time_globals_get();
+
+	return (int32)(network_time_globals->network_time_locked ? network_time_globals->time_locked_timestamp : system_milliseconds());
+}
+
+uint32 __cdecl network_time_get_exact(
+	void)
 {
 	return INVOKE(0x1B3C4E, 0x1AF217, network_time_get_exact);
 }
 
-void network_session_time_register_session_manager(c_network_session_manager* session_manager)
+
+int32 network_time_since(
+	uint32 timestamp)
+{
+	const s_network_time_globals* network_time_globals = network_time_globals_get();
+
+	return (int32)(network_time_globals->network_time_locked ? network_time_globals->time_locked_timestamp : system_milliseconds() - timestamp);
+}
+
+
+void network_session_time_register_session_manager(
+	c_network_session_manager* session_manager)
 {
 	s_network_time_globals* network_time_globals = network_time_globals_get();
 
@@ -46,7 +80,8 @@ void network_session_time_register_session_manager(c_network_session_manager* se
 
 /* private code */
 
-static s_network_time_globals* network_time_globals_get(void)
+static s_network_time_globals* network_time_globals_get(
+	void)
 {
 	return Memory::GetAddress<s_network_time_globals*>(0x51ABC8, 0x544A20);
 }
