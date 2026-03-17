@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "screen_video_settings.h"
+
 #include "screen_display_mode.h"
 #include "screen_resolution.h"
 #include "screen_brightness_level.h"
@@ -11,14 +12,14 @@
 #include "screen_vsync_setting.h"
 #include "screen_splitscreen_setting.h"
 
+#include "cache/cache_files.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
+#include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_shared_globals.h"
 #include "interface/user_interface_utilities.h"
 #include "rasterizer/rasterizer_settings.h"
-
-#include "tag_files/tag_loader/tag_injection.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 
@@ -204,7 +205,7 @@ void c_video_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 	}
 }
 
-void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_video_settings_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
 {
 	//INVOKE_TYPE(0x24961B, 0x0, void(__thiscall*)(c_video_settings_list*, s_event_record**, datum*), this, pevent, pitem_index);
 
@@ -219,7 +220,7 @@ void c_video_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = 0;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;

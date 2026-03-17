@@ -6,6 +6,7 @@
 #include "screen_press_start_introduction.h"
 #include "screen_xbox_live_task_progress_dialog.h"
 
+#include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
 #include "input/input_process.h"
 #include "input/input_windows.h"
@@ -17,7 +18,6 @@
 #include "interface/user_interface_networking.h"
 #include "interface/user_interface_player_widget.h"
 #include "interface/user_interface_screen_widget_definition.h"
-#include "interface/user_interface_utilities.h"
 #include "networking/online/online_account_xbox.h"
 #include "shell/shell.h"
 

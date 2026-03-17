@@ -1,10 +1,10 @@
 ﻿#include "stdafx.h"
-
 #include "screen_button_settings.h"
+
 #include "cache/cache_files.h"
 #include "input/input_abstraction.h"
 #include "interface/user_interface_memory.h"
-#include "interface/user_interface_bitmap_block.h"
+#include "interface/user_interface_screen_widget_definition.h"
 #include "saved_games/player_profile.h"
 
 #include "tag_files/tag_loader/tag_injection.h"
@@ -268,7 +268,7 @@ void c_button_settings_edit_list::update_list_items(c_list_item_widget* item, in
 }
 
 
-void c_button_settings_edit_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_button_settings_edit_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
 {
 	//INVOKE_TYPE(0x25D0AC, 0x0, void(__thiscall*)(c_button_settings_edit_list*, s_event_record**, datum*), this, pevent, pitem_index);
 

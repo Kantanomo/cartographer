@@ -114,7 +114,7 @@ void c_multiplayer_video_settings_list::update_list_items(c_list_item_widget* it
 	return;
 }
 
-void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
 {
 	//INVOKE_TYPE(0x258F3E, 0x0, void(__thiscall*)(c_multiplayer_video_settings_list*, s_event_record**, datum*), this, pevent, pitem_index);
 
@@ -122,7 +122,7 @@ void c_multiplayer_video_settings_list::handle_item_pressed_event(s_event_record
 	params.m_flags = 0;
 	params.m_window_index = this->get_parent_render_window();
 	params.m_context = 0;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = this->get_parent_channel();
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;

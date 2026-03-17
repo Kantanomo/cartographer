@@ -95,7 +95,7 @@ void c_vsync_edit_list::update_list_items(c_list_item_widget* item, int32 skin_i
 	}
 }
 
-void c_vsync_edit_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_vsync_edit_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
 {
 	const bool choice = DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index) == _item_on ? true : false;
 	H2Config_use_vsync = choice;

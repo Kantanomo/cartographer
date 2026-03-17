@@ -23,15 +23,15 @@ protected:
 	c_slot2<c_settings_list, s_event_record*, datum> m_slot;
 	bool field_464; // probably for unlocking "unused" item
 
-	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
-	void handle_item_player_profile(s_event_record** pevent);
-	void handle_item_variant(s_event_record** pevent);
-	void handle_item_video(s_event_record** pevent);
-	void handle_item_audio(s_event_record** pevent);
-	void handle_item_network(s_event_record** pevent);
-	void handle_item_about(s_event_record** pevent);
+	void handle_item_pressed_event(s_event_record* const& event, datum* pitem_index);
+	void handle_item_player_profile(s_event_record* const& event);
+	void handle_item_variant(s_event_record* const& event);
+	void handle_item_video(s_event_record* const& event);
+	void handle_item_audio(s_event_record* const& event);
+	void handle_item_network(s_event_record* const& event);
+	void handle_item_about(s_event_record* const& event);
 	//custom addition
-	void handle_item_guide(s_event_record** pevent);
+	void handle_item_guide(s_event_record* const& event);
 
 
 public:

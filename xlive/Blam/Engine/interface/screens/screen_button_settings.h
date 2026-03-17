@@ -1,4 +1,4 @@
-#include "interface/user_interface_widget.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_window.h"
@@ -17,7 +17,7 @@ protected:
 	bool m_qtr_screen;
 	c_slot2<c_button_settings_edit_list, s_event_record*, datum> m_slot;
 
-	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
+	void handle_item_pressed_event(s_event_record* const& event, datum* pitem_index);
 
 public:
 	c_button_settings_edit_list(int16 user_flags);

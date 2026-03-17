@@ -27,7 +27,7 @@ protected:
 	bool m_multiplayer_menu;
 	c_slot2<c_display_mode_edit_list, s_event_record*, datum> m_slot;
 
-	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
+	void handle_item_pressed_event(s_event_record* const& event, datum* pitem_index);
 
 
 public:

@@ -1,23 +1,14 @@
 #pragma once
 
-/* forward declarations */
-
-struct s_event_record;
-
-class c_screen_widget;
-class c_list_widget;
-
-class _slot;
-
-/* structures */
+/* classes */
 
 class _slot
 {
 	friend class _slot_linker;
 
 protected:
-	_slot* m_previous;
-	_slot* m_next;
+	class _slot* m_previous;
+	class _slot* m_next;
 	_slot_linker* m_signal;
 
 public:
@@ -36,14 +27,14 @@ class _slot1 : public _slot
 public:
 };
 
-template <class X = s_event_record*, typename type = short>
+template <class X = struct s_event_record*, typename type = short>
 class _slot2 : public _slot
 {
 public:
 };
 
 // generally used by c_screen_widget
-template <class X = c_user_interface_widget, typename type = short>
+template <class X = class c_user_interface_widget, typename type = short>
 class c_slot1 : public _slot1<type>
 {
 	typedef void(X::* handler_t)(type*);
@@ -72,10 +63,10 @@ public:
 
 
 // generally used by c_list_widget
-template <class X = c_list_widget, typename Y = s_event_record*, typename type = int16>
+template <class X = class c_list_widget, typename Y = struct s_event_record * const, typename type = int16>
 class c_slot2 : public _slot2<Y, type>
 {
-	typedef void(X::* handler_t)(Y*, type*);
+	typedef void(X::* handler_t)(Y const &, type*);
 
 	X* m_class_ptr;
 	handler_t m_handler;
@@ -91,9 +82,9 @@ public:
 		m_class_ptr = _class;
 		m_handler = handler;
 	}
-	virtual void event_handler(Y* event, type* id)
+	virtual void event_handler(Y const & event, type* id)
 	{
-		return INVOKE_CLASS_FN(m_class_ptr, m_handler) (event, id);
+		return INVOKE_CLASS_FN(m_class_ptr, m_handler)(event, id);
 	}
 };
 //ASSERT_STRUCT_SIZE(class c_slot2<class c_search_option_max_players_edit_list, struct s_event_record *, long>, 0x18);

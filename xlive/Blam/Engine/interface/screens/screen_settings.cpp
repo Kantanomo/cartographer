@@ -8,6 +8,7 @@
 #include "screen_variant_game_engine_type.h"
 #include "screen_single_player_profile_select.h"
 
+#include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
 #include "cartographer/discord/discord_interface.h"
 #include "interface/user_interface_controller.h"
@@ -176,7 +177,7 @@ void c_settings_list::update_list_items(c_list_item_widget* item, int32 skin_ind
 	}
 }
 
-void c_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_settings_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
 {
 	//return INVOKE_TYPE(0x21F70A, 0x0, void(__thiscall*)(c_settings_list*, s_event_record**, long*), this, pevent, pitem_index);
 
@@ -185,36 +186,36 @@ void c_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* 
 	switch (item_absolute_index)
 	{
 	case _item_player_profile:
-		handle_item_player_profile(pevent);
+		handle_item_player_profile(event);
 		break;
 	case _item_variant:
-		handle_item_variant(pevent);
+		handle_item_variant(event);
 		break;
 	case _item_video:
-		handle_item_video(pevent);
+		handle_item_video(event);
 		break;
 	case _item_audio:
-		handle_item_audio(pevent);
+		handle_item_audio(event);
 		break;
 	case _item_network:
-		handle_item_network(pevent);
+		handle_item_network(event);
 		break;
 	case _item_about:
-		handle_item_about(pevent);
+		handle_item_about(event);
 		break;
 	case _item_guide:
-		handle_item_guide(pevent);
+		handle_item_guide(event);
 		break;
 	}
 }
 
-void c_settings_list::handle_item_player_profile(s_event_record** pevent)
+void c_settings_list::handle_item_player_profile(s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -223,13 +224,13 @@ void c_settings_list::handle_item_player_profile(s_event_record** pevent)
 
 	params.m_load_function(&params);
 }
-void c_settings_list::handle_item_variant(s_event_record** pevent)
+void c_settings_list::handle_item_variant(s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -238,13 +239,13 @@ void c_settings_list::handle_item_variant(s_event_record** pevent)
 
 	params.m_load_function(&params);
 }
-void c_settings_list::handle_item_video(s_event_record** pevent)
+void c_settings_list::handle_item_video(s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -253,13 +254,13 @@ void c_settings_list::handle_item_video(s_event_record** pevent)
 
 	params.m_load_function(&params);
 }
-void c_settings_list::handle_item_audio(s_event_record** pevent)
+void c_settings_list::handle_item_audio(s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -268,13 +269,13 @@ void c_settings_list::handle_item_audio(s_event_record** pevent)
 
 	params.m_load_function(&params);
 }
-void c_settings_list::handle_item_network(s_event_record** pevent)
+void c_settings_list::handle_item_network(s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -283,13 +284,13 @@ void c_settings_list::handle_item_network(s_event_record** pevent)
 
 	params.m_load_function(&params);
 }
-void c_settings_list::handle_item_about(s_event_record** pevent)
+void c_settings_list::handle_item_about(s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = NULL;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
@@ -298,7 +299,7 @@ void c_settings_list::handle_item_about(s_event_record** pevent)
 
 	params.m_load_function(&params);
 }
-void c_settings_list::handle_item_guide(s_event_record** pevent)
+void c_settings_list::handle_item_guide(s_event_record* const& event)
 {
 	ui_load_cartographer_guide_menu();
 }

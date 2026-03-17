@@ -15,7 +15,7 @@ protected:
 	s_event_record m_saved_input;
 
 
-	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
+	void handle_item_pressed_event(s_event_record* const& event, datum* pitem_index);
 
 public:
 	static void* load(s_screen_parameters* parameters);
