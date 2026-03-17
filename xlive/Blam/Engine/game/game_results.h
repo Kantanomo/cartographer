@@ -298,7 +298,7 @@ class c_game_results : s_game_results
 };
 ASSERT_STRUCT_SIZE(c_game_results, 0xDC68);
 
-struct s_game_results_incremental_update
+struct s_game_results_incremental
 {
 	bool initialized;
 	bool started;
@@ -310,7 +310,7 @@ struct s_game_results_incremental_update
 	s_game_results_statistics statistics;
 	s_game_results_machine_data machines[k_network_maximum_machines_per_session];
 };
-ASSERT_STRUCT_SIZE(s_game_results_incremental_update, 19404);
+ASSERT_STRUCT_SIZE(s_game_results_incremental, 19404);
 
 /* prototypes */
 
@@ -350,8 +350,8 @@ void game_results_insert_kill_event(int16 player_index, int16 killed_player_inde
 void game_results_insert_score_event(int16 player_index, int32 score_type, datum weapon_index);
 void game_results_insert_carry_event(int16 player_index, datum weapon_index, int32 carry_type);
 
-void game_results_populate_incremental_update(struct s_game_results_incremental_update* message);
+void game_results_populate_incremental_update(struct s_game_results_incremental* message);
 void game_results_calculate_incremental_update(
-	struct s_game_results_incremental_update* previous_state,
-	struct s_game_results_incremental_update* current_state,
+	struct s_game_results_incremental* previous_state,
+	struct s_game_results_incremental* current_state,
 	struct s_network_message_distributed_game_update* incremental_update);

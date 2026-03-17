@@ -10,7 +10,7 @@ struct c_game_results_replicator
 	bool m_sending_updates;
 	bool m_receiving_updates;
 	int32 m_update_number;
-	s_game_results_incremental_update m_game_results_incremental;
+	s_game_results_incremental m_game_results_incremental;
 	uint32 m_update_timestamp;
 };
 ASSERT_STRUCT_SIZE(c_game_results_replicator, 19420);

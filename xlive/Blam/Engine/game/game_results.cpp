@@ -524,7 +524,7 @@ void game_results_insert_carry_event(int16 player_index, datum weapon_index, int
 }
 
 void game_results_populate_incremental_update(
-	s_game_results_incremental_update* update)
+	s_game_results_incremental* update)
 {
 	s_game_results &game_results = *game_results_get();
 
@@ -552,8 +552,8 @@ void game_results_populate_incremental_update(
 }
 
 void __cdecl game_results_calculate_incremental_update(
-	struct s_game_results_incremental_update* previous_state,
-	struct s_game_results_incremental_update* current_state,
+	struct s_game_results_incremental* previous_state,
+	struct s_game_results_incremental* current_state,
 	struct s_network_message_distributed_game_update* incremental_update)
 {
 	INVOKE(0x67CE3, 0x0, game_results_calculate_incremental_update, previous_state, current_state, incremental_update);
