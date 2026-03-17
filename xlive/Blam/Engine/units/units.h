@@ -8,9 +8,7 @@
 enum
 {
 	MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS = 2,
-	NUMBER_OF_UNIT_HUD_TYPES = 2,
 	k_powered_seats_count = 2,
-	MAXIMUM_INITIAL_WEAPONS_PER_UNIT = 4
 };
 
 /* enums */
@@ -77,6 +75,12 @@ enum e_unit_control_flags : uint32
 };
 
 /* structures */
+
+struct s_unit_weapon_set
+{
+	int16 set_identifier;
+	int8 weapon_indices[2];
+};
 
 struct s_unit_304
 {

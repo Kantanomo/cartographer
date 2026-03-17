@@ -1,12 +1,32 @@
 #pragma once
-#include "dialogue_definitions.h"
-#include "unit_action_system.h"
-
 #include "ai/ai.h"
 
 #include "game/game_allegiance.h"
 #include "interface/motion_sensor.h"
 #include "objects/object_definition.h"
+
+enum
+{
+	UNIT_DEFINITION_TAG = 'unit',
+	UNIT_DEFINITION_VERSION = 3,
+};
+
+enum
+{
+	MAXIMUM_SEATS_PER_UNIT_DEFINITION = 32,
+	MAXIMUM_INITIAL_WEAPONS_PER_UNIT = 4,
+	MAXIMUM_IK_MARKERS_PER_SEAT = 4,
+	MAXIMUM_DIALOGUE_VARIANTS_PER_UNIT = 16,
+	MAXIMUM_POSTURES_PER_UNIT = 20,
+	MAXIMUM_MODES_PER_POSTURE = 20,
+};
+
+enum
+{
+	_unit_hud_default = 0,
+	_unit_hud_multiplayer,
+	NUMBER_OF_UNIT_HUD_TYPES,
+};
 
 enum e_unit_definition_flags : int32
 {
@@ -243,9 +263,9 @@ struct _unit_definition
 	e_motion_sensor_blip_size motion_sensor_blip_size;
 	int16 pad;
 
-	tag_block<s_posture_definition> postures;
-	tag_block<unit_hud_reference> new_hud_interfaces;
-	tag_block<dialogue_variant_definition> dialogue_variants;
+	s_tag_block postures;			// s_posture_definition
+	s_tag_block new_hud_interfaces;	// unit_hud_reference
+	s_tag_block dialogue_variants;	// dialogue_variant_definition
 
 	real32 grenade_velocity;    // World Units Per Second
 	int16 grenade_type;         // e_unit_grenade_type

@@ -16,27 +16,22 @@
 #include "hs/hs.h"
 #include "interface/hud.h"
 #include "interface/motion_sensor.h"
-#include "interface/user_interface_controller.h"
-#include "interface/user_interface_networking.h"
 #include "math/random_math.h"
 #include "main/interpolator.h"
 #include "main/main.h"
-#include "main/main_game.h"
 #include "main/main_time.h"
-#include "networking/logic/life_cycle_manager.h"
-#include "networking/session/network_session.h"
 #include "objects/lights.h"
 #include "objects/objects.h"
-#include "networking/session/network_session.h"
 #include "physics/havok.h"
 #include "physics/impacts.h"
 #include "sapien/editor.h"
 #include "saved_games/game_state.h"
+#include "scenario/scenario.h"
+#include "scenario/scenario_definitions.h"
 #include "shell/shell.h"
 #include "simulation/simulation.h"
+#include "simulation/simulation_world.h"
 #include "sound/game_sound_deterministic.h"
-#include "text/unicode.h"
-
 
 /* globals */
 
@@ -48,6 +43,18 @@ char const* global_campaign_difficulty_level_names[4]
 	"legendary"
 };
 
+char const* k_game_playback_names[k_game_simulation_count]
+{
+	"none"
+	"local",
+	"sync-client",
+	"sync-server",
+	"dist-client",
+	"dist-server",
+	"none"
+};
+
+/* structures */
 
 /* prototypes */
 
@@ -171,11 +178,6 @@ bool game_is_server(void)
 	const s_game_options* options = game_options_get();
 
 	return !(options->game_simulation == _game_simulation_synchronous_client || options->game_simulation == _game_simulation_distributed_client);
-}
-
-int16 game_get_active_structure_bsp_index()
-{
-	return get_main_game_globals()->active_structure_bsp_index;
 }
 
 // TODO: saved films
@@ -445,6 +447,33 @@ void __cdecl game_frame(real32 dt)
 	return;
 }
 
+int16 game_get_active_structure_bsp_index(
+	void)
+{
+	const game_globals_storage* game_globals = get_main_game_globals();
+
+	//ASSERT(game_options_verify(&game_globals->options));
+	ASSERT(game_globals->map_active);
+
+	
+	int16 structure_bsp_index = game_globals->active_structure_bsp_index;
+	ASSERT(structure_bsp_index==NONE || (structure_bsp_index>=0 && structure_bsp_index<global_scenario_get()->structure_bsp_references.count));
+	return structure_bsp_index;
+}
+
+void game_simulation_set(
+	e_game_simulation game_simulation)
+{
+	game_globals_storage* game_globals = get_main_game_globals();
+	ASSERT(game_simulation>_game_simulation_none && game_simulation<k_game_simulation_count);
+	ASSERT(game_globals && (game_globals->initializing || game_globals->map_active));
+	
+	game_globals->options.game_simulation = game_simulation;
+	main_status("game_simulation", "%s", k_game_playback_names[game_simulation]);
+
+	return;
+}
+
 /* private code */
 
 static void set_main_game_globals(game_globals_storage* main)
@@ -464,7 +493,7 @@ static void game_info_initialize_for_new_map(const s_game_options* options)
 	{
 		game_engine_variant_cleanup(&game_globals->options.game_variant.flags);
 	}
-	random_math_set_seed(game_globals->options.random_seed);
+	random_math_set_seed(game_globals->options.verify_random_seed);
 	game_globals->game_is_lost = false;
 	game_globals->game_is_finished = false;
 	game_globals->pvs_activation_mode = 0;

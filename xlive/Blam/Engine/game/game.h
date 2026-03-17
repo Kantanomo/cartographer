@@ -87,7 +87,6 @@ s_game_options* game_options_get(void);
 s_game_variant* current_game_variant(void);
 e_game_mode game_mode_get(void);
 bool game_in_editor(void);
-int16 game_get_active_structure_bsp_index();
 bool game_is_campaign(void);
 bool game_is_multiplayer(void);
 bool game_is_ui_shell(void);
@@ -128,9 +127,14 @@ void __cdecl game_initialize_for_new_map(const s_game_options* options);
 
 void __cdecl game_frame(real32 dt);
 
+int16 game_get_active_structure_bsp_index(void);
+
+void game_simulation_set(e_game_simulation game_simulation);
+
 /* globals */
 
 extern char const* global_campaign_difficulty_level_names[4];
 
+extern char const* k_game_playback_names[k_game_simulation_count];
 
 

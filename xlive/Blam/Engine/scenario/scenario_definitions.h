@@ -709,7 +709,7 @@ struct scenario
 	tag_reference chapter_title_text;       // unic
 	tag_reference hud_messages;             // hmt
 
-	s_tag_block structure_bsps;				// struct: scenario_structure_bsp_reference
+	s_tag_block structure_bsp_references;	// struct: scenario_structure_bsp_reference
 	s_tag_block scenario_resources;			// struct: scenario_resources_definition
 	s_tag_block old_unused_structure_physics_block;	// struct: s_here_but_for_the_grace_of_god_go_this_poor_soul
 	s_tag_block hs_unit_seats;				// struct: s_hs_unit_seat_mapping

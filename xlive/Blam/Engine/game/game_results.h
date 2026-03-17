@@ -125,7 +125,7 @@ enum e_game_results_medal_statistic : int32
 
 enum e_game_results_event_type : int8
 {
-	_game_results_event_type_unused,
+	_game_results_event_type_unused = 0,
 	_game_results_event_type_kill,
 	_game_results_event_type_carry,
 	_game_results_event_type_score,
@@ -168,6 +168,7 @@ struct s_game_results_player_data
 	bool machine_exists;
 	int8 unk_02[2];
 	s_machine_identifier machine;
+	int16 pad;
 	s_player_configuration player_configuration;
 	int16 player_place;
 	int16 score;
@@ -261,31 +262,39 @@ struct s_game_results_machine_data
 };
 ASSERT_STRUCT_SIZE(s_game_results_machine_data, 11);
 
-class c_game_results
+struct s_game_results_statistics
 {
-public:
-	uint8 m_game_end_reason;
-	bool m_initialized;
-	bool m_finalized;
-	bool m_unreliable;
-	bool m_is_matchmade_game;
-	int64 m_random_data;
-	s_game_variant m_game_variant;
-	int32 m_map_id;
-	wchar_t m_scenario_path[MAX_PATH];
-	bool m_started;
-	uint32 m_start_time;
-	bool m_finished;
-	uint32 m_finish_time;
-	int32 m_player_count_maybe;
-	s_game_results_player_data m_players[k_maximum_players];
-	s_game_results_team_data m_teams[k_maximum_teams];
-	s_game_results_player_statistics m_player_statistics[k_maximum_players];
-	s_game_results_player_vs_player_statistics m_pvp_statistics[k_maximum_players][k_maximum_players];
-	s_game_results_team_statistics m_team_statistics[k_maximum_teams];
-	s_game_results_event m_game_events[k_game_results_maximum_game_events];
-	s_game_results_machine_data m_machines[k_network_maximum_machines_per_session];
+	s_game_results_player_statistics player_statistics[k_maximum_players];
+	s_game_results_player_vs_player_statistics pvp_statistics[k_maximum_players][k_maximum_players];
+	s_game_results_team_statistics team_statistics[k_maximum_teams];
+};
+
+struct s_game_results
+{
+	uint8 game_end_reason;
+	bool initialized;
+	bool finalized;
+	bool unreliable;
+	bool is_matchmade_game;
+	int64 random_data;
+	s_game_variant game_variant;
+	int32 map_id;
+	wchar_t scenario_path[MAX_PATH];
+	bool started;
+	uint32 start_time;
+	bool finished;
+	uint32 finish_time;
+	int32 player_count_maybe;
+	s_game_results_player_data players[k_maximum_players];
+	s_game_results_team_data teams[k_maximum_teams];
+	s_game_results_statistics statistics;
+	s_game_results_event game_events[k_game_results_maximum_game_events];
+	s_game_results_machine_data machines[k_network_maximum_machines_per_session];
 	int8 gap_DBC1[168];
+};
+
+class c_game_results : s_game_results
+{
 };
 ASSERT_STRUCT_SIZE(c_game_results, 0xDC68);
 
@@ -296,13 +305,16 @@ struct s_game_results_incremental_update
 	int32 start_time;
 	bool finalized;
 	int32 finish_time;
-	s_game_results_player_statistics player_statistics[k_maximum_players];
-	int8 data[5402]; // todo: finish
+	s_game_results_player_data players[k_maximum_players];
+	s_game_results_team_data teams[k_maximum_teams];
+	s_game_results_statistics statistics;
+	s_game_results_machine_data machines[k_network_maximum_machines_per_session];
 };
 ASSERT_STRUCT_SIZE(s_game_results_incremental_update, 19404);
 
 /* prototypes */
 
+bool game_results_get_game_finalized(void);
 void game_results_stop_recording(void);
 void game_results_set_recording_pause(bool pause);
 bool game_results_get_game_recording(void);
@@ -311,8 +323,6 @@ void game_results_start_updating(void);
 void game_results_stop_updating(void);
 
 void __cdecl game_results_update(void);
-
-c_game_results* game_results_get(void);
 
 int32 game_results_get_recording_statistic(int32 player_index, int32 team_index, e_game_results_player_statistic statistic);
 int32 game_results_get_finalized_statistic(int32 player_index, int32 team_index, e_game_results_player_statistic statistic);
@@ -339,3 +349,9 @@ void game_results_insert_event(const s_game_results_event* event);
 void game_results_insert_kill_event(int16 player_index, int16 killed_player_index, int8 damage_reporting_info);
 void game_results_insert_score_event(int16 player_index, int32 score_type, datum weapon_index);
 void game_results_insert_carry_event(int16 player_index, datum weapon_index, int32 carry_type);
+
+void game_results_populate_incremental_update(struct s_game_results_incremental_update* message);
+void game_results_calculate_incremental_update(
+	struct s_game_results_incremental_update* previous_state,
+	struct s_game_results_incremental_update* current_state,
+	struct s_network_message_distributed_game_update* incremental_update);

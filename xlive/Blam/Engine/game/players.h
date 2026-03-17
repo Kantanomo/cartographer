@@ -165,6 +165,8 @@ bool __cdecl players_user_is_active(int32 user_index);
 
 datum __cdecl player_index_from_absolute_player_index(uint16 abs_player_index);
 
+void players_get_machines(uint32* machine_valid_mask, s_machine_identifier* machine_identifiers);
+
 void __cdecl players_set_machines(uint32 new_machine_valid_mask, const s_machine_identifier* new_machine_identifiers);
 
 // gets required bits for player_appearance
@@ -193,4 +195,4 @@ void players_apply_patches(void);
 
 /* macros */
 
-#define player_get(index) datum_get(player_data_get(), index);
+#define player_get(index) ((struct player_datum*)datum_get(player_data_get(), index))
