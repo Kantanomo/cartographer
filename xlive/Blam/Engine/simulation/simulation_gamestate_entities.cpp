@@ -1,7 +1,17 @@
 #include "stdafx.h"
 #include "simulation_gamestate_entities.h"
 
+#include "memory/bitstream.h"
 #include "simulation/simulation_entity_database.h"
+
+/* public code */
+
+void simulation_gamestate_entities_notify_simulation_world_reset(
+	void)
+{
+	// TODO: implement
+	return;
+}
 
 void simulation_gamestate_index_encode(c_bitstream* bitstream, datum object_index)
 {

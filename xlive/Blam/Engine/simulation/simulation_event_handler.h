@@ -15,6 +15,14 @@ public:
 class c_simulation_event_handler : c_replication_event_manager_client
 {
 public:
+    void initialize(
+        class c_simulation_world* world,
+        class c_replication_event_manager* event_manager,
+        class c_simulation_type_collection* type_collection,
+        class c_simulation_entity_database* entity_database);
+
+    void destroy(void);
+
     int32 read_incoming_event(int32 a2, int32 a3, int32 a4, uint32* a5, int32 a6, int32 a7) override;
     void process_incoming_event(e_simulation_event_type simulation_event_type, int32* entity_reference_indices, int32 block_count, struct s_replication_allocation_block* payload_block) override;
     void write_outgoing_event(int32 a2, int32 a3, uint32* a4, int8* a5) override;
