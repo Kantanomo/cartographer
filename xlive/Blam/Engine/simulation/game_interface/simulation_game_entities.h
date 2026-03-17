@@ -1,9 +1,7 @@
 #pragma once
-#include "memory/bitstream.h"
 
 enum e_simulation_entity_type : int16
 {
-	_simulation_entity_type_none = NONE,
 	_simulation_entity_type_slayer_engine_globals = 0,
 	_simulation_entity_type_ctf_engine_globals = 1,
 	_simulation_entity_type_oddball_engine_globals = 2,
@@ -22,6 +20,7 @@ enum e_simulation_entity_type : int16
 	_simulation_entity_type_turret = 15,
 	_simulation_entity_type_device = 16,
 	k_simulation_entity_count,
+	_simulation_entity_type_none = NONE,
 };
 
 struct s_simulation_game_entity
@@ -61,10 +60,15 @@ public:
 	virtual int8 creation_minimum_required_bits(s_simulation_game_entity* entity, void* a3, int32* minimum_required_bits) = 0;
 	virtual void write_creation_description_to_string(s_simulation_game_entity* entity, void* tel_data, int32 buffer_size, char* buffer) = 0;
 	virtual int32 calculate_update_relevance(int a1, int a2, DWORD* a3) = 0;
-	virtual void entity_creation_encode(uint32 creation_data_size, void* creation_data, void* telemetry_data, c_bitstream* packet) = 0;
-	virtual bool entity_creation_decode(uint32 creation_data_size, void* creation_data, c_bitstream* packet) = 0;
-	virtual bool entity_update_encode(bool a1, uint32 update_mask, uint32* update_mask_written, uint32 state_data_size, void* state_data, void* telemetry_data, c_bitstream* packet, int32 required_leave_space_bits) = 0;
-	virtual bool entity_update_decode(bool a1, uint32* out_update_mask, uint32 state_data_size, void* state_data, c_bitstream* packet) = 0;
+	virtual void entity_creation_encode(uint32 creation_data_size, void* creation_data, void* telemetry_data, class c_bitstream* packet) = 0;
+	virtual bool entity_creation_decode(uint32 creation_data_size, void* creation_data, class c_bitstream* packet) = 0;
+	virtual bool entity_update_encode(bool a1, uint32 update_mask, uint32* update_mask_written, uint32 state_data_size, void* state_data, void* telemetry_data, class c_bitstream* packet, int32 required_leave_space_bits) = 0;
+	virtual bool entity_update_decode(
+		bool initial_update,
+		uint32* update_mask,
+		int32 state_data_size,
+		void* state_data,
+		class c_bitstream* packet) = 0;
 	virtual bool entity_state_lossy_compare(void* a1, void* a2, int32 a3) = 0;
 	virtual bool entity_creation_lossy_compare(void* a1, void* a2, int32 a3) = 0;
 	virtual uint32 build_creation_data(s_simulation_game_entity* entity, int32 creation_data_size, void* out_creation_data) = 0;

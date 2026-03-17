@@ -4,6 +4,7 @@
 #include "simulation.h"
 #include "simulation_queue_entities.h"
 
+#include "memory/bitstream.h"
 #include "networking/network_event.h"
 #include "networking/network_memory.h"
 
