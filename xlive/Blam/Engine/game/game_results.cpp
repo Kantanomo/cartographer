@@ -554,7 +554,7 @@ void game_results_populate_incremental_update(
 void __cdecl game_results_calculate_incremental_update(
 	struct s_game_results_incremental* previous_state,
 	struct s_game_results_incremental* current_state,
-	struct s_network_message_distributed_game_update* incremental_update)
+	struct s_game_results_incremental_update* incremental_update)
 {
 	INVOKE(0x67CE3, 0x0, game_results_calculate_incremental_update, previous_state, current_state, incremental_update);
 	return;

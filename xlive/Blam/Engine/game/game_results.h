@@ -175,6 +175,14 @@ struct s_game_results_player_data
 };
 ASSERT_STRUCT_SIZE(s_game_results_player_data, 148);
 
+struct s_game_results_player_data_update
+{
+	bool valid;
+	bool data_valid;
+	char pad[2];
+	s_game_results_player_data data;
+};
+
 struct s_game_results_team_data
 {
 	bool exists;
@@ -183,6 +191,14 @@ struct s_game_results_team_data
 	int8 pad[20];
 };
 ASSERT_STRUCT_SIZE(s_game_results_team_data, 24);
+
+struct s_game_results_team_data_update
+{
+	bool valid;
+	bool data_valid;
+	int8 pad[2];
+	s_game_results_team_data data;
+};
 
 struct s_game_results_damage_statistics
 {
@@ -200,17 +216,37 @@ struct s_game_results_player_statistics
 };
 ASSERT_STRUCT_SIZE(s_game_results_player_statistics, 874);
 
+struct s_game_results_player_statistics_update
+{
+	bool valid;
+	bool medals_valid;
+	char pad[2];
+	s_game_results_player_statistics data;
+};
+
 struct s_game_results_player_vs_player_statistics
 {
 	s_integer_statistic statistic[k_game_results_player_vs_player_statistic_count];
 };
 ASSERT_STRUCT_SIZE(s_game_results_player_vs_player_statistics, 4);
 
+struct s_game_results_player_vs_player_statistics_update
+{
+	bool valid;
+	s_game_results_player_vs_player_statistics data;
+};
+
 struct s_game_results_team_statistics
 {
 	s_integer_statistic statistics[k_game_results_player_statistic_count];
 };
 ASSERT_STRUCT_SIZE(s_game_results_team_statistics, 90);
+
+struct s_game_results_team_statistics_update
+{
+	bool valid;
+	s_game_results_team_statistics data;
+};
 
 union s_game_results_event_data
 {
@@ -262,11 +298,24 @@ struct s_game_results_machine_data
 };
 ASSERT_STRUCT_SIZE(s_game_results_machine_data, 11);
 
+struct s_game_results_machine_data_update
+{
+	bool valid;
+	s_game_results_machine_data data;
+};
+
 struct s_game_results_statistics
 {
 	s_game_results_player_statistics player_statistics[k_maximum_players];
 	s_game_results_player_vs_player_statistics pvp_statistics[k_maximum_players][k_maximum_players];
 	s_game_results_team_statistics team_statistics[k_maximum_teams];
+};
+
+struct s_game_results_statistics_update
+{
+	s_game_results_player_statistics_update players[k_maximum_players];
+	s_game_results_player_vs_player_statistics_update player_vs_player[k_maximum_players][k_maximum_players];
+	s_game_results_team_statistics_update teams[k_maximum_players];
 };
 
 struct s_game_results
@@ -312,6 +361,20 @@ struct s_game_results_incremental
 };
 ASSERT_STRUCT_SIZE(s_game_results_incremental, 19404);
 
+struct s_game_results_incremental_update
+{
+	bool initialized;
+	bool started;
+	int32 start_time;
+	bool finalized;
+	int32 finish_time;
+	s_game_results_player_data_update players[k_maximum_players];
+	s_game_results_team_data_update teams[k_maximum_players];
+	s_game_results_statistics_update statistics;
+	s_game_results_machine_data_update machines[k_network_maximum_machines_per_session];
+};
+ASSERT_STRUCT_SIZE(s_game_results_incremental_update, 20156);
+
 /* prototypes */
 
 bool game_results_get_game_finalized(void);
@@ -354,4 +417,4 @@ void game_results_populate_incremental_update(struct s_game_results_incremental*
 void game_results_calculate_incremental_update(
 	struct s_game_results_incremental* previous_state,
 	struct s_game_results_incremental* current_state,
-	struct s_network_message_distributed_game_update* incremental_update);
+	struct s_game_results_incremental_update* incremental_update);
