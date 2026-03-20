@@ -4,6 +4,7 @@
 #include "simulation_gamestate_entities.h"
 
 #include "game/game.h"
+#include "memory/bitstream.h"
 #include "networking/network_event.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_entity_database.h"

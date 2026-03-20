@@ -18,7 +18,7 @@ protected:
 	c_list_item_widget m_list_items[k_no_of_visible_items_for_splitscren];
 	c_slot2<c_splitscreen_edit_list, s_event_record*, datum> m_slot;
 
-	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
+	void handle_item_pressed_event(s_event_record* const& event, datum* pitem_index);
 
 
 public:

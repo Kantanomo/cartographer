@@ -62,7 +62,7 @@ void halloween_event_map_load(void)
 		}
 
 		scenario* scenario_definition = (scenario*)tag_get_fast(cache_files_get_tags_header()->scenario_index);
-		const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsps, 0, scenario_structure_bsp_reference);
+		const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsp_references, 0, scenario_structure_bsp_reference);
 		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(reference->structure_bsp.index);
 
 		if (tag_injection_is_injected(sky_datum))

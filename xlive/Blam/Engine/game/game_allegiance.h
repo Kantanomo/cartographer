@@ -38,9 +38,10 @@ enum e_game_team : int16
 	_game_team_unused15 = 15,
 
 	k_maximum_teams,
+	k_team_index_bits = 4,
 
 	// Shared
-	_game_team_observer = NONE
+	_game_team_observer = NONE,
 };
 
 /* constants */

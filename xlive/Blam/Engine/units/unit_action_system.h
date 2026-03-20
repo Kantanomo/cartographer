@@ -92,8 +92,6 @@ struct unit_action_definition
 };
 ASSERT_STRUCT_SIZE(unit_action_definition, 16);
 
-#define MAXIMUM_POSTURES_PER_UNIT 20
-
 // max count: MAXIMUM_POSTURES_PER_UNIT 20
 struct s_posture_definition
 {

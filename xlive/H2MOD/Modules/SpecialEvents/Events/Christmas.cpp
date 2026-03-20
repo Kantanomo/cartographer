@@ -85,7 +85,7 @@ void christmas_event_map_load(void)
 		// Change/Add weather system to bsp
 
 		const scenario* scenario = global_scenario_get();
-		const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario->structure_bsps, 0, scenario_structure_bsp_reference);
+		const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario->structure_bsp_references, 0, scenario_structure_bsp_reference);
 		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(reference->structure_bsp.index);
 
 		structure_weather_palette_entry* weat_block = (structure_weather_palette_entry*)tag_injection_extend_block(&bsp_definition->weather_palette, sizeof(structure_weather_palette_entry), 1);

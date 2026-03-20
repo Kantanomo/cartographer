@@ -230,9 +230,9 @@ static void tag_fixes_misty_rain(void)
 				palette->weather_system.index = misty_rain_datum;
 
 				// Set the field in every single bsp in the scenario
-				for (int32 i = 0; i < scenario_definition->structure_bsps.count; ++i)
+				for (int32 i = 0; i < scenario_definition->structure_bsp_references.count; ++i)
 				{
-					const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsps, i, scenario_structure_bsp_reference);
+					const scenario_structure_bsp_reference* reference = TAG_BLOCK_GET_ELEMENT(&scenario_definition->structure_bsp_references, i, scenario_structure_bsp_reference);
 					structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(reference->structure_bsp.index);
 					structure_weather_palette_entry* bsp_palette = TAG_BLOCK_GET_ELEMENT(&bsp_definition->weather_palette, 0, structure_weather_palette_entry);
 					csstrncpy(bsp_palette->name, name, NUMBEROF(name));

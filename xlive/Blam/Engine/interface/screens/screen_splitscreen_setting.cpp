@@ -156,7 +156,7 @@ void c_splitscreen_edit_list::update_list_items(c_list_item_widget* item, int32 
 	}
 }
 
-void c_splitscreen_edit_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_splitscreen_edit_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
 {
 	e_splitscreen_list_items choice_type = (e_splitscreen_list_items)DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index);
 	H2Config_split_mode = get_split_mode_from_item_type(choice_type);

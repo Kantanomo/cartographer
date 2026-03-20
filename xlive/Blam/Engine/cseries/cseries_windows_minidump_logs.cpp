@@ -274,7 +274,7 @@ static void setup_game_options_text(const wchar_t* reports_path)
 		print_array_to_file(file, game_options->random_data, 8);
 
 		fwprintf(file, L"Random Seed: ");
-		fwprintf(file, L"%d\n", game_options->random_seed);
+		fwprintf(file, L"%d\n", game_options->verify_random_seed);
 
 		fwprintf(file, L"Is Custom Map: ");
 		print_bool_to_file(file, game_options->is_custom_map);

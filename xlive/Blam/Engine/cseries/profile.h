@@ -103,4 +103,10 @@ int64 get_performance_counter(void);
 
 int64 get_performance_frequency(void);
 
+#else
+
+#define profile_attribute_enter(...)
+
+#define profile_attribute_exit(...)
+
 #endif

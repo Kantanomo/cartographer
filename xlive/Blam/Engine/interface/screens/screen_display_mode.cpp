@@ -111,7 +111,7 @@ void c_display_mode_edit_list::set_using_mp_screen(bool param)
 	m_multiplayer_menu = param;
 }
 
-void c_display_mode_edit_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_display_mode_edit_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
 {
 	int16 absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index);
 	// ASSERT(absolute_index <= _rasterizer_settings_display_mode_last_user_selectable);
@@ -134,7 +134,7 @@ void c_display_mode_edit_list::handle_item_pressed_event(s_event_record** pevent
 		params.m_flags = 0;
 		params.m_window_index = get_parent_render_window();
 		params.m_context = 0;
-		params.m_user_flags = FLAG((*pevent)->controller);
+		params.m_user_flags = FLAG(event->controller);
 		params.m_channel_type = get_parent_channel();
 		params.m_screen_state.field_0 = NONE;
 		params.m_screen_state.m_last_focused_item_order = NONE;

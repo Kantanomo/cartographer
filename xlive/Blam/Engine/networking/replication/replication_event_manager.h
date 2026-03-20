@@ -5,7 +5,32 @@
 class c_replication_event_manager
 {
 public:
+	void initialize(class c_replication_entity_manager* entity_manager);
+	void destroy(void);
+
 	void reset(void);
+
+	void register_client(
+		class c_simulation_event_handler* client)
+	{
+		ASSERT(client!=NULL);
+		ASSERT(m_client==NULL);
+
+		m_client = client;
+
+		return;
+	}
+
+	void deregister_client(
+		class c_simulation_event_handler const* client)
+	{
+		ASSERT(client!=NULL);
+		ASSERT(m_client==client);
+		
+		m_client = NULL;
+
+		return;
+	}
 
 private:
 	class c_replication_entity_manager* m_entity_manager;

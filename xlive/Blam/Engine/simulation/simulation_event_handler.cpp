@@ -2,12 +2,14 @@
 #include "simulation_event_handler.h"
 
 #include "simulation_queue_events.h"
+#include "simulation_type_collection.h"
 
 #include "math/random_math.h"
-#include "simulation/game_interface/simulation_game_events.h"
 
 #include "networking/network_memory.h"
 #include "networking/replication/replication_control_view.h"
+#include "networking/replication/replication_event_manager.h"
+#include "simulation/game_interface/simulation_game_events.h"
 
 /* globals */
 
@@ -29,6 +31,43 @@ static __declspec(naked) void jmp_c_simulation_event_handler_process_incoming_ev
 void simulation_event_handler_apply_patches(void)
 {
 	DETOUR_ATTACH(p_process_incoming_event, Memory::GetAddress<t_process_incoming_event>(0x1D3E02, 0x1D9092), jmp_c_simulation_event_handler_process_incoming_event);
+	return;
+}
+
+void c_simulation_event_handler::initialize(
+	class c_simulation_world* world,
+	class c_replication_event_manager* event_manager,
+	class c_simulation_type_collection* type_collection,
+	class c_simulation_entity_database* entity_database)
+{
+	ASSERT(!m_initialized);
+	ASSERT(world);
+	ASSERT(event_manager);
+	ASSERT(type_collection);
+	ASSERT(entity_database);
+
+	m_world = world;
+	m_event_manager = event_manager;
+	m_type_collection = type_collection;
+	m_entity_database = entity_database;
+	
+	m_event_manager->register_client(this);
+	m_initialized = true;
+
+	return;
+}
+
+void c_simulation_event_handler::destroy(
+	void)
+{
+	ASSERT(m_initialized);
+
+	m_event_manager->deregister_client(this);
+	m_world = NULL;
+	m_event_manager = NULL;
+	m_type_collection = NULL;
+	m_initialized = false;
+
 	return;
 }
 

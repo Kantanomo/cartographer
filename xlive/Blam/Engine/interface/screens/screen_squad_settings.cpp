@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "screen_squad_settings.h"
+
 #include "screen_single_player_difficulty_select.h"
 #include "screen_single_player_level_select.h"
 #include "screen_virtual_keyboard.h"
@@ -10,7 +11,7 @@
 #include "interface/user_interface_networking.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_bitmap_block.h"
-#include "interface/user_interface_utilities.h"
+#include "interface/user_interface_screen_widget_definition.h"
 #include "main/levels.h"
 #include "main/level_definitions.h"
 #include "networking/network_event.h"
@@ -357,9 +358,9 @@ void c_squad_settings_list::update_list_items(c_list_item_widget* item, int32 sk
 	}
 }
 
-void c_squad_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_squad_settings_list::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
 {
-	//return INVOKE_TYPE(0x24FA19, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**, long*), this, pevent, pitem_index);
+	//return INVOKE_TYPE(0x24FA19, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**, long*), this, event, pitem_index);
 
 	if (*pitem_index != NONE)
 	{
@@ -369,37 +370,37 @@ void c_squad_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 		switch (item_type)
 		{
 		case _item_change_map:
-			this->handle_item_change_map(pevent);
+			this->handle_item_change_map(event);
 			break;
 		case _item_change_variant:
-			this->handle_item_change_variant(pevent);
+			this->handle_item_change_variant(event);
 			break;
 		case _item_change_level:
-			this->handle_item_change_level(pevent);
+			this->handle_item_change_level(event);
 			break;
 		case _item_change_difficulty:
-			this->handle_item_change_difficulty(pevent);
+			this->handle_item_change_difficulty(event);
 			break;
 		case _item_quick_options:
-			this->handle_item_quick_options(pevent);
+			this->handle_item_quick_options(event);
 			break;
 		case _item_switch_to_coop:
-			this->handle_item_switch_to_coop(pevent);
+			this->handle_item_switch_to_coop(event);
 			break;
 		case _item_switch_to_arranged:
-			this->handle_item_switch_to_arranged(pevent);
+			this->handle_item_switch_to_arranged(event);
 			break;
 		case _item_switch_to_optimatch:
-			this->handle_item_switch_to_optimatch(pevent);
+			this->handle_item_switch_to_optimatch(event);
 			break;
 		case _item_change_hopper:
-			this->handle_item_change_hopper(pevent);
+			this->handle_item_change_hopper(event);
 			break;
 		case _item_party_management:
-			this->handle_item_party_management(pevent);
+			this->handle_item_party_management(event);
 			break;		
 		case _item_rename_squad:
-			this->handle_item_rename_squad(pevent);
+			this->handle_item_rename_squad(event);
 			break;
 		default:
 			unreachable();
@@ -407,21 +408,21 @@ void c_squad_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 	}
 }
 
-void c_squad_settings_list::handle_item_change_map(s_event_record** pevent)
+void c_squad_settings_list::handle_item_change_map(s_event_record* const& event)
 {
-	INVOKE_TYPE(0x24F9A1, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
+	INVOKE_TYPE(0x24F9A1, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
 }
-void c_squad_settings_list::handle_item_change_variant(s_event_record** pevent)
+void c_squad_settings_list::handle_item_change_variant(s_event_record* const& event)
 {
-	INVOKE_TYPE(0x24F9DD, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
+	INVOKE_TYPE(0x24F9DD, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
 }
-void c_squad_settings_list::handle_item_change_level(s_event_record** pevent)
+void c_squad_settings_list::handle_item_change_level(s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = 0;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;
@@ -429,13 +430,13 @@ void c_squad_settings_list::handle_item_change_level(s_event_record** pevent)
 	params.m_load_function = c_screen_single_player_level_select::load_lobby;
 	params.m_load_function(&params);
 }
-void c_squad_settings_list::handle_item_change_difficulty(s_event_record** pevent)
+void c_squad_settings_list::handle_item_change_difficulty(s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
 	params.m_context = 0;
-	params.m_user_flags = FLAG((*pevent)->controller);
+	params.m_user_flags = FLAG(event->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell_dialog;
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;
@@ -443,15 +444,15 @@ void c_squad_settings_list::handle_item_change_difficulty(s_event_record** peven
 	params.m_load_function = c_screen_single_player_difficulty_select::load_lobby;
 	params.m_load_function(&params);
 }
-void c_squad_settings_list::handle_item_quick_options(s_event_record** pevent)
+void c_squad_settings_list::handle_item_quick_options(s_event_record* const& event)
 {
-	INVOKE_TYPE(0x24EF79, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
+	INVOKE_TYPE(0x24EF79, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
 }
-void c_squad_settings_list::handle_item_switch_to_coop(s_event_record** pevent)
+void c_squad_settings_list::handle_item_switch_to_coop(s_event_record* const& event)
 {
 	if (user_interface_globals_is_beta_build())
 	{
-		screen_error_ok_dialog_show(_user_interface_channel_type_game_error, _ui_error_beta_feature_disabled, _window_4, FLAG((*pevent)->controller), 0, 0);
+		screen_error_ok_dialog_show(_user_interface_channel_type_game_error, _ui_error_beta_feature_disabled, _window_4, FLAG(event->controller), 0, 0);
 	}
 	else if (network_squad_session_get_session_class() == _network_session_class_system_link
 		|| network_squad_session_get_session_class() == _network_session_class_xbox_live)
@@ -459,7 +460,7 @@ void c_squad_settings_list::handle_item_switch_to_coop(s_event_record** pevent)
 		screen_error_ok_dialog_with_custom_text(
 			_user_interface_channel_type_gameshell_dialog,
 			_ui_error_generic, _window_4,
-			FLAG((*pevent)->controller), NULL, NULL, L"Access Denied", L"Coming Soon....");
+			FLAG(event->controller), NULL, NULL, L"Access Denied", L"Coming Soon....");
 	}
 	else
 	{
@@ -474,30 +475,30 @@ void c_squad_settings_list::handle_item_switch_to_coop(s_event_record** pevent)
 		this->get_parent_screen()->start_widget_animation(3);
 	}
 }
-void c_squad_settings_list::handle_item_switch_to_arranged(s_event_record** pevent)
+void c_squad_settings_list::handle_item_switch_to_arranged(s_event_record* const& event)
 {
-	INVOKE_TYPE(0x24F015, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
+	INVOKE_TYPE(0x24F015, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
 }
-void c_squad_settings_list::handle_item_switch_to_optimatch(s_event_record** pevent)
+void c_squad_settings_list::handle_item_switch_to_optimatch(s_event_record* const& event)
 {
 	// maybe someday
-	//return INVOKE_TYPE(0x211BA1, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
+	//return INVOKE_TYPE(0x211BA1, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, event);
 
 	screen_error_ok_dialog_with_custom_text(
 		_user_interface_channel_type_gameshell_dialog,
 		_ui_error_generic, _window_4,
-		FLAG((*pevent)->controller), nullptr, nullptr, L"Alert", L"This feature is not currently available");
+		FLAG(event->controller), nullptr, nullptr, L"Alert", L"This feature is not currently available");
 }
-void c_squad_settings_list::handle_item_change_hopper(s_event_record** pevent)
+void c_squad_settings_list::handle_item_change_hopper(s_event_record* const& event)
 {
-	//return INVOKE_TYPE(0x24F68A, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
+	//return INVOKE_TYPE(0x24F68A, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, event);
 }
-void c_squad_settings_list::handle_item_party_management(s_event_record** pevent)
+void c_squad_settings_list::handle_item_party_management(s_event_record* const& event)
 {
 	// TODO : figure out why this is broken or invoke a custom menu to handle this
-	INVOKE_TYPE(0x24F5FD, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, pevent);
+	INVOKE_TYPE(0x24F5FD, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
 }
-void c_squad_settings_list::handle_item_rename_squad(s_event_record** pevent)
+void c_squad_settings_list::handle_item_rename_squad(s_event_record* const& event)
 {
 	s_session_interface_globals* session_interface_globals = s_session_interface_globals::get();	
 	ustrncpy(session_name_tmp, session_interface_globals->session_name, NUMBEROF(session_name_tmp));

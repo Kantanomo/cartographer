@@ -59,11 +59,11 @@ private:
 		} m_account_add;
 	};
 	// button handler callback
-	void handle_item_pressed_event(s_event_record** pevent, int32* pitem_index);
+	void handle_item_pressed_event(s_event_record* const& event, int32* pitem_index);
 
-	void handle_item_pressed_event_for_add_account(s_event_record** pevent, int32* pitem_index);
-	void handle_item_pressed_event_for_listed_accounts(s_event_record** pevent, int32* pitem_index);
-	void handle_item_pressed_event_for_create_account(s_event_record** pevent, int32* pitem_index);
+	void handle_item_pressed_event_for_add_account(s_event_record* const& event, int32* pitem_index);
+	void handle_item_pressed_event_for_listed_accounts(s_event_record* const& event, int32* pitem_index);
+	void handle_item_pressed_event_for_create_account(s_event_record* const& event, int32* pitem_index);
 
 
 public:

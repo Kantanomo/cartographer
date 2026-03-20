@@ -31,3 +31,10 @@ bool __cdecl texture_cache_open_pregame(void)
 {
 	return INVOKE(0x26590B, 0x0, texture_cache_open_pregame);
 }
+
+void texture_cache_free(
+	void* block)
+{
+	system_heap_free(block);
+	return;
+}

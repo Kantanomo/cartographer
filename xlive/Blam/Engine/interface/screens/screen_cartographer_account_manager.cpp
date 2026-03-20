@@ -360,19 +360,19 @@ void c_cartographer_account_manager_edit_list::update_list_items(c_list_item_wid
 	}
 }
 
-void c_cartographer_account_manager_edit_list::handle_item_pressed_event(s_event_record** pevent, int32* pitem_index)
+void c_cartographer_account_manager_edit_list::handle_item_pressed_event(s_event_record* const& event, int32* pitem_index)
 {
 	switch (m_cartographer_screen_type)
 	{
 	case _cartographer_account_manager_screen_type_list:
 	case _cartographer_account_manager_screen_type_list_remove_account:
-		handle_item_pressed_event_for_listed_accounts(pevent, pitem_index);
+		handle_item_pressed_event_for_listed_accounts(event, pitem_index);
 		break;
 	case _cartographer_account_manager_screen_type_create_account:
-		handle_item_pressed_event_for_create_account(pevent, pitem_index);
+		handle_item_pressed_event_for_create_account(event, pitem_index);
 		break;
 	case _cartographer_account_manager_screen_type_add_account:
-		handle_item_pressed_event_for_add_account(pevent, pitem_index);
+		handle_item_pressed_event_for_add_account(event, pitem_index);
 		break;
 	default:
 		break;
@@ -382,7 +382,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event(s_event
 }
 
 
-void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_add_account(s_event_record** event_record, int32* a3)
+void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_add_account(s_event_record* const& event, int32* a3)
 {
 	int16 button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
 
@@ -419,7 +419,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_add
 	}
 }
 
-void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_listed_accounts(s_event_record** event_record, int32* a3)
+void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_listed_accounts(s_event_record* const& event, int32* a3)
 {
 	const int32 button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
 
@@ -506,7 +506,7 @@ void __cdecl create_account_xbox_task_progress_cb(c_screen_xbox_live_task_progre
 	}
 }
 
-void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_create_account(s_event_record** event_record, int32* a3)
+void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_create_account(s_event_record* const& event, int32* a3)
 {
 	const int32 button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
 

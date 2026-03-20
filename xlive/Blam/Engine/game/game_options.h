@@ -57,7 +57,7 @@ struct s_game_options
 	int16 game_tick_rate;
 	int16 pad_C[3];
 	uint8 random_data[8];
-	int32 random_seed;
+	int32 verify_random_seed;
 	bool is_custom_map;
 	uint8 field_1D;
 	s_secure_map_id custom_map_id;

@@ -15,14 +15,14 @@ protected:
 	c_list_item_widget m_list_items[k_no_of_visible_items_for_main_menu];
 	c_slot2<c_main_menu_list, s_event_record*, datum> m_slot;
 
-	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
-	void handle_item_campaign(s_event_record** pevent);
-	void handle_item_xbox_live(s_event_record** pevent);
-	void handle_item_splitscreen(s_event_record** pevent);
-	void handle_item_system_link(s_event_record** pevent);
-	void handle_item_settings(s_event_record** pevent);
-	//void handle_item_guide(s_event_record** pevent);
-	void handle_item_quit(s_event_record** pevent);
+	void handle_item_pressed_event(s_event_record* const& event, datum* pitem_index);
+	void handle_item_campaign(s_event_record* const& event);
+	void handle_item_xbox_live(s_event_record* const& event);
+	void handle_item_splitscreen(s_event_record* const& event);
+	void handle_item_system_link(s_event_record* const& event);
+	void handle_item_settings(s_event_record* const& event);
+	//void handle_item_guide(s_event_record* const& event);
+	void handle_item_quit(s_event_record* const& event);
 
 public:
 	c_main_menu_list(int16 user_flags);

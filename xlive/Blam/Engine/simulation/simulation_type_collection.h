@@ -2,6 +2,8 @@
 #include "simulation/game_interface/simulation_game_entities.h"
 #include "simulation/game_interface/simulation_game_events.h"
 
+/* constants */
+
 enum
 {
 	k_simulation_entity_type_maximum_count = 32,
@@ -13,6 +15,8 @@ enum
 
 	k_simulation_event_maximum_payload_size = 512,
 };
+
+/* classes */
 
 class c_simulation_type_collection
 {

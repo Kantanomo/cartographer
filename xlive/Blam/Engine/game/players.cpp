@@ -176,6 +176,21 @@ datum __cdecl player_index_from_absolute_player_index(uint16 abs_player_index)
 	return INVOKE(0x513F3, 0x59916, player_index_from_absolute_player_index, abs_player_index);
 }
 
+void players_get_machines(
+	uint32* machine_valid_mask,
+	s_machine_identifier* machine_identifiers)
+{
+	s_players_globals* player_globals = get_players_globals();
+
+	ASSERT(machine_valid_mask);
+	ASSERT(machine_identifiers);
+
+	*machine_valid_mask = player_globals->machine_valid_mask;
+	csmemcpy(machine_identifiers, player_globals->machine_identifier, sizeof(player_globals->machine_identifier));
+
+	return;
+}
+
 void __cdecl players_set_machines(uint32 new_machine_valid_mask, const s_machine_identifier* new_machine_identifiers)
 {
 	INVOKE(0x56549, 0x5EA41, players_set_machines, new_machine_valid_mask, new_machine_identifiers);

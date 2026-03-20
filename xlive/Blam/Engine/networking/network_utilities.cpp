@@ -50,6 +50,22 @@ void __cdecl network_utilities_get_game_version(int32* executable_type, int32* e
 	return;
 }
 
+void bandwidth_profiler_record_push(
+	int32 usage_type,
+	c_bitstream* bitstream)
+{
+	// TODO: implement
+	return;
+}
+
+void bandwidth_profiler_record_pop(
+	int32 usage_type,
+	c_bitstream* bitstream)
+{
+	// TODO: implement
+	return;
+}
+
 /* private code */
 
 bool __cdecl check_executable_type_hook(int32 executable_type)

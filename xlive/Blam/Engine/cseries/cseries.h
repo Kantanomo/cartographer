@@ -56,6 +56,9 @@ struct utf32
 
 enum
 {
+	INT64_BITS = 64,
+	INT64_BITS_BITS = 4,
+	UNSIGNED_LONG_MAX = 0xFFFFFFFF,
 	BYTE_MAX = 255,
 	k_kilo = 1024,
 	SHORT_MAX = 32767,
@@ -83,6 +86,12 @@ enum
 struct csstrtok_data
 {
 	char* next_string;
+};
+
+union long_point3d
+{
+	int32 n[3];
+	struct { int32 x, y, z; };
 };
 
 /* globals */

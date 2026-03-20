@@ -31,7 +31,7 @@ void c_bitmap_widget::set_render_scale(const real_vector2d* scale)
 {
 	if (scale)
 	{
-		this->m_render_scale = *scale;
+		m_render_scale = *scale;
 	}
 }
 

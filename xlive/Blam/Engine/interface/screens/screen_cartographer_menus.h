@@ -37,7 +37,7 @@ protected:
 	c_list_item_widget m_list_item_widgets[k_no_of_visible_items_for_cartographer_guide_list];
 	c_slot2<c_cartographer_guide_edit_list, s_event_record*, int32> m_slot_2;
 
-	void handle_item_pressed_event(s_event_record** pevent, int32* pitem_index);
+	void handle_item_pressed_event(s_event_record* const& event, int32* pitem_index);
 public:
 	c_cartographer_guide_edit_list(uint16 _flags);
 
@@ -73,7 +73,7 @@ protected:
 	c_list_item_widget m_list_item_widgets[k_no_of_visible_items_for_cartographer_credits_list];
 	c_slot2<c_cartographer_credits_edit_list, s_event_record*, int32> m_slot_2;
 
-	void handle_item_pressed_event(s_event_record** pevent, int32* pitem_index);
+	void handle_item_pressed_event(s_event_record* const& event, int32* pitem_index);
 
 public:
 	c_cartographer_credits_edit_list(uint16 _flags);
@@ -111,7 +111,7 @@ protected:
 	int32 m_update_status;
 	bool m_keep_screen_open;
 
-	void handle_item_pressed_event(s_event_record** pevent, int32* pitem_index);
+	void handle_item_pressed_event(s_event_record* const& event, int32* pitem_index);
 
 public:
 	c_cartographer_update_edit_list(uint16 _flags);
@@ -153,7 +153,7 @@ protected:
 	c_list_item_widget m_list_item_widgets[k_no_of_visible_items_for_cartographer_update_notice_list];
 	c_slot2<c_cartographer_update_notice_edit_list, s_event_record*, int32> m_slot_2;
 
-	void handle_item_pressed_event(s_event_record** pevent, int32* pitem_index);
+	void handle_item_pressed_event(s_event_record* const& event, int32* pitem_index);
 
 public:
 	c_cartographer_update_notice_edit_list(uint16 _flags);

@@ -65,7 +65,7 @@ void __cdecl network_configuration_initialize(void)
 
 void __cdecl get_network_adapters(void)
 {
-	global_network_configuration_get()->adapter_count = 0;
+	global_network_configuration_get()->network_adapter.adapter_count = 0;
 
 	IP_ADAPTER_ADDRESSES* adapter_address = NULL;
 	uint32 error = network_adapter_addresses_populate(&adapter_address);
@@ -125,11 +125,11 @@ bool network_adapter_is_duplicate(const IP_ADAPTER_ADDRESSES* adapter_address)
 	const s_network_configuration* g_network_configuration = global_network_configuration_get();
 
 	// Check for duplicate adapters after the first one is added
-	if (g_network_configuration->adapter_count > 0)
+	if (g_network_configuration->network_adapter.adapter_count > 0)
 	{
-		for (uint32 i = 0; i < g_network_configuration->adapter_count; ++i)
+		for (uint32 i = 0; i < g_network_configuration->network_adapter.adapter_count; ++i)
 		{
-			const s_network_adapter* adapter = &g_network_configuration->network_adapters[i];
+			const s_network_adapter* adapter = &g_network_configuration->network_adapter.network_adapters[i];
 			int32 index = csstrncmp(adapter_address->AdapterName, adapter->adapter_name, NUMBEROF(s_network_adapter::adapter_name)) == 0;
 			if (index)
 			{
@@ -152,16 +152,16 @@ void network_adapter_populate_globals(IP_ADAPTER_ADDRESSES* adapter_address)
 		{
 			if (!network_adapter_is_duplicate(adapter_address))
 			{
-				s_network_adapter* adapter = &g_network_configuration->network_adapters[g_network_configuration->adapter_count];
+				s_network_adapter* adapter = &g_network_configuration->network_adapter.network_adapters[g_network_configuration->network_adapter.adapter_count];
 				csstrncpy(adapter->adapter_name, adapter_address->AdapterName, NUMBEROF(s_network_adapter::adapter_name));
 				ustrncpy(adapter->friendly_name, adapter_address->FriendlyName, NUMBEROF(s_network_adapter::friendly_name));
 				ustrncpy(adapter->description, adapter_address->Description, NUMBEROF(s_network_adapter::description));
-				++g_network_configuration->adapter_count;
+				++g_network_configuration->network_adapter.adapter_count;
 			}
 		}
 		adapter_address = adapter_address->Next;
 	}
-	while (adapter_address && g_network_configuration->adapter_count < k_network_adapter_max_count);
+	while (adapter_address && g_network_configuration->network_adapter.adapter_count < k_network_adapter_max_count);
 	
 	return;
 }

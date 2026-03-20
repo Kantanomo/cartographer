@@ -181,7 +181,7 @@ void network_initialize(void)
 				&& network_search_initialize()
 				&& network_life_cycle_initialize(g_network_message_gateway, g_network_observer, g_network_session_manager, &g_network_sessions[0], &g_network_sessions[1])
 				&& network_session_interface_initialize(g_network_session_manager)
-				&& network_bandwidth_initialize(g_network_observer, &global_network_configuration_get()->gap_10)
+				&& network_bandwidth_initialize(g_network_observer, &global_network_configuration_get()->field_10)
 				&& network_online_cheater_initialize();
 			network_locator_initialize();
 

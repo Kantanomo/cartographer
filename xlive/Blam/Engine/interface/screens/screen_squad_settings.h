@@ -20,18 +20,18 @@ protected:
 	c_slot2<c_squad_settings_list,s_event_record*,datum> m_slot;
 	bool m_party_mgmt_item_deleted;
 
-	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
-	void handle_item_change_map(s_event_record** pevent);
-	void handle_item_change_variant(s_event_record** pevent);
-	void handle_item_change_level(s_event_record** pevent);
-	void handle_item_change_difficulty(s_event_record** pevent);
-	void handle_item_quick_options(s_event_record** pevent);
-	void handle_item_switch_to_coop(s_event_record** pevent);
-	void handle_item_switch_to_arranged(s_event_record** pevent);
-	void handle_item_switch_to_optimatch(s_event_record** pevent);
-	void handle_item_change_hopper(s_event_record** pevent);
-	void handle_item_party_management(s_event_record** pevent);
-	void handle_item_rename_squad(s_event_record** pevent);
+	void handle_item_pressed_event(s_event_record* const& event, datum* pitem_index);
+	void handle_item_change_map(s_event_record* const& event);
+	void handle_item_change_variant(s_event_record* const& event);
+	void handle_item_change_level(s_event_record* const& event);
+	void handle_item_change_difficulty(s_event_record* const& event);
+	void handle_item_quick_options(s_event_record* const& event);
+	void handle_item_switch_to_coop(s_event_record* const& event);
+	void handle_item_switch_to_arranged(s_event_record* const& event);
+	void handle_item_switch_to_optimatch(s_event_record* const& event);
+	void handle_item_change_hopper(s_event_record* const& event);
+	void handle_item_party_management(s_event_record* const& event);
+	void handle_item_rename_squad(s_event_record* const& event);
 
 
 public:

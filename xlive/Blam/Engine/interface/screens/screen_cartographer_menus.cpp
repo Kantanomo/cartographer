@@ -237,7 +237,7 @@ void c_cartographer_guide_edit_list::update_list_items(c_list_item_widget* item,
 	}
 }
 
-void c_cartographer_guide_edit_list::handle_item_pressed_event(s_event_record** pevent, int32* pitem_index)
+void c_cartographer_guide_edit_list::handle_item_pressed_event(s_event_record* const& event, int32* pitem_index)
 {
 	int16 button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index);
 
@@ -362,7 +362,7 @@ void c_cartographer_credits_edit_list::update_list_items(c_list_item_widget* ite
 	}
 }
 
-void c_cartographer_credits_edit_list::handle_item_pressed_event(s_event_record** event_record, int32* a3)
+void c_cartographer_credits_edit_list::handle_item_pressed_event(s_event_record* const& event, int32* a3)
 {
 	return;
 }
@@ -515,7 +515,7 @@ void c_cartographer_update_edit_list::update_updater_status()
 }
 
 
-void c_cartographer_update_edit_list::handle_item_pressed_event(s_event_record** pevent, int32* pitem_index)
+void c_cartographer_update_edit_list::handle_item_pressed_event(s_event_record* const& event, int32* pitem_index)
 {
 	int32 button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index);
 
@@ -663,7 +663,7 @@ void c_cartographer_update_notice_edit_list::update_list_items(c_list_item_widge
 	}
 }
 
-void c_cartographer_update_notice_edit_list::handle_item_pressed_event(s_event_record** pevent, int32* pitem_index)
+void c_cartographer_update_notice_edit_list::handle_item_pressed_event(s_event_record* const& event, int32* pitem_index)
 {
 	int16 button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index);
 

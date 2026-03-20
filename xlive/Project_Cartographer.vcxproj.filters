@@ -2082,6 +2082,7 @@
     <ClInclude Include="Blam\Engine\networking\replication\replication_event_manager_view.h" />
     <ClInclude Include="Blam\Engine\networking\replication\replication_game_results.h" />
     <ClInclude Include="Blam\Engine\networking\replication\replication_event.h" />
+    <ClInclude Include="Blam\Engine\models\model_constants.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
