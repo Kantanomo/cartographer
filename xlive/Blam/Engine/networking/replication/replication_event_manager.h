@@ -9,10 +9,20 @@ public:
 	void destroy(void);
 
 	void reset(void);
-	void register_client(class c_simulation_event_handler* client);
+
+	void register_client(
+		class c_simulation_event_handler* client)
+	{
+		ASSERT(client!=NULL);
+		ASSERT(m_client==NULL);
+
+		m_client = client;
+
+		return;
+	}
 
 	void deregister_client(
-		c_simulation_event_handler* client)
+		class c_simulation_event_handler const* client)
 	{
 		ASSERT(client!=NULL);
 		ASSERT(m_client==client);

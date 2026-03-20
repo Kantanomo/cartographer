@@ -37,14 +37,3 @@ void c_replication_event_manager::reset(void)
 	INVOKE_TYPE(0x1D676D, 0x1D9A8E, void(__thiscall*)(c_replication_event_manager*), this);
 	return;
 }
-
-void c_replication_event_manager::register_client(
-	c_simulation_event_handler* client)
-{
-	ASSERT(client!=NULL);
-	ASSERT(m_client==NULL);
-
-	m_client = client;
-
-	return;
-}
