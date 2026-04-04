@@ -24,13 +24,14 @@ void* datum_get(const data_array* data, int32 index)
 	vassert(index != NONE, "tried to access %s index NONE", data->name);
 	vassert(
 		DATUM_INDEX_TO_IDENTIFIER(index) != 0,
-		"tried to access %s using "__FUNCTION__"() with an absolute index # % d",
+		"tried to access %s using datum_get() with an absolute index # % d",
 		data->name,
 		index
 	);
 	vassert(
 		DATUM_INDEX_TO_ABSOLUTE_INDEX(index) < data->first_free_absolute_index,
-		"%s index #%d (0x%x) is out of range (%d)", data->name,
+		"%s index #%d (0x%x) is out of range (%d)",
+		data->name,
 		DATUM_INDEX_TO_ABSOLUTE_INDEX(index),
 		index,
 		data->first_free_absolute_index
@@ -65,13 +66,13 @@ void* datum_try_and_get(const data_array* data, int32 index)
 	{
 		vassert(
 			DATUM_INDEX_TO_IDENTIFIER(index) != 0,
-			"tried to access %s using "__FUNCTION__"() with an absolute index #%d",
+			"tried to access %s using datum_try_and_get() with an absolute index #%d",
 			data->name,
 			index
 		);
 		vassert(
 			DATUM_INDEX_TO_ABSOLUTE_INDEX(index) < data->maximum_count,
-			"tried to access %s using "__FUNCTION__"() with an index 0x%08X outside maximum range [0, %d)",
+			"tried to access %s using datum_try_and_get() with an index 0x%08X outside maximum range [0, %d)",
 			data->name,
 			index,
 			data->maximum_count
@@ -95,6 +96,7 @@ void* datum_try_and_get(const data_array* data, int32 index)
 	}
 
 	ASSERT(result == align_pointer(result, data->alignment_bits));
+
 	return result;
 }
 

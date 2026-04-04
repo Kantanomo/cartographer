@@ -96,7 +96,13 @@ void c_replication_entity_manager_view::initialize(int32 world_view_index,	class
 
 void c_replication_entity_manager_view::reset(void)
 {
-	typedef void(__thiscall* reset_t)(c_replication_entity_manager_view*);
-	INVOKE_TYPE(0x1D1718, 0x1D69A4, reset_t, this);
+	INVOKE_TYPE(0x1D1718, 0x1D69A4, void(__thiscall*)(c_replication_entity_manager_view*), this);
+	return;
+}
+
+void c_replication_entity_manager_view::create_entity(
+	int32 entity_index)
+{
+	INVOKE_TYPE(0x1D258A, 0x1D7816, void(__thiscall*)(c_replication_entity_manager_view*, int32), this, entity_index);
 	return;
 }

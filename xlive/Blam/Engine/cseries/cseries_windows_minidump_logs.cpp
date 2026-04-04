@@ -271,7 +271,7 @@ static void setup_game_options_text(const wchar_t* reports_path)
 		fwprintf(file, L"%d\n", game_options->game_tick_rate);
 
 		fwprintf(file, L"Random Data: ");
-		print_array_to_file(file, game_options->random_data, 8);
+		fwprintf(file, L"%lld\n", game_options->random_data);
 
 		fwprintf(file, L"Random Seed: ");
 		fwprintf(file, L"%d\n", game_options->verify_random_seed);

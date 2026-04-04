@@ -29,12 +29,14 @@ void game_engine_end_round_with_winner(int player_datum_or_team_index, bool go_t
 
 bool game_engine_has_teams()
 {
+	bool result = false;
+
 	if (current_game_engine())
 	{
-		return TEST_BIT(current_game_variant()->game_engine_flags, _game_engine_teams_bit);
+		result = current_game_variant()->game_engine_flags.test(_game_engine_teams_bit);
 	}
 
-	return false;
+	return result;
 }
 
 bool __cdecl sub_4701B6(datum player_index)

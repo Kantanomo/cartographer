@@ -34,17 +34,15 @@ private:
 
 /* macros */
 
-#define GENERATE_EVENT_NAME() J(x_event_, __LINE__)
-
-#define event(severity, format, ...)							\
-do																\
-{																\
-	static c_event GENERATE_EVENT_NAME();						\
-	if (GENERATE_EVENT_NAME().query(severity))					\
-	{															\
-		GENERATE_EVENT_NAME().generate(format, __VA_ARGS__);	\
-	}															\
-}																\
+#define event(severity, format, ...)				\
+do													\
+{													\
+	static c_event local_event;						\
+	if (local_event.query(severity))				\
+	{												\
+		local_event.generate(format, __VA_ARGS__);	\
+	}												\
+}													\
 while(0)
 
 /* prototypes */

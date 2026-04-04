@@ -55,8 +55,7 @@ struct s_game_options
 	bool session_host_is_dedicated;
 	bool scenario_custom;
 	int16 game_tick_rate;
-	int16 pad_C[3];
-	uint8 random_data[8];
+	int64 random_data;
 	int32 verify_random_seed;
 	bool is_custom_map;
 	uint8 field_1D;
