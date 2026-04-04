@@ -9,10 +9,6 @@
 
 /* globals */
 
-static s_frame_data_storage* g_frame_data_storage = NULL;
-static s_interpolation_data* g_previous_interpolation_frame_data = NULL;
-static s_interpolation_data* g_target_interpolation_frame_data = NULL;
-
 static real32 g_interpolator_delta = 0.f;
 static bool g_interpolation_update_in_progress = false;
 static bool g_interpolation_initialized = false;
@@ -20,7 +16,11 @@ static bool g_interpolation_enabled = false;
 static c_static_flags_no_init<k_maximum_objects_per_map> g_interpolator_object_updated;
 static c_static_flags_no_init<k_maximum_objects_per_map> g_interpolator_object_interpolation_updated;
 
-s_interpolation_data* g_frame_data_intermediate = NULL;
+static thread_local s_frame_data_storage* g_frame_data_storage = NULL;
+static thread_local s_interpolation_data* g_previous_interpolation_frame_data = NULL;
+static thread_local s_interpolation_data* g_target_interpolation_frame_data = NULL;
+
+thread_local s_interpolation_data* g_frame_data_intermediate = NULL;
 
 /* prototypes */
 
