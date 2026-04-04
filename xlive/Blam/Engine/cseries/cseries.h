@@ -96,6 +96,8 @@ union long_point3d
 
 /* globals */
 
+extern char const g_zero_buffer[256];
+
 #ifdef ASSERTS_ENABLED
 extern char g_temporary[256];
 
