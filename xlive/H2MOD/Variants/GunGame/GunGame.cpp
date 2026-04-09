@@ -129,7 +129,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 	{
 		// prespawn handler
 	case ExecTime::_preEventExec:
-		player->configuration.profile_traits.profile.player_character_type = _character_type_spartan;
+		player->configuration.appearance.player_character_type = _character_type_spartan;
 		break;
 
 		// postspawn handler

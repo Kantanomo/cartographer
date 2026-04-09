@@ -37,7 +37,7 @@ struct s_player_configuration
 	int32 spawn_protection_time;
 	int8 gap_24[28];
 
-	s_player_profile_traits profile_traits;
+	s_player_appearance appearance;
 	wchar_t clan_name[16];
 	s_clan_identifiers clan_identifiers;
 

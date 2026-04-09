@@ -270,7 +270,7 @@ void c_screen_4way_signin::update(void)
 			user_interface_controller_get_profile_data(controller, &profile, &profile_index);
 
 			c_player_widget_representation* current_player = &representations[controller];
-			current_player->set_appearance(&profile.profile_traits);
+			current_player->set_appearance(&profile.appearance);
 			current_player->set_player_name_from_configuration((s_player_configuration*)profile.name); //hacky
 			show_gamertag_text = user_interface_controller_has_xbox_live(controller);
 		}
@@ -322,7 +322,7 @@ void c_screen_4way_signin::update(void)
 		if (ui_player_model_a)
 		{
 			if (controller_has_joined)
-				ui_player_model_a->apply_appearance_and_character(&profile.profile_traits, _character_type_masterchief);
+				ui_player_model_a->apply_appearance_and_character(&profile.appearance, _character_type_masterchief);
 			else
 				ui_player_model_a->set_visible(false);
 		}
@@ -330,7 +330,7 @@ void c_screen_4way_signin::update(void)
 		if (ui_player_model_b)
 		{
 			if (controller_has_joined)
-				ui_player_model_b->apply_appearance_and_character(&profile.profile_traits, _character_type_dervish);
+				ui_player_model_b->apply_appearance_and_character(&profile.appearance, _character_type_dervish);
 			else
 				ui_player_model_b->set_visible(false);
 

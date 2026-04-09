@@ -227,18 +227,18 @@ e_game_team game_results_get_finalized_player_team(int32 player_index)
 	return result;
 }
 
-void game_results_get_finalized_player_profile_traits(int32 player_index, s_player_profile_traits* profile_traits)
+void game_results_get_finalized_player_profile_traits(int32 player_index, s_player_appearance* appearance)
 {
 	//INVOKE(0x6706D, 0, game_results_get_finalized_player_profile_traits, player_index, profile_traits);
 	s_game_results* game_results = game_results_get();
 
 	if (game_results->initialized && player_index != NONE && game_results->players[player_index].exists)
 	{
-		*profile_traits = game_results->players[player_index].player_configuration.profile_traits;
+		*appearance = game_results->players[player_index].player_configuration.appearance;
 	}
 	else
 	{
-		player_profile_traits_initialize(profile_traits);
+		player_profile_traits_initialize(appearance);
 	}
 }
 

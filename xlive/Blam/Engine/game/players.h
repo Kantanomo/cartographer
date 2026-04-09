@@ -173,7 +173,7 @@ void __cdecl players_set_machines(uint32 new_machine_valid_mask, const s_machine
 uint32 player_appearance_required_bits(void);
 
 // Validate player configuration
-void __cdecl player_validate_configuration(datum player_index, s_player_configuration* configuration_data);
+void __cdecl players_validate_configuration(int32 player_index, s_player_configuration* configuration_data);
 
 // Sets whether or not the passed user can interact with weapons
 void player_user_weapon_interaction_set(int32 user_index, bool enabled);

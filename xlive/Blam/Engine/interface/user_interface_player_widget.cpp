@@ -54,7 +54,7 @@ void c_player_widget_representation::set_user_role(int32 role)
 	INVOKE_TYPE(0x220624, 0x0, void(__thiscall*)(c_player_widget_representation*, int32), this, role);
 }
 
-void c_player_widget_representation::set_appearance(s_player_profile_traits* appearance)
+void c_player_widget_representation::set_appearance(s_player_appearance* appearance)
 {
-	INVOKE_TYPE(0x2205CA, 0x0, void(__thiscall*)(c_player_widget_representation*, s_player_profile_traits*), this, appearance);
+	INVOKE_TYPE(0x2205CA, 0x0, void(__thiscall*)(c_player_widget_representation*, s_player_appearance*), this, appearance);
 }

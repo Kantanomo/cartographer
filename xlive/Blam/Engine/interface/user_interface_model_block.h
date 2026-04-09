@@ -12,7 +12,7 @@ protected:
 	s_ui_model_scene_reference* m_tag_block;
 
 public:
-	void apply_appearance_and_character(s_player_profile_traits* appearance, e_character_type character);
+	void apply_appearance_and_character(s_player_appearance* appearance, e_character_type character);
 
 	// c_model_widget virtual functions
 

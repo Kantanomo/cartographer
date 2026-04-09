@@ -26,7 +26,7 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
 	// TODO Remove this once we get tag injection working on servers
 	if (initial_state_data->controlling_player_index != NONE)
 	{
-		if (datum unit_rep_tag_index = game_globals_get_representation(creation_data->profile_traits.profile.player_character_type)->third_person_unit.index;
+		if (datum unit_rep_tag_index = game_globals_get_representation(creation_data->appearance.player_character_type)->third_person_unit.index;
 			unit_rep_tag_index != NONE)
 		{
 			placement_data.definition_index = unit_rep_tag_index;
@@ -39,7 +39,7 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
 	// The unit is not controlled by an actor
 	// The function game_engine_get_change_colors is able to retrieve the colours for the engine mode
 	if ((initial_state_data->controlling_actor_index == NONE) &&
-		game_engine_get_change_colors(&creation_data->profile_traits.profile, creation_data->team, change_colors))
+		game_engine_get_change_colors(&creation_data->appearance, creation_data->team, change_colors))
 	{
 		placement_data.change_color_override_mask |= MASK(4);
 		csmemcpy(placement_data.change_color_overrides, change_colors, sizeof(placement_data.change_color_overrides));

@@ -404,7 +404,7 @@ s_simulation_player_netdebug_data* game_engine_get_netdebug_data(datum player_in
 
 void __cdecl game_engine_apply_map_patches(void);
 
-bool __cdecl game_engine_get_change_colors(struct s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
+bool __cdecl game_engine_get_change_colors(struct s_player_appearance* player_profile, e_game_team team_index, real_rgb_color* change_colors);
 
 bool __cdecl game_engine_variant_cleanup(uint16* flags);
 

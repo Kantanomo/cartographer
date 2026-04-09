@@ -27,7 +27,7 @@ ASSERT_STRUCT_SIZE(s_simulation_unit_state_data, 0xF8);
 struct s_simulation_unit_creation_data
 {
 	s_simulation_object_creation_data object;
-	s_player_profile_traits profile_traits;
+	s_player_appearance appearance;
 	e_game_team team;
 	int8 pad1[2];
 };

@@ -199,7 +199,7 @@ bool network_session_interface_set_local_user_character_type(int32 user_index, e
 	// Don't change the character type if the user doesn't exist
 	if (user_properties->user_exists)
 	{
-		user_properties->properties.profile_traits.profile.player_character_type = character_type;
+		user_properties->properties.appearance.player_character_type = character_type;
 		return true;
 	}
 

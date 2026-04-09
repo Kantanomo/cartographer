@@ -10,7 +10,7 @@ class c_hud_widget : protected c_user_interface_widget
 {
 protected:
 	s_hud_block_reference* m_tag_block;
-	s_player_profile_traits m_appearance;
+	s_player_appearance m_appearance;
 	int16 m_team_index;
 	int16 m_rank_index;
 

@@ -76,7 +76,7 @@ enum e_player_color : int8
 
 /* structures */
 
-struct s_player_profile
+struct s_player_appearance
 {
 	e_player_color primary_color;
 	e_player_color secondary_color;
@@ -84,16 +84,10 @@ struct s_player_profile
 	e_player_color quaternary_color;
 	e_character_type player_character_type;
 	s_emblem_info emblem_info;
-};
-ASSERT_STRUCT_SIZE(s_player_profile, 8);
-
-struct s_player_profile_traits
-{
-	s_player_profile profile;
 	int32 gap_48;
 	int32 gap_4C;
 };
-ASSERT_STRUCT_SIZE(s_player_profile_traits, 16);
+ASSERT_STRUCT_SIZE(s_player_appearance, 16);
 
 struct s_persistent_weapon_data
 {
@@ -152,7 +146,7 @@ struct s_saved_game_player_profile
 	int8 data2[20];
 	s_saved_game_profile_input_preferences input_preferences;
 	int8 data3[16];
-	s_player_profile_traits profile_traits;
+	s_player_appearance appearance;
 	int8 gap2[176];
 };
 ASSERT_STRUCT_SIZE(s_saved_game_player_profile, 4616);
@@ -165,8 +159,8 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 
 bool saved_game_player_profile_read_file(uint32 enumerated_file_index, s_saved_game_player_profile* profile);
 
-bool __cdecl saved_game_player_profile_read_post_verify_profile_traits(s_player_profile_traits* profile);
+bool __cdecl saved_game_player_profile_read_post_verify_profile_traits(s_player_appearance* profile);
 
 bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_player_profile* profile);
 
-void player_profile_traits_initialize(s_player_profile_traits* profile_traits);
+void player_profile_traits_initialize(s_player_appearance* appearance);
