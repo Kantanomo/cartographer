@@ -24,6 +24,26 @@ void simulation_players_apply_patches(void)
 	return;
 }
 
+void simulation_player_collection_clear(
+	s_player_collection* collection)
+{
+	ASSERT(collection);
+
+	csmemset(collection, 0, sizeof(*collection));
+
+	for (int32 player_index = 0; player_index<NUMBEROF(collection->players); ++player_index)
+	{
+		s_player_collection_player* collection_player = &collection->players[player_index];
+
+		collection_player->left_game = false;
+		collection_player->left_game_time = NONE;
+		collection_player->controller_index = k_no_controller;
+		collection_player->user_index = NONE;
+	}
+
+	return;
+}
+
 bool __cdecl simulation_players_apply_update(simulation_player_update* player_update)
 {
 	return INVOKE(0x1E22E2, 0x1C930E, simulation_players_apply_update, player_update);
@@ -31,12 +51,13 @@ bool __cdecl simulation_players_apply_update(simulation_player_update* player_up
 
 void __cdecl simulation_player_joined_game(datum player_index)
 {
-	s_simulation_globals* g_simulation_globals = simulation_get_globals();
-	ASSERT(g_simulation_globals->world);
+	s_simulation_globals* simulation_globals = simulation_get_globals();
+	
+	ASSERT(simulation_globals->world);
 
-	if (g_simulation_globals->initialized && !g_simulation_globals->field_B)
+	if (simulation_globals->initialized && !simulation_globals->loading_saved_game)
 	{
-		g_simulation_globals->world->create_player(player_index);
+		simulation_globals->world->create_player(player_index);
 		if (!shell_is_dedicated_server())
 		{
 			// Update discord player counts
@@ -55,12 +76,12 @@ void __cdecl simulation_player_joined_game(datum player_index)
 
 void __cdecl simulation_player_left_game(datum player_index)
 {
-	s_simulation_globals* g_simulation_globals = simulation_get_globals();
-	ASSERT(g_simulation_globals->world);
+	s_simulation_globals* simulation_globals = simulation_get_globals();
+	ASSERT(simulation_globals->world);
 
-	if (g_simulation_globals->initialized && !g_simulation_globals->field_B)
+	if (simulation_globals->initialized && !simulation_globals->loading_saved_game)
 	{
-		g_simulation_globals->world->delete_player(player_index);
+		simulation_globals->world->delete_player(player_index);
 		if (!shell_is_dedicated_server())
 		{
 			// Update discord player counts

@@ -1,6 +1,7 @@
 #pragma once
 #include "game_allegiance.h"
 #include "game_statborg.h"
+#include "player_constants.h"
 
 #include "main/game_preferences.h"
 #include "math/color_math.h"

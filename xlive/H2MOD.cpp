@@ -20,6 +20,7 @@
 #include "game/cheats.h"
 #include "game/game.h"
 #include "game/game_globals.h"
+#include "game/game_options.h"
 #include "game/game_time.h"
 #include "game/multiplayer_globals.h"
 #include "game/player_control.h"

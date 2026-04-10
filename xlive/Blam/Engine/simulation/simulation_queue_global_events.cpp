@@ -174,7 +174,7 @@ void simulation_queue_player_event_insert(e_simulation_queue_player_event_type e
 		uint16 abs_player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 
 		stream.begin_writing(1);
-		stream.write_integer("player-index", abs_player_index, k_player_index_bit_count);
+		stream.write_integer("player-index", abs_player_index, k_player_index_bits);
 		stream.write_bool("active", event_data->active);
 
 
@@ -211,7 +211,7 @@ void simulation_queue_player_event_apply(const s_simulation_queue_element* eleme
 	c_bitstream stream(element->data, element->data_size);
 	stream.begin_reading();
 
-	const uint16 abs_player_index = (uint16)stream.read_integer("player-index", k_player_index_bit_count);
+	const uint16 abs_player_index = (uint16)stream.read_integer("player-index", k_player_index_bits);
 
 	const datum player_index = player_index_from_absolute_player_index(abs_player_index);
 	if (stream.error_occurred())
@@ -279,7 +279,7 @@ void simulation_queue_player_update_apply(const s_simulation_queue_element* elem
 	}
 	else if (!simulation_players_apply_update(&update))
 	{
-		simulation_get_globals()->fatal_error = true;
+		simulation_get_globals()->simulation_fatal_error = true;
 		event(_event_error, "networking:simulation:player_update_apply: failed to apply player update");
 	}
 

@@ -2,6 +2,7 @@
 #include "damage.h"
 
 #include "game/game.h"
+#include "game/game_options.h"
 #include "networking/network_event.h"
 #include "units/units.h"
 

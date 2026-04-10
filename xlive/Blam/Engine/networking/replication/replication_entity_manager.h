@@ -2,6 +2,7 @@
 #include "replication_control_view.h"
 #include "replication_entity_manager_view.h"
 
+#include "game/game.h"
 #include "simulation/game_interface/simulation_game_entities.h"
 
 enum

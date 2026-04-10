@@ -4,7 +4,7 @@
 
 /* enums */
 
-enum e_event_level : int32
+enum e_event_level
 {
 	_event_verbose,
 	_event_status,

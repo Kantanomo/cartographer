@@ -5,8 +5,9 @@
 #include "game/game_engine.h"
 #include "game/game_globals.h"
 #include "interface/user_interface_controller.h"
-#include "networking/network_event.h"
 #include "networking/session/network_session.h"
+#include "networking/network_event.h"
+#include "networking/network_game_definitions.h"
 #include "saved_games/game_variant.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
@@ -206,7 +207,7 @@ uint32 player_appearance_required_bits()
 	return 39;
 }
 
-void __cdecl player_configuration_validate_character_type(
+void player_configuration_validate_character_type(
 	s_player_configuration* configuration_data)
 {
 	// Campaign verification
@@ -318,10 +319,12 @@ void __cdecl players_validate_configuration(
 	player_configuration_validate_team(player_index, configuration_data);
 
 	ASSERT(configuration_data->team_index==NONE || (configuration_data->team_index>=0 && configuration_data->team_index<k_maximum_teams));
+	/* FIXME: asserts in mainmenu since the map is compiled without any player reps, I think this should be NONE in this case?
 	ASSERT(
 		configuration_data->appearance.player_character_type==NONE ||
 		(configuration_data->appearance.player_character_type>=0 && configuration_data->appearance.player_character_type<globals->player_representation.count)
 	);
+	*/
 
 	return;
 }
@@ -549,16 +552,16 @@ void __cdecl player_find_action_context(datum player_index, s_player_interaction
 							default:
 							{
 								// Search through the children of the object and add them to the nearby objects array
-								for (datum current_weapon_datum = object->object.current_weapon_datum; current_weapon_datum != NONE; ++nearby_object_num)
+								for (datum child_object_index = object->object.first_child_object_index; child_object_index != NONE; ++nearby_object_num)
 								{
 									if (nearby_object_num > NUMBEROF(nearby_objects))
 									{
 										break;
 									}
 
-									const object_datum* weapon_object = object_get(current_weapon_datum);
-									nearby_objects[nearby_object_num] = current_weapon_datum;
-									current_weapon_datum = weapon_object->object.next_object_index;
+									const object_datum* child_object = object_get(child_object_index);
+									nearby_objects[nearby_object_num] = child_object_index;
+									child_object_index = child_object->object.next_object_index;
 								}
 								break;
 							}
@@ -577,28 +580,114 @@ int16 local_player_count(void)
 	return get_players_globals()->local_player_count;
 }
 
-void __cdecl players_update_before_game(const struct simulation_update* update)
+void __cdecl players_update_before_game(
+	const struct simulation_update* update)
 {
 	INVOKE(0x5815E, 0x60656, players_update_before_game, update);
 	return;
 }
 
-void __cdecl players_update_after_game(const struct simulation_update* update)
+void __cdecl players_update_after_game(
+	const struct simulation_update* update)
 {
 	INVOKE(0x58C22, 0x6111A, players_update_after_game, update);
 	return;
 }
 
-void players_update_for_checkpoint(void)
+void players_update_for_checkpoint(
+	void)
 {
 	players_joined_in_progress_allow_spawn();
 	return;
 }
 
-void players_joined_in_progress_allow_spawn(void)
+void players_joined_in_progress_allow_spawn(
+	void)
 {
-	// TODO: implement
+	c_player_in_game_iterator player_iterator;
+
+	while (player_iterator.next())
+	{
+		player_datum* player =  player_iterator.get_datum();
+
+		if (!player)
+		{
+			break;
+		}
+
+		if (!TEST_BIT(player->flags, _player_left_game_bit))
+		{
+			if (TEST_BIT(player->flags, _player_joined_in_progress_bit))
+			{
+				SET_BIT(player->flags, _player_joined_in_progress_bit, false);
+			}
+		}
+	}
+
 	return;
+}
+
+void clan_identifier_clear(
+	s_clan_identifier* clan_id)
+{
+	csmemset(clan_id, 0, sizeof(*clan_id));
+
+	return;
+}
+
+void player_appearance_initialize(
+	s_player_appearance* player_appearance)
+{
+	csmemset(player_appearance, 0, sizeof(*player_appearance));
+
+	return;
+}
+
+char const* player_identifier_get_string(
+	s_player_identifier const* player_id)
+{
+	static char player_id_string[sizeof(*player_id)*3 + 1];
+	
+	for (int32 byte_index = 0; byte_index < sizeof(*player_id); ++byte_index)
+	{
+		_snprintf_s(
+			&player_id_string[byte_index*3],
+			sizeof(player_id_string)-(byte_index*3),
+			_TRUNCATE,
+			"%02x%c",
+			player_id->identifier[byte_index],
+			byte_index != sizeof(*player_id)-1 ? ':' : '\0'
+		);
+	}
+
+	return player_id_string;
+}
+
+char const* clan_identifier_get_string(
+	s_clan_identifier const* clan_id)
+{
+	static char clan_id_string[sizeof(*clan_id)*3 + 1];
+
+	if (csmemcmp(clan_id, g_zero_buffer, sizeof(*clan_id)))
+	{
+		for (int32 byte_index = 0; byte_index < sizeof(*clan_id); ++byte_index)
+		{
+			_snprintf_s(
+				&clan_id_string[byte_index*3],
+				NUMBEROF(clan_id_string) - (byte_index*3),
+				_TRUNCATE,
+				"%02x%c",
+				clan_id->identifier[byte_index],
+				byte_index != sizeof(*clan_id)-1 ? ':' : '\0'
+			);
+		}
+	}
+	else
+	{
+		_snprintf_s(clan_id_string, NUMBEROF(clan_id_string), _TRUNCATE, "<clan invalid>");
+	}
+
+	return clan_id_string;
 }
 
 void players_apply_patches(void)

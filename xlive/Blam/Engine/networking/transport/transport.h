@@ -18,9 +18,9 @@ enum e_transport_type : int32
 	k_protocol_count
 };
 
-enum e_transport_platform : int32
+enum e_transport_platform
 {
-	_transport_platform_xbox,
+	_transport_platform_xbox= 0,
 	_transport_platform_windows,
 	k_transport_platform_count
 };

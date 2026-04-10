@@ -4,6 +4,7 @@
 #include "cache/cache_files.h"
 #include "game/game.h"
 #include "game/game_engine_util.h"
+#include "game/game_options.h"
 #include "game/game_time.h"
 #include "game/players.h"
 #include "interface/user_interface_controller.h"

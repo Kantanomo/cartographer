@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "user_interface_network_search.h"
 
-#include "game/player_constants.h"
+#include "game/game.h"
 #include "networking/logic/network_logic.h"
 #include "networking/logic/network_search.h"
 #include "networking/network_game_definitions.h"

@@ -14,13 +14,22 @@
 #include "units/biped_definitions.h"
 #include "units/vehicle_definitions.h"
 
-/* private prototypes */
+/* prototypes */
 
 static void __cdecl scenario_tags_postprocess(void);
 
 static void __cdecl scenario_apply_level_patches(void);
 
 /* public code */
+
+void scenario_apply_patches(
+	void)
+{
+	PatchCall(Memory::GetAddress(0x28516), scenario_tags_postprocess);	// Default Maps
+	PatchCall(Memory::GetAddress(0x284DE), scenario_tags_postprocess);	// Custom Maps
+	
+	return;
+}
 
 scenario* global_scenario_get(void) 
 {
@@ -49,14 +58,7 @@ int32 global_scenario_index_get(void)
 	return *Memory::GetAddress<int32*>(0x4119A0, 0x3B528C);
 }
 
-void scenario_apply_patches(void)
-{
-	PatchCall(Memory::GetAddress(0x28516), scenario_tags_postprocess);	// Default Maps
-	PatchCall(Memory::GetAddress(0x284DE), scenario_tags_postprocess);	// Custom Maps
-	return;
-}
-
-uint32 scenario_netgame_equipment_size(void)
+int32 scenario_netgame_equipment_size(void)
 {
 	return global_scenario_get()->netgame_equipment.count;
 }
@@ -66,6 +68,7 @@ void location_invalidate(s_location* object_location)
 	object_location->leaf_index = NONE;
 	object_location->cluster_index = NONE;
 	object_location->bsp_index = get_global_structure_bsp_index();
+
 	return;
 }
 
@@ -99,35 +102,23 @@ static void __cdecl scenario_tags_postprocess(void)
 		switch (group.group)
 		{
 		case _tag_group_biped:
-		{
 			biped_definitions_fixup(i);
 			break;
-		}
 		case _tag_group_creature:
-		{
 			creature_definitions_fixup(i);
 			break;
-		}
 		case _tag_group_vehicle:
-		{
 			vehicle_definitions_fixup(i);
 			break;
-		}
 		case _tag_group_collision_model:
-		{
 			collision_model_definitions_fixup(i);
 			break;
-		}
 		case _tag_group_physics_model:
-		{
 			physics_model_definitions_fixup(i, false);
 			break;
-		}
 		case _tag_group_vertex_shader:
-		{
 			//rasterizer_dx9_vertex_shaders_replace_map_bytecode(i);
 			break;
-		}
 		default:
 			break;
 		}
@@ -135,6 +126,7 @@ static void __cdecl scenario_tags_postprocess(void)
 	}
 	scenario_apply_level_patches();
 	game_engine_apply_map_patches();
+
 	return;
 }
 
