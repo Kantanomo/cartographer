@@ -199,7 +199,7 @@ bool network_session_interface_set_local_user_character_type(int32 user_index, e
 	// Don't change the character type if the user doesn't exist
 	if (user_properties->user_exists)
 	{
-		user_properties->properties.profile_traits.profile.player_character_type = character_type;
+		user_properties->properties.appearance.player_character_type = character_type;
 		return true;
 	}
 
@@ -248,7 +248,7 @@ void network_session_membership_update_local_players_teams()
 		{
 			int32 local_peer_index = session->get_local_peer_index();
 
-			if (session->game_variant_is_team_play())
+			if (session->get_session_parameters()->game_variant.game_engine_flags.test(_game_engine_teams_bit))
 			{
 				for (int32 i = 0; i < k_number_of_users; i++)
 				{
@@ -416,6 +416,19 @@ bool c_network_session::handle_leave_internal(int32 peer_index)
 {
 	return INVOKE_TYPE(0x1CC7B4, 0x1A3D34, bool(__thiscall*)(c_network_session*, int32), this, peer_index);
 }
+
+s_session_parameters const* c_network_session::get_session_parameters(
+	void) const
+{
+	return &m_session_parameters;
+}
+
+s_session_parameters* c_network_session::get_session_parameters(
+	void)
+{
+	return &m_session_parameters;
+}
+
 
 /* private code */
 

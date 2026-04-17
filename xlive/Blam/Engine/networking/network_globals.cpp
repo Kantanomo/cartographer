@@ -100,10 +100,17 @@ c_network_text_chat_manager** global_network_text_chat_manager_get(void)
 	return Memory::GetAddress<c_network_text_chat_manager**>(0x51C47C, 0x520B9C);
 }
 
-void network_initialize(void)
+bool network_initialized(
+	void)
+{
+	return network_globals_get()->initialized;
+}
+
+void network_initialize(
+	void)
 {
 	s_network_globals* network_globals = network_globals_get();
-	if (shell_application_type() == _shell_application_game && !network_globals->network_initialized)
+	if (shell_application_type() == _shell_application_game && !network_globals->initialized)
 	{
 		if (shell_command_line_flag_is_set(_shell_command_line_flag_disable_voice_chat))
 		{
@@ -175,8 +182,8 @@ void network_initialize(void)
 
 			const bool network_initialized =
 				session_initialized
-				&& g_network_sessions[0].initialize_session(0, _network_session_type_one, 0, g_network_message_gateway, g_network_observer, g_network_session_manager, g_network_text_chat_manager)
-				&& g_network_sessions[1].initialize_session(1, _network_session_type_one, 1, g_network_message_gateway, g_network_observer, g_network_session_manager, g_network_text_chat_manager)
+				&& g_network_sessions[0].initialize_session(0, _network_session_type_squad, 0, g_network_message_gateway, g_network_observer, g_network_session_manager, g_network_text_chat_manager)
+				&& g_network_sessions[1].initialize_session(1, _network_session_type_squad, 1, g_network_message_gateway, g_network_observer, g_network_session_manager, g_network_text_chat_manager)
 				&& network_broadcast_search_initialize(g_network_link, g_network_message_gateway)
 				&& network_search_initialize()
 				&& network_life_cycle_initialize(g_network_message_gateway, g_network_observer, g_network_session_manager, &g_network_sessions[0], &g_network_sessions[1])
@@ -192,7 +199,7 @@ void network_initialize(void)
 				online_strings_initialize();
 				network_storage_initialize();
 				voice_engine_initialize();
-				network_globals->network_initialized = true;
+				network_globals->initialized = true;
 			}
 			else
 			{

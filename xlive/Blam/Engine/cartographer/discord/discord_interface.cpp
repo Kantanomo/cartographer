@@ -3,6 +3,7 @@
 
 #include "game/game.h"
 #include "game/game_globals.h"
+#include "game/game_options.h"
 #include "interface/user_interface_networking.h"
 #include "networking/logic/life_cycle_manager.h" 
 #include "networking/session/network_session.h"

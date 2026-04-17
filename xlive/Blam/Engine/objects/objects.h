@@ -154,7 +154,7 @@ struct _object_datum
 	c_flags_no_init<e_object_data_flags, uint32, k_object_data_flags_count> flags;
 	void* object_header_block;
 	datum next_object_index;
-	datum current_weapon_datum;
+	datum first_child_object_index;
 	datum parent_object_index;
 	uint8 matrix_index;
 	uint8 inhibited_flags;

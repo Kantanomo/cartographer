@@ -514,7 +514,7 @@ datum __cdecl object_new(object_placement_data* data)
 			object->object.first_cluster_reference = NONE;
 			object->object.parent_object_index = NONE;
 			object->object.next_object_index = NONE;
-			object->object.current_weapon_datum = NONE;
+			object->object.first_child_object_index = NONE;
 			object->object.name_list_index = NONE;
 			object->object.netgame_equipment_index = NONE;
 			object->object.shield_damage_decay_timer = NONE;

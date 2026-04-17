@@ -15,21 +15,17 @@ enum e_network_session_qos_status_data_type : int32
 
 /* structures */
 
-// practically the xuid, but aligned to 4 (hence the split in 2 32 bit variables)
 struct s_player_identifier
 {
-	uint32 id_low;
-	uint32 id_high;
+	uint8 identifier[8];
 };
 ASSERT_STRUCT_SIZE(s_player_identifier, 8);
 
-struct s_clan_identifiers
+struct s_clan_identifier
 {
-	uint32 ID_1;
-	uint32 ID_2;
-	uint32 ID_3;
+	uint8 identifier[12];
 };
-ASSERT_STRUCT_SIZE(s_clan_identifiers, 12);
+ASSERT_STRUCT_SIZE(s_clan_identifier, 12);
 
 struct s_player_configuration
 {
@@ -37,9 +33,9 @@ struct s_player_configuration
 	int32 spawn_protection_time;
 	int8 gap_24[28];
 
-	s_player_profile_traits profile_traits;
+	s_player_appearance appearance;
 	wchar_t clan_name[16];
-	s_clan_identifiers clan_identifiers;
+	s_clan_identifier clan_identifiers;
 
 	int8 team_index;
 	int8 player_handicap_level;	// e_user_interface_controller_handicap

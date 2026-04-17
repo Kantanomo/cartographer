@@ -526,7 +526,7 @@ static int CommandCollection::LogPlayersCmd(const std::vector<std::string>& toke
 			string.append(", PlayerName=");
 			string.append(player_name);
 
-			const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+			const player_datum* player = (player_datum*)datum_get_absolute(player_data_get(), player_index);
 			wchar_string_to_utf8_string(player->configuration.player_name, player_name, NUMBEROF(player_name));
 
 			string.append(", Name from game player state=");
@@ -536,8 +536,11 @@ static int CommandCollection::LogPlayersCmd(const std::vector<std::string>& toke
 			string.append(std::to_string(NetworkSession::GetPlayerTeam(player_index)).c_str());
 			
 			string.append(", Identifier=");
-			string.append(std::to_string(NetworkSession::GetPlayerId(player_index).id_low).c_str());
-			string.append(std::to_string(NetworkSession::GetPlayerId(player_index).id_high).c_str());
+
+			int64 id;
+			csmemcpy(&id, NetworkSession::GetPlayerId(player_index).identifier, sizeof(id));
+
+			string.append_print(", Identifier=%llX", id);
 
 			outputCb(StringFlag_None, string.get_string());
 		}

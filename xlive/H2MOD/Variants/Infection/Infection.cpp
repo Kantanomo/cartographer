@@ -4,6 +4,7 @@
 #include "cache/cache_files.h"
 #include "game/game.h"
 #include "game/game_engine_util.h"
+#include "game/game_options.h"
 #include "game/game_time.h"
 #include "game/players.h"
 #include "interface/user_interface_controller.h"
@@ -238,7 +239,7 @@ void Infection::preSpawnServerSetup() {
 		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", current_player_index, isZombie, id, player->configuration.player_name);
 		if (isZombie) 
 		{
-			player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+			player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
 			if (player->configuration.team_index != k_zombie_team)
 			{
 				// prevent the fucks from switching to humans in the pre-game lobby after joining
@@ -247,7 +248,7 @@ void Infection::preSpawnServerSetup() {
 		}
 		else 
 		{
-			player->configuration.profile_traits.profile.player_character_type = infection_human_get_player_type();
+			player->configuration.appearance.player_character_type = infection_human_get_player_type();
 		}
 	}
 }
@@ -255,14 +256,14 @@ void Infection::preSpawnServerSetup() {
 void Infection::setPlayerAsHuman(int32 player_index)
 {
 	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
-	player->configuration.profile_traits.profile.player_character_type = infection_human_get_player_type();
+	player->configuration.appearance.player_character_type = infection_human_get_player_type();
 	player->unit_speed = k_human_unit_speed;
 }
 
 void Infection::setPlayerAsZombie(int32 player_index)
 {
 	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
-	player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+	player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
 	player->unit_speed = k_zombie_unit_speed;
 	call_give_player_weapon(player_index, e_weapons_datum_index::energy_blade, 1);
 	return;
@@ -439,7 +440,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", player->configuration.player_name, player->player_identifier);
 						user_interface_controller_set_desired_team_index(player->controller_index, k_zombie_team);
 						user_interface_controller_update_network_properties(player->controller_index);
-						player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+						player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
 					}
 					else
 					{
@@ -507,7 +508,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 				if(team == k_zombie_team)
 				{
 					event(_event_verbose, "h2mod:infection: Client is infected! switching bipeds: %d", player_abs_index);
-					player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+					player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
 				}
 			}
 		}
@@ -544,7 +545,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 				}
 				else if (team == k_zombie_team)
 				{
-					player->configuration.profile_traits.profile.player_character_type = infection_zombie_get_character_type();
+					player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
 					player_user_weapon_interaction_set(player->user_index, false);
 					hud_player_indicators_draw_enabled_set(player->user_index, true);
 				}

@@ -1,8 +1,8 @@
 #pragma once
 #include "machine_id.h"
 
+#include "game/game.h"
 #include "game/player_control.h"
-#include "game/player_constants.h"
 #include "networking/network_game_definitions.h"
 
 /* enums */
@@ -50,9 +50,9 @@ struct s_player_collection_player
 {
 	s_player_identifier identifier;
 	bool left_game;
-	uint32 left_game_time;
+	int32 left_game_time;
 	s_machine_identifier machine_identifier;
-	uint32 user_index;
+	int32 user_index;
 	e_controller_index controller_index;
 	s_player_configuration configuration_data;
 };
@@ -90,7 +90,9 @@ ASSERT_STRUCT_SIZE(c_simulation_player, 0x88);
 
 void simulation_players_apply_patches(void);
 
-bool __cdecl simulation_players_apply_update(simulation_player_update* player_update);
+void simulation_player_collection_clear(struct s_player_collection* collection);
+
+bool __cdecl simulation_players_apply_update(struct simulation_player_update* player_update);
 
 void __cdecl simulation_player_joined_game(datum player_index);
 

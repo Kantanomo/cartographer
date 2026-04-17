@@ -114,6 +114,6 @@ struct s_emblem_info
 {
 	e_emblem_foreground foreground_emblem;
 	e_emblem_background background_emblem;
-	c_flags<e_emblem_flags, uint8, k_emblem_flag_count> emblem_flags;
+	c_flags_no_init<e_emblem_flags, uint8, k_emblem_flag_count> emblem_flags;
 };
 ASSERT_STRUCT_SIZE(s_emblem_info, 3);

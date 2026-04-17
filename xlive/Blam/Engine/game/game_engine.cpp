@@ -37,7 +37,7 @@ void __cdecl game_engine_apply_map_patches(void)
 	return;
 }
 
-bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors)
+bool __cdecl game_engine_get_change_colors(s_player_appearance* player_profile, e_game_team team_index, real_rgb_color* change_colors)
 {
 	return INVOKE(0x6E5C3, 0x6D1BF, game_engine_get_change_colors, player_profile, team_index, change_colors);
 }

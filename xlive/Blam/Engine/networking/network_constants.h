@@ -1,5 +1,5 @@
 #pragma once
-#include "game/player_constants.h"
+#include "game/game.h"
 
 /* constants */
 

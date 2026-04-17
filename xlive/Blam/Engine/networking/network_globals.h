@@ -4,7 +4,7 @@
 
 struct s_network_globals
 {
-	bool network_initialized;
+	bool initialized;
 	bool halt_on_critical_events;
 };
 
@@ -13,6 +13,8 @@ struct s_network_globals
 void network_globals_apply_patches(void);
 
 s_network_globals* network_globals_get(void);
+
+bool network_initialized(void);
 
 void network_initialize(void);
 

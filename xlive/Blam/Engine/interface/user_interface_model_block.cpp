@@ -2,9 +2,9 @@
 
 #include "user_interface_model_block.h"
 
-void c_model_widget::apply_appearance_and_character(s_player_profile_traits* appearance, e_character_type character)
+void c_model_widget::apply_appearance_and_character(s_player_appearance* appearance, e_character_type character)
 {
-	INVOKE_TYPE(0x240CEE, 0x0, void(__thiscall*)(c_model_widget*, s_player_profile_traits*, e_character_type), this, appearance, character);
+	INVOKE_TYPE(0x240CEE, 0x0, void(__thiscall*)(c_model_widget*, s_player_appearance*, e_character_type), this, appearance, character);
 }
 
 

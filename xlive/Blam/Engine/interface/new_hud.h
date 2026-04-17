@@ -45,7 +45,7 @@ struct s_new_hud_engine_globals
 	int32 field_204;
 	datum betraying_player_datum_index;
 	int32 gap_20C;
-	s_player_profile_traits default_profile_traits;
+	s_player_appearance default_profile_traits;
 	int16 unk_220;
 	bool show_hud;
 	bool flag_20D;			// initialized to 1 but unused?

@@ -30,21 +30,21 @@ struct simulation_update
 	int32 game_time_ticks;
 	uint32 random_seed;
 };
-ASSERT_STRUCT_SIZE(simulation_update, 0x3BD8);
+ASSERT_STRUCT_SIZE(struct simulation_update, 0x3BD8);
 
 struct s_simulation_globals
 {
 	bool initialized;
-	bool fatal_error;
+	bool simulation_fatal_error;
 	bool engine_paused;
 	int32 field_4;
 	bool simulation_invalidate;
 	bool simulation_reset_pending;
 	bool simulation_reset_in_progress;
-	bool field_B;
+	bool loading_saved_game;
 	c_simulation_world* world;
 	c_simulation_watcher* watcher;
-	c_simulation_type_collection* simulation_type_collection;
+	c_simulation_type_collection* type_collection;
 };
 ASSERT_STRUCT_SIZE(s_simulation_globals, 24);
 

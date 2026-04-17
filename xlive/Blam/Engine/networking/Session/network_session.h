@@ -76,7 +76,7 @@ enum e_network_game_privacy : int32
 enum e_network_session_type : uint32
 {
 	_network_session_type_none= 0,
-	_network_session_type_one,
+	_network_session_type_squad,
 	k_network_session_type_count,
 };
 
@@ -435,6 +435,9 @@ public:
 
 	bool channel_is_authoritative(int32 network_channel_index) const;
 
+	s_session_parameters const* get_session_parameters(void) const;
+	s_session_parameters* get_session_parameters(void);
+
 	e_network_session_state current_local_state() const
 	{
 		ASSERT(VALID_INDEX(m_local_state, k_network_session_state_count));
@@ -657,11 +660,6 @@ public:
 		}
 	}
 
-	bool game_variant_is_team_play() const
-	{
-		return TEST_BIT(m_session_parameters.game_variant.game_engine_flags, _game_engine_teams_bit);
-	}
-
 	// switch multiple players with a single membership update
 	void switch_players_to_teams(datum* player_indexes, int32 player_count, e_game_team* team_indexes);
 
@@ -686,6 +684,13 @@ public:
 	{
 		return m_session_class == _network_session_class_xbox_live;
 	}
+	
+	bool time_exists(
+		void) const
+	{
+		return m_time_exists;
+	}
+
 
 	bool get_secure_key(s_transport_secure_identifier* out_session_id, XNKEY* out_session_key, int32* out_session_key_index, e_transport_platform* transport_platform) const;
 	bool get_transport_session_id(s_transport_secure_identifier* out_session_id) const;

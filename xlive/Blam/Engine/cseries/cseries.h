@@ -58,6 +58,9 @@ enum
 {
 	INT64_BITS = 64,
 	INT64_BITS_BITS = 4,
+
+	k_short_bits= 16,
+
 	UNSIGNED_LONG_MAX = 0xFFFFFFFF,
 	BYTE_MAX = 255,
 	k_kilo = 1024,
@@ -95,6 +98,8 @@ union long_point3d
 };
 
 /* globals */
+
+extern char const g_zero_buffer[256];
 
 #ifdef ASSERTS_ENABLED
 extern char g_temporary[256];

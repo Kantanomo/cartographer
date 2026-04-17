@@ -27,6 +27,8 @@ struct s_transport_unique_identifier
 // Return true if both secure addresses are the same
 bool transport_secure_address_compare(const s_transport_secure_address* a, const s_transport_secure_address* b);
 
+void transport_secure_address_extract_identifier(s_transport_secure_address const* address, struct s_machine_identifier* identifier);
+
 char* transport_secure_identifier_get_string(const s_transport_secure_identifier* identifier);
 
 const char* managed_session_get_id_string(const s_transport_secure_identifier* session_id);

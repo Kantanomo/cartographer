@@ -28,20 +28,21 @@ bool network_session_time_get_id_and_time(
 {
 	s_network_time_globals* network_time_globals = network_time_globals_get();
 
-	bool result = false;
+	bool found = false;
 
 	if (network_time_globals->session_manager)
 	{
 		c_network_session* session = network_time_globals->session_manager->get_session(session_id);
-		if (session && session->m_time_exists)
+		
+		if (session && session->time_exists())
 		{
 			session->get_transport_session_id(id);
 			*time = session->time_get();
-			result = true;
+			found = true;
 		}
 	}
 
-	return result;
+	return found;
 }
 
 int32 network_time_get(

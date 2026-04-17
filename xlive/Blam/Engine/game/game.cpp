@@ -3,6 +3,7 @@
 
 #include "game_engine.h"
 #include "game_grief.h"
+#include "game_options.h"
 #include "game_results.h"
 #include "game_time.h"
 #include "players.h"
@@ -31,6 +32,7 @@
 #include "shell/shell.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_world.h"
+#include "structures/cluster_partitions.h"
 #include "sound/game_sound_deterministic.h"
 
 /* globals */
@@ -56,10 +58,36 @@ char const* k_game_playback_names[k_game_simulation_count]
 
 /* structures */
 
+struct game_globals_storage
+{
+	bool initializing;
+	bool map_active;
+	int16 active_structure_bsp_index;
+	int32 unused_0;
+	s_game_options options;
+	bool game_in_progress;
+	bool game_is_lost;
+	int32 ticks_to_reset_game;
+	bool game_is_finished;
+	bool game_sounds_disabled;
+	int16 pad_1;
+	uint32 ticks_till_end;
+	int32 game_ragdoll_count;
+	int32 unused_1;
+	s_game_cluster_bit_vectors cluster_pvs;
+	s_game_cluster_bit_vectors cluster_pvs_local;
+	s_game_cluster_bit_vectors cluster_activation;
+	uint8 enable_scripted_camera_pvs;
+	uint8 pad_2;
+	uint16 pvs_activation_mode;
+	datum pvs_object_datum;
+};
+ASSERT_STRUCT_SIZE(game_globals_storage, 0x1270);
+
 /* prototypes */
 
 static void set_main_game_globals(game_globals_storage* main);
-
+static game_globals_storage* get_main_game_globals(void);
 static void game_info_initialize_for_new_map(const s_game_options* options);
 
 static void __cdecl game_tick_pulse_random_seed_deterministic(const struct simulation_update* update);
@@ -101,11 +129,6 @@ void game_apply_pre_winmain_patches(void)
 s_game_systems* get_game_systems(void)
 {
 	return Memory::GetAddress<s_game_systems*>(0x3A0468, 0x35D198);
-}
-
-game_globals_storage* get_main_game_globals(void)
-{
-	return *Memory::GetAddress<game_globals_storage**>(0x482D3C, 0x4CB520);
 }
 
 bool map_initialized(void)
@@ -406,7 +429,8 @@ void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt)
 	return;
 }
 
-void __cdecl game_initialize_for_new_map(const s_game_options* options)
+void __cdecl game_initialize_for_new_map(
+	const s_game_options* options)
 {
 	game_globals_storage* game_globals = get_main_game_globals();
 
@@ -474,12 +498,65 @@ void game_simulation_set(
 	return;
 }
 
+void game_globals_storage_print_debug_contents(
+	FILE* file)
+{
+	game_globals_storage* game_globals = get_main_game_globals();
+
+	ASSERT(file);
+
+	fwprintf(file, L"GAME GLOBALS\n");
+	fwprintf(file, L"%ls", L"=============================================\n");
+
+	fwprintf(file, L"Initializing: ");
+	fwprintf(file, L"%ls\n", (game_globals->initializing ? L"True" : L"False"));
+
+	fwprintf(file, L"Map Active: ");
+	fwprintf(file, L"%ls\n", (game_globals->map_active ? L"True" : L"False"));
+
+	fwprintf(file, L"Active Structure BSP Index: %hd", game_globals->active_structure_bsp_index);
+
+	fwprintf(file, L"Game In Progress: ");
+	fwprintf(file, L"%ls\n", (game_globals->game_in_progress ? L"True" : L"False"));
+
+	fwprintf(file, L"Game Is Lost: ");
+	fwprintf(file, L"%ls\n", (game_globals->game_is_lost ? L"True" : L"False"));
+
+	fwprintf(file, L"Ticks To Reset Game: %d\n", game_globals->ticks_to_reset_game);
+
+	fwprintf(file, L"Game Is Finished: ");
+	fwprintf(file, L"%ls\n", (game_globals->game_is_finished ? L"True" : L"False"));
+
+	fwprintf(file, L"Game Sounds Disabled: ");
+	fwprintf(file, L"%ls\n", (game_globals->game_sounds_disabled ? L"True" : L"False"));
+
+	fwprintf(file, L"Ticks Till End: %u\n", game_globals->ticks_till_end);
+
+	fwprintf(file, L"Game Ragdoll Count: %d\n", game_globals->game_ragdoll_count);
+
+	fwprintf(file, L"Enable Scripted Camera PVS: ");
+	fwprintf(file, L"%ls\n", (game_globals->enable_scripted_camera_pvs ? L"True" : L"False"));
+
+	fwprintf(file, L"PVS Object Is Set: %hu\n", game_globals->pvs_activation_mode);
+
+	fwprintf(file, L"PVS Object Datum: %d\n", game_globals->pvs_object_datum);
+
+	return;
+}
+
 /* private code */
 
-static void set_main_game_globals(game_globals_storage* main)
+static void set_main_game_globals(
+	game_globals_storage* main)
 {
 	*Memory::GetAddress<game_globals_storage**>(0x482D3C, 0x4CB520) = main;
 	return;
+}
+
+static game_globals_storage* get_main_game_globals(
+	void)
+{
+	return *Memory::GetAddress<game_globals_storage**>(0x482D3C, 0x4CB520);
 }
 
 static void game_info_initialize_for_new_map(const s_game_options* options)
@@ -530,3 +607,4 @@ static void __cdecl game_save_update(void)
 	INVOKE(0x9E673, 0x90909, game_save_update);
 	return;
 }
+

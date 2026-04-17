@@ -39,7 +39,9 @@ bool simulation_object_variant_should_sync(s_simulation_object_creation_data* cr
 		s_model_definition* model_definition = (s_model_definition*)tag_get_fast(model_tag_index);
 
 		// Confirm that the "default" variant is not the one we are trying to sync
-		sync_variant = model_definition->variants[creation_data->model_variant_index]->name != object_def->object.default_model_variant;
+		const s_model_variant* variant = TAG_BLOCK_GET_ELEMENT(&model_definition->variants, creation_data->model_variant_index, s_model_variant);
+
+		sync_variant = variant->name != object_def->object.default_model_variant;
 	}
 
 	return sync_variant;
@@ -135,7 +137,9 @@ bool __stdcall c_simulation_object_entity_definition__object_setup_placement_dat
 				s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_model_index);
 				if (object_creation_data->model_variant_index < model_def->variants.count)
 				{
-					placement_data->variant_name = model_def->variants[object_creation_data->model_variant_index]->name;
+					const s_model_variant* variant = TAG_BLOCK_GET_ELEMENT(&model_def->variants, object_creation_data->model_variant_index, s_model_variant);
+
+					placement_data->variant_name = variant->name;
 				}
 			}
 			

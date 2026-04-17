@@ -21,6 +21,8 @@ enum
 
 /* globals */
 
+char const g_zero_buffer[256] = {};
+
 #ifdef ASSERTS_ENABLED
 char g_temporary[256] = {};
 

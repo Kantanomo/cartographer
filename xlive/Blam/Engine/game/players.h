@@ -17,9 +17,23 @@ enum
 
 enum e_player_flags : int16
 {
-	_player_active_in_game_bit = 0, // not entirely sure about this one, but the code uses the bit below
-	_player_left_game_bit = 1,
-	_player_first_spawn_bit = 3,
+	_player_active_in_game_bit = 0,
+	_player_left_game_bit,
+	_player_blocking_teleporter_bit,
+	_player_initial_spawn_bit,
+	_player_action_suppress_primary_bit,
+	_player_action_suppress_secondary_bit,
+	_player_action_suppress_tertiary_bit,
+	_player_action_dual_wield_grenade_latch_bit,
+	_player_standing_in_teleporter_bit,
+	_player_standing_in_teleporter_teleported_bit,
+	_player_vehicle_entrance_ban_bit,
+	_player_play_coop_spawn_effect_bit,
+	_player_sitting_out_bit,
+	_player_joined_in_progress_bit,
+	_player_is_tracked_target_bit,
+	_player_is_locked_target_bit,
+	k_player_flag_count,
 };
 
 struct s_player_shot_info
@@ -173,7 +187,7 @@ void __cdecl players_set_machines(uint32 new_machine_valid_mask, const s_machine
 uint32 player_appearance_required_bits(void);
 
 // Validate player configuration
-void __cdecl player_validate_configuration(datum player_index, s_player_configuration* configuration_data);
+void __cdecl players_validate_configuration(int32 player_index, s_player_configuration* configuration_data);
 
 // Sets whether or not the passed user can interact with weapons
 void player_user_weapon_interaction_set(int32 user_index, bool enabled);
@@ -190,6 +204,14 @@ void __cdecl players_update_after_game(const struct simulation_update* update);
 void players_update_for_checkpoint(void);
 
 void players_joined_in_progress_allow_spawn(void);
+
+void clan_identifier_clear(struct s_clan_identifier* clan_id);
+
+void player_appearance_initialize(struct s_player_appearance* player_appearance);
+
+char const* player_identifier_get_string(struct s_player_identifier const* player_id);
+
+char const* clan_identifier_get_string(struct s_clan_identifier const* clan_id);
 
 void players_apply_patches(void);
 

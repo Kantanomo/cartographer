@@ -530,7 +530,7 @@ struct s_model_definition
 	e_shadow_fade_distance shadow_fade_distance;
 	int16 pad2;
 
-	tag_block<s_model_variant> variants;
+	s_tag_block variants;	// s_model_variant
 	tag_block<s_model_material> materials;
 	tag_block<s_model_damage_info> new_damage_info;
 	tag_block<s_model_target> targets;

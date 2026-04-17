@@ -28,7 +28,7 @@ private:
 	uint32 m_flags;
 	wchar_t* m_player_configuration_name;
 	wchar_t m_player_custom_name[32];
-	s_player_profile_traits m_appearance;
+	s_player_appearance m_appearance;
 	string_id m_team_name;
 	e_game_team m_player_team;
 	bool m_fake_player;
@@ -47,6 +47,6 @@ public:
 	void set_player_is_observer(bool observer);
 	void set_fake_player(bool fake);
 	void set_user_role(int32 role);
-	void set_appearance(s_player_profile_traits* appearance);
+	void set_appearance(s_player_appearance* appearance);
 };
 ASSERT_STRUCT_SIZE(c_player_widget_representation, 0x74);

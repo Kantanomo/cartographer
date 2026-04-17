@@ -33,20 +33,21 @@ enum e_game_variant_description_index : char
 enum e_game_engine_flags : int32
 {
 	_game_engine_teams_bit = 0,
-	_game_engine_motion_sensor_bit = 1,
-	_game_engine_always_invisible_bit = 2,
-	_game_engine_round_switch_resets_map_bit = 3,
-	_game_engine_tie_resolution_bit = 4,
-	_game_engine_observers_bit = 5,
-	_game_engine_changing_teams_bit = 6,
-	_game_engine_friendly_fire_bit = 7,
-	_game_engine_overshields_on_map_bit = 8,
-	_game_engine_invisibility_on_map_bit = 9,
-	_game_engine_grenades_on_map_bit = 10,
-	_game_engine_starting_grenades_bit = 11,
-	_game_engine_extra_damage_bit = 12,
-	_game_engine_damage_resistant_bit = 13,
-	_game_engine_force_even_teams_bit = 14,
+	_game_engine_motion_sensor_bit,
+	_game_engine_always_invisible_bit,
+	_game_engine_round_switch_resets_map_bit,
+	_game_engine_tie_resolution_bit,
+	_game_engine_observers_bit,
+	_game_engine_changing_teams_bit,
+	_game_engine_friendly_fire_bit,
+	_game_engine_overshields_on_map_bit,
+	_game_engine_invisibility_on_map_bit,
+	_game_engine_grenades_on_map_bit,
+	_game_engine_starting_grenades_bit,
+	_game_engine_extra_damage_bit,
+	_game_engine_damage_resistant_bit,
+	_game_engine_force_even_teams_bit,
+	k_game_engine_flag_count
 };
 
 enum e_game_engine_round_setting
@@ -288,7 +289,7 @@ struct s_game_variant
 	e_game_variant_description_index description_index;
 	wchar_t variant_name[32];
 	e_game_engine_type variant_game_engine_index;
-	e_game_engine_flags game_engine_flags;
+	c_flags_no_init<e_game_engine_flags, uint32, k_game_engine_flag_count> game_engine_flags;
 
 	/* match settings */
 	e_game_engine_round_setting round_setting;

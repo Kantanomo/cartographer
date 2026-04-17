@@ -397,7 +397,7 @@ int32 game_results_get_finalized_player_place(int32 player_index);
 s_player_configuration* game_results_get_finalized_player_configuration(int32 player_index);
 int8* game_results_get_finalized_player_unknown_02(int32 player_index);
 e_game_team game_results_get_finalized_player_team(int32 player_index);
-void game_results_get_finalized_player_profile_traits(int32 player_index, s_player_profile_traits* profile_traits);
+void game_results_get_finalized_player_profile_traits(int32 player_index, s_player_appearance* appearance);
 bool game_results_get_player_position(real_point3d* position, int32 player_index);
 int32 game_results_get_finalized_team_score(e_game_team team);
 int32 game_results_get_finalized_team_place(e_game_team team);

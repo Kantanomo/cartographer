@@ -1,7 +1,6 @@
 #pragma once
 #include "replication_scheduler.h"
 
-
 /* constants */
 
 enum
@@ -35,6 +34,36 @@ ASSERT_STRUCT_SIZE(s_replication_entity_manager_view_statistics, 24);
 
 class c_replication_entity_manager_view : c_replication_scheduler_client
 {
+public:
+	bool has_data_to_transmit(void) override;
+	bool build_outgoing_requests(const s_simulation_view_telemetry_data* telemetry_data, int32 maximum_number_of_requests, void* requests) override;
+	int32 terminator_required_bits(void) override;
+	void write_to_packet(void* request_identifier, int32 request_type, void* telemetry_data, int32 packet_sequence_number, class c_bitstream* packet, int32 must_leave_space_bits) override;
+	void write_terminator_to_packet(class c_bitstream* packet) override;
+	int32 read_from_packet(class c_bitstream* packet, int32 maximum_number_of_requests, void* requests, int32* out_number_of_requests) override;
+	void process_incoming_request(void* request) override;
+	void notify_packet_acknowledged(void) override;
+	void mark_packet_delivered(bool delivered) override;
+
+	void initialize(int32 world_view_index, class c_replication_entity_manager* entity_manager);
+	void reset(void);
+
+	void create_entity(int32 entity_index);
+
+	void stop_replication(void);
+
+	bool is_replicating(
+		void) const
+	{
+		return m_replicating;
+	}
+
+	bool has_fatal_error(
+		void) const
+	{
+		return m_fatal_error;
+	}
+
 private:
 	bool m_initialized;
 	bool m_replicating;
@@ -48,19 +77,5 @@ private:
 	s_replication_entity_view_data m_entity_data[k_replication_entity_manager_view_max_entities];
 	int32 m_current_absolute_index_position;
 	s_replication_entity_manager_view_statistics m_statistics;
-
-public:
-	bool has_data_to_transmit() override;
-	bool build_outgoing_requests(const s_simulation_view_telemetry_data* telemetry_data, int32 maximum_number_of_requests, void* requests) override;
-	int32 terminator_required_bits() override;
-	void write_to_packet(void* request_identifier, int32 request_type, void* telemetry_data, int32 packet_sequence_number, c_bitstream* packet, int32 must_leave_space_bits) override;
-	void write_terminator_to_packet(c_bitstream* packet) override;
-	int32 read_from_packet(c_bitstream* packet, int32 maximum_number_of_requests, void* requests, int32* out_number_of_requests) override;
-	void process_incoming_request(void* request) override;
-	void notify_packet_acknowledged() override;
-	void mark_packet_delivered(bool delivered) override;
-
-	void initialize(int32 world_view_index, class c_replication_entity_manager* entity_manager);
-	void reset(void);
 };
 ASSERT_STRUCT_SIZE(c_replication_entity_manager_view, 20544);

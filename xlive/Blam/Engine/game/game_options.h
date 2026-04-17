@@ -6,29 +6,6 @@
 #include "saved_games/game_variant.h"
 #include "simulation/machine_id.h"
 
-/* enums */
-
-enum e_game_simulation : int8
-{
-	_game_simulation_none = 0,
-	_game_simulation_local,
-	_game_simulation_synchronous_client,
-	_game_simulation_synchronous_server,
-	_game_simulation_distributed_client,
-	_game_simulation_distributed_server,
-	k_game_simulation_count,
-};
-
-enum e_game_mode : int32
-{
-	_game_mode_none = 0,
-	_game_mode_campaign,
-	_game_mode_multiplayer,
-	_game_mode_ui_shell,
-	_game_mode_tool,
-	k_game_mode_count
-};
-
 /* structures */
 
 #pragma pack(push, 1)
@@ -55,8 +32,7 @@ struct s_game_options
 	bool session_host_is_dedicated;
 	bool scenario_custom;
 	int16 game_tick_rate;
-	int16 pad_C[3];
-	uint8 random_data[8];
+	int64 random_data;
 	int32 verify_random_seed;
 	bool is_custom_map;
 	uint8 field_1D;

@@ -18,12 +18,12 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 	csmemset(profile, 0, sizeof(s_saved_game_player_profile));
 	profile->valid_maybe = true;
 	ustrncpy(profile->name, L"Guest", NUMBEROF(s_saved_game_player_profile::name));
-	profile->profile_traits.profile.primary_color = _player_color_colbat;
-	profile->profile_traits.profile.secondary_color = _player_color_white;
-	profile->profile_traits.profile.tertiary_color = _player_color_white;
-	profile->profile_traits.profile.quaternary_color = _player_color_white;
-	profile->profile_traits.profile.emblem_info.foreground_emblem = _emblem_foreground_seventh_column;
-	profile->profile_traits.profile.emblem_info.background_emblem = _emblem_background_solid;
+	profile->appearance.primary_color = _player_color_colbat;
+	profile->appearance.secondary_color = _player_color_white;
+	profile->appearance.tertiary_color = _player_color_white;
+	profile->appearance.quaternary_color = _player_color_white;
+	profile->appearance.emblem_info.foreground_emblem = _emblem_foreground_seventh_column;
+	profile->appearance.emblem_info.background_emblem = _emblem_background_solid;
 	profile->unk |= 1;
 	profile->input_preferences.controller_sensitivity = 3;
 	profile->input_preferences.mouse_sensitivity = 3;
@@ -65,15 +65,15 @@ bool saved_game_player_profile_read_file(uint32 enumerated_file_index, s_saved_g
 	//if (profile->gap2[0x29] >= 3u)
 	//	profile->gap2[0x29] = 0;
 
-	if(!saved_game_player_profile_read_post_verify_profile_traits(&profile->profile_traits))
-		csmemset(&profile->profile_traits, 0, sizeof(s_player_profile_traits));
+	if(!saved_game_player_profile_read_post_verify_profile_traits(&profile->appearance))
+		csmemset(&profile->appearance, 0, sizeof(s_player_appearance));
 	
 	return result;
 }
 
-bool __cdecl saved_game_player_profile_read_post_verify_profile_traits(s_player_profile_traits* profile_traits)
+bool __cdecl saved_game_player_profile_read_post_verify_profile_traits(s_player_appearance* appearance)
 {
-	return INVOKE(0x54f82, 0, saved_game_player_profile_read_post_verify_profile_traits, profile_traits);
+	return INVOKE(0x54f82, 0, saved_game_player_profile_read_post_verify_profile_traits, appearance);
 }
 
 bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_player_profile* profile)
@@ -91,16 +91,16 @@ bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_p
 	}
 }
 
-void player_profile_traits_initialize(s_player_profile_traits* profile_traits)
+void player_profile_traits_initialize(s_player_appearance* appearance)
 {
-	profile_traits->profile.primary_color = _player_color_white;
-	profile_traits->profile.secondary_color = _player_color_white;
-	profile_traits->profile.tertiary_color = _player_color_white;
-	profile_traits->profile.quaternary_color = _player_color_white;
-	profile_traits->profile.player_character_type = _character_type_masterchief;
-	profile_traits->profile.emblem_info.foreground_emblem = _emblem_foreground_seventh_column;
-	profile_traits->profile.emblem_info.background_emblem = _emblem_background_solid;
-	profile_traits->profile.emblem_info.emblem_flags.clear();
-	profile_traits->gap_48 = 0;
-	profile_traits->gap_4C = 0;
+	appearance->primary_color = _player_color_white;
+	appearance->secondary_color = _player_color_white;
+	appearance->tertiary_color = _player_color_white;
+	appearance->quaternary_color = _player_color_white;
+	appearance->player_character_type = _character_type_masterchief;
+	appearance->emblem_info.foreground_emblem = _emblem_foreground_seventh_column;
+	appearance->emblem_info.background_emblem = _emblem_background_solid;
+	appearance->emblem_info.emblem_flags.clear();
+	appearance->gap_48 = 0;
+	appearance->gap_4C = 0;
 }

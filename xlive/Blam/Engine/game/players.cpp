@@ -6,6 +6,8 @@
 #include "game/game_globals.h"
 #include "interface/user_interface_controller.h"
 #include "networking/session/network_session.h"
+#include "networking/network_event.h"
+#include "networking/network_game_definitions.h"
 #include "saved_games/game_variant.h"
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
@@ -18,6 +20,9 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 
+/* prototypes */
+
+static void player_configuration_validate_team(int32 player_index, s_player_configuration* configuration_data);
 
 /* globals */
 
@@ -202,7 +207,8 @@ uint32 player_appearance_required_bits()
 	return 39;
 }
 
-void __cdecl player_configuration_validate_character_type(s_player_configuration* configuration_data)
+void player_configuration_validate_character_type(
+	s_player_configuration* configuration_data)
 {
 	// Campaign verification
 	if (game_is_campaign())
@@ -220,7 +226,7 @@ void __cdecl player_configuration_validate_character_type(s_player_configuration
 				if (player_starting_location->campaign_player_type != NONE)
 				{
 					configuration_data->team_index = _game_team_player;
-					configuration_data->profile_traits.profile.player_character_type = (e_character_type)player_starting_location->campaign_player_type;
+					configuration_data->appearance.player_character_type = (e_character_type)player_starting_location->campaign_player_type;
 					found = true;
 					break;
 				 }
@@ -230,36 +236,36 @@ void __cdecl player_configuration_validate_character_type(s_player_configuration
 			if (!found)
 			{
 				configuration_data->team_index = _game_team_player;
-				configuration_data->profile_traits.profile.player_character_type = _character_type_masterchief;
+				configuration_data->appearance.player_character_type = _character_type_masterchief;
 			}
 		}
 		else
 		{
 			configuration_data->team_index = _game_team_player;
-			configuration_data->profile_traits.profile.player_character_type = _character_type_masterchief;
+			configuration_data->appearance.player_character_type = _character_type_masterchief;
 		}
 	}
 	// Multiplayer verification
 	else if (game_is_multiplayer())
 	{
 		// If the character is mastechief set him to a spartan in multiplayer
-		if (configuration_data->profile_traits.profile.player_character_type == _character_type_masterchief)
+		if (configuration_data->appearance.player_character_type == _character_type_masterchief)
 		{
-			configuration_data->profile_traits.profile.player_character_type = _character_type_spartan;
+			configuration_data->appearance.player_character_type = _character_type_spartan;
 		}
 
 		// Don't allow dervish since he's not loaded properly in shared
-		if (configuration_data->profile_traits.profile.player_character_type == _character_type_dervish)
+		if (configuration_data->appearance.player_character_type == _character_type_dervish)
 		{
-			configuration_data->profile_traits.profile.player_character_type = _character_type_elite;
+			configuration_data->appearance.player_character_type = _character_type_elite;
 		}
 
 		// Force skeletons in mp during the halloween event
 		// Carto addition
-		if (e_character_type character = configuration_data->profile_traits.profile.player_character_type;
+		if (e_character_type character = configuration_data->appearance.player_character_type;
 			character != _character_type_flood && H2Config_spooky_boy && get_current_special_event() == _special_event_halloween)
 		{
-			configuration_data->profile_traits.profile.player_character_type = _character_type_skeleton;
+			configuration_data->appearance.player_character_type = _character_type_skeleton;
 			if (!shell_is_dedicated_server())
 			{
 				for (uint32 i = 0; i < k_number_of_users; i++)
@@ -272,67 +278,53 @@ void __cdecl player_configuration_validate_character_type(s_player_configuration
 	}
 }
 
-void __cdecl player_validate_configuration(datum player_index, s_player_configuration* configuration_data)
+void __cdecl players_validate_configuration(
+	int32 player_index,
+	s_player_configuration* configuration_data)
 {
 	player_configuration_validate_character_type(configuration_data);
 	
+	s_game_globals* globals = scenario_get_game_globals();
+
 	// General character verification
-	e_character_type character = configuration_data->profile_traits.profile.player_character_type;
-	if (character != NONE)
+	if (configuration_data->appearance.player_character_type != NONE)
 	{
-		if (character >= _character_type_masterchief)
-		{
-			s_game_globals* globals = scenario_get_game_globals();
-			if (character > (e_character_type)globals->player_representation.count - 1)
-			{
-				character = (e_character_type)(globals->player_representation.count - 1);
-			}
-		}
-		else
-		{
-			character = _character_type_masterchief;
-		}
-		configuration_data->profile_traits.profile.player_character_type = character;
+		configuration_data->appearance.player_character_type = (e_character_type)PIN(
+			configuration_data->appearance.player_character_type,
+			_character_type_masterchief,
+			globals->player_representation.count-1
+		);
 	}
 
 	// Skill verification
-	int8 player_displayed_skill = configuration_data->player_displayed_skill;
-	if (player_displayed_skill != NONE)
+	if (configuration_data->player_displayed_skill != NONE)
 	{
-		if (player_displayed_skill < 0)
-			player_displayed_skill = 0;
-		configuration_data->player_displayed_skill = player_displayed_skill;
+		configuration_data->player_displayed_skill = MAX(configuration_data->player_displayed_skill, 0);
 	}
-	int8 player_overall_skill = configuration_data->player_overall_skill;
-	if (player_overall_skill != NONE)
+
+	if (configuration_data->player_overall_skill != NONE)
 	{
-		if (player_overall_skill < 0)
-		{
-			player_overall_skill = 0;
-		}
-		configuration_data->player_overall_skill = player_overall_skill;
+		configuration_data->player_overall_skill = MAX(configuration_data->player_overall_skill, 0);
 	}
 
 	// Handicap verification
 	configuration_data->player_handicap_level = PIN(configuration_data->player_handicap_level, _user_interface_controller_handicap_none, _user_interface_controller_handicap_severe);
 	
 	// User role verification
-	int8 bungie_user_role = configuration_data->bungie_user_role;
-	if (bungie_user_role < 0 || bungie_user_role > 7)
+	if (!VALID_INDEX(configuration_data->bungie_user_role, 8))
 	{
 		configuration_data->bungie_user_role = 0;
 	}
 
-	if (current_game_engine())
-	{
-		if (TEST_BIT(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
-		{
-			if (configuration_data->team_index != _game_team_observer && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
-			{
-				configuration_data->team_index = _game_team_observer;
-			}
-		}
-	}
+	player_configuration_validate_team(player_index, configuration_data);
+
+	ASSERT(configuration_data->team_index==NONE || (configuration_data->team_index>=0 && configuration_data->team_index<k_maximum_teams));
+	/* FIXME: asserts in mainmenu since the map is compiled without any player reps, I think this should be NONE in this case?
+	ASSERT(
+		configuration_data->appearance.player_character_type==NONE ||
+		(configuration_data->appearance.player_character_type>=0 && configuration_data->appearance.player_character_type<globals->player_representation.count)
+	);
+	*/
 
 	return;
 }
@@ -560,16 +552,16 @@ void __cdecl player_find_action_context(datum player_index, s_player_interaction
 							default:
 							{
 								// Search through the children of the object and add them to the nearby objects array
-								for (datum current_weapon_datum = object->object.current_weapon_datum; current_weapon_datum != NONE; ++nearby_object_num)
+								for (datum child_object_index = object->object.first_child_object_index; child_object_index != NONE; ++nearby_object_num)
 								{
 									if (nearby_object_num > NUMBEROF(nearby_objects))
 									{
 										break;
 									}
 
-									const object_datum* weapon_object = object_get(current_weapon_datum);
-									nearby_objects[nearby_object_num] = current_weapon_datum;
-									current_weapon_datum = weapon_object->object.next_object_index;
+									const object_datum* child_object = object_get(child_object_index);
+									nearby_objects[nearby_object_num] = child_object_index;
+									child_object_index = child_object->object.next_object_index;
 								}
 								break;
 							}
@@ -588,28 +580,114 @@ int16 local_player_count(void)
 	return get_players_globals()->local_player_count;
 }
 
-void __cdecl players_update_before_game(const struct simulation_update* update)
+void __cdecl players_update_before_game(
+	const struct simulation_update* update)
 {
 	INVOKE(0x5815E, 0x60656, players_update_before_game, update);
 	return;
 }
 
-void __cdecl players_update_after_game(const struct simulation_update* update)
+void __cdecl players_update_after_game(
+	const struct simulation_update* update)
 {
 	INVOKE(0x58C22, 0x6111A, players_update_after_game, update);
 	return;
 }
 
-void players_update_for_checkpoint(void)
+void players_update_for_checkpoint(
+	void)
 {
 	players_joined_in_progress_allow_spawn();
 	return;
 }
 
-void players_joined_in_progress_allow_spawn(void)
+void players_joined_in_progress_allow_spawn(
+	void)
 {
-	// TODO: implement
+	c_player_in_game_iterator player_iterator;
+
+	while (player_iterator.next())
+	{
+		player_datum* player =  player_iterator.get_datum();
+
+		if (!player)
+		{
+			break;
+		}
+
+		if (!TEST_BIT(player->flags, _player_left_game_bit))
+		{
+			if (TEST_BIT(player->flags, _player_joined_in_progress_bit))
+			{
+				SET_BIT(player->flags, _player_joined_in_progress_bit, false);
+			}
+		}
+	}
+
 	return;
+}
+
+void clan_identifier_clear(
+	s_clan_identifier* clan_id)
+{
+	csmemset(clan_id, 0, sizeof(*clan_id));
+
+	return;
+}
+
+void player_appearance_initialize(
+	s_player_appearance* player_appearance)
+{
+	csmemset(player_appearance, 0, sizeof(*player_appearance));
+
+	return;
+}
+
+char const* player_identifier_get_string(
+	s_player_identifier const* player_id)
+{
+	static char player_id_string[sizeof(*player_id)*3 + 1];
+	
+	for (int32 byte_index = 0; byte_index < sizeof(*player_id); ++byte_index)
+	{
+		_snprintf_s(
+			&player_id_string[byte_index*3],
+			sizeof(player_id_string)-(byte_index*3),
+			_TRUNCATE,
+			"%02x%c",
+			player_id->identifier[byte_index],
+			byte_index != sizeof(*player_id)-1 ? ':' : '\0'
+		);
+	}
+
+	return player_id_string;
+}
+
+char const* clan_identifier_get_string(
+	s_clan_identifier const* clan_id)
+{
+	static char clan_id_string[sizeof(*clan_id)*3 + 1];
+
+	if (csmemcmp(clan_id, g_zero_buffer, sizeof(*clan_id)))
+	{
+		for (int32 byte_index = 0; byte_index < sizeof(*clan_id); ++byte_index)
+		{
+			_snprintf_s(
+				&clan_id_string[byte_index*3],
+				NUMBEROF(clan_id_string) - (byte_index*3),
+				_TRUNCATE,
+				"%02x%c",
+				clan_id->identifier[byte_index],
+				byte_index != sizeof(*clan_id)-1 ? ':' : '\0'
+			);
+		}
+	}
+	else
+	{
+		_snprintf_s(clan_id_string, NUMBEROF(clan_id_string), _TRUNCATE, "<clan invalid>");
+	}
+
+	return clan_id_string;
 }
 
 void players_apply_patches(void)
@@ -618,7 +696,7 @@ void players_apply_patches(void)
 	WriteValue<BYTE>(Memory::GetAddress(0x54fb2, 0x5D4AA) + 1, k_player_character_type_count);
 
 	// Replace the player profile validation function with our own
-	PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);
+	PatchCall(Memory::GetAddress(0x5509E, 0x5D596), players_validate_configuration);
 
 	// Replace update activation to insert events into the simulation queue
 	PatchCall(Memory::GetAddress(0x58182, 0x6067A), players_update_activation);
@@ -627,3 +705,40 @@ void players_apply_patches(void)
 	return;
 }
 
+/* private code */
+
+static void player_configuration_validate_team(
+	int32 player_index,
+	s_player_configuration* configuration)
+{
+	if (current_game_engine())
+	{
+		if (get_game_variant()->game_engine_flags.test(_game_engine_teams_bit))
+		{
+			s_game_engine_globals* globals = game_engine_globals_get();
+
+			if (configuration->team_index != _game_team_observer && !TEST_BIT(globals->team_bitmask, configuration->team_index))
+			{
+				if (game_is_authoritative())
+				{
+					error(
+						_error_category_multiplayer,
+						_error_delayed,
+						"player configuration had invalid team index %d (valid_teams 0x%04X), setting to observer",
+						configuration->team_index,
+						globals->team_bitmask);
+				}
+
+				event(
+					_event_message,
+					"game_engine:players: %s player 0x%08X configuration had invalid team index %d (valid_teams 0x%04X), setting to observer",
+				
+				);
+
+				configuration->team_index = _game_team_observer;
+			}
+		}
+	}
+
+	return;
+}

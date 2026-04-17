@@ -1,22 +1,20 @@
 #pragma once
 #include "object_types.h"
 
+/* enums */
+
 enum e_object_source : int8
 {
 	_object_source_structure = 0,
-	_object_source_editor = 1,
-	_object_source_dynamic = 2,
-	_object_source_legacy = 3,
+	_object_source_editor,
+	_object_source_dynamic,
+	_object_source_legacy,
 };
+
+/* classes */
 
 class c_object_identifier
 {
-private:
-	int32 m_unique_id;
-	int16 m_origin_bsp_index;
-	int8/*e_object_type*/ m_object_type;
-	e_object_source m_source;
-
 public:
 	c_object_identifier(void) = default;
 	~c_object_identifier(void) = default;
@@ -31,5 +29,11 @@ public:
 
 	bool is_scenario_object(void) const;
 	datum find_object_index(void) const;
+
+private:
+	int32 m_unique_id;
+	int16 m_origin_bsp_index;
+	int8/*e_object_type*/ m_object_type;
+	e_object_source m_source;
 };
 ASSERT_STRUCT_SIZE(c_object_identifier, 8);

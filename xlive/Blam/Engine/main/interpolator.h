@@ -2,7 +2,7 @@
 #include "game/player_constants.h"
 #include "interface/first_person_weapons.h"
 #include "models/render_models.h"
-#include "objects/objects.h"
+#include "objects/object_constants.h"
 
 /* constants */
 
@@ -60,7 +60,7 @@ struct s_frame_data_storage
 
 /* globals */
 
-extern s_interpolation_data* g_frame_data_intermediate;
+extern thread_local s_interpolation_data* g_frame_data_intermediate;
 
 /* prototypes */
 

@@ -58,7 +58,7 @@ void add_hat_and_beard_to_model(datum player_hlmt_datum, datum hat_scenery_datum
 		++block_count;
 
 	s_model_definition* model = (s_model_definition*)tag_get_fast(player_hlmt_datum);
-	s_model_variant* variant = model->variants[0];
+	s_model_variant* variant = TAG_BLOCK_GET_ELEMENT(&model->variants, 0, s_model_variant);
 
 	s_model_variant_object* blocks = (s_model_variant_object*)tag_injection_extend_block(&variant->objects, variant->objects.type_size(), block_count);
 

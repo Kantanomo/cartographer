@@ -4,6 +4,7 @@
 #include "transport_address.h"
 
 #include "shell/shell_windows.h"
+#include "simulation/machine_id.h"
 
 #include <Xlive/xnet/Sockets/XSocket.h>
 
@@ -15,12 +16,24 @@ static char g_transport_security_unique_identifier_string[13];
 
 /* public code */
 
-bool transport_secure_address_compare(const s_transport_secure_address* a, const s_transport_secure_address* b)
+bool transport_secure_address_compare(
+	const s_transport_secure_address* a,
+	const s_transport_secure_address* b)
 {
 	return csmemcmp(a, b, sizeof(s_transport_secure_address)) == 0;
 }
 
-char* transport_secure_identifier_get_string(const s_transport_secure_identifier* identifier)
+void transport_secure_address_extract_identifier(
+	s_transport_secure_address const* address,
+	s_machine_identifier* identifier)
+{
+	csmemcpy(identifier, address->addr.abEnet, sizeof(*identifier));
+
+	return;
+}
+
+char* transport_secure_identifier_get_string(
+	const s_transport_secure_identifier* identifier)
 {
 	csprintf(
 		g_transport_security_identifier_string,
@@ -35,10 +48,12 @@ char* transport_secure_identifier_get_string(const s_transport_secure_identifier
 		identifier->id.ab[6],
 		identifier->id.ab[7]
 	);
+
 	return g_transport_security_identifier_string;
 }
 
-const char* managed_session_get_id_string(const s_transport_secure_identifier* session_id)
+const char* managed_session_get_id_string(
+	const s_transport_secure_identifier* session_id)
 {
     ASSERT(session_id != NULL);
 
@@ -57,7 +72,8 @@ const char* managed_session_get_id_string(const s_transport_secure_identifier* s
 	);
 }
 
-const char* transport_unique_identifier_get_string(const s_transport_unique_identifier* unique_identifier)
+const char* transport_unique_identifier_get_string(
+	const s_transport_unique_identifier* unique_identifier)
 {
 	ASSERT(unique_identifier != NULL);
 	
@@ -73,7 +89,11 @@ const char* transport_unique_identifier_get_string(const s_transport_unique_iden
 		unique_identifier->ab[5]);
 }
 
-char* transport_secure_address_to_string(const s_transport_secure_address* in_secure_address, char* string, int32 size, bool include_online_address, bool include_mac_address)
+char* transport_secure_address_to_string(
+	const s_transport_secure_address* in_secure_address,
+	char* string, int32 size,
+	bool include_online_address,
+	bool include_mac_address)
 {
 	if (*xlive_initilized_get())
 	{
@@ -134,13 +154,16 @@ char* transport_secure_address_to_string(const s_transport_secure_address* in_se
 			}
 		}
 	}
+
 	return string;
 }
 
-const char* transport_secure_address_get_mac_string(const s_transport_secure_address* address)
+const char* transport_secure_address_get_mac_string(
+	const s_transport_secure_address* address)
 {
 	s_transport_unique_identifier unique_id;
 	csmemcpy(&unique_id, address->addr.abEnet, sizeof(unique_id));
+	
 	return transport_unique_identifier_get_string(&unique_id);
 }
 
@@ -155,7 +178,9 @@ bool __cdecl transport_secure_identifier_retrieve(
 	return INVOKE(0x1B5F84, 0x1963BE, transport_secure_identifier_retrieve, usable_address, platform, remote_identifier, secure_identifier, secure_key, secure_address);
 }
 
-bool __cdecl transport_secure_address_get(s_transport_secure_address* secure_address, transport_address* address)
+bool __cdecl transport_secure_address_get(
+	s_transport_secure_address* secure_address,
+	transport_address* address)
 {
 	return INVOKE(0x1B5836, 0x0, transport_secure_address_get, secure_address, address);
 }
