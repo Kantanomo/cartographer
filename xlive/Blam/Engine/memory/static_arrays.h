@@ -1,6 +1,8 @@
 #pragma once
 #include "text/unicode.h"
 
+/* classes */
+
 template<typename t_storage_type, size_t k_count>
 class c_static_array
 {
@@ -73,12 +75,55 @@ protected:
 	t_type m_data[k_maximum_count];
 };
 
+template<typename t_type, typename t_storage_type, int32 k_min, int32 k_max>
+class c_enum
+{
+public:
+	inline operator t_type(
+		void) const
+	{
+		return (t_type)m_enum_value;
+	}
+
+	c_enum<t_type, t_storage_type, k_min, k_max> &operator=(
+		t_type new_value)
+	{
+		m_enum_value = (t_storage_type)new_value;
+		
+		return *this;
+	}
+
+	bool operator==(
+		t_type rhs) const
+	{
+		return m_enum_value==rhs;
+	}
+
+	inline bool in_range(
+		void) const
+	{
+		return m_enum_value>=k_min && m_enum_value<k_max;
+	}
+	
+	inline void set_raw_value(
+		t_storage_type new_value)
+	{
+		m_enum_value = new_value;
+
+		return;
+	}
+
+private:
+	t_storage_type m_enum_value;
+};
+
 template<typename t_type, typename t_storage_type, size_t k_count>
 class c_flags_no_init 
 {
 	static_assert(std::is_unsigned_v<t_storage_type>, "error: t_storage_type is not an unsigned integral type");
 	static_assert(k_count > 0 && k_count <= (sizeof(t_storage_type) * 8), "error: k_count < 0 || k_count > (sizeof(t_storage_type) * 8)");
 
+public:
 	bool valid_bit(t_type bit) const
 	{
 		return VALID_INDEX(bit, k_count);
@@ -89,8 +134,6 @@ class c_flags_no_init
 	{
 		return !TEST_FLAG(m_storage, ~MASK(k_count));
 	}
-
-public:
 
 	void set(t_type bit, bool enable)
 	{
@@ -118,7 +161,9 @@ public:
 	void set_unsafe(t_storage_type raw_bits)
 	{
 		m_storage = raw_bits;
+
 		ASSERT(valid());
+
 		return;
 	}
 
@@ -530,8 +575,8 @@ inline size_t c_static_wchar_string<T>::max_length(void) const
 template<size_t T>
 wchar_t* c_static_wchar_string<T>::append(const wchar_t* src)
 {
-	wchar_t* result = ustrncat(this->get_buffer(), src, T);
-	result[T - 1] = 0;
+	wchar_t* result = ustrncat(get_buffer(), src, T);
+	result[T-1] = L'\0';
 	return result;
 }
 
@@ -620,10 +665,11 @@ const wchar_t* c_static_wchar_string<T>::append_print(const wchar_t* format, ...
 	return m_string;
 }
 
-/* globals */
+/* typedefs */
 
 typedef c_static_wchar_string<512> c_maximum_interface_text;
 
+/* globals */
 
 #ifdef ASSERTS_ENABLED
 extern c_static_string<256> g_static_string_assert_text;
