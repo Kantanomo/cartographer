@@ -1,26 +1,42 @@
 #pragma once
 #include "tag_files/tag_block.h"
 
-#define MAXIMUM_PLANES_PER_BSP3D 65536
-#define MAXIMUM_LEAVES_PER_BSP3D 65536
-#define MAXIMUM_BSP2D_REFERENCES_PER_COLLISION_BSP 131072
-#define MAXIMUM_SURFACES_PER_COLLISION_BSP 131072
-#define MAXIMUM_EDGES_PER_COLLISION_BSP 262144
-#define MAXIMUM_VERTICES_PER_COLLISION_BSP 131072
+/* constants */
 
-enum e_collision_surface_flags : uint8
+enum
 {
-	_collision_surface_two_sided = FLAG(0),
-	_collision_surface_invisible = FLAG(1),
-	_collision_surface_climbable = FLAG(2),
-	_collision_surface_breakable = FLAG(3),
-	_collision_surface_invalid = FLAG(4),
-	_collision_surface_conveyor = FLAG(5)
+	MAXIMUM_PLANES_PER_BSP3D = 65536,
+	MAXIMUM_LEAVES_PER_BSP3D = 65536,
+	MAXIMUM_BSP2D_REFERENCES_PER_COLLISION_BSP = 131072,
+	MAXIMUM_SURFACES_PER_COLLISION_BSP = 131072,
+	MAXIMUM_EDGES_PER_COLLISION_BSP = 262144,
+	MAXIMUM_VERTICES_PER_COLLISION_BSP = 131072
+};
+
+/* enums */
+
+enum e_collision_surface_flags
+{
+	_collision_surface_two_sided_bit = 0,
+	_collision_surface_invisible_bit,
+	_collision_surface_climbable_bit,
+	_collision_surface_breakable_bit,
+	_collision_surface_invalid_bit,
+	_collision_surface_conveyor_bit,
+	NUMBER_OF_COLLISION_SURFACE_FLAGS
 };
 
 enum e_collision_leaf_flags : uint8
 {
 	_collision_leaf_contains_double_sided_surfaces = FLAG(0)
+};
+
+/* structures */
+
+struct bsp3d
+{
+	s_tag_block nodes;
+	s_tag_block planes;
 };
 
 // max: MAXIMUM_VERTICES_PER_COLLISION_BSP
@@ -49,7 +65,7 @@ struct collision_surface
 {
 	uint16 plane;
 	uint16 first_edge;
-	e_collision_surface_flags flags;
+	uint8 /*e_collision_surface_flags*/ flags;
 	int8 breakable_surface;
 	uint16 material;
 };
@@ -90,9 +106,8 @@ ASSERT_STRUCT_SIZE(bsp3d_node, 8);
 
 struct collision_bsp
 {
-	tag_block<bsp3d_node> bsp_3d_nodes;
-	// max: MAXIMUM_PLANES_PER_BSP3D
-	tag_block<real_plane3d> planes;
+	bsp3d bsp3d;
+
 	tag_block<collision_leaf> leaves;
 	tag_block<bsp2d_reference> bsp_2d_references;
 	tag_block<bsp2d_node> bsp_2d_nodes;

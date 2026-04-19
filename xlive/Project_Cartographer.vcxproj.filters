@@ -554,6 +554,7 @@
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_sentinel.cpp" />
     <ClCompile Include="Blam\Engine\render\render_prt.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_postgame_statistics.cpp" />
+    <ClCompile Include="Blam\Engine\physics\bsp3d.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2085,6 +2086,7 @@
     <ClInclude Include="Blam\Engine\networking\replication\replication_event.h" />
     <ClInclude Include="Blam\Engine\models\model_constants.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_postgame_statistics.h" />
+    <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -6,7 +6,9 @@
 #include "cache/cache_files.h"
 #include "creatures/creature_definitions.h"
 #include "game/game_engine.h"
+#include "game/game_globals.h"
 #include "objects/object_location.h"
+#include "physics/bsp3d.h"
 #include "physics/collision_model_definitions.h"
 #include "physics/physics_model_definitions.h"
 #include "rasterizer/dx9/rasterizer_dx9_vertex_shaders.h"
@@ -31,39 +33,52 @@ void scenario_apply_patches(
 	return;
 }
 
-scenario* global_scenario_get(void) 
+scenario* global_scenario_get(
+	void) 
 {
 	return *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430);
 }
 
-void set_global_scenario(scenario* _scenario)
+void set_global_scenario(
+	scenario* _scenario)
 {
 	*Memory::GetAddress<scenario**>(0x479E74, 0x4A6430) = _scenario;
 }
 
-collision_bsp* global_collision_bsp_get(void)
+bsp3d* global_bsp3d_get(
+	void)
+{
+	return *Memory::GetAddress<bsp3d**>(0x479E60, 0x4A641C);
+}
+
+collision_bsp* global_collision_bsp_get(
+	void)
 {
 	return *Memory::GetAddress<collision_bsp**>(0x479E64, 0x4A6420);
 }
 
-void global_scenario_index_set(datum scenario_index)
+void global_scenario_index_set(
+	datum scenario_index)
 {
 	datum* global_scenario_index = Memory::GetAddress<datum*>(0x4119A0, 0x3B528C);
 	*global_scenario_index = scenario_index;
 	return;
 }
 
-int32 global_scenario_index_get(void)
+int32 global_scenario_index_get(
+	void)
 {
 	return *Memory::GetAddress<int32*>(0x4119A0, 0x3B528C);
 }
 
-int32 scenario_netgame_equipment_size(void)
+int32 scenario_netgame_equipment_size(
+	void)
 {
 	return global_scenario_get()->netgame_equipment.count;
 }
 
-void location_invalidate(s_location* object_location)
+void location_invalidate(
+	s_location* object_location)
 {
 	object_location->leaf_index = NONE;
 	object_location->cluster_index = NONE;
@@ -72,26 +87,61 @@ void location_invalidate(s_location* object_location)
 	return;
 }
 
-void __cdecl scenario_location_from_point(s_location* location, real_point3d* point)
+int32 scenario_leaf_index_from_point(
+	real_point3d const* point)
+{
+	bsp3d* global_bsp3d = global_bsp3d_get();
+
+	ASSERT(global_bsp3d);
+
+	return bsp3d_test_point(global_bsp3d, 0, point);
+}
+
+void __cdecl scenario_location_from_point(
+	s_location* location,
+	real_point3d* point)
 {
 	INVOKE(0x281EE, 0x30CB1, scenario_location_from_point, location, point);
 	return;
 }
 
-bool __cdecl scenario_location_underwater(s_location* location, real_point3d* point, int16* global_material_index)
+bool __cdecl scenario_location_underwater(
+	s_location* location,
+	real_point3d* point,
+	int16* global_material_index)
 {
 	return INVOKE(0x27A03, 0x304C6, scenario_location_underwater, location, point, global_material_index);
 }
 
-void __cdecl scenario_location_from_leaf(s_location* location, int32 leaf_index)
+void __cdecl scenario_location_from_leaf(
+	s_location* location,
+	int32 leaf_index)
 {
 	INVOKE(0x2819D, 0x30C60, scenario_location_from_leaf, location, leaf_index);
 	return;
 }
 
+
+bool __cdecl scenario_switch_bsp(
+	int16 bsp_index)
+{
+	return INVOKE(0x27CA6, 0x0, scenario_switch_bsp, bsp_index);
+}
+
+void scenario_language_pack_unload(
+	void)
+{
+	s_game_globals* game_globals = scenario_get_game_globals();
+
+	game_globals->language_pack[get_current_language()].unload_data();
+	
+	return;
+}
+
 /* private code */
 
-static void __cdecl scenario_tags_postprocess(void)
+static void __cdecl scenario_tags_postprocess(
+	void)
 {
 	tag_iterator itr;
 	tag_iterator_new(&itr, _tag_group_none);
@@ -130,7 +180,8 @@ static void __cdecl scenario_tags_postprocess(void)
 	return;
 }
 
-static void __cdecl scenario_apply_level_patches(void)
+static void __cdecl scenario_apply_level_patches(
+	void)
 {
 	return INVOKE(0x27EDD, 0x0, scenario_apply_level_patches);
 }
