@@ -179,7 +179,7 @@ bool xbox_tickrate_is_enabled()
 
 void call_give_player_weapon(datum player_index, datum weapon_tag_definition_index, bool resetLoadout)
 {
-	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player_datum const* player = player_get(player_index);
 
 	if (player->unit_index != NONE)
 	{

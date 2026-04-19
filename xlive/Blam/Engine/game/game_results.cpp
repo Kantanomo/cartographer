@@ -245,7 +245,7 @@ void game_results_get_finalized_player_profile_traits(int32 player_index, s_play
 bool game_results_get_player_position(real_point3d* position, int32 player_index)
 {
 	//usercall 0x6928E
-	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player_datum const* player = player_get(player_index);
 
 	if (player->unit_index != NONE && player->dead_unit_index != NONE)
 	{

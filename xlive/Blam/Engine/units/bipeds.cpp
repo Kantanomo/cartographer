@@ -234,9 +234,11 @@ void __cdecl biped_get_sight_position(
 		}
 
 		datum player_index = player_index_from_unit_index(biped_index);
+		
 		if (player_index != NONE)
 		{
-			player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+			player_datum const* player = player_get(player_index);
+			
 			if (player->user_index != NONE)
 			{
 				real_point3d point;

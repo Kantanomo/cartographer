@@ -297,7 +297,8 @@ static bool game_is_synchronous_networking(void)
 
 static void simulation_queue_player_event_set_activation(int32 player_index, bool active)
 {
-	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player_datum* player = player_get(player_index);
+
 	if (TEST_BIT(player->flags, 0) != active)
 	{
 		SET_BIT(player->flags, 0, active);

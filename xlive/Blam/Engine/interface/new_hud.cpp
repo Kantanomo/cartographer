@@ -100,7 +100,7 @@ bool __cdecl render_ingame_chat_check(void)
 {
 	if (H2Config_hide_ingame_chat)
 	{
-		const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index_from_user_index(0));
+		player_datum const* player = player_get(player_index_from_user_index(0));
 
 		if (player->is_chatting == 2)
 		{

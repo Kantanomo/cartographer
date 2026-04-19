@@ -75,9 +75,9 @@ void GraveRobber::PickupSkull(datum player_index, datum skull_datum)
 {
 	if (skull_datum == NONE) { return; }
 
-	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
-
+	player_datum const* player = player_get(player_index);
 	c_game_statborg* game_statborg = game_engine_get_statborg();
+	
 	if (!game_is_predicted())
 	{
 		player_is_picking_up_skull = true;
@@ -92,6 +92,7 @@ void GraveRobber::PickupSkull(datum player_index, datum skull_datum)
 		else
 		{
 			const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
+
 			if (game_statborg->get_player_stat(player_abs_index, _statborg_entry_round_score) == current_game_variant()->score_to_win_round)
 			{
 				game_engine_end_round_with_winner(player_index, false);
@@ -187,7 +188,7 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 void GraveRobber::OnPlayerDeath(ExecTime execTime, datum player_index)
 {
-	const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player_datum const* player = player_get(player_index);
 
 	switch (execTime)
 	{

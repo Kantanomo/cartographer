@@ -99,9 +99,9 @@ void GunGame::OnPlayerDeath(ExecTime execTime, datum player_index)
 		// to note after the original function executes, the controlled unit by this player is set to NONE
 		if (!game_is_predicted())
 		{
-			const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
-
+			player_datum const* player = player_get(player_index);
 			unit_datum* unit = unit_try_and_get(player->unit_index);
+
 			unit->unit.grenade_counts[_unit_grenade_human_fragmentation] = 0;
 			unit->unit.grenade_counts[_unit_grenade_covenant_plasma] = 0;
 			simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));
@@ -122,8 +122,8 @@ void GunGame::OnPlayerDeath(ExecTime execTime, datum player_index)
 
 void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 {
-	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 	const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
+	player_datum* player = player_get(player_index);
 
 	switch (execTime)
 	{
@@ -189,7 +189,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum player_index)
 
 bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_index, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
 {
-	const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player_datum const* player = player_get(player_index);
 
 	uint64 id;
 	s_player_identifier identifier = NetworkSession::GetPlayerId(player_index);
