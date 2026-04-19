@@ -10,7 +10,7 @@
 #define _real_epsilon 0.0001f
 #define k_real_epsilon _real_epsilon
 
-#define _pi M_PI
+#define _pi ((real32)(M_PI))
 
 /* macros */
 
@@ -609,6 +609,9 @@ real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_v
 void vectors3d_from_euler_angles3d(real_vector3d* forward, real_vector3d* up, const real_euler_angles3d* angles);
 
 void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angles2d* angles);
+
+void quantize_real_point3d(real_point3d const* point, real_rectangle3d const* bounds, int32 axis_encoding_bit_count, long_point3d* point_quantization);
+void dequantize_real_point3d(long_point3d const* point_quantization, real_rectangle3d const* bounds, int32 axis_encoding_bit_count, real_point3d* point);
 
 /* macros */
 
