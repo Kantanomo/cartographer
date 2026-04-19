@@ -50,6 +50,7 @@ bool screenshot_in_progress(void);
 bool cubemap_screenshot_in_progress(void);
 
 bool movie_recording(void);
+void movie_stop(void);
 
 real32 movie_recording_timestep(void);
 

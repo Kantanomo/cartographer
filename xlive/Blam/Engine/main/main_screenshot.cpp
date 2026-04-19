@@ -106,6 +106,14 @@ bool movie_recording(void)
 	return result;
 }
 
+void movie_stop(
+	void)
+{
+	movie_globals_get()->in_progress = false;
+
+	return;
+}
+
 real32 movie_recording_timestep(void)
 {
 	const s_movie_globals* movie_globals = movie_globals_get();

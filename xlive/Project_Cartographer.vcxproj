@@ -623,6 +623,7 @@
     <ClCompile Include="Blam\Engine\cache\pc_geometry_cache.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_texture_cache.cpp" />
     <ClCompile Include="Blam\Engine\cache\phyical_memory_map.cpp" />
+    <ClCompile Include="Blam\Engine\cache\xbox_sound_cache.cpp" />
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
@@ -975,6 +976,7 @@
     <ClInclude Include="Blam\Engine\cache\pc_texture_cache.h" />
     <ClInclude Include="Blam\Engine\cache\physical_memory_map.h" />
     <ClInclude Include="Blam\Engine\cache\predicted_resources.h" />
+    <ClInclude Include="Blam\Engine\cache\xbox_sound_cache.h" />
     <ClInclude Include="Blam\Engine\camera\camera_track_definition.h" />
     <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\camera\director.h" />
