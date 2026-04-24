@@ -79,8 +79,7 @@ template<typename t_type, typename t_storage_type, int32 k_min, int32 k_max>
 class c_enum
 {
 public:
-	inline operator t_type(
-		void) const
+	inline operator t_type(void) const
 	{
 		return (t_type)m_enum_value;
 	}
@@ -99,8 +98,7 @@ public:
 		return m_enum_value==rhs;
 	}
 
-	inline bool in_range(
-		void) const
+	inline bool in_range(void) const
 	{
 		return m_enum_value>=k_min && m_enum_value<k_max;
 	}

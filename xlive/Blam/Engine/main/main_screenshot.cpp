@@ -106,8 +106,7 @@ bool movie_recording(void)
 	return result;
 }
 
-void movie_stop(
-	void)
+void movie_stop(void)
 {
 	movie_globals_get()->in_progress = false;
 

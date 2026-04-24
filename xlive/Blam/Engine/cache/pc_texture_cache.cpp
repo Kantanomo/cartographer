@@ -35,22 +35,19 @@ void __cdecl texture_cache_block_for_one_frame(
 	return;
 }
 
-bool __cdecl texture_cache_open_pregame(
-	void)
+bool __cdecl texture_cache_open_pregame(void)
 {
 	return INVOKE(0x26590B, 0x0, texture_cache_open_pregame);
 }
 
-void texture_cache_unk(
-	void)
+void texture_cache_unk(void)
 {
 	// This never did anything
 
 	return;
 }
 
-void __cdecl texture_cache_close(
-	void)
+void __cdecl texture_cache_close(void)
 {
 	// This function does nothing on dedis
 
@@ -59,8 +56,7 @@ void __cdecl texture_cache_close(
 	return;
 }
 
-void texture_cache_close_pregame(
-	void)
+void texture_cache_close_pregame(void)
 {
 	texture_cache_close();
 

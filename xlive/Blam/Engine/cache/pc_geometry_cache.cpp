@@ -5,15 +5,13 @@
 
 /* public code */
 
-void __cdecl geometry_cache_new(
-	void)
+void __cdecl geometry_cache_new(void)
 {
 	INVOKE(0x26526C, 0x0, geometry_cache_new);
 	return;
 }
 
-void __cdecl geometry_cache_close(
-	void)
+void __cdecl geometry_cache_close(void)
 {
 	// This function does nothing on dedis
 
@@ -22,8 +20,7 @@ void __cdecl geometry_cache_close(
 	return;
 }
 
-void __cdecl pc_geometry_cache_block_count_clear(
-	void)
+void __cdecl pc_geometry_cache_block_count_clear(void)
 {
 	INVOKE(0x264F31, 0x0, pc_geometry_cache_block_count_clear);
 	return;

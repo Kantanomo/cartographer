@@ -33,8 +33,7 @@ void scenario_apply_patches(
 	return;
 }
 
-scenario* global_scenario_get(
-	void) 
+scenario* global_scenario_get(void) 
 {
 	return *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430);
 }
@@ -45,14 +44,12 @@ void set_global_scenario(
 	*Memory::GetAddress<scenario**>(0x479E74, 0x4A6430) = _scenario;
 }
 
-bsp3d* global_bsp3d_get(
-	void)
+bsp3d* global_bsp3d_get(void)
 {
 	return *Memory::GetAddress<bsp3d**>(0x479E60, 0x4A641C);
 }
 
-collision_bsp* global_collision_bsp_get(
-	void)
+collision_bsp* global_collision_bsp_get(void)
 {
 	return *Memory::GetAddress<collision_bsp**>(0x479E64, 0x4A6420);
 }
@@ -65,14 +62,12 @@ void global_scenario_index_set(
 	return;
 }
 
-int32 global_scenario_index_get(
-	void)
+int32 global_scenario_index_get(void)
 {
 	return *Memory::GetAddress<int32*>(0x4119A0, 0x3B528C);
 }
 
-int32 scenario_netgame_equipment_size(
-	void)
+int32 scenario_netgame_equipment_size(void)
 {
 	return global_scenario_get()->netgame_equipment.count;
 }
@@ -128,8 +123,7 @@ bool __cdecl scenario_switch_bsp(
 	return INVOKE(0x27CA6, 0x0, scenario_switch_bsp, bsp_index);
 }
 
-void scenario_language_pack_unload(
-	void)
+void scenario_language_pack_unload(void)
 {
 	s_game_globals* game_globals = scenario_get_game_globals();
 
@@ -140,8 +134,7 @@ void scenario_language_pack_unload(
 
 /* private code */
 
-static void __cdecl scenario_tags_postprocess(
-	void)
+static void __cdecl scenario_tags_postprocess(void)
 {
 	tag_iterator itr;
 	tag_iterator_new(&itr, _tag_group_none);
@@ -180,8 +173,7 @@ static void __cdecl scenario_tags_postprocess(
 	return;
 }
 
-static void __cdecl scenario_apply_level_patches(
-	void)
+static void __cdecl scenario_apply_level_patches(void)
 {
 	return INVOKE(0x27EDD, 0x0, scenario_apply_level_patches);
 }

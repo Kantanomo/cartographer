@@ -14,8 +14,7 @@ struct s_unicode_string_list_reference
 
 /* public code */
 
-bool c_language_pack::unload_data(
-	void)
+bool c_language_pack::unload_data(void)
 {
 	if (m_data_loaded)
 	{
