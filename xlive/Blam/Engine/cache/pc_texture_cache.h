@@ -23,6 +23,9 @@ struct IDirect3DTexture9* __cdecl pc_texture_cache_preload_bitmap(struct bitmap_
 
 void __cdecl texture_cache_block_for_one_frame(int32 a1);
 
+void texture_cache_unk(void);
 bool __cdecl texture_cache_open_pregame(void);
+void __cdecl texture_cache_close(void);
+void texture_cache_close_pregame(void);
 
 void texture_cache_free(void* block);

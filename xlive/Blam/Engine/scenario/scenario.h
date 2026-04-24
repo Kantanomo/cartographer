@@ -23,8 +23,14 @@ int32 scenario_netgame_equipment_size(void);
 
 void location_invalidate(struct s_location* object_location);
 
+int32 scenario_leaf_index_from_point(real_point3d const* point);
+
 void __cdecl scenario_location_from_point(struct s_location* location, real_point3d* point);
 
 bool __cdecl scenario_location_underwater(struct s_location* location, real_point3d* point, int16* global_material_index);
 
 void __cdecl scenario_location_from_leaf(struct s_location* location, int32 leaf_index);
+
+bool __cdecl scenario_switch_bsp(int16 bsp_index);
+
+void scenario_language_pack_unload(void);

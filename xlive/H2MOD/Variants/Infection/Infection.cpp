@@ -255,17 +255,20 @@ void Infection::preSpawnServerSetup() {
 
 void Infection::setPlayerAsHuman(int32 player_index)
 {
-	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player_datum* player = player_get(player_index);
+
 	player->configuration.appearance.player_character_type = infection_human_get_player_type();
 	player->unit_speed = k_human_unit_speed;
 }
 
 void Infection::setPlayerAsZombie(int32 player_index)
 {
-	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player_datum* player = player_get(player_index);
+
 	player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
 	player->unit_speed = k_zombie_unit_speed;
 	call_give_player_weapon(player_index, e_weapons_datum_index::energy_blade, 1);
+	
 	return;
 }
 
@@ -423,7 +426,7 @@ void Infection::OnMapLoad(ExecTime execTime, s_game_options* options)
 
 void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 {
-	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player_datum* player = player_get(player_index);
 
 	switch (execTime)
 	{
@@ -487,7 +490,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 #ifdef EVENTS_ENABLED
 	const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 #endif
-	player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+	player_datum* player = player_get(player_index);
 
 	switch (execTime)
 	{

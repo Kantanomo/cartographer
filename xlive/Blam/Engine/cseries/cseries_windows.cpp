@@ -159,7 +159,7 @@ void center_window(HWND hwnd)
 	return;
 }
 
-uint32 system_seconds()
+uint32 system_seconds(void)
 {
-	return (uint32)_time64(0);
+	return (uint32)_time64(NULL);
 }

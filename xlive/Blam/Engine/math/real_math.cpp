@@ -2,6 +2,7 @@
 #include "real_math.h"
 
 #include "matrix_math.h"
+#include "real_quantization.h"
 
 /* constants */
 
@@ -291,6 +292,49 @@ void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angle
 	forward->i = cosine(angles->yaw) * horizontal_projection;
 	forward->j = sine(angles->yaw) * horizontal_projection;
 	forward->k = sine(angles->pitch);
+}
+
+void quantize_real_point3d(
+	real_point3d const* point, 
+	real_rectangle3d const* bounds,
+	int32 axis_encoding_bit_count,
+	long_point3d* point_quantization)
+{
+	ASSERT(axis_encoding_bit_count<=SIZEOF_BITS(point->n[0]));
+
+	for (int32 axis=0; axis<NUMBEROF(point->n); ++axis)
+	{
+		point_quantization->n[axis] = quantize_real(
+			PIN(point->n[axis], bounds->n[2*axis], bounds->n[2*axis+1]),
+			bounds->n[2*axis],
+			bounds->n[2*axis+1],
+			axis_encoding_bit_count,
+			false
+		);
+	}
+
+	return;
+}
+
+void dequantize_real_point3d(
+	long_point3d const* point_quantization,
+	real_rectangle3d const* bounds,
+	int32 axis_encoding_bit_count,
+	real_point3d* point) 
+{
+	ASSERT(axis_encoding_bit_count<=16);
+
+	for (int32 axis = 0; axis<NUMBEROF(point_quantization->n); ++axis)
+	{
+		point->n[axis] = dequantize_real(
+			point_quantization->n[axis],
+			bounds->n[2*axis],
+			bounds->n[2*axis + 1],
+			axis_encoding_bit_count,
+			false);
+	}
+
+	return;
 }
 
 /* private code */

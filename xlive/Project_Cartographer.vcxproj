@@ -623,6 +623,7 @@
     <ClCompile Include="Blam\Engine\cache\pc_geometry_cache.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_texture_cache.cpp" />
     <ClCompile Include="Blam\Engine\cache\phyical_memory_map.cpp" />
+    <ClCompile Include="Blam\Engine\cache\xbox_sound_cache.cpp" />
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
@@ -720,6 +721,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_video_settings_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_adapter.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_squad_browser.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_postgame_statistics.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_press_start_introduction.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_resolution.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_restore_video_defaults.cpp" />
@@ -869,6 +871,7 @@
     <ClCompile Include="Blam\Engine\objects\object_identifier.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
     <ClCompile Include="Blam\Engine\objects\widgets\widgets.cpp" />
+    <ClCompile Include="Blam\Engine\physics\bsp3d.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_dead.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_flying.cpp" />
@@ -973,6 +976,7 @@
     <ClInclude Include="Blam\Engine\cache\pc_texture_cache.h" />
     <ClInclude Include="Blam\Engine\cache\physical_memory_map.h" />
     <ClInclude Include="Blam\Engine\cache\predicted_resources.h" />
+    <ClInclude Include="Blam\Engine\cache\xbox_sound_cache.h" />
     <ClInclude Include="Blam\Engine\camera\camera_track_definition.h" />
     <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\camera\director.h" />
@@ -1117,6 +1121,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_video_settings_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_adapter.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_squad_browser.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_postgame_statistics.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_press_start_introduction.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_resolution.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_restore_video_defaults.h" />
@@ -1550,6 +1555,7 @@
     <ClInclude Include="Blam\Engine\objects\widgets\antenna_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\widgets.h" />
     <ClInclude Include="Blam\Engine\physics\breakable_surface_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_dead.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_definitions.h" />

@@ -1,17 +1,17 @@
 #pragma once
-#include "memory/data.h"
-#include "geometry/geometry_block.h"
+
+/* structures */
 
 struct pc_geometry_cache_geometry_block
 {
-	int unk_1;
-	int unk_2;
-	int unk_3;
+	int32 unk_1;
+	int32 unk_2;
+	int32 unk_3;
 };
 
 struct pc_geometry_cache_globals
 {
-	data_array* geometry_blocks;
+	struct data_array* geometry_blocks;
 	uint32 cache_base_address;
 	uint32 cache_base_address_allocation_size;
 };
@@ -29,8 +29,10 @@ enum e_pc_geometry_cache_preload_flags : uint8
 
 void __cdecl geometry_cache_new(void);
 
+void __cdecl geometry_cache_close(void);
+
 void __cdecl pc_geometry_cache_block_count_clear(void);
 
-bool __cdecl pc_geometry_cache_preload_geometry(geometry_block_info* geometry_block_info, e_pc_geometry_cache_preload_flags preload_flags);
+bool __cdecl pc_geometry_cache_preload_geometry(struct geometry_block_info* geometry_block_info, e_pc_geometry_cache_preload_flags preload_flags);
 
 void geometry_cache_block_for_one_frame(int32 a1);

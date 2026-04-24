@@ -8,14 +8,18 @@ c_game_statborg* __cdecl game_engine_get_statborg(void)
 	return INVOKE(0x6B8A7, 0x6AD32, game_engine_get_statborg);
 }
 
-int16 c_game_statborg::get_player_stat(int32 player_index, e_statborg_entry statborg_entry)
+int16 c_game_statborg::get_player_stat(
+	int32 player_index,
+	e_statborg_entry statborg_entry) const
 {
-	return this->m_player_data[player_index].statistic[statborg_entry];
+	return m_player_data[player_index].statistic[statborg_entry];
 }
 
-int16 c_game_statborg::get_team_stat(int32 team_index, e_statborg_entry statistic)
+int16 c_game_statborg::get_team_stat(
+	int32 team_index,
+	e_statborg_entry statistic) const
 {
-	return this->m_team_data[team_index].statistic[statistic];
+	return m_team_data[team_index].statistic[statistic];
 }
 
 typedef void(__thiscall* adjust_player_stat_t)(c_game_statborg* statborg, datum, e_statborg_entry, int16, int32, bool);

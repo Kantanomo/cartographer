@@ -9,7 +9,7 @@
 /* macros */
 
 #ifdef HS_COMPILER_ENABLED
-#define HS_FUNCTION_DEFINITION_CREATE(global_name, name, type, address) \
+#define HS_GLOBAL_EXTERNAL_CREATE(global_name, name, type, address) \
 static const hs_global_external (global_name) =	\
 {												\
 	(name),										\
@@ -17,7 +17,7 @@ static const hs_global_external (global_name) =	\
 	(address)									\
 }
 #else
-#define HS_FUNCTION_DEFINITION_CREATE(global_name, name, type, address) \
+#define HS_GLOBAL_EXTERNAL_CREATE(global_name, name, type, address) \
 static const hs_global_external (global_name) =	\
 {												\
 	(type),										\
@@ -27,19 +27,19 @@ static const hs_global_external (global_name) =	\
 
 /* constants */
 
-HS_FUNCTION_DEFINITION_CREATE(debug_no_drawing_definition, "debug_no_drawing", _hs_type_boolean, &debug_no_drawing);
-HS_FUNCTION_DEFINITION_CREATE(debug_force_all_player_views_to_default_definition, "debug_force_all_player_views_to_default_player", _hs_type_boolean, &debug_force_all_player_views_to_default_player);
-HS_FUNCTION_DEFINITION_CREATE(debug_render_freeze_definition, "debug_render_freeze", _hs_type_boolean, &debug_render_freeze);
-HS_FUNCTION_DEFINITION_CREATE(debug_render_horizontal_splitscreen_definition, "debug_render_horizontal_splitscreen", _hs_type_boolean, &debug_render_horizontal_splitscreen);
-HS_FUNCTION_DEFINITION_CREATE(debug_load_panic_to_main_menu_definition, "debug_load_panic_to_main_menu", _hs_type_boolean, &debug_load_panic_to_main_menu);
-HS_FUNCTION_DEFINITION_CREATE(display_framerate_definition, "display_framerate", _hs_type_boolean, &display_framerate);
-HS_FUNCTION_DEFINITION_CREATE(display_frame_deltas_definition, "display_frame_deltas", _hs_type_boolean, &display_frame_deltas);
-HS_FUNCTION_DEFINITION_CREATE(console_pauses_game_definition, "console_pauses_game", _hs_type_boolean, &debug_console_pauses_game);
-HS_FUNCTION_DEFINITION_CREATE(framerate_infinite_definition, "framerate_infinite", _hs_type_boolean, &debug_disable_frame_rate_throttle);
+HS_GLOBAL_EXTERNAL_CREATE(debug_no_drawing_definition, "debug_no_drawing", _hs_type_boolean, &debug_no_drawing);
+HS_GLOBAL_EXTERNAL_CREATE(debug_force_all_player_views_to_default_definition, "debug_force_all_player_views_to_default_player", _hs_type_boolean, &debug_force_all_player_views_to_default_player);
+HS_GLOBAL_EXTERNAL_CREATE(debug_render_freeze_definition, "debug_render_freeze", _hs_type_boolean, &debug_render_freeze);
+HS_GLOBAL_EXTERNAL_CREATE(debug_render_horizontal_splitscreen_definition, "debug_render_horizontal_splitscreen", _hs_type_boolean, &debug_render_horizontal_splitscreen);
+HS_GLOBAL_EXTERNAL_CREATE(debug_load_panic_to_main_menu_definition, "debug_load_panic_to_main_menu", _hs_type_boolean, &debug_load_panic_to_main_menu);
+HS_GLOBAL_EXTERNAL_CREATE(display_framerate_definition, "display_framerate", _hs_type_boolean, &display_framerate);
+HS_GLOBAL_EXTERNAL_CREATE(display_frame_deltas_definition, "display_frame_deltas", _hs_type_boolean, &display_frame_deltas);
+HS_GLOBAL_EXTERNAL_CREATE(console_pauses_game_definition, "console_pauses_game", _hs_type_boolean, &debug_console_pauses_game);
+HS_GLOBAL_EXTERNAL_CREATE(framerate_infinite_definition, "framerate_infinite", _hs_type_boolean, &debug_disable_frame_rate_throttle);
 
 
 
-HS_FUNCTION_DEFINITION_CREATE(console_status_string_render_definition, "console_status_string_render", _hs_type_boolean, NULL);
+HS_GLOBAL_EXTERNAL_CREATE(console_status_string_render_definition, "console_status_string_render", _hs_type_boolean, NULL);
 
 const hs_global_external* hs_external_globals[] =
 {

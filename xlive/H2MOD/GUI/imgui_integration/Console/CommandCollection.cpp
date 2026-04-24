@@ -591,7 +591,8 @@ static int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens
 		string.append(std::to_string(session->m_session_membership.peers[peer_index].map_status).c_str());
 		
 		const datum player_index = session->m_session_membership.peers[peer_index].local_players_indexes[0];
-		const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+		player_datum const* player = player_get(player_index);
+		
 		if (player)
 		{
 			wchar_string_to_utf8_string(session->get_player_membership(player_index)->configuration.player_name, name, NUMBEROF(name));

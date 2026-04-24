@@ -107,8 +107,9 @@ void interface_draw_screen(void)
 			sub_4701B6(player_index) &&
 			!cubemap_screenshot_in_progress())
 		{
-			const s_hud_scripted_globals* g_hud_scripted_globals = get_hud_scripted_globals();
-			const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+			s_hud_scripted_globals const* g_hud_scripted_globals = get_hud_scripted_globals();
+			player_datum const* player = player_get(player_index);
+
 			int32 perspective = director_get_perspective(g_user_render_index);
 
 			if (g_hud_scripted_globals->field_0)

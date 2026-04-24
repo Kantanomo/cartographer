@@ -69,7 +69,9 @@ void display_assert(const char* condition, char const* file, int32 line, bool as
 		call_fatal_error_callbacks();
 		if (!is_debugger_present())
 		{
-			RaiseException(0x73746Bu, 0, 0, 0);
+			// FIXME: Don't do this (for now) as it triggers the carto crash handler
+			//RaiseException(0x73746Bu, 0, 0, 0);
+			
 			main_halt_and_catch_fire();
 			handle_fatal_error(NONE, condition);
 		}

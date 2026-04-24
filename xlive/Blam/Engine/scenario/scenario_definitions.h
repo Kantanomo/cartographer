@@ -225,14 +225,6 @@ enum e_spawn_type : short
 	spawn_type_respawn_only = 2
 };
 
-enum e_campaign_player_type : short
-{
-	campaign_player_type_masterchief = 0,
-	campaign_player_type_dervish = 1,
-	campaign_player_type_chief_multiplayer = 2,
-	campaign_player_type_elite_multiplayer = 3,
-};
-
 // max count: MAXIMUM_SCENARIO_PLAYERS_PER_BLOCK 256
 struct scenario_player
 {
@@ -251,7 +243,7 @@ struct scenario_player
 	e_spawn_type spawn_type_3;
 	string_id unused_name_0;
 	string_id unused_name_1;
-	e_campaign_player_type campaign_player_type;
+	int16 /*e_character_type*/ campaign_player_type;
 	int16 pad[3];
 };
 ASSERT_STRUCT_SIZE(scenario_player, 52);

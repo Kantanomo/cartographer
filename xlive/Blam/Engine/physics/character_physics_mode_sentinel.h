@@ -1,6 +1,8 @@
 #pragma once
 #include "animations/animation_id.h"
 
+/* classes */
+
 class c_character_physics_mode_sentinel_datum
 {
 private:

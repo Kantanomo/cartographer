@@ -100,8 +100,9 @@ namespace CustomVariantSettings
 		{
 			if (currentVariantSettings.infiniteGrenades)
 			{
-				const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+				player_datum const* player = player_get(player_index);
 				unit_datum* unit = unit_try_and_get(player->unit_index);
+				
 				unit->unit.grenade_counts[_unit_grenade_human_fragmentation] = 4;
 				unit->unit.grenade_counts[_unit_grenade_covenant_plasma] = 4;
 				simulation_action_object_update(player->unit_index, FLAG(_simulation_action_update_grenade_count_bit));

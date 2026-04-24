@@ -72,7 +72,8 @@ void vibration_update(real32 dt)
 
 				if (player_index != NONE)
 				{
-					player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
+					player_datum const* player = player_get(player_index);
+
 					if (player->controller_index != NONE)
 					{
 						ASSERT(VALID_INDEX(player->controller_index, k_number_of_controllers));

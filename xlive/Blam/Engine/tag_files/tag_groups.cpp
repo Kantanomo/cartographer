@@ -156,7 +156,10 @@ static char g_string_id_storage[k_maximum_string_id_storage];
 
 /* public code */
 
-int32 __cdecl tag_group_get_link_set_sort(uint32 a1, uint32 a2, uint32 a3)
+int32 __cdecl tag_group_get_link_set_sort(
+	uint32 a1,
+	uint32 a2,
+	uint32 a3)
 {
 	return INVOKE(0x30D90, 0x24C40, tag_group_get_link_set_sort, a1, a2, a3);
 }
