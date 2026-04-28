@@ -281,49 +281,6 @@ struct s_session_membership
 };
 ASSERT_STRUCT_SIZE(s_session_membership, 9328);
 
-struct s_session_interface_user
-{
-	bool user_exists;
-	s_player_identifier network_user_identifier;
-	uint8 gap_B[3];
-	e_controller_index controller_index;
-	s_player_configuration properties;
-	int32 player_voice_exists;
-	int32 player_text_chat_exists;
-	uint32 field_A0[2];
-	uint32 field_A8[2];
-	uint32 field_B0[2];
-	char field_B4[4];
-};
-ASSERT_STRUCT_SIZE(s_session_interface_user, 0xB8);
-
-struct s_session_interface_globals
-{
-	bool initialised;
-	uint8 gap_1;
-	wchar_t machine_name[16];
-	wchar_t session_name[32];
-	uint8 qos_active;
-	uint8 gap_63;
-	uint8 gap_64[16];
-	uint32 upstream_bandwidth_bps;
-	uint32 downstream_bandwidth_bps;
-	uint8 gap_7C[8];
-	uint32 nat_type;
-	uint32 field_88;
-	uint32 field_8C;
-	uint32 field_90;
-	int32 current_map_progress_percentage;
-	s_session_interface_user users[k_number_of_users];
-	uint32 session_connection_identifiers[6];
-	s_game_variant variants[2];
-	uint8 gap_5F0[68];
-	uint32 sessions_manager;
-	
-	static s_session_interface_globals* get();
-};
-ASSERT_STRUCT_SIZE(s_session_interface_globals, 0x638);
-
 /* classes */
 
 class c_network_session
@@ -719,15 +676,9 @@ ASSERT_STRUCT_OFFSET(c_network_session, m_session_parameters, 0x4C60);
 
 /* prototypes */
 
-s_session_interface_user* session_interface_get_local_user_properties(int32 user_index);
-
 void network_session_apply_patches();
 
 void network_session_membership_update_local_players_teams();
 
 e_network_session_class network_squad_session_get_session_class();
-bool network_session_interface_set_local_user_character_type(int32 user_index, e_character_type character_type);
-bool network_session_interface_get_local_user_identifier(int32 user_index, s_player_identifier* out_identifier);
-void network_session_interface_set_local_user_rank(int32 user_index, int8 rank);
-bool __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_configuration* out_properties, int32* out_player_voice, int32* out_player_text_chat);
 void __cdecl network_globals_switch_environment(int32 a1, bool a2);

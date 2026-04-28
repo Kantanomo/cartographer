@@ -165,16 +165,6 @@ void NetworkSession::LeaveSession()
 	p_leave_session(0);
 }
 
-s_session_interface_globals* s_session_interface_globals::get()
-{
-	return Memory::GetAddress<s_session_interface_globals*>(0x51A590, 0x520408);
-}
-
-s_session_interface_user* session_interface_get_local_user_properties(int32 user_index)
-{
-	return &s_session_interface_globals::get()->users[user_index];
-}
-
 e_network_session_class network_squad_session_get_session_class()
 {
 	//return INVOKE(0x1B1643, 0x0, network_squad_session_get_session_class);
@@ -189,45 +179,6 @@ e_network_session_class network_squad_session_get_session_class()
 		}
 	}
 	return out_class;
-}
-
-
-bool network_session_interface_set_local_user_character_type(int32 user_index, e_character_type character_type)
-{
-	s_session_interface_user* user_properties = session_interface_get_local_user_properties(user_index);
-	
-	// Don't change the character type if the user doesn't exist
-	if (user_properties->user_exists)
-	{
-		user_properties->properties.appearance.player_character_type = character_type;
-		return true;
-	}
-
-	return false;
-}
-
-bool network_session_interface_get_local_user_identifier(int32 user_index, s_player_identifier* out_identifier)
-{
-	s_session_interface_user* user_properties = session_interface_get_local_user_properties(user_index);
-	if (user_properties->user_exists)
-	{
-		*out_identifier = user_properties->network_user_identifier;
-		return true;
-	}
-	return false;
-}
-
-void network_session_interface_set_local_user_rank(int32 user_index, int8 rank)
-{
-	s_session_interface_user* user_properties = session_interface_get_local_user_properties(user_index);
-	user_properties->properties.player_displayed_skill = rank;
-	user_properties->properties.player_overall_skill = rank;
-	return;
-}
-
-bool __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_configuration* out_properties, int32* out_player_voice, int32* out_player_text_chat)
-{
-	return INVOKE(0x1B10E0, 0x1970A8, network_session_interface_get_local_user_properties, user_index, out_controller_index, out_properties, out_player_voice, out_player_text_chat);
 }
 
 void __cdecl network_globals_switch_environment(int32 a1, bool a2)
