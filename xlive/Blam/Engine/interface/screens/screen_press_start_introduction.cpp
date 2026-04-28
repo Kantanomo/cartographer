@@ -48,17 +48,14 @@ const void* c_screen_press_start_introduction::load_proc(void) const
 	return &c_screen_press_start_introduction::load;
 }
 
-void c_screen_press_start_introduction::handle_item_pressed_event(s_event_record* const& event, datum* pitem_index)
+void c_screen_press_start_introduction::handle_item_pressed_event(
+	s_event_record* const& event,
+	datum* pitem_index)
 {
-	s_event_record* arg = event;
-
-	this->m_saved_input.type = arg->type;
-	this->m_saved_input.controller = arg->controller;
-	this->m_saved_input.component = arg->component;
-	this->m_saved_input.value = arg->value;
-
-	this->m_has_input_saved = true;
-
+	m_saved_input = *event;
+	m_has_input_saved = true;
+	
+	return;
 }
 
 void* c_screen_press_start_introduction::load(s_screen_parameters* parameters)

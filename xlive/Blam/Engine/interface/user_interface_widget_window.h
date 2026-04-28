@@ -430,7 +430,7 @@ public:
 	virtual int32 sub_60F1F4(s_event_record* a2);
 	virtual uint8 sub_60EFC1(s_event_record* event);
 	virtual int32 sub_60F081(s_event_record* a2);
-	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
+	virtual e_controller_component get_component_from_button_key(int32 special_widget_index);
 	virtual bool sub_40AD53(int32 a2);
 	virtual e_user_interface_channel_type get_channel();
 	virtual e_user_interface_render_window get_render_window();

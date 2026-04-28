@@ -219,9 +219,9 @@ public:
 		return INVOKE_VFPTR_FN(_get_vfptr_table, 29, int32(class_type::**)(s_event_record*), a2);
 	}
 
-	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index) override
+	virtual e_controller_component get_component_from_button_key(int32 special_widget_index) override
 	{
-		return INVOKE_VFPTR_FN(_get_vfptr_table, 30, e_user_interface_controller_component(class_type::**)(int32), special_widget_index);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 30, e_controller_component(class_type::**)(int32), special_widget_index);
 	}
 
 	virtual bool sub_40AD53(int32 a2) override

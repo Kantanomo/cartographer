@@ -50,8 +50,8 @@ bool c_screen_xbox_live_task_progress_dialog::handle_event(s_event_record* event
 {
 	if (event->type == _user_interface_event_type_gamepad_button_pressed)
 	{
-		if (event->component == _user_interface_controller_component_button_b
-			|| event->component == _user_interface_controller_component_button_back)
+		if (event->component == _controller_component_button_b
+			|| event->component == _controller_component_button_back)
 		{
 			if (m_close_function)
 			{

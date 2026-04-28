@@ -303,7 +303,7 @@ static error_code_string_mapping table[k_last_ui_error_code + 1] =
 	{ERROR_STRING_CREATE(_ui_error_map_out_of_hard_disk_space)},
 	{ERROR_STRING_CREATE(_ui_error_device_not_supported)},
 	{ERROR_STRING_CREATE(_ui_error_achievements_interrupted)},
-	{ERROR_STRING_CREATE(_confirm_lose_progress)},
+	{ERROR_STRING_CREATE(_ui_error_confirm_lose_progress)},
 	{ERROR_STRING_CREATE(_ui_error_beta_achievements_disabled)},
 	{ERROR_STRING_CREATE(_ui_error_cannot_connect_versions_wrong)},
 	{ERROR_STRING_CREATE(_ui_error_confirm_booted_from_session)},
@@ -575,9 +575,11 @@ void set_debug_show_screen_tag_path(bool value)
 void user_interface_show_current_screen_tag(const char* path)
 {
 	char destination[128];
+
+	e_user_interface_channel_type ui_channel = (e_user_interface_channel_type)NONE;
+
 	csstrncpy(destination, path, NUMBEROF(destination));
 	
-	e_user_interface_channel_type ui_channel = (e_user_interface_channel_type)NONE;
 	if (!csstrcmp(destination, "hardware") || !csstrcmp(destination, "hardware_error") || !csstrcmp(destination, ""))
 	{
 		ui_channel = _user_interface_channel_type_hardware_error;
@@ -639,6 +641,7 @@ void user_interface_show_current_screen_tag(const char* path)
 			console_printf("invalid channel");
 		}
 	}
+
 	return;
 }
 
@@ -651,72 +654,87 @@ void debug_set_ui_beta(bool value)
 void user_interface_test_error_ok(int16 id)
 {
 	ui_test_error_code((e_ui_error_types)id, false, false);
+	return;
 }
 
 void user_interface_test_error_ok_cancel(int16 id)
 {
 	ui_test_error_code((e_ui_error_types)id, true, false);
+	return;
 }
+
 void user_interface_test_confirmation(int16 id)
 {
 	ui_test_error_code((e_ui_error_types)id, false, true);
+	return;
 }
 #endif
 
 
-bool __cdecl user_interface_globals_is_beta_build()
+bool __cdecl user_interface_globals_is_beta_build(void)
 {
 	return INVOKE(0x209ED8, 0x0, user_interface_globals_is_beta_build);
 }
 
-int32 __cdecl user_interface_globals_get_game_difficulty()
+int32 __cdecl user_interface_globals_get_game_difficulty(void)
 {
 	return INVOKE(0x209E98, 0x0, user_interface_globals_get_game_difficulty);
 }
 
-int32 __cdecl user_interface_globals_get_edit_player_profile_index()
+int32 __cdecl user_interface_globals_get_edit_player_profile_index(void)
 {
 	return INVOKE(0x209BA3, 0, user_interface_globals_get_edit_player_profile_index);
 }
 
-s_saved_game_player_profile* __cdecl user_interface_globals_get_edit_player_profile()
+s_saved_game_player_profile* __cdecl user_interface_globals_get_edit_player_profile(void)
 {
 	return INVOKE(0x209B9D, 0, user_interface_globals_get_edit_player_profile);
 }
 
-e_scenario_type __cdecl user_interface_globals_get_map_type()
+e_scenario_type __cdecl user_interface_globals_get_map_type(void)
 {
 	return INVOKE(0x20B8BB, 0x0, user_interface_globals_get_map_type);
 }
 
-void __cdecl user_interface_globals_set_game_difficulty_real(int32 difficulty)
+void __cdecl user_interface_globals_set_game_difficulty_real(
+	int32 difficulty)
 {
 	INVOKE(0x209E44, 0x0, user_interface_globals_set_game_difficulty_real, difficulty);
+	return;
 }
 
-void __cdecl user_interface_globals_set_loading_from_persistent_storage(bool a1)
+void __cdecl user_interface_globals_set_loading_from_persistent_storage(
+	bool a1)
 {
 	INVOKE(0x209E6C, 0x0, user_interface_globals_set_loading_from_persistent_storage, a1);
+	return;
 }
 
-void __cdecl user_interface_globals_commit_edit_profile_changes()
+void __cdecl user_interface_globals_commit_edit_profile_changes(void)
 {
 	INVOKE(0x209A98, 0x0, user_interface_globals_commit_edit_profile_changes);
+	return;
 }
 
-void __cdecl user_interface_globals_save_profile_changes_to_disk()
+void __cdecl user_interface_globals_save_profile_changes_to_disk(void)
 {
 	INVOKE(0x209C3E, 0x0, user_interface_globals_save_profile_changes_to_disk);
+	return;
 }
 
-void __cdecl user_interface_globals_finish_saving_profile_changes()
+void __cdecl user_interface_globals_finish_saving_profile_changes(void)
 {
 	INVOKE(0x209D08, 0x0, user_interface_globals_finish_saving_profile_changes);
+	return;
 }
 
-void __cdecl user_interface_globals_set_edit_player_profile(e_controller_index controller_index, uint32 profile_index, s_saved_game_player_profile* profile)
+void __cdecl user_interface_globals_set_edit_player_profile(
+	e_controller_index controller_index,
+	uint32 profile_index,
+	s_saved_game_player_profile* profile)
 {
 	INVOKE(0x209B72, 0x0, user_interface_globals_set_edit_player_profile, controller_index, profile_index, profile);
+	return;
 }
 
 /* private code */
@@ -726,20 +744,21 @@ static s_user_interface_globals* user_interface_globals_get(void)
 	return Memory::GetAddress<s_user_interface_globals*>(0x9718E0);
 }
 
-static const char* user_interface_error_codes_get_name(e_ui_error_types error_code)
+static const char* user_interface_error_codes_get_name(
+	e_ui_error_types error_code)
 {
-	ASSERT(VALID_INDEX(error_code, k_last_ui_error_code));
+	ASSERT(VALID_INDEX(error_code, k_ui_error_count));
 	ASSERT(table[error_code].error_code == error_code);
+
 	return table[error_code].string;
 }
 
-static void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool confirmation)
+static void ui_test_error_code(
+	e_ui_error_types error_id,
+	bool use_cancel,
+	bool confirmation)
 {
-	if (error_id > k_last_ui_error_code)
-	{
-		error(_error_delayed, "error code must be between 0 & %d", (int32)k_last_ui_error_code);
-	}
-	else
+	if (VALID_INDEX(error_id, k_ui_error_count))
 	{
 #ifdef TERMINAL_ENABLED
 		console_printf("error code #%d= '%s'", error_id, user_interface_error_codes_get_name(error_id));
@@ -771,4 +790,10 @@ static void ui_test_error_code(e_ui_error_types error_id, bool use_cancel, bool 
 			screen_error_ok_dialog_show(_user_interface_channel_type_game_error, error_id, _window_4, NONE, nullptr, nullptr);
 		}
 	}
+	else
+	{
+		error(_error_delayed, "error code must be between 0 & %d", k_last_ui_error_code);
+	}
+
+	return;
 }

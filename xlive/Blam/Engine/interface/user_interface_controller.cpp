@@ -54,6 +54,14 @@ s_user_interface_controller_globals* user_interface_controller_globals_get(void)
 	return Memory::GetAddress<s_user_interface_controller_globals*>(0x96C858, 0x999038);
 }
 
+inline s_user_interface_controller* user_interface_controller_get(
+	e_controller_index controller_index)
+{
+	vassert(VALID_INDEX(controller_index, k_number_of_controllers), "invalid controller index!", NULL);
+
+	return &user_interface_controller_globals_get()->controllers[controller_index];
+}
+
 void __cdecl user_interface_controller_initialize(void)
 {
 	INVOKE(0x208608, 0x0, user_interface_controller_initialize);
@@ -110,7 +118,7 @@ void __cdecl user_interface_controller_update(void)
 bool __cdecl user_interface_controller_is_player_profile_valid(e_controller_index controller_index)
 {
 	//return INVOKE(0x206B50, 0x1F3F78, user_interface_controller_is_player_profile_valid, controller_index);
-	return user_interface_controller_globals_get()->controllers[controller_index].m_flags.test(_controller_state_has_valid_profile_bit);
+	return user_interface_controller_get(controller_index)->flags.test(_controller_state_has_valid_profile_bit);
 }
 
 e_controller_index __cdecl user_interface_controller_get_next_valid_index(e_controller_index controller_index)
@@ -346,20 +354,21 @@ uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(
 
 bool __cdecl user_interface_controller_has_xbox_live(e_controller_index controller_index)
 {
-	return user_interface_controller_globals_get()->controllers[controller_index].m_flags.test(_controller_state_has_xbox_live_bit);
+	return user_interface_controller_get(controller_index)->flags.test(_controller_state_has_xbox_live_bit);
 }
 
 void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active)
 {
 	//INVOKE(0x208A01, 0x0, user_interface_controller_xbox_live_account_set_signed_in, controller_index, active);
-	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
+	s_user_interface_controller* controller = user_interface_controller_get(controller_index);
+	
 	if (active)
 	{
-		controller->m_flags.set(_controller_state_has_xbox_live_bit, true);
+		controller->flags.set(_controller_state_has_xbox_live_bit, true);
 	}
 	else
 	{
-		controller->m_flags.set(_controller_state_has_xbox_live_bit, false);
+		controller->flags.set(_controller_state_has_xbox_live_bit, false);
 
 		// not calling update_name here to prevent recursion lock
 		//user_interface_controller_update_player_name(controller_index);
@@ -372,7 +381,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 {
 	// INVOKE(0x208312, 0x0, user_interface_controller_update_player_name, controller_index);
 
-	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
+	s_user_interface_controller* controller = user_interface_controller_get(controller_index);
 	c_user_interface_guide_state_manager* guide = user_interface_guide_state_manager_get();
 	if (online_connected_to_xbox_live())
 	{
@@ -454,8 +463,7 @@ static void user_interface_controller_update_disconnect(void)
 		controller != k_no_controller;
 		controller = next_controller(controller))
 	{
-
-		s_user_interface_controller& controller_data = g_user_interface_controller_globals->controllers[controller];
+		s_user_interface_controller* controller_data = user_interface_controller_get(controller);
 		bool bad_condition = !input_has_gamepad_plugged((uint16)controller);
 
 		if (controller == k_windows_device_controller_index)
@@ -480,13 +488,13 @@ static void user_interface_controller_update_disconnect(void)
 
 			g_user_interface_controller_globals->controller_detached[controller] = result;
 
-			controller_data.m_flags.set(_controller_state_is_attached_bit, false);
-			controller_data.m_flags.set(_controller_state_bit1, false);
-			controller_data.m_flags.set(_controller_state_bit2, false);
+			controller_data->flags.set(_controller_state_is_attached_bit, false);
+			controller_data->flags.set(_controller_state_bit1, false);
+			controller_data->flags.set(_controller_state_bit2, false);
 		}
 		else
 		{
-			controller_data.m_flags.set(_controller_state_is_attached_bit, true);
+			controller_data->flags.set(_controller_state_is_attached_bit, true);
 			g_user_interface_controller_globals->controller_detached[controller] = false;
 
 			int8 out_drive_letter;
@@ -494,9 +502,9 @@ static void user_interface_controller_update_disconnect(void)
 			const bool test_drive2 = input_windows_drive_letter_test(2 + controller * 2, &out_drive_letter);
 			//bool has_voice_active= voice_enabled_test(controller); //TODO
 
-			controller_data.m_flags.set(_controller_state_bit1, test_drive1);
-			controller_data.m_flags.set(_controller_state_bit2, test_drive2);
-			//controller_data.m_flags.set(_controller_state_has_voice_bit, test_drive2); //TODO : also find this voice_bit on h2v
+			controller_data->flags.set(_controller_state_bit1, test_drive1);
+			controller_data->flags.set(_controller_state_bit2, test_drive2);
+			//controller_data.flags.set(_controller_state_has_voice_bit, test_drive2); //TODO : also find this voice_bit on h2v
 
 		}
 	}

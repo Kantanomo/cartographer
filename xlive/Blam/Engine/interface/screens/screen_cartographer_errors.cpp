@@ -199,7 +199,7 @@ bool c_cartographer_error_menu::handle_event(s_event_record* event)
 		|| event->type == _user_interface_event_type_mouse_button_left_click)
 	{
 		if (event->component == _user_interface_keyboard_component_button_letter_a
-			|| event->component == _user_interface_controller_component_button_a)
+			|| event->component == _controller_component_button_a)
 		{
 			start_widget_animation(3);
 			result = true;

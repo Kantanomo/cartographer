@@ -140,8 +140,8 @@ struct s_saved_game_player_profile
 {
 	int32 valid_maybe;
 	int32 unk;
-	wchar_t name[16];
-	int8 data[192];
+	wchar_t name[32];
+	int8 data[160];
 	s_saved_game_profile_variant_info variant;
 	int8 data2[20];
 	s_saved_game_profile_input_preferences input_preferences;

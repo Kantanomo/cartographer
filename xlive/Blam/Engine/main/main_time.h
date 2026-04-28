@@ -7,15 +7,6 @@ enum
 	k_system_timer_resolution_ms = 1,
 };
 
-/* globals */
-
-extern bool display_framerate;
-extern bool display_frame_deltas;
-extern bool debug_disable_frame_rate_throttle;
-
-
-extern bool g_main_game_time_frame_limiter_enabled;
-
 /* prototypes */
 
 void main_time_apply_patches(void);
@@ -43,3 +34,11 @@ bool __cdecl main_time_should_reset(void);
 int32 __cdecl main_time_get_tickrate(void);
 
 void main_time_frame_rate_display(void);
+
+/* globals */
+
+extern bool display_framerate;
+extern bool display_frame_deltas;
+extern bool debug_disable_frame_rate_throttle;
+
+extern bool g_main_game_time_frame_limiter_enabled;
