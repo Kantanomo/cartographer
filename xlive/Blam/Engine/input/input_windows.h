@@ -14,7 +14,7 @@ enum
 };
 
 // Needs to be a define...
-#define k_windows_device_controller_index _controller_index_0		// controller_index which the mouse/keyboard combo will use
+#define k_windows_device_controller_index _controller0		// controller_index which the mouse/keyboard combo will use
 
 /* forward declarations */
 

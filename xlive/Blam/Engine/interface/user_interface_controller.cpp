@@ -67,21 +67,21 @@ void __cdecl user_interface_controller_update(void)
 	s_user_interface_controller_globals* g_user_interface_controller_globals = user_interface_controller_globals_get();
 	uint32 time_elapsed = user_interface_milliseconds();
 
-	if (g_user_interface_controller_globals->event_records[_controller_index_0].type)
+	if (g_user_interface_controller_globals->event_records[_controller0].type)
 	{
-		user_interface_controller_event_submit(&g_user_interface_controller_globals->event_records[_controller_index_0]);
+		user_interface_controller_event_submit(&g_user_interface_controller_globals->event_records[_controller0]);
 
 		//progressively move 3->2->1->0 and submit data on 0
 		int8 count = 0;
 		do
 		{
-			csmemcpy(&g_user_interface_controller_globals->event_records[_controller_index_0 + count],
-				&g_user_interface_controller_globals->event_records[_controller_index_0 + count + 1],
+			csmemcpy(&g_user_interface_controller_globals->event_records[_controller0 + count],
+				&g_user_interface_controller_globals->event_records[_controller0 + count + 1],
 				sizeof(s_event_record));
 			count++;
-		} while (count < _controller_index_3);
+		} while (count < _controller3);
 
-		csmemset(&g_user_interface_controller_globals->event_records[_controller_index_3], 0, sizeof(s_event_record));
+		csmemset(&g_user_interface_controller_globals->event_records[_controller3], 0, sizeof(s_event_record));
 	}
 
 	else if (!g_user_interface_controller_globals->event_manager_suppress)
@@ -510,7 +510,7 @@ static void user_interface_controller_removed_handler(void)
 
 	s_user_interface_controller_globals* g_user_interface_controller_globals = user_interface_controller_globals_get();
 
-	int16 detached_controller = _controller_index_0;
+	int16 detached_controller = _controller0;
 	while (!g_user_interface_controller_globals->controller_detached[detached_controller])
 	{
 		if (++detached_controller >= k_number_of_controllers)
@@ -522,16 +522,16 @@ static void user_interface_controller_removed_handler(void)
 		e_ui_error_types error_msg = _ui_error_controller_removed;
 		switch (detached_controller)
 		{
-		case _controller_index_0:
+		case _controller0:
 			detached_controller = _ui_error_controller1_removed;
 			break;
-		case _controller_index_1:
+		case _controller1:
 			detached_controller = _ui_error_controller2_removed;
 			break;
-		case _controller_index_2:
+		case _controller2:
 			detached_controller = _ui_error_controller3_removed;
 			break;
-		case _controller_index_3:
+		case _controller3:
 			detached_controller = _ui_error_controller4_removed;
 			break;
 		}

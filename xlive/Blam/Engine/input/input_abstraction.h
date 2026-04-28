@@ -26,7 +26,7 @@ extern const real_point2d k_default_right_thumbstick_deadzone_axial_percentage;
 
 enum e_input_device_types :int32
 {
-	_input_device_type_general = -1,
+	_input_device_type_general = NONE,
 	_input_device_type_mouse,
 	_input_device_type_keyboard,
 	_input_device_type_gamepad

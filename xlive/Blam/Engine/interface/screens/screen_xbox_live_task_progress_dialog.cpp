@@ -151,7 +151,7 @@ void c_screen_xbox_live_task_progress_dialog::close_task()
 void c_screen_xbox_live_task_progress_dialog::add_task(proc_task_cb_t update_function)
 {
 	ASSERT(update_function != nullptr);
-	add_task_ex(NONE, _controller_index_0, update_function, nullptr, nullptr);
+	add_task_ex(NONE, _controller0, update_function, nullptr, nullptr);
 }
 
 void c_screen_xbox_live_task_progress_dialog::add_task_ex(datum task_datum, e_controller_index controller_index, proc_task_cb_t update_function, proc_task_cb_t close_function, uint8* data)

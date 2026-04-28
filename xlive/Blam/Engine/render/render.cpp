@@ -53,7 +53,7 @@ bool render_lens_flares_enabled = true;
 bool render_patchy_fog_enabled = true;
 bool render_water_enabled = true;
 
-e_controller_index g_render_current_controller_index = _controller_index_0;
+e_controller_index g_render_current_controller_index = _controller0;
 uint32 g_render_current_user_index = 0;
 
 window_bound g_user_window_bounds[k_number_of_controllers]{};

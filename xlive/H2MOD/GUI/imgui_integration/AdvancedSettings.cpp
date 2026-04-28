@@ -259,7 +259,7 @@ namespace ImGuiHandler {
 						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_static_fp_tooltip));
 					ImGui::NextColumn();
 
-					if (g_advanced_settings_current_controller_index == _controller_index_0)
+					if (g_advanced_settings_current_controller_index == _controller0)
 					{
 						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_show_hud), &should_show_hud);
 						if (ImGui::IsItemEdited())
@@ -387,7 +387,7 @@ namespace ImGuiHandler {
 					ImGui::Checkbox("##MK_Sep", &g_advanced_settings_current_cartographer_profile->mouse_uniform);
 					if (ImGui::IsItemEdited())
 					{
-						input_abstraction_set_mouse_look_sensitivity(_controller_index_0, g_advanced_settings_current_cartographer_profile->mouse_sensitivity);
+						input_abstraction_set_mouse_look_sensitivity(_controller0, g_advanced_settings_current_cartographer_profile->mouse_sensitivity);
 					}
 					if (ImGui::IsItemHovered())
 					{
@@ -423,7 +423,7 @@ namespace ImGuiHandler {
 						if (ImGui::IsItemEdited())
 						{
 							g_advanced_settings_current_cartographer_profile->mouse_sensitivity = (real32)g_mouse_sens;
-							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, g_advanced_settings_current_cartographer_profile->mouse_sensitivity);
+							input_abstraction_set_mouse_look_sensitivity(_controller0, g_advanced_settings_current_cartographer_profile->mouse_sensitivity);
 						}
 						ImGui::PushItemWidth(WidthPercentage(15));
 
@@ -431,13 +431,13 @@ namespace ImGuiHandler {
 						if (ImGui::IsItemEdited()) {
 
 							g_advanced_settings_current_cartographer_profile->mouse_sensitivity = PIN(g_advanced_settings_current_cartographer_profile->mouse_sensitivity, 1.f, 100.f);
-							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, g_advanced_settings_current_cartographer_profile->mouse_sensitivity);
+							input_abstraction_set_mouse_look_sensitivity(_controller0, g_advanced_settings_current_cartographer_profile->mouse_sensitivity);
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "Mousesens3"), ImVec2(WidthPercentage(10), item_size.y)))
 						{
 							g_advanced_settings_current_cartographer_profile->mouse_sensitivity = 3.0f;
-							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, g_advanced_settings_current_cartographer_profile->mouse_sensitivity);
+							input_abstraction_set_mouse_look_sensitivity(_controller0, g_advanced_settings_current_cartographer_profile->mouse_sensitivity);
 						}
 					}
 				}
@@ -925,20 +925,20 @@ namespace ImGuiHandler {
 			if (ImGui::Begin(advanced_settings_get_string(_advanced_string_title), &open, window_flags))
 			{
 				HudSettings();
-				if (g_advanced_settings_current_controller_index == _controller_index_0)
+				if (g_advanced_settings_current_controller_index == _controller0)
 				{
 					VideoSettings();
 					MouseKeyboardSettings();
 				}
 				ControllerSettings();
-				if (g_advanced_settings_current_controller_index == _controller_index_0)
+				if (g_advanced_settings_current_controller_index == _controller0)
 				{
 					HostSettings();
 					GameSettings();
 				}
 
 #ifndef NDEBUG
-				if (g_advanced_settings_current_controller_index == _controller_index_0)
+				if (g_advanced_settings_current_controller_index == _controller0)
 				{
 					if (ImGui::CollapsingHeader("Dev Testing"))
 					{
@@ -1066,7 +1066,7 @@ namespace ImGuiHandler {
 			{
 				cartographer_player_profile_save(g_advanced_settings_current_controller_index);
 
-				if(g_advanced_settings_current_controller_index == _controller_index_0)
+				if(g_advanced_settings_current_controller_index == _controller0)
 					SaveH2Config();
 			}
 		}

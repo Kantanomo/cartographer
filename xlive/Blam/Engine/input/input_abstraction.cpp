@@ -45,7 +45,7 @@ uint16 g_old_mouse_buttons[8];
 
 s_keyboard_input_state g_old_keyboard_state;
 
-e_controller_index g_updating_gamepad_index = _controller_index_0;
+e_controller_index g_updating_gamepad_index = _controller0;
 
 bool g_controller_advanced_settings_toggle[k_number_of_users]{};
 

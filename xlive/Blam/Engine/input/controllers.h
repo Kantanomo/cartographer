@@ -2,14 +2,15 @@
 
 /* enum */
 
-enum e_controller_index : int32
+enum e_controller_index
 {
-	_controller_index_0 = 0,
-	_controller_index_1,
-	_controller_index_2,
-	_controller_index_3,
+	_controller0 = 0,
+	_controller1,
+	_controller2,
+	_controller3,
 	k_number_of_controllers,
-	k_no_controller = NONE
+	k_no_controller = NONE,
+	k_any_controller = 255
 };
 
 /* prototypes */

@@ -255,7 +255,7 @@ void c_screen_4way_signin::update(void)
 	this->set_controller_mask_recursive(all_users_mask);
 	c_player_widget_representation representations[k_number_of_controllers];
 
-	for (e_controller_index controller = _controller_index_0;
+	for (e_controller_index controller = _controller0;
 		controller != k_no_controller;
 		controller = user_interface_controller_get_next_valid_index(controller))
 	{
@@ -468,12 +468,14 @@ bool __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_i
 	//return INVOKE(0xA421, 0x0, user_interface_mainmenu_sign_out_controller_callback, controller_index);
 	user_interface_controller_sign_out(controller_index);
 	user_interface_enter_game_shell(2);
+
 	return true;
 
 }
 bool __cdecl user_interface_sign_out_controller_default_callback(e_controller_index controller_index)
 {
 	user_interface_controller_sign_out(controller_index);
+
 	return true;
 }
 bool __cdecl user_interface_decline_invite_callback(e_controller_index controller_index)
