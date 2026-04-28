@@ -18,12 +18,18 @@ XUSER_SIGNIN_INFO* XUserGetSignInInfo(DWORD dwUserIndex)
 
 bool XUserSignInChanged()
 {
-	for (int i = 0; i < 4; i++)
+	bool result = false;
+
+	for (DWORD i= 0; i <NUMBEROF(g_xXUserSignInChanged); ++i)
 	{
 		if (g_xXUserSignInChanged[i])
-			return true;
+		{
+			result = true;
+			break;
+		}
 	}
-	return false;
+
+	return result;
 }
 
 bool XUserSignedIn(DWORD dwUserIndex)
@@ -149,9 +155,6 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 // #5262: XUserGetSigninState
 XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 {
-	if (dwUserIndex != 0)
-		dwUserIndex = 0;
-
 	XUSER_SIGNIN_STATE result;
 	const char* signInStateStr;
 
@@ -188,9 +191,6 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 	if (szUserName == NULL)
 		return ERROR_INVALID_PARAMETER;
 
-	if (dwUserIndex != 0)
-		dwUserIndex = 0;
-
 	XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
 
 	if (signedInUser->UserSigninState != eXUserSigninState_NotSignedIn)
@@ -208,9 +208,6 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_INFO pSigninInfo)
 {
 	static int print = 0;
-
-	if (dwUserIndex != 0)
-		dwUserIndex = 0;
 
 	XUSER_SIGNIN_INFO* signedInUser = XUserGetSignInInfo(dwUserIndex);
 

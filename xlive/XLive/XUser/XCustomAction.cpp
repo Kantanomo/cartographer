@@ -4,10 +4,13 @@
 #include "XLive/xbox/xbox.h"
 
 // #472
-int WINAPI XCustomSetAction(DWORD dwActionIndex, LPCWSTR szActionText, DWORD dwFlags)
+void WINAPI XCustomSetAction(
+	DWORD dwActionIndex,
+	LPCWSTR szActionText,
+	DWORD dwFlags)
 {
 	LOG_TRACE_XLIVE("XCustomSetAction");
-	return 0;
+	return;
 }
 
 // #477
