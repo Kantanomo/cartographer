@@ -21,3 +21,11 @@ void __cdecl network_life_cycle_end(void)
 
 	return;
 }
+
+void __cdecl network_life_cycle_leave_squad(
+	bool immediate)
+{
+	INVOKE(0x1AD6AF, 0x0, network_life_cycle_leave_squad, immediate);
+
+	return;
+}

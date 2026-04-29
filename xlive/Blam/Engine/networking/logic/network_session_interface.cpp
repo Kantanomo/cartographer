@@ -3,6 +3,8 @@
 
 #include "game/players.h"
 #include "game/player_constants.h"
+#include "networking/logic/life_cycle_manager.h"
+#include "networking/session/network_session.h"
 #include "networking/session/network_session_manager.h"
 #include "networking/network_event.h"
 #include "networking/network_game_definitions.h"
@@ -65,6 +67,39 @@ const wchar_t* network_session_interface_get_session_name(void)
 
 	return session_interface_globals->session_name;
 }
+
+bool network_group_session_get_membership(
+	int32* update_number,
+	int32* local_peer_index,
+	int32* host_peer_index,
+	int32* leader_peer_index,
+	int32* peer_count,
+	struct s_network_session_peer const** peers,
+	int32* player_count,
+	uint32* player_valid_flags,
+	struct s_network_session_player const** players)
+{
+	bool success = false;
+	c_network_session* session = NULL;
+
+	if (network_life_cycle_in_squad_session(&session))
+	{
+		success = network_session_get_membership(
+			session,
+			update_number,
+			local_peer_index,
+			host_peer_index,
+			leader_peer_index,
+			peer_count,
+			peers,
+			player_count,
+			player_valid_flags,
+			players);
+	}
+
+	return success;
+}
+
 
 bool __cdecl network_session_interface_get_local_user_properties(
 	int32 user_index,
@@ -157,6 +192,103 @@ void network_session_interface_set_user_identifier(
 	event(_event_message, "logic:session: local user %d set user identifier=%s", user_index, player_identifier_get_string(&user_properties->player_identifier));
 
 	return;
+}
+
+bool network_session_get_membership(
+	class c_network_session* session,
+	int32* update_number,
+	int32* local_peer_index,
+	int32* host_peer_index,
+	int32* leader_peer_index,
+	int32* peer_count,
+	struct s_network_session_peer const **peers,
+	int32* player_count,
+	uint32* player_valid_flags,
+	struct s_network_session_player const **players)
+{
+	bool success = false;
+	
+	ASSERT(session);
+
+	if (session->established())
+	{
+		int32 current_local_peer_index;
+		int32 current_host_peer_index;
+
+		s_session_membership const* membership = session->get_session_membership(&current_local_peer_index, &current_host_peer_index);
+		int32 current_update_number = session->get_local_session_membership_update_number();
+
+		ASSERT(membership);
+		ASSERT(current_local_peer_index>=0 && current_local_peer_index<membership->peer_count);
+		ASSERT(current_host_peer_index>=0 && current_host_peer_index<membership->peer_count);
+		ASSERT(membership->leader_peer_index>=0 && membership->leader_peer_index<membership->peer_count);
+		ASSERT(current_update_number!=NONE);
+
+		if (update_number)
+		{
+			*update_number = current_update_number;
+		}
+		if (local_peer_index)
+		{
+			*local_peer_index = current_local_peer_index;
+		}
+		if (host_peer_index)
+		{
+			*host_peer_index = current_host_peer_index;
+		}
+		if (leader_peer_index)
+		{
+			*leader_peer_index = membership->leader_peer_index;
+		}
+		if (peer_count)
+		{
+			*peer_count = membership->peer_count;
+		}
+		if (peers)
+		{
+			*peers = membership->peers;
+		}
+		if (player_count)
+		{
+			*player_count = membership->player_count;
+		}
+		if (player_valid_flags)
+		{
+			*player_valid_flags = membership->player_valid_flags;
+		}
+		if (players)
+		{
+			*players = membership->players;
+		}
+	}
+
+	return success;
+}
+
+e_network_session_class network_squad_session_get_session_class(void)
+{
+	//return INVOKE(0x1B1643, 0x0, network_squad_session_get_session_class);
+
+	e_network_session_class out_class = _network_session_class_unknown;
+	c_network_session* session = NULL;
+
+	if (network_life_cycle_in_squad_session(&session))
+	{
+		ASSERT(session);
+
+		if (session->established())
+		{
+			out_class = session->m_session_class;
+		}
+	}
+
+	return out_class;
+}
+
+bool network_session_is_online(
+	e_network_session_class session_class)
+{
+	return session_class==_network_session_class_xbox_live;
 }
 
 /* private code */

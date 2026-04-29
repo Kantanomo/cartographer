@@ -10,7 +10,7 @@
 
 /* enums */
 
-enum e_network_session_map_status : int32
+enum e_network_session_map_status
 {
 	_network_session_map_status_none= 0,
 	_network_session_map_status_unable_to_precache,
@@ -22,7 +22,7 @@ enum e_network_session_map_status : int32
 	k_network_session_map_status_count
 }; 
 
-enum e_network_session_state : int32
+enum e_network_session_state
 {
 	_network_session_state_none= 0,
 	_network_session_state_peer_joining,
@@ -64,16 +64,16 @@ enum e_network_session_mode
 	k_network_session_mode_count
 };
 
-enum e_network_game_privacy : int32
+enum e_network_game_privacy
 {
-	_network_game_privacy_open,
+	_network_game_privacy_open= 0,
 	_network_game_privacy_gold,
 	_network_game_privacy_invite,
 	_network_game_privacy_closed,
 	k_network_game_privacy_count
 };
 
-enum e_network_session_type : uint32
+enum e_network_session_type
 {
 	_network_session_type_none= 0,
 	_network_session_type_squad,
@@ -137,12 +137,12 @@ struct s_cartographer_network_session_parameters
 
 class c_network_session_cartographer
 {
-	s_cartographer_peer_data peers[k_network_maximum_machines_per_session];
+public:
 
+private:
+	s_cartographer_peer_data peers[k_network_maximum_machines_per_session];
 	s_cartographer_network_session_parameters parameters;
 	s_cartographer_network_session_parameters transmitted_parameters;
-
-public:
 };
 
 // END CARTOGRAPHER ADDITION
@@ -251,25 +251,24 @@ ASSERT_STRUCT_SIZE(s_network_session_peer, 268);
 
 struct s_network_session_player
 {
-	s_player_identifier identifier; // -0xA
-	int32 peer_index; // -0x8
-	int32 peer_user_index; // -0x4
-	WORD player_flags; // 0x0
+	s_player_identifier identifier;
+	int32 peer_index;
+	int32 peer_user_index;
+	uint16 player_flags;
 	bool properties_valid;
-	char pad[1];
-	int32 controller_index;
+	int8 pad[1];
+	e_controller_index controller_index;
 	s_player_configuration configuration;
 	s_player_configuration desired_configuration;
 	uint32 player_voice;
 	uint32 player_text_chat;
 };
-ASSERT_STRUCT_OFFSET(s_network_session_player, controller_index, 20);
 ASSERT_STRUCT_SIZE(s_network_session_player, 296);
 
 struct s_session_membership
 {
 	int32 update_number; // 0x70
-	int32 session_leader_peer_index; // 0x74
+	int32 leader_peer_index; // 0x74
 	uint64 dedicated_server_id; // 0x78
 	int32 xbox_session_leader_peer_index; // 0x80
 	int32 peer_count; // 0x84
@@ -355,7 +354,7 @@ public:
 	uint32 field_7924;
 	uint32 total_join_request_attempts;
 	uint32 last_time_join_request_sent;
-	uint32 local_membership_update_number;
+	uint32 m_local_membership_update_number;
 	uint32 field_7934;
 	uint32 field_7938;
 	int32 field_793C;
@@ -390,10 +389,23 @@ public:
 		class c_network_session_manager* session_manager,
 		class c_network_text_chat_manager* text_chat_manager);
 
+	s_session_membership const* get_session_membership(int32* out_local_peer_index, int32* out_session_host_peer_index) const;
+	s_session_membership const* get_session_membership_unsafe(int32* out_local_peer_index, int32* out_session_host_peer_index) const;
+	int32 get_session_membership_update_number(void) const;
+	int32 get_local_session_membership_update_number(void) const;
+
 	bool channel_is_authoritative(int32 network_channel_index) const;
 
 	s_session_parameters const* get_session_parameters(void) const;
 	s_session_parameters* get_session_parameters(void);
+
+	e_network_session_class session_class(
+		void) const
+	{
+		ASSERT(m_session_class>=0 && m_session_class<k_network_session_class_count);
+
+		return m_session_class;
+	}
 
 	e_network_session_state current_local_state() const
 	{
@@ -584,7 +596,7 @@ public:
 
 	bool is_local_peer_session_leader() const
 	{
-		return m_session_membership.session_leader_peer_index == m_local_peer_index;
+		return m_session_membership.leader_peer_index == m_local_peer_index;
 	}
 
 	bool is_session_player_active(datum player_index) const
@@ -600,7 +612,7 @@ public:
 	void request_membership_update()
 	{
 		this->m_session_membership.update_number++;
-		this->local_membership_update_number++;
+		this->m_local_membership_update_number++;
 	}
 
 	int32 session_mode() const
@@ -658,6 +670,8 @@ public:
 		return VALID_INDEX(this->m_session_class, k_network_session_class_count) ? k_network_protocols_text[this->m_session_class] : "<unknown>";
 	}
 
+	bool leader_request_delegate_leadership(s_transport_secure_address const* boot_peer_address);
+	bool leader_request_boot_machine(s_transport_secure_address const* boot_peer_address);
 	bool handle_leave_request(const struct transport_address* incoming_address);
 
 	bool handle_leave_internal(int32 peer_index);
@@ -680,5 +694,4 @@ void network_session_apply_patches();
 
 void network_session_membership_update_local_players_teams();
 
-e_network_session_class network_squad_session_get_session_class();
 void __cdecl network_globals_switch_environment(int32 a1, bool a2);

@@ -165,22 +165,6 @@ void NetworkSession::LeaveSession()
 	p_leave_session(0);
 }
 
-e_network_session_class network_squad_session_get_session_class()
-{
-	//return INVOKE(0x1B1643, 0x0, network_squad_session_get_session_class);
-
-	e_network_session_class out_class = _network_session_class_unknown;
-	c_network_session* session = NULL;
-	if (network_life_cycle_in_squad_session(&session))
-	{
-		if (session->established())
-		{
-			out_class = session->m_session_class;
-		}
-	}
-	return out_class;
-}
-
 void __cdecl network_globals_switch_environment(int32 a1, bool a2)
 {
 	INVOKE(0x1B54CF, 0x1A922D, network_globals_switch_environment, a1, a2);
@@ -258,7 +242,74 @@ bool c_network_session::initialize_session(
 		text_chat_manager);
 }
 
-bool c_network_session::channel_is_authoritative(int32 network_channel_index) const
+s_session_membership const* c_network_session::get_session_membership(
+	int32* out_local_peer_index,
+	int32* out_session_host_peer_index) const
+{
+	ASSERT(established());
+	ASSERT(m_session_membership.update_number!=NONE);
+	ASSERT(m_local_peer_index>=0 && m_local_peer_index<m_session_membership.peer_count);
+	ASSERT(m_session_host_peer_index>=0 && m_session_host_peer_index<m_session_membership.peer_count);
+
+	if (out_local_peer_index)
+	{
+		*out_local_peer_index = m_local_peer_index;
+	}
+
+	if (out_session_host_peer_index)
+	{
+		*out_session_host_peer_index = m_session_host_peer_index;
+	}
+	
+	return &m_session_membership;
+}
+
+s_session_membership const* c_network_session::get_session_membership_unsafe(
+	int32* out_local_peer_index,
+	int32* out_session_host_peer_index) const
+{
+	int32 local_peer_index = NONE;
+	int32 session_host_peer_index = NONE;
+	const s_session_membership* membership = NULL;
+
+	if (current_local_state() && m_session_membership.update_number != NONE)
+	{
+		ASSERT(m_local_peer_index>=0 && m_local_peer_index<m_session_membership.peer_count);
+		ASSERT(m_session_host_peer_index>=0 && m_session_host_peer_index<m_session_membership.peer_count);
+
+		local_peer_index = m_local_peer_index;
+		session_host_peer_index = m_session_host_peer_index;
+		membership = &m_session_membership;
+	}
+
+	if (out_local_peer_index)
+	{
+		*out_local_peer_index = local_peer_index;
+	}
+
+	if (out_session_host_peer_index)
+	{
+		*out_session_host_peer_index = session_host_peer_index;
+	}
+
+	return membership;
+}
+
+int32 c_network_session::get_session_membership_update_number(void) const
+{
+	ASSERT(established());
+	ASSERT(m_session_membership.update_number!=NONE);
+
+	return m_session_membership.update_number;
+}
+
+int32 c_network_session::get_local_session_membership_update_number(void) const
+{
+	return m_local_membership_update_number;
+}
+
+bool c_network_session::channel_is_authoritative(
+	int32 network_channel_index) const
 {
 	bool result = false;
 
@@ -331,6 +382,18 @@ uint32 c_network_session::time_get(void) const
 {
 	ASSERT(m_time_exists);
 	return m_time + network_time_get_exact();
+}
+
+bool c_network_session::leader_request_delegate_leadership(
+	s_transport_secure_address const* boot_peer_address)
+{
+	return INVOKE_TYPE(0x1C8693, 0x0, bool(__thiscall*)(c_network_session*, s_transport_secure_address const*), this, boot_peer_address);
+}
+
+bool c_network_session::leader_request_boot_machine(
+	s_transport_secure_address const* boot_peer_address)
+{
+	return INVOKE_TYPE(0x1CDF84, 0x0, bool(__thiscall*)(c_network_session*, s_transport_secure_address const*), this, boot_peer_address);
 }
 
 bool c_network_session::handle_leave_request(const transport_address* incoming_address)

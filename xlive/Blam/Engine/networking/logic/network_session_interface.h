@@ -11,6 +11,16 @@ enum
 
 bool __cdecl network_session_interface_initialize(class c_network_session_manager* session_manager);
 const wchar_t* network_session_interface_get_session_name(void);
+bool network_group_session_get_membership(
+	int32* update_number,
+	int32* local_peer_index,
+	int32* host_peer_index,
+	int32* leader_peer_index,
+	int32* peer_count,
+	struct s_network_session_peer const** peers,
+	int32* player_count,
+	uint32* player_valid_flags,
+	struct s_network_session_player const** players);
 bool __cdecl network_session_interface_get_local_user_properties(
 	int32 user_index,
 	enum e_controller_index* controller_index,
@@ -23,3 +33,16 @@ int32 network_session_interface_get_team_index(int32 user_index);
 void network_session_interface_set_local_user_rank(int32 user_index, int8 rank);
 int32 __cdecl network_session_interface_add_local_user(struct s_player_identifier const* user_identifier);
 void network_session_interface_set_user_identifier(int32 user_index, struct s_player_identifier const* user_identifier);
+bool network_session_get_membership(
+	class c_network_session *session,
+	int32* update_number,
+	int32* local_peer_index,
+	int32* host_peer_index,
+	int32* leader_peer_index,
+	int32* peer_count,
+	struct s_network_session_peer const **peers,
+	int32* player_count,
+	uint32* player_valid_flags,
+	struct s_network_session_player const **players);
+enum e_network_session_class network_squad_session_get_session_class(void);
+bool network_session_is_online(e_network_session_class session_class);
