@@ -35,7 +35,18 @@ void scenario_apply_patches(
 
 scenario* global_scenario_get(void) 
 {
-	return *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430);
+	scenario* global_scenario = *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430);
+	
+	ASSERT(global_scenario);
+
+	return global_scenario;
+}
+
+scenario* global_scenario_try_and_get(void)
+{
+	scenario* global_scenario = *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430);
+
+	return global_scenario;
 }
 
 void set_global_scenario(

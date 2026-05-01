@@ -52,14 +52,15 @@ enum
 
 /* enums */
 
-enum e_scenario_type : int16
+enum e_scenario_type
 {
 	_scenario_type_solo = 0,
-	_scenario_type_multiplayer = 1,
-	_scenario_type_main_menu = 2,
-	_scenario_type_multiplayer_shared = 3,
-	_scenario_type_single_player_shared = 4,
-	k_scenario_type_count
+	_scenario_type_multiplayer,
+	_scenario_type_main_menu,
+	_scenario_type_multiplayer_shared,
+	_scenario_type_single_player_shared,
+	k_scenario_type_count,
+	_scenario_type_invalid = NONE
 };
 
 enum e_scenario_flags : int16
@@ -621,7 +622,7 @@ struct scenario
 {
 	tag_reference do_not_use;			// sbsp
 	s_tag_block skies;					// struct: tag_reference
-	e_scenario_type type;
+	c_enum<e_scenario_type, int16, _scenario_type_solo, k_scenario_type_count> type;
 	e_scenario_flags flags;
 	s_tag_block child_scenarios;		// struct: scenario_child_scenario_reference
 

@@ -503,7 +503,6 @@ ASSERT_STRUCT_SIZE(s_user_interface_tag_globals, 32);
 
 /* forward declarations */
 
-enum e_scenario_type : int16;
 enum e_user_interface_screen_id : uint32;
 
 /* prototypes */
@@ -568,7 +567,7 @@ bool __cdecl user_interface_globals_is_beta_build(void);
 int32 __cdecl user_interface_globals_get_game_difficulty(void);
 int32 __cdecl user_interface_globals_get_edit_player_profile_index(void);
 struct s_saved_game_player_profile* user_interface_globals_get_edit_player_profile(void);
-e_scenario_type __cdecl user_interface_globals_get_map_type(void);
+enum e_scenario_type __cdecl user_interface_globals_get_map_type(void);
 void __cdecl user_interface_globals_set_game_difficulty_real(int32 difficulty);
 void __cdecl user_interface_globals_set_loading_from_persistent_storage(bool a1);
 void __cdecl user_interface_globals_commit_edit_profile_changes(void);

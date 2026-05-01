@@ -11,6 +11,8 @@ void scenario_apply_patches(void);
 
 struct scenario* global_scenario_get(void);
 
+scenario* global_scenario_try_and_get(void);
+
 void set_global_scenario(struct scenario* _scenario);
 
 struct collision_bsp* global_collision_bsp_get(void);
