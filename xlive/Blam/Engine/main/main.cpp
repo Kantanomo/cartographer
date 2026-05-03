@@ -10,12 +10,11 @@
 #include "map_repository.h"
 #include "main_time.h"
 
-#include "achievements/achievement_live_interface.h"
+#include "achievements/achievement_manager.h"
 #include "bink/wmv_playback.h"
 #include "cache/cache_files_windows.h"
 #include "camera/director.h"
 #include "camera/observer.h"
-#include "cartographer/discord/discord_interface.h"
 #include "cseries/async.h"
 #include "cseries/cseries_windows_debug.h"
 #include "cseries/debug_memory.h"
@@ -33,6 +32,7 @@
 #include "interface/user_interface.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/logic/network_search.h"
+#include "networking/panorama/panorama_presence.h"
 #include "networking/network_globals.h"
 #include "physics/collision_usage.h"
 #include "rasterizer/rasterizer_globals.h"
@@ -45,7 +45,6 @@
 #include "sound/sound_manager.h"
 #include "text/font_group.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
@@ -173,17 +172,26 @@ void __cdecl main_loop_pregame(int32 a1, int32 a2)
 	return;
 }
 
-void __cdecl main_reset_map_immediate()
+void __cdecl main_reset_map_immediate(void)
 {
 	INVOKE(0x9763, 0x1FA4E, main_reset_map_immediate);
 	return;
 }
 
-void main_load_core()
+void main_save_and_exit_campaign_immediately(void)
+{
+	s_main_globals* main_globals = main_globals_get();
+	main_globals->save_map_and_exit = true;
+	
+	return;
+}
+
+void main_load_core(void)
 {
 	s_main_globals* main_globals = main_globals_get();
 	csstrncpy(main_globals->core_file_name, "core", ARRAYSIZE(main_globals->core_file_name));
 	main_globals->load_core = true;
+
 	return;
 }
 
@@ -363,7 +371,7 @@ void main_loop_body(void)
 				vibration_clear_all_now();
 			}
 
-			achievement_live_interface_get()->start_upload();
+			achievement_manager_get()->start_upload();
 
 			if (main_time_is_throttled())
 			{
