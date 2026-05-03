@@ -4,7 +4,19 @@
 
 /* enums */
 
-enum e_network_session_qos_status_data_type : int32
+enum e_life_cycle_state
+{
+	_life_cycle_state_none = 0,
+	_life_cycle_state_pre_game,
+	_life_cycle_state_start_game,
+	_life_cycle_state_in_game,
+	_life_cycle_state_post_game,
+	_life_cycle_state_joining,
+	_life_cycle_state_matchmaking,
+	k_life_cycle_state_count
+};
+
+enum e_network_session_qos_status_data_type
 {
 	_network_session_qos_status_data_none = 0,
 	_network_session_qos_status_data_lobby_or_game,
@@ -29,10 +41,7 @@ ASSERT_STRUCT_SIZE(s_clan_identifier, 12);
 
 struct s_player_configuration
 {
-	wchar_t player_name[XUSER_NAME_SIZE];
-	int32 spawn_protection_time;
-	int8 gap_24[28];
-
+	wchar_t name[32];
 	s_player_appearance appearance;
 	wchar_t clan_name[16];
 	s_clan_identifier clan_identifiers;

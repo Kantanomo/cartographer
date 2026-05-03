@@ -639,7 +639,7 @@ void draw_hud_text_get_string(s_draw_hud_widget_input_results* widget_function_r
 		{
 			player_datum const* player = player_get(user_state->player_index);
 
-			out_string->print(L"%s", player->configuration.player_name);
+			out_string->print(L"%s", player->configuration.name);
 		}
 		else
 		{

@@ -2,23 +2,8 @@
 #include "game/player_constants.h"
 #include "networking/network_game_definitions.h"
 
-/* enums */
-
-enum e_game_life_cycle : int32
-{
-	_life_cycle_none,
-	_life_cycle_pre_game,
-	_life_cycle_start_game,
-	_life_cycle_in_game,
-	_life_cycle_post_game,
-	_life_cycle_joining,
-	_life_cycle_matchmaking,
-	k_life_cycle_count
-};
-
 /* typedefs */
 
-e_game_life_cycle get_game_life_cycle(void);
 typedef bool (__cdecl *life_cycle_update_t)(void* life_cycle_handler);
 typedef void (__cdecl *life_cycle_initialize_t)(void* life_cycle_handler_requested, void* life_cycle_handler_current, int32 a3, void* a4);
 typedef void (__cdecl *life_cycle_dispose_t)(void* life_cycle_handler_current, void* life_cycle_handler_requested);
@@ -37,10 +22,10 @@ class c_game_life_cycle_handler
 {
 public:
 	c_game_life_cycle_handler_functions* functions;
-	e_game_life_cycle m_life_cycle;
+	e_life_cycle_state m_life_cycle;
 	class c_game_life_cycle_manager* m_life_cycle_manager;
 	bool field_C;
-	void initialize(class c_game_life_cycle_manager* life_cycle_manager, e_game_life_cycle life_cycle, bool a3);
+	void initialize(class c_game_life_cycle_manager* life_cycle_manager, e_life_cycle_state life_cycle, bool a3);
 };
 
 class c_game_life_cycle_handler_none : c_game_life_cycle_handler
@@ -131,8 +116,9 @@ ASSERT_STRUCT_SIZE(c_game_life_cycle_handler_matchmaking, 0x18);
 class c_game_life_cycle_manager
 {
 public:
-	e_game_life_cycle m_state;
-	c_game_life_cycle_handler* m_life_cycle_handlers[k_life_cycle_count];
+	// TODO: make all these public member variables private
+	e_life_cycle_state m_current_state;
+	c_game_life_cycle_handler* m_life_cycle_handlers[k_life_cycle_state_count];
 	void* m_network_session_manager;
 	class c_network_session* m_active_squad_session;
 	class c_network_session* m_secondary_squad_session;
@@ -142,7 +128,7 @@ public:
 	bool m_update_active;
 	bool m_update_requested;
 
-	e_game_life_cycle m_requested_life_cycle;
+	e_life_cycle_state m_requested_life_cycle;
 	int32 m_entry_data_size;
 	uint8 m_entry_data[4];
 
@@ -154,32 +140,39 @@ public:
 		class c_network_session* squad_session_two)
 	{
 		csmemset(m_life_cycle_handlers, 0, sizeof(m_life_cycle_handlers));
-		this->m_state = _life_cycle_none;
-		this->m_network_message_gateway = network_message_gateway;
-		this->m_network_observer = network_observer;
-		this->m_network_session_manager = network_session_manager;
-		this->m_active_squad_session = squad_session_one;
-		this->m_secondary_squad_session = squad_session_two;
-		this->m_update_active = false;
-		this->m_state_change_active = false;
-		this->m_update_requested = false;
-		this->m_requested_life_cycle = _life_cycle_none;
+		
+		m_current_state = _life_cycle_state_none;
+		m_network_message_gateway = network_message_gateway;
+		m_network_observer = network_observer;
+		m_network_session_manager = network_session_manager;
+		m_active_squad_session = squad_session_one;
+		m_secondary_squad_session = squad_session_two;
+		m_update_active = false;
+		m_state_change_active = false;
+		m_update_requested = false;
+		m_requested_life_cycle = _life_cycle_state_none;
 	}
 
 	static c_game_life_cycle_manager* get();
-	
 
 	void update()
 	{
 		INVOKE_TYPE(0x1D7738, 0x1BCDA8, void(__thiscall*)(c_game_life_cycle_manager*), this);
 	}
 
-	e_game_life_cycle get_life_cycle() const;
+	e_life_cycle_state get_life_cycle() const;
 	bool get_active_session(class c_network_session** out_session) const;
 	
 	bool state_is_joining() const;
 	bool state_is_in_game() const;
-	void request_state_change(e_game_life_cycle requested_state, int a3, void* a4);
+	void request_state_change(e_life_cycle_state requested_state, int a3, void* a4);
+
+	e_life_cycle_state get_current_state(void) const
+	{
+		ASSERT(m_current_state>=0&&m_current_state<k_life_cycle_state_count);
+
+		return m_current_state;
+	}
 };
 ASSERT_STRUCT_SIZE(c_game_life_cycle_manager, 68);
 

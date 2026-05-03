@@ -5,7 +5,7 @@
 #include "interface/hud.h"
 #include "interface/new_hud_definitions.h"
 #include "main/main_screenshot.h"
-#include "networking/logic/life_cycle_manager.h"
+#include "networking/logic/network_life_cycle.h"
 #include "render/render.h"
 
 #include "H2MOD/Modules/Input/KeyboardInput.h"
@@ -109,7 +109,7 @@ bool __cdecl render_ingame_chat_check(void)
 		return true;
 	}
 
-	else if (!game_is_ui_shell() && get_game_life_cycle() == _life_cycle_in_game)
+	else if (!game_is_ui_shell() && network_life_cycle_get_state() == _life_cycle_state_in_game)
 	{
 		//Enable chat in engine mode and game state mp.
 		return false;

@@ -28,7 +28,7 @@ static datum pump_datum = NONE;
 
 /* prototypes */
 
-static void halloween_game_life_cycle_update(e_game_life_cycle state);
+static void halloween_game_life_cycle_update(e_life_cycle_state state);
 
 /* public code */
 
@@ -108,9 +108,9 @@ void halloween_event_map_load(void)
 
 /* private code */
 
-static void halloween_game_life_cycle_update(e_game_life_cycle state)
+static void halloween_game_life_cycle_update(e_life_cycle_state state)
 {
-	if (state == _life_cycle_in_game)
+	if (state == _life_cycle_state_in_game)
 	{
 		object_placement_data placement;
 

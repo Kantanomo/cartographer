@@ -10,6 +10,7 @@
 #include "interface/user_interface_controller.h"
 #include "items/item_collection_definition.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "networking/logic/network_life_cycle.h"
 #include "networking/logic/network_session_interface.h"
 #include "networking/session/network_session.h"
 #include "networking/network_event.h"
@@ -237,7 +238,7 @@ void Infection::preSpawnServerSetup() {
 			isZombie = true;
 		}
 
-		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", current_player_index, isZombie, id, player->configuration.player_name);
+		event(_event_verbose, "h2mod:infection: Zombie pre spawn index = %d, isZombie = %d, playerIdentifier = %llu, playerName:%ws", current_player_index, isZombie, id, player->configuration.name);
 		if (isZombie) 
 		{
 			player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
@@ -275,7 +276,7 @@ void Infection::setPlayerAsZombie(int32 player_index)
 
 void Infection::onGameTick()
 {
-	if(get_game_life_cycle() == _life_cycle_in_game && NetworkSession::LocalPeerIsSessionHost())
+	if (network_life_cycle_get_state() == _life_cycle_state_in_game && NetworkSession::LocalPeerIsSessionHost())
 	{
 		if (game_time_get() > 0)
 		{
@@ -441,7 +442,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 				{
 					if (player->user_index != NONE)
 					{
-						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", player->configuration.player_name, player->player_identifier);
+						event(_event_verbose, "h2mod:infection: Infected local player, Name=%ws, identifier=%llu", player->configuration.name, player->player_identifier);
 						user_interface_controller_set_desired_team_index(player->controller_index, k_zombie_team);
 						user_interface_controller_update_network_properties(player->controller_index);
 						player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
@@ -449,7 +450,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 					else
 					{
 						//if not, then this is a new zombie
-						event(_event_verbose, "h2mod:infection: Player died, name=%ws, identifer=%llu", player->configuration.player_name, player->player_identifier);
+						event(_event_verbose, "h2mod:infection: Player died, name=%ws, identifer=%llu", player->configuration.name, player->player_identifier);
 						Infection::triggerSound(_snd_new_zombie, 1000);
 					}
 				}

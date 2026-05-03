@@ -158,7 +158,7 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 user_inde
 				&& network_session_interface_get_local_user_properties(local_player_count, NULL, &player_properties, NULL, NULL))
 			{
 				p_player_names[local_player_count] = player_names[local_player_count];
-				wcsncpy_s(player_names[local_player_count], 32, player_properties.player_name, UINT_MAX);
+				wcsncpy_s(player_names[local_player_count], 32, player_properties.name, UINT_MAX);
 			}
 			++local_player_count;
 		} while (local_player_count < k_number_of_users);
@@ -174,7 +174,7 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 user_inde
 void user_interface_networking_join_game_direct(XNKID kid, XNKEY key, const XNADDR* addr, int8 exe_type, int32 exe_version, int32 comp_version)
 {
 	c_game_life_cycle_handler_joining* handler = 
-		(c_game_life_cycle_handler_joining*)c_game_life_cycle_manager::get()->m_life_cycle_handlers[_life_cycle_joining];
+		(c_game_life_cycle_handler_joining*)c_game_life_cycle_manager::get()->m_life_cycle_handlers[_life_cycle_state_joining];
 
 	handler->joining_xnkid = kid;
 	handler->joining_xnkey = key;
@@ -198,7 +198,7 @@ void user_interface_networking_join_game_direct(XNKID kid, XNKEY key, const XNAD
 			s_player_configuration temp_properties;
 			if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties(i, 0, &temp_properties, 0, 0))
 			{
-				ustrncpy(local_usernames[valid_local_player_count], temp_properties.player_name, NUMBEROF(temp_properties.player_name));
+				ustrncpy(local_usernames[valid_local_player_count], temp_properties.name, NUMBEROF(temp_properties.name));
 				local_identifiers[valid_local_player_count] = temp_identifier;
 				++valid_local_player_count;
 			}
@@ -218,7 +218,7 @@ void user_interface_networking_join_game_direct(XNKID kid, XNKEY key, const XNAD
 		handler->join_attempt_result_code = 0; //Force valid result code, leave the denying the connection up to the host.
 	}
 
-	c_game_life_cycle_manager::get()->request_state_change(_life_cycle_joining, 0, 0);
+	c_game_life_cycle_manager::get()->request_state_change(_life_cycle_state_joining, 0, 0);
 	game_shell_set_in_progress();
 }
 

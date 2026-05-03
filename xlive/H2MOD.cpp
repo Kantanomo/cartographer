@@ -49,6 +49,7 @@
 #include "main/main_screenshot.h"
 #include "main/main_time.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "networking/logic/network_life_cycle.h"
 #include "networking/session/network_session.h"
 #include "networking/transport/transport.h"
 #include "networking/network_event.h"
@@ -494,7 +495,7 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 				ProjectileFix::ApplyProjectileVelocity();
 			}
 
-			if (get_game_life_cycle() == _life_cycle_in_game)
+			if (network_life_cycle_get_state() == _life_cycle_state_in_game)
 			{
 				// send server map checksums to client
 				//MapChecksumSync::SendState();
@@ -831,7 +832,7 @@ static void __cdecl user_interface_controller_set_desired_team_index_hook(e_cont
 	// prevent team switch in the pregame lobby, when the game already started
 	if (session
 		&& session->session_mode() == _network_session_mode_in_game
-		&& get_game_life_cycle() == _life_cycle_pre_game)
+		&& network_life_cycle_get_state() == _life_cycle_state_pre_game)
 	{
 		return;
 	}

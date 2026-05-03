@@ -445,7 +445,7 @@ public:
 
 	const wchar_t* get_player_name(datum player_index)
 	{
-		return get_player_membership(player_index)->configuration.player_name;
+		return get_player_membership(player_index)->configuration.name;
 	}
 
 	int32 get_local_peer_index() const
