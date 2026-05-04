@@ -4,6 +4,7 @@
 #include "screen_cartographer_account_manager.h"
 
 #include "input/input_windows.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_utilities.h"

@@ -8,7 +8,6 @@
 
 #include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
-#include "camera/camera.h"
 
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"

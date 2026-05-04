@@ -6,11 +6,15 @@
 #include "user_interface_widget_window.h"
 #include "user_interface_guide.h"
 
+#include "game/players.h"
 #include "game/game_time.h"
 #include "input/input_windows.h"
 #include "networking/logic/network_session_interface.h"
 #include "networking/online/online_account_xbox.h"
+#include "networking/panorama/panorama_achievements.h"
+#include "networking/network_event.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
+#include "saved_games/player_profile.h"
 #include "scenario/scenario_definitions.h"
 #include "scenario/scenario.h"
 #include "sound/sound_manager.h"
@@ -22,12 +26,41 @@
 typedef bool(__cdecl* t_user_interface_controller_sign_in)(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index);
 typedef void(__cdecl* t_user_interface_controller_sign_out)(e_controller_index controller_index);
 
-/* globals */
+/* structures */
 
-t_user_interface_controller_sign_in p_user_interface_controller_sign_in;
-t_user_interface_controller_sign_out p_user_interface_controller_sign_out;
+struct s_user_interface_controller
+{
+	c_flags_no_init<e_controller_state_flags, uint32, k_controller_state_flags_count> flags;
+	int32 user_index;
+	s_player_identifier controller_user_identifier;
+	int32 pad;
+	s_saved_game_player_profile player_profile;
+	uint32 profile_index;
+	int32 desired_team_index;
+	e_user_interface_controller_handicap player_handicap_level;
+	int8 pad_2[3];
+	uint32 bungienet_user_flags;
+	int8 player_is_griefer;
+	int8 pad_4[3];
+	int32 achievement_flags;
+	s_player_identifier player_identifier;
+	wchar_t player_name[32];
+};
+ASSERT_STRUCT_SIZE(s_user_interface_controller, 4732);
 
-/* private prototypes */
+struct s_user_interface_controller_globals
+{
+	s_user_interface_controller controllers[k_number_of_controllers];
+	s_event_record event_records[k_number_of_controllers];
+	bool controller_detached[k_number_of_controllers];
+	bool event_manager_suppress;
+};
+ASSERT_STRUCT_SIZE(s_user_interface_controller_globals, 19000);
+
+/* prototypes */
+
+static s_user_interface_controller_globals* user_interface_controller_globals_get(void);
+static inline s_user_interface_controller* user_interface_controller_get(e_controller_index controller_index);
 
 static bool __cdecl user_interface_controller_verify_reconnection(void);
 static bool __cdecl user_interface_controller_verify_reconnection_failed(c_screen_widget* error_screen);
@@ -36,6 +69,11 @@ static bool user_inteface_controller_has_removed_screen_active(void);
 static void user_interface_controller_update_disconnect(void);
 static void user_interface_controller_removed_handler(void);
 static void user_interface_controller_boot_to_dash_check(void);
+
+/* globals */
+
+static t_user_interface_controller_sign_in p_user_interface_controller_sign_in;
+static t_user_interface_controller_sign_out p_user_interface_controller_sign_out;
 
 /* public code */
 
@@ -48,19 +86,6 @@ void user_interface_controller_apply_patches(void)
 	DETOUR_ATTACH(p_user_interface_controller_sign_out, Memory::GetAddress<t_user_interface_controller_sign_out>(0x208257, 0x1F491B), user_interface_controller_sign_out);
 	PatchCall(Memory::GetAddress(0x20CB4B), user_interface_controller_update); // fix infinite controller-disconnect looping
 	return;
-}
-
-s_user_interface_controller_globals* user_interface_controller_globals_get(void)
-{
-	return Memory::GetAddress<s_user_interface_controller_globals*>(0x96C858, 0x999038);
-}
-
-inline s_user_interface_controller* user_interface_controller_get(
-	e_controller_index controller_index)
-{
-	vassert(VALID_INDEX(controller_index, k_number_of_controllers), "invalid controller index!", NULL);
-
-	return &user_interface_controller_globals_get()->controllers[controller_index];
 }
 
 void __cdecl user_interface_controller_initialize(void)
@@ -422,6 +447,19 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 }
 
 /* private code */
+
+static s_user_interface_controller_globals* user_interface_controller_globals_get(void)
+{
+	return Memory::GetAddress<s_user_interface_controller_globals*>(0x96C858, 0x999038);
+}
+
+static inline s_user_interface_controller* user_interface_controller_get(
+	e_controller_index controller_index)
+{
+	vassert(VALID_INDEX(controller_index, k_number_of_controllers), "invalid controller index!", NULL);
+
+	return &user_interface_controller_globals_get()->controllers[controller_index];
+}
 
 static bool __cdecl user_interface_controller_verify_reconnection(void)
 {

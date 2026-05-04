@@ -1,6 +1,4 @@
 #pragma once
-#include "user_interface.h"
-
 #include "input/controllers.h"
 #include "math/color_math.h"
 #include "tag_files/tag_reference.h"
@@ -131,8 +129,8 @@ public:
 	virtual c_user_interface_widget* sub_612ABC();
 	virtual c_user_interface_widget* sub_612BCA();
 	virtual bool handle_event(struct s_event_record* event);
-	virtual e_user_interface_channel_type get_parent_channel();
-	virtual e_user_interface_render_window get_parent_render_window();
+	virtual enum e_user_interface_channel_type get_parent_channel();
+	virtual enum e_user_interface_render_window get_parent_render_window();
 	virtual void construct_animation_on_region_enter(int32 a1);
 	virtual void construct_animation_on_region_leave(int32 a1);
 	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point);

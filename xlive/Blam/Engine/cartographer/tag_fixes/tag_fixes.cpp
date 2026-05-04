@@ -248,7 +248,8 @@ static void tag_fixes_misty_rain(void)
 static void tag_fixes_elite_mp(void)
 {
 	const s_game_globals* game_globals = scenario_get_game_globals();
-	s_game_globals_player_representation* player_rep = game_globals->player_representation[_character_type_elite];
+	s_game_globals_player_representation const* player_rep = TAG_BLOCK_GET_ELEMENT(&game_globals->player_representation, _character_type_elite, s_game_globals_player_representation);
+
 	if (player_rep->third_person_unit.index != NONE)
 	{
 		const biped_definition* elite_biped = (biped_definition*)tag_get_fast(player_rep->third_person_unit.index);
@@ -397,7 +398,8 @@ static void tag_fixes_split_screen_hud(void)
 static void sound_classes_fix_values(void)
 {
 	const s_game_globals* game_globals = scenario_get_game_globals();
-	const s_sound_globals_definition* sound_globals = game_globals->sound_globals[0];
+	const s_sound_globals_definition* sound_globals = TAG_BLOCK_GET_ELEMENT(&game_globals->sound_globals, 0, s_sound_globals_definition);
+
 	if (game_globals->sound_globals.count > 0 && sound_globals->sound_classes.index != NONE)
 	{
 		s_sound_classes_definition* sound_classes = (s_sound_classes_definition*)tag_get_fast(sound_globals->sound_classes.index);

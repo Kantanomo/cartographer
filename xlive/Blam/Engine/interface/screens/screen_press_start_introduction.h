@@ -1,8 +1,9 @@
 #pragma once
-#include "interface/user_interface_controller.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_widget_window.h"
 #include "interface/user_interface_widget_button.h"
 
+/* classes */
 
 class c_screen_press_start_introduction : protected c_screen_widget
 {

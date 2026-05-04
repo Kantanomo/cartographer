@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "weapon_definitions.h"
 
-#include "saved_games/player_profile.h"
+#include "game/game_globals.h"
 
 /* public code */
 

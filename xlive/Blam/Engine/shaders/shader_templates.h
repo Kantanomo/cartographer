@@ -114,7 +114,7 @@ struct s_shader_template_parameter
 	real32 default_const_value;
 	real_rgb_color default_const_color;
 
-	e_bitmap_type bitmap_type;
+	int16 /* e_bitmap_type */ bitmap_type;
 	int16 pad;
 
 	c_flags_no_init<e_bitmap_animation_flags, uint16, k_bitmap_animation_flag_count> bitmap_animation_flags;

@@ -81,6 +81,6 @@ void simulation_update_pregame(void);
 
 void __cdecl simulation_process_input(uint32 player_action_mask, const player_action* player_actions);
 
-bool __cdecl simulation_get_machine_active_in_game(s_machine_identifier* machine_identifier);
+bool __cdecl simulation_get_machine_active_in_game(struct s_machine_identifier* machine_identifier);
 
 void simulation_apply_patches(void);

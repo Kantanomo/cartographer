@@ -3,7 +3,7 @@
 #include "user_interface_screen_widget_definition.h"
 
 #include "game/game_allegiance.h"
-#include "saved_games/player_profile.h"
+#include "game/players.h"
 
 /* classes */
 

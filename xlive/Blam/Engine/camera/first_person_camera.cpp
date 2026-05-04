@@ -123,8 +123,9 @@ static void __cdecl first_person_camera_update(int8* camera, s_director_update* 
 	// Original method of setting the crosshair position
 	else
 	{
-		const s_game_globals* globals = scenario_get_game_globals();
-		const s_game_globals_player_control* player_control = globals->player_control[0];
+		s_game_globals const* globals = scenario_get_game_globals();
+		s_game_globals_player_control const* player_control = TAG_BLOCK_GET_ELEMENT(&globals->player_control, 0, s_game_globals_player_control);
+
 		result->crosshair_position = player_control->crosshair_location;
 	}
 

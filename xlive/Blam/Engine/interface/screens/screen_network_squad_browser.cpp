@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "screen_network_squad_browser.h"
 
-#include "interface/user_interface_controller.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_network_search.h"
 #include "networking/logic/network_logic.h"
 #include "networking/transport/transport_security.h"

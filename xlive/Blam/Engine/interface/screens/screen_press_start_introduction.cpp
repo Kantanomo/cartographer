@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "screen_press_start_introduction.h"
+
+#include "interface/user_interface.h"
 #include "interface/user_interface_memory.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 

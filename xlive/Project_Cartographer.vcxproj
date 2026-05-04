@@ -970,6 +970,7 @@
     <ClInclude Include="Blam\Engine\bink\wmv_playback.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmaps.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmap_types.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_utilities.h" />
     <ClInclude Include="Blam\Engine\bitmaps\targa_file.h" />
     <ClInclude Include="Blam\Engine\bitmaps\tiff_file.h" />
@@ -1165,6 +1166,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_utilities.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_button.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_widget_group.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_list.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_list_item.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_tab_view.h" />
@@ -2437,7 +2439,6 @@
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_units.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_vehicles.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_weapons.h" />
-    <ClInclude Include="Blam\Engine\simulation\machine_id.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_actors.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_encoding.h" />

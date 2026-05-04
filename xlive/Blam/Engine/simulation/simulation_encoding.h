@@ -1,5 +1,5 @@
 #pragma once
-#include "machine_id.h"
+#include "game/players.h"
 #include "networking/network_constants.h"
 
 /* structures */

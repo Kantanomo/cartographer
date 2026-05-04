@@ -1,14 +1,29 @@
 #pragma once
-#include "game/player_constants.h"
+#include "game/players.h"
 #include "main/map_manager.h"
 #include "networking/network_constants.h"
-#include "networking/network_game_definitions.h"
 #include "saved_games/game_variant.h"
-#include "simulation/machine_id.h"
 
 /* structures */
 
-#pragma pack(push, 1)
+struct s_persistent_weapon
+{
+	int16 damage_reporting_type;
+	int16 rounds_inventory;
+	int16 rounds_loaded;
+	int16 battery;
+};
+
+struct s_persistent_campaign_player
+{
+	bool initialized;
+	s_persistent_weapon primary_weapon;
+	s_persistent_weapon backpack_weapon;
+	s_persistent_weapon secondary_weapon;
+	uint16 grenade_counts_mask;
+};
+ASSERT_STRUCT_SIZE(s_persistent_campaign_player, 28);
+
 struct game_player_options
 {
 	bool valid;
@@ -17,12 +32,10 @@ struct game_player_options
 	e_controller_index controller_index;
 	s_machine_identifier machine_identifier;
 	s_player_identifier player_identifier;
-	int16 field_16;
 	s_player_configuration properties;
 	s_persistent_campaign_player player_type[2]; // index 0 is masterchief, index 1 is dervish
 };
 ASSERT_STRUCT_SIZE(game_player_options, 212);
-#pragma pack(pop)
 
 struct s_game_options
 {

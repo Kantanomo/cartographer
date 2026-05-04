@@ -233,19 +233,16 @@ class c_flags : public c_flags_no_init<t_type, t_storage_type, k_count>
 public:
 	c_flags(void) 
 	{ 
-		this->clear();
+		clear();
+		
 		return; 
 	}
 
 	c_flags(t_storage_type value)
 	{
-		*this = value;
-		return;
-	}
+		set_unsafe(value);
 
-	void operator=(t_storage_type value)
-	{
-		c_flags_no_init<t_type, t_storage_type, k_count>::operator=(value);
+		return;
 	}
 };
 

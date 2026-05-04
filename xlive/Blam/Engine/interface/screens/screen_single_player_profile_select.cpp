@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include  "screen_single_player_profile_select.h"
+#include "screen_single_player_profile_select.h"
 
+#include "interface/user_interface.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "saved_games/saved_game_files.h"
 

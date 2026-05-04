@@ -1,4 +1,5 @@
 #pragma once
+#include "game/players.h"
 #include "game/player_constants.h"
 #include "networking/network_game_definitions.h"
 

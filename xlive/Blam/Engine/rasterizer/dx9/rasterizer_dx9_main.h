@@ -2,6 +2,7 @@
 #include "rasterizer_dx9_targets.h"
 
 #include "bitmaps/bitmap_group.h"
+#include "bitmaps/bitmap_types.h"
 #include "math/color_math.h"
 #include "rasterizer/rasterizer_globals.h"
 
@@ -83,7 +84,7 @@ bool __cdecl rasterizer_dx9_reset(bool create_window);
 
 void __cdecl rasterizer_dx9_reset_depth_buffer(void);
 
-void rasterizer_dx9_present(bitmap_data* screenshot_bitmap, bool a2);
+void rasterizer_dx9_present(struct bitmap_data* screenshot_bitmap, bool a2);
 
 void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4);
 

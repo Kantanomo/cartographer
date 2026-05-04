@@ -1,9 +1,6 @@
 #pragma once
-#include "user_interface.h"
 #include "game/game_allegiance.h"
 #include "input/controllers.h"
-#include "networking/network_game_definitions.h"
-#include "saved_games/player_profile.h"
 
 /* enums */
 
@@ -16,7 +13,6 @@ enum e_user_interface_controller_handicap : int8
 
 	k_user_interface_controller_handicap_count
 };
-
 
 enum e_user_interface_automation_mode : uint16
 {
@@ -49,44 +45,9 @@ enum e_controller_state_flags
 	k_controller_state_flags_count,
 };
 
-/* structures */
-
-struct s_user_interface_controller
-{
-	c_flags_no_init<e_controller_state_flags, uint32, k_controller_state_flags_count> flags;
-	uint32 user_index;
-	s_player_identifier controller_user_identifier;
-	int32 pad;
-	s_saved_game_player_profile player_profile;
-	uint32 profile_index;
-	int32 desired_team_index;
-	e_user_interface_controller_handicap player_handicap_level;
-	int8 pad_2[3];
-	uint32 bungienet_user_flags;
-	int8 player_is_griefer;
-	int8 pad_4[3];
-	int32 achievement_flags;
-	s_player_identifier player_identifier;
-	wchar_t player_name[32];
-};
-ASSERT_STRUCT_SIZE(s_user_interface_controller, 4732);
-
-struct s_user_interface_controller_globals
-{
-	s_user_interface_controller controllers[k_number_of_controllers];
-	s_event_record event_records[k_number_of_controllers];
-	bool controller_detached[k_number_of_controllers];
-	bool event_manager_suppress;
-};
-ASSERT_STRUCT_SIZE(s_user_interface_controller_globals, 19000);
-
 /* prototypes */
 
 void user_interface_controller_apply_patches(void);
-
-s_user_interface_controller_globals* user_interface_controller_globals_get(void);
-
-inline s_user_interface_controller* user_interface_controller_get(e_controller_index controller_index);
 
 void __cdecl user_interface_controller_initialize(void);
 void __cdecl user_interface_controller_update(void);
@@ -109,12 +70,12 @@ uint32 __cdecl user_interface_controller_get_signed_in_controller_count(void);
 uint16 __cdecl user_interface_controller_get_signed_in_controllers_mask(void);
 uint32 __cdecl user_interface_controller_get_last_level_played(e_controller_index controller_index);
 uint32 __cdecl user_interface_controller_get_highest_campaign_level_in_signed_in_controllers();
-bool __cdecl user_interface_controller_sign_in(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index);
+bool __cdecl user_interface_controller_sign_in(e_controller_index controller_index, struct s_saved_game_player_profile* profile, uint32 enumerated_file_index);
 void __cdecl user_interface_controller_sign_out(e_controller_index controller_index);
 void __cdecl user_interface_controller_sign_out_all_controllers();
-void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32* profile_index);
-void __cdecl user_interface_controller_get_user_properties(e_controller_index controller_index, s_player_identifier* controller_user_identifier, s_player_configuration* properties);
-void __cdecl user_interface_controller_event_submit(s_event_record* event);
+void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, struct s_saved_game_player_profile* profile, uint32* profile_index);
+void __cdecl user_interface_controller_get_user_properties(e_controller_index controller_index, struct s_player_identifier* controller_user_identifier, struct s_player_configuration* properties);
+void __cdecl user_interface_controller_event_submit(struct s_event_record* event);
 
 void __cdecl user_interface_controller_update_network_properties(e_controller_index controller_index);
 void __cdecl user_interface_controller_pick_profile_dialog(e_controller_index controller_index, bool online_user);

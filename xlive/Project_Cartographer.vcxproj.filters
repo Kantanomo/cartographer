@@ -556,6 +556,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_postgame_statistics.cpp" />
     <ClCompile Include="Blam\Engine\physics\bsp3d.cpp" />
     <ClCompile Include="Blam\Engine\cache\xbox_sound_cache.cpp" />
+    <ClCompile Include="Blam\Engine\achievements\achievement_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -891,7 +892,6 @@
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_units.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_vehicles.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_weapons.h" />
-    <ClInclude Include="Blam\Engine\simulation\machine_id.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_actors.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_event_handler.h" />
@@ -2089,6 +2089,10 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_postgame_statistics.h" />
     <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
     <ClInclude Include="Blam\Engine\cache\xbox_sound_cache.h" />
+    <ClInclude Include="Blam\Engine\achievements\achievement_list.h" />
+    <ClInclude Include="Blam\Engine\achievements\achievement_manager.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_widget_group.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmap_types.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

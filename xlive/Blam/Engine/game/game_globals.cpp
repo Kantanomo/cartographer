@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "game_globals.h"
 
-
 #include "cache/cache_files.h"
 #include "main/level_definitions.h"
 #include "models/models.h"
@@ -68,7 +67,7 @@ s_camera_track_definition* game_globals_get_default_camera_track(void)
 {
 	s_game_globals* game_globals = scenario_get_game_globals();
 
-	return (s_camera_track_definition*)tag_get_fast(game_globals->camera[0]->default_unit_camera_track.index);
+	return (s_camera_track_definition*)tag_get_fast(TAG_BLOCK_GET_ELEMENT(&game_globals->camera, 0, s_game_globals_camera)->default_unit_camera_track.index);
 }
 
 void scenario_set_game_globals(s_game_globals* globals)
@@ -89,7 +88,7 @@ s_ui_levels_definition* game_globals_get_ui_levels(void)
 
 s_game_globals_player_representation* game_globals_get_representation(e_character_type type)
 {
-	return scenario_get_game_globals()->player_representation[type];
+	return TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->player_representation, type, s_game_globals_player_representation);
 }
 
 /* private code */
@@ -98,10 +97,11 @@ static void game_globals_remove_singleplayer_representation(void)
 {
 	s_game_globals* globals = scenario_get_game_globals();
 
-	s_game_globals_player_representation* masterchief_rep = globals->player_representation[_character_type_masterchief];
-	s_game_globals_player_representation* spartan_rep = globals->player_representation[_character_type_spartan];
+	s_game_globals_player_representation* masterchief_rep = TAG_BLOCK_GET_ELEMENT(&globals->player_representation, _character_type_masterchief, s_game_globals_player_representation);
+	s_game_globals_player_representation* spartan_rep = TAG_BLOCK_GET_ELEMENT(&globals->player_representation, _character_type_spartan, s_game_globals_player_representation);
 
 	masterchief_rep->third_person_unit = spartan_rep->third_person_unit;
+
 	return;
 }
 
@@ -237,7 +237,11 @@ static void game_globals_prepare_lmao_representation(s_game_globals_custom_repre
 static void add_new_representations(s_game_globals_custom_representation_result* representations)
 {
 	s_game_globals* globals = scenario_get_game_globals();
-	s_game_globals_player_representation* new_blocks = (s_game_globals_player_representation*)tag_injection_extend_block(&globals->player_representation, globals->player_representation.type_size(), k_cartographer_custom_representation_count);
+	s_game_globals_player_representation* new_blocks = (s_game_globals_player_representation*)tag_injection_extend_block(
+		&globals->player_representation,
+		sizeof(s_game_globals_player_representation),
+		k_cartographer_custom_representation_count
+	);
 
 	for (uint32 index = 0; index < k_cartographer_custom_representation_count; index++)
 	{
@@ -252,17 +256,21 @@ static void add_new_representations(s_game_globals_custom_representation_result*
 			const tag_reference fp_body_tag_ref = { _tag_group_render_model, representation_result->first_person_body };
 			const tag_reference unit_tag_ref = { _tag_group_biped, representation_result->third_person_unit };
 
-			new_representation->first_person_hands = representation_result->first_person_hands != NONE ? fp_hands_tag_ref : globals->player_representation[fallback_character]->first_person_hands;
-			new_representation->first_person_body = representation_result->first_person_body != NONE ? fp_body_tag_ref : globals->player_representation[fallback_character]->first_person_body;
-			new_representation->third_person_unit = representation_result->third_person_unit != NONE ? unit_tag_ref : globals->player_representation[fallback_character]->third_person_unit;
-			new_representation->third_person_variant = representation_result->variant != NONE ? representation_result->variant : globals->player_representation[fallback_character]->third_person_variant;
+			s_game_globals_player_representation const* fallback_representation = TAG_BLOCK_GET_ELEMENT(&globals->player_representation, fallback_character, s_game_globals_player_representation);
+
+			new_representation->first_person_hands = representation_result->first_person_hands != NONE ? fp_hands_tag_ref : fallback_representation->first_person_hands;
+			new_representation->first_person_body = representation_result->first_person_body != NONE ? fp_body_tag_ref : fallback_representation->first_person_body;
+			new_representation->third_person_unit = representation_result->third_person_unit != NONE ? unit_tag_ref : fallback_representation->third_person_unit;
+			new_representation->third_person_variant = representation_result->variant != NONE ? representation_result->variant : fallback_representation->third_person_variant;
 		}
 		else
 		{
-			new_representation->first_person_hands = globals->player_representation[fallback_character]->first_person_hands;
-			new_representation->first_person_body = globals->player_representation[fallback_character]->first_person_body;
-			new_representation->third_person_unit = globals->player_representation[fallback_character]->third_person_unit;
-			new_representation->third_person_variant = globals->player_representation[fallback_character]->third_person_variant;
+			s_game_globals_player_representation const* fallback_representation = TAG_BLOCK_GET_ELEMENT(&globals->player_representation, fallback_character, s_game_globals_player_representation);
+
+			new_representation->first_person_hands = fallback_representation->first_person_hands;
+			new_representation->first_person_body = fallback_representation->first_person_body;
+			new_representation->third_person_unit = fallback_representation->third_person_unit;
+			new_representation->third_person_variant = fallback_representation->third_person_variant;
 		}
 	}
 	return;

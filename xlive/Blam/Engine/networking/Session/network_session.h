@@ -1,9 +1,9 @@
 #pragma once
 #include "game/game_allegiance.h"
+#include "game/players.h"
 #include "game/player_constants.h"
 #include "input/controllers.h"
 #include "networking/network_constants.h"
-#include "networking/network_game_definitions.h"
 #include "networking/transport/transport.h"
 #include "networking/transport/transport_security.h"
 #include "saved_games/game_variant.h"
@@ -267,15 +267,15 @@ ASSERT_STRUCT_SIZE(s_network_session_player, 296);
 
 struct s_session_membership
 {
-	int32 update_number; // 0x70
-	int32 leader_peer_index; // 0x74
-	uint64 dedicated_server_id; // 0x78
-	int32 xbox_session_leader_peer_index; // 0x80
-	int32 peer_count; // 0x84
-	s_network_session_peer peers[k_network_maximum_machines_per_session]; // 0x88
-	int32 player_count; // 0x1254
-	uint32 player_valid_flags; // 0x1258
-	s_network_session_player players[k_maximum_players]; // 0x125C
+	int32 update_number;
+	int32 leader_peer_index;
+	uint64 dedicated_server_id;
+	int32 xbox_session_leader_peer_index;
+	int32 peer_count;
+	s_network_session_peer peers[k_network_maximum_machines_per_session];
+	int32 player_count;
+	uint32 player_valid_flags;
+	s_network_session_player players[k_maximum_players];
 	uint32 player_sequence_number;
 };
 ASSERT_STRUCT_SIZE(s_session_membership, 9328);

@@ -147,7 +147,7 @@ extern bool g_catch_exceptions;
 
 #define BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT) (((BIT_COUNT) + (LONG_BITS - 1)) / LONG_BITS)
 #define BIT_VECTOR_SIZE_IN_BYTES(BIT_COUNT) (4 * BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT))
-#define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1))))
+#define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT((BIT_VECTOR)[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1))))
 #define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_BIT(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1)), ENABLE))
 
 // Creates a bitmask that sets every bit between (bit) - 1 and bit 0 to 1

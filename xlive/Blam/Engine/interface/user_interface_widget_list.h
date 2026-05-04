@@ -59,7 +59,7 @@ struct s_custom_item_text_mapping
 class c_list_widget : public c_user_interface_widget
 {
 protected:
-	data_array* m_list_data;
+	struct data_array* m_list_data;
 	uint16 m_up_arrow_transition_time;
 	uint16 m_down_arrow_transition_time;
 	int32 m_intro_delay_milliseconds;

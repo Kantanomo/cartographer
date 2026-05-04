@@ -4,6 +4,7 @@
 #include "players.h"
 
 #include "objects/objects.h"
+#include "saved_games/player_profile.h"
 
 /* constants */
 

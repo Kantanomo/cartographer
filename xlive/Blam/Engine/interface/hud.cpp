@@ -87,7 +87,7 @@ void set_crosshair_offset(real32 offset)
 {
 	if (!isnan(offset))
 	{
-		scenario_get_game_globals()->player_control[0]->crosshair_location.y = offset;
+		TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->player_control, 0, s_game_globals_player_control)->crosshair_location.y = offset;
 	}
 }
 

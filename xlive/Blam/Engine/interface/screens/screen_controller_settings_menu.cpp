@@ -2,6 +2,7 @@
 #include "screen_controller_settings_menu.h"
 
 #include "input/input_abstraction.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_list_item.h"
 #include "interface/user_interface_widget_text.h"

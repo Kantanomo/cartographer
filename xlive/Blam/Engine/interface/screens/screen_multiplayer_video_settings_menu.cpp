@@ -14,8 +14,7 @@
 #include "interface/user_interface_controller.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "render/render.h"
-
-
+#include "saved_games/player_profile.h"
 
 /* enums */
 

@@ -8,6 +8,7 @@
 
 #include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
+#include "game/game_globals.h"
 #include "input/input_process.h"
 #include "input/input_windows.h"
 #include "interface/user_interface.h"

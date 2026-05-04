@@ -24,6 +24,7 @@
 #endif
 
 #include "game/game.h"
+#include "game/game_globals.h"
 
 #include "interface/hud_definitions.h"
 #include "interface/hud_messaging.h"

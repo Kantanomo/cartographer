@@ -105,13 +105,16 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 		const int32 user_index = players_first_active_user();
 
 		hud_messaging_post(user_index, k_skull_string_ids[skull]);
-		scripted_player_effect_screen_fade_in(1.0, 1.0, 1.0, 20);
-		const datum sound_datum = scenario_get_game_globals()->player_information[0]->ice_cream.index;
+		scripted_player_effect_screen_fade_in(1.f, 1.f, 1.f, 20);
+		
+		const datum sound_datum = TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->player_information, 0, s_game_globals_player_information)->ice_cream.index;
+		
 		if (sound_datum != NONE)
 		{
 			unspatialized_impulse_sound_new(sound_datum, 1.f);
 		}
 	}
+
 	return;
 }
 

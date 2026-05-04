@@ -7,7 +7,6 @@
 #include "networking/session/network_session.h"
 #include "networking/session/network_session_manager.h"
 #include "networking/network_event.h"
-#include "networking/network_game_definitions.h"
 
 /* structures */
 
