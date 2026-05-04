@@ -40,37 +40,41 @@ real_matrix3x3* matrix3x3_rotation_from_quaternion(real_matrix3x3* matrix, const
 	return matrix;
 }
 
-real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, real_quaternion* quaternion)
+real_quaternion* matrix3x3_rotation_to_quaternion(
+	const real_matrix3x3* matrix,
+	real_quaternion* quaternion)
 {
-	real32 v1 = matrix->forward.i + matrix->left.j + matrix->up.k;
-	if (v1 <= 0.0f)
+	real32 trace = matrix->forward.i + matrix->left.j + matrix->up.k;
+	
+	if (trace <= 0.f)
 	{
-		uint32 i = matrix->forward.i < matrix->left.j;
+		// Largest component
+		int32 i = matrix->forward.i < matrix->left.j;
+		
 		if (matrix->v.n[4 * i] < matrix->up.k)
 		{
 			i = 2;
 		}
 
-		int32 i_1 = (i + 1) % 3;
-		int32 i_2 = (i + 2) % 3;
-		real32 forward_result = matrix->v.n[4 * i] - matrix->v.n[4 * i_1] - matrix->v.n[4 * i_2] + 1.0f;
-		real32 forward_result_sqroot = square_root(forward_result);
+		int32 j = (i + 1) % 3;
+		int32 k = (i + 2) % 3;
+		
+		real32 s = matrix->v.n[4 * i] - matrix->v.n[4 * j] - matrix->v.n[4 * k];
 
-		quaternion->v.n[i] = forward_result_sqroot * 0.5f;
+		quaternion->v.n[i] = square_root(s + 1.0f) / 2.f;
 
 		// Make sure value set is greater than epsilon
 		ASSERT(quaternion->v.n[i] > k_real_epsilon);
 
 		real32 scalar = 0.25f / quaternion->v.n[i];
 
-		quaternion->w = (matrix->matrix[i_1][i_2] - matrix->matrix[i_2][i_1]) * scalar;
-		quaternion->v.n[i_1] = (matrix->matrix[i][i_1] + matrix->matrix[i_1][i]) * scalar;
-		quaternion->v.n[i_2] = (matrix->matrix[i][i_2] + matrix->matrix[i_2][i]) * scalar;
+		quaternion->w = (matrix->matrix[j][k] - matrix->matrix[k][j]) * scalar;
+		quaternion->v.n[j] = (matrix->matrix[i][j] + matrix->matrix[j][i]) * scalar;
+		quaternion->v.n[k] = (matrix->matrix[i][k] + matrix->matrix[k][i]) * scalar;
 	}
 	else
 	{
-		real32 v1_root = square_root(v1 + 1.0f);
-		quaternion->w = v1_root * 0.5f;
+		quaternion->w = square_root(trace + 1.f) / 2.f;
 		
 		// Make sure w is greater than epsilon
 		ASSERT(quaternion->w > k_real_epsilon);
@@ -88,6 +92,7 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 		quaternion->v.k = -quaternion->v.k;
 		quaternion->w = -quaternion->w;
 	}
+
 	return quaternion;
 }
 
@@ -224,10 +229,16 @@ void matrix4x3_to_point_and_vectors(real_matrix4x3* matrix, real_point3d* positi
 	return;
 }
 
-real_point3d* matrix4x3_transform_point(const real_matrix4x3* matrix, const real_point3d* point, real_point3d* result)
+real_point3d* matrix4x3_transform_point(
+	const real_matrix4x3* matrix,
+	const real_point3d* point,
+	real_point3d* result)
 {
-	real_point3d scaled_point = *point; 
-	if (matrix->scale != 1.0f)
+	ASSERT(matrix && point && result);
+
+	real_point3d scaled_point = *point;
+
+	if (matrix->scale != 1.f)
 	{
 		scaled_point.x *= matrix->scale;
 		scaled_point.y *= matrix->scale;
@@ -237,13 +248,18 @@ real_point3d* matrix4x3_transform_point(const real_matrix4x3* matrix, const real
 	result->x = (((matrix->vectors.up.i * scaled_point.z) + (matrix->vectors.left.i * scaled_point.y)) + (matrix->vectors.forward.i * scaled_point.x)) + matrix->position.x;
 	result->y = (((matrix->vectors.up.j * scaled_point.z) + (matrix->vectors.left.j * scaled_point.y)) + (matrix->vectors.forward.j * scaled_point.x)) + matrix->position.y;
 	result->z = (((matrix->vectors.up.k * scaled_point.z) + (matrix->vectors.left.k * scaled_point.y)) + (matrix->vectors.forward.k * scaled_point.x)) + matrix->position.z;
+
 	return result;
 }
 
-real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const real_vector3d *vector, real_vector3d* result)
+real_vector3d* matrix4x3_transform_vector(
+	real_matrix4x3 const* matrix,
+	real_vector3d const *vector,
+	real_vector3d* result)
 {
 	real_vector3d scaled_vector = *vector;
-	if (matrix->scale != 1.0f)
+
+	if (matrix->scale != 1.f)
 	{
 		scale_vector3d(&scaled_vector, matrix->scale, &scaled_vector);
 	}
@@ -251,6 +267,7 @@ real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const re
 	result->i = (((matrix->vectors.up.i * scaled_vector.k) + (matrix->vectors.left.i * scaled_vector.j)) + (matrix->vectors.forward.i * scaled_vector.i)) + matrix->position.x;
 	result->j = (((matrix->vectors.up.j * scaled_vector.k) + (matrix->vectors.left.j * scaled_vector.j)) + (matrix->vectors.forward.j * scaled_vector.i)) + matrix->position.y;
 	result->k = (((matrix->vectors.up.k * scaled_vector.k) + (matrix->vectors.left.k * scaled_vector.j)) + (matrix->vectors.forward.k * scaled_vector.i)) + matrix->position.z;
+
 	return result;
 }
 
