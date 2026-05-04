@@ -2,7 +2,6 @@
 #include "new_hud_definitions.h"
 
 #include "game/game_engine_territories.h"
-#include "game/players.h"
 #include "math/color_math.h"
 
 /* enums */
@@ -15,7 +14,6 @@ enum e_model_group_targets_flags : __int32
 	e_model_group_targets_flags_vulnerable = 0x8,
 	e_model_group_targets_flags_alwas_locked_by_plasma_tracking = 0x10,
 };
-
 
 /* structures */
 
@@ -37,26 +35,6 @@ struct s_new_hud_globals_player_info
 	uint8 gap_5C[36];
 };
 ASSERT_STRUCT_SIZE(s_new_hud_globals_player_info, 128);
-
-struct s_new_hud_engine_globals
-{
-	s_new_hud_globals_player_info player_data[k_number_of_users];
-	int32 field_200;
-	int32 field_204;
-	datum betraying_player_datum_index;
-	int32 gap_20C;
-	s_player_appearance default_profile_traits;
-	int16 unk_220;
-	bool show_hud;
-	bool flag_20D;			// initialized to 1 but unused?
-	bool flag_20E;			// initialized to 1 but unused?
-	bool connected_to_live;
-	int8 gap_222[2];
-	real32 hud_opacity;
-	real32 unk_22C;
-	real32 unk_230;
-};
-ASSERT_STRUCT_SIZE(s_new_hud_engine_globals, 564);
 
 struct s_new_hud_temporary_user_state
 {
@@ -110,7 +88,6 @@ ASSERT_STRUCT_SIZE(s_new_hud_temporary_user_state, 0x288);
 void new_hud_apply_patches(void);
 
 void should_draw_hud_override_set(bool flag);
-s_new_hud_engine_globals* get_new_hud_engine_globals(void);
 s_new_hud_globals_player_info* __cdecl new_hud_engine_globals_get_player_data(int32 local_player_index);
 void __cdecl new_hud_engine_globals_set_drawing_player_index(datum player_datum);
 s_hud_scripted_globals* get_hud_scripted_globals(void);

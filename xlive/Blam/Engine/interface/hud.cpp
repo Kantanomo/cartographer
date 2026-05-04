@@ -13,6 +13,7 @@
 #include "game/game_engine.h"
 #include "game/game_engine_util.h"
 #include "game/game_globals.h"
+#include "game/players.h"
 #include "main/main_screenshot.h"
 #include "render/render.h"
 

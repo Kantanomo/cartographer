@@ -2,6 +2,7 @@
 #include "new_hud.h"
 
 #include "game/game.h"
+#include "game/players.h"
 #include "interface/hud.h"
 #include "interface/new_hud_definitions.h"
 #include "main/main_screenshot.h"
@@ -11,16 +12,41 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
-/* globals */
 
-bool g_should_draw_hud_override = true;
+/* structures */
+
+struct s_new_hud_engine_globals
+{
+	s_new_hud_globals_player_info player_data[k_number_of_users];
+	int32 field_200;
+	int32 field_204;
+	datum betraying_player_datum_index;
+	int32 gap_20C;
+	s_player_appearance default_profile_traits;
+	int16 unk_220;
+	bool show_hud;
+	bool flag_20D;			// initialized to 1 but unused?
+	bool flag_20E;			// initialized to 1 but unused?
+	bool connected_to_live;
+	int8 gap_222[2];
+	real32 hud_opacity;
+	real32 unk_22C;
+	real32 unk_230;
+};
+ASSERT_STRUCT_SIZE(s_new_hud_engine_globals, 564);
 
 /* prototypes */
+
+static s_new_hud_engine_globals* get_new_hud_engine_globals(void);
 
 bool __cdecl render_ingame_chat_check(void);
 
 // Hook for ui_get_hud_elements for modifying the hud anchor for text
 real_point2d* __cdecl ui_get_hud_element_position_hook(e_hud_anchor anchor, real_point2d* point);
+
+/* globals */
+
+bool g_should_draw_hud_override = true;
 
 /* public code */
 
@@ -39,11 +65,6 @@ void should_draw_hud_override_set(bool flag)
 {
 	g_should_draw_hud_override = flag;
 	return;
-}
-
-s_new_hud_engine_globals* get_new_hud_engine_globals(void)
-{
-	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4, 0x99E93C);
 }
 
 s_new_hud_globals_player_info* __cdecl new_hud_engine_globals_get_player_data(int32 local_player_index)
@@ -95,6 +116,11 @@ bool new_hud_dont_draw(void)
 }
 
 /* private code */
+
+static s_new_hud_engine_globals* get_new_hud_engine_globals(void)
+{
+	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4, 0x99E93C);
+}
 
 bool __cdecl render_ingame_chat_check(void) 
 {

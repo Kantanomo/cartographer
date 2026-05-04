@@ -557,6 +557,7 @@
     <ClCompile Include="Blam\Engine\physics\bsp3d.cpp" />
     <ClCompile Include="Blam\Engine\cache\xbox_sound_cache.cpp" />
     <ClCompile Include="Blam\Engine\achievements\achievement_manager.cpp" />
+    <ClCompile Include="Blam\Engine\networking\logic\life_cycle\life_cycle_handler_joining.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2093,6 +2094,7 @@
     <ClInclude Include="Blam\Engine\achievements\achievement_manager.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_group.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_types.h" />
+    <ClInclude Include="Blam\Engine\networking\logic\life_cycle\life_cycle_handler_joining.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

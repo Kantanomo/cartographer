@@ -815,6 +815,7 @@
     <ClCompile Include="Blam\Engine\multithreading\synchronization.cpp" />
     <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\locator\network_locator.cpp" />
+    <ClCompile Include="Blam\Engine\networking\logic\life_cycle\life_cycle_handler_joining.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\network_bandwidth.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\network_broadcast_search.cpp" />
@@ -1224,6 +1225,7 @@
     <ClInclude Include="Blam\Engine\Networking\couch\xsession_manager.h" />
     <ClInclude Include="Blam\Engine\networking\delivery\network_link.h" />
     <ClInclude Include="Blam\Engine\networking\locator\network_locator.h" />
+    <ClInclude Include="Blam\Engine\networking\logic\life_cycle\life_cycle_handler_joining.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\networking\logic\network_bandwidth.h" />
     <ClInclude Include="Blam\Engine\networking\logic\network_broadcast_search.h" />

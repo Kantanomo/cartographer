@@ -5,12 +5,13 @@
 * NOTE: This header should NEVER EVER EVER be included in any other file except hs_runtime.cpp
 */
 
-#include "cache/cache_files.h"
-
 #include "hs.h"
 #include "hs_globals_external.h"
 #include "hs_runtime.h"
 #include "object_lists.h"
+
+#include "cache/cache_files.h"
+#include "memory/data.h"
 
 #ifdef TERMINAL_ENABLED
 #include "main/console.h"

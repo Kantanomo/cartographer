@@ -80,12 +80,6 @@ void c_game_life_cycle_handler::initialize(c_game_life_cycle_manager* life_cycle
 	this->m_life_cycle_manager->m_life_cycle_handlers[this->m_life_cycle] = this;
 }
 
-void __cdecl c_game_life_cycle_handler_joining::check_joining_capability()
-{
-	INVOKE(0x1AD643, 0x1A65C0, check_joining_capability);
-	return;
-}
-
 bool c_game_life_cycle_manager::get_active_session(c_network_session** out_session) const
 {
 	bool result = false;
