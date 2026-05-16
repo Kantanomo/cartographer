@@ -147,7 +147,6 @@ private:
 
 // END CARTOGRAPHER ADDITION
 
-#pragma pack(push, 1)
 struct s_session_peer
 {
 	bool peer_valid;
@@ -163,6 +162,7 @@ struct s_session_peer
 };
 ASSERT_STRUCT_SIZE(s_session_peer, 28);
 
+#pragma pack(push, 1)
 struct s_session_virtual_couch
 {
 	uint32 incremental_update_number;
@@ -173,6 +173,7 @@ struct s_session_virtual_couch
 	uint64 player_ids[k_maximum_players];
 };
 ASSERT_STRUCT_SIZE(s_session_virtual_couch, 200);
+#pragma pack(pop)
 
 struct s_session_parameters
 {
@@ -256,7 +257,6 @@ struct s_network_session_player
 	int32 peer_user_index;
 	uint16 player_flags;
 	bool properties_valid;
-	int8 pad[1];
 	e_controller_index controller_index;
 	s_player_configuration configuration;
 	s_player_configuration desired_configuration;
@@ -686,7 +686,6 @@ private:
 ASSERT_STRUCT_SIZE(c_network_session, 31624);
 ASSERT_STRUCT_OFFSET(c_network_session, m_session_membership, 0x70);
 ASSERT_STRUCT_OFFSET(c_network_session, m_session_parameters, 0x4C60);
-#pragma pack(pop)
 
 /* prototypes */
 
