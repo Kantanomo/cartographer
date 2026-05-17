@@ -133,6 +133,7 @@ vassert(															\
 void hs_runtime_apply_patches(void)
 {
 	PatchCall(Memory::GetAddress(0xA3997, 0x95BF7), hs_runtime_initialize);
+	
 	return;
 }
 
@@ -153,6 +154,7 @@ void __cdecl hs_runtime_initialize(void)
 	INVOKE(0x94EC4, 0xAA0C4, hs_runtime_initialize);
 	
 	hs_typecasting_table_initialize();
+
 	return;
 }
 
@@ -219,12 +221,14 @@ void hs_runtime_dirty(void)
 	hs_compile_dispose();
 	ai_reset();
 	ai_handle_script_verification(true);
+
 	return;
 }
 
 void hs_runtime_require_gc(void)
 {
 	g_require_gc = true;
+
 	return;
 }
 
@@ -266,18 +270,23 @@ void __cdecl hs_runtime_dispose_from_old_map(void)
 	return;
 }
 
-hs_syntax_node* hs_syntax_get(datum index)
+hs_syntax_node* hs_syntax_get(
+	datum index)
 {
 	data_array* g_hs_syntax_data = *hs_syntax_data_get();
+	
 	return (hs_syntax_node*)datum_get(g_hs_syntax_data, index);
 }
 
-hs_thread* hs_thread_get(datum index)
+hs_thread* hs_thread_get(
+	datum index)
 {
 	return (hs_thread*)datum_get(hs_thread_data_get(), index);
 }
 
-int32 hs_thread_new(e_hs_thread_type type, int32 script_index)
+int32 hs_thread_new(
+	e_hs_thread_type type,
+	int32 script_index)
 {
 	const int32 result = datum_new(hs_thread_data_get());
 
@@ -308,7 +317,8 @@ int32 hs_thread_new(e_hs_thread_type type, int32 script_index)
 }
 
 // TODO: remove this once we've fully re-implemented the hs function table
-void hs_thread_main_original(int32 thread_index)
+void hs_thread_main_original(
+	int32 thread_index)
 {
 	void* func = Memory::GetAddress<void*>(0x96A71, 0xABC71);
 	__asm
@@ -321,7 +331,8 @@ void hs_thread_main_original(int32 thread_index)
 	return;
 }
 
-void hs_thread_main(int32 thread_index)
+void hs_thread_main(
+	int32 thread_index)
 {
 	s_hs_runtime_globals* hs_runtime_globals = hs_runtime_globals_get();
 
@@ -406,22 +417,29 @@ void hs_thread_main(int32 thread_index)
 	}
 
 	hs_runtime_globals->executing_thread_index = NONE;
+	
 	return;
 }
 
-void hs_thread_delete(int32 thread_index)
+void hs_thread_delete(
+	int32 thread_index)
 {
 	ASSERT(hs_thread_get(thread_index)->type != _hs_thread_type_script);
 	datum_delete(hs_thread_data_get(), thread_index);
+	
 	return;
 }
 
-void hs_evaluate(int32 thread_index, int32 expression_index, int32* destination)
+void hs_evaluate(
+	int32 thread_index, 
+	int32 expression_index,
+	int32* destination)
 {
 	hs_thread* thread = hs_thread_get(thread_index);
 	hs_syntax_node* node = hs_syntax_get(expression_index);
 
 	const data_array* hs_thread_data = hs_thread_data_get();
+
 	hs_thread_assert(valid_thread(thread), "corrupted stack.", thread_index);
 	ASSERT(destination);
 
@@ -447,22 +465,31 @@ void hs_evaluate(int32 thread_index, int32 expression_index, int32* destination)
 		SET_BIT(thread->flags, _hs_thread_in_function_call_bit, true);
 		thread->stack->expression_index = expression_index;
 	}
+
 	return;
 }
 
-void __cdecl hs_return(int32 thread_index, int32 value)
+void __cdecl hs_return(
+	int32 thread_index,
+	int32 value)
 {
 	INVOKE(0x9505D, 0xAA25D, hs_return, thread_index, value);
 	return;
 }
 
-int32* hs_macro_function_evaluate(int16 function_index, int32 thread_index, bool initialize)
+int32* hs_macro_function_evaluate(
+	int16 function_index,
+	int32 thread_index,
+	bool initialize)
 {
 	const hs_function_definition* function = hs_function_get(function_index);
+
 	return hs_arguments_evaluate(thread_index, function->formal_parameter_count, (const int16*)function->formal_parameters, initialize);
 }
 
-int32 hs_runtime_evaluate(datum expression_index, bool display_expression_result)
+int32 hs_runtime_evaluate(
+	datum expression_index,
+	bool display_expression_result)
 {
 	datum result = NONE;
 	if (expression_index != NONE)
@@ -479,6 +506,7 @@ int32 hs_runtime_evaluate(datum expression_index, bool display_expression_result
 		if (hs_runtime_globals->initialized)
 		{
 			const datum thread_index = hs_thread_new(_hs_thread_type_runtime_evaluate, NONE);
+
 			if (thread_index == NONE)
 			{
 				error(_error_immediate, "### ERROR %s: could not allocate thread to execute a command!", __FUNCTION__);
@@ -513,12 +541,14 @@ int32 hs_runtime_evaluate(datum expression_index, bool display_expression_result
 	return result;
 }
 
-bool hs_can_cast(int16 actual_type, int16 desired_type)
+bool hs_can_cast(
+	int16 actual_type,
+	int16 desired_type)
 {
+	bool result;
+
 	ASSERT(actual_type == _hs_passthrough || hs_type_valid(actual_type));
 	ASSERT(hs_type_valid(desired_type));
-
-	bool result;
 
 	// Trying to cast to itself...
 	if (actual_type == _hs_passthrough || actual_type == desired_type)
@@ -554,33 +584,41 @@ bool hs_can_cast(int16 actual_type, int16 desired_type)
 			result = hs_type_mask_can_cast(actual_type - FIRST_HS_OBJECT_TYPE, desired_type - FIRST_HS_OBJECT_TYPE);
 		}
 	}
+
 	return result;
 }
 
-int32 hs_cast(int32 thread_index, int16 actual_type, int16 desired_type, int32 value)
+int32 hs_cast(
+	int32 thread_index,
+	int16 actual_type,
+	int16 desired_type,
+	int32 value)
 {
+	int32 result = value;
+
 	hs_thread_assert(hs_can_cast(actual_type, desired_type), "bad typecast.", thread_index);
 	
-	if (actual_type == desired_type || actual_type == _hs_passthrough)
-		return value;
-	if (desired_type >= FIRST_HS_OBJECT_NAME_TYPE && desired_type <= LAST_HS_OBJECT_NAME_TYPE)
-		return value;
-	
-	int32 result;
-	if (desired_type < FIRST_HS_OBJECT_TYPE || desired_type > LAST_HS_OBJECT_TYPE)
+	// Don't attempt to cast if our types are the same or our type is a passthrough type
+	// Also, make sure our desired type isn't an object type
+	if (actual_type != desired_type && actual_type != _hs_passthrough &&
+		!IN_RANGE(desired_type, FIRST_HS_OBJECT_NAME_TYPE, LAST_HS_OBJECT_NAME_TYPE))
 	{
-		ASSERT(VALID_INDEX(desired_type, NUMBER_OF_HS_NODE_TYPES));
-		ASSERT(VALID_INDEX(actual_type, NUMBER_OF_HS_NODE_TYPES));
-		ASSERT(g_typecasting_procedures[desired_type][actual_type] != NULL);
-		result = g_typecasting_procedures[desired_type][actual_type](value);
-	}
-	else if (IN_RANGE(actual_type, FIRST_HS_OBJECT_NAME_TYPE, LAST_HS_OBJECT_NAME_TYPE))
-	{
-		result = object_index_from_name_index((int16)value);
-	}
-	else
-	{
-		result = value;
+		if (desired_type < FIRST_HS_OBJECT_TYPE || desired_type > LAST_HS_OBJECT_TYPE)
+		{
+			ASSERT(VALID_INDEX(desired_type, NUMBER_OF_HS_NODE_TYPES));
+			ASSERT(VALID_INDEX(actual_type, NUMBER_OF_HS_NODE_TYPES));
+			ASSERT(g_typecasting_procedures[desired_type][actual_type] != NULL);
+
+			result = g_typecasting_procedures[desired_type][actual_type](value);
+		}
+		else if (IN_RANGE(actual_type, FIRST_HS_OBJECT_NAME_TYPE, LAST_HS_OBJECT_NAME_TYPE))
+		{
+			result = object_index_from_name_index((int16)value);
+		}
+		else
+		{
+			result = value;
+		}
 	}
 
 	return result;
@@ -626,6 +664,7 @@ void render_debug_scripting(void)
 		render_debug_string(string);
 		draw_string_set_tab_stops(tab_stops, 0);
 	}
+
 	return;
 }
 
@@ -678,95 +717,125 @@ static void hs_typecasting_table_initialize(void)
 	return;
 }
 
-static int32 hs_data_to_void(int32 n)
+static int32 hs_data_to_void(
+	int32 n)
 {
 	return NULL;
 }
 
-static int32 hs_long_to_boolean(int32 n)
+static int32 hs_long_to_boolean(
+	int32 n)
 {
 	return n == 0;
 }
 
-static int32 hs_short_to_boolean(int32 s)
+static int32 hs_short_to_boolean(
+	int32 s)
 {
 	return ((int16)s) == 0;
 }
 
-static int32 hs_string_to_boolean(int32 n)
+static int32 hs_string_to_boolean(
+	int32 n)
 {
 	const size_t length = cstrlen((const char*)n);
+
 	return hs_long_to_boolean(length);
 }
 
-static int32 hs_short_to_real(int32 s)
+static int32 hs_short_to_real(
+	int32 s)
 {
-	const real32 v = (real32)(int16)s;
-	return (int32)v;
+	const int32 result = (int32)(real32)(int16)s;
+
+	return result;
 }
 
-static int32 hs_long_to_real(int32 n)
+static int32 hs_long_to_real(
+	int32 n)
 {
-	const real32 v = (real32)n;
-	return (int32)v;
+	const int32 result = (int32)(real32)n;
+
+	return result;
 }
 
-static int32 hs_enum_to_real(int32 e)
+static int32 hs_enum_to_real(
+	int32 e)
 {
-	const real32 v = (real32)e;
-	return (int32)v;
+	const int32 result = (int32)(real32)e;
+	return result;
 }
 
-static int32 hs_real_to_short(int32 r)
+static int32 hs_real_to_short(
+	int32 r)
 {
-	return (int16)(int32)*(real32*)&r;
+	const int32 result = (int16)(int32)*(real32*)&r;
+	return result;
 }
 
-static int32 hs_long_to_short(int32 n)
+static int32 hs_long_to_short(
+	int32 n)
 {
-	return (int16)n;
+	int32 result = (int16)n;
+
+	return result;
 }
 
-static int32 hs_real_to_long(int32 r)
+static int32 hs_real_to_long(
+	int32 r)
 {
-	return (int32)*(real32*)&r;
+	int32 result = (int32)*(real32*)&r;
+	
+	return result;
 }
 
-static int32 hs_short_to_long(int32 s)
+static int32 hs_short_to_long(
+	int32 s)
 {
-	return (int16)s;
+	int32 result = (int16)s;
+	
+	return result;
 }
 
-static int32 hs_object_to_object_list(int32 object_index)
+static int32 hs_object_to_object_list(
+	int32 object_index)
 {
 	int32 result = NONE;
+	
 	if (object_index != NONE)
 	{
 		result = object_list_new();
 		object_list_add(result, object_index);
 	}
+
 	return result;
 }
 
-static int32 hs_object_name_to_object_list(int32 object_name_index)
+static int32 hs_object_name_to_object_list(
+	int32 object_name_index)
 {
 	int32 result = NONE;
-	const int32 object_index = object_index_from_name_index((int16)object_name_index);
+	int32 object_index = object_index_from_name_index((int16)object_name_index);
+	
 	if (object_index != NONE)
 	{
 		result = object_list_new();
 		object_list_add(result, object_index);
 	}
+
 	return result;
 }
 
-static bool hs_syntax_node_exists(int32 index)
+static bool hs_syntax_node_exists(
+	int32 index)
 {
 	data_array* g_hs_syntax_data = *hs_syntax_data_get();
 	return datum_try_and_get(g_hs_syntax_data, index) != NULL;
 }
 
-static void* hs_stack_allocate(int32 thread_index, int32 size)
+static void* hs_stack_allocate(
+	int32 thread_index,
+	int32 size)
 {
 	const hs_thread* thread = hs_thread_get(thread_index);
 	hs_stack_frame* frame = thread->stack;
@@ -781,10 +850,14 @@ static void* hs_stack_allocate(int32 thread_index, int32 size)
 	return result;
 }
 
-static void hs_script_evaluate(int16 script_index, int32 thread_index, bool initialize)
+static void hs_script_evaluate(
+	int16 script_index,
+	int32 thread_index,
+	bool initialize)
 {
 	hs_thread_get(thread_index);
 	int32* stack = (int32*)hs_stack_allocate(thread_index, sizeof(int32));
+	
 	if (initialize)
 	{
 		const hs_script* script = scenario_get_hs_script(global_scenario_get(), script_index);
@@ -794,10 +867,12 @@ static void hs_script_evaluate(int16 script_index, int32 thread_index, bool init
 	{
 		hs_return(thread_index, *stack);
 	}
+
 	return;
 }
 
-static void hs_thread_stack_adjust(int32 thread_index)
+static void hs_thread_stack_adjust(
+	int32 thread_index)
 {
 	hs_thread* thread = hs_thread_get(thread_index);
 
@@ -808,10 +883,12 @@ static void hs_thread_stack_adjust(int32 thread_index)
 	new_frame->parent = thread->stack;
 	thread->stack = new_frame;
 	new_frame->size = 0;
+
 	return;
 }
 
-static const char* hs_thread_format(int32 thread_index)
+static const char* hs_thread_format(
+	int32 thread_index)
 {
 	const char* result;
 	
@@ -844,19 +921,23 @@ static const char* hs_thread_format(int32 thread_index)
 	return result;
 }
 
-static int32 hs_global_designator_get_index(int16 global_designator)
+static int32 hs_global_designator_get_index(
+	int16 global_designator)
 {
 	return global_designator < 0 ? HS_GLOBAL_INDEX(global_designator) : k_hs_external_global_count + HS_GLOBAL_INDEX(global_designator);
 }
 
-static int32 hs_global_evaluate(int16 global_designator)
+static int32 hs_global_evaluate(
+	int16 global_designator)
 {
 	hs_global_reconcile_read(global_designator);
 	int32 index = hs_global_designator_get_index(global_designator);
+
 	return ((hs_global_runtime*)datum_get_absolute(hs_global_data_get(), index))->long_value;
 }
 
-static void hs_global_reconcile_read(int16 global_designator)
+static void hs_global_reconcile_read(
+	int16 global_designator)
 {
 	if (global_designator < 0)
 	{
@@ -1022,10 +1103,12 @@ static void hs_global_reconcile_read(int16 global_designator)
 			halt();
 		}
 	}
+
 	return;
 }
 
-static void hs_global_reconcile_write(int16 global_designator)
+static void hs_global_reconcile_write(
+	int16 global_designator)
 {
 	const e_hs_type type = (e_hs_type)hs_global_get_type(global_designator);
 	const int32 index = hs_global_designator_get_index(global_designator);
@@ -1217,17 +1300,22 @@ static void hs_global_reconcile_write(int16 global_designator)
 		object_datum* object = object_get(absolute->long_value);
 		object->object.flags.set(_object_ever_referenced_by_hs_bit, true);
 	}
+
 	return;
 }
 
-static bool hs_type_mask_can_cast(int16 actual_type, int16 desired_type)
+static bool hs_type_mask_can_cast(
+	int16 actual_type,
+	int16 desired_type)
 {
 	ASSERT(VALID_INDEX(actual_type, NUMBER_OF_HS_OBJECT_TYPES));
 	ASSERT(VALID_INDEX(desired_type, NUMBER_OF_HS_OBJECT_TYPES));
 	return (hs_object_type_masks[desired_type] & hs_object_type_masks[actual_type]) == hs_object_type_masks[actual_type];
 }
 
-static const char* expression_get_function_name(int32 thread_index, int32 expression_index)
+static const char* expression_get_function_name(
+	int32 thread_index,
+	int32 expression_index)
 {
 	const hs_syntax_node* expression = hs_syntax_get(expression_index);
 	const hs_thread* thread = hs_thread_get(thread_index);
@@ -1256,7 +1344,10 @@ static const char* expression_get_function_name(int32 thread_index, int32 expres
 	return result;
 }
 
-static bool script_error(int32 thread_index, const char* message, const char* condition)
+static bool script_error(
+	int32 thread_index,
+	const char* message,
+	const char* condition)
 {
 	bool result = false;	// Always fail on error
 
@@ -1267,10 +1358,15 @@ static bool script_error(int32 thread_index, const char* message, const char* co
 		message ? message : "no reason given.",
 		condition
 	);
+
 	return result;
 }
 
-static int32* hs_arguments_evaluate(int32 thread_index, int16 formal_parameter_count, const int16* formal_parameters, bool initialize)
+static int32* hs_arguments_evaluate(
+	int32 thread_index,
+	int16 formal_parameter_count,
+	const int16* formal_parameters,
+	bool initialize)
 {
 	hs_thread* thread = hs_thread_get(thread_index);
 	int32* arguments = (int32*)hs_stack_allocate(thread_index, sizeof(int32) * formal_parameter_count);

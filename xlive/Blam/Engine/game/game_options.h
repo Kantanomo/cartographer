@@ -6,7 +6,7 @@
 
 /* structures */
 
-struct s_persistent_weapon
+struct s_campaign_armaments_weapon
 {
 	int16 damage_reporting_type;
 	int16 rounds_inventory;
@@ -14,15 +14,20 @@ struct s_persistent_weapon
 	int16 battery;
 };
 
-struct s_persistent_campaign_player
+struct s_campaign_armaments_player
 {
-	bool initialized;
-	s_persistent_weapon primary_weapon;
-	s_persistent_weapon backpack_weapon;
-	s_persistent_weapon secondary_weapon;
-	uint16 grenade_counts_mask;
+	bool valid;
+	s_campaign_armaments_weapon primary_weapon;
+	s_campaign_armaments_weapon backpack_weapon;
+	s_campaign_armaments_weapon secondary_weapon;
+	uint8 grenade_counts[2];
 };
-ASSERT_STRUCT_SIZE(s_persistent_campaign_player, 28);
+ASSERT_STRUCT_SIZE(s_campaign_armaments_player, 28);
+
+struct s_campaign_armaments
+{
+	s_campaign_armaments_player player_armaments[2];	// index 0 is masterchief, index 1 is dervish
+};
 
 struct game_player_options
 {
@@ -33,7 +38,7 @@ struct game_player_options
 	s_machine_identifier machine_identifier;
 	s_player_identifier player_identifier;
 	s_player_configuration properties;
-	s_persistent_campaign_player player_type[2]; // index 0 is masterchief, index 1 is dervish
+	s_campaign_armaments campaign_armaments;
 };
 ASSERT_STRUCT_SIZE(game_player_options, 212);
 
