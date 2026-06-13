@@ -207,7 +207,7 @@ struct s_ui_error_string_data
 	string_id title;
 	string_id message;
 	string_id ok;
-	string_id cancel;
+	string_id abort_download;
 };
 
 // max count: k_ui_maximum_error_per_category_count

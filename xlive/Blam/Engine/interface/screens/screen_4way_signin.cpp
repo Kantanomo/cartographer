@@ -8,6 +8,7 @@
 
 #include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
+#include "game/game_globals.h"
 #include "input/input_process.h"
 #include "input/input_windows.h"
 #include "interface/user_interface.h"
@@ -255,7 +256,7 @@ void c_screen_4way_signin::update(void)
 	this->set_controller_mask_recursive(all_users_mask);
 	c_player_widget_representation representations[k_number_of_controllers];
 
-	for (e_controller_index controller = _controller_index_0;
+	for (e_controller_index controller = _controller0;
 		controller != k_no_controller;
 		controller = user_interface_controller_get_next_valid_index(controller))
 	{
@@ -468,12 +469,14 @@ bool __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_i
 	//return INVOKE(0xA421, 0x0, user_interface_mainmenu_sign_out_controller_callback, controller_index);
 	user_interface_controller_sign_out(controller_index);
 	user_interface_enter_game_shell(2);
+	
 	return true;
 
 }
 bool __cdecl user_interface_sign_out_controller_default_callback(e_controller_index controller_index)
 {
 	user_interface_controller_sign_out(controller_index);
+
 	return true;
 }
 bool __cdecl user_interface_decline_invite_callback(e_controller_index controller_index)
@@ -496,8 +499,9 @@ bool __cdecl user_interface_decline_invite_callback(e_controller_index controlle
 bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record* event)
 {
 	bool sucess = true;
-	if (event->component == _user_interface_controller_component_button_a ||
-		event->component == _user_interface_controller_component_button_start)
+
+	if (event->component == _controller_component_button_a ||
+		event->component == _controller_component_button_start)
 	{
 		s_screen_parameters params;
 		params.m_flags = 0;
@@ -550,8 +554,8 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			params.m_load_function(&params);
 
 	}
-	else if (event->component == _user_interface_controller_component_button_b ||
-		event->component == _user_interface_controller_component_button_back)
+	else if (event->component == _controller_component_button_b ||
+		event->component == _controller_component_button_back)
 	{
 		if (user_interface_controller_get_signed_in_controller_count() == 1)
 		{
@@ -606,8 +610,8 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 
 bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event) const
 {
-	if (event->component == _user_interface_controller_component_button_a
-		|| event->component == _user_interface_controller_component_button_start)
+	if (event->component == _controller_component_button_a
+		|| event->component == _controller_component_button_start)
 	{
 		bool online = false;
 		if (online_connected_to_xbox_live() && this->m_call_context == _4_way_signin_type_crossgame_invite)
@@ -616,8 +620,8 @@ bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event
 		}
 		user_interface_controller_pick_profile_dialog(event->controller, online);
 	}
-	else if ((event->component == _user_interface_controller_component_button_b 
-		|| event->component == _user_interface_controller_component_button_back)
+	else if ((event->component == _controller_component_button_b 
+		|| event->component == _controller_component_button_back)
 		&& !user_interface_controller_get_signed_in_controller_count())
 	{
 		user_interface_error_ok_cancel_dialog_show_confirmation(
@@ -630,10 +634,11 @@ bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event
 	return true;
 }
 
-bool c_screen_4way_signin::handle_automation_event(s_event_record* event)
+bool c_screen_4way_signin::handle_automation_event(
+	s_event_record* event)
 {
 	bool result= false;
-	int16 automation_mode = (int16)event->value;
+	int16 automation_mode = event->event_value;
 
 	if (!IN_RANGE(automation_mode, 2, 11))
 	{
@@ -642,19 +647,21 @@ bool c_screen_4way_signin::handle_automation_event(s_event_record* event)
 	else
 	{
 		s_event_record new_event;
-		new_event.component = event->component;
-		new_event.value = event->value;
-		new_event.controller = event->controller;
 
+		new_event.component = event->component;
+		new_event.event_value = event->event_value;
+		new_event.controller = event->controller;
 		new_event.type = _user_interface_event_type_gamepad_button_pressed;
+		
 		result = this->handle_event(&new_event);
 	}
+
 	return result;
 }
 
 bool c_screen_4way_signin::handle_split_input_event(s_event_record* event)
 {
-	if (event->component == _user_interface_controller_component_button_x
+	if (event->component == _controller_component_button_x
 		&& !input_windows_processing_device_change()
 		&& g_show_split_inputs_option)
 	{

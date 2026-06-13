@@ -36,7 +36,7 @@ typedef struct
 
 typedef struct {
 	DWORD dwType;
-	WCHAR wszCustomText[2000];
+	WCHAR wszCustomText[XPLAYERLIST_BUTTONTEXT_MAX_LENGTH];
 } XPLAYERLIST_BUTTON;
 
 typedef struct {
@@ -172,3 +172,17 @@ typedef struct _XUSER_STATS_SPEC
 #define XCONTEXTID(global, id)          XPROPERTYID(global, XUSER_DATA_TYPE_CONTEXT, id)
 #define XPROPERTYTYPEFROMID(id)         ((id >> 28) & 0xf)
 #define XISSYSTEMPROPERTY(id)           (id & X_PROPERTY_SCOPE_MASK)
+
+DWORD WINAPI XShowCustomPlayerListUI(
+	DWORD dwUserIndex,
+	DWORD dwFlags,
+	LPCWSTR pzsTitle,
+	LPCWSTR pszDescription,
+	CONST BYTE* pbImage,
+	DWORD cbImage,
+	CONST XPLAYERLIST_USER* rgPlayers,
+	DWORD cPlayers,
+	CONST XPLAYERLIST_BUTTON* pXButton,
+	CONST XPLAYERLIST_BUTTON* pYButton,
+	XPLAYERLIST_RESULT* pResult,
+	XOVERLAPPED* pOverlapped);

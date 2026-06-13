@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "screen_virtual_keyboard.h"
 
+#include "interface/user_interface.h"
 #include "interface/user_interface_memory.h"
 #include "main/game_preferences.h"
 

@@ -1,10 +1,9 @@
 #pragma once
 #include "game_allegiance.h"
-#include "player_constants.h"
+#include "game/players.h"
+#include "objects/damage_reporting.h"
 #include "networking/network_constants.h"
-#include "networking/network_game_definitions.h"
 #include "saved_games/game_variant.h"
-#include "simulation/machine_id.h"
 
 /* constants */
 
@@ -394,7 +393,7 @@ int32 game_results_get_finalized_medal_statistic(int32 player_index, e_game_resu
 int32 game_results_get_finalized_pvp_statistic(int32 player_index, int32 vs_player_index, e_game_results_player_vs_player_statistic statistic);
 int32 game_results_get_finalized_player_score(int32 player_index);
 int32 game_results_get_finalized_player_place(int32 player_index);
-s_player_configuration* game_results_get_finalized_player_configuration(int32 player_index);
+struct s_player_configuration* game_results_get_finalized_player_configuration(int32 player_index);
 int8* game_results_get_finalized_player_unknown_02(int32 player_index);
 e_game_team game_results_get_finalized_player_team(int32 player_index);
 void game_results_get_finalized_player_profile_traits(int32 player_index, s_player_appearance* appearance);

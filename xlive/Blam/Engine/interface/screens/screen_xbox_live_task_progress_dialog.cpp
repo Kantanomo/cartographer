@@ -50,8 +50,8 @@ bool c_screen_xbox_live_task_progress_dialog::handle_event(s_event_record* event
 {
 	if (event->type == _user_interface_event_type_gamepad_button_pressed)
 	{
-		if (event->component == _user_interface_controller_component_button_b
-			|| event->component == _user_interface_controller_component_button_back)
+		if (event->component == _controller_component_button_b
+			|| event->component == _controller_component_button_back)
 		{
 			if (m_close_function)
 			{
@@ -151,7 +151,7 @@ void c_screen_xbox_live_task_progress_dialog::close_task()
 void c_screen_xbox_live_task_progress_dialog::add_task(proc_task_cb_t update_function)
 {
 	ASSERT(update_function != nullptr);
-	add_task_ex(NONE, _controller_index_0, update_function, nullptr, nullptr);
+	add_task_ex(NONE, _controller0, update_function, nullptr, nullptr);
 }
 
 void c_screen_xbox_live_task_progress_dialog::add_task_ex(datum task_datum, e_controller_index controller_index, proc_task_cb_t update_function, proc_task_cb_t close_function, uint8* data)

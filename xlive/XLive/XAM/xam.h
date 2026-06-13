@@ -108,3 +108,5 @@
 #define XN_PARTY_LAST                                    XNID(XNID_CURRENTVERSION+1, _XNAREA_PARTY, 0x0006)
 
 int WINAPI XNotifyDelayUI(int a1);
+
+BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId, PULONG_PTR pParam);

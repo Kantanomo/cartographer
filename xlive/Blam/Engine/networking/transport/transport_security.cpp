@@ -3,8 +3,8 @@
 
 #include "transport_address.h"
 
+#include "game/players.h"
 #include "shell/shell_windows.h"
-#include "simulation/machine_id.h"
 
 #include <Xlive/xnet/Sockets/XSocket.h>
 

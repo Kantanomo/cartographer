@@ -4,6 +4,7 @@
 #include "screen_cartographer_account_manager.h"
 
 #include "input/input_windows.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_utilities.h"
@@ -199,7 +200,7 @@ bool c_cartographer_error_menu::handle_event(s_event_record* event)
 		|| event->type == _user_interface_event_type_mouse_button_left_click)
 	{
 		if (event->component == _user_interface_keyboard_component_button_letter_a
-			|| event->component == _user_interface_controller_component_button_a)
+			|| event->component == _controller_component_button_a)
 		{
 			start_widget_animation(3);
 			result = true;

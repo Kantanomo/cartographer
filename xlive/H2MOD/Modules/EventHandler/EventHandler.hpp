@@ -72,7 +72,7 @@ namespace EventHandler
 	};
 
 	using CountdownStartEventCallback = void(*)();
-	using GameLifeCycleEventCallback = void(*)(enum e_game_life_cycle state);
+	using GameLifeCycleEventCallback = void(*)(enum e_life_cycle_state state);
 	using NetworkPlayerEventCallback = void(*)(int peerIndex, NetworkPlayerEventType type);
 	using GameLoopEventCallback = void(*)();
 	using ServerCommandEventCallback = void(*)(enum e_server_console_commands command);

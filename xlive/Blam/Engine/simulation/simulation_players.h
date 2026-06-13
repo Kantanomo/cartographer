@@ -1,9 +1,8 @@
 #pragma once
-#include "machine_id.h"
-
 #include "game/game.h"
+#include "game/players.h"
 #include "game/player_control.h"
-#include "networking/network_game_definitions.h"
+#include "input/controllers.h"
 
 /* enums */
 

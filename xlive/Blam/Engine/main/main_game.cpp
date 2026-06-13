@@ -318,6 +318,7 @@ void main_menu_launch_force(void)
 	{
 		main_menu_launch(0);
 	}
+
 	return;
 }
 

@@ -8,7 +8,7 @@
 #ifdef TERMINAL_ENABLED
 #include "main/console.h"
 #endif
-#include "networking/logic/life_cycle_manager.h"
+#include "networking/logic/network_life_cycle.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 #include "H2MOD/Modules/Input/ControllerInput.h"
@@ -268,7 +268,7 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 	ASSERT(out_buttons != nullptr);
 	if (gamepad && gamepad->XGetState(&state) == ERROR_SEVERITY_SUCCESS)
 	{
-		if (profile_settings->controller_custom_layout_enabled && (get_game_life_cycle() == _life_cycle_in_game || game_mode_get() == _game_mode_campaign))
+		if (profile_settings->controller_custom_layout_enabled && (network_life_cycle_get_state() == _life_cycle_state_in_game || game_mode_get() == _game_mode_campaign))
 		{
 			for (uint8 button_index = 0; button_index < k_number_of_xinput_buttons; button_index++)
 			{

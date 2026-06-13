@@ -585,6 +585,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Blam\Engine\achievements\achievement_live_interface.cpp" />
+    <ClCompile Include="Blam\Engine\achievements\achievement_manager.cpp" />
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\ai\actor_dynamic_firing_position.cpp" />
     <ClCompile Include="Blam\Engine\ai\actor_types.cpp" />
@@ -814,6 +815,7 @@
     <ClCompile Include="Blam\Engine\multithreading\synchronization.cpp" />
     <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\locator\network_locator.cpp" />
+    <ClCompile Include="Blam\Engine\networking\logic\life_cycle\life_cycle_handler_joining.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\network_bandwidth.cpp" />
     <ClCompile Include="Blam\Engine\networking\logic\network_broadcast_search.cpp" />
@@ -922,7 +924,9 @@
     <ClInclude Include="3rdparty\zlib-1.1.4\include\zlib.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\minizip\unzip.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\minizip\zip.h" />
+    <ClInclude Include="Blam\Engine\achievements\achievement_list.h" />
     <ClInclude Include="Blam\Engine\achievements\achievement_live_interface.h" />
+    <ClInclude Include="Blam\Engine\achievements\achievement_manager.h" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
     <ClInclude Include="Blam\Engine\ai\actor_dynamic_firing_position.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
@@ -967,6 +971,7 @@
     <ClInclude Include="Blam\Engine\bink\wmv_playback.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmaps.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmap_types.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_utilities.h" />
     <ClInclude Include="Blam\Engine\bitmaps\targa_file.h" />
     <ClInclude Include="Blam\Engine\bitmaps\tiff_file.h" />
@@ -1162,6 +1167,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_utilities.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_button.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_widget_group.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_list.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_list_item.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_tab_view.h" />
@@ -1219,6 +1225,7 @@
     <ClInclude Include="Blam\Engine\Networking\couch\xsession_manager.h" />
     <ClInclude Include="Blam\Engine\networking\delivery\network_link.h" />
     <ClInclude Include="Blam\Engine\networking\locator\network_locator.h" />
+    <ClInclude Include="Blam\Engine\networking\logic\life_cycle\life_cycle_handler_joining.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\networking\logic\network_bandwidth.h" />
     <ClInclude Include="Blam\Engine\networking\logic\network_broadcast_search.h" />
@@ -2434,7 +2441,6 @@
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_units.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_vehicles.h" />
     <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_weapons.h" />
-    <ClInclude Include="Blam\Engine\simulation\machine_id.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_actors.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_encoding.h" />

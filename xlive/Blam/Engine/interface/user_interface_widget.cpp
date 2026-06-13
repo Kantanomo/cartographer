@@ -54,16 +54,26 @@ void c_user_interface_widget::initialize_animation(s_animation_transform* animat
 
 e_controller_index c_user_interface_widget::get_any_responding_controller() const
 {
-	if (TEST_FLAG(m_controllers_mask, _controller_index_0))
-		return _controller_index_0;
-	if (TEST_FLAG(m_controllers_mask, _controller_index_1))
-		return _controller_index_1;
-	if (TEST_FLAG(m_controllers_mask, _controller_index_2))
-		return _controller_index_2;
-	if (TEST_FLAG(m_controllers_mask, _controller_index_3))
-		return _controller_index_3;
+	e_controller_index result = k_no_controller;
 
-	return k_no_controller;
+	if (TEST_BIT(m_controllers_mask, _controller0))
+	{
+		result = _controller0;
+	}
+	else if (TEST_BIT(m_controllers_mask, _controller1))
+	{
+		result = _controller1;
+	}
+	else if (TEST_BIT(m_controllers_mask, _controller2))
+	{
+		result = _controller2;
+	}
+	else if (TEST_BIT(m_controllers_mask, _controller3))
+	{
+		result = _controller3;
+	}
+
+	return result;
 }
 
 int16 c_user_interface_widget::get_animation_type() const

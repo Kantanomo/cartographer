@@ -58,15 +58,18 @@ void Check_Overlapped(PXOVERLAPPED pOverlapped)
 // #1082: XGetOverlappedExtendedError
 DWORD WINAPI XGetOverlappedExtendedError(PXOVERLAPPED pOverlapped)
 {
+	DWORD result = ERROR_IO_INCOMPLETE;
+
 	if (pOverlapped == nullptr)
 	{
-		return GetLastError();
+		result = GetLastError();
+	}
+	else if (pOverlapped->InternalLow != ERROR_IO_PENDING)
+	{
+		result = pOverlapped->dwExtendedError;
 	}
 
-	if (pOverlapped->InternalLow != ERROR_IO_PENDING)
-		return pOverlapped->dwExtendedError;
-
-	return ERROR_IO_INCOMPLETE;
+	return result;
 }
 
 
@@ -147,7 +150,7 @@ DWORD WINAPI XLivePBufferFree(FakePBuffer * pBuffer)
 
 
 // #5022: XLiveGetUpdateInformation
-HRESULT  WINAPI XLiveGetUpdateInformation (DWORD)
+HRESULT WINAPI XLiveGetUpdateInformation(PXLIVEUPDATE_INFORMATION)
 {
 	LOG_TRACE_XLIVE("XLiveGetUpdateInformation");
 	return S_FALSE; // no update
@@ -189,7 +192,7 @@ BOOL WINAPI XCloseHandle (HANDLE hObject)
 
 
 // #5254: XCancelOverlapped
-int WINAPI XCancelOverlapped (PXOVERLAPPED pOverlapped)
+int WINAPI XCancelOverlapped(PXOVERLAPPED pOverlapped)
 {
 	LOG_TRACE_XLIVE("XCancelOverlapped  (pOverlapped = {:p})", (void*)pOverlapped);
 
@@ -331,7 +334,7 @@ int WINAPI XOnlineCleanup()
 
 
 // #5312: XFriendsCreateEnumerator
-DWORD WINAPI XFriendsCreateEnumerator (DWORD dwUserIndex, DWORD dwStartingIndex, DWORD dwFriendstoReturn, DWORD *pcbBuffer, HANDLE * phEnum)
+DWORD WINAPI XFriendsCreateEnumerator(DWORD dwUserIndex, DWORD dwStartingIndex, DWORD dwFriendstoReturn, DWORD *pcbBuffer, HANDLE * phEnum)
 {
 	LOG_TRACE_XLIVE("XFriendsCreateEnumerator");
 
@@ -368,8 +371,10 @@ int WINAPI XUserMuteListQuery(DWORD dwUserIndex, XUID XuidRemoteTalker, BOOL *pf
 int WINAPI XInviteGetAcceptedInfo(DWORD dwUserIndex, XINVITE_INFO* pInfo)
 {
 	LOG_TRACE_XLIVE("XInviteGetAcceptedInfo");
+	
 	pInfo->hostInfo = user_interface_guide_state_manager_get()->m_xsession_info;
 	pInfo->fFromGameInvite = true;
+
 	return 1;
 }
 

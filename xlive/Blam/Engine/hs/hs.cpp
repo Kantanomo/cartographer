@@ -24,6 +24,7 @@
 #endif
 
 #include "game/game.h"
+#include "game/game_globals.h"
 
 #include "interface/hud_definitions.h"
 #include "interface/hud_messaging.h"
@@ -704,6 +705,7 @@ void hs_node_gc(void)
 			hs_thread* thread = hs_thread_get(thread_index);
 
 			ASSERT(thread->stack);
+
 			if (thread->stack->expression_index != NONE)
 			{
 				ASSERT(hs_syntax_get(thread->stack->expression_index) != NULL);

@@ -106,16 +106,16 @@
 
 typedef struct
 {
-    IN_ADDR     ina;                            // IP address (zero if not static/DHCP)
-    IN_ADDR     inaOnline;                      // Online IP address (zero if not online)
-    WORD        wPortOnline;                    // Online port
-    BYTE        abEnet[6];                      // Ethernet MAC address
-    BYTE        abOnline[20];                   // Online identification
+	IN_ADDR     ina;                            // IP address (zero if not static/DHCP)
+	IN_ADDR     inaOnline;                      // Online IP address (zero if not online)
+	WORD        wPortOnline;                    // Online port
+	BYTE        abEnet[6];                      // Ethernet MAC address
+	BYTE        abOnline[20];                   // Online identification
 } XNADDR;
 
 typedef struct
 {
-    BYTE        ab[8];                          // xbox to xbox key identifier
+	BYTE        ab[8];                          // xbox to xbox key identifier
 } XNKID;
 
 typedef XNADDR TSADDR;
@@ -140,47 +140,47 @@ typedef XNADDR TSADDR;
 
 typedef struct
 {
-    BYTE        ab[16];                         // xbox to xbox key exchange key
+	BYTE        ab[16];                         // xbox to xbox key exchange key
 } XNKEY;
 
 typedef struct
 {
-    INT         iStatus;                        // WSAEINPROGRESS if pending; 0 if success; error if failed
-    UINT        cina;                           // Count of IP addresses for the given host
-    IN_ADDR     aina[8];                        // Vector of IP addresses for the given host
+	INT         iStatus;                        // WSAEINPROGRESS if pending; 0 if success; error if failed
+	UINT        cina;                           // Count of IP addresses for the given host
+	IN_ADDR     aina[8];                        // Vector of IP addresses for the given host
 } XNDNS;
 
 
 typedef struct
 {
-    BYTE        bFlags;                         // See XNET_XNQOSINFO_*
-    BYTE        bReserved;                      // Reserved
-    WORD        cProbesXmit;                    // Count of Qos probes transmitted
-    WORD        cProbesRecv;                    // Count of Qos probes successfully received
-    WORD        cbData;                         // Size of Qos data supplied by target (may be zero)
-    BYTE *      pbData;                         // Qos data supplied by target (may be NULL)
-    WORD        wRttMinInMsecs;                 // Minimum round-trip time in milliseconds
-    WORD        wRttMedInMsecs;                 // Median round-trip time in milliseconds
-    DWORD       dwUpBitsPerSec;                 // Upstream bandwidth in bits per second
-    DWORD       dwDnBitsPerSec;                 // Downstream bandwidth in bits per second
+	BYTE        bFlags;                         // See XNET_XNQOSINFO_*
+	BYTE        bReserved;                      // Reserved
+	WORD        cProbesXmit;                    // Count of Qos probes transmitted
+	WORD        cProbesRecv;                    // Count of Qos probes successfully received
+	WORD        cbData;                         // Size of Qos data supplied by target (may be zero)
+	BYTE *      pbData;                         // Qos data supplied by target (may be NULL)
+	WORD        wRttMinInMsecs;                 // Minimum round-trip time in milliseconds
+	WORD        wRttMedInMsecs;                 // Median round-trip time in milliseconds
+	DWORD       dwUpBitsPerSec;                 // Upstream bandwidth in bits per second
+	DWORD       dwDnBitsPerSec;                 // Downstream bandwidth in bits per second
 } XNQOSINFO;
 
 typedef struct
 {
-    UINT        cxnqos;                         // Count of items in axnqosinfo[] array
-    UINT        cxnqosPending;                  // Count of items still pending
-    XNQOSINFO   axnqosinfo[1];                  // Vector of Qos results
+	UINT        cxnqos;                         // Count of items in axnqosinfo[] array
+	UINT        cxnqosPending;                  // Count of items still pending
+	XNQOSINFO   axnqosinfo[1];                  // Vector of Qos results
 } XNQOS;
 
 typedef struct
 {
-    DWORD       dwSizeOfStruct;                 // Structure size, must be set prior to calling XNetQosGetListenStats
-    DWORD       dwNumDataRequestsReceived;      // Number of client data request probes received
-    DWORD       dwNumProbesReceived;            // Number of client probe requests received
-    DWORD       dwNumSlotsFullDiscards;         // Number of client requests discarded because all slots are full
-    DWORD       dwNumDataRepliesSent;           // Number of data replies sent
-    DWORD       dwNumDataReplyBytesSent;        // Number of data reply bytes sent
-    DWORD       dwNumProbeRepliesSent;          // Number of probe replies sent
+	DWORD       dwSizeOfStruct;                 // Structure size, must be set prior to calling XNetQosGetListenStats
+	DWORD       dwNumDataRequestsReceived;      // Number of client data request probes received
+	DWORD       dwNumProbesReceived;            // Number of client probe requests received
+	DWORD       dwNumSlotsFullDiscards;         // Number of client requests discarded because all slots are full
+	DWORD       dwNumDataRepliesSent;           // Number of data replies sent
+	DWORD       dwNumDataReplyBytesSent;        // Number of data reply bytes sent
+	DWORD       dwNumProbeRepliesSent;          // Number of probe replies sent
 } XNQOSLISTENSTATS;
 
 
@@ -445,52 +445,52 @@ typedef struct _XUSER_ACHIEVEMENT {
 
 
 typedef struct {
-    XNKID sessionID;
-    XNADDR hostAddress;
-    XNKEY keyExchangeKey;
+	XNKID sessionID;
+	XNADDR hostAddress;
+	XNKEY keyExchangeKey;
 } XSESSION_INFO, *PXSESSION_INFO;
 
 typedef enum _XSESSION_STATE
 {
-    XSESSION_STATE_LOBBY = 0,
-    XSESSION_STATE_REGISTRATION,
-    XSESSION_STATE_INGAME,
-    XSESSION_STATE_REPORTING,
-    XSESSION_STATE_DELETED
+	XSESSION_STATE_LOBBY = 0,
+	XSESSION_STATE_REGISTRATION,
+	XSESSION_STATE_INGAME,
+	XSESSION_STATE_REPORTING,
+	XSESSION_STATE_DELETED
 } XSESSION_STATE;
  
 
 typedef struct {
-    XUID xuidOnline;
-    DWORD dwUserIndex;
-    DWORD dwFlags;
+	XUID xuidOnline;
+	DWORD dwUserIndex;
+	DWORD dwFlags;
 } XSESSION_MEMBER;
 
 
 typedef struct {
-    DWORD dwUserIndexHost;
-    DWORD dwGameType;
-    DWORD dwGameMode;
-    DWORD dwFlags;
-    DWORD dwMaxPublicSlots;
-    DWORD dwMaxPrivateSlots;
-    DWORD dwAvailablePublicSlots;
-    DWORD dwAvailablePrivateSlots;
-    DWORD dwActualMemberCount;
-    DWORD dwReturnedMemberCount;
-    XSESSION_STATE eState;
-    ULONGLONG qwNonce;
-    XSESSION_INFO sessionInfo;
-    XNKID xnkidArbitration;
-    XSESSION_MEMBER *pSessionMembers;
+	DWORD dwUserIndexHost;
+	DWORD dwGameType;
+	DWORD dwGameMode;
+	DWORD dwFlags;
+	DWORD dwMaxPublicSlots;
+	DWORD dwMaxPrivateSlots;
+	DWORD dwAvailablePublicSlots;
+	DWORD dwAvailablePrivateSlots;
+	DWORD dwActualMemberCount;
+	DWORD dwReturnedMemberCount;
+	XSESSION_STATE eState;
+	ULONGLONG qwNonce;
+	XSESSION_INFO sessionInfo;
+	XNKID xnkidArbitration;
+	XSESSION_MEMBER *pSessionMembers;
 } XSESSION_LOCAL_DETAILS, *PXSESSION_LOCAL_DETAILS;
   
 
 typedef enum 
 {
-    XONLINE_NAT_OPEN = 1,
-    XONLINE_NAT_MODERATE,
-    XONLINE_NAT_STRICT
+	XONLINE_NAT_OPEN = 1,
+	XONLINE_NAT_MODERATE,
+	XONLINE_NAT_STRICT
 } XONLINE_NAT_TYPE;
  
 
@@ -544,15 +544,15 @@ typedef struct _XSESSION_REGISTRATION_RESULTS
 
 typedef enum 
 {
-    XMARKETPLACE_OFFERING_TYPE_CONTENT = 0x00000002,
-    XMARKETPLACE_OFFERING_TYPE_GAME_DEMO = 0x00000020,
-    XMARKETPLACE_OFFERING_TYPE_GAME_TRAILER = 0x00000040,
-    XMARKETPLACE_OFFERING_TYPE_THEME = 0x00000080,
-    XMARKETPLACE_OFFERING_TYPE_TILE = 0x00000800,
-    XMARKETPLACE_OFFERING_TYPE_ARCADE = 0x00002000,
-    XMARKETPLACE_OFFERING_TYPE_VIDEO = 0x00004000,
-    XMARKETPLACE_OFFERING_TYPE_CONSUMABLE = 0x00010000,
-    XMARKETPLACE_OFFERING_TYPE_AVATARITEM = 0x00100000
+	XMARKETPLACE_OFFERING_TYPE_CONTENT = 0x00000002,
+	XMARKETPLACE_OFFERING_TYPE_GAME_DEMO = 0x00000020,
+	XMARKETPLACE_OFFERING_TYPE_GAME_TRAILER = 0x00000040,
+	XMARKETPLACE_OFFERING_TYPE_THEME = 0x00000080,
+	XMARKETPLACE_OFFERING_TYPE_TILE = 0x00000800,
+	XMARKETPLACE_OFFERING_TYPE_ARCADE = 0x00002000,
+	XMARKETPLACE_OFFERING_TYPE_VIDEO = 0x00004000,
+	XMARKETPLACE_OFFERING_TYPE_CONSUMABLE = 0x00010000,
+	XMARKETPLACE_OFFERING_TYPE_AVATARITEM = 0x00100000
 } XMARKETPLACE_OFFERING_TYPE;
  
  
@@ -564,47 +564,47 @@ typedef struct _MESSAGEBOX_RESULT {
 }	MESSAGEBOX_RESULT, *PMESSAGEBOX_RESULT;
 
 typedef struct {
-    DWORD dwNewOffers;
-    DWORD dwTotalOffers;
+	DWORD dwNewOffers;
+	DWORD dwTotalOffers;
 } XOFFERING_CONTENTAVAILABLE_RESULT;
 
 #define XMARKETPLACE_CONTENT_ID_LEN 20
 
 typedef struct {
-    ULONGLONG qwOfferID;
-    ULONGLONG qwPreviewOfferID;
-    DWORD dwOfferNameLength;
-    WCHAR *wszOfferName;
-    DWORD dwOfferType;
-    BYTE contentId[ XMARKETPLACE_CONTENT_ID_LEN ];
-    BOOL fIsUnrestrictedLicense;
-    DWORD dwLicenseMask;
-    DWORD dwTitleID;
-    DWORD dwContentCategory;
-    DWORD dwTitleNameLength;
-    WCHAR *wszTitleName;
-    BOOL fUserHasPurchased;
-    DWORD dwPackageSize;
-    DWORD dwInstallSize;
-    DWORD dwSellTextLength;
-    WCHAR *wszSellText;
-    DWORD dwAssetID;
-    DWORD dwPurchaseQuantity;
-    DWORD dwPointsPrice;
+	ULONGLONG qwOfferID;
+	ULONGLONG qwPreviewOfferID;
+	DWORD dwOfferNameLength;
+	WCHAR *wszOfferName;
+	DWORD dwOfferType;
+	BYTE contentId[ XMARKETPLACE_CONTENT_ID_LEN ];
+	BOOL fIsUnrestrictedLicense;
+	DWORD dwLicenseMask;
+	DWORD dwTitleID;
+	DWORD dwContentCategory;
+	DWORD dwTitleNameLength;
+	WCHAR *wszTitleName;
+	BOOL fUserHasPurchased;
+	DWORD dwPackageSize;
+	DWORD dwInstallSize;
+	DWORD dwSellTextLength;
+	WCHAR *wszSellText;
+	DWORD dwAssetID;
+	DWORD dwPurchaseQuantity;
+	DWORD dwPointsPrice;
 } XMARKETPLACE_CONTENTOFFER_INFO, *PXMARKETPLACE_CONTENTOFFER_INFO;
 
 typedef struct {
-    XUID xuidInvitee;
-    XUID xuidInviter;
-    DWORD dwTitleID;
-    XSESSION_INFO hostInfo;
-    BOOL fFromGameInvite;
+	XUID xuidInvitee;
+	XUID xuidInviter;
+	DWORD dwTitleID;
+	XSESSION_INFO hostInfo;
+	BOOL fFromGameInvite;
 } XINVITE_INFO, * PXINVITE_INFO;
 
 
 typedef struct _STRING_DATA {
-    WORD wStringSize;
-    WCHAR *pszString;
+	WORD wStringSize;
+	WCHAR *pszString;
 } STRING_DATA;
  
 
@@ -615,8 +615,6 @@ typedef struct _STRING_VERIFY_RESPONSE {
 } STRING_VERIFY_RESPONSE;
 #pragma pack( pop )
 
-BOOL WINAPI XCloseHandle(HANDLE hObject);
-
 // === replacement ===
 struct FakePBuffer {
 	HANDLE id;
@@ -625,5 +623,29 @@ struct FakePBuffer {
 	LPBYTE pbData;
 };
 
+typedef struct _XLIVEUPDATE_INFORMATION
+{
+	DWORD cbSize;
+	BOOL  bSystemUpdate;
+	DWORD dwFromVersion;
+	DWORD dwToVersion; 
+	WCHAR szUpdateDownloadPath[MAX_PATH];
+} XLIVEUPDATE_INFORMATION, * PXLIVEUPDATE_INFORMATION;
+
+
+DWORD WINAPI XGetOverlappedExtendedError(PXOVERLAPPED pOverlapped);
+DWORD WINAPI XGetOverlappedResult(XOVERLAPPED* pOverlapped, LPDWORD pResult, BOOL bWait);
+
+int WINAPI XCancelOverlapped(PXOVERLAPPED pOverlapped);
+int WINAPI XEnumerate(HANDLE hEnum, CHAR* pvBuffer, DWORD cbBuffer, PDWORD pcItemsReturned, PXOVERLAPPED pOverlapped);
+
+int WINAPI XInviteGetAcceptedInfo(DWORD dwUserIndex, XINVITE_INFO* pInfo);
+
+BOOL WINAPI XCloseHandle(HANDLE hObject);
+
 LONG WINAPI XLivePBufferAllocate(DWORD size, FakePBuffer** pBuffer);
+
+HRESULT WINAPI XLiveGetUpdateInformation(PXLIVEUPDATE_INFORMATION);
+
 DWORD WINAPI XLivePBufferSetByte(FakePBuffer* pBuffer, DWORD offset, BYTE value);
+

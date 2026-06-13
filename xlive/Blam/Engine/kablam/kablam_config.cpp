@@ -12,7 +12,7 @@
 
 static void kablam_config_cartographer_initialize(void);
 
-static void vip_lock(e_game_life_cycle state);
+static void vip_lock(e_life_cycle_state state);
 
 static int32 server_console_add_vip(const wchar_t* player_name);
 
@@ -72,18 +72,18 @@ static void kablam_config_cartographer_initialize(void)
 	return;
 }
 
-static void vip_lock(e_game_life_cycle state)
+static void vip_lock(e_life_cycle_state state)
 {
 	c_network_session* session;
 
 	if (network_life_cycle_in_squad_session(&session))
 	{
-		if (state == _life_cycle_post_game)
+		if (state == _life_cycle_state_post_game)
 		{
 			server_console_clear_vip();
 			session->m_session_parameters.party_privacy = _network_game_privacy_open;
 		}
-		if (state == _life_cycle_in_game)
+		if (state == _life_cycle_state_in_game)
 		{
 			for (int32 i = 0; i < k_maximum_players; i++)
 			{

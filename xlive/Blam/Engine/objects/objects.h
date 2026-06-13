@@ -2,7 +2,6 @@
 #include "emblems.h"
 #include "object_placement.h"
 
-#include "memory/data.h"
 #include "math/real_math.h"
 
 /* constants */
@@ -321,7 +320,7 @@ private:
 
 /* prototypes */
 
-data_array* object_header_data_get(void);
+struct data_array* object_header_data_get(void);
 
 void objects_apply_patches(void);
 

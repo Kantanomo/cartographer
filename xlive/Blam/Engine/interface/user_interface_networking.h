@@ -4,13 +4,13 @@
 
 enum e_session_protocol
 {
-	_session_protocol_splitscreen_coop = 0x0,
-	_session_protocol_splitscreen_custom = 0x1,
-	_session_protocol_system_link_coop = 0x2,
-	_session_protocol_system_link_custom = 0x3,
-	_session_protocol_xbox_live_coop = 0x4,
-	_session_protocol_xbox_live_custom = 0x5,
-	_session_protocol_xbox_live_optimatch = 0x6,
+	_session_protocol_splitscreen_coop = 0,
+	_session_protocol_splitscreen_custom,
+	_session_protocol_system_link_coop,
+	_session_protocol_system_link_custom,
+	_session_protocol_xbox_live_coop,
+	_session_protocol_xbox_live_custom,
+	_session_protocol_xbox_live_optimatch,
 };
 
 /* structures */

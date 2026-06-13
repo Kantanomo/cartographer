@@ -81,22 +81,41 @@ int WINAPI XShowFriendRequestUI(DWORD dwUserIndex, XUID xuidUser)
 }
 
 // #5212: XShowCustomPlayerListUI
-DWORD WINAPI XShowCustomPlayerListUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR pzsTitle, LPCWSTR pszDescription, CONST BYTE *pbImage, DWORD cbImage, CONST XPLAYERLIST_USER *rgPlayers, DWORD cPlayers, CONST XPLAYERLIST_BUTTON *pXButton, CONST XPLAYERLIST_BUTTON *pYButton, XPLAYERLIST_RESULT *pResult, XOVERLAPPED *pOverlapped)
+DWORD WINAPI XShowCustomPlayerListUI(
+	DWORD dwUserIndex,
+	DWORD dwFlags,
+	LPCWSTR pzsTitle,
+	LPCWSTR pszDescription,
+	CONST BYTE *pbImage,
+	DWORD cbImage,
+	CONST XPLAYERLIST_USER *rgPlayers,
+	DWORD cPlayers,
+	CONST XPLAYERLIST_BUTTON *pXButton,
+	CONST XPLAYERLIST_BUTTON *pYButton,
+	XPLAYERLIST_RESULT *pResult,
+	XOVERLAPPED *pOverlapped)
 {
-	if (pOverlapped) {
+	DWORD result = ERROR_SUCCESS;
+
+	if (pOverlapped) 
+	{
 		//asynchronous
 
 		pOverlapped->InternalLow = ERROR_SUCCESS;
 
 		Check_Overlapped(pOverlapped);
 
-		return ERROR_IO_PENDING;
+		result = ERROR_IO_PENDING;
 	}
-	else {
+	else
+	{
 		//synchronous
-		//return result;
+
+		// Unfinished
+
 	}
-	return ERROR_SUCCESS;
+
+	return result;
 }
 
 // #5216: XShowKeyboardUI

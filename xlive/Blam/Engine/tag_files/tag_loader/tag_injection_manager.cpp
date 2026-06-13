@@ -159,7 +159,7 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 	
 
 	// fix for multiplayer shared cache type, where the tag table was intentionally made to be pushed farther down to prevent collisions.
-	if ((e_scenario_type)m_active_map_cache_header.type == _scenario_type_multiplayer_shared)
+	if (m_active_map_cache_header.type == _scenario_type_multiplayer_shared)
 	{
 		// The hired gun special
 		m_active_map_scenario_instance_offset = m_active_map_cache_header.data_offset;
@@ -369,7 +369,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 		return NONE;
 	}
 	
-	const bool scenario_is_mp_shared = (e_scenario_type)m_active_map_cache_header.type == _scenario_type_multiplayer_shared;
+	const bool scenario_is_mp_shared = m_active_map_cache_header.type == _scenario_type_multiplayer_shared;
 
 	// fix for multiplayer shared cache type, where the tag table was intentionally made to be pushed farther down to prevent collisions.
 	const int32 start_index = scenario_is_mp_shared ? FIRST_SHARED_TAG_INSTANCE_INDEX : 0;

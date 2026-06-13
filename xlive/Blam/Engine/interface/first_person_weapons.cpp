@@ -126,7 +126,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
 				s_game_globals* globals = scenario_get_game_globals();
 				if (IN_RANGE(first_person_data->character_type, _character_type_masterchief, globals->player_representation.count - 1))
 				{
-					const s_game_globals_player_representation* player_rep = globals->player_representation[first_person_data->character_type];
+					s_game_globals_player_representation const* player_rep = TAG_BLOCK_GET_ELEMENT(&globals->player_representation, first_person_data->character_type, s_game_globals_player_representation);
 					const datum fp_hands_index = player_rep->first_person_hands.index;
 					const datum fp_body_index = player_rep->first_person_body.index;
 					datum unit_model_index = NONE;
@@ -428,7 +428,9 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 	if (weapon_index != NONE)
 	{
 		s_game_globals* game_globals = scenario_get_game_globals();
-		s_game_globals_player_representation* player_representation = game_globals->player_representation[fp_data->character_type];
+
+		s_game_globals_player_representation const* player_representation = TAG_BLOCK_GET_ELEMENT(&game_globals->player_representation, fp_data->character_type, s_game_globals_player_representation);
+
 		const weapon_datum* weapon = weapon_get(weapon_index);
 
 		struct weapon_definition* weapon_definition = (struct weapon_definition*)tag_get_fast(weapon->definition_index);
@@ -921,7 +923,7 @@ static void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_
 							&& iterator.attach_to_marker
 							&& IN_RANGE(fp_data->character_type, _character_type_masterchief, globals->player_representation.count - 1))
 						{
-							const s_game_globals_player_representation* player_rep = globals->player_representation[fp_data->character_type];
+							s_game_globals_player_representation const* player_rep = TAG_BLOCK_GET_ELEMENT(&globals->player_representation, fp_data->character_type, s_game_globals_player_representation);
 							datum fp_hands_model_index = player_rep->first_person_hands.index;
 							const weapon_datum* weapon = weapon_get(fp_data->weapon[k_first_person_primary_weapon].weapon_index);
 							const weapon_definition* weapon_def = (weapon_definition*)tag_get_fast(weapon->definition_index);

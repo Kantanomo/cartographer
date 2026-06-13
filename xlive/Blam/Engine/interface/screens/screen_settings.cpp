@@ -381,7 +381,7 @@ void* c_screen_settings::load(s_screen_parameters* parameters)
 
 		screen->m_allocated = true;
 
-		networking_panorama_presence_set_presence(_context_presence_settings);
+		panorama_presence_set(_context_presence_settings);
 		user_interface_register_screen_to_channel(screen, parameters);
 	}
 	else

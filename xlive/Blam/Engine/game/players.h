@@ -1,10 +1,10 @@
 #pragma once
+#include "game_globals.h"
 #include "player_constants.h"
 
 #include "input/controllers.h"
 #include "memory/data.h"
-#include "networking/network_game_definitions.h"
-#include "simulation/machine_id.h"
+#include "objects/emblems.h"
 
 /* constants */
 
@@ -15,7 +15,7 @@ enum
 
 /* enums */
 
-enum e_player_flags : int16
+enum e_player_flags
 {
 	_player_active_in_game_bit = 0,
 	_player_left_game_bit,
@@ -36,6 +36,18 @@ enum e_player_flags : int16
 	k_player_flag_count,
 };
 
+/* structures */
+
+struct s_player_appearance
+{
+	c_enum<enum e_player_color_index, int8, _player_color_index_min_value, k_player_color_count> change_color_index[4];
+	c_enum<enum e_character_type, int8, NONE, k_player_character_type_count> player_character_type;
+	s_emblem_info emblem_info;
+	int32 gap_48;
+	int32 gap_4C;
+};
+ASSERT_STRUCT_SIZE(s_player_appearance, 16);
+
 struct s_player_shot_info
 {
 	int16 shot_id;
@@ -48,7 +60,40 @@ struct s_player_shot_info
 };
 ASSERT_STRUCT_SIZE(s_player_shot_info, 8);
 
-/* structures */
+struct s_player_identifier
+{
+	uint8 identifier[8];
+};
+ASSERT_STRUCT_SIZE(s_player_identifier, 8);
+
+struct s_clan_identifier
+{
+	uint8 identifier[12];
+};
+ASSERT_STRUCT_SIZE(s_clan_identifier, 12);
+
+struct s_machine_identifier
+{
+	uint8 machine_identifier[6];
+};
+
+struct s_player_configuration
+{
+	wchar_t name[32];
+	s_player_appearance appearance;
+	wchar_t clan_name[16];
+	s_clan_identifier clan_identifiers;
+
+	int8 team_index;
+	int8 player_handicap_level;	// e_user_interface_controller_handicap
+	int8 player_displayed_skill;
+	int8 player_overall_skill;
+	int8 player_is_griefer;
+	int8 bungie_user_role;
+	int8 achievement_flags;
+	int8 unk2;
+};
+ASSERT_STRUCT_SIZE(s_player_configuration, 132);
 
 #pragma pack(push, 1)
 struct player_datum

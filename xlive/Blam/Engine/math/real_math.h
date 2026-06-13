@@ -474,13 +474,13 @@ inline real_vector3d* cross_product3d(const real_vector3d* a, const real_vector3
 	result->i = res.m128_f32[0];
 	result->j = res.m128_f32[1];
 	result->k = res.m128_f32[2];
-	return result;
 #else
 	result->i = a->j * b->k - a->k * b->j;
 	result->j = a->k * b->i - a->i * b->k;
 	result->k = a->i * b->j - a->j * b->i;
-	return result;
 #endif
+
+	return result;
 }
 
 inline void set_real_point3d(real_point3d* point, real32 x, real32 y, real32 z)

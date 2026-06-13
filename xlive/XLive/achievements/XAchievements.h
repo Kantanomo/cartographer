@@ -47,4 +47,14 @@ typedef struct
 	DWORD                               dwFlags;
 } XACHIEVEMENT_DETAILS, *PXACHIEVEMENT_DETAILS;
 
+DWORD WINAPI XUserCreateAchievementEnumerator(
+	DWORD dwTitleId,
+	DWORD dwUserIndex,
+	XUID xuid,
+	DWORD dwDetailFlags,
+	DWORD dwStartingIndex, 
+	DWORD cItem,
+	PDWORD pchBuffer, 
+	PHANDLE phEnum);
+
 int AchievementEnumerator(DWORD cbBuffer, CHAR* pvBuffer, PDWORD pcItemsReturned, XOVERLAPPED* pOverlapped);

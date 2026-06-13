@@ -6,10 +6,15 @@
 #include "user_interface_widget_window.h"
 #include "user_interface_guide.h"
 
+#include "game/players.h"
 #include "game/game_time.h"
 #include "input/input_windows.h"
+#include "networking/logic/network_session_interface.h"
 #include "networking/online/online_account_xbox.h"
+#include "networking/panorama/panorama_achievements.h"
+#include "networking/network_event.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
+#include "saved_games/player_profile.h"
 #include "scenario/scenario_definitions.h"
 #include "scenario/scenario.h"
 #include "sound/sound_manager.h"
@@ -21,12 +26,41 @@
 typedef bool(__cdecl* t_user_interface_controller_sign_in)(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index);
 typedef void(__cdecl* t_user_interface_controller_sign_out)(e_controller_index controller_index);
 
-/* globals */
+/* structures */
 
-t_user_interface_controller_sign_in p_user_interface_controller_sign_in;
-t_user_interface_controller_sign_out p_user_interface_controller_sign_out;
+struct s_user_interface_controller
+{
+	c_flags_no_init<e_controller_state_flags, uint32, k_controller_state_flags_count> flags;
+	int32 user_index;
+	s_player_identifier controller_user_identifier;
+	int32 pad;
+	s_saved_game_player_profile player_profile;
+	uint32 profile_index;
+	int32 desired_team_index;
+	e_user_interface_controller_handicap player_handicap_level;
+	int8 pad_2[3];
+	uint32 bungienet_user_flags;
+	int8 player_is_griefer;
+	int8 pad_4[3];
+	int32 achievement_flags;
+	s_player_identifier player_identifier;
+	wchar_t player_name[32];
+};
+ASSERT_STRUCT_SIZE(s_user_interface_controller, 4732);
 
-/* private prototypes */
+struct s_user_interface_controller_globals
+{
+	s_user_interface_controller controllers[k_number_of_controllers];
+	s_event_record event_records[k_number_of_controllers];
+	bool controller_detached[k_number_of_controllers];
+	bool event_manager_suppress;
+};
+ASSERT_STRUCT_SIZE(s_user_interface_controller_globals, 19000);
+
+/* prototypes */
+
+static s_user_interface_controller_globals* user_interface_controller_globals_get(void);
+static inline s_user_interface_controller* user_interface_controller_get(e_controller_index controller_index);
 
 static bool __cdecl user_interface_controller_verify_reconnection(void);
 static bool __cdecl user_interface_controller_verify_reconnection_failed(c_screen_widget* error_screen);
@@ -35,6 +69,11 @@ static bool user_inteface_controller_has_removed_screen_active(void);
 static void user_interface_controller_update_disconnect(void);
 static void user_interface_controller_removed_handler(void);
 static void user_interface_controller_boot_to_dash_check(void);
+
+/* globals */
+
+static t_user_interface_controller_sign_in p_user_interface_controller_sign_in;
+static t_user_interface_controller_sign_out p_user_interface_controller_sign_out;
 
 /* public code */
 
@@ -47,11 +86,6 @@ void user_interface_controller_apply_patches(void)
 	DETOUR_ATTACH(p_user_interface_controller_sign_out, Memory::GetAddress<t_user_interface_controller_sign_out>(0x208257, 0x1F491B), user_interface_controller_sign_out);
 	PatchCall(Memory::GetAddress(0x20CB4B), user_interface_controller_update); // fix infinite controller-disconnect looping
 	return;
-}
-
-s_user_interface_controller_globals* user_interface_controller_globals_get(void)
-{
-	return Memory::GetAddress<s_user_interface_controller_globals*>(0x96C858, 0x999038);
 }
 
 void __cdecl user_interface_controller_initialize(void)
@@ -67,21 +101,21 @@ void __cdecl user_interface_controller_update(void)
 	s_user_interface_controller_globals* g_user_interface_controller_globals = user_interface_controller_globals_get();
 	uint32 time_elapsed = user_interface_milliseconds();
 
-	if (g_user_interface_controller_globals->event_records[_controller_index_0].type)
+	if (g_user_interface_controller_globals->event_records[_controller0].type)
 	{
-		user_interface_controller_event_submit(&g_user_interface_controller_globals->event_records[_controller_index_0]);
+		user_interface_controller_event_submit(&g_user_interface_controller_globals->event_records[_controller0]);
 
 		//progressively move 3->2->1->0 and submit data on 0
 		int8 count = 0;
 		do
 		{
-			csmemcpy(&g_user_interface_controller_globals->event_records[_controller_index_0 + count],
-				&g_user_interface_controller_globals->event_records[_controller_index_0 + count + 1],
+			csmemcpy(&g_user_interface_controller_globals->event_records[_controller0 + count],
+				&g_user_interface_controller_globals->event_records[_controller0 + count + 1],
 				sizeof(s_event_record));
 			count++;
-		} while (count < _controller_index_3);
+		} while (count < _controller3);
 
-		csmemset(&g_user_interface_controller_globals->event_records[_controller_index_3], 0, sizeof(s_event_record));
+		csmemset(&g_user_interface_controller_globals->event_records[_controller3], 0, sizeof(s_event_record));
 	}
 
 	else if (!g_user_interface_controller_globals->event_manager_suppress)
@@ -110,7 +144,7 @@ void __cdecl user_interface_controller_update(void)
 bool __cdecl user_interface_controller_is_player_profile_valid(e_controller_index controller_index)
 {
 	//return INVOKE(0x206B50, 0x1F3F78, user_interface_controller_is_player_profile_valid, controller_index);
-	return user_interface_controller_globals_get()->controllers[controller_index].m_flags.test(_controller_state_has_valid_profile_bit);
+	return user_interface_controller_get(controller_index)->flags.test(_controller_state_has_valid_profile_bit);
 }
 
 e_controller_index __cdecl user_interface_controller_get_next_valid_index(e_controller_index controller_index)
@@ -346,20 +380,21 @@ uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(
 
 bool __cdecl user_interface_controller_has_xbox_live(e_controller_index controller_index)
 {
-	return user_interface_controller_globals_get()->controllers[controller_index].m_flags.test(_controller_state_has_xbox_live_bit);
+	return user_interface_controller_get(controller_index)->flags.test(_controller_state_has_xbox_live_bit);
 }
 
 void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active)
 {
 	//INVOKE(0x208A01, 0x0, user_interface_controller_xbox_live_account_set_signed_in, controller_index, active);
-	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
+	s_user_interface_controller* controller = user_interface_controller_get(controller_index);
+	
 	if (active)
 	{
-		controller->m_flags.set(_controller_state_has_xbox_live_bit, true);
+		controller->flags.set(_controller_state_has_xbox_live_bit, true);
 	}
 	else
 	{
-		controller->m_flags.set(_controller_state_has_xbox_live_bit, false);
+		controller->flags.set(_controller_state_has_xbox_live_bit, false);
 
 		// not calling update_name here to prevent recursion lock
 		//user_interface_controller_update_player_name(controller_index);
@@ -372,7 +407,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 {
 	// INVOKE(0x208312, 0x0, user_interface_controller_update_player_name, controller_index);
 
-	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
+	s_user_interface_controller* controller = user_interface_controller_get(controller_index);
 	c_user_interface_guide_state_manager* guide = user_interface_guide_state_manager_get();
 	if (online_connected_to_xbox_live())
 	{
@@ -412,6 +447,19 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 }
 
 /* private code */
+
+static s_user_interface_controller_globals* user_interface_controller_globals_get(void)
+{
+	return Memory::GetAddress<s_user_interface_controller_globals*>(0x96C858, 0x999038);
+}
+
+static inline s_user_interface_controller* user_interface_controller_get(
+	e_controller_index controller_index)
+{
+	vassert(VALID_INDEX(controller_index, k_number_of_controllers), "invalid controller index!", NULL);
+
+	return &user_interface_controller_globals_get()->controllers[controller_index];
+}
 
 static bool __cdecl user_interface_controller_verify_reconnection(void)
 {
@@ -454,8 +502,7 @@ static void user_interface_controller_update_disconnect(void)
 		controller != k_no_controller;
 		controller = next_controller(controller))
 	{
-
-		s_user_interface_controller& controller_data = g_user_interface_controller_globals->controllers[controller];
+		s_user_interface_controller* controller_data = user_interface_controller_get(controller);
 		bool bad_condition = !input_has_gamepad_plugged((uint16)controller);
 
 		if (controller == k_windows_device_controller_index)
@@ -480,13 +527,13 @@ static void user_interface_controller_update_disconnect(void)
 
 			g_user_interface_controller_globals->controller_detached[controller] = result;
 
-			controller_data.m_flags.set(_controller_state_is_attached_bit, false);
-			controller_data.m_flags.set(_controller_state_bit1, false);
-			controller_data.m_flags.set(_controller_state_bit2, false);
+			controller_data->flags.set(_controller_state_is_attached_bit, false);
+			controller_data->flags.set(_controller_state_bit1, false);
+			controller_data->flags.set(_controller_state_bit2, false);
 		}
 		else
 		{
-			controller_data.m_flags.set(_controller_state_is_attached_bit, true);
+			controller_data->flags.set(_controller_state_is_attached_bit, true);
 			g_user_interface_controller_globals->controller_detached[controller] = false;
 
 			int8 out_drive_letter;
@@ -494,9 +541,9 @@ static void user_interface_controller_update_disconnect(void)
 			const bool test_drive2 = input_windows_drive_letter_test(2 + controller * 2, &out_drive_letter);
 			//bool has_voice_active= voice_enabled_test(controller); //TODO
 
-			controller_data.m_flags.set(_controller_state_bit1, test_drive1);
-			controller_data.m_flags.set(_controller_state_bit2, test_drive2);
-			//controller_data.m_flags.set(_controller_state_has_voice_bit, test_drive2); //TODO : also find this voice_bit on h2v
+			controller_data->flags.set(_controller_state_bit1, test_drive1);
+			controller_data->flags.set(_controller_state_bit2, test_drive2);
+			//controller_data.flags.set(_controller_state_has_voice_bit, test_drive2); //TODO : also find this voice_bit on h2v
 
 		}
 	}
@@ -510,7 +557,7 @@ static void user_interface_controller_removed_handler(void)
 
 	s_user_interface_controller_globals* g_user_interface_controller_globals = user_interface_controller_globals_get();
 
-	int16 detached_controller = _controller_index_0;
+	int16 detached_controller = _controller0;
 	while (!g_user_interface_controller_globals->controller_detached[detached_controller])
 	{
 		if (++detached_controller >= k_number_of_controllers)
@@ -522,16 +569,16 @@ static void user_interface_controller_removed_handler(void)
 		e_ui_error_types error_msg = _ui_error_controller_removed;
 		switch (detached_controller)
 		{
-		case _controller_index_0:
+		case _controller0:
 			detached_controller = _ui_error_controller1_removed;
 			break;
-		case _controller_index_1:
+		case _controller1:
 			detached_controller = _ui_error_controller2_removed;
 			break;
-		case _controller_index_2:
+		case _controller2:
 			detached_controller = _ui_error_controller3_removed;
 			break;
-		case _controller_index_3:
+		case _controller3:
 			detached_controller = _ui_error_controller4_removed;
 			break;
 		}

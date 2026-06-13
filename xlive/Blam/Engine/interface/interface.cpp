@@ -32,9 +32,10 @@ void apply_interface_hooks(void)
 	return;
 }
 
-datum interface_get_tag_index(e_interface_tag interface_tag_index)
+datum interface_get_tag_index(int32 interface_tag_index)
 {
 	VALID_INDEX(interface_tag_index, NUMBER_OF_INTERFACE_TAGS);
+
 	return game_globals_get_interface_tag_reference(interface_tag_index).index;
 }
 

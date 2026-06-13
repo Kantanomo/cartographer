@@ -376,8 +376,8 @@ class c_screen_widget : public c_user_interface_widget
 {
 protected:
 	e_user_interface_screen_id m_screen_id;
-	e_user_interface_channel_type m_channel_type;
-	e_user_interface_render_window m_window_index;
+	enum e_user_interface_channel_type m_channel_type;
+	enum e_user_interface_render_window m_window_index;
 	int32 m_child_count;
 	c_normal_text_widget m_header_text;
 	c_normal_text_widget m_screen_button_key_text;
@@ -422,7 +422,7 @@ public:
 	// c_screen_widget additions
 
 	virtual void sub_60E884();
-	virtual void initialize(s_screen_parameters* parameters) = 0;
+	virtual void initialize(struct s_screen_parameters* parameters) = 0;
 	virtual void post_initialize();
 	virtual void post_initialize_button_keys();
 	virtual c_user_interface_widget* sub_6102C5();
@@ -430,7 +430,7 @@ public:
 	virtual int32 sub_60F1F4(s_event_record* a2);
 	virtual uint8 sub_60EFC1(s_event_record* event);
 	virtual int32 sub_60F081(s_event_record* a2);
-	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
+	virtual enum e_controller_component get_component_from_button_key(int32 special_widget_index);
 	virtual bool sub_40AD53(int32 a2);
 	virtual e_user_interface_channel_type get_channel();
 	virtual e_user_interface_render_window get_render_window();
@@ -473,8 +473,8 @@ public:
 	// base interface overrides
 	virtual ~c_screen_with_menu() = default;
 	virtual bool handle_event(s_event_record* event) override;
-	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point) override;
-	virtual void initialize(s_screen_parameters* parameters) override;
+	virtual class c_user_interface_widget* sub_6121F6(rectangle2d* point) override;
+	virtual void initialize(struct s_screen_parameters* parameters) override;
 
 private:
 	typedef c_screen_with_menu class_type;
@@ -489,4 +489,4 @@ ASSERT_STRUCT_SIZE(c_screen_with_menu, 0xA60);
 
 
 // Todo : move to proper location
-void user_interface_register_screen_to_channel(c_screen_widget* new_screen, s_screen_parameters* parameters);
+void user_interface_register_screen_to_channel(class c_screen_widget* new_screen, struct s_screen_parameters* parameters);

@@ -95,3 +95,4 @@ XUSER_SIGNIN_INFO* XUserGetSignInInfo(DWORD dwUserIndex);
 
 int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid);
 XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex);
+DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName);

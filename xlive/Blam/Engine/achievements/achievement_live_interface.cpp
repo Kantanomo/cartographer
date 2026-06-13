@@ -3,13 +3,25 @@
 
 /* public code */
 
-void c_achievement_live_interface::start_upload(void)
+void c_achievement_live_interface::process_live_signin_state(
+	bool signed_in)
 {
-	INVOKE_TYPE(0x4A808, 0x0, void(__thiscall*)(c_achievement_live_interface*), this);
-	return;
-}
+	error(_error_delayed, "Achievements: process_live_signin_state: %d", signed_in);
+	csmemset(m_queue_achievement, false, sizeof(m_queue_achievement));
 
-c_achievement_live_interface* achievement_live_interface_get(void)
-{
-	return *Memory::GetAddress<c_achievement_live_interface**>(0x482D48);
+	m_upload_achievements = false;
+	
+	if (!m_upload_in_progress && m_overlapped.InternalLow == ERROR_IO_PENDING)
+	{
+		error(_error_delayed, "Achievements: cancel upload");
+		XCancelOverlapped(&m_overlapped);
+	}
+
+	csmemset(m_achievement_uploading, 0, sizeof(m_achievement_uploading));
+	
+	m_upload_in_progress = false;
+
+	csmemset(&m_overlapped, 0, sizeof(m_overlapped));
+
+	return;
 }

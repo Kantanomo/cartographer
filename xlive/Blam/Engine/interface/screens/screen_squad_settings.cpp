@@ -15,7 +15,8 @@
 #include "main/levels.h"
 #include "main/level_definitions.h"
 #include "networking/network_event.h"
-#include "networking/Session/network_session.h"
+#include "networking/logic/network_session_interface.h"
+#include "networking/session/network_session.h"
 #include "saved_games/game_variant.h"
 
 #include "tag_files/tag_loader/tag_injection.h"
@@ -408,15 +409,22 @@ void c_squad_settings_list::handle_item_pressed_event(s_event_record* const& eve
 	}
 }
 
-void c_squad_settings_list::handle_item_change_map(s_event_record* const& event)
+void c_squad_settings_list::handle_item_change_map(
+	s_event_record* const& event)
 {
 	INVOKE_TYPE(0x24F9A1, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
+	return;
 }
-void c_squad_settings_list::handle_item_change_variant(s_event_record* const& event)
+
+void c_squad_settings_list::handle_item_change_variant(
+	s_event_record* const& event)
 {
 	INVOKE_TYPE(0x24F9DD, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
+	return;
 }
-void c_squad_settings_list::handle_item_change_level(s_event_record* const& event)
+
+void c_squad_settings_list::handle_item_change_level(
+	s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
@@ -429,8 +437,12 @@ void c_squad_settings_list::handle_item_change_level(s_event_record* const& even
 	params.m_screen_state.m_last_focused_item_index = NONE;
 	params.m_load_function = c_screen_single_player_level_select::load_lobby;
 	params.m_load_function(&params);
+	
+	return;
 }
-void c_squad_settings_list::handle_item_change_difficulty(s_event_record* const& event)
+
+void c_squad_settings_list::handle_item_change_difficulty(
+	s_event_record* const& event)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
@@ -443,12 +455,19 @@ void c_squad_settings_list::handle_item_change_difficulty(s_event_record* const&
 	params.m_screen_state.m_last_focused_item_index = NONE;
 	params.m_load_function = c_screen_single_player_difficulty_select::load_lobby;
 	params.m_load_function(&params);
+
+	return;
 }
-void c_squad_settings_list::handle_item_quick_options(s_event_record* const& event)
+
+void c_squad_settings_list::handle_item_quick_options(
+	s_event_record* const& event)
 {
 	INVOKE_TYPE(0x24EF79, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
+	return;
 }
-void c_squad_settings_list::handle_item_switch_to_coop(s_event_record* const& event)
+
+void c_squad_settings_list::handle_item_switch_to_coop(
+	s_event_record* const& event)
 {
 	if (user_interface_globals_is_beta_build())
 	{
@@ -474,12 +493,19 @@ void c_squad_settings_list::handle_item_switch_to_coop(s_event_record* const& ev
 
 		this->get_parent_screen()->start_widget_animation(3);
 	}
+
+	return;
 }
-void c_squad_settings_list::handle_item_switch_to_arranged(s_event_record* const& event)
+
+void c_squad_settings_list::handle_item_switch_to_arranged(
+	s_event_record* const& event)
 {
 	INVOKE_TYPE(0x24F015, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
+	return;
 }
-void c_squad_settings_list::handle_item_switch_to_optimatch(s_event_record* const& event)
+
+void c_squad_settings_list::handle_item_switch_to_optimatch(
+	s_event_record* const& event)
 {
 	// maybe someday
 	//return INVOKE_TYPE(0x211BA1, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, event);
@@ -488,29 +514,36 @@ void c_squad_settings_list::handle_item_switch_to_optimatch(s_event_record* cons
 		_user_interface_channel_type_gameshell_dialog,
 		_ui_error_generic, _window_4,
 		FLAG(event->controller), nullptr, nullptr, L"Alert", L"This feature is not currently available");
+
+	return;
 }
+
 void c_squad_settings_list::handle_item_change_hopper(s_event_record* const& event)
 {
 	//return INVOKE_TYPE(0x24F68A, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record**), this, event);
+
+	return;
 }
+
 void c_squad_settings_list::handle_item_party_management(s_event_record* const& event)
 {
 	// TODO : figure out why this is broken or invoke a custom menu to handle this
 	INVOKE_TYPE(0x24F5FD, 0x0, void(__thiscall*)(c_squad_settings_list*, s_event_record* const&), this, event);
-}
-void c_squad_settings_list::handle_item_rename_squad(s_event_record* const& event)
-{
-	s_session_interface_globals* session_interface_globals = s_session_interface_globals::get();	
-	ustrncpy(session_name_tmp, session_interface_globals->session_name, NUMBEROF(session_name_tmp));
-	ui_load_virtual_keyboard(session_name_tmp, NUMBEROF(session_name_tmp), _vkbd_context_squad_name_entry);
+	return;
 }
 
+void c_squad_settings_list::handle_item_rename_squad(s_event_record* const& event)
+{
+	ustrncpy(session_name_tmp, network_session_interface_get_session_name(), NUMBEROF(session_name_tmp));
+	ui_load_virtual_keyboard(session_name_tmp, NUMBEROF(session_name_tmp), _vkbd_context_squad_name_entry);
+	
+	return;
+}
 
 
 //
 // c_screen_squad_settings class starts here
 // 
-
 
 
 c_screen_squad_settings::c_screen_squad_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
@@ -718,7 +751,7 @@ void c_screen_squad_settings::update()
 		}
 		if (option_value_text_block)
 		{
-			option_value_text_block->set_text(s_session_interface_globals::get()->session_name);
+			option_value_text_block->set_text(network_session_interface_get_session_name());
 		}
 
 		break;

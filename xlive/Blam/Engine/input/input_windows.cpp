@@ -552,7 +552,7 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 	*/
 
 	bool input_handled = false;
-	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
+	for (uint16 gamepad_index = _controller0; gamepad_index < k_number_of_controllers; gamepad_index++)
 	{
 		if (input_has_gamepad(gamepad_index, nullptr))
 		{
@@ -715,7 +715,7 @@ void __cdecl input_update_main_device_state()
 	* Allows game to actually detect multiple controllers as multi inputs rather single input
 	*/
 
-	uint8 device_index = _controller_index_0;
+	uint8 device_index = _controller0;
 	do
 	{
 		input_device* device = g_xinput_devices[device_index];
@@ -1018,7 +1018,7 @@ static int compare_device_ports(const void* p1, const void* p2)
 static void input_windows_update_device_mapping(void)
 {
 	input_device* g_new_xinput_order[k_number_of_controllers] = {};
-	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
+	for (uint16 gamepad_index = _controller0; gamepad_index < k_number_of_controllers; gamepad_index++)
 	{
 		g_new_xinput_order[gamepad_index] = g_xinput_devices[gamepad_index];
 	}
@@ -1032,10 +1032,10 @@ static void input_windows_update_device_mapping(void)
 
 	if (g_should_offset_gamepad_indices)
 	{
-		g_xinput_devices[_controller_index_0] = g_new_xinput_order[_controller_index_3];
-		g_xinput_devices[_controller_index_1] = g_new_xinput_order[_controller_index_0];
-		g_xinput_devices[_controller_index_2] = g_new_xinput_order[_controller_index_1];
-		g_xinput_devices[_controller_index_3] = g_new_xinput_order[_controller_index_2];
+		g_xinput_devices[_controller0] = g_new_xinput_order[_controller3];
+		g_xinput_devices[_controller1] = g_new_xinput_order[_controller0];
+		g_xinput_devices[_controller2] = g_new_xinput_order[_controller1];
+		g_xinput_devices[_controller3] = g_new_xinput_order[_controller2];
 	}
 	return;
 }
@@ -1043,7 +1043,7 @@ static void input_windows_update_device_mapping(void)
 static void input_windows_restore_device_mapping(void)
 {
 	input_device* g_new_xinput_order[k_number_of_controllers] = {};
-	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
+	for (uint16 gamepad_index = _controller0; gamepad_index < k_number_of_controllers; gamepad_index++)
 	{
 		g_new_xinput_order[gamepad_index] = g_xinput_devices[gamepad_index];
 	}
@@ -1053,7 +1053,7 @@ static void input_windows_restore_device_mapping(void)
 	qsort(g_new_xinput_order, NUMBEROF(g_new_xinput_order), sizeof(input_device*), compare_device_ports);
 
 
-	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
+	for (uint16 gamepad_index = _controller0; gamepad_index < k_number_of_controllers; gamepad_index++)
 	{
 		g_xinput_devices[gamepad_index] = g_new_xinput_order[gamepad_index];
 	}

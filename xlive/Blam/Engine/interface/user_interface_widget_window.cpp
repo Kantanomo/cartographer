@@ -168,12 +168,12 @@ int32 c_screen_widget::sub_60F081(s_event_record* a2)
 	return INVOKE_TYPE(0x20F081, 0x0, int32(__thiscall*)(c_screen_widget*, s_event_record*), this, a2);
 }
 
-e_user_interface_controller_component c_screen_widget::get_component_from_button_key(int32 special_widget_index)
+e_controller_component c_screen_widget::get_component_from_button_key(int32 special_widget_index)
 {
 	//converts private_use_characters to controller_component
 	// anything other than a,b,x,y defaults to a
 	//override this if you want to add support for say d-pad up or triggers
-	return INVOKE_TYPE(0x20F151, 0x0, e_user_interface_controller_component(__thiscall*)(c_screen_widget*, int32), this, special_widget_index);
+	return INVOKE_TYPE(0x20F151, 0x0, e_controller_component(__thiscall*)(c_screen_widget*, int32), this, special_widget_index);
 }
 
 bool c_screen_widget::sub_40AD53(int32 a2)

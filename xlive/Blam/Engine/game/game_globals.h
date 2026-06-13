@@ -1,18 +1,132 @@
 #pragma once
-#include "bitmaps/bitmap_group.h"
-#include "interface/interface.h"
+#include "bitmaps/bitmap_types.h"
 #include "main/game_preferences.h"
 #include "math/color_math.h"
-#include "saved_games/player_profile.h"
-#include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 #include "text/text_group.h"
+
+/* constants */
 
 enum
 {
 	NUMBER_OF_GLOBAL_SOUNDS = 2,
 	k_maximum_material_types = 256,
 	k_game_globals_maximum_multiplayer_colors = 32
+};
+
+enum
+{
+	_game_difficulty_enemy_damage_scale = 0,
+	_game_difficulty_enemy_vitality_scale,
+	_game_difficulty_enemy_shield_scale,
+	_game_difficulty_enemy_recharge_scale,
+	_game_difficulty_friend_damage_scale,
+	_game_difficulty_friend_vitality_scale,
+	_game_difficulty_friend_shield_scale,
+	_game_difficulty_friend_recharge_scale,
+	_game_difficulty_infection_form_toughness,
+	_game_difficulty_health_unused6,
+	_game_difficulty_rate_of_fire_scale,
+	_game_difficulty_fire_projectile_error_scale,
+	_game_difficulty_burst_error_scale,
+	_game_difficulty_new_target_delay_scale,
+	_game_difficulty_burst_separation_delay_scale,
+	_game_difficulty_target_tracking_bonus,
+	_game_difficulty_target_leading_bonus,
+	_game_difficulty_overcharge_chance_scale,
+	_game_difficulty_special_fire_delay_scale,
+	_game_difficulty_projectile_guidance_vs_player_scale,
+	_game_difficulty_melee_delay_bonus,
+	_game_difficulty_melee_delay_scale,
+	_game_difficulty_fire_unused6,
+	_game_difficulty_grenade_chance_scale,
+	_game_difficulty_grenade_timer_scale,
+	_game_difficulty_grenade_unused1,
+	_game_difficulty_grenade_unused2,
+	_game_difficulty_grenade_unused3,
+	_game_difficulty_major_normal_placement,
+	_game_difficulty_major_few_placement,
+	_game_difficulty_major_many_placement,
+	_game_difficulty_ram_player_chance,
+	_game_difficulty_unused2,
+	_game_difficulty_unused3,
+	_game_difficulty_unused4,
+	NUMBER_OF_GAME_DIFFICULTY_VALUES,
+};
+
+enum
+{
+	_interface_bitmap_spinner = 0,
+	_interface_bitmap_obsolete,
+	_interface_color_table_screen,
+	_interface_color_table_hud,
+	_interface_color_table_editor,
+	_interface_color_table_dialog,
+	_interface_hud_globals,
+	_interface_bitmap_motion_sweep,
+	_interface_bitmap_motion_sweep_mask,
+	_interface_bitmap_multiplayer_hud,
+	_interface_unknown_field,
+	_interface_hud_digits_definition,
+	_interface_bitmap_motion_blip,
+	_interface_bitmap_iface_map1,
+	_interface_bitmap_iface_map2,
+	_interface_bitmap_iface_map3,
+	NUMBER_OF_INTERFACE_TAGS
+};
+
+/* enums */
+
+/*
+ *	New Player Representations Read Me
+ *
+ *	adding a new representation to the project requires adding a new value to the enum below
+ *  once you have done that add a new function in game_globals.cpp to prepare the s_game_globals_custom_representation_result
+ *  the function should load/create all necessary data required to create the custom representation (fp, body, biped, variant, etc)
+ *	then add the function into the k_game_globals_custom_representation_function_table constant
+ */
+enum e_character_type : int8
+{
+	_character_type_masterchief = 0,
+	_character_type_dervish = 1,
+	_character_type_spartan = 2,
+	_character_type_elite = 3,
+
+	k_player_character_type_count_original,	// Original count of characters that shipped with the game
+
+	// cartographer added characters
+	_character_type_skeleton = 4,
+	_character_type_flood = 5,
+	_character_type_lmao = 6,
+	k_player_character_type_count,
+
+	k_cartographer_custom_representation_count = k_player_character_type_count - k_player_character_type_count_original
+};
+
+enum e_player_color_index
+{
+	_player_color_white,
+	_player_color_steel,
+	_player_color_red,
+	_player_color_orange,
+	_player_color_gold,
+	_player_color_olive,
+	_player_color_green,
+	_player_color_sage,
+	_player_color_cyan,
+	_player_color_teal,
+	_player_color_colbat,
+	_player_color_blue,
+	_player_color_violet,
+	_player_color_purple,
+	_player_color_pink,
+	_player_color_crimson,
+	_player_color_brown,
+	_player_color_tan,
+	k_player_color_count,
+
+	_player_color_none = NONE,
+	_player_color_index_min_value = NONE,
 };
 
 enum e_campaign_difficulty_level
@@ -31,6 +145,8 @@ enum e_game_globals_rasterizer_flags : int16
 {
 	_game_globals_rasterizer_flag_tint_edge_density = FLAG(0)
 };
+
+/* structures */
 
 // max count: 1
 struct s_game_globals_havok_cleanup_resources
@@ -114,7 +230,7 @@ struct s_ai_globals_definition
 	real_vector2d vault_step_wus;
 	real_vector2d vault_crouch_wus;
 	int32 pad7[12];
-	tag_block<s_ai_globals_gravemind_definition> gravemind_properties;
+	s_tag_block gravemind_properties;	// s_ai_globals_gravemind_definition
 
 	int32 pad8[12];
 	real32 scary_target_threhold;       // A target of this scariness is offically considered scary (by combat dialogue, etc.)
@@ -180,7 +296,10 @@ struct s_game_globals_player_control
 	int16 pad3;
 	int16 minimum_autolevelling_ticks;              // amount of time player needs to move and not look up or down for autolevelling to kick in
 	real32 minimum_angle_for_vehicle_flipping;      // 0 means the vehicle's up vector is along the ground, 90 means the up vector is pointing straight up:degrees
-	tag_block<real32> look_function;                // max count: 16
+
+	// max count: 16
+	s_tag_block look_function;						// real32
+	
 	real32 minimum_action_hold_time_seconds;        // time that player needs to press ACTION to register as a HOLD
 };
 ASSERT_STRUCT_SIZE(s_game_globals_player_control, 128);
@@ -188,164 +307,8 @@ ASSERT_STRUCT_SIZE(s_game_globals_player_control, 128);
 // max count: 1
 struct s_game_globals_difficulty_information
 {
-	// Explaination("health", "scale values for enemy health and damage settings")
-
-	real32 easy_enemy_damage;           // enemy damage multiplier on easy difficulty
-	real32 normal_enemy_damage;         // enemy damage multiplier on normal difficulty
-	real32 hard_enemy_damage;           // enemy damage multiplier on hard difficulty
-	real32 imposs_enemy_damage;         // enemy damage multiplier on impossible difficulty
-
-	real32 easy_enemy_vitality;         // enemy maximum body vitality scale on easy difficulty
-	real32 normal_enemy_vitality;       // enemy maximum body vitality scale on normal difficulty
-	real32 hard_enemy_vitality;         // enemy maximum body vitality scale on hard difficulty
-	real32 imposs_enemy_vitality;       // enemy maximum body vitality scale on impossible difficulty
-
-	real32 easy_enemy_shield;           // enemy maximum shield vitality scale on easy difficulty
-	real32 normal_enemy_shield;         // enemy maximum shield vitality scale on normal difficulty
-	real32 hard_enemy_shield;           // enemy maximum shield vitality scale on hard difficulty
-	real32 imposs_enemy_shield;         // enemy maximum shield vitality scale on impossible difficulty
-
-	real32 easy_enemy_recharge;         // enemy shield recharge scale on easy difficulty
-	real32 normal_enemy_recharge;       // enemy shield recharge scale on normal difficulty
-	real32 hard_enemy_recharge;         // enemy shield recharge scale on hard difficulty
-	real32 imposs_enemy_recharge;       // enemy shield recharge scale on impossible difficulty
-
-	real32 easy_friend_damage;          // friend damage multiplier on easy difficulty
-	real32 normal_friend_damage;        // friend damage multiplier on normal difficulty
-	real32 hard_friend_damage;          // friend damage multiplier on hard difficulty
-	real32 imposs_friend_damage;        // friend damage multiplier on impossible difficulty
-
-	real32 easy_friend_vitality;        // friend maximum body vitality scale on easy difficulty
-	real32 normal_friend_vitality;      // friend maximum body vitality scale on normal difficulty
-	real32 hard_friend_vitality;        // friend maximum body vitality scale on hard difficulty
-	real32 imposs_friend_vitality;      // friend maximum body vitality scale on impossible difficulty
-
-	real32 easy_friend_shield;          // friend maximum shield vitality scale on easy difficulty
-	real32 normal_friend_shield;        // friend maximum shield vitality scale on normal difficulty
-	real32 hard_friend_shield;          // friend maximum shield vitality scale on hard difficulty
-	real32 imposs_friend_shield;        // friend maximum shield vitality scale on impossible difficulty
-
-	real32 easy_friend_recharge;        // friend shield recharge scale on easy difficulty
-	real32 normal_friend_recharge;      // friend shield recharge scale on normal difficulty
-	real32 hard_friend_recharge;        // friend shield recharge scale on hard difficulty
-	real32 imposs_friend_recharge;      // friend shield recharge scale on impossible difficulty
-
-	real32 easy_infection_forms;        // toughness of infection forms (may be negative) on easy difficulty
-	real32 normal_infection_forms;      // toughness of infection forms (may be negative) on normal difficulty
-	real32 hard_infection_forms;        // toughness of infection forms (may be negative) on hard difficulty
-	real32 imposs_infection_forms;      // toughness of infection forms (may be negative) on impossible difficulty
-
-	int32 pad[4];
-	
-	// Explaination("ranged fire", "difficulty-affecting values for enemy ranged combat settings")
-
-	real32 easy_rate_of_fire;           // enemy rate of fire scale on easy difficulty
-	real32 normal_rate_of_fire;         // enemy rate of fire scale on normal difficulty
-	real32 hard_rate_of_fire;           // enemy rate of fire scale on hard difficulty
-	real32 imposs_rate_of_fire;         // enemy rate of fire scale on impossible difficulty
-
-	real32 easy_projectile_error;       // enemy projectile error scale, as a fraction of their base firing error. on easy difficulty
-	real32 normal_projectile_error;     // enemy projectile error scale, as a fraction of their base firing error. on normal difficulty
-	real32 hard_projectile_error;       // enemy projectile error scale, as a fraction of their base firing error. on hard difficulty
-	real32 imposs_projectile_error;     // enemy projectile error scale, as a fraction of their base firing error. on impossible difficulty
-
-	real32 easy_burst_error;            // enemy burst error scale; reduces intra-burst shot distance. on easy difficulty
-	real32 normal_burst_error;          // enemy burst error scale; reduces intra-burst shot distance. on normal difficulty
-	real32 hard_burst_error;            // enemy burst error scale; reduces intra-burst shot distance. on hard difficulty
-	real32 imposs_burst_error;          // enemy burst error scale; reduces intra-burst shot distance. on impossible difficulty
-
-	real32 easyNew_target_delay;        // enemy new-target delay scale factor. on easy difficulty
-	real32 normalNew_target_delay;      // enemy new-target delay scale factor. on normal difficulty
-	real32 hardNew_target_delay;        // enemy new-target delay scale factor. on hard difficulty
-	real32 impossNew_target_delay;      // enemy new-target delay scale factor. on impossible difficulty
-
-	real32 easy_burst_separation;       // delay time between bursts scale factor for enemies. on easy difficulty
-	real32 normal_burst_separation;     // delay time between bursts scale factor for enemies. on normal difficulty
-	real32 hard_burst_separation;       // delay time between bursts scale factor for enemies. on hard difficulty
-	real32 imposs_burst_separation;     // delay time between bursts scale factor for enemies. on impossible difficulty
-
-	real32 easy_target_tracking;        // additional target tracking fraction for enemies. on easy difficulty
-	real32 normal_target_tracking;      // additional target tracking fraction for enemies. on normal difficulty
-	real32 hard_target_tracking;        // additional target tracking fraction for enemies. on hard difficulty
-	real32 imposs_target_tracking;      // additional target tracking fraction for enemies. on impossible difficulty
-
-	real32 easy_target_leading;         // additional target leading fraction for enemies. on easy difficulty
-	real32 normal_target_leading;       // additional target leading fraction for enemies. on normal difficulty
-	real32 hard_target_leading;         // additional target leading fraction for enemies. on hard difficulty
-	real32 imposs_target_leading;       // additional target leading fraction for enemies. on impossible difficulty
-
-	real32 easy_overcharge_chance;      // overcharge chance scale factor for enemies. on easy difficulty
-	real32 normal_overcharge_chance;    // overcharge chance scale factor for enemies. on normal difficulty
-	real32 hard_overcharge_chance;      // overcharge chance scale factor for enemies. on hard difficulty
-	real32 imposs_overcharge_chance;    // overcharge chance scale factor for enemies. on impossible difficulty
-
-	real32 easy_special_fire_delay;     // delay between special-fire shots (overcharge, banshee bombs) scale factor for enemies. on easy difficulty
-	real32 normal_special_fire_delay;   // delay between special-fire shots (overcharge, banshee bombs) scale factor for enemies. on normal difficulty
-	real32 hard_special_fire_delay;     // delay between special-fire shots (overcharge, banshee bombs) scale factor for enemies. on hard difficulty
-	real32 imposs_special_fire_delay;   // delay between special-fire shots (overcharge, banshee bombs) scale factor for enemies. on impossible difficulty
-
-	real32 easyGuidance_vs_player;      // guidance velocity scale factor for all projectiles targeted on a player. on easy difficulty
-	real32 normalGuidance_vs_player;    // guidance velocity scale factor for all projectiles targeted on a player. on normal difficulty
-	real32 hardGuidance_vs_player;      // guidance velocity scale factor for all projectiles targeted on a player. on hard difficulty
-	real32 impossGuidance_vs_player;    // guidance velocity scale factor for all projectiles targeted on a player. on impossible difficulty
-
-	real32 easy_melee_delay_base;       // delay period added to all melee attacks, even when berserk. on easy difficulty
-	real32 normal_melee_delay_base;     // delay period added to all melee attacks, even when berserk. on normal difficulty
-	real32 hard_melee_delay_base;       // delay period added to all melee attacks, even when berserk. on hard difficulty
-	real32 imposs_melee_delay_base;     // delay period added to all melee attacks, even when berserk. on impossible difficulty
-
-	real32 easy_melee_delay_scale;      // multiplier for all existing non-berserk melee delay times. on easy difficulty
-	real32 normal_melee_delay_scale;    // multiplier for all existing non-berserk melee delay times. on normal difficulty
-	real32 hard_melee_delay_scale;      // multiplier for all existing non-berserk melee delay times. on hard difficulty
-	real32 imposs_melee_delay_scale;    // multiplier for all existing non-berserk melee delay times. on impossible difficulty
-
-	int32 pad1[4];
-
-	// Explaination("grenades", "difficulty-affecting values for enemy grenade behavior")
-
-	real32 easy_grenade_chance_scale;   // scale factor affecting the desicions to throw a grenade. on easy difficulty
-	real32 normal_grenade_chance_scale; // scale factor affecting the desicions to throw a grenade. on normal difficulty
-	real32 hard_grenade_chance_scale;   // scale factor affecting the desicions to throw a grenade. on hard difficulty
-	real32 imposs_grenade_chance_scale; // scale factor affecting the desicions to throw a grenade. on impossible difficulty
-
-	real32 easy_grenade_timer_scale;    // scale factor affecting the delay period between grenades thrown from the same encounter (lower is more often). on easy difficulty
-	real32 normal_grenade_timer_scale;  // scale factor affecting the delay period between grenades thrown from the same encounter (lower is more often). on normal difficulty
-	real32 hard_grenade_timer_scale;    // scale factor affecting the delay period between grenades thrown from the same encounter (lower is more often). on hard difficulty
-	real32 imposs_grenade_timer_scale;  // scale factor affecting the delay period between grenades thrown from the same encounter (lower is more often). on impossible difficulty
-	
-	int32 pad2[4];
-	int32 pad3[4];
-	int32 pad4[4];
-
-	// Explaination("placement", "difficulty-affecting values for enemy placement")
-
-	real32 easy_major_upgrade_normal;   // fraction of actors upgraded to their major variant. on easy difficulty
-	real32 normal_major_upgrade_normal; // fraction of actors upgraded to their major variant. on normal difficulty
-	real32 hard_major_upgrade_normal;   // fraction of actors upgraded to their major variant. on hard difficulty
-	real32 imposs_major_upgrade_normal; // fraction of actors upgraded to their major variant. on impossible difficulty
-
-	real32 easy_major_upgrade_few;      // fraction of actors upgraded to their major variant when mix = normal. on easy difficulty
-	real32 normal_major_upgrade_few;    // fraction of actors upgraded to their major variant when mix = normal. on normal difficulty
-	real32 hard_major_upgrade_few;      // fraction of actors upgraded to their major variant when mix = normal. on hard difficulty
-	real32 imposs_major_upgrade_few;    // fraction of actors upgraded to their major variant when mix = normal. on impossible difficulty
-
-	real32 easy_major_upgrade_many;     // fraction of actors upgraded to their major variant when mix = many. on easy difficulty
-	real32 normal_major_upgrade_many;   // fraction of actors upgraded to their major variant when mix = many. on normal difficulty
-	real32 hard_major_upgrade_many;     // fraction of actors upgraded to their major variant when mix = many. on hard difficulty
-	real32 imposs_major_upgrade_many;   // fraction of actors upgraded to their major variant when mix = many. on impossible difficulty
-
-
-	// Explaination("vehicles", "difficulty-affecting values for vehicle driving/combat")
-	
-	real32 easy_player_vehicle_ram_chance;      // Chance of deciding to ram the player in a vehicle on easy difficulty
-	real32 normal_player_vehicle_ram_chance;    // Chance of deciding to ram the player in a vehicle on normal difficulty
-	real32 hard_player_vehicle_ram_chance;      // Chance of deciding to ram the player in a vehicle on hard difficulty
-	real32 imposs_player_vehicle_ram_chance;    // Chance of deciding to ram the player in a vehicle on impossible difficulty
-
-	int32 pad5[4];
-	int32 pad6[4];
-	int32 pad7[4];
-	int32 pad8[21];
+	real32 game_difficulty_values[NUMBER_OF_GAME_DIFFICULTY_VALUES][k_campaign_difficulty_levels_count];
+	uint32 unused[21];
 };
 ASSERT_STRUCT_SIZE(s_game_globals_difficulty_information, 644);
 
@@ -353,10 +316,10 @@ ASSERT_STRUCT_SIZE(s_game_globals_difficulty_information, 644);
 struct s_game_globals_grenade
 {
 	int16 maximum_count;
-	int16 pad;
+	uint16 pad;
 	tag_reference throwing_effect;  // effe
-	int32 pad1[4];
-	tag_reference equipment;        // eqip
+	int32 unused[4];
+	tag_reference item;				// item
 	tag_reference projectile;       // proj
 };
 ASSERT_STRUCT_SIZE(s_game_globals_grenade, 44);
@@ -383,7 +346,7 @@ struct s_game_globals_rasterizer_data
 	tag_reference loading_screen_tickers;   // bitm
 
 	int32 pad[4];
-	tag_block<s_vertex_shader_reference> global_vertex_shaders;
+	s_tag_block global_vertex_shaders;		// s_vertex_shader_reference
 
 	// Explaination("default textures", "Used internally by the rasterizer - additive, multiplicative, detail, vector. (Do not change ever, period.)")
 	tag_reference default_textures[k_bitmap_type_count];    // bitm
@@ -440,12 +403,16 @@ struct s_game_globals_multiplayer_information
 {
 	tag_reference flag;         // item
 	tag_reference unit;         // unit
-	tag_block<s_game_globals_tag_reference> vehicles;   // max count: 20
+	
+	// max count: 20
+	s_tag_block vehicles;		// s_game_globals_tag_reference   
 
 	tag_reference hill_shader;  // shad
 	tag_reference flag_shader;  // shad
 	tag_reference ball;         // item
-	tag_block<s_game_globals_tag_reference> sounds;     // max count: 60
+	
+	// max count: 60
+	s_tag_block sounds;			// s_game_globals_tag_reference     
 
 	tag_reference in_game_text; // unic
 	int32 pad[10];
@@ -537,41 +504,56 @@ ASSERT_STRUCT_SIZE(s_game_globals_falling_damage, 104);
 // max count: 1
 struct s_game_globals_multiplayer_ui
 {
-	tag_reference random_player_names;    // unic
-	tag_block<real_rgb_color> obsolete_profile_colors;  // max count: k_game_globals_maximum_multiplayer_colors
-	tag_block<real_rgb_color> team_colors;              // max count: k_game_globals_maximum_multiplayer_colors
-	tag_reference team_names;           // unic
+	tag_reference random_player_names;		// unic
+
+	// max count: k_game_globals_maximum_multiplayer_colors
+	s_tag_block obsolete_profile_colors;	// real_rgb_color  
+
+	// max count: k_game_globals_maximum_multiplayer_colors
+	s_tag_block team_colors;				// real_rgb_color              
+
+	tag_reference team_names;				// unic
 };
 ASSERT_STRUCT_SIZE(s_game_globals_multiplayer_ui, 32);
 
 struct s_game_globals
 {
-	uint8 pad0[172];
+	int32 unused0[43];
 	e_language language;
 
-	tag_block<s_game_globals_havok_cleanup_resources> havok_cleanup_resources;
-	tag_block<s_game_globals_collision_damage> collision_damage;
-	tag_block<s_sound_globals_definition> sound_globals;
-	tag_block<s_ai_globals_definition> ai_globals;
-	tag_block<s_damage_globals_definition> damage_table;
-	tag_block<> null_tagblock;                  // Might be used as a runtime tagblock?
-	tag_block<tag_reference> sounds;            // According to guerilla this is unused (max count: NUMBER_OF_GLOBAL_SOUNDS) 
-	tag_block<s_game_globals_camera> camera;
-	tag_block<s_game_globals_player_control> player_control;
-	tag_block<s_game_globals_difficulty_information> difficulty;
-	tag_block<s_game_globals_grenade> grenades;
-	tag_block<s_game_globals_rasterizer_data> rasterizer_data;
-	tag_block<s_game_globals_interface_tag_references> interface_tags;
-	tag_block<s_game_globals_tag_reference> weapon_list;    // max count: 20
-	tag_block<s_game_globals_tag_reference> cheat_powerups; // max count: 20
-	tag_block<s_game_globals_multiplayer_information> multiplayer_information;
-	tag_block<s_game_globals_player_information> player_information;
-	tag_block<s_game_globals_player_representation> player_representation;
-	tag_block<s_game_globals_falling_damage> falling_damage;
-	s_tag_block old_materials;	// struct: material_definition
-	s_tag_block materials;		// struct: s_global_material_definition
-	tag_block<s_game_globals_multiplayer_ui> multiplayer_ui;
-	tag_block<real_rgb_color> profile_colors;               // max count: k_game_globals_maximum_multiplayer_colors
+	s_tag_block havok_cleanup_resources;	// s_game_globals_havok_cleanup_resources
+	s_tag_block collision_damage;			// s_game_globals_collision_damage
+	s_tag_block sound_globals;				// s_sound_globals_definition
+	s_tag_block ai_globals;					// s_ai_globals_definition
+	s_tag_block damage_table;				// s_damage_globals_definition
+	
+	s_tag_block unused1;                  
+	
+	// According to guerilla this is unused (max count: NUMBER_OF_GLOBAL_SOUNDS) 
+	s_tag_block sounds;						// tag_reference
+
+	s_tag_block camera;						// s_game_globals_camera
+	s_tag_block player_control;				// s_game_globals_player_control
+	s_tag_block difficulty;					// s_game_globals_difficulty_information
+	s_tag_block grenades;					// s_game_globals_grenade
+	s_tag_block rasterizer_data;			// s_game_globals_rasterizer_data
+	s_tag_block interface_tags;				// s_game_globals_interface_tag_references
+	
+	// max count: 20
+	s_tag_block weapon_list;				// s_game_globals_tag_reference
+
+	// max count: 20
+	s_tag_block cheat_powerups;				// s_game_globals_tag_reference
+	s_tag_block multiplayer_information;	// s_game_globals_multiplayer_information
+	s_tag_block player_information;			// s_game_globals_player_information
+	s_tag_block player_representation;		// s_game_globals_player_representation
+	s_tag_block falling_damage;				// s_game_globals_falling_damage
+	s_tag_block old_materials;				// struct: material_definition
+	s_tag_block materials;					// struct: s_global_material_definition
+	s_tag_block multiplayer_ui;				// s_game_globals_multiplayer_ui
+	
+	// max count: k_game_globals_maximum_multiplayer_colors
+	s_tag_block profile_colors;             // real_rgb_color
 
 	tag_reference multiplayer_globals;      // mulg
 
@@ -586,7 +568,7 @@ struct s_game_globals
 };
 ASSERT_STRUCT_SIZE(s_game_globals, 644);
 
-/* public code */
+/* prototypes */
 
 void game_globals_apply_tag_patches(void);
 
@@ -600,12 +582,14 @@ struct s_ui_levels_definition* game_globals_get_ui_levels(void);
 
 s_game_globals_player_representation* game_globals_get_representation(e_character_type type);
 
+/* public code */
+
 inline s_game_globals_rasterizer_data* rasterizer_globals_get_data(void)
 {
 	return *Memory::GetAddress<s_game_globals_rasterizer_data**>(0xA3DA3C);
 }
 
-inline tag_reference game_globals_get_interface_tag_reference(e_interface_tag interface_tag_index)
+inline tag_reference game_globals_get_interface_tag_reference(int32 interface_tag_index)
 {
-	return scenario_get_game_globals()->interface_tags[0]->interface_tag_references[interface_tag_index];
+	return TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->interface_tags, 0, s_game_globals_interface_tag_references)->interface_tag_references[interface_tag_index];
 }

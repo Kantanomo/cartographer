@@ -14,7 +14,6 @@ enum
 {
 	k_simulation_world_maximum_views = k_maximum_players,
 	k_network_maximum_actors_per_simulation = 16,
-	k_network_maximum_players_per_session = k_maximum_players
 };
 
 /* enums */

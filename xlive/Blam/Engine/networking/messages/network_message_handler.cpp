@@ -6,6 +6,7 @@
 #include "cartographer/twizzler/twizzler.h"
 #include "networking/delivery/network_channel.h"
 #include "networking/logic/life_cycle_manager.h"
+#include "networking/logic/network_session_interface.h"
 #include "networking/messages/network_message_gateway.h"
 #include "networking/messages/network_message_type_collection.h"
 #include "networking/session/network_session.h"
@@ -316,9 +317,13 @@ void c_network_message_handler::handle_map_filename_response(const transport_add
 	}
 }
 
-void c_network_message_handler::handle_player_property_rank(const transport_address* address, int32 channel_index, const s_network_message_rank_change* received_data)
+void c_network_message_handler::handle_player_property_rank(
+	const transport_address* address,
+	int32 channel_index,
+	const s_network_message_rank_change* received_data)
 {
 	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
+	
 	if (session)
 	{
 		if (session->channel_is_authoritative(channel_index))
@@ -327,6 +332,8 @@ void c_network_message_handler::handle_player_property_rank(const transport_addr
 			network_session_interface_set_local_user_rank(0, received_data->rank);
 		}
 	}
+
+	return;
 }
 
 void c_network_message_handler::handle_session_anticheat_status(const transport_address* address, int32 channel_index, const s_network_message_anti_cheat* received_data)

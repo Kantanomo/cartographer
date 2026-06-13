@@ -18,13 +18,13 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 	csmemset(profile, 0, sizeof(s_saved_game_player_profile));
 	profile->valid_maybe = true;
 	ustrncpy(profile->name, L"Guest", NUMBEROF(s_saved_game_player_profile::name));
-	profile->appearance.primary_color = _player_color_colbat;
-	profile->appearance.secondary_color = _player_color_white;
-	profile->appearance.tertiary_color = _player_color_white;
-	profile->appearance.quaternary_color = _player_color_white;
+	profile->appearance.change_color_index[0] = _player_color_colbat;
+	profile->appearance.change_color_index[1] = _player_color_white;
+	profile->appearance.change_color_index[2] = _player_color_white;
+	profile->appearance.change_color_index[3] = _player_color_white;
 	profile->appearance.emblem_info.foreground_emblem = _emblem_foreground_seventh_column;
 	profile->appearance.emblem_info.background_emblem = _emblem_background_solid;
-	profile->unk |= 1;
+	SET_BIT(profile->unk, 0, true);
 	profile->input_preferences.controller_sensitivity = 3;
 	profile->input_preferences.mouse_sensitivity = 3;
 	profile->input_preferences.flags.clear();
@@ -93,10 +93,10 @@ bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_p
 
 void player_profile_traits_initialize(s_player_appearance* appearance)
 {
-	appearance->primary_color = _player_color_white;
-	appearance->secondary_color = _player_color_white;
-	appearance->tertiary_color = _player_color_white;
-	appearance->quaternary_color = _player_color_white;
+	appearance->change_color_index[0] = _player_color_white;
+	appearance->change_color_index[1] = _player_color_white;
+	appearance->change_color_index[2] = _player_color_white;
+	appearance->change_color_index[3] = _player_color_white;
 	appearance->player_character_type = _character_type_masterchief;
 	appearance->emblem_info.foreground_emblem = _emblem_foreground_seventh_column;
 	appearance->emblem_info.background_emblem = _emblem_background_solid;

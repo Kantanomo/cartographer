@@ -129,7 +129,7 @@ void initialize_runtime_sound_gestalt_definition()
 
 	if(game_globals->sound_globals.count)
 	{
-		datum shared_gestalt_datum = game_globals->sound_globals[0]->sound_gesalt;
+		datum shared_gestalt_datum = TAG_BLOCK_GET_ELEMENT(&game_globals->sound_globals, 0, s_sound_globals_definition)->sound_gesalt;
 
 
 		// if the cache file uses a shared resource database the primary gestalt will be the datum of that shared database and the cache gestalt will be the secondary

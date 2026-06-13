@@ -1,6 +1,7 @@
 #pragma once
 #include "simulation_players.h"
 #include "simulation_world.h"
+
 #include "networking/delivery/network_channel.h"
 
 /* structures */

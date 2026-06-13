@@ -4,9 +4,14 @@
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
 // #5344: XStorageBuildServerPath
-DWORD WINAPI XStorageBuildServerPath(DWORD dwUserIndex, XSTORAGE_FACILITY StorageFacility,
-	const void *pvStorageFacilityInfo, DWORD dwStorageFacilityInfoSize,
-	WCHAR* pwszItemName, WCHAR *pwszServerPath, DWORD *pdwServerPathLength)
+DWORD WINAPI XStorageBuildServerPath(
+	DWORD dwUserIndex,
+	XSTORAGE_FACILITY StorageFacility,
+	const void *pvStorageFacilityInfo,
+	DWORD dwStorageFacilityInfoSize,
+	WCHAR* pwszItemName,
+	WCHAR *pwszServerPath,
+	DWORD *pdwServerPathLength)
 {
 	DWORD result = ERROR_INVALID_PARAMETER;
 
@@ -118,14 +123,14 @@ DWORD WINAPI XStorageUploadFromMemory(DWORD dwUserIndex, const WCHAR* wszServerP
 }
 
 // #5345: XStorageDownloadToMemory
-DWORD WINAPI XStorageDownloadToMemory(DWORD dwUserIndex,
+DWORD WINAPI XStorageDownloadToMemory(
+	DWORD dwUserIndex,
 	const WCHAR *wszServerPath,
 	DWORD dwBufferSize,
 	const BYTE *pbBuffer,
 	DWORD cbResults,
 	XSTORAGE_DOWNLOAD_TO_MEMORY_RESULTS *pResults,
-	XOVERLAPPED *pXOverlapped
-)
+	XOVERLAPPED *pXOverlapped)
 {
 	LOG_TRACE_XLIVE(L"XStorageDownloadToMemory  ( wszServerPath = {}, dwBufferSize = {}, cbResults = {} )",
 		wszServerPath, dwBufferSize, cbResults);

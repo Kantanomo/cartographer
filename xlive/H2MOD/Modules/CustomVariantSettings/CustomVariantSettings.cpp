@@ -156,16 +156,16 @@ namespace CustomVariantSettings
 		// no idea why this is needed to be executed on blue screen but whatever
 		ApplyCustomSettings(&currentVariantSettings);
 	}
-	void OnGameLifeCycleUpdate(e_game_life_cycle state)
+	void OnGameLifeCycleUpdate(e_life_cycle_state state)
 	{
 		switch (state)
 		{
-		case _life_cycle_in_game:
+		case _life_cycle_state_in_game:
 			ApplyCurrentSettings();
 			break;
-		case _life_cycle_none:
-		case _life_cycle_pre_game:
-		case _life_cycle_post_game:
+		case _life_cycle_state_none:
+		case _life_cycle_state_pre_game:
+		case _life_cycle_state_post_game:
 			ResetSettings();
 			break;
 		default:

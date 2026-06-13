@@ -8,10 +8,16 @@
 enum
 {
 	MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS = 2,
-	k_powered_seats_count = 2,
 };
 
 /* enums */
+
+enum
+{
+	_powered_seat_driver = 0,
+	_powered_seat_gunner,
+	k_powered_seats_count,
+};
 
 enum e_weapon_addition_method : int16
 {
@@ -29,7 +35,8 @@ enum e_unit_grenade_type : int16
 {
 	_unit_grenade_human_fragmentation = 0,
 	_unit_grenade_covenant_plasma = 1,
-	k_unit_grenade_types_count
+	k_unit_grenade_types_count,
+	k_unit_grenade_types_bits = 1
 };
 
 enum e_unit_weapons
