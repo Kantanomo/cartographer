@@ -42,7 +42,7 @@ void weapon_barrel_idle(uint32 weapon_index, uint16 barrel_index)
     ASSERT(weapon_def);
 
     weapon_barrel* weapon_barrel = &weapon->weapon.barrels[barrel_index];
-    weapon_barrel_definition* barrel_def = weapon_def->weapon.barrels[barrel_index];
+    weapon_barrel_definition* barrel_def = TAG_BLOCK_GET_ELEMENT(&weapon_def->weapon.barrels, barrel_index, weapon_barrel_definition);
 
     weapon_barrel->firing_idle_ticks = 0;
     weapon_barrel->fire_count = 0;

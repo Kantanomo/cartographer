@@ -40,16 +40,20 @@ void H2X::ApplyMapLoadPatches(bool enable)
 {
 	for (auto& weapon : weapons)
 	{
-		float rof = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
+		real32 rof = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
 		datum weapon_datum = tag_loaded(_tag_group_weapon, weapon.tag_string);
+		
 		if (weapon_datum != NONE)
 		{
-			weapon_definition* weapon_tag = (weapon_definition*)tag_get_fast(weapon_datum);
-			weapon.rounds_per_second_based ?
-				weapon_tag->weapon.barrels[weapon.barrel_data_block_index]->rounds_per_second.upper = rof :
-				weapon_tag->weapon.barrels[weapon.barrel_data_block_index]->fire_recovery_time_seconds = rof;
+			struct weapon_definition const* weapon_definition = (struct weapon_definition*)tag_get_fast(weapon_datum);
+			
+			weapon_barrel_definition* barrel = TAG_BLOCK_GET_ELEMENT(&weapon_definition->weapon.barrels, weapon.barrel_data_block_index, weapon_barrel_definition);
+			
+			weapon.rounds_per_second_based ? barrel->rounds_per_second.upper = rof : barrel->fire_recovery_time_seconds = rof;
 		}
 	}
+
+	return;
 }
 
 

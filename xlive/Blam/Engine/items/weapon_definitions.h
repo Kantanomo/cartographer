@@ -403,7 +403,7 @@ struct _weapon_definition
 	Blurred permutations are called '$primary-blur' and '$secondary-blur'.")*/
 
 	e_weapon_definition_flags flags;
-	string_id unk_string_id;
+	string_id old_label;
 	e_secondary_trigger_mode secondary_trigger_mode;
 	int16 maximum_alternate_shots_loaded;   // if the second trigger loads alternate ammunition, this is the maximum number of shots that can be loaded at a time
 	real32 turn_on_time;                    // how long after being readied it takes this weapon to switch its 'turned_on' attachment to 1.0
@@ -495,10 +495,10 @@ struct _weapon_definition
 	weapon_tracking_struct_block tracking;
 	weapon_interface_definition_new player_interface;
 
-	tag_block<predicted_resource> predicted_resources;
-	tag_block<weapon_magazine_definition> magazines;
-	tag_block<weapon_trigger_definition> new_triggers;
-	tag_block<weapon_barrel_definition> barrels;
+	s_tag_block predicted_resources;	// predicted_resource
+	s_tag_block magazines;				// weapon_magazine_definition
+	s_tag_block new_triggers;			// weapon_trigger_definition
+	s_tag_block barrels;				// weapon_barrel_definition
 
 	real32 weapon_power_on_velocity;
 	real32 weapon_power_off_velocity;

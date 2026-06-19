@@ -31,7 +31,7 @@ typedef void(__cdecl* t_activation_proc)(struct s_game_cluster_bit_vectors*, str
 
 /* enums */
 
-enum e_game_simulation : int8
+enum e_game_simulation
 {
 	_game_simulation_none = 0,
 	_game_simulation_local,
@@ -42,7 +42,7 @@ enum e_game_simulation : int8
 	k_game_simulation_count,
 };
 
-enum e_game_mode : int32
+enum e_game_mode
 {
 	_game_mode_none = 0,
 	_game_mode_campaign,

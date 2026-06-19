@@ -732,17 +732,20 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 					)
 				)
 				{
+					int16 ammunition_frame_position;
+
 					int16 rounds_loaded_maximum = weapon->weapon.magazines[0].rounds_loaded;
 					int16 ammunition_result = weapon->weapon.magazines[0].original_time - weapon->weapon.magazines[0].state_timer;
 
-					int16 ammunition_frame_position;
+
 					if (ammunition_result < k_fp_needler_animation_max_rounds_loaded)
 					{
 						ammunition_frame_position = weapon->weapon.magazines[0].rounds_loaded;
 					}
 					else
 					{
-						weapon_magazine_definition* magazine = weapon_definition->weapon.magazines[0];
+						weapon_magazine_definition const* magazine = TAG_BLOCK_GET_ELEMENT(&weapon_definition->weapon.magazines, 0, weapon_magazine_definition);
+
 						ammunition_result -= k_fp_needler_animation_max_rounds_loaded;
 
 						real32 v1 = ((ammunition_result * 0.2f) <= 1.f ? ammunition_result * 0.2f : 1.f);
@@ -755,6 +758,7 @@ static void __cdecl first_person_weapon_build_node_matrices(int32 user_index, in
 
 						ammunition_frame_position = (int16)(((rounds_total - rounds_loaded_maximum) * v1) + rounds_loaded_maximum);
 					}
+
 					position = (real32)ammunition_frame_position;
 				}
 				else

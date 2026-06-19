@@ -41,7 +41,10 @@ void first_person_camera_apply_patches(void)
 
 /* private code */
 
-static void __cdecl first_person_camera_build_observer_command(datum player_unit_index, real_vector3d* unit_facing, s_observer_command* result)
+static void __cdecl first_person_camera_build_observer_command(
+	datum player_unit_index, 
+	real_vector3d* unit_facing,
+	s_observer_command* result)
 {
 	result->timer = 0;
 	result->flags = 0;
@@ -56,8 +59,10 @@ static void __cdecl first_person_camera_build_observer_command(datum player_unit
 	if (player_unit_index != NONE)
 	{
 		unit_datum* player_unit = unit_get(player_unit_index);
+		
 		unit_get_camera_position(player_unit_index, &result->position.position);
 		object_get_velocities(player_unit_index, &result->velocity, nullptr);
+		
 		if (player_unit->object.parent_object_index != NONE)
 		{
 			vehicle_datum* vehicle_unit = vehicle_get(player_unit->object.parent_object_index);
@@ -67,9 +72,12 @@ static void __cdecl first_person_camera_build_observer_command(datum player_unit
 
 				ASSERT(vehicle_definition);
 
-				if (vehicle_definition->unit.seats[player_unit->unit.parent_seat_index]->flags.test(_unit_seat_definition_first_person_camera_slaved_to_gun))
+				unit_seat const* seat = TAG_BLOCK_GET_ELEMENT(&vehicle_definition->unit.seats, player_unit->unit.parent_seat_index, unit_seat);
+
+				if (seat->flags.test(_unit_seat_definition_first_person_camera_slaved_to_gun))
 				{
 					object_marker vehicle_marker;
+
 					if (object_get_markers_by_string_id(player_unit->object.parent_object_index, (string_id)0xF0000DBu, &vehicle_marker, 1))
 					{
 						result->position.position = vehicle_marker.matrix.position;
@@ -90,9 +98,12 @@ static void __cdecl first_person_camera_build_observer_command(datum player_unit
 				}
 			}
 		}
+
 		result->flags = 1;
 	}
+	
 	observer_validate_camera_command(result);
+
 	return;
 }
 

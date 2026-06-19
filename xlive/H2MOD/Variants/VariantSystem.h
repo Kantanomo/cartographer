@@ -65,7 +65,7 @@ enum e_weapons_datum_index : unsigned int
 {
 	//Unknown = 0x2,//36
 	//None = 0x1,//37
-	chaingun_turret = 0xE53D2AD8,//0
+	//chaingun_turret = 0xE53D2AD8,//0
 	gauss_turret = 0xE5F02B8B,//1
 	warthog_horn = 0xE6322BCD,//2
 	banshee_gun = 0xE6AF2C4A,//3
