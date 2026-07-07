@@ -131,7 +131,6 @@ void KeyboardInput::Initialize()
 	}
 	ToggleKeyboardInput();
 
-	addDebugText("Registering Hotkeys");
 	g_keyboard_hotkey_data[0] = { &H2Config_hotkeyIdHelp, hotkeyFuncHelp };
 	g_keyboard_hotkey_data[1] = { &H2Config_hotkeyIdGuide, hotkeyFuncGuide };
 	g_keyboard_hotkey_data[2] = { &H2Config_hotkeyIdConsole, hotkeyFuncConsole };

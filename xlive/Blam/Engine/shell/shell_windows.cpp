@@ -74,8 +74,6 @@ static void shell_windows_yield_thread(LARGE_INTEGER last_time, real32 desired_f
 // Adjust name of window to display the instance number when we have more than 1 window open
 static void shell_windows_adjust_name(void);
 
-static void shell_windows_calculate_instance_num(void);
-
 static void shell_windows_url_decode_command_line_buffer(wchar_t* argument_buffer);
 
 static void shell_windows_tokenize_command_line_buffer(const wchar_t* argument_buffer, wchar_t** args, int32 max_arg_count, int32* arg_count);
@@ -126,21 +124,21 @@ uint32 shell_get_instance_num(void)
 bool shell_platform_initialize(void)
 {
 	const bool is_dedi = shell_is_dedicated_server();
-
-	shell_windows_calculate_instance_num();
-
+	
 	if (!is_dedi)
 	{
+		shell_windows_calculate_instance_num();
+
 		shell_windows_setup_cartographer_protocol();
 
 		shell_windows_ipc_initialize();
+
+		InitOnScreenDebugText();
 	}
 
 	shell_windows_initialize_arguments();
 
 	shell_windows_throttle_framerate_initialize();
-
-	InitOnScreenDebugText();
 
 	// TODO: initialize the ini config in the same place between client and dedi 
 	if (!is_dedi)
@@ -291,6 +289,24 @@ uint32 shell_windows_get_monitor_index(void)
 		}
 	}
 	return result;
+}
+
+void shell_windows_calculate_instance_num(void)
+{
+	DWORD lastErr;
+	do
+	{
+		++g_instance_number;
+		wchar_t mutexName[64];
+		swprintf(mutexName, ARRAYSIZE(mutexName), (shell_is_dedicated_server() ? L"Halo2Server%d" : L"Halo2Player%d"), g_instance_number);
+		HANDLE mutex = CreateMutexW(0, TRUE, mutexName);
+		lastErr = GetLastError();
+		if (lastErr == ERROR_ALREADY_EXISTS && mutex != NULL)
+		{
+			CloseHandle(mutex);
+		}
+	} while (lastErr == ERROR_ALREADY_EXISTS);
+	return;
 }
 
 /* private code */
@@ -567,25 +583,6 @@ static void shell_windows_adjust_name(void)
 		s_window_globals* window_globals = window_globals_get();
 		usnprintf(window_globals->window_name, NUMBEROF(window_globals->window_name), L"%ws (P%d)", window_globals->window_name, shell_get_instance_num());
 	}
-	return;
-}
-
-static void shell_windows_calculate_instance_num(void)
-{
-	DWORD lastErr;
-	do
-	{
-		++g_instance_number;
-		wchar_t mutexName[64];
-		swprintf(mutexName, ARRAYSIZE(mutexName), (shell_is_dedicated_server() ? L"Halo2Server%d" : L"Halo2Player%d"), g_instance_number);
-		HANDLE mutex = CreateMutexW(0, TRUE, mutexName);
-		lastErr = GetLastError();
-		if (lastErr == ERROR_ALREADY_EXISTS && mutex != NULL)
-		{
-			CloseHandle(mutex);
-		}
-	}
-	while (lastErr == ERROR_ALREADY_EXISTS);
 	return;
 }
 
