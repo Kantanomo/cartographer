@@ -80,7 +80,7 @@ static void main_menu_build_game_options(s_game_options* options, int32 menu_con
 
 /* globals */
 
-static const s_variant_description_map k_launch_multiplayer_variants[k_variant_count] =
+static const s_variant_description_map k_launch_multiplayer_variants[k_game_variant_description_count] =
 {
 	{ "slayer", _game_variant_description_slayer },
 	{ "oddball", _game_variant_description_oddball },
@@ -248,7 +248,7 @@ void main_game_launch_set_multiplayer_variant(
 	char const* variant_name)
 {	
 	size_t i = 0;
-	for (; i < k_variant_count; ++i)
+	for (; i < k_game_variant_description_count; ++i)
 	{
 		if (!csstricmp(variant_name, k_launch_multiplayer_variants[i].name))
 		{
@@ -256,7 +256,7 @@ void main_game_launch_set_multiplayer_variant(
 		}
 	}
 
-	if (i == k_variant_count)
+	if (i == k_game_variant_description_count)
 	{
 		error(_error_silent, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
 		game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);

@@ -154,6 +154,8 @@ namespace MapSlots
 	/*typedef bool(__cdecl p_store_multiplayer_level_data)();
 	p_store_multiplayer_level_data* c_store_multiplayer_level_data;*/
 
+	// todo: these dedicated server functions need to be moved to kablam_level_cache.h/.cpp at some point but this code is a mess
+
 	typedef int32(__cdecl sub_map_slot_t)(int32 a1);
 	sub_map_slot_t* p_sub_map_slot;
 

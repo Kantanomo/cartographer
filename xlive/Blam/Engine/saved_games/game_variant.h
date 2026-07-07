@@ -18,7 +18,7 @@ enum e_game_engine_type : int32
 	k_game_engine_type_count
 };
 
-enum e_game_variant_description_index : char
+enum e_game_variant_description_index : int8
 {
 	_game_variant_description_slayer = 0,
 	_game_variant_description_oddball = 1,
@@ -27,7 +27,14 @@ enum e_game_variant_description_index : char
 	_game_variant_description_ctf = 4,
 	_game_variant_description_invasion = 5,
 	_game_variant_description_territories = 6,
-	k_variant_count
+
+
+	// default game saves have their own description index (100ish undefined)
+	// so the bits required are manually defined
+	// not having them defined won't hurt anything in our codebase.
+	k_game_variant_description_count,
+	k_game_variant_description_bits_required = 7,
+	k_game_variant_description_invalid = -1
 };
 
 enum e_game_engine_flags : int32
@@ -343,3 +350,5 @@ ASSERT_STRUCT_SIZE(s_game_variant, 304);
 s_game_variant* get_game_variant(void);
 
 void __cdecl game_variant_build_default(s_game_variant* variant, e_game_variant_description_index game_variant_type);
+
+s_game_variant* __cdecl get_default_game_variant_by_name(wchar_t* name);

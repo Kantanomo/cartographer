@@ -136,6 +136,7 @@ public:
 
 	void __thiscall initialize();
 	void __thiscall cleanup();
+
 private:
 	void __thiscall remove_entry_by_index(uint16 idx);
 };
