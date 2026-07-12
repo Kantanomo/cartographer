@@ -706,9 +706,17 @@ void c_tag_injecting_manager::inject_tags(void)
 #if TAG_INJECTION_DEBUG
 		const uint32 start = (uint32)cache_get_tag_data();
 		const uint32 end = start + get_base_map_tag_data_size() + k_injectable_allocation_size;
-		bool in_range = ((uint32)cache_get_tag_data() + injection_offset) >= start && ((uint32)cache_get_tag_data() + injection_offset) < end;
+		bool in_range = (start + injection_offset) >= start && (start + injection_offset) < end;
 
-		event(_event_verbose, "tags:injection: [%s] injection_offset: %x is valid: %d start: %x end: %x", __FUNCTION__, (uint32)cache_get_tag_data() + injection_offset, in_range, start, end);
+		event(
+			_event_verbose,
+			"tags:injection: [%s] injection_offset: %x is valid: %d start: %x end: %x",
+			__FUNCTION__, 
+			(uint32)cache_get_tag_data() + injection_offset,
+			in_range,
+			start,
+			end
+		);
 #endif
 
 
