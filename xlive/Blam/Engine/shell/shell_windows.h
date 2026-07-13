@@ -64,3 +64,5 @@ void shell_windows_throttle_framerate(LARGE_INTEGER last_counter, int desired_fr
 bool __cdecl gfwl_gamestore_initialize(void);
 
 uint32 shell_windows_get_monitor_index(void);
+
+void shell_windows_calculate_instance_num(void);

@@ -45,7 +45,7 @@ ASSERT_STRUCT_SIZE(game_player_options, 212);
 struct s_game_options
 {
 	e_game_mode game_mode;
-	e_game_simulation game_simulation;
+	int8 game_simulation;	// e_game_simulation
 	int8 game_network_type;
 	bool session_host_is_dedicated;
 	bool scenario_custom;

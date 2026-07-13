@@ -48,8 +48,6 @@ void PostH2Config() {
 
 void InitLocalAppData()
 {
-	addDebugText("Find AppData Local.");
-
 	wchar_t appdata_path[MAX_PATH];
 	ugetenv(appdata_path, NUMBEROF(appdata_path), L"localappdata");
 
@@ -201,11 +199,8 @@ static void startup_init_h2_game(void)
 	curl_global_init(CURL_GLOBAL_ALL);
 	atexit([] { curl_global_cleanup(); });
 
-	addDebugText(shell_is_dedicated_server() ? "Process is Dedi-Server" : "Process is Client");
-
 	H2MOD::Initialize();
 
-	addDebugText("ProcessStartup finished.");
 	return;
 }
 

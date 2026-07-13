@@ -28,7 +28,7 @@ enum
 	NUMBER_OF_UNIT_HUD_TYPES,
 };
 
-enum e_unit_definition_flags : int32
+enum e_unit_definition_flags
 {
 	_unit_definition_circular_aiming_bit = 0,
 	_unit_definition_destroyed_after_dying_bit = 1,
@@ -61,8 +61,9 @@ enum e_unit_definition_flags : int32
 	_unit_definition_unit_has_boost_bit = 28,
 	k_number_of_unit_definition_flags
 };
+typedef c_flags_no_init<e_unit_definition_flags, uint32, k_number_of_unit_definition_flags> c_unit_definition_flags;
 
-enum e_unit_seat_definition_flags : uint32
+enum e_unit_seat_definition_flags
 {
 	_unit_seat_definition_invisible = 0,
 	_unit_seat_definition_locked = 1,
@@ -181,7 +182,7 @@ struct unit_seat
 	// Explaination("camera fields", "")
 	s_unit_camera unit_camera;
 
-	tag_block<unit_hud_reference> unit_hud_interface;
+	s_tag_block unit_hud_interface;		// unit_hud_reference
 
 	string_id enter_seat_string;
 	real32 yaw_minimum;
@@ -270,9 +271,10 @@ struct _unit_definition
 	real32 grenade_velocity;    // World Units Per Second
 	int16 grenade_type;         // e_unit_grenade_type
 	int16 grenade_count;
-	tag_block<powered_seat_definition> powered_seats;
-	tag_block<unit_initial_weapon> weapons;
-	tag_block<unit_seat> seats;
+
+	s_tag_block powered_seats;	// powered_seat_definition
+	s_tag_block weapons;		// unit_initial_weapon
+	s_tag_block seats;			// unit_seat
 
 	// Explaination("Boost", "")
 	unit_boost_struct_block boost;

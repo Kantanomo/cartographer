@@ -78,9 +78,10 @@ void c_xml_definition_loader::load_cache_info()
 	m_instance = instance;
 	m_file_offset = tag_data_start_offset + m_instance.data_offset - m_scenario_instance_offset;
 
-
 #if TAG_INJECTION_DEBUG
-	event(_event_verbose, "tags:injection: [%s] instance class %s data-offset %x file-offset %x", __FUNCTION__, m_instance.group_tag.string, m_instance.data_offset, m_file_offset);
+	char const string[5] = { m_instance.group_tag.string[3], m_instance.group_tag.string[2], m_instance.group_tag.string[1], m_instance.group_tag.string[0], '\0' };
+
+	event(_event_verbose, "tags:injection: [%s] instance class %s data-offset %x file-offset %x", __FUNCTION__, string, m_instance.data_offset, m_file_offset);
 #endif
 }
 

@@ -14,8 +14,6 @@ public:
 	void init(tag_group type, const wchar_t* plugin_path);
 	const c_xml_definition_block* get_definition(void) const;
 
-	static void log(const char* function_name, const char* format, ...);
-
 #if TAG_INJECTION_DEBUG
 	static void print_definition_internal(c_xml_definition_block* definition, uint32 depth);
 	void print_definition();

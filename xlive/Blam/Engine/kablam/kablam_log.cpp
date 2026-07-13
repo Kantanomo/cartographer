@@ -2,6 +2,9 @@
 #include "kablam_log.h"
 
 #include "kablam.h"
+#include "shell/shell_windows.h"
+
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 /* typedefs */
 
@@ -51,7 +54,9 @@ void kablam_log_initialize(void)
 		*Memory::GetAddress<_iobuf**>(0x0, 0x4904EC) = ufopen(log_name, L"a+b");
 	}
 
+	shell_windows_calculate_instance_num();
 	kablam_error_log_initialize();
+	InitOnScreenDebugText();
 
 	return;
 }
@@ -80,15 +85,22 @@ static void __cdecl kablam_log(
 
 static void kablam_error_log_initialize(void)
 {
+#ifdef ERRORS_ENABLED
 	char subdirectory[128];
 
 	const wchar_t* instance_name = kablam_shell_argument_get(L"-instance:");
 
-	wchar_string_to_utf8_string(instance_name, subdirectory, NUMBEROF(subdirectory));
+	if (instance_name)
+	{
+		wchar_string_to_utf8_string(instance_name, subdirectory, NUMBEROF(subdirectory));
+	}
+	else
+	{
+		csprintf(subdirectory, NUMBEROF(subdirectory), "%d", shell_get_instance_num());
+	}
 
-#ifdef ERRORS_ENABLED
 	errors_set_log_subdirectory(subdirectory);
-#endif
 
+#endif
 	return;
 }

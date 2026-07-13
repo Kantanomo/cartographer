@@ -181,13 +181,13 @@ bool game_is_cooperative(void)
 
 bool game_is_distributed(void)
 {
-	const e_game_simulation simulation_type = game_options_get()->game_simulation;
+	const e_game_simulation simulation_type = game_simulation_get();
 	return simulation_type == _game_simulation_distributed_client || simulation_type == _game_simulation_distributed_server;
 }
 
 e_game_simulation game_simulation_get(void)
 {
-	return game_options_get()->game_simulation;
+	return (e_game_simulation)game_options_get()->game_simulation;
 }
 
 bool game_is_networked(void)
@@ -492,7 +492,7 @@ void game_simulation_set(
 	ASSERT(game_simulation>_game_simulation_none && game_simulation<k_game_simulation_count);
 	ASSERT(game_globals && (game_globals->initializing || game_globals->map_active));
 	
-	game_globals->options.game_simulation = game_simulation;
+	game_globals->options.game_simulation = (int8)game_simulation;
 	main_status("game_simulation", "%s", k_game_playback_names[game_simulation]);
 
 	return;

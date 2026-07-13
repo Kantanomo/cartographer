@@ -356,8 +356,6 @@ void H2MOD::Initialize()
 	H2X::ApplyPatches();
 	h2mod_apply_hooks();
 
-	//StatsHandler::Initialize();
-
 	DETOUR_COMMIT();
 
 	event(_event_status, "h2mod: Initialized");
@@ -757,8 +755,6 @@ static void h2mod_apply_hooks(void)
 
 static void h2mod_apply_tweaks(void)
 {
-	addDebugText("Begin Startup Tweaks.");
-
 	if (shell_is_dedicated_server())
 	{
 
@@ -798,7 +794,7 @@ static void h2mod_apply_tweaks(void)
 		// ### TODO: turn on if you want to debug halo2.exe from start of process
 		// DETOUR_ATTACH(p_IsDebuggerPresent, IsDebuggerPresent, IsDebuggerPresent_hook);
 	}
-	addDebugText("End Startup Tweaks.");
+
 	return;
 }
 
