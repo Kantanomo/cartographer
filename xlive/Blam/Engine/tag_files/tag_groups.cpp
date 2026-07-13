@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "tag_groups.h"
 
+#include "tag_group_access.h"
+
 #include "cache/cache_files.h"
 
 /* constants */
@@ -332,12 +334,39 @@ int32 tag_group_get_as_index(tag_group group)
 	}
 }
 
-void* __cdecl tag_block_get_element_with_size(const s_tag_block* block, int32 index, int32 block_size)
+void* tag_block_get_element_with_size(
+	s_tag_block const* block,
+	int32 index,
+	int32 block_size)
 {
-	return INVOKE(0x3C772, 0x32899, tag_block_get_element_with_size, block, index, block_size);
+	//return INVOKE(0x3C772, 0x32899, tag_block_get_element_with_size, block, index, block_size);
+
+	void* result = NULL;
+
+	ASSERT(block);
+	ASSERT(block->count>=0);
+
+	if (index || block->count)
+	{
+		vassert(VALID_INDEX(index, block->count), "#%d is not a valid %s index in [#0, #%d)", index, "<unknown>", block->count);
+
+		ASSERT(tag_block_get_address(block));
+
+		result = (void*)(block_size * index + (intptr_t)tag_block_get_address(block));
+
+		ASSERT(result);
+	}
+	else
+	{
+		error(_error_delayed, "asked for index=0 with block->count=0");
+	}
+
+	return result;
 }
 
-void tag_group_set_data_info(uint32 tag_data, uint32 tag_data_size)
+void tag_group_set_data_info(
+	uint32 tag_data,
+	uint32 tag_data_size)
 {
 	uint32* g_tag_group_data = Memory::GetAddress<uint32*>(0x482290, 0x4A6438);
 	uint32* g_tag_group_data_size = Memory::GetAddress<uint32*>(0x482294, 0x4A643C);
@@ -347,7 +376,8 @@ void tag_group_set_data_info(uint32 tag_data, uint32 tag_data_size)
 	return;
 }
 
-void string_id_convert_string(char* string)
+void string_id_convert_string(
+	char* string)
 {
 	for (size_t i = 0; string[i] != '\0'; ++i)
 	{
@@ -364,24 +394,30 @@ void string_id_convert_string(char* string)
 			*string = '_';
 		}
 	}
+
 	return;
 }
 
-bool string_id_load_strings(const cache_file_header* header)
+bool string_id_load_strings(
+	const cache_file_header* header)
 {
 	const int32 string_idx_offset = header->string_idx_offset;
+	
 	g_string_id_block_offset = header->string_block_offset;
 	g_string_id_count = header->string_table_count;
 
 	uint32 read_count = cache_file_align_read_size_to_cache_page(sizeof(string_id) * g_string_id_count);
+	
 	ASSERT(read_count < sizeof(g_string_id_index_buffer));
 
 	const bool result = cache_file_blocking_read(NONE, string_idx_offset, read_count, g_string_id_index_buffer);
+	
 	if (result)
 	{
 		read_count = cache_file_align_read_size_to_cache_page(header->string_table_size);
 		cache_file_blocking_read(NONE, header->string_table_offset, read_count, g_string_id_storage);
 	}
+
 	return result;
 }
 
@@ -410,13 +446,16 @@ const char* string_id_get_string_const(string_id id)
 	return result;
 }
 
-string_id string_id_exists(const char* in_string)
+string_id string_id_exists(
+	const char* in_string)
 {
 	char string[128];
+	
 	csstrncpy(string, in_string, NUMBEROF(string));
 	string_id_convert_string(string);
 
 	string_id result = _string_id_invalid;
+	
 	for (int32 i = 0; i < g_string_id_count; ++i)
 	{
 		char string_id_string[128];
@@ -427,6 +466,7 @@ string_id string_id_exists(const char* in_string)
 			result = (string_id)(i | (length << k_string_id_length_shift));
 		}
 	}
+	
 	return result;
 }
 
