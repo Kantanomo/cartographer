@@ -11,6 +11,7 @@
 #include "shell/shell_windows.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
+#include "networking/network_event.h"
 
 /* constants */
 
@@ -779,6 +780,11 @@ uint16 __cdecl input_key_msec_down(
 	int16 key)
 {
 	return INVOKE(0x2F030, 0x0, input_key_msec_down, key);
+}
+
+bool input_windows_key_pressed(int16 key)
+{
+	return g_keyboard_input_state.test(key);
 }
 
 bool __cdecl input_windows_drive_letter_test(int32 memory_unit, int8* drive_letter)

@@ -584,6 +584,11 @@
     <ClCompile Include="Blam\Engine\kablam\kablam_level_cache.cpp" />
     <ClCompile Include="Blam\Engine\main\map_manager.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_playlist_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_cartographer_setting.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_game_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\units\unit_action_system.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_primitives.cpp" />
+    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2146,6 +2151,11 @@
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_territories_property.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_level_cache.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_playlist_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_cartographer_setting.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_primitives.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_interface_cartographer_strings.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_globals_definition.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

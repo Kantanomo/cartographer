@@ -268,7 +268,7 @@
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">
-    <OutDir>$(SolutionDir)Halo2Server\</OutDir>
+    <OutDir>$(SolutionDir)Halo2\</OutDir>
     <IntDir>.\objects\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>$(WindowsSDK_LibraryPath_x86);$(DXSDK_DIR)Lib\x86;3rdparty/discord/lib;3rdparty/imgui/lib;3rdparty/spdlog/lib;3rdparty/tinyxml/lib;3rdparty/zlib/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib/debug;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
@@ -1235,6 +1235,7 @@
     <ClCompile Include="Blam\Engine\game\player_vibration.cpp" />
     <ClCompile Include="Blam\Engine\game\preferences.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_assault_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_cartographer_setting.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_ctf_property.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_equipment_property.cpp" />
     <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_game_type_property.cpp" />
@@ -1268,6 +1269,7 @@
     <ClCompile Include="Blam\Engine\interface\hud_draw.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_nav_points.cpp" />
     <ClCompile Include="Blam\Engine\interface\interface.cpp" />
+    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
     <ClCompile Include="Blam\Engine\interface\new_hud_draw.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_4way_signin.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_about_dialog.cpp" />
@@ -1408,6 +1410,7 @@
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
     <ClCompile Include="Blam\Engine\networking\delivery\network_link.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_event.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_game_definitions.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_globals.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_loading.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_memory.cpp" />
@@ -1645,6 +1648,7 @@
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_definitions_new.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_assault_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_cartographer_setting.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_ctf_property.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_equipment_property.h" />
     <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_game_type_property.h" />
@@ -1692,6 +1696,8 @@
     <ClInclude Include="Blam\Engine\interface\interface.h" />
     <ClInclude Include="Blam\Engine\interface\meter_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\motion_sensor.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_interface_cartographer_strings.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_draw.h" />
     <ClInclude Include="Blam\Engine\interface\online_menu_channel.h" />
@@ -1736,6 +1742,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_bitmap_block.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_channel.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_globals_definition.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_group_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_guide.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_hud_block.h" />
@@ -1854,6 +1861,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fog.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_motion_sensor.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_primitives.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_shader_submit.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_shader_submit_new.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_screen_effect.cpp" />
@@ -1979,6 +1987,7 @@
     <ClCompile Include="Blam\Engine\units\biped_definitions.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
+    <ClCompile Include="Blam\Engine\units\unit_action_system.cpp" />
     <ClCompile Include="Blam\Engine\units\vehicles.cpp" />
     <ClCompile Include="Blam\Engine\units\vehicle_definitions.cpp" />
     <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
@@ -2197,6 +2206,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_lens_flares.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_motion_sensor.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_primitives.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_screen_effect.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_shader_submit.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_shader_submit_new.h" />

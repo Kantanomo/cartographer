@@ -154,6 +154,7 @@ public:
 	bool process_variant_team_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
 	bool process_variant_vehicle_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
 	bool process_variant_equipment_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
+	bool process_variant_cartographer_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
 	bool process_variant_slayer_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
 	bool process_variant_oddball_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);
 	bool process_variant_juggernaut_setting(s_halo_playlist_section_item* section_item, s_game_variant* variant);

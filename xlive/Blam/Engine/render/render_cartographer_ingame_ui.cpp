@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "render_cartographer_ingame_ui.h"
 
+#include "render.h"
 #include "cartographer/build_version/cartographer_build_version.h"
 #include "cartographer/twizzler/twizzler.h"
 
@@ -22,6 +23,13 @@
 #include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/Modules/Updater/Updater.h"
 #include "version_git.h"
+#include "cache/cache_files.h"
+#include "input/input_windows.h"
+#include "interface/multiplayer_variant_settings_interface_definition.h"
+#include "rasterizer/dx9/rasterizer_dx9_dof.h"
+#include "rasterizer/dx9/rasterizer_dx9_primitives.h"
+#include "rasterizer/dx9/rasterizer_dx9_submit.h"
+#include "text/text.h"
 
 /* defines */
 
@@ -43,6 +51,7 @@ enum
 	k_cheevo_message_font = 1,
 	k_netdebug_text_font = 0,
 	k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator),
+	k_text_drawing_padding = 5
 };
 
 
@@ -52,8 +61,10 @@ static void render_cartographer_status_bar(const char* build_text);
 static void render_cartographer_git_build_info(void);
 static bool render_cartographer_achievement_message(const char* achivement_message);
 static void render_cartographer_update_message(const char* update_text, int64 update_size_bytes, int64 update_downloaded_bytes);
+void render_cartographer_variant_settings();
 static void render_netdebug_text(void);
 static void render_main_game_time_debug(void);
+
 
 /* globals */
 
@@ -89,8 +100,10 @@ void render_cartographer_ingame_ui(void)
 	render_cartographer_git_build_info();
 	render_netdebug_text();
 	render_main_game_time_debug();
-	rasterizer_dx9_perf_event_end("render cartographer ingame ui");
 
+	render_cartographer_variant_settings();
+
+	rasterizer_dx9_perf_event_end("render cartographer ingame ui");
 	return;
 }
 
@@ -263,6 +276,238 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 	}
 
 	return;
+}
+
+void render_cartographer_variant_settings()
+{
+	if (game_is_multiplayer())
+	{
+		key_stroke key;
+
+		input_peek_key(&key);
+
+		if (!input_windows_key_pressed(VK_F3))
+			return;
+
+		s_game_variant* variant = get_game_variant();
+
+		if (!variant)
+			return;
+
+		wchar_t string_buffer[256];
+
+		pixel32 header_color = PIXEL32_ARGB(128, 0, 0, 0);
+		pixel32 body_color = PIXEL32_ARGB(64, 0, 0, 0);
+
+		const int16 header_line_height = get_text_size_from_font_cache(k_cheevo_title_font);
+		const int16 body_line_height = get_text_size_from_font_cache(k_status_text_font);
+
+		rectangle2d frame_bounds;
+
+		rasterizer_get_frame_bounds(&frame_bounds);
+
+		// maybe add safe area respecting padding?
+		const rectangle2d header_rect = {
+			75,
+			20,
+			(int16)(80 + header_line_height),
+			(int16)(frame_bounds.x1 - 20)
+		};
+		const rectangle2d body_rect =
+		{
+			header_rect.bottom,
+			header_rect.left,
+			(int16)(frame_bounds.bottom - 20),
+			header_rect.right
+		};
+
+		rasterizer_dx9_draw_primitive_quad(&header_rect, header_color);
+
+		draw_string_reset();
+		draw_string_set_draw_mode(k_cheevo_title_font, 0, 2, 0, global_real_argb_white, global_real_argb_black, false);
+
+		rectangle2d header_text_bounds = header_rect;
+		header_text_bounds.top += k_text_drawing_padding;
+		header_text_bounds.bottom += header_line_height + k_text_drawing_padding;
+
+		swprintf_s(string_buffer, L"%s Settings", variant->variant_name);
+
+		rasterizer_draw_unicode_string(&header_text_bounds, string_buffer);
+
+		const uint16 body_column_count = 3;
+		const uint16 body_row_count = 2;
+
+		const uint16 body_column_width = (body_rect.right - body_rect.left) / body_column_count;
+		const uint16 body_row_height = (body_rect.bottom - body_rect.top) / body_row_count;
+
+		int16 current_cell_index = 0;
+
+		const wchar_t* headers[body_column_count * body_row_count] = {
+			L"Match",
+			L"Team",
+			L"Equipment/Vehicle",
+			L"Game Type",
+			L"Cartographer",
+			L"Players",
+		};
+
+		const e_variant_setting_category_type variant_categories[body_column_count * body_row_count]
+		{
+			(e_variant_setting_category_type)(_variant_setting_category_type_match_ctf + variant->variant_game_engine_index - 1),
+			(e_variant_setting_category_type)(_variant_setting_category_type_team_ctf + variant->variant_game_engine_index - 1),
+			_variant_setting_category_type_equipment,
+			(e_variant_setting_category_type)(_variant_setting_category_type_game_ctf + variant->variant_game_engine_index - 1),
+			_variant_setting_category_type_cartographer_settings,
+			_variant_setting_category_type_players
+		};
+
+		for (uint16 column = 0; column < body_column_count; ++column)
+		{
+			int16 current_column_left = body_rect.left + (body_column_width * column);
+			int16 current_column_right = current_column_left + body_column_width;
+			for (uint16 row = 0; row < body_row_count; ++row)
+			{
+				int16 current_row_top = body_rect.top + (body_row_height * row);
+				int16 current_row_bottom = current_row_top + body_row_height;
+
+				rectangle2d cell_rect = 
+				{
+				current_row_top,
+				current_column_left,
+				current_row_bottom,
+				current_column_right
+				};
+
+				rectangle2d cell_header_rect =
+				{
+					cell_rect.top,
+					cell_rect.left,
+					(int16)(cell_rect.top + header_line_height),
+					cell_rect.right
+				};
+
+				rectangle2d cell_body_rect =
+				{
+					cell_header_rect.bottom,
+					cell_rect.left,
+					cell_rect.bottom,
+					cell_rect.right
+				};
+
+				rasterizer_dx9_draw_primitive_quad(&cell_header_rect, header_color);
+				rasterizer_dx9_draw_primitive_quad(&cell_body_rect, body_color);
+
+				draw_string_reset();
+				draw_string_set_draw_mode(k_cheevo_title_font, 0, 2, 0, global_real_argb_white, global_real_argb_black, false);
+
+				swprintf_s(string_buffer, L"%s", headers[current_cell_index]);
+				rasterizer_draw_unicode_string(&cell_header_rect, string_buffer);
+
+				draw_string_reset();
+				draw_string_set_draw_mode(k_status_text_font, 0, 0, 0, global_real_argb_white, global_real_argb_black, false);
+
+				cell_body_rect.left += k_text_drawing_padding;
+
+				// grab the category reference if the return is null it is a custom category.
+				s_variant_setting_edit_reference* category_reference = multiplayer_variant_settings_interface_get_category_reference(variant_categories[current_cell_index]);
+
+				if (category_reference)
+				{
+					for (int32 i = 0; i < category_reference->options.count; ++i)
+					{
+						s_text_value_pair_definition* text_pair = (s_text_value_pair_definition*)tag_get_fast(category_reference->options[i]->index);
+
+						int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, text_pair->parameter);
+						s_text_value_pair_reference_new* setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(text_pair, setting_value);
+
+						c_maximum_interface_text label_buffer;
+						c_maximum_interface_text value_buffer;
+
+						string_list_get_normal_string(text_pair->string_list.index, text_pair->title_text, &label_buffer);
+
+						// format the variant parameter text, if the setting_label is nullptr that means it is a
+						// integer parsing parameter just print the int
+						if (setting_label)
+						{
+							string_list_get_normal_string(text_pair->string_list.index, setting_label->label_string, &value_buffer);
+							swprintf_s(string_buffer, L"%s: %s", label_buffer.get_string(), value_buffer.get_string());
+
+						}
+						else
+						{
+							swprintf_s(string_buffer, L"%s: %d", label_buffer.get_string(), setting_value);
+						}
+
+
+						rasterizer_draw_unicode_string(&cell_body_rect, string_buffer);
+
+						cell_body_rect.top += body_line_height + k_text_drawing_padding;
+					}
+
+					// merge the equipment and vehicle categories so we can keep the 3x2 grid size
+					if (variant_categories[current_cell_index] == _variant_setting_category_type_equipment)
+					{
+						category_reference = multiplayer_variant_settings_interface_get_category_reference(_variant_setting_category_type_vehicles);
+						if (category_reference)
+						{
+							for (int32 i = 0; i < category_reference->options.count; ++i)
+							{
+								s_text_value_pair_definition* text_pair = (s_text_value_pair_definition*)tag_get_fast(category_reference->options[i]->index);
+
+								int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, text_pair->parameter);
+								s_text_value_pair_reference_new* setting_label = multiplayer_variant_settings_interface_get_variant_parameter_label(text_pair, setting_value);
+
+								c_maximum_interface_text label_buffer;
+								c_maximum_interface_text value_buffer;
+
+								string_list_get_normal_string(text_pair->string_list.index, text_pair->title_text, &label_buffer);
+
+								// format the variant parameter text, if the setting_label is nullptr that means it is a
+								// integer parsing parameter just print the int
+								if (setting_label)
+								{
+									string_list_get_normal_string(text_pair->string_list.index, setting_label->label_string, &value_buffer);
+									swprintf_s(string_buffer, L"%s: %s", label_buffer.get_string(), value_buffer.get_string());
+
+								}
+								else
+								{
+									swprintf_s(string_buffer, L"%s: %d", label_buffer.get_string(), setting_value);
+								}
+
+								rasterizer_draw_unicode_string(&cell_body_rect, string_buffer);
+
+								cell_body_rect.top += body_line_height + k_text_drawing_padding;
+							}
+						}
+					}
+				}
+				else if (variant_categories[current_cell_index] == _variant_setting_category_type_cartographer_settings)
+				{
+					for (uint32 i = k_variant_setting_parameter_type_base_count + 1; i < k_variant_setting_parameter_type_base_count + 1 + k_variant_setting_parameter_type_cartographer_count; ++i)
+					{
+						e_variant_setting_parameter_type type = (e_variant_setting_parameter_type)i;
+
+						wchar_t title_buffer[512];
+						wchar_t value_buffer[512];
+
+						int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, type);
+
+						multiplayer_variant_settings_interface_get_custom_variant_parameter_title(nullptr, type, title_buffer);
+						multiplayer_variant_settings_interface_get_custom_variant_parameter_label(nullptr, type, setting_value, value_buffer);
+
+						swprintf_s(string_buffer, NUMBEROF(string_buffer), L"%s: %s", title_buffer, value_buffer);
+
+						rasterizer_draw_unicode_string(&cell_body_rect, string_buffer);
+
+						cell_body_rect.top += body_line_height + k_text_drawing_padding;
+					}
+				}
+
+				current_cell_index++;
+			}
+		}
+	}
 }
 
 void render_main_game_time_debug(void)

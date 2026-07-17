@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "game_time.h"
 
+#include "game.h"
+#include "game_options.h"
+#include "saved_games/game_variant.h"
+
 /* structures */
 
 struct s_time_globals
@@ -196,6 +200,66 @@ real32 game_time_get_leftover(void)
 	return PIN(game_time_globals->game_ticks_leftover, 0.f, 1.f);
 }
 
+
+void __cdecl game_time_reset()
+{
+	s_time_globals* game_time_globals = time_globals_get();
+
+	game_time_globals->initialized = false;
+	game_time_globals->tick_length = 0;
+	game_time_globals->passed_ticks_count = 0;
+	game_time_globals->game_speed = 0.f;
+	game_time_globals->game_ticks_leftover = 0.f;
+	game_time_globals->field_14 = 0.f;
+	game_time_globals->field_18 = 0.f;
+	game_time_globals->field_1C = 0.f;
+	game_time_globals->field_20 = 0.f;
+}
+
+void __cdecl game_time_setup_scenario()
+{
+	game_time_reset();
+
+	s_time_globals* game_time_globals = time_globals_get();
+	s_game_options* game_options = game_options_get();
+
+	game_time_globals->tick_rate = game_options->game_tick_rate;
+	game_time_globals->tick_length = 1.f / (real32)game_time_globals->tick_rate;
+
+	s_game_variant* variant = get_game_variant();
+
+	if (game_is_multiplayer() && variant)
+	{
+		switch (variant->cartographer_settings.game_speed)
+		{
+			case _game_speed_modifier_half:
+				game_time_globals->game_speed = 0.5f;
+				break;
+			case _game_speed_modifier_hundred_fifty:
+				game_time_globals->game_speed = 1.5f;
+				break;
+			case _game_speed_modifier_double:
+				game_time_globals->game_speed = 2.f;
+				break;
+			case _game_speed_modifier_ludicrous:
+				game_time_globals->game_speed = 5.f;
+				break;
+			case _game_speed_modifier_none:
+			default:
+				game_time_globals->game_speed = k_game_time_default_game_speed;
+				break;
+		}
+	}
+	else
+		game_time_globals->game_speed = k_game_time_default_game_speed;
+
+	game_time_globals->initialized = true;
+}
+
+void game_time_apply_patches()
+{
+	WritePointer(Memory::GetAddress(0x3A06F8, 0x35D428), game_time_setup_scenario);
+}
 
 /* private code */
 

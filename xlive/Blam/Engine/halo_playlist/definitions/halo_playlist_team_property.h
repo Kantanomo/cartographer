@@ -1,7 +1,7 @@
 #pragma once
 #include "halo_playlist_item_collection.h"
 
-#define halo_playlist_team_property_item_count 3
+#define k_halo_playlist_team_property_item_count 3
 
 enum e_halo_playlist_team_property : int32
 {

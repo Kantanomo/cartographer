@@ -1,35 +1,18 @@
 #include "stdafx.h"
 #include "halo_playlist_game_type_property.h"
 
-constexpr wchar_t* g_halo_playlist_game_type_property_strings[k_halo_playlist_game_type_item_count]
-{
-	L"Slayer",
-	L"King of the Hill",
-	L"King",
-	L"KoTH",
-	L"Oddball",
-	L"Juggernaut",
-	L"Capture the Flag",
-	L"CTF",
-	L"Assault",
-	L"Territories",
-};
-
-s_halo_playlist_item g_halo_playlist_game_type_property_items[k_halo_playlist_game_type_item_count]
-{
-	{g_halo_playlist_game_type_property_strings[0], _game_variant_description_slayer},
-	{g_halo_playlist_game_type_property_strings[1], _game_variant_description_king },
-	{g_halo_playlist_game_type_property_strings[2], _game_variant_description_king},
-	{g_halo_playlist_game_type_property_strings[3], _game_variant_description_king},
-	{g_halo_playlist_game_type_property_strings[4], _game_variant_description_oddball},
-	{g_halo_playlist_game_type_property_strings[5], _game_variant_description_juggernaut},
-	{g_halo_playlist_game_type_property_strings[6], _game_variant_description_ctf},
-	{g_halo_playlist_game_type_property_strings[7], _game_variant_description_ctf},
-	{g_halo_playlist_game_type_property_strings[8], _game_variant_description_invasion},
-	{g_halo_playlist_game_type_property_strings[9], _game_variant_description_territories},
-};
-
-s_halo_playlist_item_collection g_halo_playlist_game_type_property_item_collection{ g_halo_playlist_game_type_property_items, k_halo_playlist_game_type_item_count };
+PLAYLIST_ITEM_COLLECTION(g_halo_playlist_game_type_property_item_collection, k_halo_playlist_game_type_item_count,
+	{ L"Slayer",           _game_variant_description_slayer },
+	{ L"King of the Hill", _game_variant_description_king },
+	{ L"King",             _game_variant_description_king },
+	{ L"KoTH",             _game_variant_description_king },
+	{ L"Oddball",          _game_variant_description_oddball },
+	{ L"Juggernaut",       _game_variant_description_juggernaut },
+	{ L"Capture the Flag", _game_variant_description_ctf },
+	{ L"CTF",              _game_variant_description_ctf },
+	{ L"Assault",          _game_variant_description_invasion },
+	{ L"Territories",      _game_variant_description_territories }
+);
 
 wchar_t* halo_playlist_item_collection_game_type_get_name(e_game_variant_description_index value)
 {

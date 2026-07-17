@@ -2,6 +2,7 @@
 #include "tag_injection_table.h"
 
 #include "cache/cache_files.h"
+#include "text/text_group.h"
 #include "xml/xml_agent.h"
 
 /* constants */
@@ -13,6 +14,16 @@ enum
 };
 
 /* classes */
+
+struct s_tag_injection_string_container
+{
+	s_unicode_string_list_reference* unic_str;
+	s_string_reference* references;
+	uint32 strings_count;
+	uint32 first_string_offset;
+	uint32 buffer_length;
+	uint32 base_index;
+};
 
 class c_tag_injecting_manager
 {
@@ -50,6 +61,7 @@ public:
 	void* extend_tag_block(void* block, uint32 entry_size, uint32 count);
 	void* reserve_space_in_cache_memory(uint32 size, uint32* out_data_offset);
 
+	void load_unicode_strings() const;
 
 private:
 	c_tag_injection_table m_table;

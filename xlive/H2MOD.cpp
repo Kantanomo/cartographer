@@ -115,7 +115,9 @@
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "halo_playlist/halo_playlist.h"
+#include "interface/multiplayer_variant_settings_interface_definition.h"
 #include "items/weapons.h"
+#include "units/unit_action_system.h"
 
 /* typedefs */
 
@@ -443,6 +445,12 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 				g_xbox_tickrate_enabled = true;
 			}
 
+			if (options->game_variant.cartographer_settings.flags.test(_cartographer_variant_engine_mode))
+			{
+				event(_event_status, "h2mod: 30 tick engine mode enabled");
+				g_xbox_tickrate_enabled = true;
+			}
+
 			toggle_xbox_tickrate(options, g_xbox_tickrate_enabled);
 			if (!g_xbox_tickrate_enabled)
 			{
@@ -456,6 +464,8 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 				// in case it is found
 				CustomVariantHandler::GameVarianEnable(variant_name);
 			}
+
+			multiplayer_variant_settings_interface_on_map_load();
 		}
 		else if (options->game_mode == _game_mode_campaign)
 		{
@@ -615,6 +625,12 @@ static void h2mod_apply_hooks(void)
 	WriteValue<int32>(Memory::GetAddress(0x1AEA75, 0x1AD61C) + 1, INFINITE);
 	network_loading_apply_patches();
 
+	network_game_definitions_apply_patches();
+	physics_constants_apply_patches();
+	game_time_apply_patches();
+	unit_action_system_apply_patches();
+	weapons_apply_patches();
+
 	// sound fix for hunter's weapons (assault cannon)
 	// might be used for other game systems
 	Codecave(Memory::GetAddress(0x15E8DC, 0x142B9C), object_function_value_adjust_primary_firing, 4);
@@ -694,7 +710,7 @@ static void h2mod_apply_hooks(void)
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
 
-		weapons_apply_patches();
+		
 	}
 
 	if (shell_is_dedicated_server())

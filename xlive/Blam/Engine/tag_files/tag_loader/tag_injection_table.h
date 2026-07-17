@@ -15,6 +15,9 @@ struct s_tag_injecting_table_entry
 	bool is_initialized;
 	bool is_injected;
 	bool is_preloaded;
+
+	// a flag that can be used for flagging added processing to a tag
+	bool is_post_processed;
 	datum cache_index;
 	datum injected_index;
 	tag_group type;
@@ -33,12 +36,15 @@ public:
 	void clear(void);
 
 	uint16 get_entry_count(void) const;
+	uint16 get_entry_count_by_type(e_tag_group type) const;
 
 	s_tag_injecting_table_entry* init_entry(datum cache_index, e_tag_group type);
 
 	s_tag_injecting_table_entry* get_entry(uint16 index) const;
 	s_tag_injecting_table_entry* get_entry_by_cache_index(datum datum_index) const;
 	s_tag_injecting_table_entry* get_entry_by_injected_index(datum datum_index) const;
+	void get_entries_by_type(e_tag_group type, s_tag_injecting_table_entry* out_results);
+
 	bool has_entry_by_cache_index(datum datum_index) const;
 private:
 	s_tag_injecting_table_entry* m_table;

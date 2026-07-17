@@ -4,6 +4,7 @@
 #include "animations/animation_definitions.h"
 #include "cache/cache_files.h"
 #include "game/cheats.h"
+#include "game/game.h"
 #include "game/game_globals.h"
 #include "items/weapons.h"
 #include "items/weapon_definitions.h"
@@ -13,6 +14,7 @@
 #include "models/render_model_definitions.h"
 #include "render/render_cameras.h"
 #include "render/render.h"
+#include "saved_games/game_variant.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
 #include "units/units.h"
@@ -1002,7 +1004,13 @@ static const real_point3d* first_person_weapons_get_weapon_offset(datum user_ind
 	const e_weapon_offset_weapon weapon_offset_index = cartographer_player_profile_weapon_offsets_get_weapon_index_from_tag_index(weapon->definition_index);
 
 	const real_point3d* weapon_offset;
-	if (weapon_offset_index != NONE)
+	s_game_variant* variant = get_game_variant();
+
+	if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_force_default_weapon_offsets))
+	{
+		weapon_offset = &weapon_definition->weapon.first_person_weapon_offset;
+	}
+	else if (weapon_offset_index != NONE)
 	{
 		weapon_offset = &player_profile->weapon_offsets[weapon_offset_index];
 	}

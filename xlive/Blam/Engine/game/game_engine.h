@@ -409,8 +409,6 @@ void __cdecl game_engine_apply_map_patches(void);
 
 bool __cdecl game_engine_get_change_colors(struct s_player_appearance* player_profile, e_game_team team_index, real_rgb_color* change_colors);
 
-bool __cdecl game_engine_variant_cleanup(uint16* flags);
-
 void __cdecl game_engine_player_activated(datum player_index);
 
 bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b);

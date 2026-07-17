@@ -33,7 +33,7 @@ namespace CustomVariantSettings
 
 		real32 ComputedGravity() const
 		{
-			return gravity * s_physics_constants::get_default_gravity();
+			return 0;//gravity * s_physics_constants::get_default_gravity();
 		}
 
 		inline bool operator==(s_variant_settings& other) const

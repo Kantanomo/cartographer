@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "interface.h"
 
-#include "cutscene/cinematics.h"
 #include "game/game_globals.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_dynavobgeom.h"
+#include "rasterizer/dx9/rasterizer_dx9_primitives.h"
 #include "render/render.h"
 
 /* constants */
@@ -133,7 +133,7 @@ static void interface_splitscreen_render(void)
 			line.left = 0;
 			line.bottom = (resolution.y / 2) + line_size;
 			line.right = resolution.x;
-			draw_quad(&line, color);
+			rasterizer_dx9_draw_primitive_quad(&line, color);
 
 			// Draw horizontal line between players
 			if (player_window_count > 2)
@@ -150,7 +150,7 @@ static void interface_splitscreen_render(void)
 			line.left = (resolution.x / 2) - line_size;
 			line.bottom = resolution.y;
 			line.right = (resolution.x / 2) + line_size;
-			draw_quad(&line, color);
+			rasterizer_dx9_draw_primitive_quad(&line, color);
 
 			// Draw vertical line between players
 			if (player_window_count > 2)
@@ -161,7 +161,7 @@ static void interface_splitscreen_render(void)
 				line.left = (player_window_count == 3 ? resolution.x / 2 : 0);
 			}
 		}
-		draw_quad(&line, color);
+		rasterizer_dx9_draw_primitive_quad(&line, color);
 	}
 	return;
 }

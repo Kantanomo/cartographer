@@ -6,7 +6,7 @@
 enum e_halo_playlist_playlist_property_type : int32
 {
 	_halo_playlist_playlist_property_shuffle,
-	_halo_playlist_playlist_property_pregame_team_selection_delay,
+	_halo_playlist_playlist_property_pregame_selection_delay,
 	_halo_playlist_playlist_property_pregame_delay,
 	_halo_playlist_playlist_property_postgame_delay,
 

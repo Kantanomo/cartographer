@@ -9,6 +9,7 @@
 #include "cache/pc_texture_cache.h"
 #include "creatures/creature_definitions.h"
 #include "filesys/pc_file_system.h"
+#include "game/game_globals.h"
 #include "models/render_model_definitions.h"
 #include "networking/network_event.h"
 #include "physics/collision_model_definitions.h"
@@ -692,6 +693,9 @@ void c_tag_injecting_manager::inject_tags(void)
 		event(_event_verbose, "tags:injection: [%s]: cache_index: %x injected_index: %x type: %s tag_name: %s", __FUNCTION__, entry->cache_index, entry->injected_index, tag_class, tag_name.get_string());
 	}
 #endif
+	// do the loading of the strings before writing the loaded tags into runtime tag cache so the remapped string reference indices match
+	this->load_unicode_strings();
+
 	for(uint16 i = 0; i < m_table.get_entry_count(); i++)
 	{
 		s_tag_injecting_table_entry* entry = m_table.get_entry(i);
@@ -797,4 +801,178 @@ void* c_tag_injecting_manager::reserve_space_in_cache_memory(uint32 size, uint32
 	*out_data_offset = reserved_offset;
 
 	return (void*)(cache_get_tag_data() + reserved_offset);
+}
+
+void c_tag_injecting_manager::load_unicode_strings() const
+{
+	if (!this->m_active_map_verified)
+		return;
+
+	const uint16 unic_entry_count = this->m_table.get_entry_count_by_type(_tag_group_multilingual_unicode_string_list);
+
+	if (!unic_entry_count)
+		return;
+
+	const e_language language = get_current_language();
+
+	c_language_pack donor_pack{};
+
+	// if the active map has a language pack table load that
+	if (this->m_active_map_cache_header.language_pack_offset != NONE)
+	{
+		file_seek_and_read(
+			this->m_active_map_file_handle,
+			this->m_active_map_cache_header.language_pack_offset + sizeof(c_language_pack) * language,
+			sizeof(c_language_pack),
+			1,
+			&donor_pack);
+	}
+	// if the active map doesn't have a language pack load the globals tag and read the language pack there
+	else
+	{
+		s_game_globals map_globals{};
+
+		datum map_globals_datum = this->get_tag_datum_by_name(_tag_group_globals, "globals\\globals");
+
+		if (map_globals_datum == NONE)
+			return;
+
+		cache_file_tag_instance globals_instance = this->get_tag_instance_from_cache(map_globals_datum);
+
+		if (globals_instance.size == 0)
+			return;
+
+		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_offset + globals_instance.data_offset, sizeof(s_game_globals), 1, &map_globals);
+
+		donor_pack = map_globals.language_pack[language];
+	}
+
+	// the offset packs a few bits for something and checks it when loading if it's not 0 skip it.
+	if (((uint32)donor_pack.m_string_reference_cache_offset >> 30) != 0 || ((uint32)donor_pack.m_string_data_cache_offset >> 30) != 0)
+		return;
+
+	if (donor_pack.m_num_of_strings <= 0 || donor_pack.m_string_data_size <= 0)
+		return;
+
+	const uint32 reference_cache_offset = (uint32)donor_pack.m_string_reference_cache_offset & 0x3FFFFFFF;
+	const uint32 string_data_cache_offset = (uint32)donor_pack.m_string_data_cache_offset & 0x3FFFFFFF;
+
+	// read each unic entry and read its reference block to get the totals needed for a combined buffer
+	s_tag_injection_string_container* pending_string_item_buffer = (s_tag_injection_string_container*)calloc(unic_entry_count, sizeof(s_tag_injection_string_container));
+
+	uint32 pending_count = 0;
+	uint32 total_string_count = 0;
+	uint32 total_buffer_length = 0;
+
+	for (uint16 entry_index = 0; entry_index < this->m_table.get_entry_count(); ++entry_index)
+	{
+		s_tag_injecting_table_entry* unic_entry = this->m_table.get_entry(entry_index);
+
+		if (unic_entry->type.group != _tag_group_multilingual_unicode_string_list)
+			continue;
+
+		if (unic_entry->is_post_processed)
+			continue;
+
+		// flag the entry so it can't be processed again
+		unic_entry->is_post_processed = true;
+
+		s_multilingual_unicode_string_list_group_header* unic_tag = (s_multilingual_unicode_string_list_group_header*)unic_entry->loaded_data->get_data();
+
+		s_unicode_string_list_reference* unic_str = &unic_tag->strings[language];
+
+		if (unic_str->strings_count == 0)
+			continue;
+
+		if ((uint32)unic_str->strings_index + unic_str->strings_count > (uint32)donor_pack.m_num_of_strings)
+		{
+			event(_event_warning, "tags:injection: [%s] unic tag %08x string %d +%d exceeds language pack count %d skip",
+				__FUNCTION__, unic_entry->cache_index, unic_str->strings_index, unic_str->strings_count, donor_pack.m_num_of_strings);
+			continue;
+		}
+
+		// read the references block plus the one following it so the end of the last string is known without scanning for its terminator
+
+		// check for if the reference block being read is at the end of the table
+		const bool has_next_reference = unic_str->strings_index + unic_str->strings_count < donor_pack.m_num_of_strings;
+		const uint32 read_count = unic_str->strings_count + (has_next_reference ? 1 : 0);
+
+		const uint32 reference_offset = reference_cache_offset + unic_str->strings_index * sizeof(s_string_reference);
+
+		s_string_reference* references = (s_string_reference*)calloc(read_count, sizeof(s_string_reference));
+
+		file_seek_and_read(this->m_active_map_file_handle, reference_offset, sizeof(s_string_reference), read_count, references);
+
+		const uint32 first_string_offset = references[0].buffer_offset;
+		const uint32 end_string_offset = has_next_reference
+			? references[unic_str->strings_count].buffer_offset
+			: (uint32)donor_pack.m_string_data_size;
+
+		if (end_string_offset <= first_string_offset || end_string_offset > (uint32)donor_pack.m_string_data_size)
+		{
+			event(_event_warning, "tags:injection: [%s] unic tag %08x invalid string range %x, %x, skipped",
+				__FUNCTION__, unic_entry->cache_index, first_string_offset, end_string_offset);
+			free(references);
+			continue;
+		}
+
+		s_tag_injection_string_container* pending_string_item = &pending_string_item_buffer[pending_count++];
+
+		pending_string_item->unic_str = unic_str;
+		pending_string_item->references = references;
+		pending_string_item->strings_count = unic_str->strings_count;
+		pending_string_item->first_string_offset = first_string_offset;
+
+		pending_string_item->buffer_length = end_string_offset - first_string_offset;
+
+		pending_string_item->base_index = total_string_count;
+
+		total_string_count += pending_string_item->strings_count;
+		total_buffer_length += pending_string_item->buffer_length;
+	}
+
+	// build one combined reference table and string buffer append them to the runtime
+	// language pack in a single call and distribute the returned base index back to the tags
+	if (total_string_count)
+	{
+		s_string_reference* merged_reference_buffer = (s_string_reference*)calloc(total_string_count, sizeof(s_string_reference));
+		utf8* merged_string_buffer = (utf8*)calloc(1, total_buffer_length + 1);
+
+		uint32 current_buffer_offset = 0;
+
+		for (uint32 pending_index = 0; pending_index < pending_count; ++pending_index)
+		{
+			s_tag_injection_string_container* pending_string_item = &pending_string_item_buffer[pending_index];
+
+			file_seek_and_read(this->m_active_map_file_handle, string_data_cache_offset + pending_string_item->first_string_offset, pending_string_item->buffer_length, 1, merged_string_buffer + current_buffer_offset);
+
+			// rebase the references relative to the combined buffer
+			// pending_item->base_index as the starting location for the current reference block
+			for (uint32 str_index = 0; str_index < pending_string_item->strings_count; ++str_index)
+			{
+				merged_reference_buffer[pending_string_item->base_index + str_index].string_id = pending_string_item->references[str_index].string_id;
+				merged_reference_buffer[pending_string_item->base_index + str_index].buffer_offset = (pending_string_item->references[str_index].buffer_offset - pending_string_item->first_string_offset) + current_buffer_offset;
+			}
+
+			current_buffer_offset += pending_string_item->buffer_length;
+		}
+
+		merged_string_buffer[total_buffer_length] = '\0';
+
+		uint16 base_index = 0;
+
+		language_pack_get()->append_strings(merged_reference_buffer, merged_string_buffer, total_buffer_length, total_string_count, &base_index);
+
+		// remap each loaded tag to its new base index
+		for (uint32 pending_index = 0; pending_index < pending_count; ++pending_index)
+			pending_string_item_buffer[pending_index].unic_str->strings_index = base_index + (uint16)pending_string_item_buffer[pending_index].base_index;
+
+		free(merged_reference_buffer);
+		free(merged_string_buffer);
+	}
+
+	for (uint32 pending_index = 0; pending_index < pending_count; ++pending_index)
+		free(pending_string_item_buffer[pending_index].references);
+
+	free(pending_string_item_buffer);
 }

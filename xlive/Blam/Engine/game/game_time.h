@@ -1,5 +1,9 @@
 #pragma once
 
+/* constants */
+
+constexpr real32 k_game_time_default_game_speed = 1.f;
+
 /* prototypes */
 
 bool game_time_initialized(void);
@@ -37,3 +41,9 @@ int32 game_seconds_to_ticks_round(real32 seconds);
 real32 game_time_get_max_frame_time(void);
 
 real32 game_time_get_leftover(void);
+
+void __cdecl game_time_reset();
+
+void __cdecl game_time_setup_scenario();
+
+void game_time_apply_patches();

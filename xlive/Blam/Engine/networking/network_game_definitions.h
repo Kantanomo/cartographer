@@ -1,5 +1,7 @@
 #pragma once
+#include "memory/bitstream.h"
 #include "networking/transport/transport.h"
+#include "saved_games/game_variant.h"
 
 /* enums */
 
@@ -69,3 +71,11 @@ struct s_network_squad_status_data
 	int8 gap[1538];
 };
 ASSERT_STRUCT_SIZE(s_network_squad_status_data, 2616);
+
+
+/* public code */
+void network_game_definitions_apply_patches();
+
+void __cdecl network_game_definitions_encode_game_variant(c_bitstream* packet, s_game_variant* variant);
+
+bool __cdecl network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_variant* variant);

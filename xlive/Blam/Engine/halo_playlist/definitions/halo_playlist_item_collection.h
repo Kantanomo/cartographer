@@ -1,7 +1,7 @@
 #pragma once
 #include "saved_games/game_variant.h"
 
-#define DEFINE_PLAYLIST_ITEM_COLLECTION(_name, _expected_count, ...)          \
+#define PLAYLIST_ITEM_COLLECTION(_name, _expected_count, ...)          \
     static s_halo_playlist_item _name##_items[] = { __VA_ARGS__ };                    \
     static_assert(ARRAYSIZE(_name##_items) == (_expected_count),                      \
         #_name " out of sync with enum");                                             \

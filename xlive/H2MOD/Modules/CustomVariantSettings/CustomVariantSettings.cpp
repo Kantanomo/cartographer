@@ -116,7 +116,7 @@ namespace CustomVariantSettings
 		//Anything to be done on host and client goes here.
 		//
 		game_time_set_speed(newVariantSettings->gameSpeed);
-		s_physics_constants::get()->gravity = newVariantSettings->gravity * s_physics_constants::get_default_gravity();
+		//s_physics_constants::get()->gravity = newVariantSettings->gravity * s_physics_constants::get_default_gravity();
 		//mov [ecx+6], ax
 		static BYTE InfiniteAmmoMagazineASM[] = { 0x66, 0x89, 0x41, 0x06 };
 		//movss [edi+00000184],xmm0
@@ -236,12 +236,12 @@ namespace CustomVariantSettings
 
 	void Initialize()
 	{
-		ApplyHooks();
-		
-		EventHandler::register_callback(OnGameLifeCycleUpdate, EventType::gamelifecycle_change);
-		EventHandler::register_callback(OnMatchCountdown, EventType::countdown_start, EventExecutionType::execute_after);
-		EventHandler::register_callback(OnNetworkPlayerEvent, EventType::network_player, EventExecutionType::execute_after);
-		EventHandler::register_callback(ApplyCurrentSettings, EventType::blue_screen, EventExecutionType::execute_after);
-		EventHandler::register_callback(OnPlayerSpawn, EventType::player_spawn, EventExecutionType::execute_after);
+		//ApplyHooks();
+		//
+		//EventHandler::register_callback(OnGameLifeCycleUpdate, EventType::gamelifecycle_change);
+		//EventHandler::register_callback(OnMatchCountdown, EventType::countdown_start, EventExecutionType::execute_after);
+		//EventHandler::register_callback(OnNetworkPlayerEvent, EventType::network_player, EventExecutionType::execute_after);
+		//EventHandler::register_callback(ApplyCurrentSettings, EventType::blue_screen, EventExecutionType::execute_after);
+		//EventHandler::register_callback(OnPlayerSpawn, EventType::player_spawn, EventExecutionType::execute_after);
 	}
 }

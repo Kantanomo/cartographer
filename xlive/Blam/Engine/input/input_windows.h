@@ -243,4 +243,5 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 
 uint8 __cdecl input_key_frames_down(int16 key);
 uint16 __cdecl input_key_msec_down(int16 key);
+bool input_windows_key_pressed(int16 key);
 bool __cdecl input_windows_drive_letter_test(int32 memory_unit, int8* drive_letter);

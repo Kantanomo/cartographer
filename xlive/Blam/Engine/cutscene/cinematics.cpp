@@ -61,12 +61,6 @@ void __cdecl cinematic_update(void)
 	return;
 }
 
-void __cdecl draw_quad(const rectangle2d* points, pixel32 rect_color)
-{
-	INVOKE(0x3B101, 0x0, draw_quad, points, rect_color);
-	return;
-}
-
 void cinematics_apply_patches(void)
 {
 	// allow cinematics to run at 60 fps
