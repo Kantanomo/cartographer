@@ -271,7 +271,7 @@ void console_update(real32 dt)
 		key_stroke key;
 		if (input_peek_key(&key) && !key.repeating && key.key_code == _key_tilde)
 		{
-			input_abstraction_get_key(&key);
+			input_get_key(&key);
 			console_open(false);
 		}
 		else
