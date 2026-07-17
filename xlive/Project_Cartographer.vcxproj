@@ -632,6 +632,7 @@
     <ClCompile Include="Blam\Engine\camera\first_person_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\following_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\observer.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\build_version\cartographer_build_version.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\cartographer.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\config\endpoints.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
@@ -990,6 +991,7 @@
     <ClInclude Include="Blam\Engine\camera\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\camera\following_camera.h" />
     <ClInclude Include="Blam\Engine\camera\observer.h" />
+    <ClInclude Include="Blam\Engine\cartographer\build_version\cartographer_build_version.h" />
     <ClInclude Include="Blam\Engine\cartographer\cartographer.h" />
     <ClInclude Include="Blam\Engine\cartographer\config\endpoints.h" />
     <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
