@@ -19,6 +19,7 @@
 #include "interface/motion_sensor.h"
 #include "math/random_math.h"
 #include "main/interpolator.h"
+#include "main/console.h"
 #include "main/main.h"
 #include "main/main_time.h"
 #include "objects/lights.h"
@@ -297,6 +298,13 @@ void __cdecl game_initialize(void)
 	{
 		halo_interpolator_initialize();
 	}
+
+	// TODO: Remove this when we rewrite main_loop_initialize for dedicated servers
+	if (shell_is_dedicated_server())
+	{
+		console_execute_initial_commands();
+	}
+
 	return;
 }
 

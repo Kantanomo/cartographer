@@ -682,7 +682,8 @@ uint16* __cdecl input_get_mouse_button_state()
 	return nullptr;
 }
 
-bool input_peek_key(key_stroke* key)
+bool input_peek_key(
+	key_stroke* key)
 {
 	bool result = false;
 	if (input_globals->buffered_key_read_index < input_globals->buffered_key_read_count)
@@ -694,7 +695,8 @@ bool input_peek_key(key_stroke* key)
 	return result;
 }
 
-bool input_abstraction_get_key(key_stroke* key)
+bool input_get_key(
+	key_stroke* key)
 {
 	const bool result = input_peek_key(key);
 	if (result)
@@ -767,14 +769,16 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 	return;
 }
 
-uint8 __cdecl input_windows_key_frames_down(int16 key)
+uint8 __cdecl input_key_frames_down(
+	int16 key)
 {
-	return INVOKE(0x2EF86, 0x0, input_windows_key_frames_down, key);
+	return INVOKE(0x2EF86, 0x0, input_key_frames_down, key);
 }
 
-uint16 __cdecl input_windows_key_msec_down(int16 key)
+uint16 __cdecl input_key_msec_down(
+	int16 key)
 {
-	return INVOKE(0x2F030, 0x0, input_windows_key_msec_down, key);
+	return INVOKE(0x2F030, 0x0, input_key_msec_down, key);
 }
 
 bool __cdecl input_windows_drive_letter_test(int32 memory_unit, int8* drive_letter)

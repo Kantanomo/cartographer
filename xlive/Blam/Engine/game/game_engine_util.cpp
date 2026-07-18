@@ -6,28 +6,28 @@
 
 /* public code */
 
-bool game_engine_in_round()
+bool game_engine_in_round(void)
 {
 	return current_game_engine() != NULL
 		&& game_engine_globals_get()->field_6C == 1
 		&& (game_is_predicted() || game_engine_globals_get()->field_C44 == 1);
 }
 
-void game_engine_check_for_round_winner()
+void __cdecl game_engine_check_for_round_winner(void)
 {
-	typedef void(__cdecl game_engine_check_for_round_winner_t)();
-	auto p_game_engine_check_for_round_winner = Memory::GetAddress<game_engine_check_for_round_winner_t*>(0x70F49, 0x6FA4A);
-	p_game_engine_check_for_round_winner();
+	INVOKE(0x70F49, 0x6FA4A, game_engine_check_for_round_winner);
+	return;
 }
 
-void game_engine_end_round_with_winner(int player_datum_or_team_index, bool go_to_next_round)
+void __cdecl game_engine_end_round_with_winner(
+	int32 player_datum_or_team_index,
+	bool go_to_next_round)
 {
-	typedef void(__cdecl game_engine_end_round_with_winner_t)(int player_datum_or_team_index, bool go_to_next_round);
-	auto p_game_engine_end_round_with_winner = Memory::GetAddress<game_engine_end_round_with_winner_t*>(0x70A6F, 0x6F570);
-	p_game_engine_end_round_with_winner(player_datum_or_team_index, go_to_next_round);
+	INVOKE(0x70A6F, 0x6F570, game_engine_end_round_with_winner, player_datum_or_team_index, go_to_next_round);
+	return;
 }
 
-bool game_engine_has_teams()
+bool game_engine_has_teams(void)
 {
 	bool result = false;
 

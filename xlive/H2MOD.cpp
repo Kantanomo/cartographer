@@ -359,6 +359,9 @@ void H2MOD::Initialize()
 	DETOUR_COMMIT();
 
 	event(_event_status, "h2mod: Initialized");
+
+	TEST_N_DEF(PC6);
+
 	return;
 }
 

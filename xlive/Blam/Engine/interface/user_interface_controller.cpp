@@ -605,8 +605,8 @@ static void user_interface_controller_removed_handler(void)
 static void user_interface_controller_boot_to_dash_check(void)
 {
 	//basically ALT (SYSKEYDOWN) needs to be held earlier than F4
-	if ((input_windows_key_frames_down(VK_F4) == 1
-		&& input_windows_key_frames_down(WM_SYSKEYDOWN) != 0)
+	if ((input_key_frames_down(_key_f4) == 1
+		&& input_key_frames_down(_keypad_left_menu) != 0)
 		|| *g_input_windows_request_terminate == true)
 	{
 		e_ui_error_types error_id = _ui_error_confirm_boot_to_dash;

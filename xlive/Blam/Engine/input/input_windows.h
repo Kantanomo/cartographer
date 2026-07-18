@@ -222,7 +222,7 @@ uint16* __cdecl input_get_mouse_button_state();
 
 bool input_peek_key(key_stroke* key);
 
-bool input_abstraction_get_key(key_stroke* key);
+bool input_get_key(key_stroke* key);
 
 void __cdecl input_update_main_device_state();
 
@@ -241,6 +241,6 @@ void input_windows_clear_keyboard_input_state(void);
 void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right);
 
 
-uint8 __cdecl input_windows_key_frames_down(int16 key);
-uint16 __cdecl input_windows_key_msec_down(int16 key);
+uint8 __cdecl input_key_frames_down(int16 key);
+uint16 __cdecl input_key_msec_down(int16 key);
 bool __cdecl input_windows_drive_letter_test(int32 memory_unit, int8* drive_letter);

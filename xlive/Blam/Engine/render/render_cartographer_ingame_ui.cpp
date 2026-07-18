@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "render_cartographer_ingame_ui.h"
 
+#include "cartographer/build_version/cartographer_build_version.h"
 #include "cartographer/twizzler/twizzler.h"
 
 #include "game/game.h"
@@ -44,7 +45,6 @@ enum
 	k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator),
 };
 
-static const char g_cartographer_build_text[] = "Project Cartographer (v" DLL_VERSION_STR ") - Build Time: " __DATE__ " "  __TIME__;
 
 /* prototypes */
 
@@ -75,7 +75,7 @@ void render_cartographer_ingame_ui(void)
 #endif
 
 	rasterizer_dx9_perf_event_begin("render cartographer ingame ui", NULL);
-	render_cartographer_status_bar(g_cartographer_build_text);
+	render_cartographer_status_bar(k_cartographer_build_text);
 	render_cartographer_update_message(g_auto_update_text, sizeOfDownload, sizeOfDownloaded);
 	if (!AchievementMap.empty())
 	{

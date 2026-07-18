@@ -151,12 +151,13 @@ void terminal_gets_end(terminal_gets_state* state)
 bool terminal_update_input(real32 dt)
 {
 	bool result = false;
+
 	if (terminal_globals.input_state)
 	{
 		terminal_globals.input_state->key_count = 0;
 
 		key_stroke key;
-		while (input_abstraction_get_key(&key))
+		while (input_get_key(&key))
 		{
 			if (terminal_globals.input_state->key_count < NUMBEROF(terminal_globals.input_state->keys))
 			{
