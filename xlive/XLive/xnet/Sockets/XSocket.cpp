@@ -6,6 +6,9 @@
 
 #include "XLive/xnet/net_utils.h"
 
+/* for SIO_UDP_CONNRESET */
+#include <mswsock.h>
+
 XSocketManager g_XSockMgr;
 
 // #5310: XOnlineStartup
@@ -74,22 +77,22 @@ SOCKET WINAPI XSocketCreate(int af, int type, int protocol)
 		LOG_TRACE_NETWORK("XSocketCreate() - Socket: {} is VDP protocol", ret);
 	}
 
-	// disable SIO_UDP_CONNRESET
-	// TODO re-enable this if the issue https://github.com/pnill/cartographer/issues/320 is not caused by this
-
-	/*DWORD ioctlSetting = 0;
-	DWORD cbBytesReturned;
-	if (WSAIoctl(newXSocket->systemSocketHandle, SIO_UDP_CONNRESET, &ioctlSetting, 4u, 0, 0, &cbBytesReturned, 0, 0) == SOCKET_ERROR)
+	if (protocol == IPPROTO_UDP)
 	{
-		LOG_ERROR_NETWORK("XSocketCreate() - couldn't disable SIO_UDP_CONNRESET", ret);
+		// disable SIO_UDP_CONNRESET
+		DWORD cbBytesReturned;
+		BOOL udpConnResetIoctl = FALSE;
+		if (WSAIoctl(newXSocket->systemSocketHandle, SIO_UDP_CONNRESET, &udpConnResetIoctl, sizeof(udpConnResetIoctl), 0, 0, &cbBytesReturned, 0, 0) != SOCKET_ERROR)
+		{
+			LOG_TRACE_NETWORK("XSocketCreate() - disabled SIO_UDP_CONNRESET");
+		}
+		else
+		{
+			LOG_ERROR_NETWORK("XSocketCreate() - unable to disable SIO_UDP_CONNRESET for UDP socket, error {}", ret);
+		}
 	}
-	else
-	{
-		LOG_TRACE_NETWORK("XSocketCreate() - disabled SIO_UDP_CONNRESET");
-	}*/
 
 	g_XSockMgr.sockets.push_back(newXSocket);
-
 	/*newXSocket->SetBufferSize(SO_SNDBUF, gXnIpMgr.GetMinSockSendBufferSizeInBytes());
 	newXSocket->SetBufferSize(SO_RCVBUF, gXnIpMgr.GetMinSockRecvBufferSizeInBytes());*/
 

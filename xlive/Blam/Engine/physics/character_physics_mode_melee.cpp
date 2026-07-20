@@ -402,7 +402,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					// acceleration
 					real32 final_accel = MIN(acceleration, MAX(0.0f, max_speed_per_tick - MAX(0.0f, translational_velocity_magnitude_per_tick)));
 
-					scale_vector3d(&m_initial_aiming_vector, final_accel, &physics_output->new_velocity);
+					scale_vector3d(&m_target_vector, final_accel, &physics_output->new_velocity);
 					add_vectors3d(&physics_output->new_velocity, &current_velocity_per_tick_vector, &physics_output->new_velocity);
 					scale_vector3d(&physics_output->new_velocity, game_seconds_to_ticks_real(1.0f), &physics_output->new_velocity);
 
@@ -463,7 +463,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 		vector_from_points3d(position, &m_target_position, &vector_to_target);
 		real32 remaining_distance = magnitude3d(&vector_to_target);
 
-		real32 unk_real32_distance = dot_product3d(&m_initial_aiming_vector, velocity);
+		real32 unk_real32_distance = dot_product3d(&m_target_vector, velocity);
 		unk_real32_distance *= game_tick_length();
 		real32 acceleration = melee_lunge_get_max_speed_per_tick(game_tick_length(), m_target_distance, m_weapon_is_sword);
 		acceleration = melee_get_acceleration(acceleration);
@@ -491,12 +491,12 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 	LOG_TRACE_MELEE("{} : aiming vector adjusted length (should be 1.0 or a little lower): {}",
 		__FUNCTION__,
-		magnitude3d(&m_initial_aiming_vector));
+		magnitude3d(&m_target_vector));
 
 	LOG_TRACE_MELEE("{} : previous velocity: {}, previous velocity dot product with aiming vector adjusted: {}",
 		__FUNCTION__,
 		magnitude3d(velocity),
-		dot_product3d(&m_initial_aiming_vector, velocity));
+		dot_product3d(&m_target_vector, velocity));
 
 	if ((real32)(m_maximum_counter - m_counter) <= k_deceleration_ticks_real && !m_started_decelerating)
 		LOG_TRACE_MELEE("{} : we are about to start decelerating @ next tick : {}", __FUNCTION__, m_counter);

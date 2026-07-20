@@ -36,7 +36,7 @@ void biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector
 	perpendicular2d(forward_out, up_out);
 }
 
-void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forward, datum object_index, real_point3d* camera_position, const real_vector3d* camera_up)
+void __cdecl biped_offset_first_person_camera(datum object_index, real_point3d* camera_position, const real_vector3d* camera_forward, const real_vector3d* camera_up)
 {
 	const biped_datum* biped = biped_get(object_index);
 	const biped_definition* biped_def = (biped_definition*)tag_get_fast(biped->definition_index);
@@ -178,7 +178,7 @@ void __cdecl biped_get_sight_position(
 	real_vector3d forward = biped->unit.aiming_vector;
 	real_vector3d up;
 	generate_up_vector3d(&forward, &up);
-	biped_offset_first_person_camera(&forward, biped_index, &origin_copy, &up);
+	biped_offset_first_person_camera(biped_index, &origin_copy, &forward, &up);
 	real_vector3d origin_vector;
 	vector_from_points3d(sight_position, &origin_copy, &origin_vector);
 	if (normalize3d(&origin_vector) > 0.0f)
@@ -269,9 +269,9 @@ __declspec(naked) void biped_offset_first_person_camera_usercall_to_rewritten(vo
 
 		// Push values for function call
 		push ebx                // push camera_up
+		push eax                // push camera_forward
 		push ecx                // push camera_position
 		push edx                // push object_index
-		push eax                // push camera_forward
 
 		call biped_offset_first_person_camera
 
