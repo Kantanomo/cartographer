@@ -663,6 +663,10 @@ static void h2mod_apply_hooks(void)
 	// also call simulation_update() when loading the map
 	network_loading_apply_patches();
 
+	// sound fix for hunter's weapons (assault cannon)
+	// might be used for other game systems
+	Codecave(Memory::GetAddress(0x15E8DC, 0x142B9C), object_function_value_adjust_primary_firing, 4);
+
 	// below hooks applied to specific executables
 	if (!shell_is_dedicated_server())
 	{
@@ -677,10 +681,7 @@ static void h2mod_apply_hooks(void)
 		{
 			NopFill(Memory::GetAddress(0x1922d9), 7);
 		}
-
-		// ### TODO dedi offset
-		Codecave(Memory::GetAddress(0x15E8DC), object_function_value_adjust_primary_firing, 4);
-
+		
 		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
 		DETOUR_ATTACH(p_user_interface_controller_set_desired_team_index, Memory::GetAddress<user_interface_controller_set_desired_team_index_t>(0x2068F2), user_interface_controller_set_desired_team_index_hook);
 
