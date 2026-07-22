@@ -5,10 +5,59 @@
 #include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 
+#include "H2MOD/Modules/Accounts/AccountLogin.h"
 
-typedef void(__cdecl* ok_cancel_dialog_t)(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8);
-ok_cancel_dialog_t p_ok_cancel_dialog;
-void __cdecl ok_cancel_dialog_show_hook(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8)
+decltype(c_screen_error_dialog_ok::show_dialog)* p_error_ok_dialog_show;
+decltype(c_screen_error_dialog_ok_cancel::show_dialog)* p_ok_cancel_dialog_show;
+
+void* __cdecl c_screen_error_dialog_ok::load_for_active_users(s_screen_parameters* parameters)
+{
+	if ((parameters->m_user_flags & 0xFF) == (uint8)NONE)
+	{
+		parameters->m_user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
+	}
+	return INVOKE(0x20E032, 0x0, c_screen_error_dialog_ok::load_for_active_users, parameters);
+}
+
+void* c_screen_error_dialog_ok::show_dialog(
+	e_user_interface_channel_type channel_type,
+	e_ui_error_types error_type,
+	e_user_interface_render_window window_index,
+	uint16 user_flags,
+	void* ok_callback,
+	void* fallback)
+{
+	switch (error_type)
+	{
+	case _ui_error_install_not_complete:
+		LOG_TRACE_FUNC("ignoring need to reinstall maps");
+		return NULL;
+	case _ui_error_booted_from_session:
+	{
+		// boot them offline.
+		XUserSignOut(0);
+		UpdateMasterLoginStatus();
+	}
+	}
+
+	return p_error_ok_dialog_show(channel_type, error_type, window_index, user_flags, ok_callback, fallback);
+}
+
+void c_screen_error_dialog_ok::apply_patches()
+{
+	WritePointer(Memory::GetAddress(0x20E173) + 1, c_screen_error_dialog_ok::load_for_active_users);
+	DETOUR_ATTACH(p_error_ok_dialog_show, Memory::GetAddress<decltype(p_error_ok_dialog_show)>(0x20E15A), c_screen_error_dialog_ok::show_dialog);
+}
+
+void* c_screen_error_dialog_ok_cancel::show_dialog(
+	e_user_interface_channel_type channel_type,
+	e_ui_error_types error_type,
+	e_user_interface_render_window window_index,
+	uint16 user_flags,
+	void* ok_callback, 
+	void* fallback,
+	int32 a7,
+	int32 a8)
 {
 	//ALL_USERS_MASK
 	if ((user_flags & 0xFF) == (uint8)NONE)
@@ -41,39 +90,11 @@ void __cdecl ok_cancel_dialog_show_hook(e_user_interface_channel_type channel_ty
 			break;
 		}
 	}
-	p_ok_cancel_dialog(channel_type, error_type, window_index, user_flags, ok_callback, fallback, a7, a8);
-}
 
-
-
-void* __cdecl c_screen_error_dialog_ok::load_for_active_users(s_screen_parameters* parameters)
-{
-	if ((parameters->m_user_flags & 0xFF) == (uint8)NONE)
-	{
-		parameters->m_user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
-	}
-	return INVOKE(0x20E032, 0x0, c_screen_error_dialog_ok::load_for_active_users, parameters);
-}
-
-void c_screen_error_dialog_ok::apply_patches()
-{
-	WritePointer(Memory::GetAddress(0x20E173) + 1, c_screen_error_dialog_ok::load_for_active_users);
-}
-
-void c_screen_error_dialog_ok_cancel::show_dialog(
-	e_user_interface_channel_type channel_type,
-	e_ui_error_types error_type,
-	e_user_interface_render_window window_index,
-	uint16 user_flags,
-	void* ok_callback, 
-	void* fallback,
-	int32 a7,
-	int32 a8)
-{
-	p_ok_cancel_dialog(channel_type, error_type, window_index, user_flags, ok_callback, fallback, a7, a8);
+	return p_ok_cancel_dialog_show(channel_type, error_type, window_index, user_flags, ok_callback, fallback, a7, a8);
 }
 
 void c_screen_error_dialog_ok_cancel::apply_patches()
 {
-	DETOUR_ATTACH(p_ok_cancel_dialog, Memory::GetAddress<ok_cancel_dialog_t>(0x20E243), ok_cancel_dialog_show_hook);	
+	DETOUR_ATTACH(p_ok_cancel_dialog_show, Memory::GetAddress<decltype(p_ok_cancel_dialog_show)>(0x20E243), c_screen_error_dialog_ok_cancel::show_dialog);
 }

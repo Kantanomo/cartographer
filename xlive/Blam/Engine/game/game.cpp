@@ -287,7 +287,7 @@ void __cdecl game_initialize(void)
 	real_math_reset_precision();
 
 	s_game_systems* g_game_systems = get_game_systems();
-	for (int32 i = 0; i < 70; ++i)
+	for (int32 i = 0; i < k_game_system_count; ++i)
 	{
 		g_game_systems[i].initialize_proc();
 	}
@@ -312,7 +312,7 @@ void __cdecl game_dispose(void)
 {
 	set_main_game_globals(NULL);
 	s_game_systems* g_game_systems = get_game_systems();
-	for (int32 system_index = k_game_system_count; system_index >= 0; --system_index)
+	for (int32 system_index = k_game_system_count - 1; system_index >= 0; --system_index)
 	{
 		ASSERT(g_game_systems[system_index].dispose_proc);
 		g_game_systems[system_index].dispose_proc();
@@ -457,7 +457,7 @@ void __cdecl game_initialize_for_new_map(
 	game_info_initialize_for_new_map(options);
 
 	s_game_systems* g_game_systems = get_game_systems();
-	for (int32 i = 0; i < 70; i++)
+	for (int32 i = 0; i < k_game_system_count; ++i)
 	{
 		if (g_game_systems[i].initialize_for_new_map_proc)
 		{

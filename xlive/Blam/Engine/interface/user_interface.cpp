@@ -452,7 +452,7 @@ bool __cdecl user_interface_error_screen_is_active(e_user_interface_channel_type
 	return INVOKE(0x20A77D, 0x0, user_interface_error_screen_is_active, channel_index, window_index, error_code);
 }
 
-void __cdecl screen_error_ok_dialog_show(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, int16 user_flags, void* ok_callback, void* fallback)
+void __cdecl screen_error_ok_dialog_show(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback)
 {
 	INVOKE(0x20E1D8, 0x0, screen_error_ok_dialog_show, channel_type, ui_error_index, window_index, user_flags, ok_callback, fallback);
 	return;
@@ -769,7 +769,7 @@ static void ui_test_error_code(
 			user_interface_error_ok_cancel_dialog_show_confirmation(
 				_user_interface_channel_type_game_error,
 				_window_4,
-				NONE,
+				(uint16)NONE,
 				nullptr,
 				error_id);
 		}
@@ -787,7 +787,7 @@ static void ui_test_error_code(
 		}
 		else
 		{
-			screen_error_ok_dialog_show(_user_interface_channel_type_game_error, error_id, _window_4, NONE, nullptr, nullptr);
+			screen_error_ok_dialog_show(_user_interface_channel_type_game_error, error_id, _window_4, (uint16)NONE, nullptr, nullptr);
 		}
 	}
 	else

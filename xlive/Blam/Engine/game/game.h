@@ -13,7 +13,7 @@ enum
 
 enum
 {
-	k_game_system_count = 69,
+	k_game_system_count = 70,
 
 	k_game_maximum_ragdolls = 3,
 	k_game_maximum_ragdolls_new = 6,

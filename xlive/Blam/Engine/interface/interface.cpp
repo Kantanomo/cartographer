@@ -20,7 +20,7 @@ enum
 
 /* prototypes */
 
-static e_display_type get_display_split_type(void);
+static e_display_split_type get_display_split_type(void);
 static void set_display_type(e_display_type display_type);
 static void interface_splitscreen_render(void);
 
@@ -99,14 +99,14 @@ void __cdecl interface_draw_bitmap(
 
 /* private code */
 
-static e_display_type get_display_split_type(void)
+static e_display_split_type get_display_split_type(void)
 {
-	return *Memory::GetAddress<e_display_type*>(0x4E6970);
+	return *Memory::GetAddress<e_display_split_type*>(0x4E6970);
 }
 
 static void set_display_type(e_display_type display_type)
 {
-	WriteValue<e_display_type>(Memory::GetAddress(0xA3E460), display_type);
+	rasterizer_globals_get()->display_parameters.display_type = display_type;
 }
 
 // Renders the lines inbetween windows in splitscreen
