@@ -43,5 +43,5 @@ void apply_particle_update_patches()
 	apply_particle_system_patches();
 
 	//PatchCall(Memory::GetAddress(0xAA636, 0xB1C5D), particles_update);
-  PatchCall(Memory::GetAddress(0x105380), particle_update_points_interpolate_hook);
+	PatchCall(Memory::GetAddress(0x105380), particle_update_points_interpolate_hook);
 }

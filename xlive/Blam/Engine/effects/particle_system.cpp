@@ -108,7 +108,7 @@ c_particle_system_frame_advance_t p_c_particle_system_frame_advance;
 bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32 dt)
 {
 	thisx->flags.set(_particle_system_bit_11, thisx->flags.test(_particle_system_bit_9) && thisx->flags.test(_particle_system_bit_5));
-	thisx->flags.set(_particle_system_bit_9, thisx->flags.test(_particle_system_bit_8));
+	thisx->flags.set(_particle_system_bit_9, thisx->flags.test(_particle_system_bit_8) || thisx->keep_system_alive(dt));
 	thisx->flags.set(_particle_system_bit_8, false);
 
 	if (!thisx->flags.test(_particle_system_bit_5)
@@ -211,11 +211,6 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 		|| thisx->flags.test(_particle_system_updating_bit)
 		|| thisx->next_particle_system != NONE
 		|| (thisx->flags.test(_particle_system_bit_9) || thisx->flags.test(_particle_system_bit_11));
-	
-	if (thisx->keep_system_alive(dt))
-	{
-		result = true;
-	}
 
 	return result;
 }
