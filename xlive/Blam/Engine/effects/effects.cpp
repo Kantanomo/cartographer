@@ -85,7 +85,7 @@ void __cdecl effect_datum_get_node_matrix_relative_or_origin(int16 node, effect_
 			}
 			else
 			{
-				if (!halo_interpolator_interpolate_object_node_matrix(origin_object_index, node_index, out_mat))
+				if (!halo_interpolator_get_previous_object_node_matrix(origin_object_index, node_index, out_mat))
 				{
 					csmemcpy(out_mat, object_get_node_matrix(origin_object_index, node_index), sizeof(real_matrix4x3));
 				}

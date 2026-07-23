@@ -24,7 +24,7 @@ thread_local s_interpolation_data* g_frame_data_intermediate = NULL;
 
 /* prototypes */
 
-static object_datum* halo_interpolator_object_can_interpolate(datum object_index, int32* out_abs_object_index);
+static object_datum* halo_interpolator_object_can_interpolate(datum object_index, int32* out_abs_object_index, bool allow_during_game_tick = false);
 
 static void halo_interpolator_interpolate_position_data(int32 user_index, uint32 position_index, real_point3d* position);
 
@@ -471,6 +471,32 @@ bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 
 	return result;
 }
 
+/*	
+	allowed during game tick to read the previous position of the object 
+	which is useful for creating effects at the render position rather than game state position
+*/
+bool halo_interpolator_get_previous_object_node_matrix(datum object_index, int16 node_index, real_matrix4x3* out_matrix)
+{
+	bool result = false;
+	if (g_interpolation_update_in_progress)
+	{
+		int32 object_absolute_index;
+		if (halo_interpolator_object_can_interpolate(object_index, &object_absolute_index, true))
+		{
+			ASSERT(VALID_INDEX(node_index, MAXIMUM_NODES_PER_MODEL));
+			*out_matrix = g_previous_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index];
+			result = true;
+		}
+	}
+	else
+	{
+		// if not during game tick, just interpolate
+		result = halo_interpolator_interpolate_object_node_matrix(object_index, node_index, out_matrix);
+	}
+
+	return result;
+}
+
 bool halo_interpolator_interpolate_object_position(datum object_index, real_point3d* point)
 {
 	bool interpolate_object = false;
@@ -557,18 +583,23 @@ bool halo_interpolator_interpolate_position_backwards(int32 user_index, uint32 p
 
 /* private code */
 
-static object_datum* halo_interpolator_object_can_interpolate(datum object_index, int32* out_abs_object_index)
+static object_datum* halo_interpolator_object_can_interpolate(
+	datum object_index, 
+	int32* out_abs_object_index, 
+	bool allow_during_game_update)
 {
 	*out_abs_object_index = NONE;
-	uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
+	int32 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
 	if (!halo_frame_interpolator_enabled() || cinematic_in_progress())
 		return NULL;
 
 	ASSERT(object_index != NONE);
 
-	if (g_interpolation_update_in_progress)
+	// force_interpolated_effect allows reading interpolation data during game tick
+	// to create effects at the right positions
+	if (g_interpolation_update_in_progress && !allow_during_game_update)
 		return NULL;
-	if (!g_target_interpolation_frame_data->initialized)
+	if (!g_target_interpolation_frame_data->initialized && !allow_during_game_update)
 		return NULL;
 	if (!g_previous_interpolation_frame_data->initialized)
 		return NULL;

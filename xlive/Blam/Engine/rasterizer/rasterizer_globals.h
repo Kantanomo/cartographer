@@ -29,7 +29,7 @@ struct s_rasterizer_globals_display_parameters
 {
 	uint64 frame_presented_count;
 	int64 pad_2;
-	int64 field_8;
+	int64 vblank_index;
 	int64 pad_3;
 	int16 refresh_rate;
 	int16 pad;

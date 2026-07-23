@@ -7,11 +7,6 @@
 
 void UIRankPatch() 
 {
-	//BYTE PlayerLevel = -1;								//eventually this will pull level from webserver
-	//DWORD PlayerLevelPCR = -1;						//eventually this will pull level from webserver
-	//WriteValue(Memory::GetAddress() + 0x1B2C2F, PlayerLevel);			//sets player level in pregame lobby
-	//WriteValue(Memory::GetAddress() + 0xCC72, PlayerLevelPCR);		//sets player level in postgame carnage report
-	//Tag : ui\player_skins\player_skin_lobby.skin
 	const DWORD TagOffsetPreGameLobby = 0x0049DE90;	//Property : Bitmap Buttons
 
 	//Tag : ui\player_skins\pcr_1.skin

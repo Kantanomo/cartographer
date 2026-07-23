@@ -671,7 +671,7 @@ static void shell_windows_initialize_arguments(void)
 			else if (_wcsicmp(current_argument, L"-nosound") == 0)
 			{
 				shell_command_line_flag_set(_shell_command_line_flag_nosound, 1);
-				WriteValue(Memory::GetAddress(0x479EDC), 1);
+				*Memory::GetAddress<bool*>(0x479EDC) = true;
 			}
 			else if (_wcsicmp(current_argument, L"-novsync") == 0)
 			{

@@ -71,7 +71,7 @@ void cloth_frame_advance(real32 dt)
 void cloth_apply_patches(void)
 {
 	// disable cloth debugging that writes to cloth.txt
-	WriteValue<bool>(Memory::GetAddress(0x41F650), false);
+	*Memory::GetAddress<bool*>(0x41F650) = false;
 
 	DETOUR_ATTACH(p_cloth_frame_advance, Memory::GetAddress<t_cloth_frame_advance>(0x18F6D0), cloth_frame_advance);
 

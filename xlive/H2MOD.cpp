@@ -36,6 +36,7 @@
 #include "interface/first_person_weapons.h"
 #include "interface/new_hud.h"
 #include "interface/new_hud_draw.h"
+#include "interface/user_interface.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_text.h"
 #include "interface/user_interface_utilities.h"
@@ -118,21 +119,16 @@
 /* typedefs */
 
 typedef void(__cdecl* user_interface_controller_set_desired_team_index_t)(e_controller_index controller_index, e_game_team team);
-typedef bool(__cdecl* map_cache_load_t)(s_game_options* map_load_settings);
-typedef bool(__cdecl* player_spawn_t)(datum playerDatumIndex);
+typedef bool(__cdecl* map_cache_load_t)(s_game_options* options);
+typedef bool(__cdecl* player_spawn_t)(datum player_index);
 typedef uint16(__cdecl* get_enabled_teams_flags_t)(c_network_session*);
-typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
 
 /* globals */
-
-static BOOL(WINAPI* p_IsDebuggerPresent)() = IsDebuggerPresent;
 
 user_interface_controller_set_desired_team_index_t p_user_interface_controller_set_desired_team_index;
 map_cache_load_t p_map_cache_load;
 player_spawn_t p_player_spawn;
 get_enabled_teams_flags_t p_get_enabled_teams_flags;
-show_error_screen_t p_show_error_screen;
-int(__cdecl* sub_20E1D8)(int, int, int, int, int, int);
 
 bool g_h2x_enabled = false;
 bool g_xbox_tickrate_enabled = false;
@@ -141,7 +137,7 @@ bool g_xbox_tickrate_enabled = false;
 
 static void toggle_xbox_tickrate(s_game_options* options, bool toggle);
 
-static bool __cdecl OnPlayerSpawn(datum playerDatumIdx);
+static bool __cdecl OnPlayerSpawn(datum player_index);
 
 static void __cdecl OnPlayerDeath(datum player_index);
 
@@ -153,10 +149,6 @@ static void h2mod_apply_hooks(void);
 
 static void h2mod_apply_tweaks(void);
 
-static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6);
-
-static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6);
-
 static void __cdecl user_interface_controller_set_desired_team_index_hook(e_controller_index controller_index, e_game_team team);
 
 static int OnAutoPickUpHandler(datum player_datum, datum object_datum);
@@ -166,8 +158,6 @@ static bool GrenadeChainReactIsEngineMPCheck(void);
 static bool BansheeBombIsEngineMPCheck(void);
 
 static bool FlashlightIsEngineSPCheck(void);
-
-static BOOL WINAPI IsDebuggerPresent_hook(void);
 
 /* public code  */
 
@@ -307,8 +297,8 @@ void H2MOD::player_position_increase_client_position_margin_of_error(bool enable
 
 	real32 biped_error_margin = !enable ? k_default_biped_distance_error_margin : 4.0f;
 	real32 vehicle_error_margin = !enable ? k_default_vehicle_distance_error_margin : 10.0f;
-	WriteValue<real32>(Memory::GetAddress(0x4F958C), biped_error_margin);
-	WriteValue<real32>(Memory::GetAddress(0x4F9594), vehicle_error_margin);
+	*Memory::GetAddress<real32*>(0x4F958C) = biped_error_margin;
+	*Memory::GetAddress<real32*>(0x4F9594) = vehicle_error_margin;
 }
 
 void H2MOD::Initialize()
@@ -383,20 +373,18 @@ static void __cdecl OnPlayerDeath(datum player_index)
 	return;
 }
 
-static bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
+static bool __cdecl OnPlayerSpawn(datum player_index)
 {
-	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
+	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, player_index);
+	CustomVariantHandler::OnPlayerSpawn(ExecTime::_preEventExec, player_index);
 
-	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, playerDatumIdx);
-	CustomVariantHandler::OnPlayerSpawn(ExecTime::_preEventExec, playerDatumIdx);
-
-	bool ret = p_player_spawn(playerDatumIdx);
+	bool ret = p_player_spawn(player_index);
 
 	// check if the spawn was successful
 	if (ret)
 	{
-		EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, playerDatumIdx);
-		CustomVariantHandler::OnPlayerSpawn(ExecTime::_postEventExec, playerDatumIdx);
+		EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, player_index);
+		CustomVariantHandler::OnPlayerSpawn(ExecTime::_postEventExec, player_index);
 	}
 
 	return ret;
@@ -498,9 +486,6 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 
 			if (network_life_cycle_get_state() == _life_cycle_state_in_game)
 			{
-				// send server map checksums to client
-				//MapChecksumSync::SendState();
-
 				// here initialize custom variant
 				// in case it is found
 				CustomVariantHandler::GameVarianEnable(variant_name);
@@ -658,10 +643,13 @@ static void h2mod_apply_hooks(void)
 	// where the loading network thread (the one started and running during map load)
 	// would race with the newtork update in the function that waits for the loading network thread to finish just 1000 milliseconds
 	// instead of waiting it to process everything then exit
-	WriteValue<int32>(Memory::GetAddress(0x1AEA75, 0x1AD61C) + 1, INFINITE);
-
 	// also call simulation_update() when loading the map
+	WriteValue<int32>(Memory::GetAddress(0x1AEA75, 0x1AD61C) + 1, INFINITE);
 	network_loading_apply_patches();
+
+	// sound fix for hunter's weapons (assault cannon)
+	// might be used for other game systems
+	Codecave(Memory::GetAddress(0x15E8DC, 0x142B9C), object_function_value_adjust_primary_firing, 4);
 
 	// below hooks applied to specific executables
 	if (!shell_is_dedicated_server())
@@ -677,11 +665,7 @@ static void h2mod_apply_hooks(void)
 		{
 			NopFill(Memory::GetAddress(0x1922d9), 7);
 		}
-
-		// ### TODO dedi offset
-		Codecave(Memory::GetAddress(0x15E8DC), object_function_value_adjust_primary_firing, 4);
-
-		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
+		
 		DETOUR_ATTACH(p_user_interface_controller_set_desired_team_index, Memory::GetAddress<user_interface_controller_set_desired_team_index_t>(0x2068F2), user_interface_controller_set_desired_team_index_hook);
 
 		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
@@ -771,18 +755,6 @@ static void h2mod_apply_tweaks(void)
 			WriteBytes(Memory::GetAddress(0x221C29), assmIntroHQ, sizeof(assmIntroHQ));
 		}
 
-		//Set the LAN Server List Ping Frequency (milliseconds).
-		//WriteValue(Memory::GetAddress(0x001e9a89), 3000);
-		//Set the LAN Server List Delete Entry After (milliseconds).
-		//WriteValue(Memory::GetAddress(0x001e9b0a), 9000);
-
-		//hook the gui popup for when the player is booted.
-		sub_20E1D8 = Memory::GetAddress<int(__cdecl*)(int, int, int, int, int, int)>(0x20E1D8);
-		PatchCall(Memory::GetAddress(0x21754C), &sub_20E1D8_boot);
-
-		// patch to show game details menu in NETWORK serverlist too
-		//NopFill(Memory::GetAddress(0x219D6D), 2);
-
 		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
 		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
 		NopFill(Memory::GetAddressRelative(0x66A092), 8);
@@ -793,49 +765,25 @@ static void h2mod_apply_tweaks(void)
 		NopFill(Memory::GetAddressRelative(0x46C7C7), 5);
 		NopFill(Memory::GetAddressRelative(0x45C338), 5);
 		NopFill(Memory::GetAddressRelative(0x473C61), 5);
-
-		// ### TODO: turn on if you want to debug halo2.exe from start of process
-		// DETOUR_ATTACH(p_IsDebuggerPresent, IsDebuggerPresent, IsDebuggerPresent_hook);
 	}
 
 	return;
 }
 
-static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6)
-{
-	if (widget_type == 0x117)
-	{
-		LOG_TRACE_FUNC("Ignoring need to reinstall maps");
-		return 0;
-	}
-	return p_show_error_screen(a1, widget_type, a3, a4, a5, a6);
-}
-
-static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6)
-{
-	//a2 == 0x5 - system link lost connection
-	if (a2 == 0xb9) {
-		//boot them offline.
-		XUserSignOut(0);
-		UpdateMasterLoginStatus();
-	}
-	int result = sub_20E1D8(a1, a2, a3, a4, a5, a6);
-	return result;
-}
-
 static void __cdecl user_interface_controller_set_desired_team_index_hook(e_controller_index controller_index, e_game_team team)
 {
-	c_network_session* session = NULL;
-	network_life_cycle_in_squad_session(&session);
-
-	// prevent team switch in the pregame lobby, when the game already started
-	if (session
-		&& session->session_mode() == _network_session_mode_in_game
-		&& network_life_cycle_get_state() == _life_cycle_state_pre_game)
+	c_network_session* session;
+	if (network_life_cycle_in_squad_session(&session))
 	{
-		return;
+		// prevent team switch in the pregame lobby, when the game already started
+		if (session->session_mode() != _network_session_mode_in_game
+			|| network_life_cycle_get_state() != _life_cycle_state_pre_game)
+		{
+			p_user_interface_controller_set_desired_team_index(controller_index, team);
+		}
 	}
-	p_user_interface_controller_set_desired_team_index(controller_index, team);
+
+	return;
 }
 
 static int OnAutoPickUpHandler(datum player_datum, datum object_datum)
@@ -867,9 +815,4 @@ static bool BansheeBombIsEngineMPCheck(void)
 static bool FlashlightIsEngineSPCheck(void)
 {
 	return game_is_campaign();
-}
-
-static BOOL WINAPI IsDebuggerPresent_hook(void)
-{
-	return false;
 }
