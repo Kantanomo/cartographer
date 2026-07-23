@@ -107,6 +107,13 @@ c_particle_system_frame_advance_t p_c_particle_system_frame_advance;
 
 bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32 dt)
 {
+	// if the framerate is above the tickrate of the game update,
+	// avoid updating the following particle system's flags twice
+	// before executing one more game update (i.e in between game ticks)
+	// otherwise, _particle_system_bit_9 will mistakenly be set to false during the second frame advance update,
+	// preventing the creation of new particles during game tick, breaking effects using
+	// 'spread between ticks' system, where particles are spawned interpolated between 2 points
+	// (rocket launcher trail effect, scarab gun, etc.)
 	if (thisx->flags.test(_particle_system_bit_8) || !thisx->keep_system_alive(dt))
 	{
 		thisx->flags.set(_particle_system_bit_11, thisx->flags.test(_particle_system_bit_9) && thisx->flags.test(_particle_system_bit_5));
