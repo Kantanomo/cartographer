@@ -9,7 +9,7 @@
 
 #include "render/render_visibility_collection.h"
 
-int32 particle_system_game_time[k_max_particle_systems];
+int32 particle_system_reset_time[k_max_particle_systems];
 real32 particle_system_accumulated_time[k_max_particle_systems];
 
 c_particle_system_definition* c_particle_system::get_definition() const
@@ -24,12 +24,12 @@ data_array* get_particle_system_table()
 
 void particle_system_update_game_time(datum datum_index)
 {
-	particle_system_game_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] = game_time_get();
+	particle_system_reset_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] = game_time_get();
 }
 
 void particle_system_reset_game_time(datum datum_index)
 {
-	particle_system_game_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] = 0;
+	particle_system_reset_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] = 0;
 }
 
 void particle_system_update_dt(datum datum_index, real32 dt)
@@ -107,9 +107,12 @@ c_particle_system_frame_advance_t p_c_particle_system_frame_advance;
 
 bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32 dt)
 {
-	thisx->flags.set(_particle_system_bit_11, thisx->flags.test(_particle_system_bit_9) && thisx->flags.test(_particle_system_bit_5));
-	thisx->flags.set(_particle_system_bit_9, thisx->flags.test(_particle_system_bit_8) || thisx->keep_system_alive(dt));
-	thisx->flags.set(_particle_system_bit_8, false);
+	if (thisx->flags.test(_particle_system_bit_8) || !thisx->keep_system_alive(dt))
+	{
+		thisx->flags.set(_particle_system_bit_11, thisx->flags.test(_particle_system_bit_9) && thisx->flags.test(_particle_system_bit_5));
+		thisx->flags.set(_particle_system_bit_9, thisx->flags.test(_particle_system_bit_8));
+		thisx->flags.set(_particle_system_bit_8, false);
+	}
 
 	if (!thisx->flags.test(_particle_system_bit_5)
 		&& !render_visibility_check_location_cluster_active(&thisx->location))
@@ -212,6 +215,11 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 		|| thisx->next_particle_system != NONE
 		|| (thisx->flags.test(_particle_system_bit_9) || thisx->flags.test(_particle_system_bit_11));
 
+	if (thisx->keep_system_alive(dt))
+	{
+		result = true;
+	}
+
 	return result;
 }
 
@@ -219,11 +227,12 @@ bool c_particle_system::keep_system_alive(real32 dt)
 {
 	bool result = false;
 	datum particle_system_datum_index = particle_system_get_by_ptr(this);
-	int32 particle_system_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index);
+	int32 particle_system_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index);
+	ASSERT(VALID_INDEX(particle_system_index, k_max_particle_systems));
 
 	particle_system_update_dt(particle_system_datum_index, dt);
 
-	int32 ticks = game_time_get() - particle_system_game_time[particle_system_abs_index];
+	int32 ticks = game_time_get() - particle_system_reset_time[particle_system_index];
 	if (ticks > 1)
 	{
 		particle_system_reset_game_time(particle_system_datum_index);

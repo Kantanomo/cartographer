@@ -111,6 +111,10 @@ bool halo_interpolator_interpolate_weapon(int32 user_index, datum animation_inde
 
 bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 node_index, real_matrix4x3* out_matrix);
 
+/* used for game effects created during game tick */
+/* to create these effects at the render position and not at the game state one, otherwise do not use */
+bool halo_interpolator_get_previous_object_node_matrix(datum object_index, int16 node_index, real_matrix4x3* out_matrix);
+
 bool halo_interpolator_interpolate_object_position(datum object_index, real_point3d* point);
 
 bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_crouch);

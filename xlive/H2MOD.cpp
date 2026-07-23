@@ -120,7 +120,7 @@
 
 typedef void(__cdecl* user_interface_controller_set_desired_team_index_t)(e_controller_index controller_index, e_game_team team);
 typedef bool(__cdecl* map_cache_load_t)(s_game_options* options);
-typedef bool(__cdecl* player_spawn_t)(datum playerDatumIndex);
+typedef bool(__cdecl* player_spawn_t)(datum player_index);
 typedef uint16(__cdecl* get_enabled_teams_flags_t)(c_network_session*);
 
 /* globals */
