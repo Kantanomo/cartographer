@@ -182,8 +182,8 @@ public:
 	{
 		ASSERT(valid_bit(start_bit) && valid_bit(end_bit) && (start_bit <= end_bit));
 
-		t_type bit = (FLAG(end_bit - start_bit + 1) - 1) << start_bit;
-		return TEST_BIT(m_storage, bit);
+		t_type bit_range = (FLAG(end_bit - start_bit + 1) - 1) << start_bit;
+		return TEST_FLAG(m_storage, bit_range);
 	}
 
 	c_flags_no_init<t_type, t_storage_type, k_count> operator~(void) const
