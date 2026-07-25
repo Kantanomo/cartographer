@@ -300,7 +300,6 @@ void H2MOD::Initialize()
 		
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
-		TEST_N_DEF(PC3);
 	}
 	else
 	{
@@ -317,6 +316,8 @@ void H2MOD::Initialize()
 	H2X::ApplyPatches();
 	h2mod_apply_hooks();
 
+	TEST_N_DEF(PC3);
+	
 	DETOUR_COMMIT();
 
 	event(_event_status, "h2mod: Initialized");
