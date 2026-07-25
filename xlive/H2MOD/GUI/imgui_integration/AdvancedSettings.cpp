@@ -694,10 +694,9 @@ namespace ImGuiHandler {
 						//XDelay
 						TextVerticalPad(advanced_settings_get_string(_advanced_string_disable_x_delay));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						if (ImGui::Checkbox("##XDelay", &H2Config_xDelay))
-						{
-							H2MOD::RefreshTogglexDelay();
-						}
+						
+						ImGui::Checkbox("##XDelay", &H2Config_xDelay);
+
 						ImGui::Columns(1);
 						ImGui::Separator();
 						ImGui::Columns(3, NULL, false);

@@ -277,14 +277,6 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		std::thread(playSound).detach();
 }
 
-// TODO: remove this function and adjust the original function
-void H2MOD::RefreshTogglexDelay() {
-	BYTE xDelayJMP[] = { 0x74 };
-	if (!H2Config_xDelay)
-		xDelayJMP[0] = 0xEB;
-	WriteBytes(Memory::GetAddress(0x1c9d8e, 0x1a1316), xDelayJMP, sizeof(xDelayJMP));
-}
-
 static const real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
 
 void H2MOD::player_position_increase_client_position_margin_of_error(bool enable)

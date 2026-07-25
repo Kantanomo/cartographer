@@ -4,10 +4,12 @@
 #include "network_observer.h"
 
 #include "game/game.h"
+#include "H2MOD/Modules/Shell/Config.h"
 #include "interface/user_interface_controller.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/network_event.h"
 #include "networking/network_time.h"
+#include "networking/messages/network_message_handler.h"
 #include "shell/shell.h"
 
 /* constants */
@@ -25,6 +27,13 @@ static char g_network_session_peer_description[2][35] = {};
 static int32 g_network_session_peer_description_index = 0;
 
 c_network_session_cartographer g_cartographer_network_session;
+
+
+CLASS_HOOK_DECLARE_LABEL(c_network_session__update_countdown_timer_internal, c_network_session::update_countdown_timer_internal);
+__declspec(naked) void update_countdown_timer_internal_hook()
+{
+	CLASS_HOOK_JMP(c_network_session__update_countdown_timer_internal, c_network_session::update_countdown_timer_internal);
+}
 
 /* public code */
 
@@ -172,6 +181,7 @@ void __cdecl network_globals_switch_environment(int32 a1, bool a2)
 
 void network_session_apply_patches()
 {
+	PatchCall(Memory::GetAddress(0x1C9DBC, 0x1A1344), update_countdown_timer_internal_hook);
 }
 
 void network_session_membership_update_local_players_teams()
@@ -496,4 +506,14 @@ int32 c_network_session::get_peer_from_secure_address(const s_transport_secure_a
 		}
 	}
 	return result;
+}
+
+void c_network_session::update_countdown_timer_internal(uint32 peer_index, bool countdown_running,
+	int32 countdown_timer, bool current_host, int32 countdown_delay_reason, s_player_identifier* responsible_address)
+{
+	if (H2Config_xDelay)
+	{
+		INVOKE_TYPE(0x1C9D3F, 0x19E043, void(__thiscall*)(c_network_session*, uint32, bool, int32, bool, int32, s_player_identifier*),
+			this, peer_index, countdown_running, countdown_timer, current_host, countdown_delay_reason, responsible_address);
+	}
 }

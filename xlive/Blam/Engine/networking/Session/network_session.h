@@ -191,13 +191,15 @@ struct s_session_parameters
 	int32 field_4C88;
 	int32 field_4C8C;
 	uint32 field_4C90;
-	uint32 field_4C94;
-	uint8 gap_4C98[4];
+	bool countdown_running;
+	uint32 countdown_timer;
 	bool current_peer_is_host;
 	char pad[3];
-	uint32 field_4CA0;
-	uint32 field_4CA4;
-	uint8 gap_4CA8[16];
+	uint32 countdown_delay_reason;
+	uint32 countdown_delayed_timer;
+	s_player_identifier countdown_delayed_culprit;
+	bool end_game;
+	uint8 gap_4CA8[7];
 	uint32 field_4CB8;
 	wchar_t scenario_path[128];
 	uint8 gap4C00[12];
@@ -675,13 +677,14 @@ public:
 	bool handle_leave_request(const struct transport_address* incoming_address);
 
 	bool handle_leave_internal(int32 peer_index);
-
 private:
 	const char* get_peer_description(int32 peer_index) const;
 
 	int32 get_peer_from_incoming_address(const transport_address* incoming_address) const;
 	
 	int32 get_peer_from_secure_address(const s_transport_secure_address* secure_address) const;
+
+	void update_countdown_timer_internal(uint32 peer_index, bool countdown_running, int32 countdown_timer, bool current_host, int32 countdown_delay_reason, s_player_identifier* responsible_address);
 };
 ASSERT_STRUCT_SIZE(c_network_session, 31624);
 ASSERT_STRUCT_OFFSET(c_network_session, m_session_membership, 0x70);
