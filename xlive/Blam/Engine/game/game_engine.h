@@ -261,7 +261,7 @@ public:
 	virtual int unk_function_17(int arg1, int arg2) = 0;
 	virtual int unk_function_18(int arg1, int arg2) = 0;
 	virtual void unk_function_19() = 0;
-	virtual float player_speed_multiplier(datum player_index) = 0;
+	virtual real32 player_speed_multiplier(datum player_index) = 0;
 	virtual int unk_function_21(int arg1) = 0;
 	virtual void unk_function_22(int arg1) = 0;
 	virtual void unk_function_23(int arg1) = 0;
@@ -395,6 +395,8 @@ ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 168);
 
 /* prototypes */
 
+void game_engine_apply_patches();
+
 c_game_engine* current_game_engine(void);
 
 s_game_engine_globals* game_engine_globals_get(void);
@@ -418,3 +420,13 @@ void __cdecl game_engine_update_after_game(void);
 void __cdecl game_engine_update(void);
 
 void __cdecl game_engine_render(void);
+
+void __cdecl game_engine_update_player_movement_traits();
+
+/* globals */
+
+// these are used to replicate the behaviour of the old patch
+// in the future when c_game_engine is rewritten and we can 
+// replace player_speed_modifier these can be removed.
+extern bool g_game_engine_override_player_speed_update;
+extern c_static_flags_no_init<k_maximum_players> g_game_engine_override_player_speed_changed;

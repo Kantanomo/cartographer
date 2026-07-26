@@ -189,27 +189,6 @@ void call_give_player_weapon(datum player_index, datum weapon_tag_definition_ind
 	}
 }
 
-void H2MOD::set_unit_speed_patch(bool hackit) {
-	static BYTE oldBytes[8];
-	static bool oldBytesRead = false;
-	DWORD address = Memory::GetAddress(0x6AB7F, 0x6A3BA);
-
-	if (oldBytesRead == false)
-	{
-		ReadBytesProtected(address, oldBytes, sizeof(oldBytes));
-		oldBytesRead = true;
-	}
-
-	if (hackit)
-	{
-		NopFill(address, sizeof(oldBytes));
-	}
-	else
-	{
-		WriteBytes(address, oldBytes, sizeof(oldBytes));
-	}
-}
-
 #pragma endregion
 
 void H2MOD::disable_score_announcer_sounds(uint32 sound_flags)
@@ -615,7 +594,7 @@ static void h2mod_apply_hooks(void)
 	game_life_cycle_apply_patches();
 
 	network_memory_apply_patches();
-
+	game_engine_apply_patches();
 	simulation_apply_patches();
 	simulation_players_apply_patches();
 
