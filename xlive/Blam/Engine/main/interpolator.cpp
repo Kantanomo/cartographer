@@ -185,8 +185,6 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, cons
 	int32 out_abs_object_index;
 	if (halo_interpolator_object_can_interpolate(object_index, &out_abs_object_index))
 	{
-		result = true;
-
 		object_get_node_matrices(object_index, out_node_count);
 		if (*out_node_count > 0)
 		{
@@ -212,6 +210,7 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, cons
 			}
 
 			*node_matrices = g_frame_data_intermediate->object_data[out_abs_object_index].node_matrices;
+			result = true;
 		}
 		else
 		{
@@ -464,8 +463,8 @@ bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 
 				&g_target_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index],
 				g_interpolator_delta,
 				out_matrix);
+			result = true;
 		}
-		result = true;
 	}
 
 	return result;
@@ -499,7 +498,7 @@ bool halo_interpolator_get_previous_object_node_matrix(datum object_index, int16
 
 bool halo_interpolator_interpolate_object_position(datum object_index, real_point3d* point)
 {
-	bool interpolate_object = false;
+	bool result = false;
 	
 	int32 abs_object_index;
 	if (halo_interpolator_object_can_interpolate(object_index, &abs_object_index))
@@ -510,20 +509,20 @@ bool halo_interpolator_interpolate_object_position(datum object_index, real_poin
 		
 		if (distance < k_interpolation_distance_cutoff)
 		{
-			interpolate_object = true;
 			points_interpolate(
 				&g_previous_interpolation_frame_data->object_data[abs_object_index].position,
 				&g_target_interpolation_frame_data->object_data[abs_object_index].position,
 				g_interpolator_delta,
 				point);
+			result = true;
 		}
 	}
-	return interpolate_object;
+	return result;
 }
 
 bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_crouch)
 {
-	bool interpolate_object = false;
+	bool result = false;
 	const datum player_index = player_index_from_unit_index(object_index);
 
 	// ### TODO add biped check?
@@ -538,13 +537,13 @@ bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_
 			distance *= distance;
 			if (distance < k_interpolation_distance_cutoff)
 			{
-				interpolate_object = true;
 				scalars_interpolate(g_previous_interpolation_frame_data->crouch[player->user_index], g_target_interpolation_frame_data->crouch[player->user_index], g_interpolator_delta, out_crouch);
+				result = true;
 			}
 		}
 		
 	}
-	return interpolate_object;
+	return result;
 }
 
 bool halo_interpolator_interpolate_position_backwards(int32 user_index, uint32 position_index, real_point3d* position)
