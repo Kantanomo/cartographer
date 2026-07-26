@@ -839,7 +839,6 @@ void InitH2Config()
 {
 	H2Config_disable_ingame_keyboard = shell_get_instance_num() > 1 ? true : false;
 	ReadH2Config();
-	H2MOD::RefreshTogglexDelay();
 	g_h2config_initialized = true;
 }
 void DeinitH2Config()

@@ -1239,6 +1239,7 @@
     <ClInclude Include="Blam\Engine\networking\logic\storage\network_storage.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages_cartographer.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages_connect.h" />
+    <ClInclude Include="Blam\Engine\networking\messages\network_messages.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages_out_of_band.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages_session_membership.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages_session_parameters.h" />

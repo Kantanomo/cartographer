@@ -18,8 +18,6 @@ class H2MOD
 {
 public:
 	static void Initialize();
-	static void RefreshTogglexDelay();
-
 	static void player_position_increase_client_position_margin_of_error(bool enable);
 	static void set_unit_speed_patch(bool hackit);
 	static void disable_score_announcer_sounds(uint32 sound);

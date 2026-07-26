@@ -128,6 +128,7 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 		}
 		break;
 	}
+
 	default:
 		break;
 	} // switch (message_type)
