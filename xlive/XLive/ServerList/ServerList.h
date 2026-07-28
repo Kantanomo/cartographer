@@ -113,51 +113,37 @@ public:
 	CServerList(const CServerList& other) = delete;
 	CServerList(CServerList&& other) = delete;
 
-	static bool CountResultsUpdated;
+	static bool servicePropertiesUpdated;
 
 	static DWORD Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
 
-	HRESULT EnumerateTaskUpdate(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
+	HRESULT TaskEnumerateUpdate(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
 
 	// basic functions 
 	static void GetServerCounts(PXOVERLAPPED);
-	static void RemoveServer(DWORD dwUserIndex, PXOVERLAPPED pOverlapped);
-	static void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
+	static void Unadvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped);
+	static void Advertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
 
 #pragma region ServerListQuery
 	HANDLE m_handle = INVALID_HANDLE_VALUE;
 
-	CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
-	{
-		m_itemsPerPageCount = _cItemsPerPage;
-		m_searchPropertiesIdCount = _cSearchPropertiesIDs;
-		m_pSearchPropertyIds = new DWORD[_cSearchPropertiesIDs];
-		memcpy(m_pSearchPropertyIds, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
-	}
-
-	~CServerList()
-	{
-		delete[] m_pSearchPropertyIds;
-
-		// this must be locked when deconstructing
-		m_itemQueryMutex.unlock();
-	}
-
-	int GetItemLeftCount() const;
-	int GetValidItemsFoundCount() const;
+	CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties);
+	~CServerList();
 
 	void CancelTask() {
 		// before canceling the task 
 		// first wait for the i/o to finish
-		std::lock_guard lg(m_ioWriteMutex);
+		std::unique_lock lg(m_ioMutex);
 		m_shouldCancelTask = true;
 	}
 
 	void EnumerateFromHttp();
-	bool SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer) const;
+	bool ProcessSearchResult(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer) const;
 
 	void SetNewPageBuffer(DWORD cbBuffer, CHAR* pvBuffer)
 	{
+		std::unique_lock<std::mutex> lg(m_ioMutex);
+
 		m_resultBuffer = pvBuffer;
 		m_resultBufferSize = cbBuffer;
 	}
@@ -166,13 +152,12 @@ public:
 	{
 		_eTaskPending,
 		_eTaskIncomplete,
-		_eTaskFailed,
 		_eTaskFinished,
 	};
 
 	// mainly used for resource discard
-	std::mutex m_itemQueryMutex;
-	std::mutex m_ioWriteMutex;
+	std::mutex m_taskMutex;
+	std::mutex m_ioMutex;
 
 private:
 	
@@ -182,11 +167,10 @@ private:
 	}
 
 	PXOVERLAPPED m_pOverlapped = nullptr;
-	std::atomic<int> m_itemsLeftInDoc = 0;
+	std::atomic<int> m_itemsRemainingCount = 0;
 	std::atomic<int> m_taskState = _eTaskPending;
 
 	int m_itemsPerPageCount;
-	std::atomic<int> m_pageItemsFoundCount = 0;
 
 	DWORD m_searchPropertiesIdCount = 0;
 	DWORD* m_pSearchPropertyIds = nullptr;
@@ -201,7 +185,7 @@ private:
 
 #pragma endregion ServerListQuery
 
-	static std::mutex addServerMutex;
-	static std::mutex removeServerMutex;
+	static std::mutex advertiseMutex;
+	static std::mutex unadvertiseMutex;
 	static std::mutex getServerCountsMutex;
 };
