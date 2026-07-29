@@ -357,9 +357,8 @@ void CServerList::EnumerateFromHttp()
 	DWORD outStringBufferSize = 0;
 	DWORD itemsLeftToDownload, validItemsFound = 0;
 
-	LocatorSetOverlappedError(m_pOverlapped, ERROR_IO_INCOMPLETE, 0, HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE));
-
 	addDebugText("Requesting server list");
+
 	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
@@ -382,8 +381,7 @@ void CServerList::EnumerateFromHttp()
 	// this counter count even bad servers
 	itemsLeftToDownload = document["servers"].Size();
 	// in case we have just 1 serverlist 'page' to download
-	DWORD itemListMaxQueryCount = (std::min)(itemsLeftToDownload, (DWORD)XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN);
-
+	DWORD itemListMaxQueryCount = (std::min)(itemsLeftToDownload, m_itemsPerPageCount);
 	if (LocatorGetQueryBufferSize(itemListMaxQueryCount, m_searchPropertiesIdCount, m_pSearchPropertyIds, &outStringBufferSize) > m_resultBufferSize)
 	{
 		LocatorSetOverlappedError(m_pOverlapped, ERROR_INSUFFICIENT_BUFFER, 0, HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER));
@@ -405,7 +403,7 @@ void CServerList::EnumerateFromHttp()
 	auto xuidStrItr = serverXuidArray.Begin();
 	auto xuidStrWriteItemItr = serverXuidArray.Begin();
 
-	while (itemsLeftToDownload > 0)
+	while (!m_taskEnd)
 	{
 		// wait for the game to signal again, for the next thread
 
@@ -419,21 +417,18 @@ void CServerList::EnumerateFromHttp()
 
 			if (_clock::now() - tpBeforePause > 5s)
 			{
-				CancelTask();
-				LOG_INFO_XLIVE("{} - resume I/O timeout reached, canceling!", __FUNCTION__);
-			}
-
-			if (ShouldCancelTask())
+				LOG_INFO_XLIVE("{} - resume I/O timeout reached, ending task!", __FUNCTION__);
+				m_taskEnd = true;
+				m_taskPaused = false;
 				break;
+			}
 		}
 
-		if (ShouldCancelTask())
+		if (m_taskEnd)
 		{
-			LOG_INFO_XLIVE("{} - signaled to cancel I/0", __FUNCTION__);
+			LOG_INFO_XLIVE("{} - task signaled to end", __FUNCTION__);
 			break;
 		}
-
-		LocatorSetOverlappedError(m_pOverlapped, ERROR_IO_INCOMPLETE, 0, HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE));
 
 		// this starts from where it left off
 		DWORD serverQueryIdx = 0;
@@ -505,6 +500,7 @@ void CServerList::EnumerateFromHttp()
 
 		if (itemQueryError)
 		{
+			LocatorSetOverlappedError(m_pOverlapped, ERROR_FUNCTION_FAILED, 0, HRESULT_FROM_WIN32(ERROR_NETWORK_NOT_AVAILABLE));
 			break;
 		}
 
@@ -515,7 +511,6 @@ void CServerList::EnumerateFromHttp()
 		{
 			std::unique_lock ioLock(m_ioMutex);
 			int searchResultIdx = 0;
-			// vector should be XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN in size
 			int validPageItemsRetrieved = 0;
 			for (auto& itemQuery : itemsToDownloadQuery)
 			{
@@ -528,7 +523,6 @@ void CServerList::EnumerateFromHttp()
 						// this holds all servers found count
 						// not just per page
 						validItemsFound++;
-
 						searchResultIdx++;
 					}
 				}
@@ -538,13 +532,21 @@ void CServerList::EnumerateFromHttp()
 				xuidStrWriteItemItr++;
 			}
 
+			m_taskPaused = true;
 			m_itemsRemainingCount = itemsLeftToDownload;
 
 			// if server items were written to buffer, report back to the game
 			// this will signal the game to call XEnumerate again if there are more items to be retrieved
-			LocatorSetOverlappedError(m_pOverlapped, validPageItemsRetrieved == 0 && itemsLeftToDownload == 0 ? ERROR_NO_MORE_FILES : ERROR_SUCCESS, validPageItemsRetrieved, 0);
-
-			m_taskPaused = true;
+			if (validPageItemsRetrieved > 0)
+			{
+				LocatorSetOverlappedError(m_pOverlapped, ERROR_SUCCESS, validPageItemsRetrieved, 0);
+			}
+			else if (itemsLeftToDownload == 0)
+			{
+				LocatorSetOverlappedError(m_pOverlapped, ERROR_NO_MORE_FILES, 0, 0);
+				m_taskState = _eTaskFinished;
+				m_taskEnd = true;
+			}
 		}
 	}
 
@@ -599,25 +601,18 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 
 HRESULT CServerList::TaskEnumerateUpdate(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
+	TaskUpdateParameters(pOverlapped, cbBuffer, pvBuffer);
+
 	switch (m_taskState)
 	{
 	case _eTaskPending:
-		m_pOverlapped = pOverlapped;
-		SetNewPageBuffer(cbBuffer, pvBuffer);
+		LocatorSetOverlappedError(pOverlapped, ERROR_IO_INCOMPLETE, 0, HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE));
 		std::thread(&ServerlistRequestWorkerThread, this).detach();
 		m_taskState = _eTaskIncomplete;
 		break;
 	case _eTaskIncomplete:
 		if (m_taskPaused)
 		{
-			m_pOverlapped = pOverlapped;
-			SetNewPageBuffer(cbBuffer, pvBuffer);
-			if (m_itemsRemainingCount == 0)
-			{
-				m_taskState = _eTaskFinished;
-				break;
-			}
-
 			LocatorSetOverlappedError(pOverlapped, ERROR_IO_INCOMPLETE, 0, HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE));
 			m_taskPaused = false;
 		}
@@ -884,12 +879,11 @@ DWORD WINAPI XLocatorCreateServerEnumerator(
 	if (!phEnum)
 		return ERROR_INVALID_PARAMETER;
 
-	if (cItems < XLOCATOR_SERVER_PAGE_MIN_ITEMS)
-		cItems = XLOCATOR_SERVER_PAGE_MIN_ITEMS;
 	if (cItems > XLOCATOR_SERVER_PAGE_MAX_ITEMS)
 		cItems = XLOCATOR_SERVER_PAGE_MAX_ITEMS;
 
 	CServerList* serverListRequest = new CServerList(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs);
+
 	*phEnum = serverListRequest->m_handle;
 	*pcbBuffer = LocatorGetQueryBufferSize(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs, nullptr);
 
@@ -952,7 +946,7 @@ static void LocatorTaskCancelAll()
 
 	for (auto& task : locatorQueryList)
 	{
-		task->CancelTask();
+		task->TaskFinish();
 		XCloseHandle(task->m_handle);
 	}
 

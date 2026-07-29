@@ -56,11 +56,7 @@
 #define XLOCATOR_SERVERTYPE_PEER_HOSTED_GOLD_ONLY   3   // dedicated server is a peer-hosted game server (gold only).
 #define XLOCATOR_SERVICESTATUS_PROPERTY_START     0x100
 
-#define XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN 24
-
-#define XLOCATOR_SERVER_PAGE_MIN_ITEMS		50
-#define XLOCATOR_SERVER_PAGE_MAX_ITEMS_OLD	200
-#define XLOCATOR_SERVER_PAGE_MAX_ITEMS		2000	// Increased because we hit the limit
+#define XLOCATOR_SERVER_PAGE_MAX_ITEMS				200
 
 /* structs */
 
@@ -130,20 +126,21 @@ public:
 	CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties);
 	~CServerList();
 
-	void CancelTask() {
+	void TaskFinish() {
 		// before canceling the task 
 		// first wait for the i/o to finish
 		std::unique_lock lg(m_ioMutex);
-		m_shouldCancelTask = true;
+		m_taskEnd = true;
 	}
 
 	void EnumerateFromHttp();
 	bool ProcessSearchResult(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer) const;
 
-	void SetNewPageBuffer(DWORD cbBuffer, CHAR* pvBuffer)
+	void TaskUpdateParameters(XOVERLAPPED* overlapped, DWORD cbBuffer, CHAR* pvBuffer)
 	{
 		std::unique_lock<std::mutex> lg(m_ioMutex);
 
+		m_pOverlapped = overlapped;
 		m_resultBuffer = pvBuffer;
 		m_resultBufferSize = cbBuffer;
 	}
@@ -161,16 +158,11 @@ public:
 
 private:
 	
-	bool ShouldCancelTask() const
-	{
-		return m_shouldCancelTask;
-	}
-
 	PXOVERLAPPED m_pOverlapped = nullptr;
 	std::atomic<int> m_itemsRemainingCount = 0;
 	std::atomic<int> m_taskState = _eTaskPending;
 
-	int m_itemsPerPageCount;
+	DWORD m_itemsPerPageCount;
 
 	DWORD m_searchPropertiesIdCount = 0;
 	DWORD* m_pSearchPropertyIds = nullptr;
@@ -180,7 +172,7 @@ private:
 
 	std::string m_serverListToDownload;
 
-	std::atomic<bool> m_shouldCancelTask = false;
+	std::atomic<bool> m_taskEnd = false;
 	std::atomic<bool> m_taskPaused = false;
 
 #pragma endregion ServerListQuery
