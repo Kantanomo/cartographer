@@ -415,7 +415,7 @@ void CServerList::EnumerateFromHttp()
 		{
 			Sleep(100);
 
-			if (_clock::now() - tpBeforePause > 5s)
+			if (_clock::now() - tpBeforePause > 10s)
 			{
 				LOG_INFO_XLIVE("{} - resume I/O timeout reached, ending task!", __FUNCTION__);
 				m_taskEnd = true;
