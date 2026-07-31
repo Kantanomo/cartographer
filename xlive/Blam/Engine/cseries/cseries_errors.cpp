@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "cseries_errors.h"
 
+#ifdef ERRORS_ENABLED
+
 #include "cseries_windows.h"
 #include "profile.h"
 #include "stack_walk_windows.h"
@@ -41,7 +43,6 @@ const char *const k_primary_full_event_log_filename = "reports\\debug.txt";
 
 /* structures */
 
-#ifdef ERRORS_ENABLED
 class c_error_file
 {
 public:

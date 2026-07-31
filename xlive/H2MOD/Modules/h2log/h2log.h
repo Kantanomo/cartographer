@@ -226,8 +226,6 @@ do \
 	} \
 } while(0)
 
-#define LOG_UNUSED(var)
-
 // Generic logging
 // For the most unimportant stuff
 #define LOG_TRACE(logger, msg, ...)      CHECK_PTR((logger), (logger)->trace    (msg, __VA_ARGS__))
@@ -337,62 +335,69 @@ do \
 
 #else
 
-#define LOG_STUB(msg, args) \
-while (0)					\
-{							\
-	(void)msg;				\
+#define LOG_STUB(...)					\
+if (0)									\
+{										\
+	cseries_stub_internal(__VA_ARGS__);	\
 }
 
-#define LOG_UNUSED(var) (void)var
+#define LIMITED_LOG(log_limit, logger, ...) \
+if (0)										\
+{											\
+	log_limit;								\
+	LOG_STUB(__VA_ARGS__);					\
+}
 
-#define LIMITED_LOG(log_limit, logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
-
-#define LOG_TRACE(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_DEBUG(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_INFO(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_WARNING(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_ERROR(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_CRITICAL(logger, msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_TRACE(...) LOG_STUB(__VA_ARGS__)
+#define LOG_DEBUG(...) LOG_STUB(__VA_ARGS__)
+#define LOG_INFO(...) LOG_STUB(__VA_ARGS__)
+#define LOG_WARNING(...) LOG_STUB(__VA_ARGS__)
+#define LOG_ERROR(...) LOG_STUB(__VA_ARGS__)
+#define LOG_CRITICAL(...) LOG_STUB(__VA_ARGS__)
 
 // Mod-specific logging
-#define LOG_TRACE_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_DEBUG_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_INFO_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_WARNING_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_ERROR_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_CRITICAL_GAME(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_TRACE_GAME(...) LOG_STUB(__VA_ARGS__)
+#define LOG_DEBUG_GAME(...) LOG_STUB(__VA_ARGS__)
+#define LOG_INFO_GAME(...) LOG_STUB(__VA_ARGS__)
+#define LOG_WARNING_GAME(...) LOG_STUB(__VA_ARGS__)
+#define LOG_ERROR_GAME(...) LOG_STUB(__VA_ARGS__)
+#define LOG_CRITICAL_GAME(...) LOG_STUB(__VA_ARGS__)
 
 // Function calls
-#define LOG_TRACE_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_TRACE_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_DEBUG_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_DEBUG_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_INFO_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_INFO_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_WARNING_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_WARNING_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_ERROR_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_ERROR_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_CRITICAL_FUNC(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_CRITICAL_FUNCW(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_TRACE_FUNC(...) LOG_STUB(__VA_ARGS__)
+#define LOG_TRACE_FUNCW(...) LOG_STUB(__VA_ARGS__)
+#define LOG_DEBUG_FUNC(...) LOG_STUB(__VA_ARGS__)
+#define LOG_DEBUG_FUNCW(...) LOG_STUB(__VA_ARGS__)
+#define LOG_INFO_FUNC(...) LOG_STUB(__VA_ARGS__)
+#define LOG_INFO_FUNCW(...) LOG_STUB(__VA_ARGS__)
+#define LOG_WARNING_FUNC(...) LOG_STUB(__VA_ARGS__)
+#define LOG_WARNING_FUNCW(...) LOG_STUB(__VA_ARGS__)
+#define LOG_ERROR_FUNC(...) LOG_STUB(__VA_ARGS__)
+#define LOG_ERROR_FUNCW(...) LOG_STUB(__VA_ARGS__)
+#define LOG_CRITICAL_FUNC(...) LOG_STUB(__VA_ARGS__)
+#define LOG_CRITICAL_FUNCW(...) LOG_STUB(__VA_ARGS__)
 
 // Networking
-#define LOG_TRACE_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_DEBUG_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_INFO_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_WARNING_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_ERROR_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_CRITICAL_NETWORK(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_TRACE_NETWORK(...) LOG_STUB(__VA_ARGS__)
+#define LOG_DEBUG_NETWORK(...) LOG_STUB(__VA_ARGS__)
+#define LOG_INFO_NETWORK(...) LOG_STUB(__VA_ARGS__)
+#define LOG_WARNING_NETWORK(...) LOG_STUB(__VA_ARGS__)
+#define LOG_ERROR_NETWORK(...) LOG_STUB(__VA_ARGS__)
+#define LOG_CRITICAL_NETWORK(...) LOG_STUB(__VA_ARGS__)
 
 // xLiveLess
-#define LOG_TRACE_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_DEBUG_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_INFO_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_WARNING_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_ERROR_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
-#define LOG_CRITICAL_XLIVE(msg, ...) LOG_STUB(msg, __VA_ARGS__)
+#define LOG_TRACE_XLIVE(...) LOG_STUB(__VA_ARGS__)
+#define LOG_DEBUG_XLIVE(...) LOG_STUB(__VA_ARGS__)
+#define LOG_INFO_XLIVE(...) LOG_STUB(__VA_ARGS__)
+#define LOG_WARNING_XLIVE(...) LOG_STUB(__VA_ARGS__)
+#define LOG_ERROR_XLIVE(...) LOG_STUB(__VA_ARGS__)
+#define LOG_CRITICAL_XLIVE(...) LOG_STUB(__VA_ARGS__)
 
-#define LOG_CHECK(...) (__VA_ARGS__)
+#define LOG_CHECK(...)					\
+if (0)									\
+{										\
+	cseries_stub_internal(__VA_ARGS__);	\
+}
 
 #endif
 

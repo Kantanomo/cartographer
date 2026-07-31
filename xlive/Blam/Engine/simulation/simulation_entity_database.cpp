@@ -186,7 +186,6 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 			if (!creation_data)
 			{
 				char description[1024];
-				event_unused(description);
 				event(
 					_event_error,
 					"networking:simulation:entity: OUT OF MEMORY allocating %s creation data [%d] bytes [%s]",
@@ -202,7 +201,6 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 		if (!state_data)
 		{
 			char description[1024];
-			event_unused(description);
 			event(
 				_event_error, 
 				"networking:simulation:entity: OUT OF MEMORY allocating %s state data [%d] bytes, heap [%s]",
@@ -218,7 +216,6 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 		if (!gamestate_index)
 		{
 			char description[1024];
-			event_unused(description);
 			event(_event_error, "networking:simulation:entity: OUT OF MEMORY allocating %s gamestate data [%d] bytes [%s]", sizeof(int32), network_heap_describe(description, sizeof(description)));
 			result = 2;
 		}
@@ -229,7 +226,6 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 		if (!simulation_queue_element)
 		{
 			char description[1024];
-			event_unused(description);
 			event(
 				_event_error,
 				"networking:simulation:entity: OUT OF MEMORY allocating %s simulation queue data [%d] bytes [%s]",

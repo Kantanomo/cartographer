@@ -341,7 +341,6 @@ void ServerlistRequestWorkerThread(CServerList* listQueryTask)
 	listQueryTask->EnumerateFromHttp();
 
 	const HANDLE handle = listQueryTask->m_handle;
-	LOG_UNUSED(handle);
 
 	delete listQueryTask;
 

@@ -70,7 +70,6 @@ void c_simulation_queue::allocate(int32 size, s_simulation_queue_element** eleme
 			else
 			{
 				char description[1024];
-				event_unused(description);
 				csstrncpy(description, "UNKNOWN", NUMBEROF(description));
 				network_heap_describe(description, NUMBEROF(description));
 				event(

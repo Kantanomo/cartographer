@@ -50,8 +50,6 @@ extern const char* k_event_level_severity_strings[k_network_event_level_count];
 
 /* macros */
 
-#define event_unused(x) (void)x
-
 #ifdef EVENTS_ENABLED
 
 #define event(severity, format, ...)				\
@@ -67,6 +65,10 @@ while(0)
 
 #else
 
-#define event(severity, format, ...) (void)(0)
+#define event(severity, format, ...)	\
+if (0)									\
+{										\
+	cseries_stub_internal(__VA_ARGS__);	\
+}
 
 #endif

@@ -109,8 +109,7 @@ extern bool g_catch_exceptions;
 
 /* macros */
 
-#define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
-#define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
+#define SUPRESS_UNUSED(v) (void)(v)
 
 // Returns the minimum of the two values
 #define MIN(a, b) ((a)>(b)?(b):(a))
@@ -286,6 +285,17 @@ char* csstrnlwr(char* s, size_t size);
 char* csstrtok(char* s, const char* delimiters, bool skip_multiple_delimiters, struct csstrtok_data *data);
 
 char* strchr(char* str, int32 ch);
+
+/* used for stubs, otherwise DO NOT USE */
+void cseries_stub_internal(...);
+void cseries_stub_internal(const std::string& str);
+void cseries_stub_internal(const std::wstring& str);
+
+template<typename... Args>
+void cseries_stub_internal(const std::string& fmt, const Args &... args) { SUPRESS_UNUSED(fmt); }
+
+template<typename... Args>
+static void cseries_stub_internal(const std::wstring& fmt, const Args &... args) { SUPRESS_UNUSED(fmt); }
 
 /* public code */
 

@@ -134,7 +134,9 @@ void c_event::generate(const char* event_name, ...)
 
 void network_event_initialize(void)
 {
+#ifdef ERRORS_ENABLED
 	error_category_write_to_primary_log(_error_category_networking, false);
+#endif
 
 	network_event_globals.categories = DATA_NEW("network events", k_network_event_count, sizeof(s_network_event_datum), 0, normal_allocation_global_get());
 	ASSERT(network_event_globals.categories);
