@@ -365,12 +365,6 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 {
 	static bool resetAfterMatch = false;
 
-	// set the light suppressor flag to false
-	if (H2Config_light_suppressor)
-	{
-		WriteValue(Memory::GetAddress(0x41F6B1), 0);
-	}
-
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->game_mode);
 	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, options);
 
@@ -629,14 +623,6 @@ static void h2mod_apply_hooks(void)
 
 		event(_event_status, "h2mod: applying client hooks");
 
-		// TODO: write proper patch for this so it can be toggled mid-game
-		// Disable lightsupressor function
-
-		if (H2Config_light_suppressor)
-		{
-			NopFill(Memory::GetAddress(0x1922d9), 7);
-		}
-		
 		DETOUR_ATTACH(p_user_interface_controller_set_desired_team_index, Memory::GetAddress<user_interface_controller_set_desired_team_index_t>(0x2068F2), user_interface_controller_set_desired_team_index_hook);
 
 		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);

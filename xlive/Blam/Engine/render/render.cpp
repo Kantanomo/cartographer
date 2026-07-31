@@ -41,30 +41,37 @@
 #include "structures/structures.h"
 #include "widgets/liquid.h"
 
+#include "H2MOD/Modules/Shell/Config.h"
+
 /* globals */
+
+static uintptr_t p_render_light_suppressor_enable;
+
 
 bool g_render_layer_view_4 = false;
 bool g_render_layer_view_5 = false;
 
 bool g_submit_occlusion_tests = true;
 
-bool render_decals_enabled = true;
-bool render_lens_flares_enabled = true;
 bool render_patchy_fog_enabled = true;
+bool render_lens_flares_enabled = true;
+bool render_decals_enabled = true;
+
 bool render_water_enabled = true;
 
-e_controller_index g_render_current_controller_index = _controller0;
-uint32 g_render_current_user_index = 0;
+static e_controller_index g_render_current_controller_index = _controller0;
+static uint32 g_render_current_user_index = 0;
 
-window_bound g_user_window_bounds[k_number_of_controllers]{};
+static window_bound g_user_window_bounds[k_number_of_controllers];
 
 /* prototypes */
 
-int32* get_global_window_out_cluster_index(int32 index);
-int32* get_global_window_out_leaf_index(int32 index);
-uint32* global_scene_rendered_count_get(void);
+static bool* render_light_suppressor_enabled_get(void);
+static int32* get_global_window_out_cluster_index(int32 index);
+static int32* get_global_window_out_leaf_index(int32 index);
+static uint32* global_scene_rendered_count_get(void);
 
-void render_view(
+static void render_view(
 	real_rectangle2d* frustum_bounds,
 	render_camera* rasterizer_camera,
 	int32 window_bound_index,
@@ -85,8 +92,10 @@ void render_view(
 	int8 zero_2,
 	s_screen_flash* screen_flash);
 
-void __cdecl render_scene_bitflags_set(void);
-void __cdecl render_camera_scene(
+static void __cdecl render_scene_bitflags_set(void);
+static bool render_scene_is_splitscreen(void);
+static void rasterizer_render_scene(bool is_texture_camera);
+static void __cdecl render_camera_scene(
 	int32 render_layer_debug_view,
 	bool render_transparent_geo,
 	bool lens_flare_occlusion_test,
@@ -98,12 +107,20 @@ void __cdecl render_camera_scene(
 
 void render_apply_patches(void)
 {
+	if (H2Config_light_suppressor_disable)
+	{
+		*render_light_suppressor_enabled_get() = false;
+	}
+
 	PatchCall(Memory::GetAddress(0x19224A), render_window);
 	PatchCall(Memory::GetAddress(0x19DA7C), render_window);
 #ifdef TERMINAL_ENABLED
 	PatchCall(Memory::GetAddress(0x190E3B), terminal_draw);
 	PatchCall(Memory::GetAddress(0x190E45), main_time_frame_rate_display);
 #endif
+
+	DETOUR_ATTACH(p_render_light_suppressor_enable, Memory::GetAddress(0x1922D9), render_light_suppressor_enable);
+
 	return;
 }
 
@@ -187,9 +204,23 @@ uint32* global_frame_index_get(void)
 	return Memory::GetAddress<uint32*>(0x4E695C);
 }
 
-bool __cdecl render_structure_find_camera(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index)
+bool __cdecl render_structure_find_camera(
+	real_point3d* point,
+	int32* out_cluster_index,
+	int32* out_leaf_index)
 {
 	return INVOKE(0x191032, 0x0, render_structure_find_camera, point, out_cluster_index, out_leaf_index);
+}
+
+void __cdecl render_light_suppressor_enable(void)
+{
+	// Don't enable the light suppressor if we've disabled it in the config
+	if (!H2Config_light_suppressor_disable)
+	{
+		*render_light_suppressor_enabled_get() = true;
+	}
+
+	return;
 }
 
 e_screen_split_type get_screen_split_type(int32 render_user_index)
@@ -715,27 +746,34 @@ void __cdecl render_nonplayer_frame(window_bound* window_bounds)
 
 /* private code */
 
-int32* get_global_window_out_cluster_index(int32 index)
+static bool* render_light_suppressor_enabled_get(void)
+{
+	return Memory::GetAddress<bool*>(0x41F6B1);
+}
+
+static int32* get_global_window_out_cluster_index(
+	int32 index)
 {
 	return &Memory::GetAddress<int32*>(0x4E697C, 0x50EC4C)[index];
 }
 
-int32* get_global_window_out_leaf_index(int32 index)
+static int32* get_global_window_out_leaf_index(
+	int32 index)
 {
 	return &Memory::GetAddress<int32*>(0x4E698C, 0x50EC5C)[index];
 }
 
-uint32* global_view_frame_num_get(void)
+static uint32* global_view_frame_num_get(void)
 {
 	return Memory::GetAddress<uint32*>(0x4E6960);
 }
 
-uint32* global_scene_rendered_count_get(void)
+static uint32* global_scene_rendered_count_get(void)
 {
 	return Memory::GetAddress<uint32*>(0x4E6964);
 }
 
-void render_view(
+static void render_view(
 	real_rectangle2d* frustum_bounds,
 	render_camera* rasterizer_camera,
 	int32 window_bound_index,
@@ -835,13 +873,13 @@ void render_view(
 	return;
 }
 
-void __cdecl render_scene_bitflags_set(void)
+static void __cdecl render_scene_bitflags_set(void)
 {
 	INVOKE(0x2664AF, 0x0, render_scene_bitflags_set);
 	return;
 }
 
-bool render_scene_is_splitscreen(void)
+static bool render_scene_is_splitscreen(void)
 {
 	const s_frame* global_window_parameters = global_window_parameters_get();
 
@@ -856,7 +894,7 @@ bool render_scene_is_splitscreen(void)
 		get_player_window_count() > 1;
 }
 
-void rasterizer_render_scene(
+static void rasterizer_render_scene(
 	bool is_texture_camera)
 {
 	const s_frame* global_window_parameters = global_window_parameters_get();
@@ -906,7 +944,7 @@ void rasterizer_render_scene(
 	return;
 }
 
-void __cdecl render_camera_scene(
+static void __cdecl render_camera_scene(
 	int32 render_layer_debug_view,
 	bool render_transparent_geo,
 	bool lens_flare_occlusion_test,

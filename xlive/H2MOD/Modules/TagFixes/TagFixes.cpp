@@ -75,7 +75,7 @@ namespace TagFixes
 			{
 				shader_lod_max();
 			}
-			if (H2Config_light_suppressor)
+			if (H2Config_light_suppressor_disable)
 			{
 				light_framerate_killer();
 			}
