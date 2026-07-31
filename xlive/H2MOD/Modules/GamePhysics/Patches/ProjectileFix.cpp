@@ -7,6 +7,8 @@
 
 #include "items/projectile_definition.h"
 
+#include "math/matrix_math.h"
+
 #define PROJECTILE_DEFAULT_OBJECT_DATA_SIZE 428
 
 // h3 gets the projectile collision data from somewhere else
@@ -130,19 +132,17 @@ void __cdecl object_get_origin(unsigned __int16 unit_index, real_point3d *a3)
 	return p_object_get_origin(unit_index, a3);
 }
 
-void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vector3d* out)
+void __cdecl matrix4x3_transform_point_projectile_hook(real_matrix4x3* matrix, real_point3d* p1, real_point3d* out)
 {
-	auto p_matrix4x3_transform_point = Memory::GetAddressRelative<void(__cdecl*)(void*, real_vector3d*, real_vector3d*)>(0x47795A);
+	uint8* projectile = (uint8*)object_get(trigger_projectile_datum_index);
 
-	BYTE* projectile = (BYTE*)object_get(trigger_projectile_datum_index);
+	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - original point p1: i: {}, j: {}, k: {}", p1->x, p1->y, p1->z);
 
-	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - original values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
+	p1 = (real_point3d*)(projectile + 432);
 
-	v1 = (real_vector3d*)(projectile + 432);
+	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - new vector     p1: i: {}, j: {}, k: {}", p1->x, p1->y, p1->z);
 
-	LOG_TRACE_GAME(L" projectile matrix4x3_transform_point() - new values v1: i: {}, j: {}, k: {}", v1->i, v1->j, v1->k);
-
-	p_matrix4x3_transform_point(matrix, v1, out);
+	matrix4x3_transform_point(matrix, p1, out);
 }
 #pragma endregion
 
@@ -180,6 +180,6 @@ void ProjectileFix::ApplyPatches()
 	Codecave(Memory::GetAddressRelative(0x547BDA, 0x572B77), update_projectile_collision_data, 6);
 	Codecave(Memory::GetAddressRelative(0x55D66E, 0x54192E), matrix4x3_transform_point_parameter_replacement, 2);
 	PatchCall(Memory::GetAddressRelative(0x55D653), object_get_origin);
-	PatchCall(Memory::GetAddressRelative(0x55D67E), matrix4x3_transform_point);
+	PatchCall(Memory::GetAddressRelative(0x55D67E), matrix4x3_transform_point_projectile_hook);
 #endif
 }
