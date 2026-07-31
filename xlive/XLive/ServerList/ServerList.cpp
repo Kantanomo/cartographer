@@ -163,10 +163,11 @@ bool CServerList::ProcessSearchResult(const std::string& serverResultData, XUID 
 		BadServer(xuid, "abEnet == NULL");
 		return result;
 	}
-	// HexStrToBytes(abEnet_str, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
 	XECRYPT_RC4_STATE rc4_engine_state;
-	XeCryptRc4Key(&rc4_engine_state, (BYTE*)abEnet_str, sizeof(XNADDR::abEnet) * 2);
-	XeCryptRc4Ecb(&rc4_engine_state, searchResult.serverAddress.abEnet, sizeof(searchResult.serverAddress.abEnet));
+	HexStrToBytes(abEnet_str, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
+	XeCryptRc4Key(&rc4_engine_state, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
+	XeCryptRc4Ecb(&rc4_engine_state, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
+	searchResult.serverAddress.abEnet[0] = '\x00';
 
 	if (!doc.HasMember("abonline"))
 	{

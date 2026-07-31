@@ -325,8 +325,9 @@ void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long l
 
 	// create rc4 state from machine id key to build the abEnet
 	XECRYPT_RC4_STATE rc4_engine_state;
-	XeCryptRc4Key(&rc4_engine_state, abEnet, sizeof(XNADDR::abEnet));
-	XeCryptRc4Ecb(&rc4_engine_state, m_ipLocal.m_xnaddr.abEnet, sizeof(m_ipLocal.m_xnaddr.abEnet));
+	memcpy(m_ipLocal.m_xnaddr.abEnet, abEnet, sizeof(XNADDR::abEnet));
+	XeCryptRc4Key(&rc4_engine_state, m_ipLocal.m_xnaddr.abEnet, sizeof(XNADDR::abEnet));
+	XeCryptRc4Ecb(&rc4_engine_state, m_ipLocal.m_xnaddr.abEnet, sizeof(XNADDR::abEnet));
 	// first byte always 0x00
 	m_ipLocal.m_xnaddr.abEnet[0] = '\x00';
 
