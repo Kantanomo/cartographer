@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef EVENTS_ENABLED
-
 /* enums */
 
 enum e_event_level
@@ -32,19 +30,6 @@ private:
 	int32 m_category;
 };
 
-/* macros */
-
-#define event(severity, format, ...)				\
-do													\
-{													\
-	static c_event local_event;						\
-	if (local_event.query(severity))				\
-	{												\
-		local_event.generate(format, __VA_ARGS__);	\
-	}												\
-}													\
-while(0)
-
 /* prototypes */
 
 void network_event_initialize(void);
@@ -63,6 +48,25 @@ extern const char* k_event_level_names[k_network_event_level_count];
 
 extern const char* k_event_level_severity_strings[k_network_event_level_count];
 
+/* macros */
+
+#define event_unused(x) (void)x
+
+#ifdef EVENTS_ENABLED
+
+#define event(severity, format, ...)				\
+do													\
+{													\
+	static c_event local_event;						\
+	if (local_event.query(severity))				\
+	{												\
+		local_event.generate(format, __VA_ARGS__);	\
+	}												\
+}													\
+while(0)
+
 #else
+
 #define event(severity, format, ...) (void)(0)
+
 #endif

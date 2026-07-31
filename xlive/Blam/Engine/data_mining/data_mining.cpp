@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "data_mining.h"
 
-#ifdef EVENTS_ENABLED
-
 /* public code */
 
 void data_mine_add_event(e_event_level event_level, const char* event_text)
@@ -14,4 +12,3 @@ void data_mine_add_event(e_event_level event_level, const char* event_text)
 	return;
 }
 
-#endif

@@ -185,15 +185,14 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 			creation_data = network_heap_allocate_block(creation_data_size);
 			if (!creation_data)
 			{
-#ifdef EVENTS_ENABLED
 				char description[1024];
+				event_unused(description);
 				event(
 					_event_error,
 					"networking:simulation:entity: OUT OF MEMORY allocating %s creation data [%d] bytes [%s]",
 					creation_data_size,
 					network_heap_describe(description, sizeof(description))
 				);
-#endif
 				result = 2;
 			}
 		}
@@ -202,15 +201,14 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 		uint8* state_data = network_heap_allocate_block(state_data_size);
 		if (!state_data)
 		{
-#ifdef EVENTS_ENABLED
 			char description[1024];
+			event_unused(description);
 			event(
 				_event_error, 
 				"networking:simulation:entity: OUT OF MEMORY allocating %s state data [%d] bytes, heap [%s]",
 				state_data_size,
 				network_heap_describe(description, sizeof(description))
 			);
-#endif
 			result = 2;
 		}
 
@@ -219,10 +217,9 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 		int32* gamestate_index = (int32*)network_heap_allocate_block(sizeof(int32));
 		if (!gamestate_index)
 		{
-#ifdef EVENTS_ENABLED
 			char description[1024];
+			event_unused(description);
 			event(_event_error, "networking:simulation:entity: OUT OF MEMORY allocating %s gamestate data [%d] bytes [%s]", sizeof(int32), network_heap_describe(description, sizeof(description)));
-#endif
 			result = 2;
 		}
 		*/
@@ -231,15 +228,14 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 		uint8* simulation_queue_element = (uint8*)network_heap_allocate_block(sizeof(s_simulation_queue_element*));
 		if (!simulation_queue_element)
 		{
-#ifdef EVENTS_ENABLED
 			char description[1024];
+			event_unused(description);
 			event(
 				_event_error,
 				"networking:simulation:entity: OUT OF MEMORY allocating %s simulation queue data [%d] bytes [%s]",
 				sizeof(s_simulation_queue_element*),
 				network_heap_describe(description, sizeof(description))
 			);
-#endif
 			result = 2;
 		}
 

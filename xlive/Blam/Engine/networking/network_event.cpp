@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "network_event.h"
 
-#ifdef EVENTS_ENABLED
-
 #include "network_globals.h"
 #include "network_time.h"
 
@@ -607,5 +605,3 @@ static void network_event_iterate_categories(void)
 	}
 	return;
 }
-
-#endif

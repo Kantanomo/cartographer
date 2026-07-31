@@ -384,7 +384,7 @@ bool encode_simulation_queue_update_to_buffer(
 	return result;
 }
 
-bool decode_simulation_queue_update_from_buffer(int32 encoded_size, uint8* encoded_data, s_simulation_queue_decoded_update_data* out_decoded_data)
+bool decode_simulation_queue_update_from_buffer(uint8* encoded_data, int32 encoded_size, s_simulation_queue_decoded_update_data* out_decoded_data)
 {
 	bool decode_success = false;
 
@@ -537,7 +537,7 @@ void simulation_queue_entity_update_apply(const s_simulation_queue_element* elem
 		s_simulation_queue_decoded_update_data decoded_update_data;
 		csmemset(&decoded_update_data, 0, sizeof(decoded_update_data));
 
-		if (decode_simulation_queue_update_from_buffer(element->data_size, element->data, &decoded_update_data))
+		if (decode_simulation_queue_update_from_buffer(element->data, element->data_size, &decoded_update_data))
 		{
 			c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(decoded_update_data.entity_type);
 			s_simulation_game_entity* game_entity = simulation_get_entity_database()->entity_try_and_get(decoded_update_data.entity_index);
