@@ -215,10 +215,7 @@ bool __cdecl render_structure_find_camera(
 void __cdecl render_light_suppressor_enable(void)
 {
 	// Don't enable the light suppressor if we've disabled it in the config
-	if (!H2Config_light_suppressor_disable)
-	{
-		*render_light_suppressor_enabled_get() = true;
-	}
+	*render_light_suppressor_enabled_get() = !H2Config_light_suppressor_disable;
 
 	return;
 }
