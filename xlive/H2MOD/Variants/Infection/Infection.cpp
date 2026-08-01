@@ -21,6 +21,7 @@
 #include "units/bipeds.h"
 
 #include "H2MOD.h"
+#include "game/game_engine.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -174,7 +175,7 @@ void Infection::InitClient()
 void Infection::InitHost() {
 	event(_event_status, "h2mod:infection: Host init setting unit speed patch");
 	//Applying SpeedCheck fix
-	H2MOD::set_unit_speed_patch(true);
+	g_game_engine_override_player_speed_update = true;
 
 	event(_event_status, "h2mod:infection: Host init resetting zombie player data status");
 	reset_zombie_player_status();
@@ -261,6 +262,7 @@ void Infection::setPlayerAsHuman(int32 player_index)
 
 	player->configuration.appearance.player_character_type = infection_human_get_player_type();
 	player->unit_speed = k_human_unit_speed;
+	g_game_engine_override_player_speed_changed.set(player_index, true);
 }
 
 void Infection::setPlayerAsZombie(int32 player_index)
@@ -269,6 +271,7 @@ void Infection::setPlayerAsZombie(int32 player_index)
 
 	player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
 	player->unit_speed = k_zombie_unit_speed;
+	g_game_engine_override_player_speed_changed.set(player_index, true);
 	call_give_player_weapon(player_index, e_weapons_datum_index::energy_blade, 1);
 	
 	return;
@@ -385,7 +388,7 @@ void Infection::Dispose()
 
 	Infection::resetWeaponInteractionAndEmblems();
 	if (!game_is_predicted()) {
-		H2MOD::set_unit_speed_patch(false);
+		g_game_engine_override_player_speed_update = false;
 	}
 
 	return;
