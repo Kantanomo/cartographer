@@ -85,9 +85,12 @@ static t_main_time_reset p_main_time_reset;
 static int8 g_next_flip_delta_index;
 static int16 g_flip_deltas[k_flip_delta_count];
 
+bool debug_frame_rate = false;
 bool display_framerate = false;
 bool display_frame_deltas = false;
 bool debug_disable_frame_rate_throttle = false;
+bool debug_frame_rate_based_on_system_time = false;
+bool debug_frame_rate_stabilization = false;
 
 bool g_main_game_time_frame_limiter_enabled = false;
 

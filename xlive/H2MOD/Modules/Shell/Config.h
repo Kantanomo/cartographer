@@ -45,7 +45,7 @@ extern bool H2Config_controller_aim_assist;
 extern int H2Config_fps_limit;
 extern int8 H2Config_static_lod_state;
 extern bool H2Config_shader_lod_max;
-extern bool H2Config_light_suppressor;
+extern bool H2Config_light_suppressor_disable;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
