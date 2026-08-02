@@ -69,6 +69,6 @@ while(0)
 if (0)									\
 {										\
 	cseries_stub_internal(__VA_ARGS__);	\
-}
+} (void)0
 
 #endif

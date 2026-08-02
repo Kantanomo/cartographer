@@ -335,18 +335,24 @@ do \
 
 #else
 
+template<typename... Args>
+void h2log_stub(const std::string& fmt, const Args &... args) { SUPRESS_UNUSED(fmt); }
+
+template<typename... Args>
+static void h2log_stub(const std::wstring& fmt, const Args &... args) { SUPRESS_UNUSED(fmt); }
+
 #define LOG_STUB(...)					\
 if (0)									\
 {										\
-	cseries_stub_internal(__VA_ARGS__);	\
-}
+	h2log_stub(__VA_ARGS__);	\
+} (void)0
 
 #define LIMITED_LOG(log_limit, logger, ...) \
 if (0)										\
 {											\
 	log_limit;								\
 	LOG_STUB(__VA_ARGS__);					\
-}
+} (void)0
 
 #define LOG_TRACE(...) LOG_STUB(__VA_ARGS__)
 #define LOG_DEBUG(...) LOG_STUB(__VA_ARGS__)
@@ -396,8 +402,8 @@ if (0)										\
 #define LOG_CHECK(...)					\
 if (0)									\
 {										\
-	cseries_stub_internal(__VA_ARGS__);	\
-}
+	h2log_stub(__VA_ARGS__);			\
+} (void)0
 
 #endif
 

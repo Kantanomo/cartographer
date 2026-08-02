@@ -291,12 +291,6 @@ void cseries_stub_internal(...);
 void cseries_stub_internal(const std::string& str);
 void cseries_stub_internal(const std::wstring& str);
 
-template<typename... Args>
-void cseries_stub_internal(const std::string& fmt, const Args &... args) { SUPRESS_UNUSED(fmt); }
-
-template<typename... Args>
-static void cseries_stub_internal(const std::wstring& fmt, const Args &... args) { SUPRESS_UNUSED(fmt); }
-
 /* public code */
 
 template <typename T>

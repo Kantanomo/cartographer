@@ -102,7 +102,7 @@ void write_to_error_file(e_error_category category, e_error_priority priority, c
 if (0)									\
 {										\
 	cseries_stub_internal(__VA_ARGS__);	\
-}
+} (void)0
 
 #endif
 
