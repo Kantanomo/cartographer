@@ -5,8 +5,8 @@
     <LocalDebuggerCommand>$(OutDir)halo2.exe</LocalDebuggerCommand>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-windowed -novsync</LocalDebuggerCommandArguments>
-    <LocalDebuggerCommandArgumentsHistory>-lan|-live|-live -instance:asdf|-lan -instance:asdf|-windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
+    <LocalDebuggerCommandArguments>-nointro -windowed -novsync</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArgumentsHistory>-live|-live -instance:asdf|-lan -instance:asdf|-windowed -novsync|-nointro -windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">
     <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>

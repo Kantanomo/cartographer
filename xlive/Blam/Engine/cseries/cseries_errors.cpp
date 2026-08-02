@@ -649,7 +649,7 @@ void error_va(
 	else if (is_debugger_present())
 	{
 		OutputDebugStringA("some kind of error is occurring at initialization time");
-		//DebugBreak();
+		DebugBreak();
 	}
 
 	return;

@@ -170,7 +170,7 @@ public:
 	void process_match_property(s_halo_playlist_section_item* section);
 	bool property_name_is_valid(wchar_t* property_name);
 	void trim_property_name();
-	void error(e_halo_playlist_error error_type, uint32 file_line, wchar_t* property_name = L"", wchar_t* property_value = L"", wchar_t* extra = L"");
+	void log_error(e_halo_playlist_error error_type, uint32 file_line, wchar_t* property_name = L"", wchar_t* property_value = L"", wchar_t* extra = L"");
 	void finalize();
 
 	static int game_variant_sort(void* context, void const* lhs, void const* rhs);

@@ -139,12 +139,12 @@ void c_language_pack::append_strings(s_string_reference* string_references, utf8
 	this->m_string_data_size = new_string_data_size;
 
 
-	s_string_reference* string_reference = &this->m_string_references[*out_index];
+	//s_string_reference* string_reference = &this->m_string_references[*out_index];
 
-	utf8* str = &this->m_string_data[string_reference->buffer_offset];
+	//utf8* str = &this->m_string_data[string_reference->buffer_offset];
 
-	event(_event_verbose, "%s == %s", string_buffer, str);
-	event(_event_verbose, "%s", str);
+	//event(_event_verbose, "%s == %s", string_buffer, str);
+	//event(_event_verbose, "%s", str);
 }
 
 void __cdecl string_list_get_normal_string(

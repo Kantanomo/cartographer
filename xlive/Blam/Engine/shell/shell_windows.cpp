@@ -117,7 +117,7 @@ s_window_globals* window_globals_get(void)
 
 uint32 shell_get_instance_num(void)
 {
-	//ASSERT(g_instance_number > 0);
+	ASSERT(g_instance_number > 0);
 	return g_instance_number;
 }
 
