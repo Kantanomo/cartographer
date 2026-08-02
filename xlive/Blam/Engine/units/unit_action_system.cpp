@@ -68,7 +68,7 @@ static void unit_throw_grenade_move_to_hand(datum unit_index)
 
 	bool unit_can_throw_grenade = true;
 
-	if (unit->unit.actor_index == NONE || !unit_throw_grenade_actors_unlimited_grenades() && !action_state->throw_predicted)
+	if ((unit->unit.actor_index == NONE || !unit_throw_grenade_actors_unlimited_grenades())	&& !action_state->throw_predicted)
 	{
 		if (unit->unit.grenade_counts[unit->unit.current_grenade_index] <= 0)
 		{
