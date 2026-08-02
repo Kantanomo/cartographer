@@ -34,6 +34,6 @@ bool __cdecl online_connected_to_xbox_live()
 
 void online_account_transition_to_offline()
 {
-	ConfigureLocalUserDetails(H2Config_ip_lan);
+	ConfigureLocalUserDetails();
 	XUserSignInSetStatusChanged(0);
 }

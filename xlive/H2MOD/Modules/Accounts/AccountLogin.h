@@ -18,7 +18,7 @@ const char* GetMasterStateStr();
 void UpdateMasterLoginStatus(bool developer = false);
 void UpdateMasterStatus(int state, const char* state_str, ...);
 bool HandleGuiLogin(char* token, char* identifier, char* password, int* master_login_interpret_result);
-int ConfigureLocalUserDetails(unsigned long lanaddr);
-int ConfigureOnlineUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* machineUID, const char* onlineId, bool developer = false);
+int ConfigureLocalUserDetails();
+int ConfigureOnlineUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, const char* machineUID, const char* onlineId, bool developer = false);
 
 extern bool AccountEdit_remember;

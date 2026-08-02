@@ -78,19 +78,19 @@ void UpdateMasterLoginStatus(bool developer) {
 	}
 }
 
-int ConfigureLocalUserDetails(unsigned long lanaddr)
+int ConfigureLocalUserDetails()
 {
 	BYTE abEnet[sizeof(XNADDR::abEnet)], abOnline[sizeof(XNADDR::abOnline)];
 	XUID xuid = (unsigned long long)(rand() % 0xFFFFFFFF);
 
 	XNetRandom(abEnet, sizeof(abEnet));
 	XNetRandom(abOnline, sizeof(abOnline));
-	XUserSetup(0, xuid, NULL, 0, lanaddr, H2Config_base_port, abEnet, abOnline, false);
+	XUserSetup(0, xuid, NULL, 0, H2Config_ip_lan, H2Config_base_port, abEnet, abOnline, false);
 	UpdateMasterLoginStatus();
 	return 1;
 }
 
-int ConfigureOnlineUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* machineUID, const char* onlineId, bool developer) {
+int ConfigureOnlineUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, const char* machineUID, const char* onlineId, bool developer) {
 
 	bool xuidValid = xuid != 0;
 	size_t usernameLen = strnlen(username, XUSER_NAME_SIZE);
@@ -115,7 +115,7 @@ int ConfigureOnlineUserDetails(const char* username, const char* login_token, un
 	HexStrToBytes(std::string(machineUID, sizeof(XNADDR::abEnet) * 2), abEnet, sizeof(XNADDR::abEnet));
 	HexStrToBytes(std::string(onlineId, sizeof(XNADDR::abOnline) * 2), abOnline, sizeof(XNADDR::abOnline));
 
-	XUserSetup(0, xuid, username, xnaddr, lanaddr, H2Config_base_port, abEnet, abOnline, true);
+	XUserSetup(0, xuid, username, xnaddr, H2Config_ip_lan, H2Config_base_port, abEnet, abOnline, true);
 	TEST_N_DEF(PC4);
 	UpdateMasterLoginStatus(developer);
 
@@ -320,7 +320,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		return result;
 	}
 
-	int user_configure_result = ConfigureOnlineUserDetails(username, login_token, xuid, xnaddr, H2Config_ip_lan, machineUID, abOnline, result == 4);
+	int user_configure_result = ConfigureOnlineUserDetails(username, login_token, xuid, xnaddr, machineUID, abOnline, result == 4);
 	if (user_configure_result != 0) {
 		//allow no login_token from backend in DB emergencies / random logins.
 		if (user_configure_result == 1) {

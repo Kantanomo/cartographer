@@ -112,7 +112,7 @@ void H2DedicatedServerStartup() {
 		addDebugText("Signing in dedicated server locally.");
 
 		AccountEdit_remember = false;
-		ConfigureLocalUserDetails(H2Config_ip_lan);
+		ConfigureLocalUserDetails();
 	}
 }
 

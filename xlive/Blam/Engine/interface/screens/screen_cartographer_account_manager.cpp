@@ -473,7 +473,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 	else if (button_id == H2AccountCount)
 	{
 		g_account_manager_remove_mode = false;
-		if (ConfigureLocalUserDetails(H2Config_ip_lan))
+		if (ConfigureLocalUserDetails())
 		{
 			//show select profile gui
 			extern int notify_xlive_ui;

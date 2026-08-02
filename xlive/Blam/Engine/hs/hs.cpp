@@ -274,12 +274,12 @@ const int32 hs_type_scenery_default = NONE;
 #ifdef HS_COMPILER_ENABLED
 const hs_enum_definition hs_enum_table[NUMBER_OF_HS_ENUM_TYPES] =
 {
-	{ NUMBEROF(global_campaign_difficulty_level_names), global_campaign_difficulty_level_names},
+	{ NUMBEROF(global_campaign_difficulty_level_names), global_campaign_difficulty_level_names },
 	{ NUMBEROF(global_campaign_team_names), global_campaign_team_names },
-	{ NUMBEROF(global_actor_type_names), global_actor_type_names},
-	{ NUMBEROF(global_hud_anchor_names), global_hud_anchor_names},
-	{ NUMBEROF(global_model_state_names), global_model_state_names},
-	{ NUMBEROF(k_event_level_names), k_event_level_names}
+	{ NUMBEROF(global_actor_type_names), global_actor_type_names },
+	{ NUMBEROF(global_hud_anchor_names), global_hud_anchor_names },
+	{ NUMBEROF(global_model_state_names), global_model_state_names },
+	{ NUMBEROF(k_event_level_names), k_event_level_names }
 };
 #endif
 
