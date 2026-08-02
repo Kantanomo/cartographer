@@ -1,9 +1,16 @@
 #pragma once
 #include "halo_playlist_item_collection.h"
 
-#define k_halo_playlist_playlist_property_item_count 5
+/* constants */
 
-enum e_halo_playlist_playlist_property_type : int32
+enum
+{
+	k_halo_playlist_playlist_property_item_count = 5
+};
+
+/* enums */
+
+enum e_halo_playlist_playlist_property_type
 {
 	_halo_playlist_playlist_property_shuffle,
 	_halo_playlist_playlist_property_pregame_selection_delay,
@@ -14,4 +21,6 @@ enum e_halo_playlist_playlist_property_type : int32
 	k_halo_playlist_playlist_property_invalid = NONE
 };
 
-e_halo_playlist_playlist_property_type halo_playlist_item_collection_playlist_property_get_value(wchar_t* value);
+/* prototypes */
+
+e_halo_playlist_playlist_property_type halo_playlist_item_collection_playlist_property_get_value(wchar_t const* value);

@@ -46,27 +46,28 @@ bool __cdecl sub_4701B6(datum player_index)
 
 e_game_variant_description_index game_engine_type_get_variant_description_index(e_game_engine_type type)
 {
+	e_game_variant_description_index result = k_game_variant_description_invalid;
 	switch (type)
 	{
 	case _game_engine_type_ctf:
-		return _game_variant_description_ctf;
+		result = _game_variant_description_ctf;
 	case _game_engine_type_slayer:
-		return _game_variant_description_slayer;
+		result = _game_variant_description_slayer;
 	case _game_engine_type_oddball:
-		return _game_variant_description_oddball;
+		result = _game_variant_description_oddball;
 	case _game_engine_type_koth:
-		return _game_variant_description_king;
+		result = _game_variant_description_king;
 	case _game_engine_type_race:
-		return k_game_variant_description_invalid;
+		result = k_game_variant_description_invalid;
 	case _game_engine_type_headhunter:
-		return k_game_variant_description_invalid;
+		result = k_game_variant_description_invalid;
 	case _game_engine_type_juggernaut:
-		return _game_variant_description_juggernaut;
+		result = _game_variant_description_juggernaut;
 	case _game_engine_type_territories:
-		return _game_variant_description_territories;
+		result = _game_variant_description_territories;
 	case _game_engine_type_assault:
-		return _game_variant_description_invasion;
+		result = _game_variant_description_invasion;
 	}
 
-	return k_game_variant_description_invalid;
+	return result;
 }

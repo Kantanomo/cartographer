@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "halo_playlist_header.h"
 
+/* globals */
+
 //PLAYLIST_ITEM_COLLECTION(g_playlist_header_collection, k_halo_playlist_header_item_count,
 //    { L"Playlist",       _halo_playlist_header_playlist },
 //    { L"Variant",        _halo_playlist_header_variant },
@@ -9,7 +11,9 @@
 //    { L"Match",          _halo_playlist_header_match }
 //);
 
-e_halo_playlist_header_type halo_playlist_item_collection_get_header_type(wchar_t* value)
+/* public code */
+
+e_halo_playlist_header_type halo_playlist_item_collection_get_header_type(wchar_t const* value)
 {
 	s_halo_playlist_item_collection* g_playlist_header_collection = Memory::GetAddress<s_halo_playlist_item_collection*>(0, 0x355200);
 

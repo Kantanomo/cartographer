@@ -750,27 +750,29 @@ static void player_configuration_validate_team(
 	return;
 }
 
-int32 player_get_spawn_protection_time(real32 timer)
+static int32 player_get_spawn_protection_time(real32 timer)
 {
 	s_game_variant* variant = get_game_variant();
 
 	if (game_is_multiplayer() && variant)
 	{
+		int32 result = game_seconds_to_ticks_round(timer);
+
 		switch (variant->cartographer_settings.spawn_protection)
 		{
-		case _player_spawn_protection_timer_none:
-			return 0;
-		case _player_spawn_protection_timer_one_second:
-			return game_seconds_to_ticks_round(1);
-		case _player_spawn_protection_timer_three_seconds:
-			return game_seconds_to_ticks_round(3);
-		case _player_spawn_protection_timer_five_seconds:
-			return game_seconds_to_ticks_round(5);
-		case _player_spawn_protection_timer_ten_seconds:
-			return game_seconds_to_ticks_round(10);
-		default:
-			return game_seconds_to_ticks_round(timer);
+			case _player_spawn_protection_timer_none:
+				result = 0;
+			case _player_spawn_protection_timer_one_second:
+				result = game_seconds_to_ticks_round(1);
+			case _player_spawn_protection_timer_three_seconds:
+				result = game_seconds_to_ticks_round(3);
+			case _player_spawn_protection_timer_five_seconds:
+				result = game_seconds_to_ticks_round(5);
+			case _player_spawn_protection_timer_ten_seconds:
+				result = game_seconds_to_ticks_round(10);
 		}
+
+		return result;
 	}
 
 	return game_seconds_to_ticks_round(timer);

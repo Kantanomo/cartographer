@@ -98,7 +98,6 @@
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #endif
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
@@ -107,7 +106,6 @@
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -117,6 +115,7 @@
 #include "halo_playlist/halo_playlist.h"
 #include "interface/multiplayer_variant_settings_interface_definition.h"
 #include "items/weapons.h"
+#include "physics/physics_constants.h"
 #include "units/unit_action_system.h"
 
 /* typedefs */
@@ -308,13 +307,11 @@ void H2MOD::Initialize()
 	else
 	{
 		kablam_apply_patches();
-		playlist_loader::initialize();
 	}
 
 	cartographer_player_profile_initialize();
 	tag_injection_initialize();
 	CustomVariantHandler::RegisterCustomVariants();
-	CustomVariantSettings::Initialize();
 	MapSlots::Initialize();
 	ProjectileFix::ApplyPatches();
 	H2X::ApplyPatches();

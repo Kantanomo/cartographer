@@ -10,14 +10,46 @@
 
 /* typedefs */
 
+/* prototypes */
+
+static bool unit_throw_grenade_actors_unlimited_grenades();
+static void unit_throw_grenade_move_to_hand(datum unit_index);
+__declspec(naked) void unit_throw_grenade_move_to_hand_usercall_to_rewritten(void)
+{
+	__asm
+	{
+		pushad
+		pushfd
+
+		push edi
+
+		call unit_throw_grenade_move_to_hand
+
+		add esp, 4
+
+		popfd
+		popad
+
+		retn
+	}
+}
+
+/* public code */
+
+void unit_action_system_apply_patches()
+{
+	PatchCall(Memory::GetAddress(0x166F5E, 0x15CA1E), unit_throw_grenade_move_to_hand_usercall_to_rewritten);
+	PatchCall(Memory::GetAddress(0x169B04, 0x15F5C4), unit_throw_grenade_move_to_hand_usercall_to_rewritten);
+}
+
 /* private code */
 
-bool unit_throw_grenade_actors_unlimited_grenades()
+static bool unit_throw_grenade_actors_unlimited_grenades()
 {
 	return true;
 }
 
-void unit_throw_grenade_move_to_hand(datum unit_index)
+static void unit_throw_grenade_move_to_hand(datum unit_index)
 {
 	unit_datum* unit = unit_get(unit_index);
 
@@ -102,32 +134,4 @@ void unit_throw_grenade_move_to_hand(datum unit_index)
 		action_state->throw_grenade_index = unit->unit.current_grenade_index;
 		action_state->throw_state = _throw_in_hand;
 	}
-}
-
-__declspec(naked) void unit_throw_grenade_move_to_hand_usercall_to_rewritten(void)
-{
-	__asm
-	{
-		pushad
-		pushfd
-
-		push edi
-
-		call unit_throw_grenade_move_to_hand
-
-		add esp, 4
-
-		popfd
-		popad
-
-		retn
-	}
-}
-
-/* public code */
-
-void unit_action_system_apply_patches()
-{
-	PatchCall(Memory::GetAddress(0x166F5E, 0x15CA1E), unit_throw_grenade_move_to_hand_usercall_to_rewritten);
-	PatchCall(Memory::GetAddress(0x169B04, 0x15F5C4), unit_throw_grenade_move_to_hand_usercall_to_rewritten);
 }

@@ -3,13 +3,19 @@
 #include "main/map_manager.h"
 #include "saved_games/game_variant.h"
 
+/* constants */
+
 enum
 {
 	k_halo_playlist_maximum_variant_count = 100,
 	k_halo_playlist_maximum_match_count = 100,
 	k_halo_playlist_maximum_errors = 200,
-	k_halo_playlist_default_delay_time = 10
+	k_halo_playlist_default_delay_time = 10,
+	k_halo_playlist_maximum_file_sections = 112,
+	k_halo_playlist_maximum_text_length = 32
 };
+
+/* enums */
 
 enum e_halo_playlist_loading_result
 {
@@ -44,19 +50,22 @@ enum e_halo_playlist_error
 
 enum e_halo_playlist_reader_seek_mode
 {
-	_halo_playlist_reader_seek_mode_new_line = 0x0,
-	_halo_playlist_reader_seek_mode_header_start = 0x2,
-	_halo_playlist_reader_seek_mode_header_read = 0x3,
-	_halo_playlist_reader_seek_mode_property_name_read = 0x4,
-	_halo_playlist_reader_seek_mode_property_deliminator_scan = 0x5,
-	_halo_playlist_reader_seek_mode_property_value_read = 0x6,
-	_halo_playlist_reader_seek_mode_seek_to_next_line = 0x7,
+	_halo_playlist_reader_seek_mode_new_line,
+	_halo_playlist_reader_seek_mode_unused,
+	_halo_playlist_reader_seek_mode_header_start,
+	_halo_playlist_reader_seek_mode_header_read,
+	_halo_playlist_reader_seek_mode_property_name_read,
+	_halo_playlist_reader_seek_mode_property_deliminator_scan,
+	_halo_playlist_reader_seek_mode_property_value_read,
+	_halo_playlist_reader_seek_mode_seek_to_next_line,
 };
+
+/* structures */
 
 struct s_halo_playlist_section_item
 {
-	wchar_t name_buffer[32];
-	wchar_t value_buffer[32];
+	wchar_t name_buffer[k_halo_playlist_maximum_text_length];
+	wchar_t value_buffer[k_halo_playlist_maximum_text_length];
 	uint32 file_line;
 	bool processed;
 };
@@ -65,7 +74,7 @@ ASSERT_STRUCT_SIZE(s_halo_playlist_section_item, 0x88);
 struct s_halo_playlist_match
 {
 	uint32 match_line_in_file;
-	wchar_t map[32];
+	wchar_t map[k_halo_playlist_maximum_text_length];
 	uint32 map_line_in_file;
 	wchar_t variant[17];
 	uint32 variant_line_in_file;
@@ -91,9 +100,9 @@ struct s_halo_playlist_error
 {
 	e_halo_playlist_error error_type;
 	uint32 file_line;
-	wchar_t property_name[32];
-	wchar_t property_value[32];
-	wchar_t property_extra[32];
+	wchar_t property_name[k_halo_playlist_maximum_text_length];
+	wchar_t property_value[k_halo_playlist_maximum_text_length];
+	wchar_t property_extra[k_halo_playlist_maximum_text_length];
 };
 ASSERT_STRUCT_SIZE(s_halo_playlist_error, 0xC8);
 
@@ -116,7 +125,7 @@ ASSERT_STRUCT_SIZE(s_halo_playlist, 0x1E610);
 struct s_halo_playlist_loading_result
 {
 	int32 result_code;
-	wchar_t path[260];
+	wchar_t path[MAX_PATH];
 };
 ASSERT_STRUCT_SIZE(s_halo_playlist_loading_result, 524);
 
@@ -131,11 +140,11 @@ class c_halo_playlist_reader
 {
 public:
 	s_halo_playlist* m_playlist;
-	s_halo_playlist_match m_matches[100];
+	s_halo_playlist_match m_matches[k_halo_playlist_maximum_match_count];
 	uint32 m_match_count;
-	s_halo_playlist_section_item m_section_items[112];
+	s_halo_playlist_section_item m_section_items[k_halo_playlist_maximum_file_sections];
 	uint32 m_section_buffer_item_count;
-	wchar_t m_section_header_buffer[32];
+	wchar_t m_section_header_buffer[k_halo_playlist_maximum_text_length];
 	DWORD m_current_header_file_line;
 	e_halo_playlist_header_type m_current_section_type;
 	e_halo_playlist_reader_seek_mode m_current_reader_mode;
@@ -179,5 +188,7 @@ public:
 };
 
 ASSERT_STRUCT_SIZE(c_halo_playlist_reader, 0x6AC4);
+
+/* prototypes */
 
 void halo_playlist_apply_patches();

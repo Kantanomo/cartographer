@@ -1,7 +1,12 @@
 #pragma once
 
-#define k_game_engine_oddball_maximum_balls 3
-#define k_multiplayer_variant_headhunter_parameter_count 7
+/* constants */
+
+enum
+{
+	k_game_engine_oddball_maximum_balls = 3,
+	k_multiplayer_variant_headhunter_parameter_count = 7
+};
 
 /* enums */
 

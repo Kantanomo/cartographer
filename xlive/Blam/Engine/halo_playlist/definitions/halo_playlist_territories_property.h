@@ -1,9 +1,16 @@
 #pragma once
 #include "halo_playlist_item_collection.h"
 
-#define k_halo_playlist_territories_property_item_count 6
+/* constants */
 
-enum e_halo_playlist_territories_property : int32
+enum
+{
+	k_halo_playlist_territories_property_item_count = 6
+};
+
+/* enums */
+
+enum e_halo_playlist_territories_property
 {
 	_halo_playlist_territories_property_score_to_win_round,
 	_halo_playlist_territories_property_team_changing,
@@ -16,4 +23,6 @@ enum e_halo_playlist_territories_property : int32
 	k_halo_playlist_territories_property_invalid = NONE
 };
 
-e_halo_playlist_territories_property halo_playlist_item_collection_territories_property_get_value(wchar_t* value);
+/* prototypes */
+
+e_halo_playlist_territories_property halo_playlist_item_collection_territories_property_get_value(wchar_t const* value);

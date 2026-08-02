@@ -10,7 +10,7 @@
 #include "saved_games/game_variant.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 
-/* constant */
+/* constants */
 
 constexpr real32 k_following_camera_default_field_of_view = 78.f;
 constexpr real32 k_following_camera_default_field_of_view_radians = DEGREES_TO_RADIANS(k_following_camera_default_field_of_view);
@@ -161,12 +161,14 @@ real32 following_camera_get_default_camera_field_of_view()
 
 	s_game_variant* variant = get_game_variant();
 
+	real32 result = DEGREES_TO_RADIANS(player_profile->vehicle_field_of_view);
+
 	if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_force_default_fov))
 	{
-		return k_following_camera_default_field_of_view_radians;
+		result = k_following_camera_default_field_of_view_radians;
 	}
 
-	return DEGREES_TO_RADIANS(player_profile->vehicle_field_of_view);
+	return result;
 }
 
 void following_camera_apply_patches()

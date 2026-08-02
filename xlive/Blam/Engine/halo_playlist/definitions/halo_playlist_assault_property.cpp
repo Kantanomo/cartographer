@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "halo_playlist_assault_property.h"
 
+/* globals */
+
 //PLAYLIST_ITEM_COLLECTION(g_halo_playlist_assault_property_item_collection, k_halo_playlist_assault_property_item_count,
 //    { L"Score to Win Round",           _halo_playlist_assault_property_score_to_win_round },
 //    { L"Team Changing",                _halo_playlist_assault_property_team_changing },
@@ -19,7 +21,9 @@
 //    { L"Vehicle Operation",            _halo_playlist_assault_property_vehicle_operation }
 //);
 
-e_halo_playlist_assault_property halo_playlist_item_collection_assault_property_get_value(wchar_t* value)
+/* public code */
+
+e_halo_playlist_assault_property halo_playlist_item_collection_assault_property_get_value(wchar_t const* value)
 {
 	s_halo_playlist_item_collection* g_halo_playlist_assault_property_item_collection = Memory::GetAddress<s_halo_playlist_item_collection*>(0, 0x3562A0);
 	return (e_halo_playlist_assault_property)halo_playlist_item_collection_get_value(g_halo_playlist_assault_property_item_collection, value);

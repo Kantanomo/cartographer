@@ -63,7 +63,7 @@ void c_language_pack::string_list_get_normal_string(
 	{
 		c_maximum_interface_text string;
 		utf8* string_data = this->get_string_utf8(id, strings_start_index, strings_count);
-		utf8_string_to_wchar_string(string_data, (wchar_t*)&string, 512);
+		utf8_string_to_wchar_string(string_data, string.get_buffer(), string.max_length());
 		out_string->set(string.get_string());
 	}
 	//INVOKE_TYPE(0x3E332, 0x0, void(__thiscall*)(c_language_pack*, string_id, c_maximum_interface_text*, int32, int32), this, id, out_string, strings_start_index, strings_count);

@@ -1,9 +1,16 @@
 #pragma once
 #include "halo_playlist_item_collection.h"
 
-#define k_halo_playlist_match_property_count 5
+/* constants */
 
-enum e_halo_playlist_match_property_type : int32
+enum
+{
+	k_halo_playlist_match_property_count = 5
+};
+
+/* enums */
+
+enum e_halo_playlist_match_property_type
 {
 	_halo_playlist_match_property_type_variant,
 	_halo_playlist_match_property_type_map,
@@ -15,5 +22,7 @@ enum e_halo_playlist_match_property_type : int32
 	k_halo_playlist_match_property_invalid = NONE
 };
 
-e_halo_playlist_match_property_type halo_playlist_item_collection_get_match_property_get_value(wchar_t* value);
+/* prototypes */
+
+e_halo_playlist_match_property_type halo_playlist_item_collection_get_match_property_get_value(wchar_t const* value);
 wchar_t* halo_playlist_item_collection_match_property_get_name(e_halo_playlist_match_property_type value);

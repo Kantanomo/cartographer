@@ -1,7 +1,14 @@
 #pragma once
 #include "halo_playlist_item_collection.h"
 
-#define k_halo_playlist_oddball_property_item_count 12
+/* constants */
+
+enum
+{
+	k_halo_playlist_oddball_property_item_count = 12
+};
+
+/* enums */
 
 enum e_halo_playlist_oddball_property : int32
 {
@@ -22,4 +29,6 @@ enum e_halo_playlist_oddball_property : int32
 	k_halo_playlist_oddball_property_invalid = NONE
 };
 
-e_halo_playlist_oddball_property halo_playlist_item_collection_oddball_property_get_value(wchar_t* value);
+/* prototypes */
+
+e_halo_playlist_oddball_property halo_playlist_item_collection_oddball_property_get_value(wchar_t const* value);

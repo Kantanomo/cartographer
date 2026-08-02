@@ -7,6 +7,8 @@
         #_name " out of sync with enum");                                             \
     s_halo_playlist_item_collection _name = { _name##_items, ARRAYSIZE(_name##_items) }
 
+/* structures */
+
 struct s_halo_playlist_item
 {
 	wchar_t* name;
@@ -21,18 +23,20 @@ struct s_halo_playlist_item_collection
 };
 ASSERT_STRUCT_SIZE(s_halo_playlist_item_collection, 8);
 
+/* prototypes */
+
 wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_collection* collection, int32 value);
 
-int32 halo_playlist_item_collection_get_value(s_halo_playlist_item_collection* collection, wchar_t* value);
+int32 halo_playlist_item_collection_get_value(s_halo_playlist_item_collection* collection, wchar_t const* value);
 
-bool halo_playlist_item_collection_get_boolean_value(wchar_t* value, bool* out_result);
+bool halo_playlist_item_collection_get_boolean_value(wchar_t const* value, bool* out_result);
 
 // range 1-600 allows second and minute specifier
 // used for score, respawn times, reset times, etc
-int32 halo_playlist_item_collection_get_int_time_value(wchar_t* value);
+int32 halo_playlist_item_collection_get_int_time_value(wchar_t const* value);
 
 // range 1-1000
-int32 halo_playlist_item_collection_get_int_value(wchar_t* value);
+int32 halo_playlist_item_collection_get_int_value(wchar_t const* value);
 
 // range 1-16
-int16 halo_playlist_item_collection_player_count_get_value(wchar_t* value);
+int16 halo_playlist_item_collection_player_count_get_value(wchar_t const* value);

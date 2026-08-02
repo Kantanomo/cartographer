@@ -1,9 +1,16 @@
 #pragma once
 #include "halo_playlist_item_collection.h"
 
-#define k_halo_playlist_king_property_item_count 11
+/* constants */
 
-enum e_halo_playlist_king_property : int32
+enum 
+{
+	k_halo_playlist_king_property_item_count = 11
+};
+
+/* enums */
+
+enum e_halo_playlist_king_property
 {
 	_halo_playlist_king_property_score_to_win,
 	_halo_playlist_king_property_team_play,
@@ -21,4 +28,6 @@ enum e_halo_playlist_king_property : int32
 	k_halo_playlist_king_property_invalid = NONE
 };
 
-e_halo_playlist_king_property halo_playlist_item_collection_king_property_get_value(wchar_t* value);
+/* prototypes */
+
+e_halo_playlist_king_property halo_playlist_item_collection_king_property_get_value(wchar_t const* value);

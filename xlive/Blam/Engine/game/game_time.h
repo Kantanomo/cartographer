@@ -6,6 +6,8 @@ constexpr real32 k_game_time_default_game_speed = 1.f;
 
 /* prototypes */
 
+void game_time_apply_patches();
+
 bool game_time_initialized(void);
 
 uint32 game_time_get(void);
@@ -45,5 +47,3 @@ real32 game_time_get_leftover(void);
 void __cdecl game_time_reset();
 
 void __cdecl game_time_setup_scenario();
-
-void game_time_apply_patches();

@@ -8,8 +8,6 @@
 
 #include "shell/shell.h"
 
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
-
 /* typedef */
 typedef void(__cdecl* t_object_apply_damage_aftermath)(datum object_index, s_damage_aftermath_data* damage_data);
 t_object_apply_damage_aftermath p_object_apply_damage_aftermath;

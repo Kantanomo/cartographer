@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "halo_playlist_equipment_property.h"
 
+/* globals */
+
 //PLAYLIST_ITEM_COLLECTION(g_halo_playlist_equipment_property_item_collection,
 //    k_halo_playlist_equipment_property_item_count,
 //    { L"Starting Weapon",     _halo_playlist_equipment_property_starting_weapon },
@@ -13,7 +15,9 @@
 //    { L"Active Camo on Map",  _halo_playlist_equipment_property_active_camo_on_map }
 //);
 
-e_halo_playlist_equipment_property halo_playlist_item_collection_equipment_property_get_value(wchar_t* value)
+/* public code */
+
+e_halo_playlist_equipment_property halo_playlist_item_collection_equipment_property_get_value(wchar_t const* value)
 {
 	s_halo_playlist_item_collection* g_halo_playlist_equipment_property_item_collection = Memory::GetAddress<s_halo_playlist_item_collection*>(0, 0x355B30);
 	return (e_halo_playlist_equipment_property)halo_playlist_item_collection_get_value(g_halo_playlist_equipment_property_item_collection, value);

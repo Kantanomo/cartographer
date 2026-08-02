@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "halo_playlist_oddball_property.h"
 
+/* globals */
+
 //PLAYLIST_ITEM_COLLECTION(g_halo_playlist_oddball_property_item_collection,
 //    k_halo_playlist_oddball_property_item_count,
 //    { L"Score to Win Round",    _halo_playlist_oddball_property_score_to_win_round },
@@ -17,7 +19,9 @@
 //    { L"Ball Indicator",        _halo_playlist_oddball_property_ball_indicator }
 //);
 
-e_halo_playlist_oddball_property halo_playlist_item_collection_oddball_property_get_value(wchar_t* value)
+/* public code */
+
+e_halo_playlist_oddball_property halo_playlist_item_collection_oddball_property_get_value(wchar_t const* value)
 {
 	s_halo_playlist_item_collection* g_halo_playlist_oddball_property_item_collection = Memory::GetAddress<s_halo_playlist_item_collection*>(0, 0x355E60);
 	return (e_halo_playlist_oddball_property)halo_playlist_item_collection_get_value(g_halo_playlist_oddball_property_item_collection, value);

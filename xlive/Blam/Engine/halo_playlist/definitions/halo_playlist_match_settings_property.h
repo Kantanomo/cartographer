@@ -1,9 +1,16 @@
 #pragma once
 #include "halo_playlist_item_collection.h"
 
-#define k_halo_playlist_match_settings_property_item_count 4
+/* constants */
 
-enum e_halo_playlist_match_settings_property : int32
+enum
+{
+	k_halo_playlist_match_settings_property_item_count = 4
+};
+
+/* globals */
+
+enum e_halo_playlist_match_settings_property
 {
 	_halo_playlist_match_settings_property_number_of_rounds,
 	_halo_playlist_match_settings_property_round_time_limit,
@@ -14,4 +21,6 @@ enum e_halo_playlist_match_settings_property : int32
 	k_halo_playlist_match_settings_property_invalid = NONE
 };
 
-e_halo_playlist_match_settings_property halo_playlist_item_collection_match_settings_property_get_value(wchar_t* value);
+/* prototypes */
+
+e_halo_playlist_match_settings_property halo_playlist_item_collection_match_settings_property_get_value(wchar_t const* value);

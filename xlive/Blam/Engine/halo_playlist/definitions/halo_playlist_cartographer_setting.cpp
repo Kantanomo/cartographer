@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "halo_playlist_cartographer_setting.h"
 
+/* prototypes */
+
+static bool halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(wchar_t const* value, s_game_variant* variant, e_cartographer_variant_flags flag);
+
+/* globals */
+
 PLAYLIST_ITEM_COLLECTION(g_halo_playlist_cartographer_setting_property_item_collection, k_halo_playlist_cartographer_setting_property_count,
     { L"Engine mode",                    _halo_playlist_cartographer_setting_engine_mode },
     { L"Infinite Ammo",                  _halo_playlist_cartographer_setting_infinite_ammo },
@@ -55,6 +61,8 @@ PLAYLIST_ITEM_COLLECTION(g_halo_playlist_cartographer_spawn_protection_item_coll
     { L"Ten Seconds",   _player_spawn_protection_timer_ten_seconds }
 );
 
+/* public code */
+
 wchar_t* halo_playlist_item_collection_cartographer_setting_get_name(e_halo_playlist_cartographer_setting_property_type value)
 {
     ASSERT(IN_RANGE(value, k_halo_playlist_cartographer_setting_invalid, k_halo_playlist_cartographer_setting_count));
@@ -62,45 +70,32 @@ wchar_t* halo_playlist_item_collection_cartographer_setting_get_name(e_halo_play
     return halo_playlist_item_collection_get_name(&g_halo_playlist_cartographer_setting_property_item_collection, value);
 }
 
-e_halo_playlist_cartographer_setting_property_type halo_playlist_item_collection_cartographer_setting_get_value(wchar_t* value)
+e_halo_playlist_cartographer_setting_property_type halo_playlist_item_collection_cartographer_setting_get_value(wchar_t const* value)
 {
     return (e_halo_playlist_cartographer_setting_property_type)halo_playlist_item_collection_get_value(&g_halo_playlist_cartographer_setting_property_item_collection, value);
 }
 
-e_halo_playlist_cartographer_setting_engine_mode halo_playlist_item_collection_cartographer_engine_mode_get_value(wchar_t* value)
+e_halo_playlist_cartographer_setting_engine_mode halo_playlist_item_collection_cartographer_engine_mode_get_value(wchar_t const* value)
 {
     return (e_halo_playlist_cartographer_setting_engine_mode)halo_playlist_item_collection_get_value(&g_halo_playlist_cartographer_engine_mode_item_collection, value);
 }
 
-e_game_speed_modifier halo_playlist_item_collection_cartographer_game_speed_get_value(wchar_t* value)
+e_game_speed_modifier halo_playlist_item_collection_cartographer_game_speed_get_value(wchar_t const* value)
 {
     return (e_game_speed_modifier)halo_playlist_item_collection_get_value(&g_halo_playlist_cartographer_game_speed_item_collection, value);
 }
 
-e_game_gravity_modifier halo_playlist_item_collection_cartographer_gravity_get_value(wchar_t* value)
+e_game_gravity_modifier halo_playlist_item_collection_cartographer_gravity_get_value(wchar_t const* value)
 {
     return (e_game_gravity_modifier)halo_playlist_item_collection_get_value(&g_halo_playlist_cartographer_gravity_item_collection, value);
 }
 
-e_player_spawn_protection_timer halo_playlist_item_collection_cartographer_spawn_protection_get_value(wchar_t* value)
+e_player_spawn_protection_timer halo_playlist_item_collection_cartographer_spawn_protection_get_value(wchar_t const* value)
 {
     return (e_player_spawn_protection_timer)halo_playlist_item_collection_get_value(&g_halo_playlist_cartographer_spawn_protection_item_collection, value);
 }
 
-static bool halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(wchar_t* value, s_game_variant* variant, e_cartographer_variant_flags flag)
-{
-    bool result = false;
-    const bool eval_result = halo_playlist_item_collection_get_boolean_value(value, &result);
-
-    if (!eval_result)
-        return eval_result;
-
-    variant->cartographer_settings.flags.set(flag, result);
-
-    return eval_result;
-}
-
-bool halo_playlist_item_collection_cartographer_engine_mode_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_engine_mode_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     e_halo_playlist_cartographer_setting_engine_mode engine_mode = halo_playlist_item_collection_cartographer_engine_mode_get_value(value);
 
@@ -112,73 +107,86 @@ bool halo_playlist_item_collection_cartographer_engine_mode_write_to_variant(wch
     return true;
 }
 
-bool halo_playlist_item_collection_cartographer_infinite_ammo_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_infinite_ammo_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     return halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(value, variant, _cartographer_variant_infinite_ammo);
 }
 
-bool halo_playlist_item_collection_cartographer_infinite_grenades_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_infinite_grenades_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     return halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(value, variant, _cartographer_variant_infinite_grenades);
 }
 
-bool halo_playlist_item_collection_cartographer_explosion_physics_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_explosion_physics_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     return halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(value, variant, _cartographer_variant_explosion_physics);
 }
 
-bool halo_playlist_item_collection_cartographer_default_fov_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_default_fov_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     return halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(value, variant, _cartographer_variant_force_default_fov);
 }
 
-bool halo_playlist_item_collection_cartographer_default_weapon_offsets_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_default_weapon_offsets_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     return halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(value, variant, _cartographer_variant_force_default_weapon_offsets);
 }
 
-bool halo_playlist_item_collection_cartographer_default_crosshair_position_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_default_crosshair_position_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     return halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(value, variant, _cartographer_variant_force_default_cross_hair_offset);
 }
 
-bool halo_playlist_item_collection_cartographer_disable_dub_shot_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_disable_dub_shot_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     return halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(value, variant, _cartographer_variant_disable_dub_shot);
 }
 
-bool halo_playlist_item_collection_cartographer_game_speed_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_game_speed_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     e_game_speed_modifier game_speed = halo_playlist_item_collection_cartographer_game_speed_get_value(value);
 
-    if (game_speed == k_game_speed_modifier_invalid)
-        return false;
+    bool result = game_speed != k_game_speed_modifier_invalid;
 
-    variant->cartographer_settings.game_speed = game_speed;
+    if (result)
+        variant->cartographer_settings.game_speed = game_speed;
 
-    return true;
+    return result;
 }
 
-bool halo_playlist_item_collection_cartographer_gravity_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_gravity_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     e_game_gravity_modifier gravity = halo_playlist_item_collection_cartographer_gravity_get_value(value);
 
-    if (gravity == k_game_gravity_modifier_invalid)
-        return false;
+    bool result = gravity != k_game_gravity_modifier_invalid;
 
-    variant->cartographer_settings.gravity = gravity;
+    if (result)
+		variant->cartographer_settings.gravity = gravity;
 
-    return true;
+    return result;
 }
 
-bool halo_playlist_item_collection_cartographer_spawn_protection_write_to_variant(wchar_t* value, s_game_variant* variant)
+bool halo_playlist_item_collection_cartographer_spawn_protection_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     e_player_spawn_protection_timer spawn_protection = halo_playlist_item_collection_cartographer_spawn_protection_get_value(value);
 
-    if (spawn_protection == k_player_spawn_protection_timer_invalid)
-        return false;
+    bool result = spawn_protection != k_player_spawn_protection_timer_invalid;
 
-    variant->cartographer_settings.spawn_protection = spawn_protection;
+    if (result)
+		variant->cartographer_settings.spawn_protection = spawn_protection;
 
-    return true;
+    return result;
+}
+
+/* private code */
+
+static bool halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(wchar_t const* value, s_game_variant* variant, e_cartographer_variant_flags flag)
+{
+    bool flag_value = false;
+    const bool result = halo_playlist_item_collection_get_boolean_value(value, &flag_value);
+
+    if (result)
+        variant->cartographer_settings.flags.set(flag, flag_value);
+
+    return result;
 }

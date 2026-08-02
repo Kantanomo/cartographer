@@ -395,7 +395,7 @@ int32 utol(const wchar_t* string)
 	return _wtol(string);
 }
 
-bool __cdecl uniswcntrl(wchar_t* string)
+bool __cdecl uniswcntrl(wchar_t const* string)
 {
 	ASSERT(string);
 

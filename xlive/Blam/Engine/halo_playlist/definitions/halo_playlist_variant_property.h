@@ -1,7 +1,14 @@
 #pragma once
 #include "halo_playlist_item_collection.h"
 
-#define k_halo_playlist_variant_property_item_count 3
+/* constants */
+
+enum
+{
+	k_halo_playlist_variant_property_item_count = 3
+};
+
+/* enums */
 
 enum e_halo_playlist_variant_property_type
 {
@@ -13,4 +20,6 @@ enum e_halo_playlist_variant_property_type
 	k_halo_playlist_variant_property_invalid = NONE
 };
 
-e_halo_playlist_variant_property_type halo_playlist_item_collection_get_variant_property_type(wchar_t* value);
+/* prototypes */
+
+e_halo_playlist_variant_property_type halo_playlist_item_collection_get_variant_property_type(wchar_t const* value);

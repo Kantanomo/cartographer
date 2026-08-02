@@ -367,7 +367,7 @@ real64 ustrtod(const wchar_t* nptr, wchar_t** endptr);
 
 int32 utol(const wchar_t* string);
 
-bool __cdecl uniswcntrl(wchar_t* string);
+bool __cdecl uniswcntrl(wchar_t const* string);
 
 void wchar_string_to_ascii_string(const wchar_t* src, char* dst, int32 count);
 

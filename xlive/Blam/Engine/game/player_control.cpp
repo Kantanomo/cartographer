@@ -12,7 +12,6 @@
 #include "units/units.h"
 #include "units/unit_definitions.h"
 
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "saved_games/game_variant.h"
 
 /* constants */

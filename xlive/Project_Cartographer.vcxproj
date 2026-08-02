@@ -2009,7 +2009,6 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_virtual_keyboard.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
     <ClCompile Include="Blam\Engine\main\map_repository.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
@@ -2021,7 +2020,6 @@
     <ClCompile Include="Blam\Engine\networking\delivery\network_channel.cpp" />
     <ClCompile Include="Blam\Engine\networking\session\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\networking\session\network_session.cpp" />
-    <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\H2MODShell.cpp" />
     <ClCompile Include="H2MOD\Modules\h2log\h2log.cpp" />
@@ -3143,7 +3141,6 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_virtual_keyboard.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="Blam\Engine\main\map_repository.h" />
-    <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
@@ -3156,7 +3153,6 @@
     <ClInclude Include="Blam\Engine\networking\delivery\network_channel.h" />
     <ClInclude Include="Blam\Engine\networking\session\network_observer.h" />
     <ClInclude Include="Blam\Engine\networking\session\network_session.h" />
-    <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam.h" />
     <ClInclude Include="H2MOD\Modules\Shell\H2MODShell.h" />

@@ -16,7 +16,6 @@
 #include "scenario/scenario.h"
 #include "shell/shell.h"
 
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "saved_games/game_variant.h"
 
 /* constants */

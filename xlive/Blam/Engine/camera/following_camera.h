@@ -1,5 +1,7 @@
 #pragma once
 
+/* structures */
+
 struct s_following_camera
 {
 	bool valid;
@@ -17,5 +19,6 @@ struct s_following_camera
 
 ASSERT_STRUCT_SIZE(s_following_camera, 32);
 
+/* prototypes */
 
 void following_camera_apply_patches();

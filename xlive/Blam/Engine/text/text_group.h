@@ -56,7 +56,7 @@ public:
 	void get_string_ids(string_id* array, int32 array_size, int32 starting_index, int32 max_count);
 
 	void append_strings(s_string_reference* string_references, utf8* string_buffer, uint32 string_buffer_size, uint32 string_count, uint16* out_index);
-public:
+
 	s_string_reference* m_string_references;
 	utf8* m_string_data;
 	int32 m_num_of_strings;

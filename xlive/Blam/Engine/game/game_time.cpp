@@ -29,6 +29,11 @@ static s_time_globals* time_globals_get(void);
 
 /* public code */
 
+void game_time_apply_patches()
+{
+	WritePointer(Memory::GetAddress(0x3A06F8, 0x35D428), game_time_setup_scenario);
+}
+
 bool game_time_initialized(void)
 {
 	const s_time_globals* game_time_globals = time_globals_get();
@@ -251,14 +256,11 @@ void __cdecl game_time_setup_scenario()
 		}
 	}
 	else
+	{
 		game_time_globals->game_speed = k_game_time_default_game_speed;
+	}
 
 	game_time_globals->initialized = true;
-}
-
-void game_time_apply_patches()
-{
-	WritePointer(Memory::GetAddress(0x3A06F8, 0x35D428), game_time_setup_scenario);
 }
 
 /* private code */

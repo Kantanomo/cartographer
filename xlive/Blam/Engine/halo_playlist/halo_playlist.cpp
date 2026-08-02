@@ -23,60 +23,20 @@
 #include "kablam/kablam_level_cache.h"
 #include "main/map_repository.h"
 
+/* typedef */
+
 typedef e_halo_playlist_loading_result(__cdecl* t_halo_playlist_new)(wchar_t*, s_halo_playlist_container*);
 t_halo_playlist_new p_halo_playlist_new;
 
-e_halo_playlist_loading_result __cdecl halo_playlist_new(wchar_t* playlist_file_path, s_halo_playlist_container* playlist_container)
+/* prototypes */
+
+static e_halo_playlist_loading_result __cdecl halo_playlist_new(const wchar_t* playlist_file_path, s_halo_playlist_container* playlist_container);
+
+/* public code */
+
+void halo_playlist_apply_patches()
 {
-    csmemset(&playlist_container->playlist, 0, sizeof(s_halo_playlist));
-
-    FILE* file_handle = _wfsopen(playlist_file_path, L"rt,ccs=UNICODE", _SH_DENYWR);
-
-    e_halo_playlist_loading_result result = _halo_playlist_loading_result_unexpected_end_of_file;
-
-    c_halo_playlist_reader reader{};
-
-    reader.m_playlist = &playlist_container->playlist;
-    reader.m_match_count = 0;
-    reader.m_section_buffer_item_count = 0;
-    reader.m_current_reader_char_index = 0;
-    reader.m_current_reader_mode = _halo_playlist_reader_seek_mode_new_line;
-    reader.m_current_section_type = _halo_playlist_header_none;
-    reader.m_playlist_header_found = false;
-
-    if (file_handle)
-    {
-        wchar_t buffer[16384]{};
-        do
-        {
-            if (fgetws(buffer, 16384, file_handle))
-            {
-                reader.parse_file_section(buffer);
-            }
-            else if (!feof(file_handle))
-            {
-                fclose(file_handle);
-                return _halo_playlist_loading_result_unexpected_end_of_file;
-            }
-        } while (!feof(file_handle));
-
-        reader.finalize();
-
-        result = playlist_container->playlist.match_variant_count != 0 ?
-            _halo_playlist_loading_result_success :
-            _halo_playlist_loading_result_empty_playlist;
-
-        fclose(file_handle);
-    }
-    else
-    {
-        if (GetLastError() == ERROR_FILE_NOT_FOUND)
-            result = _halo_playlist_loading_result_file_not_found;
-        if (GetLastError() == ERROR_INVALID_DATA)
-            result = _halo_playlist_loading_result_invalid_data;
-    }
-
-    return result;
+	DETOUR_ATTACH(p_halo_playlist_new, Memory::GetAddress<t_halo_playlist_new>(0, 0x1321D), halo_playlist_new);
 }
 
 void c_halo_playlist_reader::parse_file_section(const wchar_t* file_buffer)
@@ -356,7 +316,7 @@ void c_halo_playlist_reader::process_match_section()
 
     bool valid = true;
 
-    if (!wcscmp(match->map, L""))
+    if (!ustrcmp(match->map, L""))
     {
         wchar_t* map_string = halo_playlist_item_collection_match_property_get_name(_halo_playlist_match_property_type_map);
         this->log_error(_halo_playlist_error_match_property_invalid, match->match_line_in_file, map_string);
@@ -364,7 +324,7 @@ void c_halo_playlist_reader::process_match_section()
         valid = false;
     }
 
-    if (!wcscmp(match->variant, L""))
+    if (!ustrcmp(match->variant, L""))
     {
         wchar_t* variant_string = halo_playlist_item_collection_match_property_get_name(_halo_playlist_match_property_type_variant);
         this->log_error(_halo_playlist_error_match_property_invalid, match->match_line_in_file, variant_string);
@@ -487,7 +447,7 @@ void c_halo_playlist_reader::process_variant_property(s_halo_playlist_section_it
     bool section_name_exists = false;
     for (uint32 i = 0; i < this->m_section_buffer_item_count; ++i)
     {
-        if (!wcscmp(section->name_buffer, this->m_section_items[i].name_buffer))
+        if (!ustrcmp(section->name_buffer, this->m_section_items[i].name_buffer))
         {
             this->log_error(_halo_playlist_error_property_already_defined, this->m_current_reader_line, section->name_buffer);
             section_name_exists = true;
@@ -524,9 +484,9 @@ void c_halo_playlist_reader::process_match_property(s_halo_playlist_section_item
     {
 	    case _halo_playlist_match_property_type_variant:
 	    {
-	        if (!wcscmp(match->variant, L""))
+	        if (!ustrcmp(match->variant, L""))
 	        {
-	            if (!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->variant, NUMBEROF(match->variant), section->value_buffer, UINT_MAX))
+	            if (!ustrcmp(section->value_buffer, L"") || !wcsncpy_s(match->variant, NUMBEROF(match->variant), section->value_buffer, UINT_MAX))
 	            {
 	                match->variant_line_in_file = this->m_current_reader_line;
 	            }
@@ -544,9 +504,9 @@ void c_halo_playlist_reader::process_match_property(s_halo_playlist_section_item
 	    }
 	    case _halo_playlist_match_property_type_map:
 	    {
-	        if (!wcscmp(match->map, L""))
+	        if (!ustrcmp(match->map, L""))
 	        {
-	            if (!wcscmp(section->value_buffer, L"") || !wcsncpy_s(match->map, NUMBEROF(match->map), section->value_buffer, UINT_MAX))
+	            if (!ustrcmp(section->value_buffer, L"") || !wcsncpy_s(match->map, NUMBEROF(match->map), section->value_buffer, UINT_MAX))
 	            {
 	                match->map_line_in_file = this->m_current_reader_line;
 	            }
@@ -639,7 +599,7 @@ void c_halo_playlist_reader::process_variant_section()
     else
     {
         bool variant_name_found = false;
-        wchar_t variant_name[32]{};
+        wchar_t variant_name[k_halo_playlist_maximum_text_length]{};
         uint32 variant_file_line = 0;
 
         bool game_type_found = false;
@@ -647,7 +607,7 @@ void c_halo_playlist_reader::process_variant_section()
         uint32 game_type_line = 0;
 
         bool base_variant_found = false;
-        wchar_t base_variant_name[32]{};
+        wchar_t base_variant_name[k_halo_playlist_maximum_text_length]{};
         s_game_variant* base_game_variant{};
         uint32 base_variant_file_line = 0;
 
@@ -665,7 +625,7 @@ void c_halo_playlist_reader::process_variant_section()
 	            {
 	                variant_name_found = true;
 	                variant_file_line = file_section->file_line;
-	                if (!wcscmp(file_section->value_buffer, L"") ||
+	                if (!ustrcmp(file_section->value_buffer, L"") ||
 	                    wcsncpy_s(variant_name, NUMBEROF(variant_name), file_section->value_buffer, UINT_MAX))
 	                {
 	                    this->log_error(_halo_playlist_error_property_value_invalid, variant_file_line, file_section->name_buffer, file_section->value_buffer);
@@ -678,7 +638,7 @@ void c_halo_playlist_reader::process_variant_section()
 	            {
 	                base_variant_found = true;
 	                base_variant_file_line = file_section->file_line;
-	                if (!wcscmp(file_section->value_buffer, L""))
+	                if (!ustrcmp(file_section->value_buffer, L""))
 	                {
 	                    this->log_error(_halo_playlist_error_property_value_invalid, base_variant_file_line, file_section->name_buffer, file_section->value_buffer);
 	                    valid_variant_setup = game_type_found == false;
@@ -688,7 +648,7 @@ void c_halo_playlist_reader::process_variant_section()
 	                }
 	                else
 	                {
-	                    wcsncpy_s(base_variant_name, 32, file_section->value_buffer, UINT_MAX);
+	                    wcsncpy_s(base_variant_name, k_halo_playlist_maximum_text_length, file_section->value_buffer, UINT_MAX);
 	                    base_game_variant = get_default_game_variant_by_name(base_variant_name);
 
 	                    if (!base_game_variant)
@@ -749,7 +709,7 @@ void c_halo_playlist_reader::process_variant_section()
         }
 
         if (!invalid
-            && wcscmp(variant_name, L"")
+            && ustrcmp(variant_name, L"")
             && (!base_variant_found || base_game_variant)
             && (!game_type_found || game_type >= _game_variant_description_slayer)
             )
@@ -788,7 +748,7 @@ void c_halo_playlist_reader::process_variant_section()
             }
 
             new_variant.flags &= ~1u;
-            wcsncpy_s(new_variant.variant_name, 32, variant_name, UINT_MAX);
+            wcsncpy_s(new_variant.variant_name, k_halo_playlist_maximum_text_length, variant_name, UINT_MAX);
 
             e_game_variant_description_index variant_description_index = game_engine_type_get_variant_description_index(new_variant.variant_game_engine_index);
 
@@ -1194,7 +1154,57 @@ int c_halo_playlist_reader::playlist_error_sort(void* context, void const* lhs, 
     return _wcsicmp(left->property_extra, right->property_extra);
 }
 
-void halo_playlist_apply_patches()
+/* private code */ 
+
+e_halo_playlist_loading_result __cdecl halo_playlist_new(const wchar_t* playlist_file_path, s_halo_playlist_container* playlist_container)
 {
-    DETOUR_ATTACH(p_halo_playlist_new, Memory::GetAddress<t_halo_playlist_new>(0, 0x1321D), halo_playlist_new);
+	csmemset(&playlist_container->playlist, 0, sizeof(s_halo_playlist));
+
+	FILE* file_handle = _wfsopen(playlist_file_path, L"rt,ccs=UNICODE", _SH_DENYWR);
+
+	e_halo_playlist_loading_result result = _halo_playlist_loading_result_unexpected_end_of_file;
+
+	c_halo_playlist_reader reader{};
+
+	reader.m_playlist = &playlist_container->playlist;
+	reader.m_match_count = 0;
+	reader.m_section_buffer_item_count = 0;
+	reader.m_current_reader_char_index = 0;
+	reader.m_current_reader_mode = _halo_playlist_reader_seek_mode_new_line;
+	reader.m_current_section_type = _halo_playlist_header_none;
+	reader.m_playlist_header_found = false;
+
+	if (file_handle)
+	{
+		wchar_t buffer[16384]{};
+		do
+		{
+			if (fgetws(buffer, NUMBEROF(buffer), file_handle))
+			{
+				reader.parse_file_section(buffer);
+			}
+			else if (!feof(file_handle))
+			{
+				fclose(file_handle);
+				return _halo_playlist_loading_result_unexpected_end_of_file;
+			}
+		} while (!feof(file_handle));
+
+		reader.finalize();
+
+		result = playlist_container->playlist.match_variant_count != 0 ?
+			_halo_playlist_loading_result_success :
+			_halo_playlist_loading_result_empty_playlist;
+
+		fclose(file_handle);
+	}
+	else
+	{
+		if (GetLastError() == ERROR_FILE_NOT_FOUND)
+			result = _halo_playlist_loading_result_file_not_found;
+		if (GetLastError() == ERROR_INVALID_DATA)
+			result = _halo_playlist_loading_result_invalid_data;
+	}
+
+	return result;
 }
