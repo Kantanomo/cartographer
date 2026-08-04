@@ -129,32 +129,18 @@ void __cdecl update_player_control_check_held_time(player_datum* player, s_playe
 	}
 }
 
-int16 __cdecl unit_rotate_zoom_level_hook(datum unit_index, int16 a2)
+int16 __cdecl unit_rotate_zoom_level_hook(datum unit_index, int16 zoom_level)
 {
-	int16 result = INVOKE(0x1413CE, 0, unit_rotate_zoom_level_hook, unit_index, a2);
+	int16 result = INVOKE(0x1413CE, 0, unit_rotate_zoom_level_hook, unit_index, zoom_level);
 
-	// This sucks......
-	if (result != NONE)
+	unit_datum* unit = unit_get(unit_index);
+	if (unit->unit.player_index != NONE)
 	{
-		player_datum* player = NULL;
-		c_player_in_game_iterator player_it;
-		while (player_it.next())
+		player_datum* player = player_get(unit->unit.player_index);
+		int16 user_index = player->user_index;
+		if (user_index != NONE)
 		{
-			player_datum* current_player = player_it.get_datum();
-			if (current_player->unit_index == unit_index)
-			{
-				player = current_player;
-				break;
-			}
-		}
-
-		if (player)
-		{
-			int16 user_index = player->user_index;
-			if (user_index != NONE)
-			{
-				local_player_held_zoom_delta_time[user_index] = 0.f;
-			}
+			local_player_held_zoom_delta_time[user_index] = 0.f;
 		}
 	}
 	return result;
