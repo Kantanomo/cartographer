@@ -177,7 +177,7 @@ public:
 	void process_playlist_property(s_halo_playlist_section_item* section);
 	void process_variant_property(s_halo_playlist_section_item* section);
 	void process_match_property(s_halo_playlist_section_item* section);
-	bool property_name_is_valid(wchar_t* property_name);
+	bool property_name_is_valid(wchar_t const* property_name);
 	void trim_property_name();
 	void log_error(e_halo_playlist_error error_type, uint32 file_line, wchar_t* property_name = L"", wchar_t* property_value = L"", wchar_t* extra = L"");
 	void finalize();

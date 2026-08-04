@@ -635,7 +635,7 @@ s_game_variant* get_game_variant(void);
 
 void __cdecl game_variant_build_default(s_game_variant* variant, e_game_variant_description_index game_variant_type);
 
-s_game_variant* __cdecl get_default_game_variant_by_name(wchar_t* name);
+s_game_variant* __cdecl get_default_game_variant_by_name(wchar_t const* name);
 
 bool __cdecl game_engine_variant_cleanup(s_game_variant* variant);
 

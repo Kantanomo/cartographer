@@ -18,15 +18,11 @@ void __cdecl game_variant_build_default(s_game_variant* variant, e_game_variant_
 	return;
 }
 
-s_game_variant* __cdecl get_default_game_variant_by_name(wchar_t* name)
+s_game_variant* __cdecl get_default_game_variant_by_name(wchar_t const* name)
 {
-	// Server only function?
-	if (Memory::g_memory_is_dedicated_server)
-	{
-		return INVOKE(0, 0x678E, get_default_game_variant_by_name, name);
-	}
-	else
-		return nullptr;
+	ASSERT(Memory::g_memory_is_dedicated_server);
+
+	return INVOKE(0, 0x678E, get_default_game_variant_by_name, name);
 }
 
 bool __cdecl game_engine_variant_cleanup(s_game_variant* variant)
@@ -50,8 +46,6 @@ void game_variant_cartographer_settings_default_new(s_game_variant* variant)
 	variant->cartographer_settings.gravity = _game_gravity_modifier_none;
 	variant->cartographer_settings.game_speed = _game_speed_modifier_none;
 	variant->cartographer_settings.spawn_protection = _player_spawn_protection_timer_one_second;
-	
-	//variant->cartographer_settings.flags.set(_cartographer_variant_explosion_physics, true);
 }
 
 bool game_variant_cartographer_settings_validate(s_game_variant* variant)

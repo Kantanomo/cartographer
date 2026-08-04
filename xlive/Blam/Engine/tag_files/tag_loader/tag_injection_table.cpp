@@ -117,7 +117,8 @@ void c_tag_injection_table::get_entries_by_type(e_tag_group type, s_tag_injectin
 		{	
 			s_tag_injecting_table_entry* out = &out_results[out_index++];
 			s_tag_injecting_table_entry* in = &this->m_table[i];
-			csmemcpy(out, in, sizeof(s_tag_injecting_table_entry));
+
+			*out = *in;
 		}
 }
 

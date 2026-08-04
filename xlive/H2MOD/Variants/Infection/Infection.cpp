@@ -262,7 +262,7 @@ void Infection::setPlayerAsHuman(int32 player_index)
 
 	player->configuration.appearance.player_character_type = infection_human_get_player_type();
 	player->unit_speed = k_human_unit_speed;
-	g_game_engine_override_player_speed_changed.set(player_index, true);
+	g_game_engine_override_player_speed_changed.set(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), true);
 }
 
 void Infection::setPlayerAsZombie(int32 player_index)
@@ -271,7 +271,7 @@ void Infection::setPlayerAsZombie(int32 player_index)
 
 	player->configuration.appearance.player_character_type = infection_zombie_get_character_type();
 	player->unit_speed = k_zombie_unit_speed;
-	g_game_engine_override_player_speed_changed.set(player_index, true);
+	g_game_engine_override_player_speed_changed.set(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index), true);
 	call_give_player_weapon(player_index, e_weapons_datum_index::energy_blade, 1);
 	
 	return;

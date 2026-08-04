@@ -1,5 +1,12 @@
 #pragma once
 
+/* enums */
+
+enum draw_string_mode_flags
+{
+	_draw_string_wrap_vertically = 0
+};
+
 /* prototypes */
 
 void __cdecl draw_string_get_color(union real_argb_color* color);
