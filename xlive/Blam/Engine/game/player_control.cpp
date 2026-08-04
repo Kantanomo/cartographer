@@ -28,11 +28,11 @@ void __cdecl player_control_update(real32 world_seconds_elapsed, real32 game_sec
 
 real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 {
-	const s_player_control* player_control_info = player_control_get(user_index);
+	const s_player_control* player_control = player_control_get(user_index);
 
 	float result = observer_default_field_of_view();
 
-	if (player_control_info->unit_datum_index != NONE)
+	if (player_control->unit_datum_index != NONE)
 	{
 		float fov;
 		const s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(user_index);
@@ -47,11 +47,11 @@ real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 		}
 		else
 		{
-			unit_definition* unit = (unit_definition*)tag_get_fast(object_get(player_control_info->unit_datum_index)->definition_index);
+			unit_definition* unit = (unit_definition*)tag_get_fast(object_get(player_control->unit_datum_index)->definition_index);
 			fov = unit->unit.camera_field_of_view;
 		}
 
-		result = unit_get_field_of_view(player_control_info->unit_datum_index, fov, player_control_info->actions.zoom_level);
+		result = unit_get_field_of_view(player_control->unit_datum_index, fov, player_control->control_state.desired_zoom_level);
 	}
 	return result;
 }
@@ -93,7 +93,7 @@ s_player_control* player_control_get(int32 user_index)
 
 int16 player_control_get_zoom_level(int32 user_index)
 {
-	return player_control_get(user_index)->actions.zoom_level;
+	return player_control_get(user_index)->control_state.desired_zoom_level;
 }
 
 void player_control_disable_local_camera(bool state)
@@ -124,7 +124,7 @@ void __cdecl update_player_control_check_held_time(player_datum* player, s_playe
 	{
 		if (player_control->zoom_input_held && local_player_held_zoom_delta_time[player->user_index] >= 1.0f)
 		{
-			player_control->actions.zoom_level = player_control->field_9A;
+			player_control->control_state.desired_zoom_level = player_control->field_9A;
 		}
 	}
 }

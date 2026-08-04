@@ -1,6 +1,7 @@
 #pragma once
 #include "game_globals.h"
 #include "player_constants.h"
+#include "player_control.h"
 
 #include "input/controllers.h"
 #include "memory/data.h"
@@ -94,6 +95,24 @@ struct s_player_configuration
 	int8 unk2;
 };
 ASSERT_STRUCT_SIZE(s_player_configuration, 132);
+
+struct player_action
+{
+	uint32 control_flags1;
+	uint32 control_flags2;
+	real_euler_angles2d desired_facing_angles;
+	real_point2d throttle;
+	real32 primary_trigger;
+	real32 secondary_trigger;
+	uint32 action_flags;
+	s_unit_weapon_set desired_weapon_set;
+	int16 desired_grenade_index;
+	int16 desired_zoom_level;
+	s_player_action_context action_context;
+	s_aim_assist_targeting_result aim_assist_data;
+	int32 field_5C;
+};
+ASSERT_STRUCT_SIZE(player_action, 0x60);
 
 #pragma pack(push, 1)
 struct player_datum
