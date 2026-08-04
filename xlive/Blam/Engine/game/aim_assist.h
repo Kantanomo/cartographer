@@ -29,7 +29,7 @@ struct s_aim_assist_targeting_result
 	datum target_object;
 	datum model_target;
 	datum target_player;
-	int8 gap_C[12];
+	real_point3d impact_position;
 	int16 auto_aim_flags;
 	int8 gap_1A[2];
 	real32 primary_auto_aim_level;
