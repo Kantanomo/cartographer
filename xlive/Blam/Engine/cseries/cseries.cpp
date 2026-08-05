@@ -382,3 +382,44 @@ char* strchr(char* str, int32 ch)
 {
 	return std::strchr(str, ch);
 }
+
+char const* get_language_display_name(
+	e_language language)
+{
+	char const* name = "";
+
+	switch (language)
+	{
+	case _language_english:
+		name = "english";
+		break;
+	case _language_japanese:
+		name = "japanese";
+		break;
+	case _language_german:
+		name = "german";
+		break;
+	case _language_french:
+		name = "french";
+		break;
+	case _language_spanish:
+		name = "spanish";
+		break;
+	case _language_italian:
+		name = "italian";
+		break;
+	case _language_korean:
+		name = "korean";
+		break;
+	case _language_chinese:
+		name = "chinese";
+		break;
+	case _language_portuguese:
+		name = "portuguese";
+		break;
+	default:
+		break;
+	}
+
+	return name;
+}

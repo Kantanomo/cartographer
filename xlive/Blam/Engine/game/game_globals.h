@@ -578,6 +578,8 @@ struct s_camera_track_definition* game_globals_get_default_camera_track(void);
 
 void scenario_set_game_globals(s_game_globals* globals);
 
+e_language get_map_language(void);
+
 struct s_ui_levels_definition* game_globals_get_ui_levels(void);
 
 s_game_globals_player_representation* game_globals_get_representation(e_character_type type);

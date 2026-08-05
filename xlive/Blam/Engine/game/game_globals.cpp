@@ -75,6 +75,23 @@ void scenario_set_game_globals(s_game_globals* globals)
 	*Memory::GetAddress<s_game_globals**>(0x479E70, 0x4A642C) = globals;
 }
 
+e_language get_map_language(void)
+{
+	e_language language = _language_english;
+
+	if (global_scenario_try_and_get())
+	{
+		e_language game_globals_language = scenario_get_game_globals()->language;
+
+		if (VALID_INDEX(game_globals_language, k_language_count))
+		{
+			language = game_globals_language;
+		}
+	}
+
+	return language;
+}
+
 s_ui_levels_definition* game_globals_get_ui_levels(void)
 {
 	s_game_globals* globals = scenario_get_game_globals();
