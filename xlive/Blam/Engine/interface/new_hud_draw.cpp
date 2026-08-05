@@ -67,37 +67,203 @@ static uint8 g_draw_hud_user_draw_player_indicators_mask;
 
 /* prototypes */
 
+static s_draw_hud_widget_input_results* global_hud_draw_widget_function_results_get(void);
+
+static real_rgb_color* global_hud_draw_widget_special_hud_type_color_primary_get(void);
+
+static real_rgb_color* global_hud_draw_widget_special_hud_type_secondary_color_get(void);
+
+static real_rgb_color* global_hud_draw_widget_special_hud_type_tertiary_color_get(void);
+
+static real_rgb_color* global_hud_draw_text_widget_primary_color_get(void);
+
+static void draw_hud_get_bitmap_data(
+	uint32 local_render_user_index,
+	s_hud_bitmap_widget_definition* bitmap_widget,
+	real_rectangle2d* bounds,
+	int16* out_bitmap_index,
+	int16* out_width_pixels,
+	int16* out_height_pixels);
+
+static real32 __cdecl draw_hud_widget_get_value(int32 unused, string_id input_name);
+
+static void hud_widget_effect_evaluate(
+	uint32 local_render_user_index,
+	s_new_hud_temporary_user_state* user_state,
+	s_hud_widget_effect_definition* widget_effect,
+	real_point2d* out_offset,
+	real_point2d* out_scale,
+	real32* out_theta);
+
+static bool draw_hud_bitmap_is_crosshair(datum bitmap_datum);
+
+static void __cdecl draw_hud_bitmap_widget(
+	int32 local_render_user_index,
+	s_new_hud_temporary_user_state* user_state,
+	s_hud_bitmap_widget_definition* bitmap_widget,
+	s_draw_hud_widget_input_results* widget_function_results);
+
+static void __cdecl draw_hud_resolve_string_id_to_value(string_id string, wchar_t* out_string);
+
+static void __cdecl draw_hud_fixup_private_characters(wchar_t* string);
+
+static int32 draw_hud_get_draw_string_font_index(int32 font_index);
+
+static void draw_hud_text_get_string(
+	s_draw_hud_widget_input_results* widget_function_results,
+	s_hud_text_widget_definition* text_widget,
+	s_new_hud_temporary_user_state* user_state,
+	c_maximum_interface_text* out_string,
+	int32* out_font);
+
+static void __cdecl draw_hud_text_widget(
+	uint32 local_render_user_index,
+	s_new_hud_temporary_user_state* user_state,
+	s_hud_text_widget_definition* text_widget,
+	s_draw_hud_widget_input_results* widget_function_results);
+
+static void __cdecl draw_hud_player_indicators(uint32 local_render_user_index);
+
 static void rasterizer_setup_2d_vertex_shader_user_interface_constants(void);
 
 static void __cdecl render_ingame_user_interface_hud_indicators_element_hook(int32* a1, datum tag_index, datum bitmap_index, int32* a4, datum shader_index);
 
+/* public code */
+
+void new_hud_draw_apply_patches(void)
+{
+	hud_player_indicators_draw_reset();
+
+	PatchCall(Memory::GetAddress(0x226702), draw_hud_player_indicators);
+	PatchCall(Memory::GetAddress(0x224F46), draw_hud_bitmap_widget);
+	PatchCall(Memory::GetAddress(0x224FDA), draw_hud_text_widget);
+
+	DETOUR_ATTACH(p_draw_ingame_user_interface_hud_element, Memory::GetAddress<t_render_ingame_user_interface_hud_element>(0x221E3B), render_ingame_user_interface_hud_element);
+	DETOUR_ATTACH(p_render_ingame_user_interface_hud_indicators_element, Memory::GetAddress<t_render_ingame_user_interface_hud_indicators_element_hook>(0x221C77), render_ingame_user_interface_hud_indicators_element_hook);
+	return;
+}
+
+void hud_draw_on_map_load()
+{
+	if (g_draw_hud_crosshair_bitmap_cache)
+		free(g_draw_hud_crosshair_bitmap_cache);
+
+	g_draw_hud_crosshair_bitmap_cache_count = 0;
+
+	// initial loop to find how many bitmaps there are
+	tag_iterator it;
+	tag_iterator_new(&it, _tag_group_bitmap);
+	while (tag_iterator_next(&it) != NONE)
+	{
+		if (strstr(tag_get_name(it.current_tag_index), "new_hud\\crosshairs"))
+		{
+			g_draw_hud_crosshair_bitmap_cache_count++;
+		}
+	}
+
+	// allocate a storage for the datums
+	g_draw_hud_crosshair_bitmap_cache = (datum*)calloc(g_draw_hud_crosshair_bitmap_cache_count, sizeof(datum));
+
+	// do a second loop to store all the actual datums
+	size_t i = 0;
+	tag_iterator_new(&it, _tag_group_bitmap);
+	while (tag_iterator_next(&it) != NONE)
+	{
+		if (strstr(tag_get_name(it.current_tag_index), "new_hud\\crosshairs") && i < g_draw_hud_crosshair_bitmap_cache_count)
+		{
+			g_draw_hud_crosshair_bitmap_cache[i++] = it.current_tag_index;
+		}
+		// Exit when we've cached all the bitmap datums
+		else if (i >= g_draw_hud_crosshair_bitmap_cache_count) {
+			break;
+		}
+	}
+
+	return;
+}
+
+datum hud_bitmap_tag_index_get(void)
+{
+	return *Memory::GetAddress<datum*>(0x976678);
+}
+
+int16 hud_bitmap_data_index_get(void)
+{
+	return *Memory::GetAddress<int16*>(0x97667C);
+}
+
+void hud_player_indicators_draw_enabled_set(int32 user_index, bool enabled)
+{
+	SET_BIT(g_draw_hud_user_draw_player_indicators_mask, user_index, enabled);
+	return;
+}
+
+void hud_player_indicators_draw_reset(void)
+{
+	g_draw_hud_user_draw_player_indicators_mask = FLAG(k_number_of_users) - 1;	// Set all bits representing local users to 1
+	return;
+}
+
+void __cdecl draw_hud_layer(void)
+{
+	INVOKE(0x22657B, 0x0, draw_hud_layer);
+	return;
+}
+
+void new_hud_draw_deinitialize(void)
+{
+	if (g_draw_hud_crosshair_bitmap_cache)
+	{
+		free(g_draw_hud_crosshair_bitmap_cache);
+	}
+	return;
+}
+
+void __cdecl render_ingame_user_interface_hud_element(
+	real32 left,
+	real32 top,
+	int16 x,
+	int16 y,
+	real32 scale,
+	real32 rotation_rad,
+	datum bitmap_tag_index,
+	datum bitmap,
+	real_rectangle2d* bounds,
+	datum shader_tag_index)
+{
+	rasterizer_setup_2d_vertex_shader_user_interface_constants();
+	p_draw_ingame_user_interface_hud_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, bounds, shader_tag_index);
+	return;
+}
+
 /* private code */
 
-static s_draw_hud_widget_input_results* global_hud_draw_widget_function_results_get()
+static s_draw_hud_widget_input_results* global_hud_draw_widget_function_results_get(void)
 {
 	return Memory::GetAddress<s_draw_hud_widget_input_results*>(0x976680);
 }
 
-static real_rgb_color* global_hud_draw_widget_special_hud_type_color_primary_get()
+static real_rgb_color* global_hud_draw_widget_special_hud_type_color_primary_get(void)
 {
 	return Memory::GetAddress<real_rgb_color*>(0x976690);
 }
-static real_rgb_color* global_hud_draw_widget_special_hud_type_secondary_color_get()
+static real_rgb_color* global_hud_draw_widget_special_hud_type_secondary_color_get(void)
 {
 	return Memory::GetAddress<real_rgb_color*>(0x97669C);
 }
-static real_rgb_color* global_hud_draw_widget_special_hud_type_tertiary_color_get()
+
+static real_rgb_color* global_hud_draw_widget_special_hud_type_tertiary_color_get(void)
 {
 	return Memory::GetAddress<real_rgb_color*>(0x9766A8);
 }
 
-static real_rgb_color* global_hud_draw_text_widget_primary_color_get()
+static real_rgb_color* global_hud_draw_text_widget_primary_color_get(void)
 {
 	return Memory::GetAddress<real_rgb_color*>(0x976650);
 }
 
 static void draw_hud_get_bitmap_data(
-	uint32 local_render_user_index, 
+	uint32 local_render_user_index,
 	s_hud_bitmap_widget_definition* bitmap_widget,
 	real_rectangle2d* bounds,
 	int16* out_bitmap_index,
@@ -180,14 +346,16 @@ static void draw_hud_get_bitmap_data(
 	return;
 }
 
-static real32 __cdecl draw_hud_widget_get_value(int32 unused, string_id input_name)
+static real32 __cdecl draw_hud_widget_get_value(
+	int32 unused,
+	string_id input_name)
 {
 	return INVOKE(0x22211A, 0, draw_hud_widget_get_value, unused, input_name);
 }
 
 static void hud_widget_effect_evaluate(
 	uint32 local_render_user_index,
-	s_new_hud_temporary_user_state * user_state, 
+	s_new_hud_temporary_user_state* user_state,
 	s_hud_widget_effect_definition* widget_effect,
 	real_point2d* out_offset,
 	real_point2d* out_scale,
@@ -306,7 +474,7 @@ static void __cdecl draw_hud_bitmap_widget(
 		((bitmap_bounds.x1 - bitmap_bounds.x0) * registration_point.x) * bitmap_size.x,
 		((bitmap_bounds.y1 - bitmap_bounds.y0) * registration_point.y) * bitmap_size.y
 	};
-	
+
 	const real_point2d calc_offset =
 	{
 		(real32)screen_offset.x + offset_result.x,
@@ -657,9 +825,9 @@ static void draw_hud_text_get_string(
 			out_string->print(L"%d", value);
 		}
 	}
-	else if(text_widget->flags.test(text_widget_flag_talking_player_hack))
+	else if (text_widget->flags.test(text_widget_flag_talking_player_hack))
 	{
-		if(user_state->player_talking && user_state->player_index != NONE)
+		if (user_state->player_talking && user_state->player_index != NONE)
 		{
 			player_datum const* player = player_get(user_state->player_index);
 
@@ -694,7 +862,7 @@ static void __cdecl draw_hud_text_widget(
 	c_maximum_interface_text widget_string;
 
 	draw_hud_text_get_string(widget_function_results, text_widget, user_state, &widget_string, &draw_string_font_index);
-	draw_string_set_draw_mode(draw_string_font_index, NONE, 0,0, global_real_argb_white, global_real_argb_black, false);
+	draw_string_set_draw_mode(draw_string_font_index, NONE, 0, 0, global_real_argb_white, global_real_argb_black, false);
 	if (draw_string_set_string(widget_string.get_string()))
 	{
 		rasterizer_flags_unknown_function_1();
@@ -704,8 +872,8 @@ static void __cdecl draw_hud_text_widget(
 		rasterizer_shader_submit(text_widget->shader.index, 0, 1, 0, 0, 100.f);
 		draw_string_set_position(0, 0);
 
-		real_point2d offset_result {0,0};
-		real_point2d scale_result {1.f,1.f};
+		real_point2d offset_result{ 0,0 };
+		real_point2d scale_result{ 1.f,1.f };
 
 		if (text_widget->effect.count > 0)
 		{
@@ -741,7 +909,7 @@ static void __cdecl draw_hud_text_widget(
 		draw_string_set_player_color(global_real_argb_white);
 		draw_string_set_shadow_color(global_real_argb_black);
 
-		switch(text_widget->justification)
+		switch (text_widget->justification)
 		{
 		case text_justification_center:
 			bounds.left = (int16)(final_location.x - (real32)(ceil_text_width >> 1));
@@ -782,117 +950,6 @@ static void __cdecl draw_hud_player_indicators(
 
 	return;
 }
-
-/* public code */
-
-void hud_draw_on_map_load()
-{
-	if (g_draw_hud_crosshair_bitmap_cache)
-		free(g_draw_hud_crosshair_bitmap_cache);
-
-	g_draw_hud_crosshair_bitmap_cache_count = 0;
-
-	// initial loop to find how many bitmaps there are
-	tag_iterator it;
-	tag_iterator_new(&it, _tag_group_bitmap);
-	while (tag_iterator_next(&it) != NONE)
-	{
-		if (strstr(tag_get_name(it.current_tag_index), "new_hud\\crosshairs"))
-		{
-			g_draw_hud_crosshair_bitmap_cache_count++;
-		}
-	}
-
-	// allocate a storage for the datums
-	g_draw_hud_crosshair_bitmap_cache = (datum*)calloc(g_draw_hud_crosshair_bitmap_cache_count, sizeof(datum));
-
-	// do a second loop to store all the actual datums
-	size_t i = 0;
-	tag_iterator_new(&it, _tag_group_bitmap);
-	while (tag_iterator_next(&it) != NONE)
-	{
-		if (strstr(tag_get_name(it.current_tag_index), "new_hud\\crosshairs") && i < g_draw_hud_crosshair_bitmap_cache_count)
-		{
-			g_draw_hud_crosshair_bitmap_cache[i++] = it.current_tag_index;
-		}
-		// Exit when we've cached all the bitmap datums
-		else if (i >= g_draw_hud_crosshair_bitmap_cache_count) {
-			break;
-		}
-	}
-
-	return;
-}
-
-datum hud_bitmap_tag_index_get(void)
-{
-	return *Memory::GetAddress<datum*>(0x976678);
-}
-
-int16 hud_bitmap_data_index_get(void)
-{
-	return *Memory::GetAddress<int16*>(0x97667C);
-}
-
-void hud_player_indicators_draw_enabled_set(int32 user_index, bool enabled)
-{
-	SET_BIT(g_draw_hud_user_draw_player_indicators_mask, user_index, enabled);
-	return;
-}
-
-void hud_player_indicators_draw_reset(void)
-{
-	g_draw_hud_user_draw_player_indicators_mask = FLAG(k_number_of_users) - 1;	// Set all bits representing local users to 1
-	return;
-}
-
-void __cdecl draw_hud_layer(void)
-{
-	INVOKE(0x22657B, 0x0, draw_hud_layer);
-	return;
-}
-
-void new_hud_draw_apply_patches(void)
-{
-	hud_player_indicators_draw_reset();
-
-	PatchCall(Memory::GetAddress(0x226702), draw_hud_player_indicators);
-	PatchCall(Memory::GetAddress(0x224F46), draw_hud_bitmap_widget);
-	PatchCall(Memory::GetAddress(0x224FDA), draw_hud_text_widget);
-	
-	DETOUR_ATTACH(p_draw_ingame_user_interface_hud_element, Memory::GetAddress<t_render_ingame_user_interface_hud_element>(0x221E3B), render_ingame_user_interface_hud_element);
-	DETOUR_ATTACH(p_render_ingame_user_interface_hud_indicators_element, Memory::GetAddress<t_render_ingame_user_interface_hud_indicators_element_hook>(0x221C77), render_ingame_user_interface_hud_indicators_element_hook);
-	return;
-}
-
-void new_hud_draw_deinitialize(void)
-{
-	if (g_draw_hud_crosshair_bitmap_cache)
-	{
-		free(g_draw_hud_crosshair_bitmap_cache);
-	}
-	return;
-}
-
-void __cdecl render_ingame_user_interface_hud_element(
-	real32 left,
-	real32 top,
-	int16 x,
-	int16 y,
-	real32 scale,
-	real32 rotation_rad,
-	datum bitmap_tag_index,
-	datum bitmap,
-	real_rectangle2d* bounds,
-	datum shader_tag_index)
-{
-	rasterizer_setup_2d_vertex_shader_user_interface_constants();
-	p_draw_ingame_user_interface_hud_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, bounds, shader_tag_index);
-	return;
-}
-
-/* private code */
-
 static void rasterizer_setup_2d_vertex_shader_user_interface_constants(void)
 {
 	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
