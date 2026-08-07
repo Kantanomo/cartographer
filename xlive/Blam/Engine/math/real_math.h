@@ -602,6 +602,8 @@ real32 scalars_interpolate(real32 a, real32 b, real32 t, real32* result);
 
 real_point3d* points_interpolate(const real_point3d* a, const real_point3d* b, real32 t, real_point3d* result);
 
+#define vectors_interpolate(a, b, t, result) points_interpolate((const real_point3d*)a, (const real_point3d*)b, t, (real_point3d*)result)
+
 real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out);
 
 real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up);

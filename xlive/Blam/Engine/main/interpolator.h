@@ -48,6 +48,8 @@ struct s_interpolation_data
 	s_weapon_interpolation_data weapon_data[k_number_of_users][k_first_person_max_weapons];
 	s_position_interpolation_data position_data[k_number_of_users][k_interpolation_positions_count];
 	real32 crouch[k_number_of_users];
+	real_vector3d camera_offset[k_number_of_users];
+	real_vector3d aiming_vector[k_number_of_users];
 };
 //ASSERT_STRUCT_SIZE(s_interpolation_data, 0x1A33F04);
 
@@ -117,6 +119,7 @@ bool halo_interpolator_get_previous_object_node_matrix(datum object_index, int16
 
 bool halo_interpolator_interpolate_object_position(datum object_index, real_point3d* point);
 
-bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_crouch);
+bool halo_interpolator_interpolate_biped_sight_crouch(datum object_index, real32* out_crouch);
+bool halo_interpolator_interpolate_biped_sight_aiming_vector(datum object_index, real_vector3d* out_aiming_vector);
+bool halo_interpolator_interpolate_biped_sight_camera_offset(datum object_index, real_vector3d* out_aiming_vector);
 
-bool halo_interpolator_interpolate_position_backwards(int32 user_index, uint32 position_index, real_point3d* position);
