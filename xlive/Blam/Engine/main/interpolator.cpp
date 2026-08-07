@@ -26,8 +26,6 @@ thread_local s_interpolation_data* g_frame_data_intermediate = NULL;
 
 static object_datum* halo_interpolator_object_can_interpolate(datum object_index, int32* out_abs_object_index, bool allow_during_game_tick = false);
 
-static void halo_interpolator_interpolate_position_data(int32 user_index, uint32 position_index, real_point3d* position);
-
 static void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolation_data);
 
 /* public code */
