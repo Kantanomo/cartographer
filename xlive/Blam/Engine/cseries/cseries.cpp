@@ -386,7 +386,7 @@ char* strchr(char* str, int32 ch)
 char const* get_language_display_name(
 	e_language language)
 {
-	char const* name = "";
+	char const* name;
 
 	switch (language)
 	{
@@ -418,6 +418,7 @@ char const* get_language_display_name(
 		name = "portuguese";
 		break;
 	default:
+		name = "";
 		break;
 	}
 
