@@ -133,16 +133,20 @@ int16 __cdecl unit_rotate_zoom_level_hook(datum unit_index, int16 zoom_level)
 {
 	int16 result = INVOKE(0x1413CE, 0, unit_rotate_zoom_level_hook, unit_index, zoom_level);
 
-	unit_datum* unit = unit_get(unit_index);
-	if (unit->unit.player_index != NONE)
+	if (result != NONE)
 	{
-		player_datum* player = player_get(unit->unit.player_index);
-		int16 user_index = player->user_index;
-		if (user_index != NONE)
+		unit_datum* unit = unit_get(unit_index);
+		if (unit->unit.player_index != NONE)
 		{
-			local_player_held_zoom_delta_time[user_index] = 0.f;
+			player_datum* player = player_get(unit->unit.player_index);
+			int16 user_index = player->user_index;
+			if (user_index != NONE)
+			{
+				local_player_held_zoom_delta_time[user_index] = 0.f;
+			}
 		}
 	}
+
 	return result;
 }
 
