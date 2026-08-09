@@ -318,7 +318,7 @@ void c_halo_playlist_reader::process_match_section()
 
     if (!ustrcmp(match->map, L""))
     {
-        wchar_t* map_string = halo_playlist_item_collection_match_property_get_name(_halo_playlist_match_property_type_map);
+        const wchar_t* map_string = halo_playlist_item_collection_match_property_get_name(_halo_playlist_match_property_type_map);
         this->log_error(_halo_playlist_error_match_property_invalid, match->match_line_in_file, map_string);
 
         valid = false;
@@ -326,7 +326,7 @@ void c_halo_playlist_reader::process_match_section()
 
     if (!ustrcmp(match->variant, L""))
     {
-        wchar_t* variant_string = halo_playlist_item_collection_match_property_get_name(_halo_playlist_match_property_type_variant);
+        const wchar_t* variant_string = halo_playlist_item_collection_match_property_get_name(_halo_playlist_match_property_type_variant);
         this->log_error(_halo_playlist_error_match_property_invalid, match->match_line_in_file, variant_string);
 
         valid = false;
@@ -752,7 +752,7 @@ void c_halo_playlist_reader::process_variant_section()
             }
 
             new_variant.flags &= ~1u;
-            wcsncpy_s(new_variant.variant_name, k_halo_playlist_maximum_text_length, variant_name, _TRUNCATE);
+			ustrncpy(new_variant.variant_name, variant_name, NUMBEROF(variant_name));
 
             e_game_variant_description_index variant_description_index = game_engine_type_get_variant_description_index(new_variant.variant_game_engine_index);
 
@@ -809,7 +809,7 @@ void c_halo_playlist_reader::process_variant_section()
 
                     if (!section_processed)
                     {
-                        wchar_t* variant_type_name = halo_playlist_item_collection_game_type_get_name(variant_description_index);
+                        const wchar_t* variant_type_name = halo_playlist_item_collection_game_type_get_name(variant_description_index);
                         this->log_error(_halo_playlist_error_variant_setting_invalid, file_section->file_line, file_section->name_buffer, variant_type_name);
                     }
                 }
@@ -898,6 +898,9 @@ bool c_halo_playlist_reader::process_variant_cartographer_setting(s_halo_playlis
 			break;
 		case _halo_playlist_cartographer_setting_disable_dub_shot:
 			property_result = halo_playlist_item_collection_cartographer_disable_dub_shot_write_to_variant(section_item->value_buffer, variant);
+			break;
+		case _halo_playlist_cartographer_setting_invincible_players:
+			property_result = halo_playlist_item_collection_cartographer_invincible_players_write_to_variant(section_item->value_buffer, variant);
 	}
 
 	if (!property_result)
@@ -988,7 +991,7 @@ void c_halo_playlist_reader::trim_property_name()
     //INVOKE_TYPE(0, 0xEBE2, void(__thiscall*)(c_halo_playlist_reader*), this);
 }
 
-void c_halo_playlist_reader::log_error(e_halo_playlist_error error_type, uint32 file_line, wchar_t* property_name, wchar_t* property_value, wchar_t* extra)
+void c_halo_playlist_reader::log_error(e_halo_playlist_error error_type, uint32 file_line, const wchar_t* property_name, const wchar_t* property_value, const wchar_t* extra)
 {
     if (this->m_playlist->error_log_full)
         return;

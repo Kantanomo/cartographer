@@ -3,7 +3,7 @@
 
 /* public code */
 
-wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_collection* collection, int32 value)
+const wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_collection* collection, int32 value)
 {
 	if (collection->count <= 0)
 		return L"";

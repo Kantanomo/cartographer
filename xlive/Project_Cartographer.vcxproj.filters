@@ -589,6 +589,7 @@
     <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cartographer_ingame_variant_ui.cpp" />
     <ClCompile Include="Blam\Engine\interface\cartographer_variant_settings.cpp" />
+    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_interface_cartographer_strings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -2153,7 +2154,6 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_primitives.h" />
     <ClInclude Include="Blam\Engine\interface\multiplayer_variant_interface_cartographer_strings.h" />
     <ClInclude Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.h" />
-    <ClInclude Include="Blam\Engine\interface\user_interface_globals_definition.h" />
     <ClInclude Include="Blam\Engine\render\render_cartographer_ingame_variant_ui.h" />
     <ClInclude Include="Blam\Engine\interface\cartographer_variant_settings.h" />
   </ItemGroup>

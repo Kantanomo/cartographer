@@ -2,7 +2,7 @@
 #include "multiplayer_variant_settings_interface_definition.h"
 
 #include "multiplayer_variant_interface_cartographer_strings.h"
-#include "user_interface_globals_definition.h"
+#include "user_interface_widget_group.h"
 #include "cache/cache_files.h"
 #include "game/game_engine.h"
 #include "game/game_globals.h"
@@ -68,6 +68,19 @@ static void multiplayer_variant_settings_interface_parse_cartographer_spawn_prot
 	*(real32*)out_variable = 1.f;
 }
 
+static void multiplayer_variant_settings_interface_parse_cartographer_dub_shot(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_flags_32;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.flags);
+	*(e_cartographer_variant_flags*)out_variable = _cartographer_variant_disable_dub_shot;
+}
+
+static void multiplayer_variant_settings_interface_parse_cartographer_invincible_players(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
+{
+	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_flags_32;
+	*out_offset = offsetof(s_game_variant, cartographer_settings.flags);
+	*(e_cartographer_variant_flags*)out_variable = _cartographer_variant_invincible_players;
+}
 //static void multiplayer_variant_settings_interface_parse_headhunter_moving_bin(e_multiplayer_variant_setting_interface_conversion_type* out_conversion_type, uint32* out_offset, void* out_variable)
 //{
 //	*out_conversion_type = _multiplayer_variant_setting_interface_conversion_type_int16;
@@ -197,6 +210,8 @@ static void multiplayer_variant_settings_interface_get_variant_parameter_label_c
 	case _variant_setting_parameter_type_cartographer_force_default_fov:
 	case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
 	case _variant_setting_parameter_type_cartographer_force_default_weapon_offsets:
+	case _variant_setting_parameter_type_cartographer_disable_dub_shot:
+	case _variant_setting_parameter_type_cartographer_invincible_players:
 		string = g_multiplayer_variant_interface_bool_value_strings[get_current_language()][value];
 		break;
 
@@ -276,6 +291,8 @@ static int32 multiplayer_variant_settings_interface_get_variant_parameter_value_
 	case _variant_setting_parameter_type_cartographer_engine_mode:
 	case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
 	case _variant_setting_parameter_type_cartographer_force_default_weapon_offsets:
+	case _variant_setting_parameter_type_cartographer_disable_dub_shot:
+	case _variant_setting_parameter_type_cartographer_invincible_players:
 		return 2;
 
 	case _variant_setting_parameter_type_cartographer_game_speed:
@@ -379,6 +396,10 @@ int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value
 			return variant->cartographer_settings.flags.test(_cartographer_variant_force_default_weapon_offsets);
 		case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
 			return variant->cartographer_settings.flags.test(_cartographer_variant_force_default_cross_hair_offset);
+		case _variant_setting_parameter_type_cartographer_disable_dub_shot:
+			return variant->cartographer_settings.flags.test(_cartographer_variant_disable_dub_shot);
+		case _variant_setting_parameter_type_cartographer_invincible_players:
+			return variant->cartographer_settings.flags.test(_cartographer_variant_invincible_players);
 		case _variant_setting_parameter_type_cartographer_game_speed:
 			return variant->cartographer_settings.game_speed;
 		case _variant_setting_parameter_type_cartographer_gravity:
@@ -421,6 +442,13 @@ void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(
 			break;
 		case _variant_setting_parameter_type_cartographer_force_default_cross_hair_offset:
 			variant->cartographer_settings.flags.set(_cartographer_variant_force_default_cross_hair_offset, value);
+			break;
+		case _variant_setting_parameter_type_cartographer_disable_dub_shot:
+			variant->cartographer_settings.flags.set(_cartographer_variant_disable_dub_shot, value);
+			break;
+		case _variant_setting_parameter_type_cartographer_invincible_players:
+			variant->cartographer_settings.flags.set(_cartographer_variant_invincible_players, value);
+			break;
 		case _variant_setting_parameter_type_cartographer_game_speed:
 			variant->cartographer_settings.game_speed = (e_game_speed_modifier)value;
 			break;
@@ -658,6 +686,12 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s
 		case _variant_setting_parameter_type_cartographer_spawn_protection:
 			usnprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][9]);
 			break;
+		case _variant_setting_parameter_type_cartographer_disable_dub_shot:
+			usnprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][10]);
+			break;
+		case _variant_setting_parameter_type_cartographer_invincible_players:
+			usnprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_title_strings[get_current_language()][11]);
+			break;
 		}
 
 		return;
@@ -719,6 +753,12 @@ void multiplayer_variant_settings_interface_get_custom_variant_parameter_descrip
 			break;
 		case _variant_setting_parameter_type_cartographer_spawn_protection:
 			usnprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][9]);
+			break;
+		case _variant_setting_parameter_type_cartographer_disable_dub_shot:
+			usnprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][10]);
+			break;
+		case _variant_setting_parameter_type_cartographer_invincible_players:
+			usnprintf(out_string, 512, g_multiplayer_variant_interface_cartographer_parameter_description_strings[get_current_language()][10]);
 			break;
 		}
 

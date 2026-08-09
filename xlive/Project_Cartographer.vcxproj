@@ -1270,6 +1270,7 @@
     <ClCompile Include="Blam\Engine\interface\hud_draw.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_nav_points.cpp" />
     <ClCompile Include="Blam\Engine\interface\interface.cpp" />
+    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_interface_cartographer_strings.cpp" />
     <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
     <ClCompile Include="Blam\Engine\interface\new_hud_draw.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_4way_signin.cpp" />
@@ -1744,7 +1745,6 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_bitmap_block.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_channel.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
-    <ClInclude Include="Blam\Engine\interface\user_interface_globals_definition.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_group_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_guide.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_hud_block.h" />

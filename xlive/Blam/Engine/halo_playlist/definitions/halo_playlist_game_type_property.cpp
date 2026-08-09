@@ -18,7 +18,7 @@ PLAYLIST_ITEM_COLLECTION(g_halo_playlist_game_type_property_item_collection, k_h
 
 /* public code */
 
-wchar_t* halo_playlist_item_collection_game_type_get_name(e_game_variant_description_index value)
+const wchar_t* halo_playlist_item_collection_game_type_get_name(e_game_variant_description_index value)
 {
 	return halo_playlist_item_collection_get_name(&g_halo_playlist_game_type_property_item_collection, value);
 }

@@ -6,7 +6,7 @@
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>-nointro -windowed -novsync</LocalDebuggerCommandArguments>
-    <LocalDebuggerCommandArgumentsHistory>-live|-live -instance:asdf|-lan -instance:asdf|-windowed -novsync|-nointro -windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
+    <LocalDebuggerCommandArgumentsHistory>-nointro -windowed -novsync|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_llvm|Win32'">
     <LocalDebuggerDebuggerType>NativeOnly</LocalDebuggerDebuggerType>

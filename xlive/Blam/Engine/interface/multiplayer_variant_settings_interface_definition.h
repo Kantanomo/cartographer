@@ -321,10 +321,12 @@ enum e_variant_setting_parameter_type : uint32
 	_variant_setting_parameter_type_cartographer_game_speed,
 	_variant_setting_parameter_type_cartographer_gravity,
 	_variant_setting_parameter_type_cartographer_spawn_protection,
+	_variant_setting_parameter_type_cartographer_disable_dub_shot,
+	_variant_setting_parameter_type_cartographer_invincible_players,
 
 	k_variant_setting_parameter_type_count,
 	k_variant_setting_parameter_type_base_count = 112,
-	k_variant_setting_parameter_type_cartographer_count = 10,
+	k_variant_setting_parameter_type_cartographer_count = (k_variant_setting_parameter_type_count - k_variant_setting_parameter_type_base_count) - 1,
 
 	_variant_setting_parameter_type_invalid = (uint32)NONE
 };

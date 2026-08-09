@@ -11,7 +11,7 @@
 
 struct s_halo_playlist_item
 {
-	wchar_t* name;
+	const wchar_t* name;
 	int32 value;
 };
 ASSERT_STRUCT_SIZE(s_halo_playlist_item, 8);
@@ -25,7 +25,7 @@ ASSERT_STRUCT_SIZE(s_halo_playlist_item_collection, 8);
 
 /* prototypes */
 
-wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_collection* collection, int32 value);
+const wchar_t* halo_playlist_item_collection_get_name(s_halo_playlist_item_collection* collection, int32 value);
 
 int32 halo_playlist_item_collection_get_value(s_halo_playlist_item_collection* collection, wchar_t const* value);
 

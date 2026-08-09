@@ -5,7 +5,7 @@
 
 enum 
 {
-	k_halo_playlist_cartographer_setting_property_count = 11,
+	k_halo_playlist_cartographer_setting_property_count = 12,
 	k_halo_playlist_cartographer_engine_mode_count = 6,
 	k_halo_playlist_cartographer_game_speed_count = 5,
 	k_halo_playlist_cartographer_gravity_count = 8,
@@ -27,6 +27,7 @@ enum e_halo_playlist_cartographer_setting_property_type
 	_halo_playlist_cartographer_setting_gravity,
 	_halo_playlist_cartographer_setting_spawn_protection,
 	_halo_playlist_cartographer_setting_disable_dub_shot,
+	_halo_playlist_cartographer_setting_invincible_players,
 
 	k_halo_playlist_cartographer_setting_count,
 	k_halo_playlist_cartographer_setting_invalid = NONE
@@ -43,7 +44,7 @@ enum e_halo_playlist_cartographer_setting_engine_mode
 
 /* prototypes */
 
-wchar_t* halo_playlist_item_collection_cartographer_setting_get_name(e_halo_playlist_cartographer_setting_property_type value);
+const wchar_t* halo_playlist_item_collection_cartographer_setting_get_name(e_halo_playlist_cartographer_setting_property_type value);
 
 e_halo_playlist_cartographer_setting_property_type halo_playlist_item_collection_cartographer_setting_get_value(wchar_t const* value);
 
@@ -70,6 +71,8 @@ bool halo_playlist_item_collection_cartographer_default_weapon_offsets_write_to_
 bool halo_playlist_item_collection_cartographer_default_crosshair_position_write_to_variant(wchar_t const* value, s_game_variant* variant);
 
 bool halo_playlist_item_collection_cartographer_disable_dub_shot_write_to_variant(wchar_t const* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_invincible_players_write_to_variant(wchar_t const* value, s_game_variant* variant);
 
 bool halo_playlist_item_collection_cartographer_game_speed_write_to_variant(wchar_t const* value, s_game_variant* variant);
 

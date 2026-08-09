@@ -351,6 +351,19 @@ static bool __cdecl OnPlayerSpawn(datum player_index)
 
 	bool ret = p_player_spawn(player_index);
 
+	s_game_variant* variant = get_game_variant();
+
+	if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_invincible_players))
+	{
+		player_datum* player = player_get(player_index);
+		object_datum* object = object_get(player->unit_index);
+		
+		ASSERT(player);
+		ASSERT(object);
+
+		object->object.object_damage_flags.set(_object_is_immune_to_damage, true);
+	}
+
 	// check if the spawn was successful
 	if (ret)
 	{

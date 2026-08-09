@@ -18,7 +18,8 @@ PLAYLIST_ITEM_COLLECTION(g_halo_playlist_cartographer_setting_property_item_coll
     { L"Game Speed",                     _halo_playlist_cartographer_setting_game_speed },
     { L"Gravity",                        _halo_playlist_cartographer_setting_gravity },
     { L"Spawn Protection",               _halo_playlist_cartographer_setting_spawn_protection },
-	{ L"Disable Dub Shot",               _halo_playlist_cartographer_setting_disable_dub_shot}
+	{ L"Disable Dub Shot",               _halo_playlist_cartographer_setting_disable_dub_shot},
+	{ L"Invincible Players",              _halo_playlist_cartographer_setting_invincible_players}
 );
 
 PLAYLIST_ITEM_COLLECTION(g_halo_playlist_cartographer_engine_mode_item_collection, k_halo_playlist_cartographer_engine_mode_count,
@@ -63,7 +64,7 @@ PLAYLIST_ITEM_COLLECTION(g_halo_playlist_cartographer_spawn_protection_item_coll
 
 /* public code */
 
-wchar_t* halo_playlist_item_collection_cartographer_setting_get_name(e_halo_playlist_cartographer_setting_property_type value)
+const wchar_t* halo_playlist_item_collection_cartographer_setting_get_name(e_halo_playlist_cartographer_setting_property_type value)
 {
     ASSERT(IN_RANGE(value, k_halo_playlist_cartographer_setting_invalid, k_halo_playlist_cartographer_setting_count));
 
@@ -140,6 +141,11 @@ bool halo_playlist_item_collection_cartographer_default_crosshair_position_write
 bool halo_playlist_item_collection_cartographer_disable_dub_shot_write_to_variant(wchar_t const* value, s_game_variant* variant)
 {
     return halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(value, variant, _cartographer_variant_disable_dub_shot);
+}
+
+bool halo_playlist_item_collection_cartographer_invincible_players_write_to_variant(wchar_t const* value, s_game_variant* variant)
+{
+    return halo_playlist_item_collection_cartographer_setting_flag_write_to_variant(value, variant, _cartographer_variant_invincible_players);
 }
 
 bool halo_playlist_item_collection_cartographer_game_speed_write_to_variant(wchar_t const* value, s_game_variant* variant)

@@ -431,6 +431,7 @@ enum e_cartographer_variant_flags : uint32
 	_cartographer_variant_force_default_weapon_offsets,
 	_cartographer_variant_force_default_cross_hair_offset,
 	_cartographer_variant_disable_dub_shot,
+	_cartographer_variant_invincible_players,
 
 	k_cartographer_variant_flags_count,
 	k_cartographer_variant_flags_bits_required = bits_required_for(FLAG(k_cartographer_variant_flags_count - 1)),

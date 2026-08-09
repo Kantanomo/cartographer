@@ -54,7 +54,7 @@ real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 		}
 		else
 		{
-			unit_definition* unit = (unit_definition*)tag_get_fast(unit_get(player_control_info->unit_datum_index)->definition_index);
+			unit_definition* unit = (unit_definition*)tag_get_fast(unit_get(player_control->unit_datum_index)->definition_index);
 			fov = unit->unit.camera_field_of_view;
 		}
 

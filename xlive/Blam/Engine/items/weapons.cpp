@@ -39,12 +39,9 @@ static __declspec(naked) void weapon_barrel_idle_usercall_to_rewritten()
 
 void weapons_apply_patches()
 {
-	if (!shell_is_dedicated_server())
-	{
-		PatchCall(Memory::GetAddress(0x15C60C), weapon_barrel_idle_usercall_to_rewritten);
-		PatchCall(Memory::GetAddress(0x1611AD), weapon_barrel_idle_usercall_to_rewritten);
-		PatchCall(Memory::GetAddress(0x162B38), weapon_barrel_idle_usercall_to_rewritten);
-	}
+	PatchCall(Memory::GetAddress(0x15C60C, 0x1408CC), weapon_barrel_idle_usercall_to_rewritten);
+	PatchCall(Memory::GetAddress(0x1611AD, 0x14546D), weapon_barrel_idle_usercall_to_rewritten);
+	PatchCall(Memory::GetAddress(0x162B38, 0x146DF8), weapon_barrel_idle_usercall_to_rewritten);
 
 	PatchCall(Memory::GetAddress(0x15FB9D, 0x143E5D), weapon_take_inventory_rounds);
 }

@@ -14,6 +14,8 @@ enum e_utf32
 
 	k_first_unicode_private_use_character = 0xE000,
 
+	_unicode_private_font_icon_lock = 0xE008,
+
 	_unicode_private_font_icon_a_button = 0xE100,
 	_unicode_private_font_icon_b_button,
 	_unicode_private_font_icon_x_button,

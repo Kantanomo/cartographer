@@ -25,4 +25,4 @@ enum e_halo_playlist_match_property_type
 /* prototypes */
 
 e_halo_playlist_match_property_type halo_playlist_item_collection_get_match_property_get_value(wchar_t const* value);
-wchar_t* halo_playlist_item_collection_match_property_get_name(e_halo_playlist_match_property_type value);
+const wchar_t* halo_playlist_item_collection_match_property_get_name(e_halo_playlist_match_property_type value);
