@@ -291,8 +291,6 @@ char const* get_language_display_name(e_language language);
 
 /* used for stubs, otherwise DO NOT USE */
 void cseries_stub_internal(...);
-void cseries_stub_internal(const std::string& str);
-void cseries_stub_internal(const std::wstring& str);
 
 /* public code */
 

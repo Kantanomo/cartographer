@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef EVENTS_ENABLED
+
 /* enums */
 
 enum e_event_level
@@ -14,7 +16,36 @@ enum e_event_level
 	_event_invalid = NONE
 };
 
+#endif
+
+/* macros */
+
+#ifdef EVENTS_ENABLED
+
+#define event(severity, format, ...)				\
+do													\
+{													\
+	static c_event local_event;						\
+	if (local_event.query(severity))				\
+	{												\
+		local_event.generate(format, __VA_ARGS__);	\
+	}												\
+}													\
+while(0)
+
+#else
+
+#define event(severity, format, ...)	\
+if (0)									\
+{										\
+	cseries_stub_internal(__VA_ARGS__);	\
+} (void)0
+
+#endif
+
 /* classes */
+
+#ifdef EVENTS_ENABLED
 
 class c_event
 {
@@ -47,28 +78,5 @@ void network_event_log_category(const char* category_string, e_event_level level
 extern const char* k_event_level_names[k_network_event_level_count];
 
 extern const char* k_event_level_severity_strings[k_network_event_level_count];
-
-/* macros */
-
-#ifdef EVENTS_ENABLED
-
-#define event(severity, format, ...)				\
-do													\
-{													\
-	static c_event local_event;						\
-	if (local_event.query(severity))				\
-	{												\
-		local_event.generate(format, __VA_ARGS__);	\
-	}												\
-}													\
-while(0)
-
-#else
-
-#define event(severity, format, ...)	\
-if (0)									\
-{										\
-	cseries_stub_internal(__VA_ARGS__);	\
-} (void)0
 
 #endif

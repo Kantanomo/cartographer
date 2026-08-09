@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ERRORS_ENABLED
+
 /* enums */
 
 enum e_error_priority
@@ -35,8 +37,6 @@ enum e_error_category
 	_error_category_localization,
 	k_error_category_count
 };
-
-#ifdef ERRORS_ENABLED
 
 /* prototypes */
 
@@ -98,7 +98,7 @@ void write_to_error_file(e_error_category category, e_error_priority priority, c
 #else
 
 // If errors are disabled then we just define an error macro that does nothing so we don't have to bring in error functions and logic
-#define error(...)						\
+#define error(priority, category, ...)	\
 if (0)									\
 {										\
 	cseries_stub_internal(__VA_ARGS__);	\

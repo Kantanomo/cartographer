@@ -428,14 +428,3 @@ char const* get_language_display_name(
 void cseries_stub_internal(...)
 {
 }
-
-void cseries_stub_internal(const std::string& str)
-{
-	SUPRESS_UNUSED(str);
-}
-
-void cseries_stub_internal(const std::wstring& str)
-{
-	SUPRESS_UNUSED(str);
-}
-
