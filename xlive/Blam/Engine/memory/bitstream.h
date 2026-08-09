@@ -62,7 +62,7 @@ public:
 	void begin_reading();
 	void finish_reading();
 	void begin_writing(int32 data_size_alignment);
-	void finish_writing(int32* out_space_left_in_bits);
+	void finish_writing(int32* bits_wasted);
 
 	bool would_overflow(int32 bit_count) const
 	{
@@ -92,9 +92,17 @@ public:
 		return 8 * m_data_size_bytes - m_current_bit_position;
 	}
 
-	int32 get_space_used_in_bytes() const
+	int32 get_space_used_in_bits(
+		void) const
 	{
-		return (m_current_bit_position + 7) / 8;
+		ASSERT(writing());
+		return m_current_bit_position;
+	}
+
+	int32 get_space_used_in_bytes(
+		void) const
+	{
+		return (get_space_used_in_bits() + 7) / 8;
 	}
 
 	void write_string_wchar(const char* name, const void* string, int32 size_in_words);
