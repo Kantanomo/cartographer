@@ -62,7 +62,7 @@ struct s_main_globals
 	bool load_core;
 	char core_file_name[64];
 	bool reset_map;
-	bool reset_map_random_seed;
+	bool revert_map;
 	bool save_map;
 	bool save_map_and_exit;
 	bool skip_cinematic;
@@ -147,17 +147,45 @@ void main_loop(void)
 	return;
 }
 
-void main_reset_map(void)
+void main_quit(
+	void)
+{
+	s_main_globals* main_globals = main_globals_get();
+	main_globals->exit_game = true;
+	return;
+}
+
+void main_reset_map(
+	void)
 {
 	s_main_globals* main_globals = main_globals_get();
 	main_globals->reset_map = true;
 	return;
 }
 
-void main_quit(void)
+void main_revert_map(
+	void)
 {
 	s_main_globals* main_globals = main_globals_get();
-	main_globals->exit_game = true;
+	main_globals->revert_map = true;
+	return;
+}
+
+void main_revert_map_scripting(
+	void)
+{
+	s_main_globals* main_globals = main_globals_get();
+	main_globals->revert_map = true;
+	main_globals->revert_by_scripting = true;
+	main_globals->revert_keep_playing_cinematic_outros = true;
+	return;
+}
+
+void main_save_and_exit(
+	void)
+{
+	s_main_globals* main_globals = main_globals_get();
+	main_globals->save_map_and_exit = true;
 	return;
 }
 
@@ -241,7 +269,7 @@ void main_loop_body(void)
 		}
 
 		main_globals->skip_cinematic = (main_globals->skip_cinematic ? false : main_globals->skip_cinematic);
-		main_globals->reset_map_random_seed = (main_globals->reset_map_random_seed ? false : main_globals->reset_map_random_seed);
+		main_globals->revert_map = (main_globals->revert_map ? false : main_globals->revert_map);
 
 		if (main_globals->reset_map && game_in_progress() && !game_time_get_paused())
 		{
