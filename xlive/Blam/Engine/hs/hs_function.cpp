@@ -152,7 +152,7 @@ static void cheat_drop_tag_name_evaluate(int16 function_index, int32 thread_inde
 
 
 static void main_crash_evaluate(int16 function_index, int32 thread_index, bool initialize);
-
+static void main_print_version_evaluate(int16 function_index, int32 thread_index, bool initialize);
 
 static void screenshot_cubemap_evaluate(int16 function_index, int32 thread_index, bool initialize);
 
@@ -2918,9 +2918,20 @@ HS_FUNCTION_DEFINITION_CREATE(
 	_hs_type_string
 );
 
-/*
 HS_FUNCTION_DEFINITION_CREATE(
 	version_definition,
+	_hs_type_void,
+	"version",
+	0,
+	&hs_macro_function_parse,
+	&main_print_version_evaluate,
+	"prints the build version.",
+	NULL,
+	0,
+	_hs_unparsed
+);
+
+/*
 HS_FUNCTION_DEFINITION_CREATE(
 	status_definition,
 HS_FUNCTION_DEFINITION_CREATE(
@@ -5391,8 +5402,8 @@ const hs_function_definition* hs_function_table[] =
 	&structure_bsp_index_definition,
 */
 	&crash_definition,
-/*
 	&version_definition,
+/*
 	&status_definition,
 	&record_movie_definition,
 	&record_movie_distributed_definition,
@@ -6121,7 +6132,10 @@ static void cheat_drop_tag_name_evaluate(int16 function_index, int32 thread_inde
 }
 
 
-static void main_crash_evaluate(int16 function_index, int32 thread_index, bool initialize)
+static void main_crash_evaluate(
+	int16 function_index,
+	int32 thread_index, 
+	bool initialize)
 {
 	const int32* arguments = hs_macro_function_evaluate(function_index, thread_index, initialize);
 	if (arguments)
@@ -6132,6 +6146,15 @@ static void main_crash_evaluate(int16 function_index, int32 thread_index, bool i
 	return;
 }
 
+static void main_print_version_evaluate(
+	int16 function_index,
+	int32 thread_index,
+	bool initialize)
+{
+	main_print_version();
+	hs_return(thread_index, 0);
+	return;
+}
 
 static void screenshot_cubemap_evaluate(int16 function_index, int32 thread_index, bool initialize)
 {

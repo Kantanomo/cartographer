@@ -2,6 +2,7 @@
 #include "hs_globals_external.h"
 
 #include "interface/terminal.h"
+#include "main/console.h"
 #include "main/main.h"
 #include "main/main_game.h"
 #include "main/main_render.h"
@@ -45,8 +46,12 @@ HS_GLOBAL_EXTERNAL_CREATE(debug_physical_memory_definition, "debug_physical_memo
 
 #ifdef TERMINAL_ENABLED
 HS_GLOBAL_EXTERNAL_CREATE(terminal_render_definition, "terminal_render", _hs_type_boolean, &g_terminal_render_enable);
+HS_GLOBAL_EXTERNAL_CREATE(console_dump_to_file_definition, "console_dump_to_file", _hs_type_boolean, &console_dump_to_file);
+HS_GLOBAL_EXTERNAL_CREATE(console_dump_to_debug_display_definition, "console_dump_to_debug_display", _hs_type_boolean, &console_dump_to_debug_display);
 #else
 HS_GLOBAL_EXTERNAL_CREATE(terminal_render_definition, "terminal_render", _hs_type_boolean, NULL);
+HS_GLOBAL_EXTERNAL_CREATE(console_dump_to_file_definition, "console_dump_to_file", _hs_type_boolean, NULL);
+HS_GLOBAL_EXTERNAL_CREATE(console_dump_to_debug_display_definition, "console_dump_to_debug_display", _hs_type_boolean, NULL);
 #endif
 
 //HS_GLOBAL_EXTERNAL_CREATE(render_sky_definition, "render_sky", _hs_type_boolean, &render_sky_enabled);
@@ -74,9 +79,9 @@ const hs_global_external* hs_external_globals[] =
 	&framerate_stabilization_definition,
 	&debug_physical_memory_definition,
 	&terminal_render_definition,
+	&console_dump_to_file_definition,
+	&console_dump_to_debug_display_definition,
 /*
-	&stru_CE5E64,
-	&stru_CE5E70,
 	&stru_CE5E7C,
 	&stru_CE5E88,
 	&stru_CE5E94,

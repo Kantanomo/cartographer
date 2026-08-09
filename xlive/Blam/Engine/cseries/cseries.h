@@ -1,4 +1,5 @@
 #pragma once
+#include "language.h"
 
 // 8-bit character that's specified as a multibyte utf8 string
 typedef char utf8;
@@ -286,6 +287,8 @@ char* csstrnlwr(char* s, size_t size);
 char* csstrtok(char* s, const char* delimiters, bool skip_multiple_delimiters, struct csstrtok_data *data);
 
 char* strchr(char* str, int32 ch);
+
+char const* get_language_display_name(e_language language);
 
 /* public code */
 

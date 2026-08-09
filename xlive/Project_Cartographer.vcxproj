@@ -1011,6 +1011,7 @@
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_modules.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries.h" />
     <ClInclude Include="Blam\Engine\cseries\debug_memory.h" />
+    <ClInclude Include="Blam\Engine\cseries\language.h" />
     <ClInclude Include="Blam\Engine\cseries\profile.h" />
     <ClInclude Include="Blam\Engine\cseries\runtime_state.h" />
     <ClInclude Include="Blam\Engine\cseries\sort.h" />
