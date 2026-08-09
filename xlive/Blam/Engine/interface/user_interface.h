@@ -44,7 +44,7 @@ enum e_event_type
 };
 
 // TODO : recheck these
-enum e_controller_component
+enum e_user_interface_controller_component
 {
 	_controller_component_button_a = 0,
 	_controller_component_button_b,
@@ -443,7 +443,7 @@ struct s_event_record
 {
 	e_event_type type;
 	e_controller_index controller;
-	e_controller_component component;
+	e_user_interface_controller_component component;
 	int16 event_value; // holds e_user_interface_automation_mode during _user_interface_event_type_automation
 };
 ASSERT_STRUCT_SIZE(s_event_record, 16);
@@ -485,10 +485,6 @@ struct s_screen_parameters
 ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
 
 
-/* forward declarations */
-
-enum e_user_interface_screen_id : uint32;
-
 /* prototypes */
 
 bool __cdecl user_interface_automation_is_active(void);
@@ -499,11 +495,11 @@ class c_user_interface_channel* __fastcall user_interface_get_channel(e_user_int
 bool __cdecl user_interface_error_display_allowed(void);
 bool __cdecl user_interface_has_responding_controller(int32 user_index);
 bool __cdecl user_interface_channel_is_busy(e_user_interface_channel_type channel_type);
-bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id);
+bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, enum e_user_interface_screen_id id);
 
-int32 __cdecl user_interface_get_screen_tag_index_by_id(e_user_interface_screen_id id);
+int32 __cdecl user_interface_get_screen_tag_index_by_id(enum e_user_interface_screen_id id);
 
-bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id screen_id);
+bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, enum e_user_interface_screen_id screen_id);
 bool __cdecl user_interface_error_screen_is_active(e_user_interface_channel_type channel_index, e_user_interface_render_window window_index, e_ui_error_types error_code);
 
 void __cdecl screen_error_ok_dialog_show(e_user_interface_channel_type channel_type, e_ui_error_types ui_error_index, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback);
