@@ -7,6 +7,12 @@ enum e_simulation_action_update : uint32
 	_simulation_action_update_grenade_count_bit = 22
 };
 
+enum e_simulation_action_player_update : uint32
+{
+	_simulation_action_player_update_bit_1,
+	_simulation_action_player_update_bit_2,
+};
+
 /* prototypes */
 
 void __cdecl simulation_action_object_create(datum object_index);

@@ -400,7 +400,7 @@ void __cdecl game_tick(void)
 		game_time_advance();
 	}
 
-	//main_status("game_tick", NULL);
+	main_status("game_tick", NULL);
 
 	return;
 }

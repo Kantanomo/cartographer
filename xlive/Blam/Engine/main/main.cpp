@@ -12,6 +12,7 @@
 
 #include "achievements/achievement_manager.h"
 #include "bink/wmv_playback.h"
+#include "cache/cache_files.h"
 #include "cache/cache_files_windows.h"
 #include "camera/director.h"
 #include "camera/observer.h"
@@ -508,6 +509,16 @@ void main_crash(const char* str)
 	{
 		main_halt_and_catch_fire();
 	}
+	return;
+}
+
+void main_print_version(void)
+{
+	console_printf(shell_get_version());
+	console_printf(
+		"minor version %d cache file language %s",
+		cache_files_get_header()->minor_version,
+		get_language_display_name(get_map_language()));
 	return;
 }
 

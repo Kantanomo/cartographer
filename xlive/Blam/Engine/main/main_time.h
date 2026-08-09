@@ -37,8 +37,11 @@ void main_time_frame_rate_display(void);
 
 /* globals */
 
+extern bool debug_frame_rate;
 extern bool display_framerate;
 extern bool display_frame_deltas;
 extern bool debug_disable_frame_rate_throttle;
+extern bool debug_frame_rate_based_on_system_time;
+extern bool debug_frame_rate_stabilization;
 
 extern bool g_main_game_time_frame_limiter_enabled;

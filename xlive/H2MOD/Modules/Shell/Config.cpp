@@ -56,7 +56,7 @@ bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
 bool H2Config_shader_lod_max = false;
-bool H2Config_light_suppressor = false;
+bool H2Config_light_suppressor_disable = false;
 bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
 char H2Config_dedi_server_playlist[MAX_PATH] = { "" };
@@ -474,7 +474,7 @@ void SaveH2Config()
 
 			CONFIG_SET(&ini, "shader_lod_max", &H2Config_shader_lod_max);
 
-			CONFIG_SET(&ini, "light_suppressor", &H2Config_light_suppressor);
+			CONFIG_SET(&ini, "light_suppressor", &H2Config_light_suppressor_disable);
 
 			CONFIG_SET(&ini, "disable_ingame_keyboard", &H2Config_disable_ingame_keyboard);
 
@@ -670,7 +670,7 @@ void ReadH2Config()
 				CONFIG_GET(&ini, "static_lod_state", "0", &H2Config_static_lod_state);
 				
 				CONFIG_GET(&ini, "shader_lod_max", "false", &H2Config_shader_lod_max);
-				CONFIG_GET(&ini, "light_suppressor", "false", &H2Config_light_suppressor);
+				CONFIG_GET(&ini, "light_suppressor", "false", &H2Config_light_suppressor_disable);
 				CONFIG_GET(&ini, "disable_ingame_keyboard", "false", &H2Config_disable_ingame_keyboard);
 				CONFIG_GET(&ini, "hide_ingame_chat", "false", &H2Config_hide_ingame_chat);
 

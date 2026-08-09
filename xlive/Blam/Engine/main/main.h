@@ -36,6 +36,7 @@ void main_status(const char* status_type, const char* format, ...);
 void main_halt_and_catch_fire(void);
 
 void main_crash(const char* str);
+void main_print_version(void);
 
 /* globals */
 

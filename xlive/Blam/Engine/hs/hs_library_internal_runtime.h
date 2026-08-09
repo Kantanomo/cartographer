@@ -296,13 +296,19 @@ void hs_evaluate_object_cast_up(int16 function_index, int32 thread_index, bool i
 
 /* private code */
 
-static void hs_inspect_boolean(int16 type, int32 value, char* buffer, int32 buffer_size)
+static void hs_inspect_boolean(
+	int16 type,
+	int32 value,
+	char* buffer,
+	int32 buffer_size)
 {
 	ASSERT(type == _hs_type_boolean);
 
-	const bool result = (int8)value;	// We need to cast to an int8 or else the compiler will give us a bad value
-
+	// We need to cast to a bool or else the compiler will give us a bad value
+	// Note: added (& BYTE_MAX) to make sure we only get the byte of the value
+	const bool result = (bool)(value & BYTE_MAX);	
 	const char* string = result ? "true" : "false";
+
 	csstrncpy(buffer, string, buffer_size);
 	return;
 }

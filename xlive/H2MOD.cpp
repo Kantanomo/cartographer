@@ -189,27 +189,6 @@ void call_give_player_weapon(datum player_index, datum weapon_tag_definition_ind
 	}
 }
 
-void H2MOD::set_unit_speed_patch(bool hackit) {
-	static BYTE oldBytes[8];
-	static bool oldBytesRead = false;
-	DWORD address = Memory::GetAddress(0x6AB7F, 0x6A3BA);
-
-	if (oldBytesRead == false)
-	{
-		ReadBytesProtected(address, oldBytes, sizeof(oldBytes));
-		oldBytesRead = true;
-	}
-
-	if (hackit)
-	{
-		NopFill(address, sizeof(oldBytes));
-	}
-	else
-	{
-		WriteBytes(address, oldBytes, sizeof(oldBytes));
-	}
-}
-
 #pragma endregion
 
 void H2MOD::disable_score_announcer_sounds(uint32 sound_flags)
@@ -385,12 +364,6 @@ static bool __cdecl OnPlayerSpawn(datum player_index)
 static bool __cdecl OnMapLoad(s_game_options* options)
 {
 	static bool resetAfterMatch = false;
-
-	// set the light suppressor flag to false
-	if (H2Config_light_suppressor)
-	{
-		WriteValue(Memory::GetAddress(0x41F6B1), 0);
-	}
 
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->game_mode);
 	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, options);
@@ -615,7 +588,7 @@ static void h2mod_apply_hooks(void)
 	game_life_cycle_apply_patches();
 
 	network_memory_apply_patches();
-
+	game_engine_apply_patches();
 	simulation_apply_patches();
 	simulation_players_apply_patches();
 
@@ -650,14 +623,6 @@ static void h2mod_apply_hooks(void)
 
 		event(_event_status, "h2mod: applying client hooks");
 
-		// TODO: write proper patch for this so it can be toggled mid-game
-		// Disable lightsupressor function
-
-		if (H2Config_light_suppressor)
-		{
-			NopFill(Memory::GetAddress(0x1922d9), 7);
-		}
-		
 		DETOUR_ATTACH(p_user_interface_controller_set_desired_team_index, Memory::GetAddress<user_interface_controller_set_desired_team_index_t>(0x2068F2), user_interface_controller_set_desired_team_index_hook);
 
 		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);

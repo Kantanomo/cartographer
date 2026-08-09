@@ -360,7 +360,7 @@ namespace ImGuiHandler {
 
 					//Disable Light Suppressor
 
-					ImGui::Checkbox(advanced_settings_get_string(_advanced_string_light_suppressor), &H2Config_light_suppressor);
+					ImGui::Checkbox(advanced_settings_get_string(_advanced_string_light_suppressor), &H2Config_light_suppressor_disable);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_light_suppressor_tooltip));
 				}
