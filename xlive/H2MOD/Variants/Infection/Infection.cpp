@@ -492,9 +492,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 
 void Infection::OnPlayerSpawn(ExecTime execTime, datum player_index)
 {
-#ifdef EVENTS_ENABLED
 	const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
-#endif
 	player_datum* player = player_get(player_index);
 
 	switch (execTime)

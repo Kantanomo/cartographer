@@ -292,7 +292,7 @@ int XnIpManager::GetEstablishedConnectionIdentifierByRecvAddr(XVirtualSocket* xs
 	return WSAEINVAL;
 }
 
-void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* machineUID, const char* abOnline)
+void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const BYTE* abEnet, const BYTE* abOnline)
 {
 	XnIpManager::UnregisterLocalConnectionInfo();
 
@@ -325,13 +325,16 @@ void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long l
 
 	// create rc4 state from machine id key to build the abEnet
 	XECRYPT_RC4_STATE rc4_engine_state;
-	XeCryptRc4Key(&rc4_engine_state, (BYTE*)machineUID, sizeof(XNADDR::abEnet) * 2);
+	memcpy(m_ipLocal.m_xnaddr.abEnet, abEnet, sizeof(XNADDR::abEnet));
+	XeCryptRc4Key(&rc4_engine_state, m_ipLocal.m_xnaddr.abEnet, sizeof(XNADDR::abEnet));
+	XeCryptRc4Ecb(&rc4_engine_state, m_ipLocal.m_xnaddr.abEnet, sizeof(XNADDR::abEnet));
+	// first byte always 0x00
+	m_ipLocal.m_xnaddr.abEnet[0] = '\x00';
+
+	memcpy(m_ipLocal.m_xnaddr.abOnline, abOnline, sizeof(m_ipLocal.m_xnaddr.abOnline));
+	m_ipLocal.m_pckStats.PckDataSampleUpdate();
 
 	m_ipLocal.m_xnaddr.wPortOnline = htons(baseport);
-	XeCryptRc4Ecb(&rc4_engine_state, m_ipLocal.m_xnaddr.abEnet, sizeof(m_ipLocal.m_xnaddr.abEnet));
-	//HexStrToBytes(std::string(machineUID, sizeof(XNADDR::abEnet) * 2), m_ipLocal.m_xnaddr.abEnet, sizeof(XNADDR::abEnet));
-	HexStrToBytes(std::string(abOnline, sizeof(XNADDR::abOnline) * 2), m_ipLocal.m_xnaddr.abOnline, sizeof(XNADDR::abOnline));
-	m_ipLocal.m_pckStats.PckDataSampleUpdate();
 
 	//m_ipLocal.m_valid = g_XSockMgr.MainLinkSocketInitialize(htons(baseport));
 	m_ipLocal.m_valid = true;
@@ -841,9 +844,7 @@ void XnIp::SendXNetRequest(XVirtualSocket* xsocket, eXnip_ConnectRequestType req
 	m_connectionPacketsSentCount++;
 
 	m_requestContext = true;
-#ifndef SPDLOG_DISABLED
 	const int udp_send_result = 
-#endif
 		xsocket->UdpSend((const char*)&reqPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
 	LOG_INFO_NETWORK("{} - request sent, result: {}, socket handle: {}, connection index: {}, connection id: {:x}, n0nceKey: {}",
 		__FUNCTION__,

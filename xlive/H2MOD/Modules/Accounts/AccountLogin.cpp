@@ -58,7 +58,7 @@ void UpdateMasterStatus(int new_state, const char* state_str, ...)
 }
 
 void UpdateMasterLoginStatus(bool developer) {
-	
+
 	if (XUserSignedOnline(0))
 	{
 		const char* statusStr = "Status: Online";
@@ -78,13 +78,26 @@ void UpdateMasterLoginStatus(bool developer) {
 	}
 }
 
-int ConfigureUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* machineUID, const char* abOnline, bool online_signin, bool developer) {
+int ConfigureLocalUserDetails()
+{
+	BYTE abEnet[sizeof(XNADDR::abEnet)], abOnline[sizeof(XNADDR::abOnline)];
+	XUID xuid = (unsigned long long)(rand() % 0xFFFFFFFF);
+
+	XNetRandom(abEnet, sizeof(abEnet));
+	XNetRandom(abOnline, sizeof(abOnline));
+	XUserSetup(0, xuid, NULL, 0, H2Config_ip_lan, H2Config_base_port, abEnet, abOnline, false);
+	UpdateMasterLoginStatus();
+	return 1;
+}
+
+int ConfigureOnlineUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, const char* machineUID, const char* onlineId, bool developer) {
 
 	bool xuidValid = xuid != 0;
 	size_t usernameLen = strnlen(username, XUSER_NAME_SIZE);
 	bool usernameValid = (usernameLen > 0 && usernameLen <= XUSER_MAX_NAME_LENGTH);
 	bool machineUIdValid = strnlen(machineUID, 12 + 1) == 12;
-	bool onlineIdValid = strnlen(abOnline, 40 + 1) == 40;
+	bool onlineIdValid = strnlen(onlineId, 40 + 1) == 40;
+	BYTE abEnet[sizeof(XNADDR::abEnet)], abOnline[sizeof(XNADDR::abOnline)];
 
 	// validation
 	if (!xuidValid
@@ -99,16 +112,16 @@ int ConfigureUserDetails(const char* username, const char* login_token, unsigned
 
 	int result = strlen(login_token) == 32 ? 1 : 2;
 
-	XUserSetup(0, xuid, username, xnaddr, lanaddr, H2Config_base_port, machineUID, abOnline, online_signin);
+	HexStrToBytes(std::string(machineUID, sizeof(XNADDR::abEnet) * 2), abEnet, sizeof(XNADDR::abEnet));
+	HexStrToBytes(std::string(onlineId, sizeof(XNADDR::abOnline) * 2), abOnline, sizeof(XNADDR::abOnline));
+
+	XUserSetup(0, xuid, username, xnaddr, H2Config_ip_lan, H2Config_base_port, abEnet, abOnline, true);
 	TEST_N_DEF(PC4);
 	UpdateMasterLoginStatus(developer);
 
-	if (online_signin)
+	if (!shell_is_dedicated_server())
 	{
-		if (!shell_is_dedicated_server())
-		{
-			xlive_upnp_forward_ports();
-		}
+		xlive_upnp_forward_ports();
 	}
 
 	if (H2CurrentAccountLoginToken) {
@@ -307,7 +320,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		return result;
 	}
 
-	int user_configure_result = ConfigureUserDetails(username, login_token, xuid, xnaddr, H2Config_ip_lan, machineUID, abOnline, true, result == 4);
+	int user_configure_result = ConfigureOnlineUserDetails(username, login_token, xuid, xnaddr, machineUID, abOnline, result == 4);
 	if (user_configure_result != 0) {
 		//allow no login_token from backend in DB emergencies / random logins.
 		if (user_configure_result == 1) {
@@ -484,7 +497,7 @@ HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD d
 			XUserSignInSetStatusChanged(0);
 		}
 	}
-	
+
 	if (pOverlapped)
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;

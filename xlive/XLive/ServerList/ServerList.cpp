@@ -16,7 +16,6 @@
 
 using namespace rapidjson;
 
-
 /* constants */
 
 static const char k_cartographer_add_server_url[] = k_cartographer_url_https"/live/add_server.php";
@@ -27,40 +26,30 @@ static const char k_cartographer_dedi_count_url[] = k_cartographer_url_https"/li
 
 /* prototypes */
 
-static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock);
+static void LocatorTaskInsert(CServerList* listQueryTask);
+static CServerList* LocatorTaskGet(HANDLE hTask, std::unique_lock<std::mutex>& taskLock);
+static bool LocatorTaskRemove(HANDLE hTask, std::unique_lock<std::mutex>& taskLock);
+static void LocatorTaskCancelAll();
+static DWORD LocatorGetQueryBufferSize(DWORD cItems, DWORD cRequiredPropertyIDs, DWORD* pRequredPropertiesIDs, DWORD* outStringBufferSize);
 
-static bool RemoveServerListQueryByPtr(CServerList* serverListQuery);
+static void LocatorSetOverlappedError(XOVERLAPPED* pOverlapped, DWORD dwLow, DWORD dwHigh, DWORD dwExtended);
 
 /* globals */
 
 // Title specific XLocator service properties
 static _HALO2VISTA_TITLE_SERVICE_PROPERTIES h2v_service_properties;
+bool CServerList::servicePropertiesUpdated = false;
 
-static HANDLE g_hXLocatorHandle = INVALID_HANDLE_VALUE;
+static HANDLE locatorHandle = INVALID_HANDLE_VALUE;
 
-std::mutex CServerList::addServerMutex;
-std::mutex CServerList::removeServerMutex;
+std::mutex CServerList::advertiseMutex;
+std::mutex CServerList::unadvertiseMutex;
 std::mutex CServerList::getServerCountsMutex;
 
-std::mutex serverListRequestMutex;
-std::vector<std::pair<HANDLE, CServerList*>> serverListRequests;
-
-bool CServerList::CountResultsUpdated = false;
+static std::mutex locatorQueryListMtx;
+static std::vector<CServerList*> locatorQueryList;
 
 /* public code */
-
-void ServerListQueryCancelAll()
-{
-	std::lock_guard lg(serverListRequestMutex);
-
-	for (auto& request : serverListRequests)
-	{
-		request.second->CancelOperation();
-		XCloseHandle(request.first);
-	}
-
-	serverListRequests.clear();
-}
 
 static size_t BasicStrDownloadCb(void* contents, size_t size, size_t nmemb, void* userp)
 {
@@ -69,55 +58,29 @@ static size_t BasicStrDownloadCb(void* contents, size_t size, size_t nmemb, void
 	return size * nmemb;
 }
 
-void BadServer(unsigned long long xuid, const char* log_catch)
+static void BadServer(unsigned long long xuid, const char* log_catch)
 {
 	LOG_ERROR_XLIVE("{} - server XUID: {} - catch: {}", __FUNCTION__, xuid, log_catch);
 }
 
-DWORD ComputeXLocatorServerEnumeratorBufferSize(DWORD cItems, DWORD cRequiredPropertyIDs, DWORD* pRequredPropertiesIDs, DWORD* outStringBufferSize)
+CServerList::CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
 {
-	if (!(cItems > 0))
-	{
-		if (outStringBufferSize)
-			*outStringBufferSize = 0;
-		return 0;
-	}
-
-	unsigned int stringProperties = 0;
-	DWORD result = (DWORD)((sizeof(XLOCATOR_SEARCHRESULT) * cItems) + (cItems * sizeof(XUSER_PROPERTY) * cRequiredPropertyIDs));
-
-	if (pRequredPropertiesIDs)
-	{
-		for (uint32 i = 0; i < cRequiredPropertyIDs; i++)
-		{
-			if ((pRequredPropertiesIDs[i] & 0xF0000000) == 0x40000000) // check if we have string properties
-				++stringProperties;
-		}
-	}
-
-	// string buffers are max 64 wide strings characters (128 bytes) and the null character, so in total 65 characters (130 bytes)
-	result += (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties);
-
-	if (outStringBufferSize)
-	{
-		*outStringBufferSize = (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties);
-		LOG_TRACE_XLIVE("{} : stringBufferSize: {}, stringBufferSize2: {}, cItems: {}, stringCount: {}", __FUNCTION__, *outStringBufferSize, (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties), cItems, stringProperties);
-	}
-
-	return result;
+	m_itemsPerPageCount = _cItemsPerPage;
+	m_searchPropertiesIdCount = _cSearchPropertiesIDs;
+	m_pSearchPropertyIds = new DWORD[_cSearchPropertiesIDs];
+	memcpy(m_pSearchPropertyIds, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
+	m_handle = CreateMutex(NULL, NULL, NULL);
+	LocatorTaskInsert(this);
 }
 
-int CServerList::GetItemLeftCount() const
+CServerList::~CServerList()
 {
-	return m_itemsLeftInDoc;
+	std::unique_lock<std::mutex> lg;
+	LocatorTaskRemove(m_handle, lg);
+	delete[] m_pSearchPropertyIds;
 }
 
-int CServerList::GetValidItemsFoundCount() const
-{
-	return m_pageItemsFoundCount;
-}
-
-bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer) const
+bool CServerList::ProcessSearchResult(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer) const
 {
 	XLOCATOR_SEARCHRESULT searchResult;
 	ZeroMemory(&searchResult, sizeof(XLOCATOR_SEARCHRESULT));
@@ -200,10 +163,11 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		BadServer(xuid, "abEnet == NULL");
 		return result;
 	}
-	// HexStrToBytes(abEnet_str, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
 	XECRYPT_RC4_STATE rc4_engine_state;
-	XeCryptRc4Key(&rc4_engine_state, (BYTE*)abEnet_str, sizeof(XNADDR::abEnet) * 2);
-	XeCryptRc4Ecb(&rc4_engine_state, searchResult.serverAddress.abEnet, sizeof(searchResult.serverAddress.abEnet));
+	HexStrToBytes(abEnet_str, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
+	XeCryptRc4Key(&rc4_engine_state, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
+	XeCryptRc4Ecb(&rc4_engine_state, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
+	searchResult.serverAddress.abEnet[0] = '\x00';
 
 	if (!doc.HasMember("abonline"))
 	{
@@ -372,25 +336,13 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 	return result;
 }
 
-void ServerlistWorkerThread(CServerList* serverListQuery)
+void ServerlistRequestWorkerThread(CServerList* listQueryTask)
 {
-	serverListQuery->EnumerateFromHttp();
+	listQueryTask->EnumerateFromHttp();
 
-#ifndef SPDLOG_DISABLED
-	const HANDLE handle = serverListQuery->m_handle;
-#endif
+	const HANDLE handle = listQueryTask->m_handle;
 
-	// hacky/unsafe as fuck, because we delete the resource
-	// while still practically in the class' execution ctx 
-	// to avoid the need of a garbage collector
-	// as long as no member of the function is accesed after this
-	// releases the resources, it should be fine
-
-	RemoveServerListQueryByPtr(serverListQuery);
-
-	// delete the object only after the thread is about to exit
-	serverListQuery->m_itemQueryMutex.lock();
-	delete serverListQuery;
+	delete listQueryTask;
 
 	LOG_TRACE_XLIVE("{} - successfuly discarded serverlist query Id {:X} resources", __FUNCTION__, handle);
 	return;
@@ -403,21 +355,15 @@ void CServerList::EnumerateFromHttp()
 	CURLcode curl_res;
 
 	DWORD outStringBufferSize = 0;
-	int itemsLeftToDownload, validItemsFound = 0;
-
-	m_pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-	m_pOverlapped->InternalHigh = 0;
-	m_pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
+	DWORD itemsLeftToDownload, validItemsFound = 0;
 
 	addDebugText("Requesting server list");
+
 	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_XLIVE("{} - curl failed to initialize", __FUNCTION__);
-
-		m_pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
-		m_pOverlapped->InternalHigh = 0;
-		m_pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
+		LocatorSetOverlappedError(m_pOverlapped, ERROR_FUNCTION_FAILED, 0, HRESULT_FROM_WIN32(ERROR_NETWORK_NOT_AVAILABLE));
 		return;
 	}
 
@@ -435,18 +381,15 @@ void CServerList::EnumerateFromHttp()
 	// this counter count even bad servers
 	itemsLeftToDownload = document["servers"].Size();
 	// in case we have just 1 serverlist 'page' to download
-	int itemListMaxQueryCount = (std::min)(itemsLeftToDownload, XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN);
-
-	if (ComputeXLocatorServerEnumeratorBufferSize(itemListMaxQueryCount, m_searchPropertiesIdCount, m_pSearchPropertyIds, &outStringBufferSize) > m_resultBufferSize)
+	DWORD itemListMaxQueryCount = (std::min)(itemsLeftToDownload, m_itemsPerPageCount);
+	if (LocatorGetQueryBufferSize(itemListMaxQueryCount, m_searchPropertiesIdCount, m_pSearchPropertyIds, &outStringBufferSize) > m_resultBufferSize)
 	{
-		m_pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
-		m_pOverlapped->InternalHigh = 0;
-		m_pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+		LocatorSetOverlappedError(m_pOverlapped, ERROR_INSUFFICIENT_BUFFER, 0, HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER));
 		LOG_ERROR_XLIVE("{} - insufficient buffer for I/O operation!", __FUNCTION__);
 		return;
 	}
 
-	m_itemsLeftInDoc = itemsLeftToDownload;
+	m_itemsRemainingCount = itemsLeftToDownload;
 
 	curl_mhandle = curl_multi_init();
 	curl_multi_setopt(curl_mhandle, CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEX);
@@ -460,38 +403,35 @@ void CServerList::EnumerateFromHttp()
 	auto xuidStrItr = serverXuidArray.Begin();
 	auto xuidStrWriteItemItr = serverXuidArray.Begin();
 
-	while (itemsLeftToDownload > 0)
+	while (!m_taskEnd)
 	{
 		// wait for the game to signal again, for the next thread
 
 		STD_CHRONO_DEFINE_TIME_AND_CLOCK(_time, _clock);
 
-		m_pageItemsFoundCount = 0;
-
 		_clock::time_point tpBeforePause = _clock::now();
 
-		while (m_operationOnPause)
+		while (m_taskPaused)
 		{
 			Sleep(100);
 
-			if (_clock::now() - tpBeforePause > 5s)
+			if (_clock::now() - tpBeforePause > 10s)
 			{
-				CancelOperation();
-				LOG_INFO_XLIVE("{} - resume I/O timeout reached, canceling!", __FUNCTION__);
-			}
-
-			if (ShouldCancelOperation())
+				LOG_INFO_XLIVE("{} - resume I/O timeout reached, ending task!", __FUNCTION__);
+				m_taskEnd = true;
+				m_taskPaused = false;
 				break;
+			}
 		}
 
-		if (ShouldCancelOperation())
+		if (m_taskEnd)
 		{
-			LOG_INFO_XLIVE("{} - signaled to cancel I/0", __FUNCTION__);
+			LOG_INFO_XLIVE("{} - task signaled to end", __FUNCTION__);
 			break;
 		}
 
 		// this starts from where it left off
-		int serverQueryIdx = 0;
+		DWORD serverQueryIdx = 0;
 		for (; xuidStrItr != serverXuidArray.End(); ++xuidStrItr)
 		{
 			// we reached max ITEM download size, break out and download the servers
@@ -560,6 +500,7 @@ void CServerList::EnumerateFromHttp()
 
 		if (itemQueryError)
 		{
+			LocatorSetOverlappedError(m_pOverlapped, ERROR_FUNCTION_FAILED, 0, HRESULT_FROM_WIN32(ERROR_NETWORK_NOT_AVAILABLE));
 			break;
 		}
 
@@ -568,21 +509,20 @@ void CServerList::EnumerateFromHttp()
 		WCHAR* stringBuffer = (WCHAR*)((BYTE*)propertiesBuffer + (sizeof(XUSER_PROPERTY) * m_searchPropertiesIdCount * itemListMaxQueryCount));
 
 		{
-			std::lock_guard writeIoGuard(m_ioWriteMutex);
+			std::unique_lock ioLock(m_ioMutex);
 			int searchResultIdx = 0;
-			// vector should be XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN in size
+			int validPageItemsRetrieved = 0;
 			for (auto& itemQuery : itemsToDownloadQuery)
 			{
 				if (!itemQuery.second.empty())
 				{
-					if (SearchResultParseAndWrite(itemQuery.second, std::stoll(xuidStrWriteItemItr->GetString()), &searchResults[searchResultIdx], &propertiesBuffer, &stringBuffer))
+					if (ProcessSearchResult(itemQuery.second, std::stoll(xuidStrWriteItemItr->GetString()), &searchResults[searchResultIdx], &propertiesBuffer, &stringBuffer))
 					{
-						m_pageItemsFoundCount++;
+						validPageItemsRetrieved++;
 
 						// this holds all servers found count
 						// not just per page
 						validItemsFound++;
-
 						searchResultIdx++;
 					}
 				}
@@ -592,19 +532,22 @@ void CServerList::EnumerateFromHttp()
 				xuidStrWriteItemItr++;
 			}
 
-			m_itemsLeftInDoc = itemsLeftToDownload;
+			m_taskPaused = true;
+			m_itemsRemainingCount = itemsLeftToDownload;
 
-			// if we wrote servers to buffer, report back to the game
-			// this will signal the game to call XEnumerate again
-			if (GetValidItemsFoundCount() > 0)
+			// if server items were written to buffer, report back to the game
+			// this will signal the game to call XEnumerate again if there are more items to be retrieved
+			if (validPageItemsRetrieved > 0)
 			{
-				m_pOverlapped->InternalLow = ERROR_SUCCESS;
-				m_pOverlapped->InternalHigh = GetValidItemsFoundCount();
-				m_pOverlapped->dwExtendedError = 0;
+				LocatorSetOverlappedError(m_pOverlapped, ERROR_SUCCESS, validPageItemsRetrieved, 0);
+			}
+			else if (itemsLeftToDownload == 0)
+			{
+				LocatorSetOverlappedError(m_pOverlapped, ERROR_NO_MORE_FILES, 0, 0);
+				m_taskState = _eTaskFinished;
+				m_taskEnd = true;
 			}
 		}
-
-		m_operationOnPause = true;
 	}
 
 	for (auto& itemQuery : itemsToDownloadQuery)
@@ -623,7 +566,7 @@ void CServerList::EnumerateFromHttp()
 
 void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 {
-	std::lock_guard lg(getServerCountsMutex);
+	std::unique_lock lg(getServerCountsMutex);
 
 	CURL* curl;
 	CURLcode res;
@@ -651,89 +594,61 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 			h2v_service_properties.total_public_gold = document["public_gold"].GetInt();
 
 			// we updated the results, they can be used just fine
-			CountResultsUpdated = true;
+			servicePropertiesUpdated = true;
 		}
 	}
 }
 
-DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
+HRESULT CServerList::TaskEnumerateUpdate(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped)
 {
-	bool lockQuery = true;
+	TaskUpdateParameters(pOverlapped, cbBuffer, pvBuffer);
 
-	CServerList* serverListQuery = GetServerListQueryByHandle(hHandle, lockQuery);
-	if (serverListQuery == nullptr)
-		return ERROR_INVALID_HANDLE;
-
-	switch (serverListQuery->m_operationState)
+	switch (m_taskState)
 	{
-	case OperationPending:
-		serverListQuery->m_operationState = OperationIncomplete;
-		serverListQuery->SetNewPageBuffer(cbBuffer, pvBuffer);
-		serverListQuery->m_pOverlapped = pOverlapped;
-		std::thread(&ServerlistWorkerThread, serverListQuery).detach();
+	case _eTaskPending:
+		LocatorSetOverlappedError(pOverlapped, ERROR_IO_INCOMPLETE, 0, HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE));
+		std::thread(&ServerlistRequestWorkerThread, this).detach();
+		m_taskState = _eTaskIncomplete;
 		break;
-
-	case OperationIncomplete:
-		// update:
-		// this notifies the serverlist thread to download the next serverlist "page"
-
-		if (serverListQuery->GetItemLeftCount() > 0)
+	case _eTaskIncomplete:
+		if (m_taskPaused)
 		{
-			serverListQuery->m_pOverlapped = pOverlapped;
-			serverListQuery->SetNewPageBuffer(cbBuffer, pvBuffer);
-			pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-			pOverlapped->InternalHigh = 0;
-			pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
-
-			// continue writing servers
-			serverListQuery->m_operationOnPause = false;
-
-			// break if we still have servers to write
-			break;
+			LocatorSetOverlappedError(pOverlapped, ERROR_IO_INCOMPLETE, 0, HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE));
+			m_taskPaused = false;
 		}
-		else
-		{
-			// if not, set the operation state to finished
-			// and go to OperationFinished handler
-			serverListQuery->m_operationState = OperationFinished;
-		}
-
-	case OperationFailed:
-	case OperationFinished:
-		// this query has finished, report back to the game
-		// TODO maybe add support to release the resources in the thread after a timeout
-		// in case the game doesn't check for the state anymore
-		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
-		pOverlapped->InternalHigh = 0;
-		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
-		serverListQuery->CancelOperation();
-		LOG_INFO_XLIVE("{} - query Id: {:X} I/O finished, removing query from list", __FUNCTION__, serverListQuery->m_handle);
-
-		RemoveServerListQueryByPtr(serverListQuery);
+		break;
+	case _eTaskFinished:
+		LocatorSetOverlappedError(pOverlapped, ERROR_NO_MORE_FILES, 0, HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES));
 		break;
 
 	default:
-		assert(0);
+		assert(false);
 	}
-
-	if (lockQuery)
-		serverListQuery->m_itemQueryMutex.unlock();
 
 	return ERROR_IO_PENDING;
 }
 
-void CServerList::RemoveServer(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
+DWORD CServerList::Enumerate(HANDLE hTask, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pxOverlapped)
 {
-	std::lock_guard lk(removeServerMutex);
+	std::unique_lock<std::mutex> lg;
+
+	CServerList* listQueryTask = LocatorTaskGet(hTask, lg);
+	if (listQueryTask == nullptr)
+		return ERROR_INVALID_HANDLE;
+
+	return listQueryTask->TaskEnumerateUpdate(cbBuffer, pvBuffer, pxOverlapped);
+}
+
+void CServerList::Unadvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
+{
+	std::unique_lock lk(unadvertiseMutex);
 
 	CURL* curl;
 	CURLcode res;
 	std::string readBuffer;
 	readBuffer.reserve(4096);
 
-	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
+	LocatorSetOverlappedError(pOverlapped, ERROR_IO_INCOMPLETE, 0, HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE));
 
 	curl = curl_interface_init_no_verify();
 	if (curl)
@@ -760,14 +675,23 @@ void CServerList::RemoveServer(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
 		curl_easy_cleanup(curl);
 	}
 
-	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = 0;
+	LocatorSetOverlappedError(pOverlapped, ERROR_SUCCESS, 0, 0);
 }
 
-void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
+void CServerList::Advertise(
+	DWORD dwUserIndex, 
+	DWORD dwServerType, 
+	XNKID xnkid, 
+	XNKEY xnkey, 
+	DWORD dwMaxPublicSlots, 
+	DWORD dwMaxPrivateSlots, 
+	DWORD dwFilledPublicSlots, 
+	DWORD dwFilledPrivateSlots, 
+	DWORD cProperties, 
+	PXUSER_PROPERTY pProperties, 
+	PXOVERLAPPED pOverlapped)
 {
-	std::lock_guard lk(addServerMutex);
+	std::unique_lock<std::mutex> lg(advertiseMutex);
 
 	CURL* curl;
 	CURLcode res;
@@ -776,9 +700,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 
 	XnIp* localUser = gXnIpMgr.GetLocalUserXn();
 
-	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
-	pOverlapped->InternalHigh = 0; // this shouldn't even be checked by game's code, but for some reason it gets in Halo 2, InternalHIgh is used for enumerating data, where it holds how many elemets were retreived
-	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
+	LocatorSetOverlappedError(pOverlapped, ERROR_IO_INCOMPLETE, 0, HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE));
 
 	curl = curl_interface_init_no_verify();
 	if (curl) {
@@ -875,9 +797,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		curl_easy_cleanup(curl);
 	}
 
-	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = 0;
+	LocatorSetOverlappedError(pOverlapped, ERROR_SUCCESS, 0, 0);
 }
 
 DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
@@ -890,7 +810,7 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 	if (!gXnIpMgr.GetLocalUserXn()->m_valid)
 		return (DWORD)-1;
 
-	std::thread(&CServerList::AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
+	std::thread(&CServerList::Advertise, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 	return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
 }
 
@@ -902,7 +822,7 @@ DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapp
 		return (DWORD)-1;
 	}
 
-	std::thread(&CServerList::RemoveServer, dwUserIndex, pOverlapped).detach();
+	std::thread(&CServerList::Unadvertise, dwUserIndex, pOverlapped).detach();
 	return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
 }
 
@@ -927,7 +847,7 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 
 	// we simply just give the game the results synchronously, if we have any
 	// it'll query the data each 5 seconds
-	if (CServerList::CountResultsUpdated)
+	if (CServerList::servicePropertiesUpdated)
 	{
 		pProperties[0].value.nData = h2v_service_properties.total_count;
 		pProperties[1].value.nData = h2v_service_properties.total_public;
@@ -935,9 +855,7 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 		pProperties[3].value.nData = h2v_service_properties.total_peer;
 	}
 
-	pOverlapped->InternalLow = ERROR_SUCCESS;
-	pOverlapped->InternalHigh = 0;
-	pOverlapped->dwExtendedError = 0;
+	LocatorSetOverlappedError(pOverlapped, ERROR_SUCCESS, 0, 0);
 
 	return S_OK;
 }
@@ -958,28 +876,22 @@ DWORD WINAPI XLocatorCreateServerEnumerator(
 {
 	LOG_TRACE_XLIVE("{}()", __FUNCTION__);
 
-	std::lock_guard lg(serverListRequestMutex);
-
 	if (!phEnum)
 		return ERROR_INVALID_PARAMETER;
 
-	if (cItems < XLOCATOR_SERVER_PAGE_MIN_ITEMS)
-		cItems = XLOCATOR_SERVER_PAGE_MIN_ITEMS;
 	if (cItems > XLOCATOR_SERVER_PAGE_MAX_ITEMS)
 		cItems = XLOCATOR_SERVER_PAGE_MAX_ITEMS;
 
 	CServerList* serverListRequest = new CServerList(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs);
-	*phEnum = serverListRequest->m_handle = CreateMutex(NULL, NULL, NULL);
-	*pcbBuffer = ComputeXLocatorServerEnumeratorBufferSize(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs, nullptr);
-	serverListRequests.push_back(std::make_pair(serverListRequest->m_handle, serverListRequest));
+
+	*phEnum = serverListRequest->m_handle;
+	*pcbBuffer = LocatorGetQueryBufferSize(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs, nullptr);
 
 	LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
 
 	return ERROR_SUCCESS;
 }
 
-
-// 5238: ??
 DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 {
 	LOG_TRACE_XLIVE("XLocatorCreateKey()");
@@ -993,8 +905,6 @@ DWORD WINAPI XLocatorCreateKey(XNKID* pxnkid, XNKEY* pxnkey)
 	return S_OK;
 }
 
-
-// 5235: ??
 DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, DWORD a4, DWORD a5, DWORD a6, DWORD a7, DWORD a8)
 {
 	LOG_TRACE_XLIVE("XLocatorCreateServerEnumeratorByIDs()");
@@ -1002,54 +912,85 @@ DWORD WINAPI XLocatorCreateServerEnumeratorByIDs(DWORD a1, DWORD a2, DWORD a3, D
 	return ERROR_INVALID_PARAMETER;
 }
 
-// 5236: ??
 DWORD WINAPI XLocatorServiceInitialize(DWORD a1, PHANDLE phLocatorService)
 {
 	LOG_TRACE_XLIVE("XLocatorServiceInitialize  (a1 = {:x}, phLocatorService = {:p})",
 		a1, (void*)phLocatorService);
 
-	if (phLocatorService) *phLocatorService = g_hXLocatorHandle = CreateMutex(NULL, NULL, NULL);
-
-	/*
-	Lost Planet, Gears of War
-	- LocatorV1.434307DE.RTP.
-	*/
-
+	if (phLocatorService) *phLocatorService = locatorHandle = CreateMutex(NULL, NULL, NULL);
 	return ERROR_SUCCESS;
 }
 
-// 5237: ??
 DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 {
 	LOG_TRACE_XLIVE("XLocatorServiceUnInitialize(a1 = {})", xlocatorhandle);
 
-	ServerListQueryCancelAll();
+	LocatorTaskCancelAll();
 	XCloseHandle(xlocatorhandle);
-
-	g_hXLocatorHandle = INVALID_HANDLE_VALUE;
+	locatorHandle = INVALID_HANDLE_VALUE;
 
 	return ERROR_SUCCESS;
 }
 
 /* private code */
 
-static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
+static void LocatorTaskInsert(CServerList* listQueryTask)
 {
-	std::lock_guard lg(serverListRequestMutex);
+	std::unique_lock lg(locatorQueryListMtx);
+	locatorQueryList.push_back(listQueryTask);
+}
+
+static void LocatorTaskCancelAll()
+{
+	std::unique_lock lg(locatorQueryListMtx);
+
+	for (auto& task : locatorQueryList)
+	{
+		task->TaskFinish();
+		XCloseHandle(task->m_handle);
+	}
+
+	locatorQueryList.clear();
+}
+
+static CServerList* LocatorTaskGet(HANDLE hTask, std::unique_lock<std::mutex>& taskLock)
+{
+	std::unique_lock lg(locatorQueryListMtx);
 	CServerList* result = nullptr;
 
-	for (auto& request : serverListRequests)
+	for (auto& task : locatorQueryList)
 	{
-		if (request.first == hHandle)
+		if (task->m_handle != hTask)
 		{
-			// ugly af but it'll do for now
-			// don't forget to UNLOCK after when you finish working with this
-			// mainly used to prevent the worker thread from discarding the memory
-			// when the game attempts to retrieve info about the query
-			if (lock)
-				request.second->m_itemQueryMutex.lock();
+			continue;
+		}
 
-			result = request.second;
+		result = task;
+		taskLock = std::unique_lock(result->m_taskMutex);
+
+		break;
+	}
+
+	return result;
+}
+
+static bool LocatorTaskRemove(HANDLE hTask, std::unique_lock<std::mutex>& taskLock)
+{
+	// remove from the list, to note memory doesn't get released
+	// because async I/O might still be in progress
+	std::unique_lock lg(locatorQueryListMtx);
+
+	bool result = false;
+
+	for (auto it = locatorQueryList.begin(); it != locatorQueryList.end(); it++)
+	{
+		CServerList* task = *it;
+		if (task->m_handle == hTask)
+		{
+			XCloseHandle(task->m_handle);
+			locatorQueryList.erase(it);
+			result = true;
+			taskLock = std::unique_lock(task->m_taskMutex);
 			break;
 		}
 	}
@@ -1057,24 +998,42 @@ static CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 	return result;
 }
 
-static bool RemoveServerListQueryByPtr(CServerList* serverListQuery)
+static DWORD LocatorGetQueryBufferSize(DWORD cItems, DWORD cRequiredPropertyIDs, DWORD* pRequredPropertiesIDs, DWORD* outStringBufferSize)
 {
-	// remove from the list, to note memory doesn't get released
-	// because async I/O might still be in progress
-	std::lock_guard lg(serverListRequestMutex);
-
-	bool removed = false;
-
-	for (auto it = serverListRequests.begin(); it != serverListRequests.end(); it++)
+	if (!(cItems > 0))
 	{
-		if (it->second == serverListQuery)
+		if (outStringBufferSize)
+			*outStringBufferSize = 0;
+		return 0;
+	}
+
+	unsigned int stringProperties = 0;
+	DWORD result = (DWORD)((sizeof(XLOCATOR_SEARCHRESULT) * cItems) + (cItems * sizeof(XUSER_PROPERTY) * cRequiredPropertyIDs));
+
+	if (pRequredPropertiesIDs)
+	{
+		for (uint32 i = 0; i < cRequiredPropertyIDs; i++)
 		{
-			XCloseHandle(it->first);
-			serverListRequests.erase(it);
-			removed = true;
-			break;
+			if ((pRequredPropertiesIDs[i] & 0xF0000000) == 0x40000000) // check if we have string properties
+				++stringProperties;
 		}
 	}
 
-	return removed;
+	// string buffers are max 64 wide strings characters (128 bytes) and the null character, so in total 65 characters (130 bytes)
+	result += (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties);
+
+	if (outStringBufferSize)
+	{
+		*outStringBufferSize = (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties);
+		LOG_TRACE_XLIVE("{} : stringBufferSize: {}, stringBufferSize2: {}, cItems: {}, stringCount: {}", __FUNCTION__, *outStringBufferSize, (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties), cItems, stringProperties);
+	}
+
+	return result;
+}
+
+static void LocatorSetOverlappedError(XOVERLAPPED* pOverlapped, DWORD dwLow, DWORD dwHigh, DWORD dwExtended)
+{
+	pOverlapped->InternalLow = dwLow;
+	pOverlapped->InternalHigh = dwHigh;
+	pOverlapped->dwExtendedError = dwExtended;
 }

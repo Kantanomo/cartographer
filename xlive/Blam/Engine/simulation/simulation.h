@@ -65,7 +65,7 @@ void simulation_notify_reset_initiate(void);
 void simulation_notify_going_active(void);
 
 bool simulation_in_progress(void);
-void simulation_destroy_update(void);
+void simulation_destroy_update(struct simulation_update* update);
 bool simulation_query_object_is_predicted(datum object_datum);
 c_simulation_type_collection* simulation_get_type_collection();
 

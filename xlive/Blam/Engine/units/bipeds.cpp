@@ -67,14 +67,13 @@ void __cdecl biped_offset_first_person_camera(datum object_index, real_point3d* 
 
 		ASSERT(angle_range > 0.f);
 
-		const real32 function_value = (v1 - biped_def->biped.camera_interpolation_start) / angle_range;
+		const real32 function_value = ((v1 - biped_def->biped.camera_interpolation_start) / angle_range);
 		real32 function_result = transition_function_evaluate(_transition_function_cosine, PIN(function_value, 0.f, 1.f));
 
 		if (function_result > 0.0f && biped->biped.first_person_camera_initialized)
 		{
-			real_vector2d forward_out;
-			real_vector2d up_out;
-			biped_build_2d_camera_frame(camera_forward, camera_up, &forward_out, &up_out);
+			real_vector2d forward_2d, up_2d;
+			biped_build_2d_camera_frame(camera_forward, camera_up, &forward_2d, &up_2d);
 
 			real_matrix4x3 interpolated_node_matrix;
 			real_matrix4x3* node_matrix;
@@ -91,26 +90,30 @@ void __cdecl biped_offset_first_person_camera(datum object_index, real_point3d* 
 			real_vector3d camera_diff;
 			vector_from_points3d(&node_matrix->position, camera_position, &camera_diff);
 
-			real32 forward_product = dot_product2d((real_vector2d*)&camera_diff, &forward_out);
-			real32 up_product = dot_product2d((real_vector2d*)&camera_diff, &up_out);
+			real32 forward_product = dot_product2d((real_vector2d*)&camera_diff, &forward_2d);
+			real32 up_product = dot_product2d((real_vector2d*)&camera_diff, &up_2d);
 
-			real_vector3d biped_vector = biped->biped.first_person_camera_offset;
+			real_vector3d biped_first_person_camera_offset;
+			if (!halo_interpolator_interpolate_biped_sight_camera_offset(object_index, &biped_first_person_camera_offset))
+			{
+				biped_first_person_camera_offset = biped->biped.first_person_camera_offset;
+			}
 
 			if (biped->biped.first_person_camera_offset.i <= biped_def->biped.camera_exclusion_distance)
 			{
-				biped_vector.i = biped_def->biped.camera_exclusion_distance;
+				biped_first_person_camera_offset.i = biped_def->biped.camera_exclusion_distance;
 			}
 
-			real32 i_diff = biped_vector.i - forward_product;
-			real32 j_diff = biped_vector.j - up_product;
-			real32 k_diff = biped_vector.k - camera_diff.k;
+			real32 i_diff = biped_first_person_camera_offset.i - forward_product;
+			real32 j_diff = biped_first_person_camera_offset.j - up_product;
+			real32 k_diff = biped_first_person_camera_offset.k - camera_diff.k;
 
 			real32 forward_scale = biped_def->biped.camera_forward_movement_scale * i_diff * function_result;
 			real32 side_scale = biped_def->biped.camera_side_movement_scale * j_diff * function_result;
 			real32 vertical_offset = biped_def->biped.camera_vertical_movement_scale * k_diff * function_result;
 
-			camera_position->x += (forward_out.i * forward_scale) + (up_out.i * side_scale);
-			camera_position->y += (forward_out.j * forward_scale) + (up_out.j * side_scale);
+			camera_position->x += (forward_2d.i * forward_scale) + (up_2d.i * side_scale);
+			camera_position->y += (forward_2d.j * forward_scale) + (up_2d.j * side_scale);
 			camera_position->z += vertical_offset;
 		}
 	}
@@ -120,9 +123,9 @@ void __cdecl biped_offset_first_person_camera(datum object_index, real_point3d* 
 void __cdecl biped_get_sight_position(
 	datum biped_index,
 	e_unit_estimate_mode estimate_mode,
-	real_point3d* estimated_body_position,
-	real_vector3d* desired_facing_vector,
-	real_vector3d* desired_gun_offset,
+	const real_point3d* estimated_body_position,
+	const real_vector3d* desired_facing_vector,
+	const real_vector3d* desired_gun_offset,
 	real_point3d* sight_position)
 {
 	ASSERT((estimate_mode == _unit_estimate_none) || (estimated_body_position != NULL));
@@ -162,7 +165,7 @@ void __cdecl biped_get_sight_position(
 		}
 		if (!biped_is_running_invisible_crouched_uber_melee(biped_index))
 		{
-			if (!halo_interpolator_interpolate_biped_crouch(biped_index, &crouching))
+			if (!halo_interpolator_interpolate_biped_sight_crouch(biped_index, &crouching))
 			{
 				crouching = biped->unit.crouch;
 			}
@@ -174,13 +177,19 @@ void __cdecl biped_get_sight_position(
 	real32 crouching_camera_height = biped_definition->biped.crouching_camera_height * crouching;
 	sight_position->z += (standing_camera_height + crouching_camera_height) * biped->object.scale;
 
-	real_point3d origin_copy = *sight_position;
-	real_vector3d forward = biped->unit.aiming_vector;
+	real_point3d offset_camera = *sight_position;
+	real_vector3d forward;
+
+	if (!halo_interpolator_interpolate_biped_sight_aiming_vector(biped_index, &forward))
+	{
+		forward = biped->unit.aiming_vector;
+	}
+
 	real_vector3d up;
 	generate_up_vector3d(&forward, &up);
-	biped_offset_first_person_camera(biped_index, &origin_copy, &forward, &up);
+	biped_offset_first_person_camera(biped_index, &offset_camera, &forward, &up);
 	real_vector3d origin_vector;
-	vector_from_points3d(sight_position, &origin_copy, &origin_vector);
+	vector_from_points3d(sight_position, &offset_camera, &origin_vector);
 	if (normalize3d(&origin_vector) > 0.0f)
 	{
 		collision_result collision;
@@ -220,7 +229,7 @@ void __cdecl biped_get_sight_position(
 			(
 				// Populate values
 				vector_from_points3d(&placement, &collision.point, &collision_vector),
-				vector_from_points3d(&placement, &origin_copy, &position_vector),
+				vector_from_points3d(&placement, &offset_camera, &position_vector),
 
 				// Actual check here
 				dot_product3d(&origin_vector, &position_vector) + 0.05f > dot_product3d(&collision_vector, &origin_vector)
@@ -230,23 +239,7 @@ void __cdecl biped_get_sight_position(
 		}
 		else
 		{
-			*sight_position = origin_copy;
-		}
-
-		datum player_index = player_index_from_unit_index(biped_index);
-		
-		if (player_index != NONE)
-		{
-			player_datum const* player = player_get(player_index);
-			
-			if (player->user_index != NONE)
-			{
-				real_point3d point;
-				if (halo_interpolator_interpolate_position_backwards(player->user_index, 0, &point))
-				{
-					*sight_position = point;
-				}
-			}
+			*sight_position = offset_camera;
 		}
 	}
 

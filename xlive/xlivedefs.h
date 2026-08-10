@@ -601,11 +601,12 @@ typedef struct {
 	BOOL fFromGameInvite;
 } XINVITE_INFO, * PXINVITE_INFO;
 
-
+#pragma pack( push,1 )
 typedef struct _STRING_DATA {
 	WORD wStringSize;
 	WCHAR *pszString;
 } STRING_DATA;
+#pragma pack( pop )
  
 
 #pragma pack( push,1 )

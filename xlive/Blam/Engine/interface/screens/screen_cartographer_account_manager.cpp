@@ -472,12 +472,8 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 	// play offline button
 	else if (button_id == H2AccountCount)
 	{
-		BYTE abEnet[6];
-		BYTE abOnline[20];
-		XNetRandom(abEnet, sizeof(abEnet));
-		XNetRandom(abOnline, sizeof(abOnline));
 		g_account_manager_remove_mode = false;
-		if (ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, 6).c_str(), ByteToHexStr(abOnline, 20).c_str(), false))
+		if (ConfigureLocalUserDetails())
 		{
 			//show select profile gui
 			extern int notify_xlive_ui;

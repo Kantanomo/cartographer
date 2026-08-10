@@ -4,6 +4,8 @@
 #include "unit_control.h"
 #include "unit_definitions.h"
 
+#include "items/weapons.h"
+
 #include "cache/cache_files.h"
 #include "simulation/game_interface/simulation_game_action.h"
 
@@ -21,11 +23,26 @@ static void unit_get_head_position_patch_functions(void);
 
 static void unit_apply_interpolation_patches(void);
 
+static void __cdecl unit_set_weapon_type(
+	datum unit_index,
+	datum inventory_index,
+	datum weapon_definition_index,
+	int16 multiplayer_weapon_identifier,
+	void* a5);
+
 /* public code */
 
 void unit_apply_patches(void)
 {
 	unit_apply_interpolation_patches();
+
+	// TODO FIXME: doesn't fix it completely
+	// PatchCall(Memory::GetAddress(0x1F8362, 0x1E20C8), unit_set_weapon_type);
+
+	// don't update the weapon state if we didn't actually received an update
+	// for some reason someone at bungie thought it was a good idea to apply an weapon ammo update
+	// even if we received just the weapon definition
+	NopFill(Memory::GetAddress(0x1F836A, 0x1E20D0), 4);
 	return;
 }
 
@@ -138,6 +155,34 @@ void unit_add_grenade_type_to_inventory(datum unit_index, int16 grenade_type, in
 }
 
 /* private code */
+
+static void __cdecl unit_set_weapon_type(
+	datum unit_index,
+	datum inventory_index,
+	datum weapon_definition_index,
+	int16 multiplayer_weapon_identifier,
+	void* a5)
+{
+	INVOKE(0x144E38, 0x133C88, unit_set_weapon_type, unit_index, inventory_index, weapon_definition_index, multiplayer_weapon_identifier, a5);
+
+	/* hacky but it'll mirror original functionality */
+	/* the weapon state sync (ammo counter) will not apply if *only* the weapon type flag is set, as the code for that has been no-op'd */
+	/* to avoid applying empty state updates to an weapon */
+	/* but if the unit set weapon type flag is set, and the weapon picked up has no ammo, just set the weapon state to 0 */
+	/* empty dual wieldable weapons do not receive state updates on pickup for some reason offhost */
+	/* and if the weapon doesn't have an empty magazine, its state will be updates exactly after this fn call concludes */
+	// TODO FIXME: doesn't fix it completely
+	/*
+	unit_datum* unit = unit_get(unit_index);
+	datum weapon_index = unit->unit.weapon_object_indices[inventory_index];
+	if (weapon_index != NONE)
+	{
+		weapon_datum* weapon = weapon_get(weapon_index);
+		weapon->weapon.age = 0.0f;
+		weapon->weapon.magazines[0].rounds_loaded = 0;
+		weapon->weapon.magazines[0].rounds_inventory = 0;
+	}*/
+}
 
 // Replace calls to use interpolated functions
 static void unit_get_camera_position_patch_mass_functions(void)

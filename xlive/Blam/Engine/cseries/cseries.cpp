@@ -424,3 +424,7 @@ char const* get_language_display_name(
 
 	return name;
 }
+
+void cseries_stub_internal(...)
+{
+}

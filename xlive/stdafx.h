@@ -77,8 +77,6 @@
 
 // cartographer includes
 
-#include "H2MOD/Modules/h2log/h2log.h"
-
 #include "version.h"
 
 #include "CartographerDllConf.h"
@@ -105,6 +103,8 @@
 #include "Util/Memory.h"
 
 #include <contrib/minizip/zip.h>
+
+#include "H2MOD/Modules/h2log/h2log.h"
 
 #pragma comment(lib, "IPHLPAPI.lib")
 

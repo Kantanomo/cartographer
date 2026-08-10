@@ -464,11 +464,11 @@ const char* c_network_session::get_peer_description(int32 peer_index) const
 	if (established() && VALID_INDEX(peer_index, m_session_membership.peer_count) && m_session_membership.peers[peer_index].description[0] != '\0')
 	{
 		const char* mac_string = transport_secure_address_get_mac_string(&m_session_membership.peers[peer_index].secure_address);
-		csprintf(result, 35, "#%02d:%S:%s", peer_index, m_session_membership.peers[peer_index].description[0], mac_string);
+		csprintf(result, ARRAYSIZE(g_network_session_peer_description[0]), "#%02d:%S:%s", peer_index, m_session_membership.peers[peer_index].description[0], mac_string);
 	}
 	else
 	{
-		csprintf(result, 35, "#%02d", peer_index);
+		csprintf(result, ARRAYSIZE(g_network_session_peer_description[0]), "#%02d", peer_index);
 	}
 	return result;
 }

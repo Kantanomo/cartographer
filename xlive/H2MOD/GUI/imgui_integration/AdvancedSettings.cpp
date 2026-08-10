@@ -1092,7 +1092,7 @@ static const char* advanced_settings_get_string(e_advanced_string string, const 
 
 static void advanced_settings_create_weapon_offsets_button(real32 height)
 {
-	ImVec2 b3_size = ImVec2(ImGuiHandler::WidthPercentage(33.3333333333f), height);
+	ImVec2 b3_size = ImVec2(ImGuiHandler::WidthPercentage(100.f / 3.f), height);
 	ImGui::NewLine();
 	//Ingame Change Display
 	if (ImGui::Button(advanced_settings_get_string(_advanced_string_weaponoffsets, "WeaponOffsets"), b3_size))

@@ -207,9 +207,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 		if (game_results_statistic == 7
 			&& !game_is_predicted())
 		{
-#ifdef EVENTS_ENABLED
 			const uint16 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
-#endif
 			event(_event_verbose, "h2mod:gungame: %s - player index: %d, player name: %ws", __FUNCTION__, player_abs_index, player->configuration.name);
 
 			int32 level = gungamePlayers[id];

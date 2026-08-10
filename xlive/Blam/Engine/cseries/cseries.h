@@ -110,8 +110,7 @@ extern bool g_catch_exceptions;
 
 /* macros */
 
-#define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
-#define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
+#define SUPRESS_UNUSED(v) (void)(v)
 
 // Returns the minimum of the two values
 #define MIN(a, b) ((a)>(b)?(b):(a))
@@ -289,6 +288,9 @@ char* csstrtok(char* s, const char* delimiters, bool skip_multiple_delimiters, s
 char* strchr(char* str, int32 ch);
 
 char const* get_language_display_name(e_language language);
+
+/* used for stubs, otherwise DO NOT USE */
+void cseries_stub_internal(...);
 
 /* public code */
 

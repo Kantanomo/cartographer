@@ -56,11 +56,7 @@
 #define XLOCATOR_SERVERTYPE_PEER_HOSTED_GOLD_ONLY   3   // dedicated server is a peer-hosted game server (gold only).
 #define XLOCATOR_SERVICESTATUS_PROPERTY_START     0x100
 
-#define XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN 24
-
-#define XLOCATOR_SERVER_PAGE_MIN_ITEMS		50
-#define XLOCATOR_SERVER_PAGE_MAX_ITEMS_OLD	200
-#define XLOCATOR_SERVER_PAGE_MAX_ITEMS		2000	// Increased because we hit the limit
+#define XLOCATOR_SERVER_PAGE_MAX_ITEMS				200
 
 /* structs */
 
@@ -113,68 +109,61 @@ public:
 	CServerList(const CServerList& other) = delete;
 	CServerList(CServerList&& other) = delete;
 
-	static bool CountResultsUpdated;
+	static bool servicePropertiesUpdated;
 
 	static DWORD Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
 
+	HRESULT TaskEnumerateUpdate(DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
+
 	// basic functions 
 	static void GetServerCounts(PXOVERLAPPED);
-	static void RemoveServer(DWORD dwUserIndex, PXOVERLAPPED pOverlapped);
-	static void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
+	static void Unadvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped);
+	static void Advertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
 
 #pragma region ServerListQuery
 	HANDLE m_handle = INVALID_HANDLE_VALUE;
 
-	CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
-	{
-		m_itemsPerPageCount = _cItemsPerPage;
-		m_searchPropertiesIdCount = _cSearchPropertiesIDs;
-		m_pSearchPropertyIds = new DWORD[_cSearchPropertiesIDs];
-		memcpy(m_pSearchPropertyIds, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
-	}
+	CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties);
+	~CServerList();
 
-	~CServerList()
-	{
-		delete[] m_pSearchPropertyIds;
-
-		// this must be locked when deconstructing
-		m_itemQueryMutex.unlock();
-	}
-
-	int GetItemLeftCount() const;
-	int GetValidItemsFoundCount() const;
-
-	void CancelOperation() {
-		// before canceling the operation 
+	void TaskFinish() {
+		// before canceling the task 
 		// first wait for the i/o to finish
-		std::lock_guard lg(m_ioWriteMutex);
-		m_cancelOperation = true;
+		std::unique_lock lg(m_ioMutex);
+		m_taskEnd = true;
 	}
 
 	void EnumerateFromHttp();
-	bool SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer) const;
+	bool ProcessSearchResult(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer) const;
 
-	void SetNewPageBuffer(DWORD cbBuffer, CHAR* pvBuffer)
+	void TaskUpdateParameters(XOVERLAPPED* overlapped, DWORD cbBuffer, CHAR* pvBuffer)
 	{
+		std::unique_lock<std::mutex> lg(m_ioMutex);
+
+		m_pOverlapped = overlapped;
 		m_resultBuffer = pvBuffer;
 		m_resultBufferSize = cbBuffer;
 	}
 
 	enum
 	{
-		OperationPending,
-		OperationIncomplete,
-		OperationFailed,
-		OperationFinished,
+		_eTaskPending,
+		_eTaskIncomplete,
+		_eTaskFinished,
 	};
 
-	PXOVERLAPPED m_pOverlapped = nullptr;
-	std::atomic<int> m_itemsLeftInDoc = 0;
-	std::atomic<int> m_operationState = OperationPending;
+	// mainly used for resource discard
+	std::mutex m_taskMutex;
+	std::mutex m_ioMutex;
 
-	int m_itemsPerPageCount;
-	std::atomic<int> m_pageItemsFoundCount = 0;
+private:
 	
+	PXOVERLAPPED m_pOverlapped = nullptr;
+	std::atomic<int> m_itemsRemainingCount = 0;
+	std::atomic<int> m_taskState = _eTaskPending;
+
+	DWORD m_itemsPerPageCount;
+
 	DWORD m_searchPropertiesIdCount = 0;
 	DWORD* m_pSearchPropertyIds = nullptr;
 
@@ -183,22 +172,12 @@ public:
 
 	std::string m_serverListToDownload;
 
-	std::atomic<bool> m_cancelOperation = false;
-	std::atomic<bool> m_operationOnPause = false;
-
-	// mainly used for resource discard
-	std::mutex m_itemQueryMutex;
-	std::mutex m_ioWriteMutex;
-
-private:
-	bool ShouldCancelOperation() const
-	{
-		return m_cancelOperation;
-	}
+	std::atomic<bool> m_taskEnd = false;
+	std::atomic<bool> m_taskPaused = false;
 
 #pragma endregion ServerListQuery
 
-	static std::mutex addServerMutex;
-	static std::mutex removeServerMutex;
+	static std::mutex advertiseMutex;
+	static std::mutex unadvertiseMutex;
 	static std::mutex getServerCountsMutex;
 };

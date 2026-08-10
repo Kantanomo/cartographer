@@ -9,14 +9,21 @@
 
 bool online_xuid_is_guest_account(XUID xuid)
 {
-	// return INVOKE(0x1AC4C0, 0 , online_xuid_is_guest_account, xuid);
-	return (xuid & 3ULL) != 0;
+	// return INVOKE(0x1AC4C0, 0, online_xuid_is_guest_account, xuid);
+
+	const uint16 high = (uint16)(xuid >> 48);
+	return ((high & 0x0F) == 0x9) && ((high & 0xC0) != 0);
 }
 
 uint8 online_xuid_get_guest_account_number(XUID xuid)
 {
-	// return INVOKE(0x1AC4C6, 0, online_xuid_get_guest_account_number,xuid);
-	return (xuid & 3ULL);
+	// return INVOKE(0x1AC4C6, 0, online_xuid_get_guest_account_number, xuid);
+	return uint8(xuid >> 62);
+}
+
+bool online_xuid_same_account(XUID xuid1, XUID xuid2)
+{
+	return (xuid1 & XUSER_XUID_SAME_MASK) == (xuid2 & XUSER_XUID_SAME_MASK);
 }
 
 bool __cdecl online_connected_to_xbox_live()
@@ -27,11 +34,6 @@ bool __cdecl online_connected_to_xbox_live()
 
 void online_account_transition_to_offline()
 {
-	BYTE abEnet[6];
-	BYTE abOnline[20];
-	XNetRandom(abEnet, sizeof(abEnet));
-	XNetRandom(abOnline, sizeof(abOnline));
-	ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, sizeof(abEnet)).c_str(), ByteToHexStr(abOnline, sizeof(abOnline)).c_str(), false);
-
+	ConfigureLocalUserDetails();
 	XUserSignInSetStatusChanged(0);
 }

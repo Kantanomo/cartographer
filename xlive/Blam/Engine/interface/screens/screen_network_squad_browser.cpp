@@ -8,6 +8,13 @@
 
 #include <XLive/ServerList/ServerList.h>
 
+/* constants */
+
+enum
+{
+	k_screen_live_squad_browser_max_items = 2000
+};
+
 /* typedefs */
 
 typedef c_screen_network_squad_browser* (__cdecl* load_network_browser_t)(s_screen_parameters*);
@@ -109,9 +116,8 @@ void* __cdecl c_screen_network_squad_browser::load(s_screen_parameters* paramete
 
 static void screen_network_squad_browser_increase_server_limit_apply_patches(void)
 {
-	WriteValue<int32>(Memory::GetAddress(0x214F82 + 1), XLOCATOR_SERVER_PAGE_MAX_ITEMS);
-	WriteValue<int32>(Memory::GetAddress(0x21A037 + 1), XLOCATOR_SERVER_PAGE_MAX_ITEMS);
-	WriteValue<int32>(Memory::GetAddress(0x21A059 + 1), XLOCATOR_SERVER_PAGE_MAX_ITEMS + 1);
+	WriteValue<int32>(Memory::GetAddress(0x214F82 + 1), k_screen_live_squad_browser_max_items);
+	WriteValue<int32>(Memory::GetAddress(0x21A037 + 1), k_screen_live_squad_browser_max_items);
 	
 	PatchCall(Memory::GetAddress(0x2190B0), jmp_populate_servers);
 	PatchCall(Memory::GetAddress(0x21A0B3), jmp_populate_servers);
@@ -125,13 +131,13 @@ void c_network_squad_list::populate_servers(void)
 	{
 		int32 sort_field_index = 0;
 
-		s_locator_server_data data[XLOCATOR_SERVER_PAGE_MAX_ITEMS];
+		s_locator_server_data data[k_screen_live_squad_browser_max_items];
 		data[0].indicie = -99;
 
 
 		// Iterate throughout every available squad and populate the server data
 		int32 available_squad_index = user_interface_available_squads_iterate(NONE);
-		for (int32 server_index = 1; server_index < XLOCATOR_SERVER_PAGE_MAX_ITEMS && available_squad_index != NONE; ++server_index)
+		for (int32 server_index = 1; server_index < k_screen_live_squad_browser_max_items && available_squad_index != NONE; ++server_index)
 		{
 			populate_server_data(
 				data,

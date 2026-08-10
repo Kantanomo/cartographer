@@ -14,7 +14,7 @@ static bool g_interpolation_update_in_progress = false;
 static bool g_interpolation_initialized = false;
 static bool g_interpolation_enabled = false;
 static c_static_flags_no_init<k_maximum_objects_per_map> g_interpolator_object_updated;
-static c_static_flags_no_init<k_maximum_objects_per_map> g_interpolator_object_interpolation_updated;
+static c_static_flags_no_init<k_maximum_objects_per_map> g_interpolator_object_stationary;
 
 static thread_local s_frame_data_storage* g_frame_data_storage = NULL;
 static thread_local s_interpolation_data* g_previous_interpolation_frame_data = NULL;
@@ -25,8 +25,6 @@ thread_local s_interpolation_data* g_frame_data_intermediate = NULL;
 /* prototypes */
 
 static object_datum* halo_interpolator_object_can_interpolate(datum object_index, int32* out_abs_object_index, bool allow_during_game_tick = false);
-
-static void halo_interpolator_interpolate_position_data(int32 user_index, uint32 position_index, real_point3d* position);
 
 static void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolation_data);
 
@@ -107,7 +105,7 @@ void halo_interpolator_reset(void)
 		halo_interpolator_clear_data_buffer(g_target_interpolation_frame_data);
 		halo_interpolator_clear_data_buffer(g_frame_data_intermediate);
 		g_interpolator_object_updated.clear();
-		g_interpolator_object_interpolation_updated.clear();
+		g_interpolator_object_stationary.clear();
 	}
 	return;
 }
@@ -137,12 +135,12 @@ void halo_interpolator_update_end(void)
 			{
 				if (!g_interpolator_object_updated.test(abs_object_index))
 				{
-					if (!g_interpolator_object_interpolation_updated.test(abs_object_index))
+					if (!g_interpolator_object_stationary.test(abs_object_index))
 					{
 						csmemcpy(&g_target_interpolation_frame_data->object_data[abs_object_index],
 							&g_previous_interpolation_frame_data->object_data[abs_object_index],
 							sizeof(s_object_interpolation_data));
-						g_interpolator_object_interpolation_updated.set(abs_object_index, true);
+						g_interpolator_object_stationary.set(abs_object_index, true);
 					}
 				}
 			}
@@ -232,7 +230,7 @@ void halo_interpolator_setup_new_object(datum object_index)
 		}
 
 		g_interpolator_object_updated.set(abs_object_index, false);
-		g_interpolator_object_interpolation_updated.set(abs_object_index, false);
+		g_interpolator_object_stationary.set(abs_object_index, false);
 	}
 	return;
 }
@@ -300,9 +298,9 @@ void halo_interpolator_object_populate_interpolation_data(
 			else
 			{
 				ASSERT(VALID_INDEX(nodes_count, MAXIMUM_NODES_PER_MODEL));
-				const unit_datum* unit = unit_try_and_get(object_index);
+				const biped_datum* biped = biped_try_and_get(object_index);
 
-				if (unit)
+				if (biped)
 				{
 					const datum player_index = player_index_from_unit_index(object_index);
 
@@ -312,14 +310,9 @@ void halo_interpolator_object_populate_interpolation_data(
 						
 						if (player->user_index != NONE)
 						{
-							g_target_interpolation_frame_data->crouch[player->user_index] = unit->unit.crouch;
-
-							// during game update/tick, this will return the current sight position of the biped
-							// ### TODO a proper fix, remove all this backwards camera nonsense
-							// because all nodes/positions are calculated using interpolated values
-							real_point3d point;
-							biped_get_sight_position(object_index, _unit_estimate_none, NULL, NULL, NULL, &point);
-							halo_interpolator_interpolate_position_data(player->user_index, 0, &point);
+							g_target_interpolation_frame_data->crouch[player->user_index] = biped->unit.crouch;
+							g_target_interpolation_frame_data->aiming_vector[player->user_index] = biped->unit.aiming_vector;
+							g_target_interpolation_frame_data->camera_offset[player->user_index] = biped->biped.first_person_camera_offset;
 						}
 					}
 				}
@@ -331,7 +324,7 @@ void halo_interpolator_object_populate_interpolation_data(
 				g_target_interpolation_frame_data->object_data[abs_object_index].up = *up;
 				g_target_interpolation_frame_data->object_data[abs_object_index].center_of_mass = *center_of_mass;
 				g_interpolator_object_updated.set(abs_object_index, true);
-				g_interpolator_object_interpolation_updated.set(abs_object_index, false);
+				g_interpolator_object_stationary.set(abs_object_index, false);
 			}
 		}
 	}
@@ -520,7 +513,7 @@ bool halo_interpolator_interpolate_object_position(datum object_index, real_poin
 	return result;
 }
 
-bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_crouch)
+bool halo_interpolator_interpolate_biped_sight_crouch(datum object_index, real32* out_crouch)
 {
 	bool result = false;
 	const datum player_index = player_index_from_unit_index(object_index);
@@ -537,46 +530,63 @@ bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_
 			distance *= distance;
 			if (distance < k_interpolation_distance_cutoff)
 			{
-				scalars_interpolate(g_previous_interpolation_frame_data->crouch[player->user_index], g_target_interpolation_frame_data->crouch[player->user_index], g_interpolator_delta, out_crouch);
+				scalars_interpolate(
+					g_previous_interpolation_frame_data->crouch[player->user_index],
+					g_target_interpolation_frame_data->crouch[player->user_index],
+					g_interpolator_delta,
+					out_crouch);
 				result = true;
 			}
 		}
-		
 	}
 	return result;
 }
 
-bool halo_interpolator_interpolate_position_backwards(int32 user_index, uint32 position_index, real_point3d* position)
+bool halo_interpolator_interpolate_biped_sight_aiming_vector(datum object_index, real_vector3d* out_aiming_vector)
 {
-	ASSERT(VALID_INDEX(position_index, k_interpolation_positions_count));
-	ASSERT(VALID_INDEX(user_index, k_number_of_users));
-
 	bool result = false;
-	if (g_frame_data_storage)
-	{
-		bool initialized = g_target_interpolation_frame_data->position_data[user_index][position_index].initialized
-			&& g_previous_interpolation_frame_data->position_data[user_index][position_index].initialized;
-		if (initialized
-			&& halo_frame_interpolator_enabled()
-			&& !cinematic_in_progress()
-			&& !g_interpolation_update_in_progress)
-		{
-			real32 distance = distance_squared3d(
-				&g_previous_interpolation_frame_data->position_data[user_index][position_index].node.position,
-				&g_target_interpolation_frame_data->position_data[user_index][position_index].node.position);
+	const datum player_index = player_index_from_unit_index(object_index);
 
-			if (distance < k_interpolation_distance_cutoff)
-			{
-				points_interpolate(
-					&g_previous_interpolation_frame_data->position_data[user_index][position_index].node.position,
-					&g_target_interpolation_frame_data->position_data[user_index][position_index].node.position,
-					g_interpolator_delta,
-					position);
-				result = true;
-			}
+	// ### TODO add biped check?
+	int32 abs_object_index;
+	if (player_index != NONE && halo_interpolator_object_can_interpolate(object_index, &abs_object_index))
+	{
+		player_datum const* player = player_get(player_index);
+
+		if (player->user_index != NONE)
+		{
+			vectors_interpolate(
+				&g_previous_interpolation_frame_data->aiming_vector[player->user_index],
+				&g_target_interpolation_frame_data->aiming_vector[player->user_index],
+				g_interpolator_delta,
+				out_aiming_vector);
+			result = true;
 		}
 	}
+	return result;
+}
 
+bool halo_interpolator_interpolate_biped_sight_camera_offset(datum object_index, real_vector3d* out_camera_offset)
+{
+	bool result = false;
+	const datum player_index = player_index_from_unit_index(object_index);
+
+	// ### TODO add biped check?
+	int32 abs_object_index;
+	if (player_index != NONE && halo_interpolator_object_can_interpolate(object_index, &abs_object_index))
+	{
+		player_datum const* player = player_get(player_index);
+
+		if (player->user_index != NONE)
+		{
+			vectors_interpolate(
+				&g_previous_interpolation_frame_data->camera_offset[player->user_index],
+				&g_target_interpolation_frame_data->camera_offset[player->user_index],
+				g_interpolator_delta,
+				out_camera_offset);
+			result = true;
+		}
+	}
 	return result;
 }
 
@@ -604,7 +614,7 @@ static object_datum* halo_interpolator_object_can_interpolate(
 		return NULL;
 	if (abs_object_index >= k_maximum_objects_per_map)
 		return NULL;
-	if (g_interpolator_object_interpolation_updated.test(abs_object_index))
+	if (g_interpolator_object_stationary.test(abs_object_index))
 		return NULL;
 
 	*out_abs_object_index = abs_object_index;
@@ -620,22 +630,6 @@ static object_datum* halo_interpolator_object_can_interpolate(
 		result = object_get(object_index);
 	}
 	return result;
-}
-
-static void halo_interpolator_interpolate_position_data(int32 user_index, uint32 position_index, real_point3d* position)
-{
-	ASSERT(VALID_INDEX(position_index, k_interpolation_positions_count));
-	ASSERT(VALID_INDEX(user_index, k_number_of_users));
-
-	if (g_frame_data_storage)
-	{
-		if (g_interpolation_update_in_progress)
-		{
-			matrix4x3_identity(&g_target_interpolation_frame_data->position_data[user_index][position_index].node);
-			g_target_interpolation_frame_data->position_data[user_index][position_index].node.position = *position;
-			g_target_interpolation_frame_data->position_data[user_index][position_index].initialized = true;
-		}
-	}
 }
 
 static void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolation_data)

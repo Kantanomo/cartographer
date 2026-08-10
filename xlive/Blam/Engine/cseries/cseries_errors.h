@@ -98,7 +98,11 @@ void write_to_error_file(e_error_category category, e_error_priority priority, c
 #else
 
 // If errors are disabled then we just define an error macro that does nothing so we don't have to bring in error functions and logic
-#define error(...)	(void)(0)
+#define error(priority, category, ...)	\
+if (0)									\
+{										\
+	cseries_stub_internal(__VA_ARGS__);	\
+} (void)0
 
 #endif
 

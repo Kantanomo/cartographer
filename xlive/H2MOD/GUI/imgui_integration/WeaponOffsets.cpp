@@ -49,10 +49,13 @@ namespace ImGuiHandler {
 			{
 				static e_weapon_offset_weapon selected_weapon = _weapon_offset_weapon_battle_rifle;
 
+				real_point3d* weapon_offset = &g_advanced_settings_current_cartographer_profile->weapon_offsets[selected_weapon];
+				const real_point3d* default_offset = &k_weapon_offset_constant_data[selected_weapon].default_offset;
+
 				// Populate weapon string list
 				const char* weapons[k_weapon_offsets_weapon_title_count];
-				uint32 i = 0;
-				for (uint8 string = k_weapon_offsets_weapon_title_first; string <= k_weapon_offsets_weapon_title_last; string++)
+				int32 i = 0;
+				for (int32 string = k_weapon_offsets_weapon_title_first; string <= k_weapon_offsets_weapon_title_last; string++)
 				{
 					weapons[i] = weapon_offsets_get_string((e_weapon_offsets_string)string);
 					++i;
@@ -60,16 +63,16 @@ namespace ImGuiHandler {
 
 				// Setup combo box menus for each weapon
 				ImGui::Combo(weapon_offsets_get_string(_weapon_offsets_string_combo_title), (int*)&selected_weapon, weapons, k_weapon_offset_weapon_count);
-				OffsetMenu(selected_weapon, "##OffsetX", _weapon_offsets_string_weapon_offset_x, g_advanced_settings_current_cartographer_profile->weapon_offsets[selected_weapon].x, k_weapon_offset_constant_data[selected_weapon].default_offset.x);
-				OffsetMenu(selected_weapon, "##OffsetY", _weapon_offsets_string_weapon_offset_y, g_advanced_settings_current_cartographer_profile->weapon_offsets[selected_weapon].y, k_weapon_offset_constant_data[selected_weapon].default_offset.y);
-				OffsetMenu(selected_weapon, "##OffsetZ", _weapon_offsets_string_weapon_offset_z, g_advanced_settings_current_cartographer_profile->weapon_offsets[selected_weapon].z, k_weapon_offset_constant_data[selected_weapon].default_offset.z);
+				OffsetMenu(selected_weapon, "##OffsetX", _weapon_offsets_string_weapon_offset_x, weapon_offset->x, default_offset->x);
+				OffsetMenu(selected_weapon, "##OffsetY", _weapon_offsets_string_weapon_offset_y, weapon_offset->y, default_offset->y);
+				OffsetMenu(selected_weapon, "##OffsetZ", _weapon_offsets_string_weapon_offset_z, weapon_offset->z, default_offset->z);
 			}
 		}
 
 		void Render(bool* p_open)
 		{
 			bool open = *p_open;
-			
+
 			ImGuiIO& io = ImGui::GetIO();
 			ImGuiWindowFlags window_flags = 0 | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysVerticalScrollbar;
 			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));

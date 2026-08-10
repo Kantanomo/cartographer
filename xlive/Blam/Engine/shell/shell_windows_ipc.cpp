@@ -244,7 +244,7 @@ static void shell_windows_ipc_process_client(HANDLE pipe)
 
 static DWORD WINAPI shell_windows_ipc_server_thread(LPVOID param)
 {
-	UNREFERENCED_PARAMETER(param);
+	SUPRESS_UNUSED(param);
 
 	while (!g_ipc_state.shutdown_requested)
 	{

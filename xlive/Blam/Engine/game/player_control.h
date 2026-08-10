@@ -1,34 +1,45 @@
 #pragma once
+
 #include "game/aim_assist.h"
+#include "units/units.h"
 
 /* structs */
 
-struct s_player_action_weapons
+struct s_player_interaction
 {
-	int8 primary_weapon_index;
-	int8 secondary_weapon_index;
+	int16 type;
+	int16 data;
+	datum object_index;
 };
+ASSERT_STRUCT_SIZE(s_player_interaction, 8);
 
-struct player_action
+struct s_player_action_context
 {
-	real32 control_flag0;
-	real32 control_flag1;
-	real_euler_angles2d facing;
-	real_point2d throttle;
-	real32 trigger;
-	real32 secondary_trigger;
-	uint32 action_flags;
-	uint16 weapon_set_identifier;
-	int16 zoom_level;
-	s_player_action_weapons weapon_indexes;
-	uint16 grenade_index;
-	int32 interaction_type;
-	int32 interaction_object;
-	int32 melee_target_unit;
-	s_aim_assist_targeting_result aim_assist_data;
-	int32 unk;
+	s_player_interaction interaction;
+	datum melee_target_unit_index;
 };
-ASSERT_STRUCT_SIZE(player_action, 0x60);
+ASSERT_STRUCT_SIZE(s_player_action_context, 12);
+
+struct s_player_control_state
+{
+	int32 control_flags;
+	int32 action_flags;
+	int32 field_8;
+	int32 field_C;
+	int32 field_10;
+	char gap_14[8];
+	real_euler_angles2d desired_angles;
+	real_point2d throttle;
+	real32 primary_trigger;
+	real32 secondary_trigger;
+	s_unit_weapon_set desired_weapon_set;
+	int16 desired_grenade_index;
+	int16 desired_zoom_level;
+	uint8 gap_24[20];
+	s_aim_assist_targeting_result aim_assist_targeting;
+	uint8 gap_5C[4];
+	s_player_action_context action_context;
+};
 
 struct s_player_interaction_context
 {
@@ -41,14 +52,7 @@ ASSERT_STRUCT_SIZE(s_player_interaction_context, 12);
 struct s_player_control
 {
 	datum unit_datum_index;
-	int32 control_flag;
-	int32 field_8;
-	int32 field_C;
-	int32 field_10;
-	int32 field_14;
-	player_action actions;
-	int8 gap_78[4];
-	s_player_interaction_context action_context;
+	s_player_control_state control_state;
 	int8 gap_80[17];
 	bool zoom_input_held;
 	int16 field_9A;
@@ -112,9 +116,6 @@ s_player_control_globals* player_control_globals_get(void);
 s_player_control* player_control_get(int32 user_index);
 int16 player_control_get_zoom_level(int32 user_index);
 
-
-void player_control_update_dt(real32 dt);
-
 // Gets the FOV from the unit tag of the player with the passed controller index
 // We modified it so it overriddes the FOV depending on if the user has a custom FOV set or the forced FOV value is set for custom variants
 real32 __cdecl player_control_get_field_of_view(uint32 user_index);
@@ -126,3 +127,4 @@ real_euler_angles2d* __cdecl player_control_get_facing(uint32 player_index);
 void __cdecl player_control_get_camera_info(uint32 player_index, s_player_control_camera_info* camera_info);
 
 void player_control_apply_patches();
+

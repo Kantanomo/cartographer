@@ -112,12 +112,7 @@ void H2DedicatedServerStartup() {
 		addDebugText("Signing in dedicated server locally.");
 
 		AccountEdit_remember = false;
-
-		BYTE abEnet[6];
-		BYTE abOnline[20];
-		XNetRandom(abEnet, sizeof(abEnet));
-		XNetRandom(abOnline, sizeof(abOnline));
-		ConfigureUserDetails("[Username]", "12345678901234567890123456789012", rand(), 0, H2Config_ip_lan, ByteToHexStr(abEnet, sizeof(abEnet)).c_str(), ByteToHexStr(abOnline, sizeof(abOnline)).c_str(), false);
+		ConfigureLocalUserDetails();
 	}
 }
 

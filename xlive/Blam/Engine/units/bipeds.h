@@ -77,9 +77,9 @@ void bipeds_apply_patches(void);
 void __cdecl biped_get_sight_position(
 	datum biped_index,
 	e_unit_estimate_mode estimate_mode,
-	real_point3d* estimated_body_position,
-	real_vector3d* desired_facing_vector,
-	real_vector3d* desired_gun_offset,
+	const real_point3d* estimated_body_position,
+	const real_vector3d* desired_facing_vector,
+	const real_vector3d* desired_gun_offset,
 	real_point3d* object_origin);
 
 /* macros */

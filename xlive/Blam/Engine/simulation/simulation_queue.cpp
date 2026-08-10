@@ -16,80 +16,69 @@ void c_simulation_queue::allocate(int32 size, s_simulation_queue_element** eleme
 	{
 		uint32 required_data_size = sizeof(s_simulation_queue_element) + size;
 
-		if (allocated_count() + 1 < k_simulation_queue_count_max)
-		{
-			if (allocated_size_in_bytes() + required_data_size < k_simulation_queue_size_max)
-			{
-				if (size < k_simulation_queue_element_data_size_max)
-				{
-					if (allocated_new_encoded_size_bytes(size) < k_simulation_queue_max_encoded_size)
-					{
-						uint8* net_heap_block = network_heap_allocate_block(required_data_size);
-						if (net_heap_block)
-						{
-							csmemset(net_heap_block, 0, required_data_size);
-							s_simulation_queue_element* allocated_elem = (s_simulation_queue_element*)net_heap_block;
-							allocated_elem->type = _simulation_queue_element_type_none;
-							allocated_elem->data = net_heap_block + sizeof(s_simulation_queue_element);
-							allocated_elem->data_size = size;
-							allocated_elem->next = NULL;
-
-							++m_allocated_count;
-							m_allocated_size += required_data_size;
-							*element_out = allocated_elem;
-						}
-						else
-						{
-#ifdef EVENTS_ENABLED
-							char description[1024];
-							csstrncpy(description, "UNKNOWN", NUMBEROF(description));
-							network_heap_describe(description, NUMBEROF(description));
-							event(
-								_event_fatal,
-								"networking:simulation_queue: OUT OF MEMORY requesting allocation for %d bytes [%s]",
-								size,
-								description
-							);
-#endif
-						}
-					}
-					else
-					{
-						event(
-							_event_fatal,
-							"networking:simulation_queue: can't allocate element, would exceed encoded size maximum [0x%08X/0x%8X]",
-							allocated_new_encoded_size_bytes(size),
-							k_simulation_queue_max_encoded_size
-						);
-					}
-				}
-				else
-				{
-					event(
-						_event_fatal,
-						"networking:simulation_queue: can't allocate element, would exceed element size maximum [0x%08X/0x%8X]",
-						size,
-						k_simulation_queue_element_data_size_max
-					);
-				}
-			}
-			else
-			{
-				event(
-					_event_fatal,
-					"networking:simulation_queue: can't allocate element, would exceed size maximum [0x%08X/0x%8X]",
-					size,
-					131072
-				);
-			}
-		}
-		else
+		if (allocated_count() + 1 >= k_simulation_queue_count_max)
 		{
 			event(
 				_event_fatal,
 				"networking:simulation_queue: can't allocate element, would exceed count maximum [max 0x%8X]",
 				k_simulation_queue_count_max
 			);
+		}
+		else if (allocated_size_in_bytes() + required_data_size >= k_simulation_queue_size_max)
+		{
+			event(
+				_event_fatal,
+				"networking:simulation_queue: can't allocate element, would exceed size maximum [0x%08X/0x%8X]",
+				size,
+				k_simulation_queue_size_max
+			);
+		}
+		else if (size >= k_simulation_queue_element_data_size_max)
+		{
+			event(
+				_event_fatal,
+				"networking:simulation_queue: can't allocate element, would exceed element size maximum [0x%08X/0x%8X]",
+				size,
+				k_simulation_queue_element_data_size_max
+			);
+		}
+		else if (allocated_new_encoded_size_bytes(size) >= k_simulation_queue_max_encoded_size)
+		{
+			event(
+				_event_fatal,
+				"networking:simulation_queue: can't allocate element, would exceed encoded size maximum [0x%08X/0x%8X]",
+				allocated_new_encoded_size_bytes(size),
+				k_simulation_queue_max_encoded_size
+			);
+		}
+		else
+		{
+			uint8* net_heap_block = network_heap_allocate_block(required_data_size);
+			if (net_heap_block)
+			{
+				csmemset(net_heap_block, 0, required_data_size);
+				s_simulation_queue_element* allocated_elem = (s_simulation_queue_element*)net_heap_block;
+				allocated_elem->type = _simulation_queue_element_type_none;
+				allocated_elem->data = net_heap_block + sizeof(s_simulation_queue_element);
+				allocated_elem->data_size = size;
+				allocated_elem->next = NULL;
+
+				++m_allocated_count;
+				m_allocated_size += required_data_size;
+				*element_out = allocated_elem;
+			}
+			else
+			{
+				char description[1024];
+				csstrncpy(description, "UNKNOWN", NUMBEROF(description));
+				network_heap_describe(description, NUMBEROF(description));
+				event(
+					_event_fatal,
+					"networking:simulation_queue: OUT OF MEMORY requesting allocation for %d bytes [%s]",
+					size,
+					description
+				);
+			}
 		}
 	}
 }
