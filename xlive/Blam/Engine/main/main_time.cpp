@@ -114,17 +114,7 @@ void __cdecl main_time_initialize(void)
 
 	csmemset(g_flip_deltas, 0, sizeof(g_flip_deltas));
 
-
 	g_main_game_time_counter_last_time = shell_time_counter_now(NULL);
-
-	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works, and we have to explicitly set the time resolution
-	// and since they were added, when playing on a laptop on battery it migth add heavy stuttering when using a frame limiter based on Sleep function (or std::this_thread::sleep_for) implementation
-	// the game sets them already but only during the loading screen period, then it resets to system default when the loading screen ends 
-	// (tho i think in the new implementation is working on a per thread basis now instead of global frequency, since it still works even when the game resets after loading screen ends and loading screen runs in another thread)
-
-	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
-
-	timeBeginPeriod(k_system_timer_resolution_ms);
 	return;
 }
 
@@ -202,21 +192,26 @@ real32 __cdecl main_time_update(void)
 	{
 		if (game_time_initialized())
 		{
+			// Sleep() once, spin lock the rest
+			bool system_sleep_once = false;
+			const real32 k_system_sleep_max = 2.0f + k_real_epsilon;
+
 			// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
 			// FIXED by interpolation: 
 			// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
 			while (dt_sec < game_time_get_max_frame_time())
 			{
-				uint32 yield_time_msec = 0;
 				real32 fMsSleep = (real32)(game_time_get_max_frame_time() - dt_sec) * 1000.f;
 
-				if (fMsSleep >= 2.0f + k_real_epsilon)
+				// to reduce stuttering, spend some of the time to sleep by CPU spinning,
+				// Sleep is not precise since Windows is not a RTOS
+				if (!system_sleep_once && fMsSleep > k_system_sleep_max)
 				{
-					yield_time_msec = (int32)fMsSleep;
+					int32 yield_time = (int32)(fMsSleep - k_system_sleep_max);
+					yield_time = MAX(0, yield_time);
 
-					// TODO FIXME to reduce stuttering, spend some of the time to sleep by CPU spinning,
-					// Sleep is not precise since Windows is not a RTOS
-					Sleep(yield_time_msec);
+					Sleep((DWORD)yield_time);
+					system_sleep_once = true;
 				}
 
 				dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);

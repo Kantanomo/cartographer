@@ -8,6 +8,7 @@
 #include "cseries/runtime_state.h"
 #include "input/input_windows.h"
 #include "main/game_preferences.h"
+#include "main/main_time.h"
 #include "main/licensing.h"
 #include "math/real_math.h"
 #include "networking/network_configuration.h"
@@ -56,6 +57,7 @@ void shell_apply_patches(void)
 	else
 	{
 		PatchCall(Memory::GetAddress(0x0, 0xC9BE), shell_initialize);	// main_loop_initialize
+		PatchCall(Memory::GetAddress(0x0, 0xC9CE), shell_dispose);
 	}
 
 	return;
@@ -130,6 +132,11 @@ bool shell_initialize(void)
 
 	SYSTEM_DEBUG_MEMORY(cseries_initialize());
 
+	// windows 10 version 2004 and above added behaviour changes to how windows timer resolution works
+	// and the time resolution has to be set explicitly
+	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
+	timeBeginPeriod(k_system_timer_resolution_ms);
+
 #ifdef _WINDOWS
 	if (shell_platform_initialize())
 #endif
@@ -202,6 +209,9 @@ bool shell_initialize(void)
 
 void __cdecl shell_dispose(void)
 {
+	// Reset time resolution to system default on game exit
+	timeEndPeriod(k_system_timer_resolution_ms);
+
 	INVOKE(0x48A9, 0x4CFE, shell_dispose);
 	return;
 }
