@@ -319,9 +319,6 @@ void __cdecl game_dispose(void)
 	}
 	
 	halo_interpolator_dispose();
-
-	// Reset time resolution to system default on game exit
-	timeEndPeriod(k_system_timer_resolution_ms);
 	return;
 }
 
