@@ -44,11 +44,14 @@ void c_bitstream::begin_writing(int32 alignment)
 	p_begin_writing(this, alignment, 0, 0);	// last 2 arguments are debug
 }
 
-void c_bitstream::finish_writing(int32* out_space_left_in_bits)
+void c_bitstream::finish_writing(
+	int32* bits_wasted)
 {
-	typedef void(__thiscall* finish_writing_t)(c_bitstream*, void*);
-	auto p_finish_writing = Memory::GetAddress<finish_writing_t>(0xD1205, 0xCD7BF);
-	p_finish_writing(this, out_space_left_in_bits);
+	ASSERT(writing());
+	vassert(!overflowed(), "bitstream overflowed (%d bits > %d max-size), cannot be written successfully", m_current_bit_position, m_data_size_bytes * SIZEOF_BITS(int8));
+
+	INVOKE_TYPE(0xD1205, 0xCD7BF, void(__thiscall*)(class c_bitstream*, int32*), this, bits_wasted);
+	return;
 }
 
 void c_bitstream::reset(e_bitstream_state state)

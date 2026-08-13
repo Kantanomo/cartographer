@@ -364,6 +364,8 @@ bool encode_simulation_queue_update_to_buffer(
 	uint32 update_mask, 
 	int32* out_encoded_size)
 {
+	bool result;
+
 	c_bitstream stream(encode_buffer, encode_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
 
@@ -376,10 +378,10 @@ bool encode_simulation_queue_update_to_buffer(
 	uint32 update_mask_written = 0;
 	entity_def->entity_update_encode(false, update_mask, &update_mask_written, data->state_data_size, data->state_data, NULL, &stream, 0);
 
-	bool result = !stream.error_occurred();
-	stream.finish_writing(NULL);
-
 	*out_encoded_size = stream.get_space_used_in_bytes();
+
+	result = !stream.error_occurred();
+	stream.finish_writing(NULL);
 
 	return result;
 }

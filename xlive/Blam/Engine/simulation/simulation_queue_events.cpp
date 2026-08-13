@@ -64,6 +64,8 @@ static bool encode_event_to_buffer(
 	void* payload
 )
 {
+	bool result;
+
 	c_bitstream stream(encode_buffer, encode_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
 	simulation_event_encode_header(&stream, event_type, reference_count, entity_references);
@@ -73,23 +75,11 @@ static bool encode_event_to_buffer(
 	// write the event data to the stream
 	sim_event_definition->encode(payload_size, payload, &stream);
 
-	bool result = !stream.error_occurred();
+	*out_encoded_size = stream.get_space_used_in_bytes();
+
+	result = !stream.error_occurred();
 	stream.finish_writing(NULL);
 
-	if (result)
-	{
-		SIM_EVENT_QUEUE_DBG("#####");
-		SIM_EVENT_QUEUE_DBG("event encoding, stream is fine? %d, encoded size: %d", 
-			!stream.error_occurred(), 
-			stream.get_space_used_in_bytes());
-		SIM_EVENT_QUEUE_DBG("event type: %d, reference count: %d", event_type, reference_count);
-	}
-	else
-	{
-		SIM_EVENT_QUEUE_DBG("event encoding failed!!!! --------");
-	}
-
-	*out_encoded_size = stream.get_space_used_in_bytes();
 	return result;
 }
 
