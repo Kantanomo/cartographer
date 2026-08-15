@@ -129,7 +129,7 @@ int ConfigureOnlineUserDetails(const char* username, const char* login_token, un
 	}
 	if (result == 1) {
 		H2CurrentAccountLoginToken = (char*)calloc(32 + 1, sizeof(char));
-		snprintf(H2CurrentAccountLoginToken, 32 + 1, login_token);
+		snprintf(H2CurrentAccountLoginToken, 32 + 1, "%s", login_token);
 	}
 	else {
 		H2CurrentAccountLoginToken = NULL;
@@ -196,7 +196,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 128 + 1, tempName);
+			snprintf(tempstr1, 128 + 1, "%s", tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -214,7 +214,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 128 + 1, tempName);
+			snprintf(tempstr1, 128 + 1, "%s", tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -234,7 +234,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 32 + 1, tempName);
+			snprintf(tempstr1, 32 + 1, "%s", tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -278,7 +278,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 12 + 1, tempName);
+			snprintf(tempstr1, 12 + 1, "%s", tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -297,7 +297,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 40 + 1, tempName);
+			snprintf(tempstr1, 40 + 1, "%s", tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -333,7 +333,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 							}
 							H2AccountArrayUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
 							strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, XUSER_MAX_NAME_LENGTH);
-							snprintf(H2AccountArrayLoginToken[i], 32 + 1, login_token);
+							snprintf(H2AccountArrayLoginToken[i], 32 + 1, "%s", login_token);
 							break;
 						}
 					}

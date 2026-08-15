@@ -199,14 +199,11 @@ int XnIpManager::HandleRecvdPacket(XVirtualSocket* xsocket, sockaddr_in* lpFrom,
 				&& strncmp(broadcastPck->pckHeader.signatureString, XNIP_BROADCAST_HEADER_STR, XNIP_MAX_PCK_STR_HDR_LEN) == 0
 				&& broadcastPck->data.name.sin_addr.s_addr == htonl(INADDR_BROADCAST))
 			{
-				if (*lpBytesRecvdCount > sizeof(XBroadcastPacket))
-				{
-					*lpBytesRecvdCount = *lpBytesRecvdCount - sizeof(XBroadcastPacket);
-					memmove(lpBuffers[0].buf, lpBuffers[0].buf + sizeof(XBroadcastPacket), *lpBytesRecvdCount);
-					lpFrom->sin_addr = broadcastPck->data.name.sin_addr;
-					lpFrom->sin_port = xsocket->GetNetworkOrderSocketVirtualPort();
-					return 0;
-				}
+				*lpBytesRecvdCount = *lpBytesRecvdCount - sizeof(XBroadcastPacket);
+				memmove(lpBuffers[0].buf, lpBuffers[0].buf + sizeof(XBroadcastPacket), *lpBytesRecvdCount);
+				lpFrom->sin_addr = broadcastPck->data.name.sin_addr;
+				lpFrom->sin_port = xsocket->GetNetworkOrderSocketVirtualPort();
+				return 0;
 			}
 		}
 		break;
@@ -277,7 +274,7 @@ int XnIpManager::GetEstablishedConnectionIdentifierByRecvAddr(XVirtualSocket* xs
 			if (mapping == nullptr)
 			{
 				LOG_ERROR_NETWORK("{} - no port mapping for ip address: {}:{}", __FUNCTION__, inet_ntoa(fromAddr->sin_addr), ntohs(fromAddr->sin_port));
-				return WSAEINVAL;
+				continue;
 			}
 
 			if (xsocket->SockAddrInEqual(fromAddr, mapping))
