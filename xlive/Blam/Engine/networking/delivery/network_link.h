@@ -22,10 +22,10 @@ class c_network_link
 	int8 gap0[16];
 	c_network_out_of_band_consumer* m_consumer;
 	int8 gap1[552];
-	c_network_time_statistics m_field_248;
-	c_network_time_statistics m_field_320;
-	c_network_time_statistics m_field_3F8;
-	c_network_time_statistics m_field_4D0;
+	c_network_time_statistics m_packets_transmitted;
+	c_network_time_statistics m_packets_received;
+	c_network_time_statistics m_upstream_bandwidth;
+	c_network_time_statistics m_downstream_bandwidth;
 
 public:
 	bool initialize_link(void);

@@ -4,6 +4,7 @@
 //	- manages network bandwidth based on network conditions
 
 #include "networking/transport/transport_address.h"
+#include "networking/transport/transport_security.h"
 #include "networking/transport/transport_qos.h"
 #include "networking/network_statistics.h"
 
@@ -92,12 +93,12 @@ struct s_observer_channel
 	int32 field_98;
 	int32 field_9C;
 	uint8 gap_A0[8];
-	c_network_time_statistics field_A8;
-	c_network_window_statistics field_180;
-	c_network_time_statistics field_290;
-	c_network_time_statistics field_368;
-	c_network_window_statistics field_440;
-	c_network_window_statistics field_550;
+	c_network_time_statistics received_bytes_statistics;
+	c_network_window_statistics packet_round_trip_statistics;
+	c_network_time_statistics transmitted_bytes_statistics;
+	c_network_time_statistics acknowledged_bytes_statistics;
+	c_network_window_statistics packet_loss_statistics;
+	c_network_window_statistics packet_warning_statistics;
 	int32 field_660;
 	int32 field_664;
 	int32 field_668;
@@ -114,12 +115,14 @@ struct s_observer_channel
 	int32 unmanaged_stream_bandwidth;
 	real32 net_rate_unmanaged_stream;
 	int32 unmanaged_stream_window_size;
-	bool managed_stream;
-	uint8 field_6A5;
-	bool simulation_attached;
-	bool simulation_authority;
-	bool simulation_not_authority;
-	uint8 gap_6A9[3];
+	bool active;
+	bool is_load_bearing;
+	bool is_simulation;
+	bool is_simulation_authority;
+	bool is_simulation_client;
+	bool is_synchronous;
+	bool is_synchronous_joining;
+	bool saturate_stream;
 	int32 stream_bps;
 	int32 stream_window_size;
 	real32 stream_packet_rate;
@@ -172,12 +175,12 @@ public:
 	void* m_network_message_gateway;
 	void* m_message_types;
 	struct s_network_observer_configuration* m_configuration;
-	int32 *field_14;
+	int32* field_14;
 	uint8 gap_18[8];
-	XNKID session_id;
+	s_transport_secure_identifier m_session_id;
 	uint8 gap28[32];
 	uint8 field_48;
-	XNKEY xnkey;
+	s_transport_secure_key m_session_key;
 	int32 field_5C;
 	uint8 gap_60[4];
 	int32 field_64;
@@ -187,29 +190,27 @@ public:
 	s_observer_channel m_observer_channels[k_network_channel_count];
 	bool network_observer_enabled;
 	int8 field_7481;
-	int32 field_7484;
-	int32 throughput;
-	int32 congestion;
+	int32 m_estimate_upstream_bps;
+	int32 m_bandwidth_maximum_throughput_bps;
+	int32 m_bandwidth_congestion_bps;
 	int32 field_7490;
 	bool field_7494;
 	uint8 gap_7495[3];
-	int32 field_7498;
-	int32 field_749C;
+	int32 m_bandwidth_satiation_count[2];
 	int32 field_74A0;
 	int32 field_74A4;
 	int32 field_74A8;
 	uint8 gap_74AC[4];
-	real32 field_74B0;
-	uint8 gap_74B4[212];
+	c_network_time_statistics m_bandwidth_statistics;
 	int32 field_7588;
 	int32 field_758C;
 	int32 field_7590;
 	int32 field_7594;
 	int8 field_7598;
 	int32 field_759C;
-	int32 bits_per_sec;
-	real32 field_75A4;
-	real32 packets_per_sec;
+	int32 m_allocated_bandwidth_bps;
+	real32 m_allocated_rate_authority;
+	real32 m_allocated_rate_client;
 	int32 field_75AC;
 	int32 field_75B0;
 	int32 field_75B4;
@@ -236,7 +237,7 @@ public:
 		int32 out_voice_chat_data_buffer_size,
 		uint8* out_voice_chat_data_buffer);
 
-	bool __thiscall get_bandwidth_results(int32 *out_throughput, real32 *out_satiation, int32 *a4);
+	bool __thiscall get_bandwidth_results(int32* bandwidth_successful_bps, real32* bandwidth_satiation_fraction, int32* bandwidth_unsafe_bps);
 	int32 get_observer_channel_state(int32 observer_index) { return m_observer_channels[observer_index].state; };
 	void send_message(e_network_observer_owner session_index, int32 observer_index, bool send_out_of_band, int32 type, int32 size, const void* data);
 

@@ -330,7 +330,7 @@ void render_netdebug_text(void)
 					netdebug_data->client_rtt_msec = (int16)observer_channel->net_rtt;
 					netdebug_data->client_packet_rate = (int16)(observer_channel->stream_packet_rate * 10.f);
 					netdebug_data->client_throughput = (int16)((observer_channel->throughput_bps * 10.f) / 1024.f);
-					netdebug_data->client_packet_loss_percentage = (int16)(observer_channel->field_440.average_values_in_window() * 100.f);
+					netdebug_data->client_packet_loss_percentage = (int16)(observer_channel->packet_loss_statistics.average_values_in_window() * 100.f);
 
 					// NOT UPDATED IN REAL-TIME
 					//s_network_session_peer* membership_peer = session->get_peer_membership(session->get_local_peer_index());
