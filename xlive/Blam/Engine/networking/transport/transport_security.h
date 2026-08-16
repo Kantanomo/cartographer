@@ -2,14 +2,14 @@
 
 /* structures */
 
-struct s_transport_secure_key
-{
-	XNKEY key;
-};
-
 struct s_transport_secure_identifier
 {
 	XNKID id;
+};
+
+struct s_transport_secure_key
+{
+	XNKEY key;
 };
 
 struct s_transport_secure_address

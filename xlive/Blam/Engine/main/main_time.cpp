@@ -193,28 +193,31 @@ real32 __cdecl main_time_update(void)
 		if (game_time_initialized())
 		{
 			// Sleep() once, spin lock the rest
-			bool system_sleep_once = false;
-			const real32 k_system_sleep_max = 2.0f + k_real_epsilon;
+			const real32 k_system_sleep_min = 2.0f + k_real_epsilon;
 
 			// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
 			// FIXED by interpolation: 
 			// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
-			while (dt_sec < game_tick_length())
+
+			const real32 desired_frame_time = game_tick_length();
+			if (dt_sec < desired_frame_time)
 			{
-				real32 fMsSleep = (real32)(game_tick_length() - dt_sec) * 1000.f;
+				real32 yield_time_msec = (real32)(desired_frame_time - dt_sec) * 1000.f;
 
 				// to reduce stuttering, spend some of the time to sleep by CPU spinning,
 				// Sleep is not precise since Windows is not a RTOS
-				if (!system_sleep_once && fMsSleep > k_system_sleep_max)
+				if (yield_time_msec > k_system_sleep_min)
 				{
-					int32 yield_time = (int32)(fMsSleep - k_system_sleep_max);
-					yield_time = MAX(0, yield_time);
+					int32 system_yield_msec = (int32)(yield_time_msec - k_system_sleep_min);
+					system_yield_msec = MAX(0, system_yield_msec);
 
-					Sleep((DWORD)yield_time);
-					system_sleep_once = true;
+					Sleep((DWORD)system_yield_msec);
 				}
 
-				dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq);
+				while (dt_sec = main_time_delta_calculate(shell_time_counter_now(NULL), freq), 
+					dt_sec < desired_frame_time)
+				{
+				}
 			}
 		}
 		else

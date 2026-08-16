@@ -370,9 +370,7 @@ public:
 
 	void InsertPortMapping(PortMapping* mapping)
 	{
-		PortMapping* pMap = (PortMapping*)malloc(sizeof(*mapping));
-		memcpy(pMap, mapping, sizeof(*pMap));
-		m_netAddrMappings.insert(pMap);
+		m_netAddrMappings.insert((void*)mapping, sizeof(*mapping));
 	}
 
 	const sockaddr_in* GetPortMapping(WORD virtualPort) const

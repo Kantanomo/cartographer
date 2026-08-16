@@ -45,7 +45,7 @@ static int InterpretMasterCreate(char* response_content) {
 			}
 
 			char tempstr1[512] = { "" };
-			snprintf(tempstr1, 32, tempName);
+			snprintf(tempstr1, 32, "%s", tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--)
 			{
 				if (isspace(tempstr1[j]))

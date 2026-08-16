@@ -3,6 +3,7 @@
 
 #include "networking/delivery/network_channel.h"
 #include "networking/messages/network_message_gateway.h"
+#include "networking/network_event.h"
 
 #include "shell/shell.h"
 
@@ -193,10 +194,43 @@ void c_network_observer::reset_network_observer_bandwidth_preferences()
 }
 
 CLASS_HOOK_DECLARE_LABEL(c_network_observer__get_bandwidth_results, c_network_observer::get_bandwidth_results);
-bool __thiscall c_network_observer::get_bandwidth_results(int32 *out_throughput, real32 *out_satiation, int32 *a4)
+bool __thiscall c_network_observer::get_bandwidth_results(int32* bandwidth_successful_bps, real32* bandwidth_satiation_fraction, int32* bandwidth_unsafe_bps)
 {
 	// let the game know we don't have any bandwidth measurements available to save
-	return false;
+	ASSERT(bandwidth_successful_bps);
+	ASSERT(bandwidth_satiation_fraction);
+	ASSERT(bandwidth_unsafe_bps);
+
+	bool result = false;
+
+	int32 satiation = m_bandwidth_satiation_count[1] + m_bandwidth_satiation_count[0];
+
+	if (m_bandwidth_maximum_throughput_bps != NONE
+		&& m_bandwidth_congestion_bps != NONE
+		&& satiation > 0)
+	{
+		*bandwidth_successful_bps = m_bandwidth_maximum_throughput_bps;
+		*bandwidth_satiation_fraction = (real32)m_bandwidth_satiation_count[1] / (real32)satiation;
+		*bandwidth_unsafe_bps = m_bandwidth_congestion_bps;
+		result = true;
+	}
+
+	event(
+		_event_message, 
+		"networking:observer:bandwidth: %s bandwidth results: throughput %dbps congestion %dbps recorded satiation %d/%d",
+		result ? "REPORTING" : "NOT REPORTING",
+		m_bandwidth_maximum_throughput_bps,
+		m_bandwidth_congestion_bps,
+		m_bandwidth_satiation_count[0],
+		m_bandwidth_satiation_count[1]
+	);
+
+#ifndef _DEBUG
+	// TODO FIXME:
+	// currently disable reporting
+	result = false;
+#endif
+	return result;
 }
 
 void __declspec(naked) jmp_get_bandwidth_results()
@@ -252,7 +286,7 @@ bool __thiscall c_network_observer::channel_should_send_packet_hook(
 	// like limited network packet rate, otherwise people with uncapped FPS will overflow host's packet buffer
 
 	// first we check if we are dealing with a managed network stream
-	if (observer_channel->managed_stream)
+	if (observer_channel->active)
 	{
 		// check if we're host
 		if (network_channel->is_simulation_authority())

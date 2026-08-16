@@ -179,7 +179,7 @@ void H2AccountAccountAdd(const char* username, const char* token) {
 
 			bufflen = strlen(token) + 1;
 			H2AccountArrayLoginToken[i] = (char*)calloc(bufflen, sizeof(*token));
-			snprintf(H2AccountArrayLoginToken[i], bufflen, token);
+			snprintf(H2AccountArrayLoginToken[i], bufflen, "%s", token);
 
 			H2AccountArrayUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(*username));
 			strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, XUSER_MAX_NAME_LENGTH);
@@ -241,7 +241,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 		while (isspace(*tempName)) {
 			tempName++;
 		}
-		snprintf(tempstr1, 17, tempName);
+		snprintf(tempstr1, 17, "%s", tempName);
 		for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 			if (isspace(tempstr1[j])) {
 				tempstr1[j] = 0;
@@ -258,7 +258,7 @@ static int interpretConfigSetting(char* fileLine, char* version, int lineNumber)
 		while (isspace(*tempName)) {
 			tempName++;
 		}
-		snprintf(tempstr1, 33, tempName);
+		snprintf(tempstr1, 33, "%s", tempName);
 		for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 			if (isspace(tempstr1[j])) {
 				tempstr1[j] = 0;

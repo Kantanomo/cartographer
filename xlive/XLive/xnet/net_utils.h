@@ -37,12 +37,13 @@ public:
 		return m_last;
 	}
 
-	NetElement* insert(void* data)
+	NetElement* insert(void* data, size_t dataSize)
 	{
 		NetElement* element = (NetElement*)malloc(sizeof(NetElement));
 
 		element->next = nullptr;
-		element->data = data;
+		element->data = malloc(dataSize);
+		memcpy(element->data, data, dataSize);
 
 		if (m_first == nullptr)
 		{
@@ -87,6 +88,7 @@ public:
 				}
 
 				m_count--;
+				free(cur->data);
 				free(cur);
 				break;
 			}

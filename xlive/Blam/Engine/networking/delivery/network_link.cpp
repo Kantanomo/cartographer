@@ -17,10 +17,10 @@
 
 bool c_network_link::initialize_link(void)
 {
-	m_field_248.initialize(2000);
-	m_field_320.initialize(2000);
-	m_field_3F8.initialize(2000);
-	m_field_4D0.initialize(2000);
+	m_packets_transmitted.initialize(2000);
+	m_packets_received.initialize(2000);
+	m_upstream_bandwidth.initialize(2000);
+	m_downstream_bandwidth.initialize(2000);
 	create_endpoints();
 	m_initialized = true;
 	return m_initialized;
