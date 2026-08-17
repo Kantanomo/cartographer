@@ -294,6 +294,7 @@
     <ClCompile Include="Blam\Engine\scenario\scenario_interpolators.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadows.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_text.cpp" />
     <ClCompile Include="Blam\Engine\render\render_layers.cpp" />
     <ClCompile Include="Blam\Engine\render\render_primitive.cpp" />
@@ -1021,6 +1022,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_cinematics.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_screen_effects.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadows.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_text.h" />
     <ClInclude Include="Blam\Engine\render\render_layers.h" />

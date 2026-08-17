@@ -83,4 +83,21 @@ struct s_render_object
 };
 ASSERT_STRUCT_SIZE(s_render_object, 484);
 
+// Engine accessor (halo2.exe 0x596397): cached render state for an object, or NULL.
+s_render_cache_storage* __cdecl render_object_cache_get_render_state(datum object_index);
+
+// Engine accessor (halo2.exe 0x596364): the object's current level of detail for the
+// bound window (0..5 = l1..l6), or NONE.
+int8 render_object_cache_get_level_of_detail(datum object_index);
+
+// Gates the rasterizer GEOMETRY cache fields (entry+76/+80) -- NOT the lighting.
+bool render_object_cache_storage_is_object_cached(s_render_cache_storage* storage);
+
+// The object's computed render_lighting, or NULL. Read-only mirror of the engine's
+// object_get_cached_render_lighting (halo2.exe 0x5969FF): ultimate-parent walk plus the
+// authoritative lighting-valid gate (cache entry+3). Never allocates or evicts a cache entry,
+// which is why it is not simply a call to the engine function. Use this -- not
+// render_object_cache_get_render_state + is_object_cached -- to read lighting.
+render_lighting* render_object_cache_get_lighting(datum object_index);
+
 void render_lod_new_apply_patches();

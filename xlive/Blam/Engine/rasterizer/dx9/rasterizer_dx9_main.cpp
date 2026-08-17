@@ -13,6 +13,7 @@
 #include "rasterizer_dx9_screen_effect.h"
 #include "rasterizer_dx9_submit.h"
 #include "rasterizer_dx9_shader_submit.h"
+#include "rasterizer_dx9_stencil_shadows.h"
 #include "rasterizer_dx9_targets.h"
 #include "rasterizer_dx9_text.h"
 #include "rasterizer_dx9_vertex_buffers.h"
@@ -517,6 +518,11 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
 	D3DDISPLAYMODEEX fs_disp_mode;
 	if (rasterizer_dx9_main_globals->global_d3d_device)
 	{
+		// stencil shadow resources live in D3DPOOL_DEFAULT (shadow VBs, shaders, index
+		// buffer) — release them ahead of the reset; both caches rebuild lazily
+		stencil_shadow_cache_clear();
+		stencil_shadow_shaders_dispose();
+
 		HRESULT hr;
 		rasterizer_dx9_log_hr(
 			hr,

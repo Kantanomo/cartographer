@@ -882,6 +882,24 @@ real_matrix4x3* object_get_node_matrices(datum object_index, int32* out_node_cou
 	return (real_matrix4x3*)object_header_block_get_with_count(object_index, &object->object.nodes_block, sizeof(real_matrix4x3), out_node_count);
 }
 
+// NAME IS MISLEADING — this does NOT produce the renderer's skinning matrices (it. 489).
+//
+// The engine function at this RVA is `render_object_adjust_skinning_for_sky` (halo2.exe 0x5963C7):
+//
+//     position = global_origin3d - object->object.position;
+//     return render_sky_modify_node_matrices(&position, node_matrices, out_matrices, count);
+//
+// It re-bases node matrices onto the world origin for SKY objects, and does nothing else. It is not a
+// pose transform, and it is not the render-time node matrix computation.
+//
+// Where the render-time pose actually comes from: `render_model_build_skinning` (0x77DEBD) calls
+// `object_compute_render_time_node_matrices` (0x53599B) INTERNALLY — render-only node composition plus
+// eye tracking (it. 487). There is no separately callable "give me the matrices the renderer skinned
+// with" entry point, which is why the stencil shadow builder cannot simply reuse one; see
+// td-isq-generation.md it. 486-489.
+//
+// Left named as-is rather than renamed unilaterally — the comment carries the fact, and a rename would
+// touch an engine-wrapper API outside the stencil-shadow work.
 int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_matrix_count, const real_matrix4x3* object_skinning_matrices, real_matrix4x3* out_object_skinning_matrices)
 {
 	return INVOKE(0x1963C7, 0x0, object_get_skinning_matrices, object_index, skinning_matrix_count, object_skinning_matrices, out_object_skinning_matrices);

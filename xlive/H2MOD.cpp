@@ -72,6 +72,7 @@
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
+#include "rasterizer/dx9/rasterizer_dx9_stencil_shadows.h"
 #include "rasterizer/dx9/rasterizer_dx9_water.h"
 #include "rasterizer/dx9/rasterizer_dx9_weather.h"
 #include "render/render.h"
@@ -367,6 +368,10 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->game_mode);
 	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, options);
+
+	// stencil shadow data is built from (and keyed by) the outgoing map's tags; release it
+	// before the new cache loads so stale vertex buffers can never draw on the next map
+	stencil_shadow_cache_clear();
 
 	bool result = p_map_cache_load(options);
 	if (result == false) // verify if the game didn't fail to load the map
@@ -666,6 +671,7 @@ static void h2mod_apply_hooks(void)
 		rasterizer_dx9_screen_effect_apply_patches();
 		rasterizer_dx9_shader_submit_new_apply_patches();
 		rasterizer_dx9_targets_apply_patches();
+		rasterizer_dx9_stencil_shadows_apply_patches();
 		rasterizer_dx9_water_apply_patches();
 		rasterizer_dx9_weather_apply_patches();
 

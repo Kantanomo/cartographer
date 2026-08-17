@@ -9,6 +9,7 @@
 #include "models/render_models.h"
 #include "models/render_model_definitions.h"
 #include "objects/objects.h"
+#include "objects/object_globals.h"
 #include "rasterizer/rasterizer_memory.h"
 #include "render/render_objects.h"
 
@@ -61,6 +62,107 @@ bool render_object_cache_storage_is_object_cached(s_render_cache_storage* storag
     }
 
     return result;
+}
+
+// Read-only mirror of the engine's object_get_cached_render_lighting (halo2.exe 0x5969FF):
+// the same ultimate-parent walk and, critically, the same AUTHORITATIVE validity gate -- the
+// lighting-valid byte at cache entry+3, which is what tells you entry+84 actually holds this
+// object's computed lighting. (render_object_cache_storage_is_object_cached above answers a
+// different question: it gates the rasterizer GEOMETRY cache fields, so an entry can pass it
+// while the lighting is still a previous tenant's or uninitialised.)
+//
+// Deliberately NOT a call to the engine function: that one routes through
+// object_get_cached_render_state (0x59604D), which is an allocator -- on a miss it does
+// datum_new_in_range and, when the pool is full, LRU-EVICTS another object's entry, re-inits
+// it (entry[3] = 0) and calls render_object_update_change_colors. Invoking that from a render
+// hook would thrash live entries and hand back freshly invalidated lighting anyway.
+render_lighting* render_object_cache_get_lighting(datum object_index)
+{
+    // entry layout, 256-byte stride (from object_get_cached_render_state, halo2.exe 0x59604D)
+    const int32 k_cached_render_state_lighting_valid_offset = 3;
+    const int32 k_cached_render_state_owner_offset = 4;
+    const int32 k_cached_render_state_storage_offset = 68;
+
+    while (true)
+    {
+        const object_datum* object = object_get(object_index);
+        if (object == NULL)
+        {
+            return NULL;
+        }
+        if (object->object.flags.test(_object_uses_cinematic_lighting_bit))
+        {
+            // CONFIRMED render_lighting-shaped (was: "never confirmed to carry a shadow_direction,
+            // so callers get NULL"). Overlaying render_lighting on s_object_globals + 0x1C maps
+            // every field onto a real member, with nothing left over:
+            //
+            //   +0  ambient                 -> cinematic_ambient_color          (0x1C)
+            //   +12 shadow_direction        -> cinematic_primary_light_vector_1 (0x28)
+            //   +24 lighting_accuracy       -> cinematic_primary_light_unk1     (0x34)
+            //   +28 shadow_opacity          -> cinematic_primary_light_unk2     (0x38)
+            //   +32 primary_direction_color -> cinematic_primary_light_color    (0x3C)
+            //   +44 primary_direction       -> cinematic_primary_light_vector   (0x48)
+            //   +56 / +68 secondary         -> cinematic_secondary_light_*      (0x54/0x60)
+            //   +80 sh_index                -> field_6C                         (0x6C)
+            //
+            // 0x1C + sizeof(render_lighting) == 0x70, exactly where global_function_values begins.
+            // cinematic_lighting_set_primary_light (halo2.exe 0x530900) confirms it is POPULATED as
+            // one: it builds a vector from the script's yaw/pitch, negates it in place into
+            // primary_direction (+44), copies that same negated vector into shadow_direction (+12),
+            // sets lighting_accuracy and shadow_opacity to 0.8, and stores sh_index = 0xFFFF (NONE).
+            // A negated light vector is exactly what shadow_direction means, and 0.8 is a usable
+            // opacity -- so this is real data, not a coincidental shape. The engine's own signature
+            // returns this address as render_lighting*, so stock consumers already read it this way.
+            //
+            // Safe when the script never ran: the blob is then all zeros, and the caster loop's
+            // zero-length shadow_direction guard falls back to the fixed sun AND the default
+            // opacity, so the worst case is a default-lit shadow rather than none.
+            //
+            // Returning NULL here made every cinematic-lit object count as `nolighting` and cast no
+            // shadow. The live log (17/08) shows nolighting rejecting 2 of 3 eligible casters with
+            // every other counter at zero, so this may account for a large share of that.
+            s_object_globals* globals = object_globals_get();
+            if (globals == NULL)
+            {
+                return NULL;
+            }
+            return (render_lighting*)&globals->cinematic_ambient_color;
+        }
+        if (object->object.parent_object_index == NONE)
+        {
+            break;
+        }
+        datum parent_index = object_get_ultimate_parent(object_index);
+        if (parent_index == NONE || parent_index == object_index)
+        {
+            break;
+        }
+        object_index = parent_index;
+    }
+
+    const object_datum* object = object_get(object_index);
+    if (object == NULL || object->object.cached_render_state_index == NONE)
+    {
+        return NULL;
+    }
+
+    uint8* entry = (uint8*)datum_get(get_cached_object_render_states_array(),
+        object->object.cached_render_state_index);
+    if (entry == NULL)
+    {
+        return NULL;
+    }
+    // the engine's own reuse test: the entry may have been recycled to another object
+    if (*(datum*)(entry + k_cached_render_state_owner_offset) != object_index)
+    {
+        return NULL;
+    }
+    if (entry[k_cached_render_state_lighting_valid_offset] == 0)
+    {
+        return NULL;
+    }
+
+    return &((s_render_cache_storage*)(entry + k_cached_render_state_storage_offset))->lighting;
 }
 
 void __cdecl render_object_update_change_colors(datum object_index, bool a2)

@@ -8,6 +8,7 @@
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_errors.h"
+#include "rasterizer/dx9/rasterizer_dx9_stencil_shadows.h"
 #include "rasterizer/rasterizer_main.h"
 #include "render/render_cartographer_ingame_ui.h"
 
@@ -220,6 +221,7 @@ static void main_render_hook(void)
 {
 	if (!cubemap_screenshot_in_progress())
 	{
+		stencil_shadow_debug_update();
 		render_cartographer_ingame_ui();
 	}
 
