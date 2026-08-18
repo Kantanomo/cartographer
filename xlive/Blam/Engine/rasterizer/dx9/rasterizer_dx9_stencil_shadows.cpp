@@ -10,6 +10,9 @@
 #include "memory/data.h"
 #include "math/matrix_math.h"		// matrix4x3_multiply — skinning = node_world x inverse_bind
 #include "main/interpolator.h"		// it. 471 interp probe — needs the interpolator's bool result
+#include "models/models.h"			// it. 506 probe — s_model_definition::render_only_node_flags (+0xA4)
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"	// it. 528 — F6 mode shown on screen, not just logged
+#include "physics/collisions.h"		// it. 530 — collision_test_vector for the clipped-extrusion experiment
 #include "rasterizer/rasterizer_globals.h"
 #include "render/render.h"
 #include "render/render_lights.h"
@@ -20,6 +23,12 @@
 #include "vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_extrude_vs30.h"
 #include "vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_solid.h"
 #include "vertex_shaders_dx9/preprocessed_hlsl_from_tool/compiled/shadow_stipple.h"
+// it. 557 — per-pixel reach bound. Lives under shaders/ (not the tool-dumped tree) because it is
+// ours, like the other hand-written .fx in that directory.
+#include "shaders/compiled/shadow_reach_clip.h"
+#include "render/render_cameras.h"		// it. 557 — render_camera::point/forward/z_far for the reach encode
+#include "rasterizer_dx9_targets.h"		// it. 557 — _rasterizer_target_z_a8b8g8r8 + set_target_as_texture
+#include "rasterizer_dx9_shader_submit.h"	// it. 557 — rasterizer_dx9_set_sampler_state
 
 #include <xmmintrin.h>
 #include <unordered_map>
@@ -34,6 +43,18 @@ static IDirect3DIndexBuffer9* g_stencil_shadow_index_buffer = NULL;
 // SM3 pair for td's stipple-density fade (screen-door clip in the ps; vs_3_0 required
 // because SM3 shaders cannot pair with other model versions). NULL when unsupported.
 static IDirect3DVertexShader9* g_stencil_shadow_vertex_shader_sm3 = NULL;
+// it. 557 — REACH-CLIP ps_3_0. Shares the SM3 vertex shader above: D3D9 forbids mixing shader
+// models, so this pixel shader is only usable alongside g_stencil_shadow_vertex_shader_sm3 (the
+// same rule the :842 comment records for the vs_2_0 / fixed-function pairing). NULL when
+// unsupported, which disables the mode rather than failing the draw.
+static IDirect3DPixelShader9* g_stencil_shadow_reach_clip_shader = NULL;
+// it. 566 — c0..c6 for the above, rebuilt per caster. See shadow_reach_clip.fx for the register map:
+// c0 (1/vw, 1/vh, z_far, reach), c1 cam point, c2 forward, c3 right + tan(hfov/2),
+// c4 up + tan(vfov/2), c5 caster centre, c6 extrusion direction.
+static const uint32 k_stencil_shadow_reach_constant_count = 8;	// it. 590 added c7 (shadow dir + slope)
+static real32 g_stencil_shadow_reach_c[k_stencil_shadow_reach_constant_count][4] = {};
+// set per caster; false when the mode is off, unsupported, or the camera/viewport look wrong
+static bool g_stencil_shadow_reach_active = false;
 static IDirect3DPixelShader9* g_stencil_shadow_stipple_shader = NULL;
 
 enum
@@ -49,6 +70,10 @@ enum
 {
 	k_stencil_shadow_light_constant = 254,
 	k_stencil_shadow_extrusion_distance_constant = 255,
+	// it. 534: per-vertex clip plane (xyz = extrude direction, w = plane distance + margin). Zero xyz
+	// disables it, so the stock path is unaffected. Same high-register convention as the two above —
+	// see do-not-fix entry 3 for why our shader owns c253-c255 rather than td's c[15]/c[20].
+	k_stencil_shadow_clip_plane_constant = 253,
 	k_stencil_shadow_tint_constant = 31	// ps_2_0 highest constant register
 };
 
@@ -113,6 +138,288 @@ static void stencil_shadow_force_render_state(D3DRENDERSTATETYPE state, DWORD va
 // shader's far-plane clamp) was the direct cause of shadows far larger than their casters:
 // a 0.7wu biped was being given a 20000wu volume.
 static const real32 k_stencil_shadow_extrusion_distance = 2.f;
+
+// it. 524 — DYNAMIC PER-CASTER EXTRUSION (experiment, selected by F6). Sentinel is NEGATIVE so it can
+// never collide with a real distance. 4.5 reproduces the stock 2.0 wu at a biped's 0.44 bounding radius,
+// so the biped case is unchanged and larger casters get proportionally longer volumes.
+static const real32 k_stencil_shadow_dynamic_extrusion = -1.f;
+
+// it. 530 — CLIPPED extrusion (experiment, user-authorised). Sentinel -2, negative like the dynamic one
+// so neither can collide with a real distance.
+//
+// Casts one ray per caster from its centre along the light and extrudes to the first hit, PLUS a margin.
+// The margin is the whole point: clipping *at* the surface parks the far cap exactly on it, which is the
+// coplanar case that produces the grazing speckle (it. 525) — it would GUARANTEE the artefact it is meant
+// to remove. Burying the cap inside the receiver fixes both at once: the leak stops at the wall, and the
+// cap is inside geometry where nothing samples it.
+//
+// `+ radius` because the ray starts at the object's CENTRE while sections sit above and below it; without
+// it, a section higher than the centre would end short of the floor and lose its shadow entirely.
+//
+// THIS IS THE INVENTION `td-symptom-3-shadows-through-geometry.md` FORBIDS ("cap volumes against collision
+// geometry"). It is a deliberate, user-authorised divergence for evaluation, not a fidelity fix, and it
+// has a real cost beyond fidelity: it kills legitimately long shadows — a caster on a ledge that should
+// throw down onto the floor below will instead stop at the ledge.
+static const real32 k_stencil_shadow_clipped_extrusion = -2.f;
+static const real32 k_stencil_shadow_clip_probe_length = 50.f;	// max search distance along the light
+
+// it. 557 — REACH-CLIP. Sentinel -3, continuing the negative-sentinel scheme.
+//
+// This is the ONLY mode that does not put a finite far cap in the scene. DYNAMIC (-1) and CLIPPED (-2)
+// both chose *where* to put the cap; any finite choice leaves it somewhere a receiver can graze, which
+// is why both relocated the artefact instead of removing it. Here the volume runs effectively INFINITE
+// — the shader's far-plane clamp collapses the cap onto the far plane, MEASURED it. 550 — and the leak
+// that would otherwise cause is bounded PER PIXEL in shadow_reach_clip.fx.
+// it. 561 — CROSS-SECTION SEAM STITCHING, now OFF by default.
+//
+// Restored it. 542, dense-slot bug fixed it. 543. it. 544 then MEASURED that it changes nothing
+// visible: 52 seams paired and drawn on a 4-section caster, fragmentation identical. So it carries
+// no demonstrated benefit.
+//
+// It does carry a specific risk. Pairing is a POSITION HASH quantised to 1/4096 wu, and a matched
+// pair is retagged `k_stencil_shadow_matched_boundary` on BOTH sides (:3677-3680) so the per-section
+// walk SKIPS them (:2837) and one bridge quad replaces two sentinel closures. A FALSE match therefore
+// deletes two genuine silhouette edges and bridges an edge that is not a seam — which draws as a
+// spike reaching to an unrelated vertex. The user reported exactly that ("some edges seem broken now
+// ... caused when the cross-stitching runtime was built"), on a build where it was live.
+//
+// Zero measured upside against a mechanism that can delete real edges: default OFF. Flip to true to
+// A/B it. Do NOT re-enable without a way to reject false pairs (matching the endpoints' NORMALS as
+// well as positions would be the obvious guard).
+static const bool k_stencil_shadow_stitch_seams = false;
+
+// it. 569 — REACH CLIP PARKED. The mechanism is sound and the maths is verified; the PLUMBING is not.
+//
+// Root cause, MEASURED it. 569 and not guessed: `rasterizer_dx9_set_target_as_texture` is
+// REDUNDANCY-CACHED, and it. 568 released the sampler with a raw `device->SetTexture(0, NULL)`. That
+// bypasses the cache, so the cache still believes the depth target is bound: the next section's bind
+// NO-OPS, and every draw after the first samples NOTHING. The log shows it exactly —
+// `texture=1 size=1600x1200` on the first draw, `texture=0` on all the rest. The same desync leaves the
+// engine believing s0 is populated, which is why wall decals stayed corrupted.
+//
+// Turning it off here rather than attempting a sixth fix: five builds, a live rendering regression, and
+// the remaining work is engine state-cache integration rather than anything about shadows.
+//
+// TO RESUME, in order:
+//   1. Bind AND release through the SAME cached API (find the engine's texture setter behind
+//      rasterizer_dx9_set_target_as_texture, halo2.exe 0x260256, and use it for the release) — never mix
+//      it with raw device calls.
+//   2. Re-verify with the `stencil reach bind:` line: EVERY sample must read `texture=1`, not just the
+//      first.
+//   3. Only then judge the visual. Sizes already match (1600x1200 both), and the encoding is confirmed
+//      LINEAR by two engine shaders (it. 568), so those are settled.
+// it. 573 — RE-ENABLED. Two things changed since the parking:
+//   1. The release now goes through `rasterizer_dx9_device_set_texture` (the SAME cached setter the bind
+//      uses, IDB 0x66EBC7), so the cache cannot desync. Its body is a plain compare-and-set and handles
+//      NULL safely — VERIFIED by decompilation, not assumed.
+//   2. it. 571 found that the "no shadows" seen during EVERY reach trial was a `volumes_drawn` scope bug
+//      of mine, not reach. Reach has therefore never actually been evaluated — its trials were run
+//      against a build where the shipping apply never ran at all.
+static const bool k_stencil_shadow_reach_enabled = true;
+
+static const real32 k_stencil_shadow_reach_extrusion = -3.f;
+// The extrusion handed to the shader in reach mode. Must be long enough that the far-plane clamp
+// engages, which it. 550 measured as ~379 wu of camera depth; 500 is the value the user already
+// A/B-tested as visually clean, so reuse it rather than introduce a second unvalidated number.
+static const real32 k_stencil_shadow_reach_extrusion_distance = 500.f;
+// How far BEHIND the caster (in view depth, world units) a receiver may still be shadowed.
+// Deliberately generous to start: too small truncates legitimate ground shadows, which is the
+// failure mode the user rejected in the CLIPPED experiments. Tune DOWN from here, not up.
+// it. 575 measured that 1.5 wu visibly reduces the leak — which CONFIRMED the depth sample is live and
+// the whole reach mechanism works. it. 578 then made the reach PER-CASTER (traced to the caster's own
+// receiver), so this constant is now only the FALLBACK used before the trace runs.
+static const real32 k_stencil_shadow_reach_distance = 1.5f;
+// it. 578: added past the traced hit so the bound sits just BELOW the receiving surface rather than
+// exactly on it. Unlike the CLIPPED margin (it. 533-539) this is not fighting coplanarity — there is no
+// far cap here — it only absorbs trace-vs-render surface disagreement, so it can stay small.
+// it. 587: 0.25 -> 0.05. Since it. 586 removed the `+ radius` term, the leak past a receiving surface is
+// EXACTLY this margin — no other term contributes. The user reports the leak much reduced but not gone,
+// and this is the only remaining lever.
+//
+// Unlike the it. 533-539 clip margin this is not fighting coplanarity (there is no far cap in the scene
+// to graze), so it can go very small. Its only job is absorbing disagreement between the collision
+// surface the ray hits and the render surface the pixel shows.
+//
+// If SLOPED ground starts showing truncated shadows, that is this value being too small — points further
+// out along a slope have a larger `along` than the traced hit. Raise it; do NOT reinstate `+ radius`,
+// which scales with the caster and reopens the leak (it. 586).
+static const real32 k_stencil_shadow_reach_margin = 0.05f;
+// it. 539: MINIMUM extrusion under clipping. A vertex already past the clip plane would otherwise get
+// zero, putting its far-cap triangle exactly on its near-cap triangle — the two cancel and that part of
+// the shadow VANISHES. That was the user's "shadow culling" report: present only in clipped mode, absent
+// at 2.0 and 500 where nothing is ever clamped.
+//
+// 0.15 wu is well above the depth quantum at any shadow-visible range (it. 536) and small enough that a
+// clamped vertex barely over-penetrates. It only applies to vertices the plane has already passed, so it
+// does not affect the normal case where clipping does its job.
+static const real32 k_stencil_shadow_clip_min_extrude = 0.15f;
+
+// it. 540 — PER-SECTION clip plane. One plane per CASTER was the wrong granularity, and the run said so:
+// a caster in this content draws **20 sections** (others 4 and 6), all sharing a plane derived from a
+// single ray at the object's centre. On a slope, or on any object whose sections span vertically, that
+// plane fits almost none of them — sections below it clip to nothing (shadow vanishes), sections above it
+// clip too late. That is the ragged, fragmented result the user reported and which the it. 539 minimum
+// extrusion did not cure, because the minimum bounds the SYMPTOM (collapsed volumes) and not the CAUSE
+// (a plane in the wrong place for that section).
+//
+// Casting per section is what the user proposed for the dynamic mode at it. 526, for the same reason, and
+// the cost was measured affordable at it. 537: the per-caster version (~10 rays/frame) did not register
+// against a 0.958 ms baseline, and per-section is ~50.
+//
+// Definition lives below the globals it touches — search "stencil_shadow_set_clip_plane".
+// it. 532: margin cut 0.5 -> 0.1 (user: "0.5wu is too big"). Correct, and it costs nothing in safety:
+//
+//   * THE MARGIN IS THE MINIMUM BURIAL DEPTH. A vertex at the caster's leading edge (offset +radius
+//     along the light) buries its cap by exactly `margin`; every other vertex buries deeper. So the
+//     margin only has to exceed DEPTH PRECISION at the receiver, not caster scale.
+//   * it. 406 measured one 24-bit depth quantum at ~2.5e-5 wu at 5 wu view distance, coarsening with
+//     range. 0.1 wu is still thousands of quanta at any distance the shadow is legible, so the cap
+//     stays unambiguously behind the receiver and the grazing case (it. 525) cannot reappear.
+//   * It directly reduces the residual leak: penetration is `radius + margin` below the receiver
+//     (it. 531), so this takes the biped case from 1.30 wu to 0.90 wu — a 30% cut.
+//
+// Do NOT push it toward zero: at ~1e-3 wu it approaches the depth quantum at long range and the far cap
+// starts grazing again, which is the artefact this whole mode exists to remove.
+//
+// The `+ radius` term still dominates. Removing THAT needs per-vertex extrusion (it. 529/531), where the
+// penetration becomes the margin alone.
+// it. 533: 0.1 -> 0.02 (user: "0.1 is also still too big"). Lowered as asked, but the margin is NOT what
+// bounds the penetration, and the arithmetic says so:
+//
+//   With ONE scalar per caster, E must bury the FURTHEST vertex (E >= h_max + margin), and the NEAREST
+//   vertex then penetrates by E - h_min. So
+//
+//       penetration = (h_max - h_min) + margin = THE CASTER'S OWN EXTENT ALONG THE LIGHT + margin
+//
+//   For a biped (~0.705 wu tall, it. 415) that is ~0.71 + margin. At 0.1 the margin was 1/8 of it; at
+//   0.02 it is 1/36. Going to zero would take 0.81 -> 0.71 and no further. **The caster's size is the
+//   limiter and no per-caster value can beat it.**
+//
+// 0.02 wu is still ~800 depth quanta at 5 wu view distance (one quantum ~2.5e-5 wu, it. 406), so the cap
+// stays behind the receiver and the it. 525 grazing case does not return. Do not go much below this —
+// the bound is depth precision at range, and at ~1e-3 the cap starts grazing again.
+//
+// THE REAL FIX IS PER-VERTEX (it. 529/531), and the toolchain for it exists: `build dx9 vertex
+// shaders.bat` + `bin/fxc.exe`. Passing the clip plane as a shader constant makes each vertex extrude its
+// OWN distance, so penetration becomes the margin ALONE (0.02) with no caster-size term:
+//     amount = max(0, clip_c.w - dot(clip_c.xyz, world_pos))     // clip_c = (extrude_dir, plane_d + margin)
+// That is a ~35x reduction over the current scheme, and needs no per-vertex rays and no VB change.
+static const real32 k_stencil_shadow_clip_margin = 0.02f;		// buries the far cap past the receiver
+static const real32 k_stencil_shadow_dynamic_extrusion_scale = 4.5f;
+// Floor, so a small section (the run contains one at 0.057 wu) does not get a volume so short that its
+// shadow disappears entirely. Arbitrary — it exists to keep the experiment interpretable, not because
+// any reference specifies it.
+static const real32 k_stencil_shadow_dynamic_extrusion_min = 0.5f;
+// it. 528: bounded report of the per-section values the dynamic mode resolves to (the `stencil size:`
+// line shows only the caster-wide fallback, so without this the experiment is unreadable). Declared here
+// rather than with the other latches because stencil_shadow_section_extrusion below needs it.
+// Reset per map in stencil_shadow_cache_clear.
+static int32 g_stencil_shadow_logged_dynamic_extrusion = 0;
+// it. 530: bounded report of the clipped distances, same rationale.
+static int32 g_stencil_shadow_logged_clip = 0;
+// it. 581: RESET ON EVERY F6 PRESS, not once per process. At ~500 fps a per-process cap is consumed by
+// one caster in milliseconds, so it always captured the player's own object and never the scene's
+// (it. 562), and once spent it stayed silent — which made "mode selected but no telemetry" ambiguous
+// between "not in the mode" and "cap exhausted". Resetting per press makes entering a mode ALWAYS
+// produce fresh evidence.
+static int32 g_stencil_shadow_logged_reach = 0;
+static int32 g_stencil_shadow_logged_bind = 0;		// same, for `stencil reach bind:`
+static int32 g_stencil_shadow_reach_tick = 0;		// it. 585 — periodic sampler for `stencil reach:`
+// it. 538: how often the LOD fallback substitutes a level the engine did not request. A non-zero count
+// means some shadows are cast from a mesh that is not the one being rendered.
+static bool g_stencil_shadow_warned_lod_fallback = false;
+static int32 g_stencil_shadow_lod_fallbacks = 0;
+// it. 534: per-vertex clip plane uploaded to c253 — (extrude_dir.xyz, plane_distance + margin).
+// All-zero disables it in the shader, which is the state for every mode except CLIPPED.
+static real32 g_stencil_shadow_clip_plane[4] = { 0.f, 0.f, 0.f, 0.f };
+
+// it. 540 — PER-SECTION clip plane. Declared here, below every constant and global it touches (the first
+// placement was above them and failed to compile — worth the note, since the natural spot to write it is
+// next to the other clip constants, which is too early).
+static real32 stencil_shadow_set_clip_plane(
+	const real_point3d* origin,
+	const real_point3d* toward_light,
+	datum ignore_object,
+	real32 object_radius)
+{
+	g_stencil_shadow_clip_plane[0] = 0.f;
+	g_stencil_shadow_clip_plane[1] = 0.f;
+	g_stencil_shadow_clip_plane[2] = 0.f;
+	g_stencil_shadow_clip_plane[3] = 0.f;
+	if (!origin)
+	{
+		return k_stencil_shadow_extrusion_distance;
+	}
+
+	real_vector3d probe;
+	probe.i = -toward_light->x * k_stencil_shadow_clip_probe_length;
+	probe.j = -toward_light->y * k_stencil_shadow_clip_probe_length;
+	probe.k = -toward_light->z * k_stencil_shadow_clip_probe_length;
+
+	collision_result collision;
+	collision.global_material_index = NONE;
+	const uint32 clip_flags =
+		FLAG(_collision_test_structure_bit) | FLAG(_collision_test_instanced_geometry_bit);
+	if (!collision_test_vector(clip_flags, origin, &probe, ignore_object, NONE, &collision))
+	{
+		// nothing within the probe -> leave the plane disabled and fall back to the stock distance
+		return k_stencil_shadow_extrusion_distance;
+	}
+
+	const real_vector3d dir = { -toward_light->x, -toward_light->y, -toward_light->z };
+	g_stencil_shadow_clip_plane[0] = dir.i;
+	g_stencil_shadow_clip_plane[1] = dir.j;
+	g_stencil_shadow_clip_plane[2] = dir.k;
+	g_stencil_shadow_clip_plane[3] =
+		(dir.i * collision.point.x + dir.j * collision.point.y + dir.k * collision.point.z)
+		+ k_stencil_shadow_clip_margin;
+
+	if (g_stencil_shadow_logged_clip < 12)
+	{
+		g_stencil_shadow_logged_clip++;
+		LOG_INFO_GAME("stencil clip: hit_t={:.3f} plane_d={:.3f} -> PER-SECTION plane (it. 540; one plane per caster fitted a 20-section object badly)",
+			collision.t, g_stencil_shadow_clip_plane[3]);
+	}
+	return (collision.t * k_stencil_shadow_clip_probe_length) + object_radius
+		+ k_stencil_shadow_clip_margin;
+}
+
+// it. 526 — PER-SECTION extrusion for the dynamic experiment.
+//
+// Per-caster (it. 524) is too coarse: a caster's sections sit at different heights, so one value
+// displaces every far cap by the same amount and lands them at different distances from the floor.
+// Scaling by the SECTION's own size lets each cap be placed on its own terms. `extrusion_distance` is
+// already a per-section parameter of stencil_shadow_section_draw — only the value was shared.
+//
+// Falls back to the caster-wide value whenever the extent is unusable, so a build that failed to record
+// one can never produce a degenerate volume.
+static inline real32 stencil_shadow_section_extrusion(
+	const s_stencil_shadow_section* shadow, bool dynamic, real32 fallback)
+{
+	if (!dynamic || !shadow || !(shadow->extent_max > 0.0001f))
+	{
+		return fallback;
+	}
+	const real32 scaled = shadow->extent_max * k_stencil_shadow_dynamic_extrusion_scale;
+	const real32 result = scaled > k_stencil_shadow_dynamic_extrusion_min
+		? scaled : k_stencil_shadow_dynamic_extrusion_min;
+	// it. 528: REPORT THE RESOLVED VALUE. `stencil size:` logs the CASTER-WIDE distance, which in
+	// dynamic mode is the 2.0 fallback — identical to stock on screen and in the log, so the experiment
+	// was unreadable without this. (I asserted that line would show the per-section values; it does not.
+	// Same class as the probes audited in it. 471-478: a number reported where the interesting one is
+	// computed elsewhere.)
+	//
+	// Bounded to the first 12 sections per map so a 6-section vehicle and a biped both fit without
+	// spamming. Latch is file-scope and reset in stencil_shadow_cache_clear.
+	if (g_stencil_shadow_logged_dynamic_extrusion < 12)
+	{
+		g_stencil_shadow_logged_dynamic_extrusion++;
+		LOG_INFO_GAME("stencil dynamic extrusion: extent={:.3f}wu -> extrusion={:.3f}wu{} (it. 526 — per SECTION; stock is a flat 2.000 for every section)",
+			shadow->extent_max, result,
+			scaled > k_stencil_shadow_dynamic_extrusion_min ? "" : " [FLOORED]");
+	}
+	return result;
+}
 
 // REGISTER LAYOUT IS OURS, NOT td's (clarified it. 285). The c[15] / c[20].w above describe td's
 // NV2A microcode. Our HLSL uses its own high registers -- light in c254 (xyz = position,
@@ -212,6 +519,14 @@ static bool g_stencil_shadow_warned_no_node_map = false;
 static bool g_stencil_shadow_warned_bone_no_map = false;
 static bool g_stencil_shadow_warned_normalized_no_bounds = false;
 static bool g_stencil_shadow_probed_interpolation = false;
+// it. 506: bounds it. 487's render-only-node / eye-tracking divergence. One-shot per map.
+static bool g_stencil_shadow_probed_render_only = false;
+// it. 510: the CURRENT caster's render-only flags, published by the caster loop so the section builder
+// can intersect them with the nodes the shadow geometry actually references. Not owned — points into
+// tag data, valid only for the iteration that set it.
+static const int8* g_stencil_shadow_render_only_flags = NULL;
+static int32 g_stencil_shadow_render_only_node_count = 0;
+static bool g_stencil_shadow_probed_render_only_used = false;
 // it. 472: WHY the last section build failed. `stencil_shadow_section_build` has EIGHT distinct
 // `return false` paths and six of them were silent, so the `BUILD FAILED` line could not be
 // attributed — and the it. 422 plan was to COUNT those lines as the gate's cost. Set on every
@@ -667,6 +982,13 @@ static bool stencil_shadow_shaders_initialize(IDirect3DDevice9Ex* device)
 			&g_stencil_shadow_stipple_shader)))
 		{
 			g_stencil_shadow_stipple_shader = NULL;
+		}
+		// it. 557 — reach clip. Optional exactly like the stipple pair: a failure here must leave
+		// the other modes working, so it only disables its own F6 mode.
+		if (FAILED(device->CreatePixelShader((const DWORD*)k_shadow_reach_clip_ps_3_0,
+			&g_stencil_shadow_reach_clip_shader)))
+		{
+			g_stencil_shadow_reach_clip_shader = NULL;
 		}
 	}
 	return true;
@@ -1825,6 +2147,57 @@ bool stencil_shadow_section_build(
 		}
 	}
 
+	// it. 510 PROBE — DIAGNOSTIC ONLY. Does the SHADOW actually reference any render-only node?
+	//
+	// it. 509 measured 14 of 33 nodes render-only on a biped, which sounds material — but that counts
+	// the MODEL, not the shadow. A render-only node with no shadow-casting geometry bound to it costs
+	// nothing, because the composition we skip (0x53599B) would move a node no shadow vertex uses.
+	// This intersects the two sets, which is the number that actually decides whether it. 487's risky
+	// plumbing is worth building.
+	//
+	// Counts DISTINCT nodes, and covers both binding paths: `welded_nodes` (the single-node / dominant
+	// path) and `welded_bone_indices` (the 4-bone weighted path, the one that runs on real bipeds).
+	// Both hold MODEL node indices — already remapped through `node_map` (it. 494) — so they are
+	// directly comparable to the flag bit positions.
+	//
+	//   used_render_only=0  -> the shadow never binds a render-only node. it. 487 CLOSES for this
+	//                          content: skipping the composition cannot move a shadow vertex, and the
+	//                          divergence reduces to eye tracking on nodes the shadow may not use either
+	//   used_render_only>0  -> that many nodes carry shadow geometry the engine poses and we do not.
+	//                          Build the plumbing
+	//
+	// One-shot per map; latch reset in stencil_shadow_cache_clear.
+	if (!g_stencil_shadow_probed_render_only_used && g_stencil_shadow_render_only_flags)
+	{
+		g_stencil_shadow_probed_render_only_used = true;
+		uint32 used_bits[8] = {};
+		for (uint32 i = 0; i < (uint32)welded_nodes.size(); i++)
+		{
+			used_bits[welded_nodes[i] >> 5] |= (1u << (welded_nodes[i] & 31));
+		}
+		for (uint32 i = 0; i < (uint32)welded_bone_indices.size(); i++)
+		{
+			used_bits[welded_bone_indices[i] >> 5] |= (1u << (welded_bone_indices[i] & 31));
+		}
+		int32 used_nodes = 0, used_render_only = 0;
+		for (int32 node_index = 0; node_index < 256; node_index++)
+		{
+			if (((used_bits[node_index >> 5] >> (node_index & 31)) & 1) == 0)
+			{
+				continue;
+			}
+			used_nodes++;
+			if (node_index < g_stencil_shadow_render_only_node_count
+				&& ((g_stencil_shadow_render_only_flags[node_index >> 3] >> (node_index & 7)) & 1) != 0)
+			{
+				used_render_only++;
+			}
+		}
+		LOG_INFO_GAME("stencil renderonly used: section nodes={} of which render_only={} (class={}) (it. 510 — 0 means the SHADOW never binds a render-only node, so it. 487's skipped composition cannot move it and the item CLOSES for this content)",
+			used_nodes, used_render_only,
+			(int32)section->global_geometry_classification);
+	}
+
 	out_shadow->valid = true;
 	// SIZE DIAGNOSTIC: the section's own extent in the space its vertices live in. The drawn
 	// shadow can never be smaller than this, so if the extent already dwarfs the object the
@@ -1866,6 +2239,22 @@ bool stencil_shadow_section_build(
 			if (p->x > hi.x) hi.x = p->x;
 			if (p->y > hi.y) hi.y = p->y;
 			if (p->z > hi.z) hi.z = p->z;
+		}
+		// it. 526: retain the section's largest extent for PER-SECTION dynamic extrusion.
+		//
+		// The user's point, and it is correct: a caster's sections sit at DIFFERENT heights — a
+		// vehicle's chassis, wheels and gun mount are not coplanar — so one per-caster extrusion
+		// displaces every section's far cap by the same amount and lands them at different distances
+		// from the floor. Some graze it, some do not, and no single per-caster value can miss them
+		// all. A per-section value can be chosen to miss each one individually.
+		//
+		// Cheap: this bound is already computed here for the size diagnostic, and the extrusion is
+		// ALREADY a per-section parameter of stencil_shadow_section_draw — only the value was shared.
+		{
+			const real32 ex = hi.x - lo.x, ey = hi.y - lo.y, ez = hi.z - lo.z;
+			real32 largest = ex > ey ? ex : ey;
+			if (ez > largest) { largest = ez; }
+			out_shadow->extent_max = largest;
 		}
 		// D9 cross-check: td's invariant is that the shadow geometry is exactly the first
 		// shadow_casting_part_count parts, totalling shadow_casting_triangle_count triangles.
@@ -2087,11 +2476,38 @@ static bool stencil_shadow_section_animate(
 		//   ran>0 and max_pos >~1e-2wu -> real pose lag, bounded by max_pos. Apply the interpolated
 		//                                 matrix AFTER the geometry fixes are confirmed.
 		// Latches reset in stencil_shadow_cache_clear.
+		//
+		// ===== it. 500: THE PROBE'S ANSWER CAME BACK POSITIVE, AND THE FIX IS NOW APPLIED BELOW ====
+		// The 16:37 run measured three samples (it. 498):
+		//     ran=220/240  max_pos=0.00009wu  max_fwd=0.052deg   (near-static caster)
+		//     ran=200/240  max_pos=0.00017wu  max_fwd=0.077deg   (near-static caster)
+		//     ran=240/240  max_pos=0.01631wu  max_fwd=11.436deg  (MOVING caster)
+		// `ran > 0` throughout, so the interpolator engaged — not the declined case. The third sample
+		// is above this probe's own "~1e-2 wu = a visible limb offset" threshold, on a 0.705 wu caster,
+		// with 11.4 degrees of orientation lag. So the branch this comment calls
+		// "ran>0 and max_pos >~1e-2wu -> apply the interpolated matrix AFTER the geometry fixes are
+		// confirmed" is the branch we are on, and the geometry fixes ARE confirmed: the same run reports
+		// `decomp=applied` on 30/30 sections with every extent well under the normalised 2.0 span.
+		//
+		// The interpolator call is now made UNCONDITIONALLY (it used to run only while probing) and its
+		// result is ADOPTED as the pose, below the probe. Order matters: the probe must difference
+		// against the RAW `world`, so the adoption happens after the measurement, not before — otherwise
+		// the probe would report 0 forever and look like a closed item.
+		//
+		// The probe keeps running and keeps its meaning inverted-but-useful: it now reports how much
+		// correction is being applied rather than how much error is being left.
+		//
+		// NOT fixed here, and still open: it. 487's second divergence — the engine also composes
+		// render-only nodes and eye tracking via `object_compute_render_time_node_matrices` (0x53599B)
+		// before skinning, which we still skip. That is a different mechanism from interpolation and was
+		// never what this probe measured. See it. 488: td cannot have either divergence because its
+		// shadow and its model share one skinning pool.
+		real_matrix4x3 interpolated;
+		const bool interpolation_ran = halo_interpolator_interpolate_object_node_matrix(
+			object_index, (int16)node, &interpolated);
 		if (!g_stencil_shadow_probed_interpolation)
 		{
-			real_matrix4x3 interpolated;
-			bool ran = halo_interpolator_interpolate_object_node_matrix(
-				object_index, (int16)node, &interpolated);
+			const bool ran = interpolation_ran;
 			if (ran)
 			{
 				g_stencil_shadow_interp_ran++;
@@ -2120,6 +2536,20 @@ static bool stencil_shadow_section_animate(
 					g_stencil_shadow_interp_max_pos,
 					g_stencil_shadow_interp_max_fwd);
 			}
+		}
+
+		// it. 500: ADOPT the interpolated (render) pose. Placed AFTER the probe on purpose — see the
+		// block above. `interpolated` is a stack local, but `world` is consumed by the multiply on the
+		// very next line and never escapes this lambda, so pointing at it is safe.
+		//
+		// When the interpolator declines (object cannot interpolate, or previous->target exceeded
+		// `k_interpolation_distance_cutoff` = 900.0, the teleport guard) we keep the raw matrix, which
+		// is exactly what `object_try_get_node_matrix_interpolated` does. Doing it here rather than
+		// through that wrapper keeps the existing NULL/bounds check on `world` above — the wrapper
+		// dereferences `object_get_node_matrix` unguarded in its fallback path.
+		if (interpolation_ran)
+		{
+			world = &interpolated;
 		}
 
 		matrix4x3_multiply(world, &render_model->nodes[node]->default_inverse_matrix,
@@ -2629,9 +3059,21 @@ void stencil_shadow_section_draw(
 	light_constant[1] = light_position->y;
 	light_constant[2] = light_position->z;
 	light_constant[3] = point_light ? 1.f : 0.f;
-	real32 extrusion_constant[4] = { extrusion_distance, 0.f, 0.f, 0.f };
+	// it. 539: .y is the MINIMUM extrusion the shader will apply under clipping. Non-zero only when a
+	// clip plane is active — see the shader for why zero is unsafe there (coincident caps cancel and the
+	// shadow disappears). Zero in every other mode, which never consults it.
+	real32 extrusion_constant[4] = {
+		extrusion_distance,
+		(g_stencil_shadow_clip_plane[0] != 0.f || g_stencil_shadow_clip_plane[1] != 0.f
+			|| g_stencil_shadow_clip_plane[2] != 0.f) ? k_stencil_shadow_clip_min_extrude : 0.f,
+		0.f, 0.f };
 	device->SetVertexShaderConstantF(k_stencil_shadow_light_constant, light_constant, 1);
 	device->SetVertexShaderConstantF(k_stencil_shadow_extrusion_distance_constant, extrusion_constant, 1);
+	// it. 534: per-vertex clip plane. Zero xyz disables it in the shader, and every mode except CLIPPED
+	// leaves it zero — so this upload is a no-op for the stock path. Uploaded unconditionally rather than
+	// only when active, because a stale plane left in c253 from a previous frame would silently clip a
+	// mode that is not supposed to be clipped.
+	device->SetVertexShaderConstantF(k_stencil_shadow_clip_plane_constant, g_stencil_shadow_clip_plane, 1);
 
 	uint32 index_count = (uint32)indices.size();
 	if (index_count > k_stencil_shadow_index_buffer_capacity)
@@ -2662,13 +3104,67 @@ void stencil_shadow_section_draw(
 	// faded objects mark proportionally fewer stencil pixels (SM3 pair required)
 	bool stipple = g_stencil_shadow_draw_mode != 1 && opacity < 0.995f
 		&& g_stencil_shadow_vertex_shader_sm3 && g_stencil_shadow_stipple_shader;
-	device->SetVertexShader(stipple
+	// it. 557: reach clip also needs the SM3 vertex shader (D3D9 forbids mixing shader models, the
+	// same rule the :842 comment records). It takes priority over stipple when both would apply —
+	// they both want the single pixel-shader slot, and losing the stipple fade in an experimental
+	// mode is far cheaper than losing the reach bound this mode exists to test.
+	const bool reach_clip = g_stencil_shadow_reach_active
+		&& g_stencil_shadow_draw_mode != 1 && g_stencil_shadow_reach_clip_shader;
+	device->SetVertexShader((stipple || reach_clip)
 		? g_stencil_shadow_vertex_shader_sm3 : g_stencil_shadow_vertex_shader);
 	if (g_stencil_shadow_draw_mode == 1)
 	{
 		const real32 tint[4] = { 1.f, 0.125f, 0.125f, 0.375f };
 		device->SetPixelShader(g_stencil_shadow_pixel_shader);
 		device->SetPixelShaderConstantF(k_stencil_shadow_tint_constant, tint, 1);
+	}
+	else if (reach_clip)
+	{
+		device->SetPixelShader(g_stencil_shadow_reach_clip_shader);
+		device->SetPixelShaderConstantF(0, &g_stencil_shadow_reach_c[0][0],
+			k_stencil_shadow_reach_constant_count);
+		// The engine's depth-as-colour MRT output (target 22), already written by the geometry
+		// passes that run before us. POINT filtering on purpose: the packed 24-bit depth is spread
+		// across R,G,B, so any interpolation between texels blends unrelated byte planes and
+		// produces depths that exist nowhere in the scene.
+		rasterizer_dx9_set_target_as_texture(0, _rasterizer_target_z_a8b8g8r8);
+		rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+		rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+		rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+		rasterizer_dx9_set_sampler_state(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+		rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+
+		// it. 568 — VERIFY THE BIND, do not infer it. Two engine shaders agree the encoding is linear,
+		// so it. 566 should have produced shadows and did not. That makes "the sample never happens" the
+		// leading candidate, and it is directly checkable: read the texture back off the device and
+		// compare its surface size against the viewport the UVs are built from. A size mismatch also
+		// invalidates the `(vpos + 0.5) * (1/viewport)` mapping even when the bind succeeds.
+		if (g_stencil_shadow_logged_bind < 4)
+		{
+			g_stencil_shadow_logged_bind++;
+			IDirect3DBaseTexture9* bound = NULL;
+			HRESULT hr = device->GetTexture(0, &bound);
+			uint32 tw = 0, th = 0;
+			if (SUCCEEDED(hr) && bound)
+			{
+				IDirect3DTexture9* tex2d = NULL;
+				if (SUCCEEDED(bound->QueryInterface(__uuidof(IDirect3DTexture9), (void**)&tex2d)) && tex2d)
+				{
+					D3DSURFACE_DESC desc = {};
+					if (SUCCEEDED(tex2d->GetLevelDesc(0, &desc)))
+					{
+						tw = desc.Width;
+						th = desc.Height;
+					}
+					tex2d->Release();
+				}
+				bound->Release();
+			}
+			LOG_INFO_GAME("stencil reach bind: hr={:#x} texture={} size={}x{} viewport={:.0f}x{:.0f} (sizes MUST match or the VPOS->UV mapping is wrong)",
+				(uint32)hr, bound ? 1 : 0, tw, th,
+				(g_stencil_shadow_reach_c[0][0] > 0.f ? 1.f / g_stencil_shadow_reach_c[0][0] : 0.f),
+				(g_stencil_shadow_reach_c[0][1] > 0.f ? 1.f / g_stencil_shadow_reach_c[0][1] : 0.f));
+		}
 	}
 	else if (stipple)
 	{
@@ -2691,6 +3187,29 @@ void stencil_shadow_section_draw(
 		0,
 		index_count / 3);
 	stencil_shadow_force_render_state(D3DRS_DEPTHBIAS, 0);
+
+	// it. 568 — RELEASE SAMPLER 0. The reach path binds the depth target to s0 and forces POINT
+	// filtering; leaving either in place corrupts every later draw that samples s0 without setting its
+	// own texture. The user saw exactly that: a wall decal (the "3" numeral) rendering as a flat black
+	// shape. Unbinding the texture is the part that matters — the filter is restored to LINEAR as well
+	// so a later consumer relying on the engine's default is not silently point-sampled.
+	// it. 573 — RELEASE THROUGH THE CACHED SETTER, never the raw device.
+	//
+	// it. 568 used `device->SetTexture(0, NULL)` and desynced the engine's redundancy cache: the cache
+	// still believed the depth target was bound, so the NEXT section's bind no-opped and every draw after
+	// the first sampled nothing (MEASURED: `texture=1` on sample 1, `texture=0` on 2-4), while the engine
+	// separately believed s0 was populated — which is what corrupted the wall decals.
+	//
+	// `rasterizer_dx9_device_set_texture` is the setter `rasterizer_dx9_set_target_as_texture` itself ends
+	// in (targets.cpp:353). Its body (IDB 0x66EBC7) is `if (cache[stage] != texture) { SetTexture(...);
+	// cache[stage] = texture; }` — a plain compare-and-set that handles NULL, VERIFIED by decompilation.
+	// Releasing through it keeps cache and device in step, so the next bind is seen as a real change.
+	if (reach_clip)
+	{
+		rasterizer_dx9_device_set_texture(0, NULL);
+		rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+		rasterizer_dx9_set_sampler_state(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	}
 
 	if (FAILED(draw_result))
 	{
@@ -3165,7 +3684,9 @@ static uint64 stencil_shadow_seam_key(const real_point3d* a, const real_point3d*
 // whose bind-pose endpoints coincide across two sections are retagged matched (skipped by
 // the per-section walk) and bridged by ONE owner-side cross quad.
 static s_stencil_shadow_model_cross* stencil_shadow_model_cross_get(
-	datum render_model_index, const render_model_definition* render_model)
+	datum render_model_index, const render_model_definition* render_model,
+	s_stencil_shadow_section* const* drawn_sections, const int16* section_of_dense,
+	int32 drawn_count)
 {
 	uint32 key = (uint32)render_model_index & 0xFFFF;
 	auto found = g_stencil_shadow_cross_cache.find(key);
@@ -3177,13 +3698,130 @@ static s_stencil_shadow_model_cross* stencil_shadow_model_cross_get(
 	s_stencil_shadow_model_cross& cross = g_stencil_shadow_cross_cache[key];
 	cross.built = true;
 
-	// STITCHING DISABLED (2026-08-16): with sentinel orientation fixed, every section
-	// closes itself independently — correct counting without bridges. The one-sided
-	// bridge left the PARTNER section's volume open whenever dominant-node skinning
-	// opened a seam crack (unpaired wedge sheets fanning from bipeds — user-verified in
-	// the green visualizer). td could stitch because its full-weight skinning keeps seam
-	// verts coincident; ours cannot until full-weight skinning lands. Sentinels stay
-	// untagged; the empty list below makes the cross pass a no-op.
+	// it. 542 — RUNTIME SEAM PAIRING RESTORED. This is the substitute for a TOOL-time step, not a port
+	// of a td runtime one: tool.exe pairs edges at tag build time (`sub_42D1C0`, the "building edges"
+	// pass, recovered it. 278) and writes four shared-edge tag blocks; td's runtime only LOOKS THEM UP.
+	// Vista strips those blocks — `render_model_section_data` is 112 B against td's 524, and the
+	// difference is the ISQ/DSQ payload (it. 518) — so there is nothing to read and the pairing has to be
+	// derived here, exactly as `CLAUDE.md` says all ISQ/DSQ post-processing must be.
+	//
+	// WHY IT WAS DISABLED, AND WHY THAT NO LONGER HOLDS. The removal note gave two reasons:
+	//   1. "the one-sided bridge left the PARTNER section's volume open" — attributed to unpaired wedge
+	//      sheets fanning from bipeds. it. 504 showed that signature was the MISSING INVERSE BIND
+	//      (it. 317), which is fixed and measured absent while stitching stayed off.
+	//   2. "ours cannot until full-weight skinning lands" — full-weight skinning landed (it. 468); the
+	//      weighted blend runs on every declaration-4 section, which is what keeps seam vertices
+	//      coincident and is precisely the property td relies on.
+	// Both are void (it. 504), and the fragmentation the user is seeing is what unbridged seams look
+	// like: mode 1 shows a coherent volume while mode 2 shows broken counting (it. 541).
+	//
+	// METHOD. A boundary quad is one the per-section walk could not pair (`tri_right == 0xFFFF`). Its
+	// endpoints are in BIND-POSE MODEL space (it. 333-335), which is the space seams coincide in — that
+	// is why this can be built once per model and cached, and why it works for skinned sections whose
+	// world positions differ every frame. Hash each boundary edge by its two endpoint positions
+	// (`stencil_shadow_seam_key`, an unordered pair) and pair entries that come from DIFFERENT sections.
+	//
+	// RETAG. Each matched edge is retagged `k_stencil_shadow_matched_boundary` (0xFFFE) on BOTH sides so
+	// the per-section draw skips it and the bridge closes it instead. Without this the seam gets a bridge
+	// quad AND two sentinel closures — double-counted stencil along every seam, which would look like the
+	// artefact the disable was blamed for and invite the wrong diagnosis a second time (the hazard is
+	// spelled out at the sentinel site).
+	struct s_seam_ref
+	{
+		int32 section;
+		uint32 quad_index;
+		uint16 vert_a;
+		uint16 vert_b;
+		uint16 triangle;
+	};
+	std::unordered_map<uint64, std::vector<s_seam_ref>> seams;
+
+	// it. 543: iterate DENSE slots; `section_of_dense` recovers the stable section index that goes into
+	// the emitted quads, so the per-model cache stays valid when a different LOD changes which sections
+	// draw (the hazard it. 505 flagged in the "producer emits dense slots" alternative).
+	for (int32 slot = 0; slot < drawn_count; slot++)
+	{
+		s_stencil_shadow_section* shadow = drawn_sections[slot];
+		if (!shadow || !shadow->valid || !shadow->base_positions)
+		{
+			continue;
+		}
+		for (uint32 quad_index = 0; quad_index < shadow->quad_count; quad_index++)
+		{
+			const s_stencil_shadow_quad* quad = &shadow->quads[quad_index];
+			if (quad->tri_right != k_stencil_shadow_boundary_triangle)
+			{
+				continue;	// already paired inside its own section
+			}
+			if (quad->vert_a >= shadow->welded_vertex_count
+				|| quad->vert_b >= shadow->welded_vertex_count)
+			{
+				continue;
+			}
+			const uint64 seam = stencil_shadow_seam_key(
+				&shadow->base_positions[quad->vert_a], &shadow->base_positions[quad->vert_b]);
+			s_seam_ref ref;
+			ref.section = slot;			// dense slot: used for pairing and for the retag
+			ref.quad_index = quad_index;
+			ref.vert_a = quad->vert_a;
+			ref.vert_b = quad->vert_b;
+			ref.triangle = quad->tri_left;
+			seams[seam].push_back(ref);
+		}
+	}
+
+	int32 paired = 0;
+	for (auto& entry : seams)
+	{
+		std::vector<s_seam_ref>& refs = entry.second;
+		for (uint32 i = 0; i < refs.size(); i++)
+		{
+			for (uint32 j = i + 1; j < refs.size(); j++)
+			{
+				if (refs[i].section == refs[j].section)
+				{
+					continue;	// a hole inside one section, not a seam between two
+				}
+				// OWNER is the lower section index, so the pair is emitted exactly ONCE and the
+				// choice is stable across frames.
+				const s_seam_ref& owner = refs[i].section < refs[j].section ? refs[i] : refs[j];
+				const s_seam_ref& partner = refs[i].section < refs[j].section ? refs[j] : refs[i];
+				// it. 543: emit the STABLE section indices, recovered from the dense slots
+				const int16 owner_section = section_of_dense[owner.section];
+				const int16 partner_section = section_of_dense[partner.section];
+				if (owner_section < 0 || owner_section > 255
+					|| partner_section < 0 || partner_section > 255)
+				{
+					continue;	// must fit the quad's uint8 fields
+				}
+
+				s_stencil_shadow_cross_quad bridge;
+				bridge.vert_a = owner.vert_a;
+				bridge.vert_b = owner.vert_b;
+				bridge.owner_triangle = owner.triangle;
+				bridge.owner_section = (uint8)owner_section;
+				bridge.partner_section = (uint8)partner_section;
+				bridge.partner_triangle = partner.triangle;
+				cross.quads.push_back(bridge);
+
+				// retag BOTH sides so neither is sentinel-closed as well as bridged
+				drawn_sections[owner.section]->quads[owner.quad_index].tri_right =
+					k_stencil_shadow_matched_boundary;
+				drawn_sections[partner.section]->quads[partner.quad_index].tri_right =
+					k_stencil_shadow_matched_boundary;
+
+				// each boundary edge participates in at most one bridge
+				refs.erase(refs.begin() + j);
+				refs.erase(refs.begin() + i);
+				i--;
+				paired++;
+				break;
+			}
+		}
+	}
+
+	LOG_INFO_GAME("stencil stitch: model {} paired {} cross-section seams from {} distinct boundary keys (it. 542 — runtime substitute for tool.exe's build-time edge pass; Vista strips td's four shared-edge blocks)",
+		(uint32)render_model_index, paired, (uint32)seams.size());
 	return &cross;
 }
 
@@ -3250,9 +3888,21 @@ static void stencil_shadow_draw_cross_indices(
 
 	stencil_shadow_set_node_constants(model_matrix);
 	real32 light_constant[4] = { light_position->x, light_position->y, light_position->z, 0.f };
-	real32 extrusion_constant[4] = { extrusion_distance, 0.f, 0.f, 0.f };
+	// it. 539: .y is the MINIMUM extrusion the shader will apply under clipping. Non-zero only when a
+	// clip plane is active — see the shader for why zero is unsafe there (coincident caps cancel and the
+	// shadow disappears). Zero in every other mode, which never consults it.
+	real32 extrusion_constant[4] = {
+		extrusion_distance,
+		(g_stencil_shadow_clip_plane[0] != 0.f || g_stencil_shadow_clip_plane[1] != 0.f
+			|| g_stencil_shadow_clip_plane[2] != 0.f) ? k_stencil_shadow_clip_min_extrude : 0.f,
+		0.f, 0.f };
 	device->SetVertexShaderConstantF(k_stencil_shadow_light_constant, light_constant, 1);
 	device->SetVertexShaderConstantF(k_stencil_shadow_extrusion_distance_constant, extrusion_constant, 1);
+	// it. 534: per-vertex clip plane. Zero xyz disables it in the shader, and every mode except CLIPPED
+	// leaves it zero — so this upload is a no-op for the stock path. Uploaded unconditionally rather than
+	// only when active, because a stale plane left in c253 from a previous frame would silently clip a
+	// mode that is not supposed to be clipped.
+	device->SetVertexShaderConstantF(k_stencil_shadow_clip_plane_constant, g_stencil_shadow_clip_plane, 1);
 
 	uint32 index_count = (uint32)indices.size();
 	if (index_count > k_stencil_shadow_index_buffer_capacity)
@@ -3353,6 +4003,13 @@ void stencil_shadow_cache_clear(void)
 	g_stencil_shadow_warned_bone_no_map = false;
 	g_stencil_shadow_warned_normalized_no_bounds = false;
 	g_stencil_shadow_probed_interpolation = false;
+	g_stencil_shadow_probed_render_only = false;
+	g_stencil_shadow_probed_render_only_used = false;
+	g_stencil_shadow_logged_dynamic_extrusion = 0;
+	g_stencil_shadow_warned_lod_fallback = false;
+	g_stencil_shadow_lod_fallbacks = 0;
+	g_stencil_shadow_render_only_flags = NULL;
+	g_stencil_shadow_render_only_node_count = 0;
 	g_stencil_shadow_interp_samples = 0;
 	g_stencil_shadow_interp_ran = 0;
 	g_stencil_shadow_interp_max_pos = 0.f;
@@ -3396,7 +4053,24 @@ void stencil_shadow_debug_update(void)
 	bool extrude_key_down = (GetAsyncKeyState(VK_F6) & 0x8000) != 0;
 	if (extrude_key_down && !extrude_key_was_down)
 	{
+		// it. 527: DYNAMIC is the FIRST step, so one press from the default lands on the mode under
+		// test rather than on a 500 wu diagnostic extreme.
+		//   2.0 (stock) -> DYNAMIC -> 500 -> 5 -> 0.3 -> 2.0
+		// it. 573: REACH restored to the cycle, first after STOCK so the comparison that matters
+		// (2.0 vs reach) stays a single keypress.
 		if (g_stencil_shadow_extrusion_override == 0.f)
+		{
+			g_stencil_shadow_extrusion_override = k_stencil_shadow_reach_extrusion;
+		}
+		else if (g_stencil_shadow_extrusion_override == k_stencil_shadow_reach_extrusion)
+		{
+			g_stencil_shadow_extrusion_override = k_stencil_shadow_clipped_extrusion;
+		}
+		else if (g_stencil_shadow_extrusion_override == k_stencil_shadow_clipped_extrusion)
+		{
+			g_stencil_shadow_extrusion_override = k_stencil_shadow_dynamic_extrusion;
+		}
+		else if (g_stencil_shadow_extrusion_override == k_stencil_shadow_dynamic_extrusion)
 		{
 			g_stencil_shadow_extrusion_override = 500.f;
 		}
@@ -3404,13 +4078,87 @@ void stencil_shadow_debug_update(void)
 		{
 			g_stencil_shadow_extrusion_override = 5.f;
 		}
+		else if (g_stencil_shadow_extrusion_override == 5.f)
+		{
+			// it. 521: a SHORT step, added to test whether the seam leaks (it. 517-520) and the
+			// original through-geometry over-reach COMPOUND, as the user proposed.
+			//
+			// The mechanism: an unbridged seam is an OPEN volume, and an opening only produces a wrong
+			// count where it falls between the eye and a receiver **inside the volume**. So the seam
+			// defect's visible area scales with how much receiver surface the volume covers — which is
+			// what extrusion length sets. Symptom 3 compounds it by putting volume on BOTH sides of
+			// thin geometry, roughly doubling the exposed surface.
+			//
+			// Every previous F6 step went UP (2 -> 500 -> 5), which cannot test this. 0.3 wu is well
+			// under a caster's own size (a biped is 0.705 wu tall, it. 415), so the volume barely
+			// leaves the caster and the covered receiver area collapses.
+			//
+			//   leaks shrink with the volume -> COMPOUNDING CONFIRMED: the seams are the defect, the
+			//                                   extrusion is the exposure. Restoring stitching fixes it,
+			//                                   and no extrusion change is warranted (it is td's own 2.0)
+			//   leaks persist unchanged       -> extrusion is NOT a factor; the seam openings leak
+			//                                   wherever they are, and the compounding idea is wrong
+			g_stencil_shadow_extrusion_override = 0.3f;
+		}
 		else
 		{
 			g_stencil_shadow_extrusion_override = 0.f;
 		}
-		LOG_INFO_GAME("stencil shadows: extrusion={}",
-			g_stencil_shadow_extrusion_override == 0.f
-				? k_stencil_shadow_extrusion_distance : g_stencil_shadow_extrusion_override);
+		// it. 527: the sentinel is negative, so printing it raw would read as "extrusion=-1" and look
+		// like a bug. Name the mode instead; the per-section values it resolves to are visible on the
+		// `stencil size:` line (`extrusion=` computed, `radius=` the caster it belongs to).
+		// it. 528: ON SCREEN, not just in the log. The mode was only discoverable by reading the log
+		// file mid-game, which is useless while looking at the artefact — the user could not tell which
+		// F6 step was the dynamic one. `addDebugText` is the same facility the rest of the mod uses for
+		// in-game state.
+		// it. 581: every mode change re-arms the per-caster diagnostics, so entering a mode always
+		// yields fresh telemetry from the CURRENT scene rather than whatever the counters caught in
+		// the first few milliseconds of the process.
+		g_stencil_shadow_logged_reach = 0;
+		g_stencil_shadow_logged_bind = 0;
+		// it. 581: print the RAW override. Two iterations were lost to "the screen says REACH-CLIP but
+		// no reach telemetry appears" — the on-screen text is scrollback and persists after later
+		// presses move the mode on, so it is NOT evidence of the current mode. This value is.
+		LOG_INFO_GAME("stencil mode: override={:.1f} (sentinels: 0=STOCK -1=DYNAMIC -2=CLIPPED -3=REACH; anything else is a literal wu distance)",
+			g_stencil_shadow_extrusion_override);
+
+		if (g_stencil_shadow_extrusion_override == k_stencil_shadow_reach_extrusion)
+		{
+			// Say on screen whether the mode is actually RUNNING. Without SM3 it silently falls back
+			// to stock 2.0, and a user comparing modes would otherwise see "REACH" while looking at
+			// the stock artefact and conclude the idea failed.
+			const bool usable =
+				g_stencil_shadow_reach_clip_shader && g_stencil_shadow_vertex_shader_sm3;
+			addDebugText("stencil extrusion: REACH-CLIP %s (infinite volume, %.1f wu reach)",
+				usable ? "active" : "UNAVAILABLE (no SM3) - running stock 2.0",
+				k_stencil_shadow_reach_distance);
+			LOG_INFO_GAME("stencil shadows: extrusion=REACH-CLIP usable={} extrude={}wu reach={}wu (it. 557 — infinite volume, per-pixel depth bound)",
+				usable ? 1 : 0, k_stencil_shadow_reach_extrusion_distance,
+				k_stencil_shadow_reach_distance);
+		}
+		else if (g_stencil_shadow_extrusion_override == k_stencil_shadow_clipped_extrusion)
+		{
+			// it. 540: %.1f rendered the 0.02 margin as "+0.0" on screen and read as a bug. %.3f.
+			addDebugText("stencil extrusion: CLIPPED per-section (+%.3f margin, min %.2f)",
+				k_stencil_shadow_clip_margin, k_stencil_shadow_clip_min_extrude);
+			LOG_INFO_GAME("stencil shadows: extrusion=CLIPPED to world geometry (probe {}wu, margin {})",
+				k_stencil_shadow_clip_probe_length, k_stencil_shadow_clip_margin);
+		}
+		else if (g_stencil_shadow_extrusion_override == k_stencil_shadow_dynamic_extrusion)
+		{
+			addDebugText("stencil extrusion: DYNAMIC per-section (extent x %.1f, min %.1f)",
+				k_stencil_shadow_dynamic_extrusion_scale, k_stencil_shadow_dynamic_extrusion_min);
+			LOG_INFO_GAME("stencil shadows: extrusion=DYNAMIC per-section (section extent x {}, min {})",
+				k_stencil_shadow_dynamic_extrusion_scale, k_stencil_shadow_dynamic_extrusion_min);
+		}
+		else
+		{
+			const real32 shown = g_stencil_shadow_extrusion_override == 0.f
+				? k_stencil_shadow_extrusion_distance : g_stencil_shadow_extrusion_override;
+			addDebugText("stencil extrusion: %.3f wu%s", shown,
+				g_stencil_shadow_extrusion_override == 0.f ? " (STOCK, td's value)" : " (fixed)");
+			LOG_INFO_GAME("stencil shadows: extrusion={}", shown);
+		}
 	}
 	extrude_key_was_down = extrude_key_down;
 }
@@ -3929,6 +4677,164 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 		}
 		datum render_model_index = hlmt_render_model_reference->index;
 
+		// it. 506 PROBE — DIAGNOSTIC ONLY, changes nothing. Bounds it. 487's divergence.
+		//
+		// The engine skins from `object_compute_render_time_node_matrices` (0x53599B), which we skip.
+		// That function does three things: recompute animated orientations, **compose render-only
+		// nodes onto their parents** (`render_only_node_flags`), and apply **eye tracking** for units.
+		// it. 502 established it is LIVE on our casters — it early-outs on
+		// `node_orientation_block.offset == -1`, and `objects.cpp:642-644` allocates that block only
+		// when the object can interpolate, which the it. 498 run proved true (`ran` 200-240 of 240).
+		// What has never been measured is how much it MOVES anything, and that decides whether the
+		// item is worth the risky plumbing (0x53599B dereferences `section_indices` and mutates its
+		// input array in place, so a wrong argument is a crash, not a wrong shadow).
+		//
+		// Reading it:
+		//   node_orient=-1/0        -> the function early-outs for this caster; NO divergence at all,
+		//                              and it. 502's one unverified link (does a zero-size allocation
+		//                              yield offset -1?) is answered in the affirmative
+		//   render_only_nodes=0     -> no cosmetic nodes to compose; the divergence reduces to eye
+		//                              tracking alone, i.e. head/eye nodes on units — small and
+		//                              bounded, and it. 487's "probably secondary" is CONFIRMED
+		//   render_only_nodes>0     -> that many nodes are posed by a composition we skip, so their
+		//                              geometry sits wrongly in the shadow. Worth the plumbing
+		//
+		// `render_only_node_flags` is at s_model_definition+0xA4 — verified against the Vista IDB's
+		// own type (offset 0xA4, int8[32], struct size 252) and pinned by
+		// `ASSERT_STRUCT_SIZE(s_model_definition, 252)`, so this is not a header-trusting read.
+		// One-shot per map; latch reset in stencil_shadow_cache_clear.
+		// it. 510: published for the BUILDER's intersection probe (see stencil_shadow_section_build).
+		// Set every iteration, not just while probing, so the builder always sees the flags belonging
+		// to the caster it is building for. Cleared per map in stencil_shadow_cache_clear.
+		{
+			const s_model_definition* current_model =
+				(const s_model_definition*)tag_get_fast(object_definition->model.index);
+			g_stencil_shadow_render_only_flags = current_model ? current_model->render_only_node_flags : NULL;
+			g_stencil_shadow_render_only_node_count =
+				object->object.node_orientation_block.size / 32;
+		}
+		if (!g_stencil_shadow_probed_render_only)
+		{
+			g_stencil_shadow_probed_render_only = true;
+			const s_model_definition* model_definition =
+				(const s_model_definition*)tag_get_fast(object_definition->model.index);
+			// it. 507: BOUND THE POPCOUNT BY node_count. The first version counted all 256 bits of
+			// `render_only_node_flags[32]` and reported **45** for a model with **33** nodes — more
+			// render-only nodes than nodes. Bits at or above `node_count` are not meaningful (the tool
+			// only defines the low `node_count` of them), so counting them inflates the answer with
+			// whatever the tag happens to carry there.
+			//
+			// `node_orientation_block.size` is the node count times 32 — that is literally how the
+			// engine sizes it (`objects.cpp:642`: `32 * node_count`), and the live read confirms it:
+			// size 1056 = 32 x 33, against the 33 nodes it. 378 measured on this biped. So the bound
+			// is derived from the same field rather than assumed.
+			//
+			// Both numbers are reported: `raw` exposes bits set beyond the node count (which would
+			// mean the flags field carries junk, worth knowing on its own), `nodes` is the answer.
+			const int32 probe_node_count = object->object.node_orientation_block.size / 32;
+			int32 render_only_nodes = 0;
+			int32 render_only_raw = 0;
+			if (model_definition)
+			{
+				for (int32 bit_index = 0; bit_index < 256; bit_index++)
+				{
+					const uint8 byte = (uint8)model_definition->render_only_node_flags[bit_index >> 3];
+					if (((byte >> (bit_index & 7)) & 1) == 0)
+					{
+						continue;
+					}
+					render_only_raw++;
+					if (bit_index < probe_node_count)
+					{
+						render_only_nodes++;
+					}
+				}
+			}
+			// Object type is deliberately not logged: it. 420 established the caster mask is
+			// `_object_mask_unit`, so every caster reaching here is already a unit and eye tracking
+			// applies by construction. Logging it would add a column that is constant.
+			LOG_INFO_GAME("stencil renderonly probe: node_orient=off {} size {} nodes={} | render_only_nodes={} (raw bits {}) (it. 487/502/506/507 — offset -1 or size 0 means 0x53599B early-outs and there is NO divergence; nodes=0 bounds it to eye tracking alone; raw >> nodes just means junk bits past node_count)",
+				(int32)object->object.node_orientation_block.offset,
+				(int32)object->object.node_orientation_block.size,
+				probe_node_count,
+				render_only_nodes,
+				render_only_raw);
+
+			// it. 512 — HOW FAR does the composition we skip actually MOVE those nodes?
+			//
+			// it. 511 measured SCOPE (12 of the 19 nodes a biped's shadow binds are render-only) but
+			// not MAGNITUDE, and scope alone does not justify the change: `stencil inflation:` reads
+			// 0.72-0.99 (it. 504) and the shadows look right, so the correction must be small. Shipping
+			// a reimplementation of engine node composition onto a working state, for an unmeasured
+			// gain, is the wrong trade — so measure first, exactly as it. 471 preceded it. 500.
+			//
+			// Reproduces 0x53599B's render-only pass READ-ONLY, into a scratch copy:
+			//     matrix4x3_from_orientation(m, &orientations[i]);
+			//     matrix4x3_multiply(&composed[parent_node(i)], m, &composed[i]);
+			// A single forward pass is correct because Halo node arrays are ordered parent-before-child,
+			// so `composed[parent]` is already final when child `i` is reached.
+			//
+			// Deliberately NOT calling 0x53599B itself: it mutates its input array in place and
+			// dereferences `section_indices`, where a wrong argument is a crash rather than a wrong
+			// number (it. 487/502). Reimplementing just the one loop, read-only, has neither hazard.
+			// Eye tracking is not reproduced — it is a separate effect on head/eye nodes only.
+			//
+			//   max_pos ~1e-4 wu -> the correction is negligible; it. 487 closes as MEASURED-IMMATERIAL
+			//   max_pos >~1e-2 wu -> a visible limb-scale offset (the it. 431 yardstick on a 0.705 wu
+			//                        caster); build the plumbing
+			const render_model_definition* probe_render_model =
+				(const render_model_definition*)tag_get_fast(render_model_index);
+			int32 orientation_count = 0;
+			const real_orientation* orientations = (const real_orientation*)object_header_block_get_with_count(
+				object_iterator.get_index(), &object->object.node_orientation_block,
+				sizeof(real_orientation), &orientation_count);
+			int32 raw_count = 0;
+			const real_matrix4x3* raw_nodes =
+				(const real_matrix4x3*)object_get_node_matrices(object_iterator.get_index(), &raw_count);
+			if (model_definition && probe_render_model && orientations && raw_nodes
+				&& orientation_count > 0 && raw_count >= orientation_count
+				&& orientation_count <= (int32)probe_render_model->nodes.count)
+			{
+				static real_matrix4x3 composed[256];
+				const int32 count = orientation_count < 256 ? orientation_count : 256;
+				for (int32 i = 0; i < count; i++) { composed[i] = raw_nodes[i]; }
+				real32 max_pos = 0.f, max_deg = 0.f;
+				int32 compared = 0;
+				// it. 515 SELF-CHECK on this probe's one unverified assumption. The single forward pass
+				// is only valid if node arrays are ordered PARENT-BEFORE-CHILD, so that `composed[parent]`
+				// is already final when child `i` is reached. That is the usual Halo convention but it was
+				// asserted, not measured — and an out-of-order parent would compose against a RAW parent
+				// instead of a composed one, silently under-reporting the delta. Counting violations makes
+				// the number self-validating: `order_violations=0` means the pass was legitimate.
+				int32 order_violations = 0;
+				for (int32 i = 1; i < count; i++)
+				{
+					if (((model_definition->render_only_node_flags[i >> 3] >> (i & 7)) & 1) == 0) { continue; }
+					const int16 parent = probe_render_model->nodes[i]->parent_node;
+					if (parent < 0 || parent >= count) { continue; }
+					if (parent >= i) { order_violations++; }
+					real_matrix4x3 local;
+					matrix4x3_from_orientation(&local, &orientations[i]);
+					matrix4x3_multiply(&composed[parent], &local, &composed[i]);
+					const real32 dx = composed[i].position.x - raw_nodes[i].position.x;
+					const real32 dy = composed[i].position.y - raw_nodes[i].position.y;
+					const real32 dz = composed[i].position.z - raw_nodes[i].position.z;
+					const real32 pos_delta = sqrtf(dx * dx + dy * dy + dz * dz);
+					real32 cos_theta = composed[i].vectors.forward.i * raw_nodes[i].vectors.forward.i
+						+ composed[i].vectors.forward.j * raw_nodes[i].vectors.forward.j
+						+ composed[i].vectors.forward.k * raw_nodes[i].vectors.forward.k;
+					if (cos_theta > 1.f) { cos_theta = 1.f; }
+					if (cos_theta < -1.f) { cos_theta = -1.f; }
+					const real32 deg = (real32)(acos((real64)cos_theta) * (180.0 / 3.14159265358979323846));
+					if (pos_delta > max_pos) { max_pos = pos_delta; }
+					if (deg > max_deg) { max_deg = deg; }
+					compared++;
+				}
+				LOG_INFO_GAME("stencil renderonly delta: compared={} max_pos={:.5f}wu max_fwd={:.3f}deg order_violations={} (it. 512/515 — magnitude of the composition we skip; ~1e-4 closes it. 487 as immaterial, >~1e-2 justifies the plumbing. order_violations MUST be 0 or the single forward pass composed against a raw parent and the deltas are UNDER-reported)",
+					compared, max_pos, max_deg, order_violations);
+			}
+		}
+
 		// P2-1: td's distance fade. Past the model's own shadow reach the object casts
 		// NOTHING (td: shadow_alpha 0 -> rasterizer_stencilshadow_shadows_model_section_draw
 		// draws no primitives at all); inside the last 10wu it stipples out. Replaces the
@@ -3989,8 +4895,395 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 		// rasterizer_light_submit uploads no separate distance constant, before the microcode
 		// showed the distance is the .w of the light block it uploads.
 		// F6 cycles alternative distances for diagnostics only.
-		real32 extrusion_distance = g_stencil_shadow_extrusion_override != 0.f
-			? g_stencil_shadow_extrusion_override : k_stencil_shadow_extrusion_distance;
+		// it. 524 — DYNAMIC PER-CASTER EXTRUSION, an experiment (F6 mode, sentinel -1).
+		//
+		// it. 523 established the specks are the volume's FAR END intersecting receiver geometry: they
+		// TRANSLATE with the extrusion distance rather than vanishing (the user's own correction). A
+		// per-caster length is the natural thing to try, so it is wired here as a mode rather than
+		// argued about.
+		//
+		// **Its known limitation, stated so the result is read correctly** (assessed in
+		// td-symptom-3-shadows-through-geometry.md): extrusion is ONE scalar per caster, but receiver
+		// depth varies ACROSS a caster's footprint — a vehicle over a stepped ramp has receivers at
+		// several distances. No single value can miss them all, so this is expected to **relocate** the
+		// intersection band, not remove it. The experiment is worth running because "relocated to
+		// somewhere it rarely lands" may still look better, and that is a judgement only the screen can
+		// make.
+		//
+		// The scale: the caster's own bounding radius. It is the one size signal available without a BSP
+		// raycast (which the notes forbid, and which would cost a trace per caster per frame). 4.5x
+		// reproduces the stock 2.0 wu at a biped's 0.44 radius, so the biped case is unchanged and larger
+		// casters get proportionally longer volumes — the physically sensible direction, since a bigger
+		// occluder should throw further before its volume ends.
+		//
+		// NOT a candidate for shipping as-is: it is a divergence from td's fixed 2.0 either way, and
+		// per it. 523 there is no faithful fix. Judge it on the screen, then decide.
+		// it. 526: the dynamic case is resolved PER SECTION, further down, where the built section is
+		// in hand. This is only the caster-wide fallback used by every non-dynamic mode; in dynamic
+		// mode it also stands in for any section whose extent is unusable.
+		const bool dynamic_extrusion =
+			g_stencil_shadow_extrusion_override == k_stencil_shadow_dynamic_extrusion;
+		const bool clipped_extrusion =
+			g_stencil_shadow_extrusion_override == k_stencil_shadow_clipped_extrusion;
+		// it. 557 — REACH CLIP. Needs the SM3 pair; without it the mode degrades to the stock
+		// distance rather than drawing an unbounded volume, which would look like a catastrophic
+		// leak and get blamed on the idea rather than on the missing shader.
+		const bool reach_extrusion =
+			k_stencil_shadow_reach_enabled
+			&& g_stencil_shadow_extrusion_override == k_stencil_shadow_reach_extrusion
+			&& g_stencil_shadow_reach_clip_shader && g_stencil_shadow_vertex_shader_sm3;
+		g_stencil_shadow_reach_active = false;
+		if (reach_extrusion)
+		{
+			const s_frame* frame = global_window_parameters_get();
+			const render_camera* cam = frame ? &frame->camera : NULL;
+			// z_far normalises the encode; a zero/absurd one means the camera is not set up for
+			// this view, so leave the mode inactive rather than divide by it.
+			const real32 vw = cam ? (real32)rectangle2d_width(&cam->viewport_bounds) : 0.f;
+			const real32 vh = cam ? (real32)rectangle2d_height(&cam->viewport_bounds) : 0.f;
+			if (cam && cam->z_far > 1.f && vw > 0.f && vh > 0.f
+				&& cam->vertical_field_of_view > 0.01f)
+			{
+				// it. 566 — FULL WORLD RECONSTRUCTION. it. 557 and it. 563 both compared VIEW DEPTHS
+				// to keep the unverified encoding semantic non-load-bearing; it. 565 measured why
+				// that cannot work at any constant (a downward light with a horizontal view puts the
+				// shadow's end at LOWER view depth than the caster, so the threshold inverts).
+				// "Within R of the caster" is a 3D distance. Reconstruct and measure it.
+				const real_point3d* p = &object->object.center;
+
+				// right = cross(forward, up). Halo's convention is forward=+x, LEFT=+y, up=+z, so
+				// cross((1,0,0),(0,0,1)) = (0,-1,0) — i.e. +right, which is what the shader's
+				// `uv.x * 2 - 1` (left-to-right) expects.
+				const real_vector3d right =
+				{
+					cam->forward.j * cam->up.k - cam->forward.k * cam->up.j,
+					cam->forward.k * cam->up.i - cam->forward.i * cam->up.k,
+					cam->forward.i * cam->up.j - cam->forward.j * cam->up.i
+				};
+				const real32 tan_half_v = tanf(cam->vertical_field_of_view * 0.5f);
+				const real32 tan_half_h = tan_half_v * (vw / vh);
+
+				// it. 568: the depth target holds NDC z, not linear depth (it. 566 produced no shadows
+				// at all, which is the signature of reconstructing everything at ~z_far). Hand the
+				// shader the projection's A/B so it can invert `z_ndc = A - B/d`. These are the same
+				// quantities it. 550 measured live off the engine's wvp constants (1.0000587 /
+				// 0.0601054) — cross-check the log against those; a large divergence means z_near or
+				// z_far here is not the projection the depth target was written with.
+				g_stencil_shadow_reach_c[0][0] = 1.f / vw;
+				g_stencil_shadow_reach_c[0][1] = 1.f / vh;
+				g_stencil_shadow_reach_c[0][2] = cam->z_far;
+				g_stencil_shadow_reach_c[0][3] = 0.f;
+
+				g_stencil_shadow_reach_c[1][0] = cam->point.x;
+				g_stencil_shadow_reach_c[1][1] = cam->point.y;
+				g_stencil_shadow_reach_c[1][2] = cam->point.z;
+
+				// it. 578 — REACH IS PER-CASTER, NOT A CONSTANT.
+				//
+				// User's observation, and it is a real limitation rather than a tuning problem: a fixed
+				// reach encodes "the caster sits near its receiver". An airborne Banshee, a thrown
+				// grenade, a player mid-jump all have their LEGITIMATE ground shadow cut off, because
+				// their receiver is further away than the constant. That is the same truncation failure
+				// the CLIPPED experiments were rejected for, arriving by another route.
+				//
+				// So find the caster's own receiver: one ray from its centre along the light. This is the
+				// SAME probe CLIPPED uses (it. 530), but the use is different and that difference is the
+				// whole point — CLIPPED moved the FAR CAP onto the hit, putting a cap in the scene and
+				// reproducing the artefact it was meant to remove (it. 522/525). Here the volume stays
+				// INFINITE and the hit only sets a per-pixel bound. No cap, no coplanarity.
+				//
+				// `+ radius` because the ray leaves the object's CENTRE while its sections extend below
+				// it; without it a low section's shadow would be cut before reaching the floor.
+				real32 caster_reach = k_stencil_shadow_reach_distance;
+				{
+					real_vector3d reach_probe;
+					reach_probe.i = -toward_light_world.x * k_stencil_shadow_clip_probe_length;
+					reach_probe.j = -toward_light_world.y * k_stencil_shadow_clip_probe_length;
+					reach_probe.k = -toward_light_world.z * k_stencil_shadow_clip_probe_length;
+
+					collision_result reach_hit;
+					reach_hit.global_material_index = NONE;
+					// World only. Including objects would let one caster truncate another's shadow.
+					const uint32 reach_flags =
+						FLAG(_collision_test_structure_bit) | FLAG(_collision_test_instanced_geometry_bit);
+					if (collision_test_vector(reach_flags, &object->object.center, &reach_probe,
+						object_iterator.get_index(), NONE, &reach_hit))
+					{
+						// it. 586 — NO `+ radius`. That term was carried over from CLIPPED (it. 530) where
+						// it was correct: there it padded the EXTRUSION LENGTH so sections hanging below
+						// the object's centre still reached the floor.
+						//
+						// Here it is wrong and it is exactly the leak the user reported. `along` measures
+						// the RECEIVER's distance from the caster CENTRE along the light, and the floor
+						// beneath sits at `hit_distance` no matter which section casts onto it — sections
+						// below centre project onto that same floor at the same `along`. So the radius
+						// bought nothing and simply licensed the shadow to pass through anything thinner
+						// than the caster's own radius (1.077 wu on a Warthog — through most floors).
+						// it. 590 — MEASURE the receiver's slope instead of padding for it.
+						//
+						// it. 587 (`hit + margin`) truncated the caster's own shadow; it. 589 padded by
+						// `radius * |light_xy|` and the leak came back. Both are consequences of one
+						// fact: `along` VARIES across a receiver that is not perpendicular to the light,
+						// so no per-caster CONSTANT can bound it tightly and completely at once.
+						//
+						// So measure the variation. A second ray, offset along the shadow's horizontal
+						// direction, gives `along` at a second point; the slope between the two hits is
+						// d(along)/d(lateral) for that surface. The shader then evaluates a LINE rather
+						// than a constant, which is exact for any planar receiver — floor, ramp or wall.
+						caster_reach = (reach_hit.t * k_stencil_shadow_clip_probe_length)
+							+ k_stencil_shadow_reach_margin;
+
+						// it. 593 — FALLBACK IS THE ANALYTIC SLOPE, NOT ZERO.
+						//
+						// it. 592 MEASURED that the second ray misses ~78% of the time (47 of 60
+						// samples), and slope 0 reverts the bound to it. 587's constant, which truncates
+						// the shadow — the airborne fragmentation.
+						//
+						// The same run showed that whenever the ray DOES hit, the measured slope equals
+						// `|light_xy|` to three decimals in EVERY sample (13/13). That is the it. 590
+						// derivation confirmed against live data, so the analytic value is not a guess —
+						// it is the exact answer for a flat receiver, which is the common case.
+						//
+						// So: default to the analytic slope, and let a successful second ray OVERRIDE it
+						// where the receiver is genuinely not flat (ramps). Strictly better than 0 in
+						// every case — a missed ray now behaves like a flat floor instead of like a
+						// vertical wall.
+						const real32 analytic_slope = sqrtf(
+							toward_light_world.x * toward_light_world.x
+							+ toward_light_world.y * toward_light_world.y);
+						g_stencil_shadow_reach_c[7][3] = analytic_slope;
+
+						// Horizontal direction the shadow travels. Degenerate under a near-vertical
+						// light, and correctly so: there is no lateral spread to correct for.
+						const real32 light_xy_len = sqrtf(
+							toward_light_world.x * toward_light_world.x
+							+ toward_light_world.y * toward_light_world.y);
+						if (light_xy_len > 0.05f)
+						{
+							const real_vector3d shadow_dir =
+							{
+								-toward_light_world.x / light_xy_len,
+								-toward_light_world.y / light_xy_len,
+								0.f
+							};
+							g_stencil_shadow_reach_c[7][0] = shadow_dir.i;
+							g_stencil_shadow_reach_c[7][1] = shadow_dir.j;
+							g_stencil_shadow_reach_c[7][2] = 0.f;
+
+							// Second probe, offset one caster-radius along the shadow. Same length and
+							// direction as the first so the two hits are directly comparable.
+							const real32 offset = (object->object.radius > 0.1f)
+								? object->object.radius : 0.5f;
+							const real_point3d probe2_origin =
+							{
+								p->x + shadow_dir.i * offset,
+								p->y + shadow_dir.j * offset,
+								p->z
+							};
+							collision_result hit2;
+							hit2.global_material_index = NONE;
+							if (collision_test_vector(reach_flags, &probe2_origin, &reach_probe,
+								object_iterator.get_index(), NONE, &hit2))
+							{
+								// `along` of the second hit, measured from the SAME caster origin the
+								// shader uses — not from the offset probe origin, or the slope would be
+								// relative to the wrong reference.
+								const real32 along2 =
+									(hit2.point.x - p->x) * -toward_light_world.x
+									+ (hit2.point.y - p->y) * -toward_light_world.y
+									+ (hit2.point.z - p->z) * -toward_light_world.z;
+								const real32 along1 =
+									reach_hit.t * k_stencil_shadow_clip_probe_length;
+								// Clamped: a second hit on a DIFFERENT surface (past an edge, or a wall
+								// beside the caster) produces a wild slope that would either erase the
+								// shadow or unbound it. Beyond this range the surface is not usefully
+								// planar and flat (slope 0) is the safer reading.
+								// it. 598 — NEVER LET THE MEASURED SLOPE FALL BELOW THE ANALYTIC ONE.
+								//
+								// MEASURED at the user's reproducing spot: `SLOPE=-0.452` against
+								// `expected_flat=0.411` — negative where flat is positive. Since
+								// `bound = base + slope*lateral`, a negative slope SHRINKS the bound as
+								// the shadow extends, cutting off its far end. That is the missing
+								// shadow, and back-solving confirms the fit is bogus: along1 ~ 0.39 and
+								// along2 ~ 0.19, so the second ray hit something at HALF the distance —
+								// different geometry (a step or lip), not the receiver being fitted.
+								// A two-point fit across two surfaces means nothing.
+								//
+								// `max` is the principled guard, not a clamp for its own sake: the
+								// analytic slope is EXACT for a flat receiver (13/13, it. 592), and any
+								// measured slope below it can only shorten the shadow. Taking the max
+								// means a bad fit can never clip MORE than the flat assumption would, so
+								// the failure mode becomes a little extra shadow rather than missing
+								// shadow — matching the fail-open policy chosen in it. 583.
+								//
+								// A genuinely rising receiver does have a smaller true slope, and there
+								// we keep marginally more shadow than ideal. That is the intended trade.
+								const real32 slope = (along2 - along1) / offset;
+								const real32 usable = (slope > -2.f && slope < 4.f)
+									? slope : analytic_slope;
+								g_stencil_shadow_reach_c[7][3] =
+									(usable > analytic_slope) ? usable : analytic_slope;
+							}
+						}
+					}
+					else
+					{
+						// Nothing within the probe: the caster is over a void or a very distant floor.
+						// FAIL OPEN — leave the reach effectively unbounded rather than truncating a
+						// shadow we simply could not measure. A leak is recoverable; a missing shadow
+						// over open ground reads as the feature being broken.
+						caster_reach = k_stencil_shadow_clip_probe_length;
+					}
+				}
+				g_stencil_shadow_reach_c[1][3] = caster_reach;
+
+				g_stencil_shadow_reach_c[2][0] = cam->forward.i;
+				g_stencil_shadow_reach_c[2][1] = cam->forward.j;
+				g_stencil_shadow_reach_c[2][2] = cam->forward.k;
+
+				g_stencil_shadow_reach_c[3][0] = right.i;
+				g_stencil_shadow_reach_c[3][1] = right.j;
+				g_stencil_shadow_reach_c[3][2] = right.k;
+				g_stencil_shadow_reach_c[3][3] = tan_half_h;
+
+				g_stencil_shadow_reach_c[4][0] = cam->up.i;
+				g_stencil_shadow_reach_c[4][1] = cam->up.j;
+				g_stencil_shadow_reach_c[4][2] = cam->up.k;
+				g_stencil_shadow_reach_c[4][3] = tan_half_v;
+
+				g_stencil_shadow_reach_c[5][0] = p->x;
+				g_stencil_shadow_reach_c[5][1] = p->y;
+				g_stencil_shadow_reach_c[5][2] = p->z;
+
+				// Extrusion direction = AWAY from the light, the axis the shadow actually travels.
+				g_stencil_shadow_reach_c[6][0] = -toward_light_world.x;
+				g_stencil_shadow_reach_c[6][1] = -toward_light_world.y;
+				g_stencil_shadow_reach_c[6][2] = -toward_light_world.z;
+
+				g_stencil_shadow_reach_active = true;
+			}
+			// it. 562: cap raised from 8. At ~500 fps the old cap was consumed by ONE caster in a
+			// dozen milliseconds, so every sample showed the same object and its unrepresentative
+			// depth (~0, the player's own) stood in for all casters. Also report world units and
+			// the caster position, because the encoded values alone hid that.
+			// it. 585 — SAMPLE PERIODICALLY, AND ALWAYS ON A NOTABLE REACH.
+			//
+			// A flat cap cannot capture the case under test. At ~500 fps 40 samples are consumed in well
+			// under a second, so the log only ever describes whatever was on screen the instant the mode
+			// was entered — grounded props, every time (it. 584). The airborne caster that motivated
+			// it. 578 would have to be in view at that exact instant to be seen at all.
+			//
+			// So: sample slowly in the background, but log IMMEDIATELY whenever a caster's traced reach
+			// is large, because that is precisely the airborne / distant-receiver case we cannot
+			// otherwise observe. `> 5 wu` is comfortably above the 1.1-2.1 wu grounded band measured in
+			// it. 584 and well below the 50 wu fail-open.
+			const bool reach_notable = g_stencil_shadow_reach_c[1][3] > 5.f;
+			if (g_stencil_shadow_logged_reach < 60
+				&& (reach_notable || (g_stencil_shadow_reach_tick++ % 240) == 0))
+			{
+				g_stencil_shadow_logged_reach++;
+				// it. 592: slope and its expected value are the whole story for the airborne breakage,
+				// and neither was visible. For a FLAT receiver the slope must equal |light_xy| exactly
+				// (derivation in it. 590) — printing both makes a bad fit self-evident: slope 0 means the
+				// second ray missed, and slope far from |light_xy| means it hit a different surface.
+				const real32 expected_slope = sqrtf(
+					toward_light_world.x * toward_light_world.x
+					+ toward_light_world.y * toward_light_world.y);
+				LOG_INFO_GAME("stencil reach: active={} caster=({:.2f},{:.2f},{:.2f}) cam=({:.2f},{:.2f},{:.2f}) SLOPE={:.3f} expected_flat={:.3f} bound_base={:.2f}wu tan_h={:.3f} tan_v={:.3f} z_far={:.1f} extrude_dir=({:.2f},{:.2f},{:.2f}) — it. 592 (slope 0 = 2nd ray missed; slope != expected = different surface)",
+					g_stencil_shadow_reach_active ? 1 : 0,
+					object->object.center.x, object->object.center.y, object->object.center.z,
+					g_stencil_shadow_reach_c[1][0], g_stencil_shadow_reach_c[1][1], g_stencil_shadow_reach_c[1][2],
+					g_stencil_shadow_reach_c[7][3], expected_slope, g_stencil_shadow_reach_c[1][3],
+					g_stencil_shadow_reach_c[3][3], g_stencil_shadow_reach_c[4][3],
+					// it. 597: the SECOND `reach_c[1][3]` that used to sit here was a leftover from the
+					// it. 575 format, giving 17 arguments for 16 placeholders. The surplus consumed the
+					// first extrude_dir slot and shifted the vector by one, so the line printed
+					// (bound_base, extrude.x, extrude.y) while claiming to print extrude_dir. That is
+					// what made it. 596 read a ~10-degree light off a perfectly ordinary ~46-degree one.
+					// fmt does not error on surplus arguments, so nothing flagged it.
+					g_stencil_shadow_reach_c[0][2],
+					g_stencil_shadow_reach_c[6][0], g_stencil_shadow_reach_c[6][1], g_stencil_shadow_reach_c[6][2]);
+			}
+		}
+		// it. 534: cleared for EVERY caster, so a plane from the previous caster (or the previous mode)
+		// can never leak into one that should not be clipped. Zero xyz disables it in the shader.
+		g_stencil_shadow_clip_plane[0] = 0.f;
+		g_stencil_shadow_clip_plane[1] = 0.f;
+		g_stencil_shadow_clip_plane[2] = 0.f;
+		g_stencil_shadow_clip_plane[3] = 0.f;
+		// it. 557: reach mode is checked FIRST and by its OVERRIDE value, not by `reach_extrusion`.
+		// The two differ when SM3 is missing, and the difference matters: the sentinel (-3) would
+		// otherwise fall through into the generic branch and be used as a literal -3 wu extrusion.
+		const bool reach_mode_selected =
+			g_stencil_shadow_extrusion_override == k_stencil_shadow_reach_extrusion;
+		real32 extrusion_distance =
+			reach_mode_selected
+				? (reach_extrusion ? k_stencil_shadow_reach_extrusion_distance
+					: k_stencil_shadow_extrusion_distance)
+			: (!dynamic_extrusion && !clipped_extrusion && g_stencil_shadow_extrusion_override != 0.f)
+				? g_stencil_shadow_extrusion_override : k_stencil_shadow_extrusion_distance;
+
+		// it. 530/541: CLIP against world geometry — ONE ray per caster, from its centre, and the plane
+		// is shared by every section. it. 540 tried a ray per section and it made things worse: sections
+		// clipping to different planes end at different depths and stop meeting along their shared edges,
+		// which with stitching disabled turns partially-sealed seams into guaranteed-mismatched ones.
+		// Keep this per-caster until stitching is restored.
+		if (clipped_extrusion)
+		{
+			// The direction's LENGTH is the search distance; `collision.t` comes back as the fraction
+			// of it that was travelled before the hit.
+			real_vector3d probe;
+			probe.i = -toward_light_world.x * k_stencil_shadow_clip_probe_length;
+			probe.j = -toward_light_world.y * k_stencil_shadow_clip_probe_length;
+			probe.k = -toward_light_world.z * k_stencil_shadow_clip_probe_length;
+
+			collision_result collision;
+			collision.global_material_index = NONE;
+			// Structure + instanced geometry only: the world is what should stop a shadow. Including
+			// objects would let one caster truncate another's shadow, which is a different (and worse)
+			// artefact. The caster itself is passed as an ignore, or the ray would hit its own hull
+			// immediately and clip the volume to nothing.
+			const uint32 clip_flags =
+				FLAG(_collision_test_structure_bit) | FLAG(_collision_test_instanced_geometry_bit);
+			if (collision_test_vector(clip_flags, &object->object.center, &probe,
+				object_iterator.get_index(), NONE, &collision))
+			{
+				extrusion_distance = (collision.t * k_stencil_shadow_clip_probe_length)
+					+ object->object.radius + k_stencil_shadow_clip_margin;
+
+				// it. 534: publish the plane so the SHADER can give every vertex its own distance.
+				//
+				// This is what removes the caster-size term. The scalar above must bury the furthest
+				// vertex, so the nearest overshoots by the caster's extent along the light (~0.71 wu on
+				// a biped) — penetration was `caster_size + margin` and shrinking the margin could not
+				// help (it. 533). Per-vertex makes it the margin ALONE.
+				//
+				// Plane: normal = the extrude direction (away from the light), through the hit point,
+				// pushed `margin` further along. The shader travels `w - dot(n, world_pos)` for each
+				// vertex, which is exactly that vertex's own distance to the plane.
+				const real_vector3d extrude_dir = { -toward_light_world.x, -toward_light_world.y, -toward_light_world.z };
+				g_stencil_shadow_clip_plane[0] = extrude_dir.i;
+				g_stencil_shadow_clip_plane[1] = extrude_dir.j;
+				g_stencil_shadow_clip_plane[2] = extrude_dir.k;
+				g_stencil_shadow_clip_plane[3] =
+					(extrude_dir.i * collision.point.x + extrude_dir.j * collision.point.y
+						+ extrude_dir.k * collision.point.z) + k_stencil_shadow_clip_margin;
+			}
+			// no hit within the probe -> nothing to clip against; stock distance stands.
+			if (g_stencil_shadow_logged_clip < 12)
+			{
+				g_stencil_shadow_logged_clip++;
+				// it. 535: report what is ACTUALLY DRAWN. Since it. 534 the shader takes the per-vertex
+				// path whenever c253 is set, so `extrusion_distance` — the old `hit + radius + margin`
+				// scalar — is **superseded and never reaches the geometry** in this mode. Logging it
+				// alone would repeat the it. 528 fault: a number reported where the interesting one is
+				// computed elsewhere. It is kept only as the comparison figure (what the single-scalar
+				// scheme WOULD have used), explicitly labelled as such.
+				LOG_INFO_GAME("stencil clip: hit_t={:.3f} plane_d={:.3f} margin={:.2f} -> PER-VERTEX (penetration = margin only). scalar_would_have_been={:.3f}wu (radius {:.3f} + margin) — superseded by c253 (it. 534)",
+					collision.t, g_stencil_shadow_clip_plane[3], k_stencil_shadow_clip_margin,
+					extrusion_distance, object->object.radius);
+			}
+		}
 
 		// per-section facing bits retained for the cross-quad (seam stitch) pass
 		enum { k_max_cross_sections = 64 };
@@ -4002,6 +5295,23 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 		// dangle by the time the cross pass reads it AFTER the loop. (The previous code was safe
 		// only because `model_matrix` pointed into engine memory.)
 		static real_matrix4x3 cross_matrix_storage[k_max_cross_sections];
+		// it. 543 — DENSE cross slots. The arrays above used to be indexed by the MODEL's section index,
+		// which overflows: the run reports *"section INDEX 107 is past the 64-slot seam-stitch array
+		// (only 1 sections drew)"*. The array was 98% empty at the moment it overflowed, and every seam
+		// touching such a section was paired by it. 542 and then silently never drawn — which is why
+		// restoring the producer changed nothing on screen.
+		//
+		// Storage is now packed 0..N-1 in draw order, and the READER maps section -> slot through the
+		// table below. Doing the remap at the reader (rather than having the producer emit dense slots)
+		// keeps the per-model cross cache valid: cached quads keep stable SECTION indices, which do not
+		// shift when a different LOD or permutation changes which sections draw. That is the hazard
+		// it. 505 identified in the "producer emits dense slots" alternative.
+		uint32 cross_count = 0;
+		int16 dense_of_section[256];
+		for (int32 i = 0; i < 256; i++) { dense_of_section[i] = -1; }
+		// reverse map, so the producer can emit stable SECTION indices while iterating dense storage
+		int16 section_of_dense[k_max_cross_sections];
+		for (int32 i = 0; i < k_max_cross_sections; i++) { section_of_dense[i] = -1; }
 
 		// td parity (rasterizer_model_draw + per-section mark bytes): only the ACTIVE
 		// LOD's section per region draws. Iterating every section shadowed the UNION of
@@ -4059,12 +5369,30 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 			{
 				// no cached LOD for this window (the accessor yields NONE when the bound window
 				// index is >= 4). td always has one; we don't, so fall back to the LOWEST detail
-				// level that exists -- shadows do not need detail, and this cannot pick up more
-				// geometry than the object renders.
+				// level that exists -- shadows do not need detail.
+				//
+				// it. 538: THE OLD COMMENT ALSO CLAIMED "this cannot pick up more geometry than the
+				// object renders". That was an assertion, never verified, and it is the wrong
+				// reassurance either way: the risk is not *more* geometry but **different** geometry.
+				// If the engine renders LOD 3 and we substitute LOD 0, the shadow is cast from a mesh
+				// the engine never draws — which presents exactly as the user's report, *"floating
+				// pieces that don't actually have geometry that is visible"*.
+				//
+				// It was also SILENT, so there was no way to tell whether it fires at all. Now counted
+				// and reported once per map with the LOD actually substituted.
 				section_index = NONE;
+				int32 fallback_level = NONE;
 				for (int32 level = 0; level < 6 && section_index == NONE; level++)
 				{
 					section_index = lod_sections[level];
+					fallback_level = level;
+				}
+				g_stencil_shadow_lod_fallbacks++;
+				if (!g_stencil_shadow_warned_lod_fallback && section_index != NONE)
+				{
+					g_stencil_shadow_warned_lod_fallback = true;
+					LOG_INFO_GAME("stencil WARNING: no cached LOD for this object (requested {}), substituted level {} — the shadow is cast from a mesh the engine may not be rendering (it. 538; suspect for 'shadows on geometry that isn't visible')",
+						(int32)object_lod, fallback_level);
 				}
 			}
 			if (section_index == NONE || section_index < 0
@@ -4166,14 +5494,22 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 					continue;
 				}
 				stencil_shadow_build_facing_bitvector(shadow, &toward_light_world, false, facing_bitvector);
+				// it. 541: the per-caster plane set before the section loop is used for every section —
+				// see the static path below for why per-section clipping is the wrong granularity while
+				// stitching is disabled.
 				stencil_shadow_section_draw(shadow, facing_bitvector, &toward_light_world, false,
-					NULL, extrusion_distance, shadow_opacity);
-				if (section_index < k_max_cross_sections)
+					NULL, stencil_shadow_section_extrusion(shadow, dynamic_extrusion, extrusion_distance),
+					shadow_opacity);
+				// it. 543: dense slot, not section index — see the declaration above.
+				if (cross_count < k_max_cross_sections && section_index >= 0 && section_index < 256)
 				{
-					memcpy(facing_scratch[section_index], facing_bitvector,
+					dense_of_section[section_index] = (int16)cross_count;
+					section_of_dense[cross_count] = (int16)section_index;
+					memcpy(facing_scratch[cross_count], facing_bitvector,
 						((shadow->plane_count + 31) / 32) * sizeof(uint32));
-					cross_shadows[section_index] = shadow;
-					cross_matrices[section_index] = NULL;
+					cross_shadows[cross_count] = shadow;
+					cross_matrices[cross_count] = NULL;
+					cross_count++;
 				}
 			}
 			else
@@ -4295,15 +5631,38 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 				real_point3d toward_light_model;
 				stencil_shadow_direction_to_model_space(draw_matrix, &toward_light_world, &toward_light_model);
 				stencil_shadow_build_facing_bitvector(shadow, &toward_light_model, false, facing_bitvector);
+				// it. 541 REVERTED it. 540's per-section ray here. Per-section is the WRONG granularity
+				// for clipping, for a structural reason:
+				//
+				//   Adjacent sections that clip to DIFFERENT planes end their volumes at different
+				//   depths, so they no longer meet along their shared edge. With cross-section stitching
+				//   disabled those seams are already only partially sealed by the sentinel (it. 457/467),
+				//   and a per-section plane turns "partially sealed" into "guaranteed mismatched" at
+				//   EVERY seam — the counts stop cancelling and shadow goes missing.
+				//
+				// The evidence was decisive: in draw mode 1 the volume is a clean, coherent slab, while
+				// mode 2 shows fragments. The GEOMETRY is right and the COUNTING is wrong, which is a
+				// closure problem, not an extrusion problem. And the user saw *less* shadow after
+				// it. 540, exactly as more seam mismatch predicts.
+				//
+				// A single per-caster plane keeps every section ending at a common depth, so seams stay
+				// aligned. That is strictly better until stitching is restored (it. 518/519), at which
+				// point per-section becomes viable again — the bridge quads would close the mismatch.
 				stencil_shadow_section_draw(shadow, facing_bitvector, &toward_light_world, false,
-					draw_matrix, extrusion_distance, shadow_opacity);
-				if (section_index < k_max_cross_sections)
+					draw_matrix,
+					stencil_shadow_section_extrusion(shadow, dynamic_extrusion, extrusion_distance),
+					shadow_opacity);
+				// it. 543: dense slot, not section index — see the declaration above.
+				if (cross_count < k_max_cross_sections && section_index >= 0 && section_index < 256)
 				{
-					memcpy(facing_scratch[section_index], facing_bitvector,
+					dense_of_section[section_index] = (int16)cross_count;
+					section_of_dense[cross_count] = (int16)section_index;
+					memcpy(facing_scratch[cross_count], facing_bitvector,
 						((shadow->plane_count + 31) / 32) * sizeof(uint32));
-					cross_shadows[section_index] = shadow;
-					cross_matrix_storage[section_index] = *draw_matrix;
-					cross_matrices[section_index] = &cross_matrix_storage[section_index];
+					cross_shadows[cross_count] = shadow;
+					cross_matrix_storage[cross_count] = *draw_matrix;
+					cross_matrices[cross_count] = &cross_matrix_storage[cross_count];
+					cross_count++;
 				}
 			}
 			// Fourth silent cap (see td-INDEX.md). Sections at index >= k_max_cross_sections
@@ -4359,33 +5718,50 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 
 		if (sections_drawn > 0)
 		{
+			// it. 571 — THE STITCH GATE MUST WRAP ONLY THE STITCHING.
+			//
+			// it. 561 put `&& k_stencil_shadow_stitch_seams` on the OUTER condition, which also gated
+			// `volumes_drawn++` at the bottom of this block. Disabling stitching therefore left
+			// volumes_drawn at 0 -> `g_stencil_shadow_mask_pending` false -> `stencil_shadow_world_darken`
+			// early-returns -> the mode-0 apply never runs. Shadows vanished from the SHIPPING path while
+			// draw mode 2 kept working, because mode 2 calls apply directly and never consults
+			// mask_pending. That asymmetry is what made it look like a reach-clip problem for six
+			// iterations.
+			if (k_stencil_shadow_stitch_seams)
+			{
 			// bridge matched seams between this object's sections (td shared-edge stitches)
+			// it. 542: the pairing needs the sections actually built for this caster — it reads their
+			// boundary quads and bind-pose positions, and retags the matched ones in place.
 			s_stencil_shadow_model_cross* cross =
-				stencil_shadow_model_cross_get(render_model_index, render_model);
+				stencil_shadow_model_cross_get(render_model_index, render_model,
+					cross_shadows, section_of_dense, (int32)cross_count);
 			if (cross && !cross->quads.empty())
 			{
 				static std::vector<uint16> cross_indices;
 				bool owner_handled[k_max_cross_sections] = {};
 				for (uint32 seed = 0; seed < cross->quads.size(); seed++)
 				{
-					uint8 owner = cross->quads[seed].owner_section;
-					if (owner >= k_max_cross_sections || owner_handled[owner] || !cross_shadows[owner])
+					// it. 543: quads carry SECTION indices; storage is dense. Map before every use.
+					const uint8 owner = cross->quads[seed].owner_section;
+					const int16 owner_slot = dense_of_section[owner];
+					if (owner_slot < 0 || owner_handled[owner_slot] || !cross_shadows[owner_slot])
 					{
 						continue;
 					}
-					owner_handled[owner] = true;
+					owner_handled[owner_slot] = true;
 					cross_indices.clear();
 					for (uint32 entry_index = 0; entry_index < cross->quads.size(); entry_index++)
 					{
 						const s_stencil_shadow_cross_quad* entry = &cross->quads[entry_index];
+						const int16 partner_slot = dense_of_section[entry->partner_section];
 						if (entry->owner_section != owner
-							|| entry->partner_section >= k_max_cross_sections
-							|| !cross_shadows[entry->partner_section])
+							|| partner_slot < 0
+							|| !cross_shadows[partner_slot])
 						{
 							continue;
 						}
-						const uint32* owner_bits = facing_scratch[owner];
-						const uint32* partner_bits = facing_scratch[entry->partner_section];
+						const uint32* owner_bits = facing_scratch[owner_slot];
+						const uint32* partner_bits = facing_scratch[partner_slot];
 						bool left_faces = (owner_bits[entry->owner_triangle >> 5]
 							>> (entry->owner_triangle & 31)) & 1;
 						bool right_faces = (partner_bits[entry->partner_triangle >> 5]
@@ -4409,17 +5785,22 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 					}
 					if (!cross_indices.empty())
 					{
-						stencil_shadow_draw_cross_indices(cross_shadows[owner], cross_indices,
-							&toward_light_world, cross_matrices[owner], extrusion_distance, shadow_opacity);
+						stencil_shadow_draw_cross_indices(cross_shadows[owner_slot], cross_indices,
+							&toward_light_world, cross_matrices[owner_slot], extrusion_distance, shadow_opacity);
 					}
 				}
 			}
+
+			}	// it. 571: end of the stitching-only gate
 
 			// P1-1: no per-object darken here. td applies ONCE, fullscreen, after all
 			// volumes are laid (render_layer_lightmap_diffuse, td 0x10D8F0) --
 			// stencil_shadow_world_darken does that. The per-object scissored apply that
 			// used to live here existed only to contain the P0-1 streaks, and it darkened
 			// overlapping casters more than once.
+			//
+			// it. 571: this MUST stay outside the stitch gate — it is what tells the darken pass a
+			// caster was laid down (`mask_pending = volumes_drawn > 0`).
 			volumes_drawn++;
 		}
 		else
@@ -4453,9 +5834,12 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 			- (dbg_no_definition + dbg_shadowless + dbg_uncached + dbg_no_model + dbg_far
 				+ dbg_opacity + dbg_no_rmodel + dbg_nonmanifold + dbg_no_matrix + dbg_no_sections
 				+ (int32)volumes_drawn);
-		LOG_INFO_GAME("stencil dbg: mode={} masking={} iter={} nodef={} shadowless={} far={} lodfail={} nolighting={} cinematic={} shallow={} worst_z={:.3f} opac={} nomodel={} normodel={} nonmanifold={} nomatrix={} nosec={} drawn={} balance={}",
+		// it. 538: `lodsub=` is the LOD-fallback count — shadows cast from a level the engine did not
+		// request. Distinct from `lodfail=`, which is a failed LOD-block validation.
+		LOG_INFO_GAME("stencil dbg: mode={} masking={} iter={} nodef={} shadowless={} far={} lodfail={} lodsub={} nolighting={} cinematic={} shallow={} worst_z={:.3f} opac={} nomodel={} normodel={} nonmanifold={} nomatrix={} nosec={} drawn={} balance={}",
 			g_stencil_shadow_draw_mode, g_stencil_shadow_masking_pass, dbg_iterated, dbg_no_definition,
-			dbg_shadowless, dbg_far, dbg_lodfail, dbg_uncached, dbg_cinematic, dbg_shallow,
+			dbg_shadowless, dbg_far, dbg_lodfail, g_stencil_shadow_lod_fallbacks,
+			dbg_uncached, dbg_cinematic, dbg_shallow,
 			dbg_shallowest_z, dbg_opacity, dbg_no_model, dbg_no_rmodel, dbg_nonmanifold,
 			dbg_no_matrix, dbg_no_sections, volumes_drawn, dbg_balance);
 
@@ -4520,6 +5904,37 @@ void stencil_shadow_lightmap_volumes_pass(void)
 	if (!device)
 	{
 		return;
+	}
+
+	// it. 560/561 — REACH CLIP RESOURCE CONFLICT.
+	//
+	// On SM3 the engine creates the z target as a COLOUR TEXTURE and renders depth into it during
+	// the lightmap-indirect stage (rasterizer_dx9_targets.cpp:810-811), and
+	// `global_d3d_surface_render_z_as_target_z` is surface level 0 of that same texture (:834-836).
+	// targets.cpp:145 keeps it bound as an MRT output for as long as
+	// `g_dx9_dont_draw_to_depth_target_if_mrt_is_used` is false — which render.cpp:408 clears before
+	// lightmap_indirect and only re-sets at :448, AFTER this pass. So during our draws the surface we
+	// want to SAMPLE is still BOUND AS A TARGET, which D3D9 forbids.
+	//
+	// It fails silently and misleadingly: undefined reads come back ~0, so `receiver - caster` is
+	// negative, `reach - delta` stays positive, texkill never fires, and the volume renders as pure
+	// unbounded infinite extrusion — indistinguishable from "the reach constant is too large"
+	// (CONFIRMED on the it. 558 build: reach active, leak unchanged).
+	//
+	// Suppressing the MRT z output for the duration of this pass is safe for the stencil counting:
+	// on SM3 that surface is a COLOUR output carrying depth-as-colour, NOT the depth-stencil buffer
+	// z-fail depends on — that one is separate and untouched. (In the non-SM3 path the same global
+	// IS a depth-stencil surface, targets.cpp:846, which is why this had to be read rather than
+	// assumed.) Re-applying the target is what actually rebinds without it, exactly as render.cpp:448
+	// relies on the next set_target to do.
+	const bool reach_mode_needs_depth_texture =
+		g_stencil_shadow_extrusion_override == k_stencil_shadow_reach_extrusion
+		&& g_stencil_shadow_reach_clip_shader && g_stencil_shadow_vertex_shader_sm3;
+	const bool saved_suppress_z_target = g_dx9_dont_draw_to_depth_target_if_mrt_is_used;
+	if (reach_mode_needs_depth_texture && !saved_suppress_z_target)
+	{
+		g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
+		rasterizer_dx9_set_target((e_rasterizer_target)*rasterizer_dx9_main_render_target_get(), 0, true);
 	}
 
 	// One-shot probe: Vista's e_global_vertex_shader table still carries the ported stencil
@@ -4646,13 +6061,22 @@ void stencil_shadow_lightmap_volumes_pass(void)
 	{
 		perf_max_ms = elapsed_ms;
 	}
-	if (++perf_samples >= 4800)	// ~10s at 8 passes x 60fps
+	if (++perf_samples >= 4800)	// it. 554 MEASURED ~580 passes/s, i.e. ~1.2 per frame, not 8
 	{
 		LOG_INFO_GAME("stencil perf: volumes pass avg={:.3f}ms max={:.3f}ms over {} passes",
 			perf_accum_ms / perf_samples, perf_max_ms, perf_samples);
 		perf_accum_ms = 0.0;
 		perf_max_ms = 0.0;
 		perf_samples = 0;
+	}
+
+	// it. 561: hand the MRT z output back exactly as we found it. Restoring the flag alone is not
+	// enough — the binding only changes on the next set_target, so re-apply it here rather than
+	// leaving the rest of the frame drawing without its depth-as-colour output.
+	if (reach_mode_needs_depth_texture && !saved_suppress_z_target)
+	{
+		g_dx9_dont_draw_to_depth_target_if_mrt_is_used = saved_suppress_z_target;
+		rasterizer_dx9_set_target((e_rasterizer_target)*rasterizer_dx9_main_render_target_get(), 0, true);
 	}
 }
 
@@ -4817,5 +6241,10 @@ void stencil_shadow_shaders_dispose(void)
 	{
 		g_stencil_shadow_stipple_shader->Release();
 		g_stencil_shadow_stipple_shader = NULL;
+	}
+	if (g_stencil_shadow_reach_clip_shader)
+	{
+		g_stencil_shadow_reach_clip_shader->Release();
+		g_stencil_shadow_reach_clip_shader = NULL;
 	}
 }

@@ -124,6 +124,12 @@ struct s_stencil_shadow_section
 	struct IDirect3DVertexBuffer9* shadow_vb;	// 2 * welded_vertex_count entries
 	uint32 welded_vertex_count;
 
+	// it. 526: largest axis extent of this section's welded points, in the space its vertices live in.
+	// Filled at build time from the bound already computed for the size diagnostic. Used only by the
+	// PER-SECTION dynamic-extrusion experiment (F6 mode) — a caster's sections sit at different heights,
+	// so a single per-caster extrusion cannot place every section's far cap clear of the floor.
+	real32 extent_max;
+
 	// Articulated support (per-vertex node sections: rigid_boned with mixed nodes, and skinned).
 	// Positions are CPU-transformed into WORLD space each draw, the dynamic VB is refreshed, and
 	// planes are recomputed in place — tag-debug's soft-group recompute. NULL/false for static
