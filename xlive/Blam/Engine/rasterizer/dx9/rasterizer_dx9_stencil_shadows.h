@@ -263,14 +263,10 @@ void __cdecl stencil_shadow_render_layer_hook(void);
 // volumes pass between lightmap_indirect and SH-PRT; mask_begin/end bracket the SH-PRT
 // layer draw so shadowed pixels receive no direct lightmap light.
 void stencil_shadow_lightmap_volumes_pass(void);
-void stencil_shadow_mask_begin(void);
-void stencil_shadow_mask_end(void);
 
 // World-layer application (called around _render_layer_lightmap_indirect):
 // mode 3 probes a faithful stencil mask on the world layer; mode 0 darkens where the
 // counts mark shadow (Vista draws the full world lightmap in one pass — design map 6.6).
-void stencil_shadow_mask_world_begin(void);
-void stencil_shadow_mask_world_end(void);
 void stencil_shadow_world_darken(void);
 
 // Installs the render-layer detour. Call from the central patch registration.

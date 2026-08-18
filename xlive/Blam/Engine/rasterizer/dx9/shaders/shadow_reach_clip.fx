@@ -50,16 +50,24 @@
 // Reproduced exactly. That the value is LINEAR normalised depth (not NDC z) is ASSUMED -- fog cubes it
 // and indexes a gradient linearly, both useless on NDC z, which sits at ~0.99 across the whole scene.
 
+// it. 618 — CONSTANTS LIVE AT c216-c223, THE TOP OF ps_3_0's RANGE. They used to sit at c0-c7 and
+// STOMPED THE ENGINE'S OWN PIXEL-SHADER CONSTANTS: fog_atmospheric_apply.fx uses c0-c2, weather_plate.fx
+// uses c0-c2 (tint_colors) and c3-c5 (dot_factors), bloom_simple.fx uses c0-c2. Every reach-clip draw
+// overwrote those with camera vectors, so later draws tinted themselves with our forward vector —
+// user-observed as a wall decal changing colour shot to shot.
+//
+// Same convention the rest of this file already follows: the vertex constants sit at c254/c255 and the
+// ps_2_0 tint at c31, each the top of its range. ps_3_0 allows c0-c223, so the top 8 are c216-c223.
 sampler2D scene_depth : register(s0);
 
-float4 reach_c    : register(c0);	// xy = 1/viewport, z = proj A, w = proj B  (see decode below)
-float4 cam_pos_c  : register(c1);	// xyz = camera point, w = reach (world units)
-float4 cam_fwd_c  : register(c2);	// xyz = camera forward (unit)
-float4 cam_rgt_c  : register(c3);	// xyz = camera right (unit), w = tan(hfov/2)
-float4 cam_up_c   : register(c4);	// xyz = camera up (unit),    w = tan(vfov/2)
-float4 caster_c   : register(c5);	// xyz = caster centre, world
-float4 extrude_c  : register(c6);	// xyz = extrusion direction (AWAY from the light, unit)
-float4 spread_c   : register(c7);	// xyz = horizontal shadow direction (unit), w = d(along)/d(lateral)
+float4 reach_c    : register(c216);	// xy = 1/viewport, z = proj A, w = proj B  (see decode below)
+float4 cam_pos_c  : register(c217);	// xyz = camera point, w = reach (world units)
+float4 cam_fwd_c  : register(c218);	// xyz = camera forward (unit)
+float4 cam_rgt_c  : register(c219);	// xyz = camera right (unit), w = tan(hfov/2)
+float4 cam_up_c   : register(c220);	// xyz = camera up (unit),    w = tan(vfov/2)
+float4 caster_c   : register(c221);	// xyz = caster centre, world
+float4 extrude_c  : register(c222);	// xyz = extrusion direction (AWAY from the light, unit)
+float4 spread_c   : register(c223);	// xyz = horizontal shadow direction (unit), w = d(along)/d(lateral)
 
 float4 main(float2 vpos : VPOS) : COLOR
 {
