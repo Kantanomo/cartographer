@@ -14,16 +14,16 @@ Project_Cartographer.vcxproj.user
 *.suo
 *.opendb
 *.db
+*.aps
 xlive.ilk
-xliveless.aps
 xliveless.opensdf
-xliveless.v12.suo
 **/.vs
 **/.vscode
 /Directx SDK/include
 /Halo2
 /Halo2Server
 /xlive/objects
+/objects
 *.opensdf
 *.user
 *.ipch
@@ -41,3 +41,14 @@ xlive/3rdparty/tinyxml/lib
 xlive/3rdparty/tinyxml/objects
 xlive/3rdparty/zlib/lib
 xlive/3rdparty/zlib/objects
+
+bin/h2admin.exe
+
+bin/h2admin.pdb
+
+
+xlive/Blam/Engine/kablam/kablam_rpc/kablam_commands_c.c
+
+xlive/Blam/Engine/kablam/kablam_rpc/kablam_commands_h.h
+
+xlive/Blam/Engine/kablam/kablam_rpc/kablam_commands_s.c
