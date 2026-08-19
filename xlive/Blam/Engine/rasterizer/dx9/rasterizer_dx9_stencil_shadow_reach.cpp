@@ -288,6 +288,9 @@ bool stencil_shadow_reach_encode(
 			const real32 expected_slope = sqrtf(
 				toward_light_world.x * toward_light_world.x
 				+ toward_light_world.y * toward_light_world.y);
+
+			UNREFERENCED_PARAMETER(expected_slope);
+
 			LOG_INFO_GAME("stencil reach: active={} caster=({:.2f},{:.2f},{:.2f}) cam=({:.2f},{:.2f},{:.2f}) SLOPE={:.3f} expected_flat={:.3f} bound_base={:.2f}wu tan_h={:.3f} tan_v={:.3f} z_far={:.1f} extrude_dir=({:.2f},{:.2f},{:.2f}) — it. 592 (slope 0 = 2nd ray missed; slope != expected = different surface)",
 				g_stencil_shadow_reach_active ? 1 : 0,
 				object->object.center.x, object->object.center.y, object->object.center.z,

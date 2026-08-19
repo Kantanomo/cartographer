@@ -39,6 +39,9 @@ void stencil_shadow_stats_report(
 			- (stats->no_definition + stats->shadowless + stats->no_lighting + stats->no_model + stats->far_culled
 				+ stats->opacity + stats->no_render_model + stats->non_manifold + stats->no_matrix + stats->no_sections
 				+ (int32)volumes_drawn);
+
+		UNREFERENCED_PARAMETER(balance);
+
 		// it. 538: `lodsub=` is the LOD-fallback count — shadows cast from a level the engine did not
 		// request. Distinct from `lodfail=`, which is a failed LOD-block validation.
 		LOG_INFO_GAME("stencil dbg: mode={} masking={} iter={} nodef={} shadowless={} far={} lodfail={} lodsub={} nolighting={} cinematic={} shallow={} worst_z={:.3f} opac={} nomodel={} normodel={} nonmanifold={} nomatrix={} nosec={} drawn={} balance={}",
@@ -80,6 +83,10 @@ void stencil_shadow_stats_report(
 			uint32 primary_capacity = 0, secondary_capacity = 0;
 			int32 primary_count = read_list2(0x4D2D60, &primary_capacity);
 			int32 secondary_count = read_list2(0x4D5840, &secondary_capacity);
+
+			UNREFERENCED_PARAMETER(primary_count);
+			UNREFERENCED_PARAMETER(secondary_count);
+
 			LOG_INFO_GAME("stencil visprobe: primary count={} cap={} (expect 256) | secondary count={} cap={} (expect 128) | our iter={} drawn={}",
 				primary_count, primary_capacity, secondary_count, secondary_capacity,
 				stats->iterated, volumes_drawn);

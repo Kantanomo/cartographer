@@ -2050,6 +2050,9 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 							bind_inverse->position.x * bind_inverse->position.x
 							+ bind_inverse->position.y * bind_inverse->position.y
 							+ bind_inverse->position.z * bind_inverse->position.z));
+
+						UNREFERENCED_PARAMETER(bind_offset);
+
 						real32 extent = 0.f;
 						for (uint32 i = 0; i < shadow->welded_vertex_count; i++)
 						{
@@ -2075,8 +2078,12 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 						real32 cos_theta = (trace - 1.f) * 0.5f;
 						if (cos_theta > 1.f) { cos_theta = 1.f; }
 						if (cos_theta < -1.f) { cos_theta = -1.f; }
+
 						real32 bind_rotation_deg =
 							(real32)(acos((real64)cos_theta) * (180.0 / 3.14159265358979323846));
+						
+						UNREFERENCED_PARAMETER(bind_rotation_deg);
+
 						// EITHER number being significant means the it. 335 composition matters:
 						// `ratio` near/above 1 = the volume was displaced; `bind_rot` non-zero = it was
 						// mis-ORIENTED. Only BOTH being ~0 means the fix is a no-op for this section.

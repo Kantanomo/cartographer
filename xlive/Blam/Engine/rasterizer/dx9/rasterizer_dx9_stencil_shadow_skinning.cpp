@@ -660,6 +660,10 @@ bool stencil_shadow_section_animate(
 		QueryPerformanceFrequency(&frequency);
 		const real64 to_microseconds = 1000000.0 / (real64)frequency.QuadPart;
 		const real64 inv_count = 1.0 / (real64)g_stencil_shadow_animate_count;
+
+		UNREFERENCED_PARAMETER(to_microseconds);
+		UNREFERENCED_PARAMETER(inv_count);
+
 		LOG_INFO_GAME("stencil animtime: animates={} vb_skipped={} avg_us skin={:.1f} vb={:.1f} planes={:.1f} (it. 660 — the it. 553/556 measurement; vb should be ~0 with vb_skipped == animates)",
 			g_stencil_shadow_animate_count, g_stencil_shadow_animate_vb_skipped,
 			(real64)g_stencil_shadow_animate_skin_ticks * to_microseconds * inv_count,

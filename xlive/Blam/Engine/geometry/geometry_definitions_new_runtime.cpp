@@ -234,6 +234,8 @@ static void stencil_shadow_probe_normal_stream(geometry_section* geometry, int32
 			if (length > max_length) { max_length = length; }
 		}
 		const real32* first = (const real32*)buffer->vertex_data;
+		UNREFERENCED_PARAMETER(first);
+
 		LOG_INFO_GAME("stencil normalprobe: buffer[{}] decl={} stride={} first_float3_length={:.4f}..{:.4f} (1.000 == a NORMAL) sample=({:.3f},{:.3f},{:.3f})",
 			buffer_index, (int32)buffer->declaration, (int32)buffer->stride,
 			min_length, max_length, first[0], first[1], first[2]);
@@ -576,6 +578,10 @@ static void stencil_shadow_section_validate(const s_stencil_shadow_section* shad
 			{
 				const uint16* lt = &shadow->triangles[quad->tri_left * 3];
 				const uint16* rt = &shadow->triangles[quad->tri_right * 3];
+
+				UNREFERENCED_PARAMETER(lt);
+				UNREFERENCED_PARAMETER(rt);
+
 				LOG_INFO_GAME("  offender quad {}: edge ({},{}) L={} ({},{},{}) order={} R={} ({},{},{}) order={} flagged={} self={}",
 					i, quad->vert_a, quad->vert_b,
 					quad->tri_left, lt[0], lt[1], lt[2], left_order,
@@ -679,6 +685,9 @@ bool stencil_shadow_build_from_geometry(
 			for (int32 buffer_index = 0; buffer_index < geometry->vertex_buffers.count; buffer_index++)
 			{
 				const rasterizer_vertex_buffer* buffer = geometry->vertex_buffers[buffer_index];
+
+				UNREFERENCED_PARAMETER(buffer);
+
 				LOG_INFO_GAME("stencil vbuf:   [{}] declaration={} stride={} count={} data={}",
 					buffer_index, (int32)buffer->declaration, (int32)buffer->stride,
 					(int32)buffer->count, buffer->vertex_data ? 1 : 0);
@@ -2376,8 +2385,10 @@ s_stencil_shadow_section* stencil_shadow_cluster_get(
 	if (g_stencil_shadow_logged_clusters < 8)
 	{
 		g_stencil_shadow_logged_clusters++;
-		const rasterizer_vertex_buffer* position_buffer =
-			geometry->vertex_buffers.count > 0 ? geometry->vertex_buffers[0] : NULL;
+		const rasterizer_vertex_buffer* position_buffer = geometry->vertex_buffers.count > 0 ? geometry->vertex_buffers[0] : NULL;
+
+		UNREFERENCED_PARAMETER(position_buffer);
+
 		LOG_INFO_GAME("stencil cluster: [{}] verts={} tris={} shadow_parts={}/{} shadow_tris={} class={} decl={} bounds={} (caps: {} planes / {} quads)",
 			cluster_index,
 			cluster->geometry_section_info.total_vertex_count,
