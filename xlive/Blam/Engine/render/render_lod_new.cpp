@@ -165,6 +165,74 @@ render_lighting* render_object_cache_get_lighting(datum object_index)
     return &((s_render_cache_storage*)(entry + k_cached_render_state_storage_offset))->lighting;
 }
 
+real32* __cdecl model_skinning_get_node_matrix(void* skinning_data, int16 node_index, real32* out_matrix)
+{
+    return INVOKE(0x37E337, 0x0, model_skinning_get_node_matrix, skinning_data, node_index, out_matrix);
+}
+
+// Read-only mirror of the pool lookup the engine does through its allocator — see the header.
+// NO ultimate-parent walk, deliberately: lighting is inherited from the parent, but a POSE is the
+// object's own. An attachment that was never submitted has no pool entry and gets NULL here; its
+// caster falls back to composing matrices itself, exactly as before this accessor existed.
+void* render_object_cache_get_skinning_pool(
+    datum object_index, int32* out_matrix_count, int32* out_miss_stage)
+{
+    // entry layout, 256-byte stride (from object_get_cached_render_state, halo2.exe 0x59604D)
+    const int32 k_cached_render_state_owner_offset = 4;
+    const int32 k_cached_render_state_storage_offset = 68;
+
+    *out_matrix_count = 0;
+    int32 miss_stage_sink;
+    int32* miss_stage = out_miss_stage ? out_miss_stage : &miss_stage_sink;
+    *miss_stage = 0;
+
+    const object_datum* object = object_get(object_index);
+    if (object == NULL || object->object.cached_render_state_index == NONE)
+    {
+        *miss_stage = 1;
+        return NULL;
+    }
+
+    // datum_try_and_get, not datum_get — the salt cannot mismatch (it. 654: the LRU reuses slots in
+    // place, never datum_delete's), but try_and_get costs nothing and cannot vassert if that ever
+    // changes. The OWNER check below is the guard that actually catches recycling.
+    uint8* entry = (uint8*)datum_try_and_get(get_cached_object_render_states_array(),
+        object->object.cached_render_state_index);
+    if (entry == NULL)
+    {
+        *miss_stage = 2;
+        return NULL;
+    }
+    if (*(datum*)(entry + k_cached_render_state_owner_offset) != object_index)
+    {
+        *miss_stage = 3;
+        return NULL;    // recycled to another object
+    }
+
+    s_render_cache_storage* storage =
+        (s_render_cache_storage*)(entry + k_cached_render_state_storage_offset);
+    if (storage->rasterizer_cpu_render_cache_offset == NONE)
+    {
+        *miss_stage = 4;
+        return NULL;
+    }
+    if (storage->render_frame_allocated != render_object_cache_create_index())
+    {
+        *miss_stage = 5;
+        return NULL;    // not filled this frame in this window — the pool arena may have recycled it
+    }
+
+    void* pool = rasterizer_pool_get_from_offset(storage->rasterizer_cpu_render_cache_offset);
+    if (pool == NULL)
+    {
+        *miss_stage = 6;
+        return NULL;
+    }
+    // pool+0: uint16 matrix count (base nodes + compound nodes) — the bound for node-indexed reads
+    *out_matrix_count = *(uint16*)pool;
+    return pool;
+}
+
 void __cdecl render_object_update_change_colors(datum object_index, bool a2)
 {
     INVOKE(0x195F91, 0x0, render_object_update_change_colors, object_index, a2);

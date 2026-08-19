@@ -15,6 +15,7 @@
 #include "bink/wmv_playback.h"
 #include "cache/pc_geometry_cache.h"
 #include "rasterizer/dx9/rasterizer_dx9_stencil_shadows.h"
+#include "render/render_stencil_shadow_dynamic.h"
 #include "effects/beam.h"
 #include "effects/player_effects.h"
 #include "game/game_engine.h"
@@ -445,6 +446,17 @@ void __cdecl render_scene(
 			stencil_shadow_world_darken();
 			rasterizer_dx9_perf_event_end("stencil_shadow_darken");
 
+			// tag-debug layer 13, FIRST HALF: lay the dynamic lights' volumes.
+			//
+			// HERE and not with the apply, because c0-c3 — the world->clip rows our extrusion shader
+			// INHERITS — are the current window's mid-scene. After render_lights_new the lights path
+			// leaves them stale, which draws volumes out of place (the note on
+			// stencil_shadow_lightmap_volumes_pass records that being learned the hard way).
+			// The darken above has just retired the lightmap counts, so the stencil is ours from here.
+			rasterizer_dx9_perf_event_begin("stencil_shadow_dynamic_volumes", NULL);
+			stencil_shadow_dynamic_volumes_pass();
+			rasterizer_dx9_perf_event_end("stencil_shadow_dynamic_volumes");
+
 			g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
 
 			rasterizer_dx9_perf_event_begin("environment_map", NULL);
@@ -493,6 +505,19 @@ void __cdecl render_scene(
 			rasterizer_dx9_perf_event_begin("render_lights_new", NULL);
 			render_lights_new();
 			rasterizer_dx9_perf_event_end("render_lights_new");
+
+			// tag-debug layer 13, SECOND HALF: consume the counts laid mid-scene.
+			//
+			// HERE because the composite is only finished once the lights have accumulated —
+			// darkening earlier would be re-lit by the very lights whose contribution the shadow is
+			// meant to withhold. Nothing between the two halves engages the stencil (only
+			// lightmap_indirect and texture_accumulate do, and both are already past), so the counts
+			// survive the gap.
+			//
+			// DEFAULT OFF and never runtime-verified — F5 toggles it. docs/12-dynamic-light-tier.md.
+			rasterizer_dx9_perf_event_begin("stencil_shadow_dynamic_apply", NULL);
+			stencil_shadow_dynamic_apply();
+			rasterizer_dx9_perf_event_end("stencil_shadow_dynamic_apply");
 
 			rasterizer_dx9_perf_event_begin("decals_alpha_blend", NULL);
 			if (render_decals_enabled)
@@ -571,6 +596,31 @@ void __cdecl render_scene(
 			rasterizer_dx9_perf_event_begin("stencil_shadow_darken", NULL);
 			stencil_shadow_world_darken();
 			rasterizer_dx9_perf_event_end("stencil_shadow_darken");
+
+			// tag-debug layer 13 in BRANCH 2 (debug_view 0/3-5).
+			//
+			// it. 637: this branch was MISSED on the first wiring — the exact failure it. 301 warned
+			// about ("duplicated integration is where a call goes missing"), which is why the
+			// shipping tier's hooks were counted across both branches rather than assumed.
+			//
+			// The volumes/apply SPLIT has no meaning here: unlike branch 1, this branch has **no
+			// light-accumulation stage at all** — no render_lights_new, nothing between the darken
+			// and the overlay layer. So the two halves run adjacent. The ordering constraint that
+			// forced the split in branch 1 (darken must follow accumulation) does not arise, because
+			// there is no accumulation to follow.
+			//
+			// it. 638 SETTLED which branch is live, and it is NOT this one: `rasterizer_render_scene`
+			// initialises `render_layer_debug_view = 1`, and only the debug globals
+			// `g_render_layer_view_4` / `_view_5` (both `false`) move it off that. So **branch 1 is
+			// normal gameplay** and this branch is a debug view.
+			//
+			// That means the volumes/apply SPLIT — which only branch 1 can express — is the one that
+			// matters, and it is correctly placed. This wiring is completeness, not coverage: it
+			// keeps the tier from vanishing if someone flips view 4 while testing.
+			rasterizer_dx9_perf_event_begin("stencil_shadow_dynamic", NULL);
+			stencil_shadow_dynamic_volumes_pass();
+			stencil_shadow_dynamic_apply();
+			rasterizer_dx9_perf_event_end("stencil_shadow_dynamic");
 
 			rasterizer_dx9_perf_event_begin("overlay", NULL);
 			render_scene_geometry(_collection_type_0, _render_layer_overlay);
