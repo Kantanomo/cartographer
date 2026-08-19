@@ -835,44 +835,116 @@ void stencil_shadow_skinning_reset_diagnostics(void)
 }
 
 
+// it. 673 — FOUR PLANES PER ITERATION, LANE-PARALLEL. The user's profiler named `cross_product3d`
+// as this function's hotspot, and the diagnosis is structural: that helper is the SHUFFLE-BASED SSE
+// cross product, which for a single one-off call spends more work marshalling three scalars into an
+// __m128, shuffling, and extracting the result back out than the arithmetic itself costs — per
+// call, `plane_count` times per articulated section per frame.
+//
+// The output layout was already the answer: `planes_soa` stores 4-plane blocks as
+// [nx x4][ny x4][nz x4][d x4] — exactly the shape lane-parallel SIMD produces with NO shuffles at
+// all. So this computes four triangles' planes at once: gather the twelve vertices' components into
+// lane arrays (the indirection through `triangles[]` is the gather-bound part it. 553 measured, and
+// it is unavoidable either way), then every cross/dot term is one _mm_mul/_mm_sub across the four
+// lanes, stored straight into the block. Same expressions per lane as the scalar math — the values
+// feed a facing SIGN test, and the per-lane operation order is unchanged.
+//
+// _mm_storeu on purpose: `planes_soa` comes from `new real32[]` (8-byte aligned on x86), and the
+// facing test already reads these blocks with _mm_loadu_ps — unaligned is this array's convention.
 static void stencil_shadow_compute_planes(
 	s_stencil_shadow_section const* shadow)
 {
-	for (uint32 triangle_index = 0; triangle_index < shadow->plane_count; triangle_index++)
+	const uint32 plane_count = shadow->plane_count;
+	const uint32 block_count = plane_count / 4;
+
+	for (uint32 block = 0; block < block_count; block++)
 	{
-		const uint16* triangle = &shadow->triangles[triangle_index * 3];
-		real_point3d const* p0 = &shadow->world_positions[triangle[0]];
-		real_point3d const* p1 = &shadow->world_positions[triangle[1]];
-		real_point3d const* p2 = &shadow->world_positions[triangle[2]];
+		// gather: 4 triangles x 3 vertices, component-planar
+		float p0x[4], p0y[4], p0z[4];
+		float p1x[4], p1y[4], p1z[4];
+		float p2x[4], p2y[4], p2z[4];
+		const uint16* tri = &shadow->triangles[block * 4 * 3];
+		for (uint32 lane = 0; lane < 4; lane++, tri += 3)
+		{
+			const real_point3d* p0 = &shadow->world_positions[tri[0]];
+			const real_point3d* p1 = &shadow->world_positions[tri[1]];
+			const real_point3d* p2 = &shadow->world_positions[tri[2]];
+			p0x[lane] = p0->x; p0y[lane] = p0->y; p0z[lane] = p0->z;
+			p1x[lane] = p1->x; p1y[lane] = p1->y; p1z[lane] = p1->z;
+			p2x[lane] = p2->x; p2y[lane] = p2->y; p2z[lane] = p2->z;
+		}
 
-		real_vector3d edge_1;
-		real_vector3d edge_2;
-		real_vector3d normal;
-		real32 d;
+		const __m128 ax = _mm_loadu_ps(p0x), ay = _mm_loadu_ps(p0y), az = _mm_loadu_ps(p0z);
 
-		vector_from_points3d(p1, p0, &edge_1);
-		vector_from_points3d(p2, p0, &edge_2);
+		// edge_1 = p0 - p1, edge_2 = p0 - p2 — the build-time convention (and the pre-helper
+		// inline's), normals matching bit-for-bit per lane
+		const __m128 e1x = _mm_sub_ps(ax, _mm_loadu_ps(p1x));
+		const __m128 e1y = _mm_sub_ps(ay, _mm_loadu_ps(p1y));
+		const __m128 e1z = _mm_sub_ps(az, _mm_loadu_ps(p1z));
+		const __m128 e2x = _mm_sub_ps(ax, _mm_loadu_ps(p2x));
+		const __m128 e2y = _mm_sub_ps(ay, _mm_loadu_ps(p2y));
+		const __m128 e2z = _mm_sub_ps(az, _mm_loadu_ps(p2z));
 
-		cross_product3d(&edge_1, &edge_2, &normal);
-		d = dot_product3d(&normal, (real_vector3d*)p0->n);
+		// n = cross(edge_1, edge_2), d = dot(n, p0) — four lanes at a time, zero shuffles
+		const __m128 nx = _mm_sub_ps(_mm_mul_ps(e1y, e2z), _mm_mul_ps(e1z, e2y));
+		const __m128 ny = _mm_sub_ps(_mm_mul_ps(e1z, e2x), _mm_mul_ps(e1x, e2z));
+		const __m128 nz = _mm_sub_ps(_mm_mul_ps(e1x, e2y), _mm_mul_ps(e1y, e2x));
+		const __m128 d = _mm_add_ps(_mm_add_ps(
+			_mm_mul_ps(nx, ax), _mm_mul_ps(ny, ay)), _mm_mul_ps(nz, az));
 
-		real32* soa = &shadow->planes_soa[(triangle_index >> 2) * 16];
-		uint32 lane = triangle_index & 3;
-		soa[lane] = normal.i;
-		soa[4 + lane] = normal.j;
-		soa[8 + lane] = normal.k;
-		soa[12 + lane] = d;
+		real32* soa = &shadow->planes_soa[block * 16];
+		_mm_storeu_ps(soa, nx);
+		_mm_storeu_ps(soa + 4, ny);
+		_mm_storeu_ps(soa + 8, nz);
+		_mm_storeu_ps(soa + 12, d);
 
 		// Off by default. When on, AoS is kept in step with SoA exactly as before — note this
 		// leaves WORLD-space planes in an array stencil_shadow_section_validate reads as though
 		// they were bind-pose, which is why the default is the quiet one.
 		if constexpr (k_stencil_shadow_write_aos_planes)
 		{
-			real_plane3d* plane = &shadow->planes[triangle_index];
-			plane->n = normal;
-			plane->d = d;
+			for (uint32 lane = 0; lane < 4; lane++)
+			{
+				real_plane3d* plane = &shadow->planes[block * 4 + lane];
+				plane->n.i = soa[lane];
+				plane->n.j = soa[4 + lane];
+				plane->n.k = soa[8 + lane];
+				plane->d = soa[12 + lane];
+			}
 		}
 	}
 
-	return;
+	// scalar tail (0-3 planes) — writes only the real lanes, so the pad lanes of the final partial
+	// block keep the zeros the build-time fill gave them
+	for (uint32 triangle_index = block_count * 4; triangle_index < plane_count; triangle_index++)
+	{
+		const uint16* triangle = &shadow->triangles[triangle_index * 3];
+		const real_point3d* p0 = &shadow->world_positions[triangle[0]];
+		const real_point3d* p1 = &shadow->world_positions[triangle[1]];
+		const real_point3d* p2 = &shadow->world_positions[triangle[2]];
+
+		const real32 e1x = p0->x - p1->x, e1y = p0->y - p1->y, e1z = p0->z - p1->z;
+		const real32 e2x = p0->x - p2->x, e2y = p0->y - p2->y, e2z = p0->z - p2->z;
+
+		const real32 n_i = e1y * e2z - e1z * e2y;
+		const real32 n_j = e1z * e2x - e1x * e2z;
+		const real32 n_k = e1x * e2y - e1y * e2x;
+		const real32 d = n_i * p0->x + n_j * p0->y + n_k * p0->z;
+
+		real32* soa = &shadow->planes_soa[(triangle_index >> 2) * 16];
+		const uint32 lane = triangle_index & 3;
+		soa[lane] = n_i;
+		soa[4 + lane] = n_j;
+		soa[8 + lane] = n_k;
+		soa[12 + lane] = d;
+
+		if constexpr (k_stencil_shadow_write_aos_planes)
+		{
+			real_plane3d* plane = &shadow->planes[triangle_index];
+			plane->n.i = n_i;
+			plane->n.j = n_j;
+			plane->n.k = n_k;
+			plane->d = d;
+		}
+	}
 }

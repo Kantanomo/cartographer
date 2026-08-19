@@ -891,6 +891,12 @@ void stencil_shadow_section_draw(
 	}
 	device->SetIndices(g_stencil_shadow_index_buffer);
 
+	// it. 668-672 — a per-caster reach SCISSOR lived here and was REMOVED after measurement. It
+	// engaged on ~40% of draws at an average 10% of the viewport — a ~90% fill cut — and fps did
+	// not move, proving the GPU is not the bottleneck at these frame rates. Derivation, the
+	// rect-leak lesson (SetScissorRect is device-persistent state: save/restore the RECT, never
+	// just the enable bit — the sky pass clips to a leaked rect), and the removal verdict:
+	// td-isq-generation.md it. 668-672.
 	HRESULT draw_result = device->DrawIndexedPrimitive(
 		D3DPT_TRIANGLELIST,
 		0,
@@ -1789,18 +1795,27 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 		// td parity (rasterizer_model_draw + per-section mark bytes): only the ACTIVE
 		// LOD's section per region draws. Iterating every section shadowed the UNION of
 		// all LOD levels and all permutations — a hull larger than the rendered object
-		// (the user's oversized-shadow report). v1 uses permutation 0 (base variant);
-		// live damage-state permutation selection is a ledger item.
-		// D11/D12 — section selection is a straight port of
-		// rasterizer_model_compute_region_section_indices (td 0x1F4200):
-		//     perm = object->region_permutation_indices[region]        (NOT always 0)
-		//     perm = (perm >= 0) ? min(perm, region->permutations.count - 1) : 0
-		//     section_index = permutations[perm]->lod_sections[level_of_detail]   (direct index)
-		// td performs NO fallback search across LODs -- it asserts the entry is valid, because
-		// the tool guarantees one exists at every level. Our previous code used permutation 0
-		// unconditionally (wrong geometry whenever the object's variant wasn't 0) and, when the
-		// chosen LOD held NONE, substituted a section from a *different* LOD -- drawing geometry
-		// the engine never renders and widening the silhouette at every extrusion distance.
+		// (the user's oversized-shadow report).
+		//
+		// it. 665/666 — SELECTOR SEMANTICS ARE NOW THE VISTA RENDERER'S, not td 0x1F4200's.
+		//
+		// The per-region byte from `object_get_region_information` is ALREADY variant- and
+		// damage-state-resolved by the object system (`s_model_variant_permutation.
+		// runtime_model_permutation_index` is written into it when the variant/state is set), and
+		// Vista's own resolve (`render_object_preload_region_sections`, 0x59C80F) consumes it
+		// directly with two special cases:
+		//     NONE (0xFF)           -> the region is HIDDEN and draws NOTHING
+		//     >= permutations.count -> not drawable this frame (engine skips or streams the old one)
+		//
+		// The previous code here was td 0x1F4200's rule — `perm = (perm >= 0) ? min(perm, count-1)
+		// : 0` — which was self-consistent INSIDE td because td's model draw used the same rule.
+		// Against Vista's renderer it substituted permutation 0 for HIDDEN regions (a shadow of
+		// geometry the renderer is not drawing — the it. 665 report: variant mismatch) and clamped
+		// garbage to the last permutation. Renderer-parity wins over td-parity when they disagree
+		// about what is on screen — the same reasoning as the it. 391 bounds decision.
+		//
+		// td's other half stands: NO fallback search across LODs — the tool guarantees a section at
+		// every level (see the lodsub handling below for the one deliberate exception).
 		int32 region_count = 0;
 		int8* region_permutation_indices = NULL;
 		object_get_region_information(object_iterator.get_index(), &region_count,
@@ -1815,20 +1830,20 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 			{
 				continue;
 			}
-			int32 permutation_index = (region_permutation_indices && region_index < region_count)
+			// it. 666 — engine selector semantics (see the block above the region loop). The byte is
+			// int8, so 0xFF reads as NONE; any other negative is garbage the engine's unsigned read
+			// would treat as >= count. Both cases: the renderer draws nothing, so neither do we.
+			const int32 permutation_selector = (region_permutation_indices && region_index < region_count)
 				? region_permutation_indices[region_index] : 0;
-			if (permutation_index >= 0)
+			if (permutation_selector == NONE)
 			{
-				if (permutation_index > region->permutations.count - 1)
-				{
-					permutation_index = region->permutations.count - 1;
-				}
+				continue;	// region HIDDEN by the active variant / damage state
 			}
-			else
+			if (permutation_selector < 0 || permutation_selector >= region->permutations.count)
 			{
-				permutation_index = 0;
+				continue;	// not drawable this frame — the engine skips it too
 			}
-			const render_model_permutation* permutation = region->permutations[permutation_index];
+			const render_model_permutation* permutation = region->permutations[permutation_selector];
 			const int16* lod_sections = &permutation->l1_section_index;
 			// td indexes info->level_of_detail directly; that is the LOD the model is actually
 			// rendering at. A NONE there means this region draws nothing at this level -- honour

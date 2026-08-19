@@ -614,17 +614,22 @@ void stencil_shadow_dynamic_volumes_pass(void)
 				{
 					continue;
 				}
-				int32 permutation_index = (region_permutation_indices && region_index < region_count)
+				// it. 666 — the Vista renderer's selector semantics (0x59C80F, it. 665), same as the
+				// hook's caster loop: the byte is variant+damage-state resolved by the object system;
+				// NONE = region hidden (draws nothing), out-of-range = not drawable. The old td-rule
+				// clamp substituted permutation 0 for hidden regions — a shadow of geometry the
+				// renderer is not drawing.
+				const int32 permutation_selector = (region_permutation_indices && region_index < region_count)
 					? region_permutation_indices[region_index] : 0;
-				if (permutation_index < 0)
+				if (permutation_selector == NONE)
 				{
-					permutation_index = 0;
+					continue;	// region HIDDEN by the active variant / damage state
 				}
-				else if (permutation_index > region->permutations.count - 1)
+				if (permutation_selector < 0 || permutation_selector >= region->permutations.count)
 				{
-					permutation_index = region->permutations.count - 1;
+					continue;	// not drawable this frame — the engine skips it too
 				}
-				const render_model_permutation* permutation = region->permutations[permutation_index];
+				const render_model_permutation* permutation = region->permutations[permutation_selector];
 				const int16 section_index = (&permutation->l1_section_index)[object_lod];
 				if (section_index == NONE || section_index < 0
 					|| section_index >= render_model->sections.count)

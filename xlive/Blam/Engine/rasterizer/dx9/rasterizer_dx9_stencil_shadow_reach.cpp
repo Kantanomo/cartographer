@@ -35,6 +35,11 @@ static int32 g_stencil_shadow_logged_reach = 0;
 static int32 g_stencil_shadow_logged_bind = 0;		// for `stencil reach bind:`
 static int32 g_stencil_shadow_reach_tick = 0;		// it. 585 — periodic sampler for `stencil reach:`
 
+// it. 668-672: a per-caster scissor rect (the kill's kept-region capsule projected to pixels) lived
+// here and was REMOVED after measurement — it engaged at an average 10% of the viewport and fps did
+// not move, so the GPU is not the bottleneck this system pays. The derivation and the rect-leak
+// lesson are in td-isq-generation.md it. 668-672 should a GPU-bound scenario ever revive it.
+
 /* public code */
 
 bool stencil_shadow_reach_shader_create(IDirect3DDevice9Ex* device)

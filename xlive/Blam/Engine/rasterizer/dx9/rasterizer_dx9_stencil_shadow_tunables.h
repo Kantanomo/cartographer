@@ -161,6 +161,15 @@ static const real32 k_stencil_shadow_reach_probe_length = 50.f;
 // c216..c223 declarations exactly.
 static const uint32 k_stencil_shadow_reach_constant_count = 8;
 
+// it. 668-672 — a per-caster REACH SCISSOR lived here and was REMOVED after measurement. It bounded
+// the volume draw to the kill's kept-region capsule projected to pixels; the engagement telemetry
+// measured it working exactly as designed (valid on ~49% of encodes, average rect 10% of the
+// viewport — a ~90% fill cut on engaged draws) and fps did not move, proving the GPU is not what
+// this system's frame rate pays for (~1.4 ms frames, CPU/submission-bound). Removed at the user's
+// direction as complexity without measured benefit; the it. 667 instruction fold was skipped for
+// the same reason. Full derivation, the SetScissorRect-persistence leak lesson, and the verdict:
+// td-isq-generation.md it. 667-672 — revive from there if a GPU-bound scenario ever appears.
+
 /* ---------------------------------------------------------------------------------------------
    DISTANCE FADE
    --------------------------------------------------------------------------------------------- */
