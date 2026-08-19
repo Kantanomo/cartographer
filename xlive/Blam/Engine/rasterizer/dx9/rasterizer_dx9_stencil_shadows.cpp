@@ -45,7 +45,16 @@
 #include <unordered_map>
 #include <vector>
 
+/* structures */
+
+struct s_isq_globals
+{
+	uint16 indices[k_stencil_shadow_index_buffer_capacity];
+};
+
 /* globals */
+
+static s_isq_globals isq_globals;
 
 static IDirect3DVertexShader9* g_stencil_shadow_vertex_shader = NULL;
 static IDirect3DPixelShader9* g_stencil_shadow_pixel_shader = NULL;
@@ -611,8 +620,9 @@ void stencil_shadow_section_draw(
 	}
 
 	// silhouette index generation (doubled indices: 2v = original, 2v+1 = extruded)
-	std::vector<uint16> indices;
-	indices.reserve(shadow->quad_count * 6);
+
+	uint32 ib_size = 0;
+
 	for (uint32 quad_index = 0; quad_index < shadow->quad_count; quad_index++)
 	{
 		const s_stencil_shadow_quad* quad = &shadow->quads[quad_index];
@@ -620,9 +630,9 @@ void stencil_shadow_section_draw(
 		{
 			continue;	// seam bridged by the model's cross-quad pass
 		}
-		bool left_faces = (facing_bitvector[quad->tri_left >> 5] >> (quad->tri_left & 31)) & 1;
-		bool right_faces = quad->tri_right != k_stencil_shadow_boundary_triangle
-			&& ((facing_bitvector[quad->tri_right >> 5] >> (quad->tri_right & 31)) & 1);
+
+		bool left_faces = BIT_VECTOR_TEST_FLAG(facing_bitvector, quad->tri_left);
+		bool right_faces = quad->tri_right != k_stencil_shadow_boundary_triangle && BIT_VECTOR_TEST_FLAG(facing_bitvector, quad->tri_right);
 
 		if (left_faces == right_faces)
 		{
@@ -633,8 +643,8 @@ void stencil_shadow_section_draw(
 		// source pairs never swap (both sides want the stored orientation)
 		uint16 vert_a = quad->vert_a;
 		uint16 vert_b = quad->vert_b;
-		bool same_winding = shadow->quad_same_winding_bits
-			&& ((shadow->quad_same_winding_bits[quad_index >> 5] >> (quad_index & 31)) & 1);
+		bool same_winding = shadow->quad_same_winding_bits && BIT_VECTOR_TEST_FLAG(shadow->quad_same_winding_bits, quad_index);
+
 		// Swap side selects the quad's winding. `right_faces` is ours; `left_faces` reproduces td's
 		// ordering exactly (both arms checked against td 0x1A16B0). See the flag's comment.
 		bool swap_side = g_stencil_shadow_quad_winding_flip ? left_faces : right_faces;
@@ -648,8 +658,15 @@ void stencil_shadow_section_draw(
 		uint16 a0 = (uint16)(vert_a * 2), a1 = (uint16)(vert_a * 2 + 1);
 		uint16 b0 = (uint16)(vert_b * 2), b1 = (uint16)(vert_b * 2 + 1);
 		// quad (a0, b0, b1, a1) as two triangles
-		indices.push_back(a0); indices.push_back(b0); indices.push_back(b1);
-		indices.push_back(a0); indices.push_back(b1); indices.push_back(a1);
+
+		isq_globals.indices[ib_size + 0] = a0;
+		isq_globals.indices[ib_size + 1] = b0;
+		isq_globals.indices[ib_size + 2] = b1;
+		isq_globals.indices[ib_size + 3] = a0;
+		isq_globals.indices[ib_size + 4] = b1;
+		isq_globals.indices[ib_size + 5] = a1;
+
+		ib_size += 6;
 	}
 
 	// caps close the volume for z-fail counting (tag-debug convention: front cap =
@@ -658,22 +675,24 @@ void stencil_shadow_section_draw(
 	for (uint32 triangle_index = 0; triangle_index < shadow->plane_count; triangle_index++)
 	{
 		const uint16* triangle = &shadow->triangles[triangle_index * 3];
-		bool faces = (facing_bitvector[triangle_index >> 5] >> (triangle_index & 31)) & 1;
+		bool faces = BIT_VECTOR_TEST_FLAG(facing_bitvector, triangle_index);
 		if (faces)
 		{
-			indices.push_back((uint16)(triangle[0] * 2));
-			indices.push_back((uint16)(triangle[1] * 2));
-			indices.push_back((uint16)(triangle[2] * 2));
+			isq_globals.indices[ib_size + 0] = (triangle[0] * 2);
+			isq_globals.indices[ib_size + 1] = (triangle[1] * 2);
+			isq_globals.indices[ib_size + 2] = (triangle[2] * 2);
 		}
 		else
 		{
-			indices.push_back((uint16)(triangle[0] * 2 + 1));
-			indices.push_back((uint16)(triangle[1] * 2 + 1));
-			indices.push_back((uint16)(triangle[2] * 2 + 1));
+			isq_globals.indices[ib_size + 0] = (triangle[0] * 2 + 1);
+			isq_globals.indices[ib_size + 1] = (triangle[1] * 2 + 1);
+			isq_globals.indices[ib_size + 2] = (triangle[2] * 2 + 1);
 		}
+
+		ib_size += 3;
 	}
 
-	if (indices.empty())
+	if (ib_size==0)
 	{
 		return;
 	}
@@ -799,8 +818,7 @@ void stencil_shadow_section_draw(
 	device->SetVertexShaderConstantF(k_stencil_shadow_light_constant, light_constant, 1);
 	device->SetVertexShaderConstantF(k_stencil_shadow_extrusion_distance_constant, extrusion_constant, 1);
 
-	uint32 index_count = (uint32)indices.size();
-	if (index_count > k_stencil_shadow_index_buffer_capacity)
+	if (ib_size > k_stencil_shadow_index_buffer_capacity)
 	{
 		// Reachable in principle: the plane cap admits 32767 triangles, and a mesh with no
 		// shared edges yields up to 3T edges -> 3 * 32767 * 6 indices, which exceeds the
@@ -811,16 +829,19 @@ void stencil_shadow_section_draw(
 		{
 			g_stencil_shadow_warned_index_overflow_volume = true;
 			LOG_INFO_GAME("stencil WARNING: index buffer overflow — {} indices truncated to {} (partial volume)",
-				index_count, (uint32)k_stencil_shadow_index_buffer_capacity);
+				ib_size, (uint32)k_stencil_shadow_index_buffer_capacity);
 		}
-		index_count = k_stencil_shadow_index_buffer_capacity;
+		ib_size = k_stencil_shadow_index_buffer_capacity;
 	}
+
 	void* ib_data = NULL;
-	if (FAILED(g_stencil_shadow_index_buffer->Lock(0, index_count * sizeof(uint16), &ib_data, D3DLOCK_DISCARD)))
+	if (FAILED(g_stencil_shadow_index_buffer->Lock(0, ib_size * sizeof(uint16), &ib_data, D3DLOCK_DISCARD)))
 	{
 		return;
 	}
-	memcpy(ib_data, indices.data(), index_count * sizeof(uint16));
+	
+	memcpy(ib_data, isq_globals.indices, ib_size * sizeof(uint16));
+	
 	g_stencil_shadow_index_buffer->Unlock();
 
 	device->SetVertexDeclaration(gpu_skin
@@ -874,7 +895,7 @@ void stencil_shadow_section_draw(
 		0,
 		shadow->welded_vertex_count * 2,
 		0,
-		index_count / 3);
+		ib_size / 3);
 	stencil_shadow_force_render_state(D3DRS_DEPTHBIAS, 0);
 
 	// it. 568 — RELEASE SAMPLER 0. The reach path binds the depth target to s0 and forces POINT
@@ -901,11 +922,12 @@ void stencil_shadow_section_draw(
 	if (FAILED(draw_result))
 	{
 		LOG_INFO_GAME("stencil draw FAILED: hr={:#x} indices={} verts={} mode={}",
-			(uint32)draw_result, index_count, shadow->welded_vertex_count * 2,
+			(uint32)draw_result, ib_size, shadow->welded_vertex_count * 2,
 			stencil_shadow_debug_draw_mode());
 	}
 
 	stencil_shadow_release_pipeline(device);
+	return;
 }
 
 
