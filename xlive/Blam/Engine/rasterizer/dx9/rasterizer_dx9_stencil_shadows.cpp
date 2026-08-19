@@ -626,18 +626,17 @@ void stencil_shadow_section_draw(
 	for (uint32 quad_index = 0; quad_index < shadow->quad_count; quad_index++)
 	{
 		const s_stencil_shadow_quad* quad = &shadow->quads[quad_index];
-		if (quad->tri_right == k_stencil_shadow_matched_boundary)
-		{
-			continue;	// seam bridged by the model's cross-quad pass
-		}
-
 		bool left_faces = BIT_VECTOR_TEST_FLAG(facing_bitvector, quad->tri_left);
 		bool right_faces = quad->tri_right != k_stencil_shadow_boundary_triangle && BIT_VECTOR_TEST_FLAG(facing_bitvector, quad->tri_right);
 
-		if (left_faces == right_faces)
+		if (
+			quad->tri_right == k_stencil_shadow_matched_boundary ||
+			left_faces == right_faces									// seam bridged by the model's cross-quad pass
+		)
 		{
-			continue;
+			continue;	
 		}
+
 
 		// order the quad so its front faces away from the lit triangle; same-winding
 		// source pairs never swap (both sides want the stored orientation)
@@ -828,8 +827,11 @@ void stencil_shadow_section_draw(
 		if (!g_stencil_shadow_warned_index_overflow_volume)
 		{
 			g_stencil_shadow_warned_index_overflow_volume = true;
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil WARNING: index buffer overflow — {} indices truncated to {} (partial volume)",
 				ib_size, (uint32)k_stencil_shadow_index_buffer_capacity);
+#endif
 		}
 		ib_size = k_stencil_shadow_index_buffer_capacity;
 	}
@@ -921,9 +923,12 @@ void stencil_shadow_section_draw(
 
 	if (FAILED(draw_result))
 	{
+
+#ifdef LOG_STENCIL
 		LOG_INFO_GAME("stencil draw FAILED: hr={:#x} indices={} verts={} mode={}",
 			(uint32)draw_result, ib_size, shadow->welded_vertex_count * 2,
 			stencil_shadow_debug_draw_mode());
+#endif
 	}
 
 	stencil_shadow_release_pipeline(device);
@@ -950,8 +955,11 @@ void stencil_shadow_apply_and_clear(real32 darkness, const RECT* scissor)
 		if (!g_stencil_shadow_warned_no_apply)
 		{
 			g_stencil_shadow_warned_no_apply = true;
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil WARNING: apply skipped — device={} pixel_shader={} — NOTHING will be darkened",
 				device ? 1 : 0, g_stencil_shadow_pixel_shader ? 1 : 0);
+#endif
 		}
 		return;
 	}
@@ -991,9 +999,12 @@ void stencil_shadow_apply_and_clear(real32 darkness, const RECT* scissor)
 			// `applies_this_frame` is now the COMPLETE tally for the previous frame
 			if (last_apply_frame != 0xFFFFFFFF && (apply_log_counter++ % 600) == 0)
 			{
+
+#ifdef LOG_STENCIL
 				LOG_INFO_GAME("stencil apply: darkness={:.2f} scissor={} mode={} calls_in_frame={} (expect scissor=0, calls=1)",
 					last_darkness, last_scissored ? 1 : 0, (int32)stencil_shadow_debug_draw_mode(),
 					applies_this_frame);
+#endif
 			}
 			last_apply_frame = frame;
 			applies_this_frame = 0;
@@ -1177,8 +1188,11 @@ static void stencil_shadow_draw_cross_indices(
 		if (!g_stencil_shadow_warned_index_overflow_cross)
 		{
 			g_stencil_shadow_warned_index_overflow_cross = true;
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil WARNING: index buffer overflow — {} indices truncated to {} (partial volume)",
 				index_count, (uint32)k_stencil_shadow_index_buffer_capacity);
+#endif
 		}
 		index_count = k_stencil_shadow_index_buffer_capacity;
 	}
@@ -1223,8 +1237,11 @@ static void stencil_shadow_draw_cross_indices(
 	if (FAILED(cross_draw_result) && !g_stencil_shadow_warned_cross_draw_failed)
 	{
 		g_stencil_shadow_warned_cross_draw_failed = true;
+
+#ifdef LOG_STENCIL
 		LOG_INFO_GAME("stencil CROSS draw FAILED: hr={:#x} indices={} verts={}",
 			(uint32)cross_draw_result, index_count, shadow->welded_vertex_count * 2);
+#endif
 	}
 	stencil_shadow_release_pipeline(device);
 }
@@ -1265,7 +1282,10 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 	if (!logged_first_fire)
 	{
 		logged_first_fire = true;
+
+#ifdef LOG_STENCIL
 		LOG_INFO_GAME("stencil shadows: render hook first fire");
+#endif
 	}
 
 	if (!stencil_shadow_active() || !cache_file_is_loaded())
@@ -1298,7 +1318,10 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 		if (!g_stencil_shadow_warned_shadows_off)
 		{
 			g_stencil_shadow_warned_shadows_off = true;
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil shadows: suppressed — engine 'render_shadows' video setting is OFF");
+#endif
 		}
 		return;
 	}
@@ -1557,12 +1580,15 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 			// Object type is deliberately not logged: it. 420 established the caster mask is
 			// `_object_mask_unit`, so every caster reaching here is already a unit and eye tracking
 			// applies by construction. Logging it would add a column that is constant.
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil renderonly probe: node_orient=off {} size {} nodes={} | render_only_nodes={} (raw bits {}) (it. 487/502/506/507 — offset -1 or size 0 means 0x53599B early-outs and there is NO divergence; nodes=0 bounds it to eye tracking alone; raw >> nodes just means junk bits past node_count)",
 				(int32)object->object.node_orientation_block.offset,
 				(int32)object->object.node_orientation_block.size,
 				probe_node_count,
 				render_only_nodes,
 				render_only_raw);
+#endif
 
 			// it. 512 — HOW FAR does the composition we skip actually MOVE those nodes?
 			//
@@ -1634,8 +1660,11 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 					if (deg > max_deg) { max_deg = deg; }
 					compared++;
 				}
+
+#ifdef LOG_STENCIL
 				LOG_INFO_GAME("stencil renderonly delta: compared={} max_pos={:.5f}wu max_fwd={:.3f}deg order_violations={} (it. 512/515 — magnitude of the composition we skip; ~1e-4 closes it. 487 as immaterial, >~1e-2 justifies the plumbing. order_violations MUST be 0 or the single forward pass composed against a raw parent and the deltas are UNDER-reported)",
 					compared, max_pos, max_deg, order_violations);
+#endif
 			}
 		}
 
@@ -1835,8 +1864,11 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 				if (!g_stencil_shadow_warned_lod_fallback && section_index != NONE)
 				{
 					g_stencil_shadow_warned_lod_fallback = true;
+
+#ifdef LOG_STENCIL
 					LOG_INFO_GAME("stencil WARNING: no cached LOD for this object (requested {}), substituted level {} — the shadow is cast from a mesh the engine may not be rendering (it. 538; suspect for 'shadows on geometry that isn't visible')",
 						(int32)object_lod, fallback_level);
+#endif
 				}
 			}
 			if (section_index == NONE || section_index < 0
@@ -1890,10 +1922,13 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 				if ((g_stencil_shadow_skipped_class_mask & class_bit) == 0)
 				{
 					g_stencil_shadow_skipped_class_mask |= class_bit;
+
+#ifdef LOG_STENCIL
 					LOG_INFO_GAME("stencil shadows: section {} SKIPPED for classification {} (>{}) — td remaps class 4 to skinned and CASTS from it (it. 188/477); count so far {}",
 						section_index, dropped_class,
 						(int32)_geometry_classification_skinned,
 						g_stencil_shadow_skipped_class_count);
+#endif
 				}
 				continue;
 			}
@@ -1986,8 +2021,10 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 						static uint32 palette_failed_log = 0;
 						if ((palette_failed_log++ % 600) == 0)
 						{
+#ifdef LOG_STENCIL
 							LOG_INFO_GAME("stencil WARNING: skinned palette build failed for section {} — section skipped this frame (count {})",
 								section_index, palette_failed_log);
+#endif
 						}
 						continue;
 					}
@@ -2087,12 +2124,15 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 						// EITHER number being significant means the it. 335 composition matters:
 						// `ratio` near/above 1 = the volume was displaced; `bind_rot` non-zero = it was
 						// mis-ORIENTED. Only BOTH being ~0 means the fix is a no-op for this section.
+
+#ifdef LOG_STENCIL
 						LOG_INFO_GAME("stencil bindprobe: static section={} node={} bind_offset={:.3f}wu extent={:.3f}wu ratio={:.2f} bind_rot={:.1f}deg inv_scale={:.3f} class={} (ratio>=1 = displaced; bind_rot>0 = mis-oriented; BOTH ~0 = fix is a no-op here)",
 							section_index, (int32)section_node, bind_offset, extent,
 							extent > 0.0001f ? bind_offset / extent : -1.f,
 							bind_rotation_deg,
 							bind_inverse->scale,
 							(int32)section->global_geometry_classification);
+#endif
 					}
 				}
 				// STATIC TRANSFORM = node_world x INVERSE BIND, as for the articulated path (it. 317).
@@ -2171,8 +2211,11 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 					if (!g_stencil_shadow_warned_no_static_bind)
 					{
 						g_stencil_shadow_warned_no_static_bind = true;
+
+#ifdef LOG_STENCIL
 						LOG_INFO_GAME("stencil WARNING: static section {} node {} >= nodes.count {} — no inverse bind, volume will be displaced",
 							section_index, (int32)section_node, render_model->nodes.count);
+#endif
 					}
 				}
 				// static: facing test is model/section-space (plane data); the shader light
@@ -2255,8 +2298,11 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 				if (!g_stencil_shadow_warned_cross_cap)
 				{
 					g_stencil_shadow_warned_cross_cap = true;
+
+#ifdef LOG_STENCIL
 					LOG_INFO_GAME("stencil WARNING: section INDEX {} is past the {}-slot seam-stitch array (only {} sections drew) — sparse indexing, not too many sections; its seams will not be bridged",
 						section_index, (int32)k_stencil_shadow_max_cross_sections, sections_drawn + 1);
+#endif
 				}
 			}
 			sections_drawn++;
@@ -2378,8 +2424,11 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 		if (!g_stencil_shadow_warned_caster_cap)
 		{
 			g_stencil_shadow_warned_caster_cap = true;
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil WARNING: hit the {}-caster frame cap; later casters drew no shadow this frame",
 				(int32)k_stencil_shadow_max_casters_per_frame);
+#endif
 		}
 	}
 
@@ -2481,8 +2530,12 @@ void stencil_shadow_lightmap_volumes_pass(void)
 					probed->Release();
 				}
 			}
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil probe: vista stencil shaders present bits={:#x} (bit0=cap_proj, bit1=stitch_no_proj, bit2=stitch_proj)",
 				present);
+#endif
+
 			device->SetVertexShader(previous);
 			if (previous)
 			{
@@ -2529,7 +2582,10 @@ void stencil_shadow_lightmap_volumes_pass(void)
 					{
 						fwrite(bytecode, 1, bytecode_size, dump_file);
 						fclose(dump_file);
+
+#ifdef LOG_STENCIL
 						LOG_INFO_GAME("stencil RE: dumped env lightmap ps ({} bytes)", bytecode_size);
+#endif
 					}
 				}
 				free(bytecode);
@@ -2538,7 +2594,10 @@ void stencil_shadow_lightmap_volumes_pass(void)
 		}
 		else
 		{
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil RE: GetPixelShader hr={:#x}", (uint32)get_ps_result);
+#endif
 		}
 	}
 
@@ -2577,8 +2636,12 @@ void stencil_shadow_lightmap_volumes_pass(void)
 	}
 	if (++perf_samples >= 4800)	// it. 554 MEASURED ~580 passes/s, i.e. ~1.2 per frame, not 8
 	{
+
+#ifdef LOG_STENCIL
 		LOG_INFO_GAME("stencil perf: volumes pass avg={:.3f}ms max={:.3f}ms over {} passes",
 			perf_accum_ms / perf_samples, perf_max_ms, perf_samples);
+#endif
+
 		perf_accum_ms = 0.0;
 		perf_max_ms = 0.0;
 		perf_samples = 0;
@@ -2647,7 +2710,10 @@ void rasterizer_dx9_stencil_shadows_apply_patches(void)
 {
 	// no engine byte patches: the draw is called directly from Cartographer's native
 	// render_scene (render/render.cpp, after render_lights_new)
+
+#ifdef LOG_STENCIL
 	LOG_INFO_GAME("stencil shadows: initialized (drawing from native render_scene)");
+#endif
 }
 
 void stencil_shadow_shaders_dispose(void)

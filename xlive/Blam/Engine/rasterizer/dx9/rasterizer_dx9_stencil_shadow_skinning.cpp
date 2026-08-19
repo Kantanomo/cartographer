@@ -10,6 +10,10 @@
 #include "render/render_lod_new.h"		// it. 655 — the skinning pool mirror + node accessor
 #include "H2MOD/Modules/h2log/h2log.h"
 
+/* prototypes */
+
+static void stencil_shadow_compute_planes(s_stencil_shadow_section const* shadow);
+
 /* globals */
 
 // Per-map one-shot latches owned by this module — reset by stencil_shadow_skinning_reset_diagnostics,
@@ -127,12 +131,14 @@ bool stencil_shadow_pool_resolve(
 		if (total >= 600)
 		{
 			g_stencil_shadow_pool_tally_reported = true;
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil pool: lookups={} hit={} no_entry={} datum_fail={} owner={} no_offset={} stale_stamp={} pool_fail={} palette_miss={} (it. 656/658 — hit=0 means the adoption is INACTIVE and every caster is on the fallback; the dominant miss stage says which check to investigate)",
 				total,
 				g_stencil_shadow_pool_tally[0], g_stencil_shadow_pool_tally[1],
 				g_stencil_shadow_pool_tally[2], g_stencil_shadow_pool_tally[3],
 				g_stencil_shadow_pool_tally[4], g_stencil_shadow_pool_tally[5],
 				g_stencil_shadow_pool_tally[6], g_stencil_shadow_pool_tally[7]);
+#endif
 		}
 	}
 	return usable;
@@ -270,11 +276,14 @@ void stencil_shadow_pool_parity_probe(
 	if (++g_stencil_shadow_pool_probe_samples >= 240)
 	{
 		g_stencil_shadow_pool_probe_reported = true;
+
+#ifdef LOG_STENCIL
 		LOG_INFO_GAME("stencil poolprobe: samples={} interp_ran={} max_basis_delta={:.5f} max_pos_delta={:.5f}wu (it. 655 — ~0 = pool == our composition; SMALL = the it. 487 render-time correction, expected; LARGE rotation on a plain object = pool layout wrong, set k_stencil_shadow_use_skinning_pool=false)",
 			g_stencil_shadow_pool_probe_samples,
 			g_stencil_shadow_pool_probe_interp_ran,
 			g_stencil_shadow_pool_probe_max_basis,
 			g_stencil_shadow_pool_probe_max_pos);
+#endif
 	}
 }
 
@@ -381,8 +390,10 @@ bool stencil_shadow_section_animate(
 			if (!g_stencil_shadow_warned_no_bind)
 			{
 				g_stencil_shadow_warned_no_bind = true;
+#ifdef LOG_STENCIL
 				LOG_INFO_GAME("stencil WARNING: no bind matrix for node {} (nodes={}, world={}) — articulated section dropped",
 					(int32)node, render_model ? render_model->nodes.count : -1, world ? 1 : 0);
+#endif
 			}
 			return NULL;
 		}
@@ -490,11 +501,14 @@ bool stencil_shadow_section_animate(
 			if (++g_stencil_shadow_interp_samples >= 240)
 			{
 				g_stencil_shadow_probed_interpolation = true;
+
+#ifdef LOG_STENCIL
 				LOG_INFO_GAME("stencil interp probe: samples={} ran={} max_pos_delta={:.5f}wu max_fwd_delta={:.3f}deg (it. 419/471 — ran=0 means the interpolator DECLINED, which is NOT evidence the poses agree)",
 					g_stencil_shadow_interp_samples,
 					g_stencil_shadow_interp_ran,
 					g_stencil_shadow_interp_max_pos,
 					g_stencil_shadow_interp_max_fwd);
+#endif
 			}
 		}
 
@@ -535,7 +549,8 @@ bool stencil_shadow_section_animate(
 			// the silhouette edge usually lives.
 			const uint8* bone_indices = &shadow->vertex_bone_indices[welded_index * 4];
 			const real32* bone_weights = &shadow->vertex_bone_weights[welded_index * 4];
-			real32 x = 0.f, y = 0.f, z = 0.f;
+			real_point3d position = { 0.f, 0.f, 0.f };
+
 			for (int32 bone = 0; bone < 4; bone++)
 			{
 				real32 weight = bone_weights[bone];
@@ -549,16 +564,18 @@ bool stencil_shadow_section_animate(
 				{
 					return false;
 				}
-				x += weight * ((m->vectors.forward.i * base->x + m->vectors.left.i * base->y
-					+ m->vectors.up.i * base->z) * m->scale + m->position.x);
-				y += weight * ((m->vectors.forward.j * base->x + m->vectors.left.j * base->y
-					+ m->vectors.up.j * base->z) * m->scale + m->position.y);
-				z += weight * ((m->vectors.forward.k * base->x + m->vectors.left.k * base->y
-					+ m->vectors.up.k * base->z) * m->scale + m->position.z);
+
+				real_point3d temp;
+				matrix4x3_transform_point(m, base, &temp);
+
+				position.x += weight * temp.x;
+				position.y += weight * temp.y;
+				position.z += weight * temp.z;
 			}
-			world->x = x;
-			world->y = y;
-			world->z = z;
+
+			world->x = position.x;
+			world->y = position.y;
+			world->z = position.z;
 			continue;
 		}
 
@@ -571,12 +588,8 @@ bool stencil_shadow_section_animate(
 		{
 			return false;
 		}
-		world->x = (m->vectors.forward.i * base->x + m->vectors.left.i * base->y
-			+ m->vectors.up.i * base->z) * m->scale + m->position.x;
-		world->y = (m->vectors.forward.j * base->x + m->vectors.left.j * base->y
-			+ m->vectors.up.j * base->z) * m->scale + m->position.y;
-		world->z = (m->vectors.forward.k * base->x + m->vectors.left.k * base->y
-			+ m->vectors.up.k * base->z) * m->scale + m->position.z;
+
+		matrix4x3_transform_point(m, base, world);
 	}
 
 	QueryPerformanceCounter(&animate_t1);
@@ -607,6 +620,7 @@ bool stencil_shadow_section_animate(
 	{
 		g_stencil_shadow_animate_vb_skipped++;
 	}
+
 	QueryPerformanceCounter(&animate_t2);
 
 	// plane recompute from world positions (same math as build)
@@ -616,39 +630,7 @@ bool stencil_shadow_section_animate(
 	// transposing it walked plane_count twice to produce one consumed result. Lane addressing is
 	// identical to stencil_shadow_planes_fill_soa: block = index/4, [nx x4][ny x4][nz x4][d x4].
 	// The pad lanes of a partial tail block keep the zeros the build-time fill gave them.
-	for (uint32 triangle_index = 0; triangle_index < shadow->plane_count; triangle_index++)
-	{
-		const uint16* triangle = &shadow->triangles[triangle_index * 3];
-		const real_point3d* p0 = &shadow->world_positions[triangle[0]];
-		const real_point3d* p1 = &shadow->world_positions[triangle[1]];
-		const real_point3d* p2 = &shadow->world_positions[triangle[2]];
-		real_vector3d edge_1 = { p0->x - p1->x, p0->y - p1->y, p0->z - p1->z };
-		real_vector3d edge_2 = { p0->x - p2->x, p0->y - p2->y, p0->z - p2->z };
-
-		real32 n_i = edge_2.k * edge_1.j - edge_1.k * edge_2.j;
-		real32 n_j = edge_1.k * edge_2.i - edge_2.k * edge_1.i;
-		real32 n_k = edge_2.j * edge_1.i - edge_1.j * edge_2.i;
-		real32 d = n_i * p0->x + n_j * p0->y + n_k * p0->z;
-
-		real32* soa = &shadow->planes_soa[(triangle_index >> 2) * 16];
-		uint32 lane = triangle_index & 3;
-		soa[lane] = n_i;
-		soa[4 + lane] = n_j;
-		soa[8 + lane] = n_k;
-		soa[12 + lane] = d;
-
-		// Off by default. When on, AoS is kept in step with SoA exactly as before — note this
-		// leaves WORLD-space planes in an array stencil_shadow_section_validate reads as though
-		// they were bind-pose, which is why the default is the quiet one.
-		if constexpr (k_stencil_shadow_write_aos_planes)
-		{
-			real_plane3d* plane = &shadow->planes[triangle_index];
-			plane->n.i = n_i;
-			plane->n.j = n_j;
-			plane->n.k = n_k;
-			plane->d = d;
-		}
-	}
+	stencil_shadow_compute_planes(shadow);
 
 	QueryPerformanceCounter(&animate_t3);
 	g_stencil_shadow_animate_skin_ticks += animate_t1.QuadPart - animate_t0.QuadPart;
@@ -664,11 +646,13 @@ bool stencil_shadow_section_animate(
 		UNREFERENCED_PARAMETER(to_microseconds);
 		UNREFERENCED_PARAMETER(inv_count);
 
+#ifdef LOG_STENCIL
 		LOG_INFO_GAME("stencil animtime: animates={} vb_skipped={} avg_us skin={:.1f} vb={:.1f} planes={:.1f} (it. 660 — the it. 553/556 measurement; vb should be ~0 with vb_skipped == animates)",
 			g_stencil_shadow_animate_count, g_stencil_shadow_animate_vb_skipped,
 			(real64)g_stencil_shadow_animate_skin_ticks * to_microseconds * inv_count,
 			(real64)g_stencil_shadow_animate_vb_ticks * to_microseconds * inv_count,
 			(real64)g_stencil_shadow_animate_plane_ticks * to_microseconds * inv_count);
+#endif
 	}
 
 	// world-position verification (user-requested): every transformed vertex must stay
@@ -729,8 +713,10 @@ bool stencil_shadow_section_animate(
 			static uint32 dbg_outlier_log = 0;
 			if (outliers && ++dbg_outlier_log % 300 == 1)
 			{
+#ifdef LOG_STENCIL
 				LOG_INFO_GAME("stencil VERTEX OUTLIERS: {}/{} world verts beyond {:.1f}wu of object (first node={})",
 					outliers, shadow->welded_vertex_count, sane_radius, outlier_node);
+#endif
 			}
 
 			// INFLATION RATIO — normalised against the section's own BIND-POSE extent, not
@@ -808,12 +794,15 @@ bool stencil_shadow_section_animate(
 				// Use `stencil bindprobe:` (bind_offset / bind_rot) to ask whether composing the bind
 				// MATTERS, and it. 412's bit-exact check for whether it HAPPENS. This line answers
 				// neither; it measures how far the volume is spread.
+
+#ifdef LOG_STENCIL
 				LOG_INFO_GAME("stencil inflation: obj={} bind_extent={:.3f}wu world_extent={:.3f}wu ratio={:.2f} (it. 473: on branch=dominant-node this is just m->scale and means NOTHING; on branch=weighted >>2 = starfish) verts={} branch={} obj_radius={:.3f} max_from_origin={:.3f}",
 					(uint32)object_index, bind_extent, world_extent,
 					bind_extent > 0.0001f ? world_extent / bind_extent : -1.f,
 					shadow->welded_vertex_count,
 					shadow->vertex_bone_weights ? "weighted" : "dominant-node",
 					object->object.radius, (real32)sqrt((real64)max_dist_sq));
+#endif
 			}
 		}
 	}
@@ -843,4 +832,47 @@ void stencil_shadow_skinning_reset_diagnostics(void)
 	g_stencil_shadow_animate_skin_ticks = 0;
 	g_stencil_shadow_animate_vb_ticks = 0;
 	g_stencil_shadow_animate_plane_ticks = 0;
+}
+
+
+static void stencil_shadow_compute_planes(
+	s_stencil_shadow_section const* shadow)
+{
+	for (uint32 triangle_index = 0; triangle_index < shadow->plane_count; triangle_index++)
+	{
+		const uint16* triangle = &shadow->triangles[triangle_index * 3];
+		real_point3d const* p0 = &shadow->world_positions[triangle[0]];
+		real_point3d const* p1 = &shadow->world_positions[triangle[1]];
+		real_point3d const* p2 = &shadow->world_positions[triangle[2]];
+
+		real_vector3d edge_1;
+		real_vector3d edge_2;
+		real_vector3d normal;
+		real32 d;
+
+		vector_from_points3d(p1, p0, &edge_1);
+		vector_from_points3d(p2, p0, &edge_2);
+
+		cross_product3d(&edge_1, &edge_2, &normal);
+		d = dot_product3d(&normal, (real_vector3d*)p0->n);
+
+		real32* soa = &shadow->planes_soa[(triangle_index >> 2) * 16];
+		uint32 lane = triangle_index & 3;
+		soa[lane] = normal.i;
+		soa[4 + lane] = normal.j;
+		soa[8 + lane] = normal.k;
+		soa[12 + lane] = d;
+
+		// Off by default. When on, AoS is kept in step with SoA exactly as before — note this
+		// leaves WORLD-space planes in an array stencil_shadow_section_validate reads as though
+		// they were bind-pose, which is why the default is the quiet one.
+		if constexpr (k_stencil_shadow_write_aos_planes)
+		{
+			real_plane3d* plane = &shadow->planes[triangle_index];
+			plane->n = normal;
+			plane->d = d;
+		}
+	}
+
+	return;
 }

@@ -291,6 +291,8 @@ bool stencil_shadow_reach_encode(
 
 			UNREFERENCED_PARAMETER(expected_slope);
 
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil reach: active={} caster=({:.2f},{:.2f},{:.2f}) cam=({:.2f},{:.2f},{:.2f}) SLOPE={:.3f} expected_flat={:.3f} bound_base={:.2f}wu tan_h={:.3f} tan_v={:.3f} z_far={:.1f} extrude_dir=({:.2f},{:.2f},{:.2f}) — it. 592 (slope 0 = 2nd ray missed; slope != expected = different surface)",
 				g_stencil_shadow_reach_active ? 1 : 0,
 				object->object.center.x, object->object.center.y, object->object.center.z,
@@ -305,6 +307,7 @@ bool stencil_shadow_reach_encode(
 				// fmt does not error on surplus arguments, so nothing flagged it.
 				g_stencil_shadow_reach_c[0][2],
 				g_stencil_shadow_reach_c[6][0], g_stencil_shadow_reach_c[6][1], g_stencil_shadow_reach_c[6][2]);
+#endif
 		}
 	}
 	return reach_extrusion;

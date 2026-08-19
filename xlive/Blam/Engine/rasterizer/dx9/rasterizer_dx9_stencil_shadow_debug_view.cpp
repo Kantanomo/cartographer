@@ -52,7 +52,10 @@ void stencil_shadow_debug_update(void)
 	if (key_down && !key_was_down)
 	{
 		g_active = !g_active;
+
+#ifdef LOG_STENCIL
 		LOG_INFO_GAME("stencil shadows: active={} mode={}", g_active, g_draw_mode);
+#endif
 	}
 	key_was_down = key_down;
 
@@ -84,8 +87,11 @@ void stencil_shadow_debug_update(void)
 	if (probe_key_down && !probe_key_was_down)
 	{
 		g_draw_mode = (g_draw_mode + 1) % 3;
+
+#ifdef LOG_STENCIL
 		LOG_INFO_GAME("stencil shadows: active={} mode={} (0=real 1=red 2=green)",
 			g_active, g_draw_mode);
+#endif
 	}
 	probe_key_was_down = probe_key_down;
 
@@ -159,8 +165,11 @@ void stencil_shadow_debug_update(void)
 		// it. 581: print the RAW override. Two iterations were lost to "the screen says REACH-CLIP but
 		// no reach telemetry appears" — the on-screen text is scrollback and persists after later
 		// presses move the mode on, so it is NOT evidence of the current mode. This value is.
+
+#ifdef LOG_STENCIL
 		LOG_INFO_GAME("stencil mode: override={:.1f} (sentinels: 0=STOCK -1=DYNAMIC -2=CLIPPED -3=REACH; anything else is a literal wu distance)",
 			g_extrusion_override);
+#endif
 
 		if (g_extrusion_override == k_stencil_shadow_reach_extrusion)
 		{
@@ -172,17 +181,23 @@ void stencil_shadow_debug_update(void)
 			addDebugText("stencil extrusion: REACH-CLIP %s (infinite volume, %.1f wu reach)",
 				usable ? "active" : "UNAVAILABLE (no SM3) - running stock 2.0",
 				k_stencil_shadow_reach_distance);
+
+#ifdef LOG_STENCIL
 			LOG_INFO_GAME("stencil shadows: extrusion=REACH-CLIP usable={} extrude={}wu reach={}wu (it. 557 — infinite volume, per-pixel depth bound)",
 				usable ? 1 : 0, k_stencil_shadow_reach_extrusion_distance,
 				k_stencil_shadow_reach_distance);
+#endif
 		}
 		else
 		{
+#ifdef LOG_STENCIL
 			const real32 shown = g_extrusion_override == 0.f
 				? k_stencil_shadow_extrusion_distance : g_extrusion_override;
+			
 			addDebugText("stencil extrusion: %.3f wu%s", shown,
 				g_extrusion_override == 0.f ? " (STOCK, td's value)" : " (fixed)");
 			LOG_INFO_GAME("stencil shadows: extrusion={}", shown);
+#endif
 		}
 	}
 	extrude_key_was_down = extrude_key_down;

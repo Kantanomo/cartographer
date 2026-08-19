@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef NDEBUG
+#define LOG_STENCIL
+#endif
+
 // Every tunable, cap and shader-register assignment for the stencil shadow system, in one place.
 //
 // WHY THIS FILE EXISTS
