@@ -69,15 +69,35 @@ float4 caster_c   : register(c221);	// xyz = caster centre, world
 float4 extrude_c  : register(c222);	// xyz = extrusion direction (AWAY from the light, unit)
 float4 spread_c   : register(c223);	// xyz = horizontal shadow direction (unit), w = d(along)/d(lateral)
 
+// it. 674 — HALF-PRECISION EXPERIMENT (user-requested). The `half` declarations below compile to
+// _pp (partial precision) hints in the ps_3_0 bytecode. Two facts to read the test by:
+//
+//   * On DX10+ hardware running D3D9 — i.e. every machine this mod realistically runs on — _pp is
+//     IGNORED: the ALUs are fp32-only and execute at full precision regardless. The EXPECTED result
+//     of this experiment on the test machine is therefore "no fps change and no visual change".
+//   * On hardware that HONOURS _pp (GeForce 6/7 era), this shader would VISIBLY BREAK: it
+//     reconstructs world positions at coordinate magnitudes of hundreds of wu, and fp16's 11-bit
+//     mantissa gives steps of 0.5-1.0 wu at magnitude 512-1024 — against a bound base measured at
+//     ~0.7 wu. The kill test would disintegrate into noise. If reach-mode shadows ever look broken
+//     on old hardware, revert this first.
+//
+// The return type stays float4: D3D9 validates that a pixel shader writes all four components of
+// COLOR0 (error X4530 — measured, not assumed), so "return void" is impossible; the constant-zero
+// return is already the one-instruction legal minimum and the ROP masks it (COLORWRITEENABLE=0).
+//
+// NOTE: the checked-in blob is currently compiled with `/Gis /Gpp` — /Gpp forces partial precision
+// on EVERY instruction (25 of 26 carry _pp; texkill has no _pp form), beyond what the half
+// declarations alone produce. A recompile with the tree's standard flags (/Gis only) will drop
+// back to the declaration-driven subset.
 float4 main(float2 vpos : VPOS) : COLOR
 {
     // VPOS is the pixel centre in pixels; +0.5 lands on the texel centre of a 1:1 target.
-    float2 uv = (vpos + 0.5f) * reach_c.xy;
+    half2 uv = (vpos + 0.5f) * reach_c.xy;
 
-    float3 packed = tex2D(scene_depth, uv).rgb;
-    float depth01 = packed.r
-                  + packed.g * 0.00390625f
-                  + packed.b * 0.000015f;
+    half3 packed = tex2D(scene_depth, uv).rgb;
+    half depth01 = packed.r
+                 + packed.g * 0.00390625f
+                 + packed.b * 0.000015f;
 
     // it. 568 — LINEAR, confirmed by a SECOND independent engine consumer.
     //
@@ -88,16 +108,16 @@ float4 main(float2 vpos : VPOS) : COLOR
     // indexing a gradient linearly, two independent engine shaders treat it as linear.
     //
     // So the encoding is NOT the reason it. 566 drew nothing. reach_c.z carries z_far again.
-    float view_depth = depth01 * reach_c.z;
+    half view_depth = depth01 * reach_c.z;
 
     // Ray through this pixel, scaled so its forward component is exactly 1. `right` and `up` are
     // perpendicular to `forward`, so dot(dir, forward) == 1 and `cam + dir * view_depth` lands at
     // precisely that view depth -- no normalize, and no division.
-    float sx = (uv.x * 2.0f - 1.0f) * cam_rgt_c.w;
-    float sy = (1.0f - uv.y * 2.0f) * cam_up_c.w;
-    float3 dir = cam_fwd_c.xyz + cam_rgt_c.xyz * sx + cam_up_c.xyz * sy;
+    half sx = (uv.x * 2.0f - 1.0f) * cam_rgt_c.w;
+    half sy = (1.0f - uv.y * 2.0f) * cam_up_c.w;
+    half3 dir = cam_fwd_c.xyz + cam_rgt_c.xyz * sx + cam_up_c.xyz * sy;
 
-    float3 receiver = cam_pos_c.xyz + dir * view_depth;
+    half3 receiver = cam_pos_c.xyz + dir * view_depth;
 
     // Distance from the caster ALONG THE LIGHT. Signed on purpose: anything in front of the caster
     // (negative) must always be kept, or the caster would stop shadowing surfaces nearer than itself.
@@ -106,7 +126,7 @@ float4 main(float2 vpos : VPOS) : COLOR
     // horizontal floors, but the user observed shadows landing on WALLS ("if i approach a wall the
     // shadow starts coming back"), and a height bound would clip a wall shadow away entirely — a
     // strictly worse trade. `along` handles any receiver orientation.
-    float along = dot(receiver - caster_c.xyz, extrude_c.xyz);
+    half along = dot(receiver - caster_c.xyz, extrude_c.xyz);
 
     // it. 590 — THE BOUND IS A LINE, NOT A CONSTANT.
     //
@@ -122,8 +142,8 @@ float4 main(float2 vpos : VPOS) : COLOR
     //
     // Exact for any planar receiver at any orientation — floor, ramp or wall — which is what makes the
     // padding unnecessary. Leak returns to the MARGIN ALONE while the shadow keeps its full extent.
-    float lateral = dot(receiver - caster_c.xyz, spread_c.xyz);
-    float bound = cam_pos_c.w + spread_c.w * lateral;
+    half lateral = dot(receiver - caster_c.xyz, spread_c.xyz);
+    half bound = cam_pos_c.w + spread_c.w * lateral;
     clip(bound - along);
 
     // Colour is irrelevant: the volume pass runs with COLORWRITEENABLE = 0 and exists only to move the
