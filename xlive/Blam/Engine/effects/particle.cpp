@@ -64,9 +64,9 @@ void c_particle::adjust_initial_position(
 			if (collision_test_vector(flags, &placement, &direction, NONE, NONE, &collision_res))
 			{
 				// fog plane??
-				point_from_line3d(&collision_res.point, &collision_res.fog_plane.n, 0.005f, &m_position);
+				point_from_line3d(&collision_res.point, &collision_res.plane.n, 0.005f, &m_position);
 				this->m_flags |= 0xAu;
-				m_velocity = collision_res.fog_plane.n;
+				m_velocity = collision_res.plane.n;
 			}
 			else
 			{

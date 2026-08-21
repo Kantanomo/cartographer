@@ -1,23 +1,22 @@
-// shadow_extrude_skinned.fx — Cartographer stencil shadow volume extrusion, GPU-SKINNED (it. 660).
-// Not a tool-dumped shader; the companion of shadow_extrude.fx for articulated sections.
+// shadow_extrude_skinned.fx - Cartographer stencil shadow volume extrusion, GPU-SKINNED. Not a
+// tool-dumped shader; the companion of shadow_extrude.fx for articulated sections.
 //
-// THE ONLY DIFFERENCE FROM shadow_extrude.fx is how world_pos is produced: instead of one node
-// matrix at c50-c52, a 4-bone blend against a palette of 3-row matrices starting at c50 — the same
-// blend, register base and row convention as Vista's own shadow_buffer_generation_skinned_4_bone
-// (which indexes `c[a0.x + 50/51/52]` in vs_2_0). Everything from `extrude_dir` down is copied
-// verbatim from shadow_extrude.fx; see the derivations there (self-shadow bias it. 615/616,
-// far-plane clamp) — they are deliberately not re-explained here.
+// THE ONLY DIFFERENCE FROM shadow_extrude.fx is how world_pos is produced: instead of one node matrix
+// at c50-c52, a 4-bone blend against a palette of 3-row matrices starting at c50 - the same blend,
+// register base and row convention as Vista's own shadow_buffer_generation_skinned_4_bone, which
+// indexes `c[a0.x + 50/51/52]` in vs_2_0. Everything from `extrude_dir` down is copied verbatim from
+// shadow_extrude.fx and the derivations live there, deliberately not repeated here.
 //
-// Divergences from the reference blend, both baked at VB build time (it. 660):
+// Divergences from the reference blend, both baked at VB build time:
 //   * indices arrive PRE-MULTIPLIED BY 3 (the reference multiplies by c[7].w at run time; we do not
 //     touch c7, which belongs to the engine). ubyte4 payload, so local slot <= 84 fits; the builder
-//     guards node_map_count <= 67 so c50 + 3N + 2 stays inside the vs_2_0 constant file.
+//     guards node_map_count <= 67, one slot under what c50 + 3S + 2 < c254 actually allows.
 //   * all four weights are STORED (ubyte4n, summing 1.0); the reference derives w0 = 1 - (rest)
 //     from c[4].w. Storing it costs nothing in a 4-byte lane we pad anyway and drops the c4 read.
 //
 // Constants:
-//   c0-c3        : world->clip dp4 rows — INHERITED from the engine
-//   c50..c50+3N  : palette — 3 rows per matrix, row r = {f[r]*s, l[r]*s, u[r]*s, pos[r]},
+//   c0-c3        : world->clip dp4 rows - INHERITED from the engine
+//   c50..c50+3N  : palette - 3 rows per matrix, row r = {f[r]*s, l[r]*s, u[r]*s, pos[r]},
 //                  model->world with the inverse bind already composed (the skinning pool's own
 //                  packing, render_model_build_skinning_for_base_nodes 0x77DD88)
 //   c254         : WORLD-space light: point -> (position.xyz, 1), directional -> (toward_light.xyz, 0)
@@ -30,7 +29,10 @@
 //   BLENDWEIGHT0   ubyte4n weights summing 1.0 (unused lanes 0)
 
 float4 wvp[4] : register(c0);
-float4 palette[204] : register(c50);	// 68 matrices x 3 rows — the full c50..c253 window
+// 68 slots x 3 rows - the full c50..c253 window. The draw uploads at most
+// k_stencil_shadow_max_palette_nodes (67) of them, so c251..c253 are declared but never written;
+// see that constant for why the C++ side stops one slot short.
+float4 palette[204] : register(c50);
 float4 light_c : register(c254);
 float4 extrude_c : register(c255);
 
@@ -49,9 +51,9 @@ VS_OUTPUT main(
 
     float4 model_pos = float4(va_position.xyz, 1.0f);
 
-    // 4-bone blend of the three matrix rows — the reference shader's r4/r5/r6 accumulation, with
+    // 4-bone blend of the three matrix rows - the reference shader's r4/r5/r6 accumulation, with
     // the index scale and the derived weight baked out (see the header). UBYTE4 input arrives as
-    // raw 0..255 floats — exact integers, so the cast (which compiles to mova) is lossless.
+    // raw 0..255 floats - exact integers, so the cast (which compiles to mova) is lossless.
     int4 a0 = (int4)va_indices;
 
     float4 row_x = va_weights.x * palette[a0.x + 0];

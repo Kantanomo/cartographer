@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "render.h"
 
 #include "render_contrails.h"
@@ -15,7 +15,6 @@
 #include "bink/wmv_playback.h"
 #include "cache/pc_geometry_cache.h"
 #include "rasterizer/dx9/rasterizer_dx9_stencil_shadows.h"
-#include "render/render_stencil_shadow_dynamic.h"
 #include "effects/beam.h"
 #include "effects/player_effects.h"
 #include "game/game_engine.h"
@@ -93,6 +92,12 @@ static void render_view(
 	s_bloom_window_data* window_bound_unk_data,
 	int8 zero_2,
 	s_screen_flash* screen_flash);
+
+// The lightmap term and the stencil shadow passes bracketing it. Shared by the SM3 and non-SM3
+// paths of render_window because the ORDER is the contract and both must obey the same one - laid
+// out separately, a change to one path breaks shadows on that hardware alone, which is the hardest
+// kind of report to act on.
+static void render_window_lightmap_and_stencil_shadows(void);
 
 static void __cdecl render_scene_bitflags_set(void);
 static bool render_scene_is_splitscreen(void);
@@ -418,44 +423,7 @@ void __cdecl render_scene(
 			rasterizer_dx9_perf_event_end("texaccum");
 			*/
 
-			// Vista has NO depth prepass: the lightmap layer itself writes scene depth, so
-			// the volumes MUST count after it (probed 2026-08-15 — volumes laid earlier see
-			// an empty depth buffer and z-fail never fires). Faithful world-term masking
-			// therefore requires re-separating the world lightmap into indirect + masked
-			// direct draws (custom env shader variants) — design map 6.6/7.
-			rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
-			render_scene_geometry(_collection_type_0, _render_layer_lightmap_indirect);
-			rasterizer_dx9_perf_event_end("lightmap_indirect");
-
-			// tag-debug pass 6 (layer 6): stencil shadow volumes only — no application here.
-			rasterizer_dx9_perf_event_begin("stencil_shadow_volumes", NULL);
-			stencil_shadow_lightmap_volumes_pass();
-			rasterizer_dx9_perf_event_end("stencil_shadow_volumes");
-
-			// The SH-PRT layer draws UNMASKED: it completes the lightmap term, which the single
-			// darken below then attenuates. Masking it here as well was a second stencil-gated
-			// attenuation td does not have (see stencil_shadow_world_darken).
-			rasterizer_dx9_perf_event_begin("sh_prt", NULL);
-			render_scene_geometry(_collection_type_0, _render_layer_spherical_harmonics_prt);
-			rasterizer_dx9_perf_event_end("sh_prt");
-
-			// tag-debug pass 7 (render_layer_lightmap_diffuse, td 0x10D8F0): the tier's ONE
-			// application — a fullscreen multiply over stencil != 128, once the whole lightmap
-			// term is down. Also retires the counts and clears the stencil for render_lights_new.
-			rasterizer_dx9_perf_event_begin("stencil_shadow_darken", NULL);
-			stencil_shadow_world_darken();
-			rasterizer_dx9_perf_event_end("stencil_shadow_darken");
-
-			// tag-debug layer 13, FIRST HALF: lay the dynamic lights' volumes.
-			//
-			// HERE and not with the apply, because c0-c3 — the world->clip rows our extrusion shader
-			// INHERITS — are the current window's mid-scene. After render_lights_new the lights path
-			// leaves them stale, which draws volumes out of place (the note on
-			// stencil_shadow_lightmap_volumes_pass records that being learned the hard way).
-			// The darken above has just retired the lightmap counts, so the stencil is ours from here.
-			rasterizer_dx9_perf_event_begin("stencil_shadow_dynamic_volumes", NULL);
-			stencil_shadow_dynamic_volumes_pass();
-			rasterizer_dx9_perf_event_end("stencil_shadow_dynamic_volumes");
+			render_window_lightmap_and_stencil_shadows();
 
 			g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
 
@@ -477,20 +445,12 @@ void __cdecl render_scene(
 			}
 			rasterizer_dx9_perf_event_end("decals_alpha_blend_prelight");
 
-			// Vista's OWN object shadows. Despite the name this is not cinematic-only:
-			// render_cinematic_lightmap_shadows (halo2.exe 0x593F9D) gates on
-			//     structure_lightmap_is_valid() && g_hs_render_lightmap_shadows
-			//     && (!cinematic_in_progress() || b_render_cinematic_lightmap_shadows)
-			// so the cinematic test EXCLUDES cinematics rather than requiring them, and it runs
-			// every frame in normal gameplay -> get_lights_around_player -> render_static_shadows
-			// -> render_static_shadows_project_quad, i.e. a projected quad ("blob") shadow per
-			// object sized from its bounding sphere.
-			//
-			// tag debug has no such system: its only object shadows are the stencil volumes.
-			// Leaving this on meant every caster got BOTH a Vista projected shadow and our
-			// stencil volume — and the projected quad is soft and bounding-sphere sized, so it
-			// reads as a shadow much larger than its object AND is completely unaffected by our
-			// extrusion distance. Suppress it while the stencil system owns object shadows.
+			// Vista's OWN object shadows, and despite the name not cinematic-only: the function's
+			// gate EXCLUDES cinematics rather than requiring them, so it runs every frame in normal
+			// gameplay and draws a projected quad ("blob") shadow per object, sized from its bounding
+			// sphere. Tag debug has no such system - its only object shadows are the stencil volumes -
+			// so leaving this on gives every caster both, and the projected quad is soft,
+			// bounding-sphere sized and unaffected by our extrusion distance.
 			if (!stencil_shadow_active())
 			{
 				rasterizer_dx9_perf_event_begin("render_cinematic_lightmap_shadows", NULL);
@@ -505,19 +465,6 @@ void __cdecl render_scene(
 			rasterizer_dx9_perf_event_begin("render_lights_new", NULL);
 			render_lights_new();
 			rasterizer_dx9_perf_event_end("render_lights_new");
-
-			// tag-debug layer 13, SECOND HALF: consume the counts laid mid-scene.
-			//
-			// HERE because the composite is only finished once the lights have accumulated —
-			// darkening earlier would be re-lit by the very lights whose contribution the shadow is
-			// meant to withhold. Nothing between the two halves engages the stencil (only
-			// lightmap_indirect and texture_accumulate do, and both are already past), so the counts
-			// survive the gap.
-			//
-			// DEFAULT OFF and never runtime-verified — F5 toggles it. docs/12-dynamic-light-tier.md.
-			rasterizer_dx9_perf_event_begin("stencil_shadow_dynamic_apply", NULL);
-			stencil_shadow_dynamic_apply();
-			rasterizer_dx9_perf_event_end("stencil_shadow_dynamic_apply");
 
 			rasterizer_dx9_perf_event_begin("decals_alpha_blend", NULL);
 			if (render_decals_enabled)
@@ -569,58 +516,7 @@ void __cdecl render_scene(
 			rasterizer_dx9_perf_event_end("texaccum");
 			*/
 
-			// Vista has NO depth prepass: the lightmap layer itself writes scene depth, so
-			// the volumes MUST count after it (probed 2026-08-15 — volumes laid earlier see
-			// an empty depth buffer and z-fail never fires). Faithful world-term masking
-			// therefore requires re-separating the world lightmap into indirect + masked
-			// direct draws (custom env shader variants) — design map 6.6/7.
-			rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
-			render_scene_geometry(_collection_type_0, _render_layer_lightmap_indirect);
-			rasterizer_dx9_perf_event_end("lightmap_indirect");
-
-			// tag-debug pass 6 (layer 6): stencil shadow volumes only — no application here.
-			rasterizer_dx9_perf_event_begin("stencil_shadow_volumes", NULL);
-			stencil_shadow_lightmap_volumes_pass();
-			rasterizer_dx9_perf_event_end("stencil_shadow_volumes");
-
-			// The SH-PRT layer draws UNMASKED: it completes the lightmap term, which the single
-			// darken below then attenuates. Masking it here as well was a second stencil-gated
-			// attenuation td does not have (see stencil_shadow_world_darken).
-			rasterizer_dx9_perf_event_begin("sh_prt", NULL);
-			render_scene_geometry(_collection_type_0, _render_layer_spherical_harmonics_prt);
-			rasterizer_dx9_perf_event_end("sh_prt");
-
-			// tag-debug pass 7 (render_layer_lightmap_diffuse, td 0x10D8F0): the tier's ONE
-			// application — a fullscreen multiply over stencil != 128, once the whole lightmap
-			// term is down. Also retires the counts and clears the stencil for render_lights_new.
-			rasterizer_dx9_perf_event_begin("stencil_shadow_darken", NULL);
-			stencil_shadow_world_darken();
-			rasterizer_dx9_perf_event_end("stencil_shadow_darken");
-
-			// tag-debug layer 13 in BRANCH 2 (debug_view 0/3-5).
-			//
-			// it. 637: this branch was MISSED on the first wiring — the exact failure it. 301 warned
-			// about ("duplicated integration is where a call goes missing"), which is why the
-			// shipping tier's hooks were counted across both branches rather than assumed.
-			//
-			// The volumes/apply SPLIT has no meaning here: unlike branch 1, this branch has **no
-			// light-accumulation stage at all** — no render_lights_new, nothing between the darken
-			// and the overlay layer. So the two halves run adjacent. The ordering constraint that
-			// forced the split in branch 1 (darken must follow accumulation) does not arise, because
-			// there is no accumulation to follow.
-			//
-			// it. 638 SETTLED which branch is live, and it is NOT this one: `rasterizer_render_scene`
-			// initialises `render_layer_debug_view = 1`, and only the debug globals
-			// `g_render_layer_view_4` / `_view_5` (both `false`) move it off that. So **branch 1 is
-			// normal gameplay** and this branch is a debug view.
-			//
-			// That means the volumes/apply SPLIT — which only branch 1 can express — is the one that
-			// matters, and it is correctly placed. This wiring is completeness, not coverage: it
-			// keeps the tier from vanishing if someone flips view 4 while testing.
-			rasterizer_dx9_perf_event_begin("stencil_shadow_dynamic", NULL);
-			stencil_shadow_dynamic_volumes_pass();
-			stencil_shadow_dynamic_apply();
-			rasterizer_dx9_perf_event_end("stencil_shadow_dynamic");
+			render_window_lightmap_and_stencil_shadows();
 
 			rasterizer_dx9_perf_event_begin("overlay", NULL);
 			render_scene_geometry(_collection_type_0, _render_layer_overlay);
@@ -1065,4 +961,32 @@ static void __cdecl render_camera_scene(
 		hologram_flag,
 		effect_flag);
 	return;
+}
+
+static void render_window_lightmap_and_stencil_shadows(void)
+{
+	// Vista has NO depth prepass: the lightmap layer itself writes scene depth, so the stencil
+	// volumes below MUST count after it — laid earlier they see an empty depth buffer and z-fail
+	// never fires.
+	rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
+	render_scene_geometry(_collection_type_0, _render_layer_lightmap_indirect);
+	rasterizer_dx9_perf_event_end("lightmap_indirect");
+
+	// Tag debug's pass 6: volumes only, no application here.
+	rasterizer_dx9_perf_event_begin("stencil_shadow_volumes", NULL);
+	stencil_shadow_lightmap_volumes_pass();
+	rasterizer_dx9_perf_event_end("stencil_shadow_volumes");
+
+	// The SH-PRT layer draws UNMASKED: it completes the lightmap term that the single darken below
+	// attenuates, and masking it here as well would attenuate twice.
+	rasterizer_dx9_perf_event_begin("sh_prt", NULL);
+	render_scene_geometry(_collection_type_0, _render_layer_spherical_harmonics_prt);
+	rasterizer_dx9_perf_event_end("sh_prt");
+
+	// Tag debug's pass 7: the tier's ONE application, a fullscreen multiply over stencil != 128
+	// once the whole lightmap term is down. Also retires the counts and clears the stencil for
+	// render_lights_new. Ordering rationale: docs/04-rendering.md.
+	rasterizer_dx9_perf_event_begin("stencil_shadow_darken", NULL);
+	stencil_shadow_world_darken();
+	rasterizer_dx9_perf_event_end("stencil_shadow_darken");
 }

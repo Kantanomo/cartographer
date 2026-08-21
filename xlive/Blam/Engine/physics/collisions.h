@@ -44,7 +44,17 @@ struct collision_result
 	real_point3d point;
 	s_location locations[2];
 	int16 global_material_index;
-	real_plane3d fog_plane;
+
+	// THE HIT SURFACE PLANE, and `n` is the surface normal - world space, already facing the incoming
+	// ray (the engine negates all four components when the backface bit is set). Filled by every path:
+	// the structure-BSP test writes it directly, and instanced geometry arrives through
+	// matrix4x3_transform_plane, so an instance's own transform is already applied.
+	//
+	// It was called `fog_plane` until 2026-08-21, which describes only `type == 2`. Under that name it
+	// was read as unrelated to the hit and recorded three times as "collision_result carries no surface
+	// normal" - a conclusion that closed off the exact thing the reach clip needed. Meanwhile
+	// particle.cpp was already bouncing particles off `n`.
+	real_plane3d plane;
 	int32 field_38;
 	int32 instanced_geometry_instance_index;
 	datum object_index;

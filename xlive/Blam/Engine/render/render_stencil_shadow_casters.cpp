@@ -5,30 +5,28 @@
 #include "objects/objects.h"
 #include "models/models.h"
 #include "rasterizer/dx9/rasterizer_dx9_stencil_shadow_tunables.h"
-#include "H2MOD/Modules/h2log/h2log.h"
+#include "networking/network_event.h"
 
 /* globals */
 
-// Per-map log budgets — "log the first N". LATCHES, not throttles: they stop firing forever, so
-// under the it. 310 rule they must be file scope and reset per map. They are int32 rather than bool,
-// which is why the documented `static bool` sweep could not see them (it. 480).
+// Per-map log budgets - "log the first N". LATCHES, not throttles: they stop firing forever, so they
+// must be file scope and reset per map, or they describe only the first map of a session.
 static int32 g_stencil_shadow_logged_lod_models = 0;
 static int32 g_stencil_shadow_logged_manifold_models = 0;
 
 /* public code */
 
-// td's shadow fade (render_lod_compute_model_alpha, td 0xD5900), shadow half only:
+// Tag debug's shadow fade (render_lod_compute_model_alpha, td 0xD5900):
 //   cutoff = reduce_to_lod_distance[min(shadow_fade_lod_index, 4)]
 //   d <= cutoff                  -> 1.0
 //   cutoff < d < cutoff + 10     -> clamp01(1 - (d - cutoff) * 0.1)
 //   d >= cutoff + 10             -> 0.0   (object casts nothing)
-// (td then takes min(model_alpha, shadow_alpha); model_alpha is the object's own fade-out,
-// which Vista already applies to the drawn model, so the shadow term is what we want here.)
+// then min'd with the object's own fade-out, below.
 //
-// Returns false when the block does not look like an LOD block, so the caller can fall back
-// to a fixed reach instead of trusting a bad read.
+// Returns false when the block does not look like an LOD block, so the caller can fall back to a
+// fixed reach instead of trusting a bad read.
 bool stencil_shadow_compute_shadow_alpha(
-	const tag_reference* model_definition,
+	const s_model_definition* model_definition,
 	real32 distance,
 	real32* out_alpha)
 {
@@ -37,32 +35,33 @@ bool stencil_shadow_compute_shadow_alpha(
 	{
 		return false;
 	}
-	const s_model_level_of_detail* lod =
-		(const s_model_level_of_detail*)((const uint8*)model_definition + 0x28);
 
-	// Validation. The offset itself is settled: td takes this block at hlmt+0x50, but that is
-	// the TAG-BUILD layout where tag_reference is 16 bytes (5 refs = 0x50); Vista's cache
-	// layout uses 8-byte references, so the same block sits at 5 * 8 = 0x28.
-	//
-	// Keep the checks to what actually catches a bad pointer. td itself validates NOTHING here
-	// -- it just clamps the selector and indexes -- so anything stricter risks rejecting valid
-	// data. An earlier version required the five distances to ascend and rejected 72 of 73
-	// objects: "reduce to l1 (super low)" is the level used FARTHEST away, so the array runs
-	// the other way, and unused slots are 0 besides.
-	int32 fade_index = lod->shadow_fade_lod_index;
+	// The five reduce-to distances are indexed by shadow_fade_distance, which is why they are read as
+	// an array rather than by name. Contiguity is the tag layout's, not an assumption.
+	static_assert(offsetof(s_model_definition, reduce_to_l5)
+		- offsetof(s_model_definition, reduce_to_l1) == 4 * sizeof(real32),
+		"the reduce-to distances must stay adjacent to be indexed by shadow_fade_distance");
+	const real32* reduce_to_lod_distance = &model_definition->reduce_to_l1;
+
+	// Keep the validation below to what actually catches a bad pointer. Tag debug validates nothing
+	// here - it just clamps the selector and indexes - so anything stricter risks rejecting valid
+	// data. Requiring the five distances to ascend, for instance, rejects almost everything: "reduce
+	// to l1 (super low)" is the level used FARTHEST away, so the array runs the other way, and unused
+	// slots are 0 besides.
+	int32 fade_index = model_definition->shadow_fade_distance;
 	if (fade_index > 4)
 	{
-		fade_index = 4;		// td: min(shadow_fade_lod_index, 4)
+		fade_index = 4;
 	}
 	for (int32 i = 0; i < 5; i++)
 	{
-		real32 value = lod->reduce_to_lod_distance[i];
+		real32 value = reduce_to_lod_distance[i];
 		if (!(value >= 0.f) || value > 100000.f)
 		{
 			return false;	// NaN, negative or absurd -> not an LOD block
 		}
 	}
-	real32 cutoff = lod->reduce_to_lod_distance[fade_index];
+	real32 cutoff = reduce_to_lod_distance[fade_index];
 	if (cutoff <= 0.f)
 	{
 		return false;	// model declares no shadow reach at this level
@@ -73,16 +72,16 @@ bool stencil_shadow_compute_shadow_alpha(
 		if (g_stencil_shadow_logged_lod_models < 6)
 		{
 			g_stencil_shadow_logged_lod_models++;
-			LOG_INFO_GAME("stencil lod: fade_index={} cutoff={:.2f} l=[{:.1f} {:.1f} {:.1f} {:.1f} {:.1f}] disappear={:.1f} begin_fade={:.1f}",
-				lod->shadow_fade_lod_index, cutoff,
-				lod->reduce_to_lod_distance[0], lod->reduce_to_lod_distance[1],
-				lod->reduce_to_lod_distance[2], lod->reduce_to_lod_distance[3],
-				lod->reduce_to_lod_distance[4],
-				lod->disappear_distance, lod->begin_fade_distance);
+			event(_event_verbose, "rasterizer:dx9:stencil:lod: fade_index=%d cutoff=%.2f l=[%.1f %.1f %.1f %.1f %.1f] disappear=%.1f begin_fade=%.1f",
+				(int32)model_definition->shadow_fade_distance, cutoff,
+				reduce_to_lod_distance[0], reduce_to_lod_distance[1],
+				reduce_to_lod_distance[2], reduce_to_lod_distance[3],
+				reduce_to_lod_distance[4],
+				model_definition->disappear_distance, model_definition->begin_fade_distance);
 		}
 	}
 
-	// --- shadow alpha: the 10wu fade band past the model's shadow cutoff ---
+	// shadow alpha: the 10wu fade band past the model's shadow cutoff
 	real32 shadow_alpha = 1.f;
 	if (distance >= cutoff + k_stencil_shadow_fade_band)
 	{
@@ -94,32 +93,22 @@ bool stencil_shadow_compute_shadow_alpha(
 		shadow_alpha = alpha < 0.f ? 0.f : (alpha > 1.f ? 1.f : alpha);
 	}
 
-	// --- I2: model alpha, and td's combination of the two ---
-	// render_lod_compute_model_alpha (td 0xD5900) computes BOTH alphas and finishes with
-	//     *out_model_alpha  = model_alpha;
-	//     *out_shadow_alpha = min(model_alpha, shadow_alpha);
-	// so an object that is itself fading out drags its shadow down with it. We previously
-	// implemented only the shadow half, leaving distant/fading objects casting a full-strength
-	// shadow after the object had begun to disappear.
-	//     if (lod->disappear_distance > 0) {
-	//         if (distance < disappear) {
-	//             if (distance > begin_fade)
-	//                 model_alpha = 1 - (distance - begin_fade)/(disappear - begin_fade);
-	//         } else model_alpha = 0;
-	//     }
+	// The model's own fade-out, min'd with the shadow alpha above exactly as
+	// render_lod_compute_model_alpha finishes, so an object that is fading out drags its shadow down
+	// with it rather than casting at full strength while it disappears.
 	real32 model_alpha = 1.f;
-	if (lod->disappear_distance > 0.f)
+	if (model_definition->disappear_distance > 0.f)
 	{
-		if (distance < lod->disappear_distance)
+		if (distance < model_definition->disappear_distance)
 		{
-			if (distance > lod->begin_fade_distance)
+			if (distance > model_definition->begin_fade_distance)
 			{
-				real32 span = lod->disappear_distance - lod->begin_fade_distance;
+				real32 span = model_definition->disappear_distance
+					- model_definition->begin_fade_distance;
 				if (span > 0.f)
 				{
-					model_alpha = 1.f - (distance - lod->begin_fade_distance) / span;
-					if (model_alpha < 0.f) model_alpha = 0.f;
-					if (model_alpha > 1.f) model_alpha = 1.f;
+					model_alpha = PIN(
+						1.f - (distance - model_definition->begin_fade_distance) / span, 0.f, 1.f);
 				}
 			}
 		}
@@ -129,35 +118,33 @@ bool stencil_shadow_compute_shadow_alpha(
 		}
 	}
 
-	*out_alpha = shadow_alpha < model_alpha ? shadow_alpha : model_alpha;
+	*out_alpha = MIN(shadow_alpha, model_alpha);
 	return true;
 }
 
-// P1-2 — td's authoritative "may this model cast a stencil shadow" gate.
+// Tag debug's authoritative "may this model cast a stencil shadow" gate.
 // rasterizer_model_compute_fake_lighting (td 0x1F4060) sets the pass-6 draw flag only when
-// render_model_check_shadow_manifold (td 0x1869F0) passes, and rasterizer_model_draw refuses
-// to draw the model in pass 6 without it. That check walks EVERY pair of the object's active
-// sections at ALL SIX LODs and tests bit `min + max*(max-1)/2` of the render_model's
-// invalid_section_pair_bits; a single set bit disqualifies the object entirely. This is
-// tag-authored data that Vista caches keep, so it replaces guessing at manifoldness.
+// render_model_check_shadow_manifold (td 0x1869F0) passes, and rasterizer_model_draw refuses to draw
+// the model in pass 6 without it. That check walks every pair of the object's active sections at all
+// six LODs and tests bit `min + max*(max-1)/2` of the render_model's invalid_section_pair_bits; a
+// single set bit disqualifies the object entirely. Tag-authored data that Vista caches keep, so it
+// replaces guessing at manifoldness.
 //
-// td's gate is `object+104 <= 1 && render_model_check_shadow_manifold(...)`. The first half is
-// NOT omitted -- object+104 is e_object_type (proved from object_get_and_verify_type, td
-// 0x85170), so `type <= 1` is _object_mask_unit, and that half is applied at the iterator via
-// k_stencil_shadow_caster_mask. This function is the second half only.
+// This is the second half of tag debug's gate only. The first half is the object-type test, applied
+// at the iterator via k_stencil_shadow_caster_mask.
 bool stencil_shadow_model_is_manifold(
 	const render_model_definition* model,
 	datum object_index)
 {
-	// Is the gate even live? The struct field survives in Vista's render_model_definition, but
-	// that is not proof the CACHE BUILD populates it -- isq/dsq are stripped exactly this way.
-	// Log the first few models' block sizes so a permanently-zero count is visible rather than
-	// silently reading as "every model is manifold".
+	// Is the gate even live? The struct field survives in Vista's render_model_definition, but that
+	// is not proof the cache build populates it - ISQ/DSQ are stripped exactly this way. Log the
+	// first few models' block sizes so a permanently-zero count is visible rather than silently
+	// reading as "every model is manifold".
 	{
 		if (model && g_stencil_shadow_logged_manifold_models < 8)
 		{
 			g_stencil_shadow_logged_manifold_models++;
-			LOG_INFO_GAME("stencil manifold: regions={} sections={} invalid_pair_words={}",
+			event(_event_verbose, "rasterizer:dx9:stencil:manifold: regions=%d sections=%d invalid_pair_words=%d",
 				model->regions.count, model->sections.count,
 				model->invalid_section_pair_bits.count);
 		}
@@ -185,14 +172,11 @@ bool stencil_shadow_model_is_manifold(
 			}
 			int32 permutation_a = (region_permutation_indices && region_a < region_count)
 				? region_permutation_indices[region_a] : 0;
-			// td's clamp, verbatim from rasterizer_model_compute_region_section_indices
-			// (td 0x1F4200): an out-of-range POSITIVE index clamps to the LAST permutation;
-			// only a NEGATIVE one falls back to 0.
-			//
-			// This has to match the draw path below exactly. It previously reset any
-			// out-of-range index to 0, so for an object whose permutation index exceeded a
-			// region's permutation count the gate evaluated a DIFFERENT section pair than the
-			// one actually drawn -- validating geometry that never reaches the volume pass.
+			// Tag debug's clamp, verbatim from rasterizer_model_compute_region_section_indices
+			// (td 0x1F4200): an out-of-range POSITIVE index clamps to the LAST permutation, and
+			// only a NEGATIVE one falls back to 0. It has to match the draw path exactly, or for
+			// an object whose permutation index exceeds a region's permutation count this gate
+			// validates a different section pair than the one actually drawn.
 			if (permutation_a >= 0)
 			{
 				if (permutation_a > a->permutations.count - 1)
@@ -219,7 +203,7 @@ bool stencil_shadow_model_is_manifold(
 				}
 				int32 permutation_b = (region_permutation_indices && region_b < region_count)
 					? region_permutation_indices[region_b] : 0;
-				// same td clamp as region_a above (td 0x1F4200)
+				// same clamp as region_a above
 				if (permutation_b >= 0)
 				{
 					if (permutation_b > b->permutations.count - 1)
@@ -241,7 +225,15 @@ bool stencil_shadow_model_is_manifold(
 				int32 high = section_a < section_b ? section_b : section_a;
 				int32 bit = low + high * (high - 1) / 2;
 				int32 word = bit >> 5;
-				if (word >= 0 && word < bit_word_count
+				// The bound is NOT redundant, though td's version of this loop has no equivalent. The
+				// tool sizes this block by the pairs it actually recorded, not by the triangular range
+				// the section count implies, so shipped models exist whose range overruns it - a
+				// 17-section biped ships one word where the range needs five, and a 4-section one ships
+				// none at all. td reads past the end for those; we skip and treat the pair as manifold.
+				// The bit decides whether a unit casts a shadow at all, so a garbage 1 read out of
+				// bounds silently deletes that caster's shadow. If td parity is wanted here, keep the
+				// out-of-range pair manifold - do not drop the check.
+				if (VALID_INDEX(word, bit_word_count)
 					&& (*model->invalid_section_pair_bits[word] & (1u << (bit & 31))) != 0)
 				{
 					return false;
@@ -252,11 +244,6 @@ bool stencil_shadow_model_is_manifold(
 
 	return true;
 }
-
-// Render-phase draw: called from Cartographer's NATIVE render_scene (render/render.cpp)
-// right after render_lights_new() — the engine's per-frame shadow phase slot, scene render
-// target and depth-stencil bound. (Engine-byte patching was a dead end: the native
-// render_scene replaces the engine function, so its bytes never execute.)
 
 void render_stencil_shadow_casters_reset_diagnostics(void)
 {

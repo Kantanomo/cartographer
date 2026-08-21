@@ -92,9 +92,8 @@ render_lighting* render_object_cache_get_lighting(datum object_index)
         }
         if (object->object.flags.test(_object_uses_cinematic_lighting_bit))
         {
-            // CONFIRMED render_lighting-shaped (was: "never confirmed to carry a shadow_direction,
-            // so callers get NULL"). Overlaying render_lighting on s_object_globals + 0x1C maps
-            // every field onto a real member, with nothing left over:
+            // The cinematic blob IS render_lighting-shaped. Overlaying render_lighting on
+            // s_object_globals + 0x1C maps every field onto a real member, with nothing left over:
             //
             //   +0  ambient                 -> cinematic_ambient_color          (0x1C)
             //   +12 shadow_direction        -> cinematic_primary_light_vector_1 (0x28)
@@ -118,9 +117,8 @@ render_lighting* render_object_cache_get_lighting(datum object_index)
             // zero-length shadow_direction guard falls back to the fixed sun AND the default
             // opacity, so the worst case is a default-lit shadow rather than none.
             //
-            // Returning NULL here made every cinematic-lit object count as `nolighting` and cast no
-            // shadow. The live log (17/08) shows nolighting rejecting 2 of 3 eligible casters with
-            // every other counter at zero, so this may account for a large share of that.
+            // Returning NULL here instead would make every cinematic-lit object count as
+            // `nolighting` and cast no shadow.
             s_object_globals* globals = object_globals_get();
             if (globals == NULL)
             {
@@ -193,8 +191,8 @@ void* render_object_cache_get_skinning_pool(
         return NULL;
     }
 
-    // datum_try_and_get, not datum_get — the salt cannot mismatch (it. 654: the LRU reuses slots in
-    // place, never datum_delete's), but try_and_get costs nothing and cannot vassert if that ever
+    // datum_try_and_get, not datum_get — the salt cannot mismatch, since the LRU reuses slots in
+    // place and never datum_delete's, but try_and_get costs nothing and cannot vassert if that ever
     // changes. The OWNER check below is the guard that actually catches recycling.
     uint8* entry = (uint8*)datum_try_and_get(get_cached_object_render_states_array(),
         object->object.cached_render_state_index);
@@ -318,7 +316,7 @@ int32 render_object_cache_get_pool_size(int32 object_model_count)
 
     if (object_model_count)
     {
-        result = 68 + object_model_count * 48;
+        result = k_skinning_pool_header_size + object_model_count * k_skinning_pool_matrix_size;
     }
 
     return result;

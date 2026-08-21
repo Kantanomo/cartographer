@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="debug_llvm|Win32">
@@ -1266,6 +1266,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadow_skinning.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadow_debug_view.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadow_diagnostics.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadow_lightmap_tier.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadows.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_errors.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.cpp" />
@@ -1308,7 +1309,6 @@
     <ClCompile Include="Blam\Engine\render\render_debug.cpp" />
     <ClCompile Include="Blam\Engine\render\render_first_person.cpp" />
     <ClCompile Include="Blam\Engine\render\render_layers.cpp" />
-    <ClCompile Include="Blam\Engine\render\render_stencil_shadow_dynamic.cpp" />
     <ClCompile Include="Blam\Engine\render\render_stencil_shadow_environment.cpp" />
     <ClCompile Include="Blam\Engine\render\render_stencil_shadow_casters.cpp" />
     <ClCompile Include="Blam\Engine\render\render_lights.cpp" />
@@ -1611,6 +1611,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadow_skinning.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadow_debug_view.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadow_diagnostics.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadow_lightmap_tier.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_stencil_shadows.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_errors.h" />
@@ -2393,7 +2394,6 @@
     <ClInclude Include="Blam\Engine\render\render_debug_structure.h" />
     <ClInclude Include="Blam\Engine\render\render_first_person.h" />
     <ClInclude Include="Blam\Engine\render\render_layers.h" />
-    <ClInclude Include="Blam\Engine\render\render_stencil_shadow_dynamic.h" />
     <ClInclude Include="Blam\Engine\render\render_stencil_shadow_environment.h" />
     <ClInclude Include="Blam\Engine\render\render_stencil_shadow_casters.h" />
     <ClInclude Include="Blam\Engine\render\render_lights.h" />

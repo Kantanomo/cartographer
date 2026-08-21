@@ -1,66 +1,41 @@
-// shadow_reach_clip.fx -- per-pixel REACH BOUND for stencil shadow volumes (it. 557, rewritten it. 566).
+// shadow_reach_clip.fx -- the per-pixel REACH BOUND for stencil shadow volumes.
 //
-// WHY THIS EXISTS
-// ---------------
-// The port is stuck between two measured facts:
-//   * finite 2.0 wu extrusion puts the FAR CAP inside the scene, where it grazes receiver geometry and
-//     fragments the shadow (it. 525/539; td does the same -- it. 544 check 3);
-//   * effectively-infinite extrusion (the "500 wu" F6 mode, which the far-plane clamp collapses onto the
-//     far plane -- MEASURED it. 550) has no far cap and is visually clean, but the volume then reaches
-//     forever and leaks through every wall behind the caster.
+// The port is stuck between two measured facts: a finite extrusion puts the FAR CAP inside the scene,
+// where it grazes receiver geometry and fragments the shadow (tag debug has the same problem), while
+// an effectively-infinite extrusion has no far cap and is visually clean but reaches forever and leaks
+// through every wall behind the caster. Every attempt to place a finite cap somewhere better only
+// relocated the artefact. This runs the volume infinite and bounds its REACH per pixel instead.
 //
-// Dynamic and clipped extrusion both tried to place a finite cap *somewhere better*. Any finite cap is in
-// the scene somewhere, so both relocated the artefact instead of removing it. This runs the volume
-// INFINITE and bounds its REACH per pixel instead.
+// WHY CLIPPING THE PIXEL IS SOUND AND CLIPPING THE GEOMETRY WAS NOT. Clipping the volume against a
+// plane cuts it open: a clipped side quad no longer meets its neighbours, closure breaks and the
+// counts stop cancelling. The discard below reads only the RECEIVER, which is fixed for a given pixel
+// and identical for every volume fragment covering it, so a pixel's crossings are all counted or all
+// discarded, never half.
 //
-// WHY IT IS SOUND (and the clip-plane attempt was not)
-// ----------------------------------------------------
-// it. 530-541 clipped the GEOMETRY against a plane. That cut the volume open: a clipped side quad no
-// longer met its neighbours, closure broke, and the counts stopped cancelling.
+// READ BEFORE "SIMPLIFYING" THIS INTO A DEPTH COMPARISON. Two earlier formulations compared VIEW
+// DEPTHS rather than reconstructing position, to keep the unverified depth encoding non-load-bearing.
+// Both failed for the same reason: a downward light with a horizontal view puts the shadow's end at
+// LOWER view depth than the caster, so the threshold goes negative while receivers sit at every depth
+// (measured: caster -0.03 wu against a threshold of -2.65 wu, i.e. "kill everything in front of the
+// camera"). "Within R of the caster" is a 3D distance and view depth cannot express it at any
+// constant. Do not attempt a fourth depth-proxy variant.
 //
-// This clips the PIXEL. The discard reads only the RECEIVER, which is fixed for a given pixel and
-// identical for every volume fragment covering it -- so a pixel's crossings are ALL counted or ALL
-// discarded, never half. Closure is untouched.
-//
-// WHY THIS IS THE THIRD FORMULATION -- READ BEFORE "SIMPLIFYING" IT
-// ----------------------------------------------------------------
-// it. 557 and it. 563 both compared VIEW DEPTHS instead of reconstructing position, specifically to keep
-// the unverified depth ENCODING SEMANTIC non-load-bearing. Both failed, and it. 565 measured why:
-//
-//     caster_depth=-0.03wu  threshold=-2.65wu  ->  "kill everything in front of the camera"
-//
-// A downward light with a horizontal view puts the shadow's end point at LOWER view depth than the
-// caster, so the threshold goes negative while receivers sit at every depth. **"Within R of the caster"
-// is a 3D distance and view depth cannot express it, at any constant.** Do not attempt a fourth
-// depth-proxy variant.
-//
-// So this reconstructs the receiver's world position and measures the real thing. That makes the
-// encoding semantic load-bearing for the first time -- the correct trade, because a wrong semantic now
-// produces VISIBLY wrong shadows instead of silently absent ones.
-//
-// DEPTH SOURCE AND DECODE
-// -----------------------
-// `_rasterizer_target_z_a8b8g8r8` (target 22), the engine's depth-as-colour MRT output. The volume pass
-// suppresses that MRT binding for its own duration (it. 561) -- without which this samples a live render
-// target and reads undefined data (it. 560).
-//
-// Packing VERIFIED from the engine's own consumer, fog_atmospheric_apply.fx:20-22:
-//     depth.r += depth.g * 0.00390625;   // 1/256
-//     depth.r += depth.b * 0.000015;     // ~1/65536
-// Reproduced exactly. That the value is LINEAR normalised depth (not NDC z) is ASSUMED -- fog cubes it
-// and indexes a gradient linearly, both useless on NDC z, which sits at ~0.99 across the whole scene.
+// DEPTH SOURCE. `_rasterizer_target_z_a8b8g8r8`, the engine's depth-as-colour MRT output. The volume
+// pass suppresses that MRT binding for its own duration; without that this samples a live render
+// target and reads undefined data. The packing below is reproduced from the engine's own consumer
+// fog_atmospheric_apply.fx, and the value is LINEAR normalised depth rather than NDC z -- confirmed by
+// two independent engine shaders, since fog cubes it and indexes a gradient linearly while
+// weather_plate.fx applies an AFFINE remap, and NDC -> linear is a reciprocal an affine remap cannot
+// express.
 
-// it. 618 — CONSTANTS LIVE AT c216-c223, THE TOP OF ps_3_0's RANGE. They used to sit at c0-c7 and
-// STOMPED THE ENGINE'S OWN PIXEL-SHADER CONSTANTS: fog_atmospheric_apply.fx uses c0-c2, weather_plate.fx
-// uses c0-c2 (tint_colors) and c3-c5 (dot_factors), bloom_simple.fx uses c0-c2. Every reach-clip draw
-// overwrote those with camera vectors, so later draws tinted themselves with our forward vector —
-// user-observed as a wall decal changing colour shot to shot.
-//
-// Same convention the rest of this file already follows: the vertex constants sit at c254/c255 and the
-// ps_2_0 tint at c31, each the top of its range. ps_3_0 allows c0-c223, so the top 8 are c216-c223.
+// CONSTANTS LIVE AT c216-c223, THE TOP OF ps_3_0's RANGE, and must stay clear of c0-c7: the engine's
+// own pixel shaders use that range for tints (fog_atmospheric_apply, weather_plate, bloom_simple), so
+// reach-clip draws there overwrote them with camera vectors and later draws tinted themselves with our
+// forward vector -- observed as a wall decal changing colour shot to shot. Same convention as the rest
+// of this system, where the vertex constants sit at c254/c255 and the ps_2_0 tint at c31.
 sampler2D scene_depth : register(s0);
 
-float4 reach_c    : register(c216);	// xy = 1/viewport, z = proj A, w = proj B  (see decode below)
+float4 reach_c    : register(c216);	// xy = 1/viewport, z = z_far
 float4 cam_pos_c  : register(c217);	// xyz = camera point, w = reach (world units)
 float4 cam_fwd_c  : register(c218);	// xyz = camera forward (unit)
 float4 cam_rgt_c  : register(c219);	// xyz = camera right (unit), w = tan(hfov/2)
@@ -69,26 +44,14 @@ float4 caster_c   : register(c221);	// xyz = caster centre, world
 float4 extrude_c  : register(c222);	// xyz = extrusion direction (AWAY from the light, unit)
 float4 spread_c   : register(c223);	// xyz = horizontal shadow direction (unit), w = d(along)/d(lateral)
 
-// it. 674 — HALF-PRECISION EXPERIMENT (user-requested). The `half` declarations below compile to
-// _pp (partial precision) hints in the ps_3_0 bytecode. Two facts to read the test by:
+// The `half` declarations compile to _pp hints, which DX10-and-later hardware running D3D9 ignores -
+// its ALUs are fp32 regardless. On hardware that honours them this shader would visibly break: it
+// reconstructs world positions at magnitudes of hundreds of world units, where fp16's 11-bit mantissa
+// steps 0.5-1.0 wu against a bound base of ~0.7 wu, and the kill test disintegrates into noise. If
+// reach-mode shadows ever look wrong on old hardware, revert this first.
 //
-//   * On DX10+ hardware running D3D9 — i.e. every machine this mod realistically runs on — _pp is
-//     IGNORED: the ALUs are fp32-only and execute at full precision regardless. The EXPECTED result
-//     of this experiment on the test machine is therefore "no fps change and no visual change".
-//   * On hardware that HONOURS _pp (GeForce 6/7 era), this shader would VISIBLY BREAK: it
-//     reconstructs world positions at coordinate magnitudes of hundreds of wu, and fp16's 11-bit
-//     mantissa gives steps of 0.5-1.0 wu at magnitude 512-1024 — against a bound base measured at
-//     ~0.7 wu. The kill test would disintegrate into noise. If reach-mode shadows ever look broken
-//     on old hardware, revert this first.
-//
-// The return type stays float4: D3D9 validates that a pixel shader writes all four components of
-// COLOR0 (error X4530 — measured, not assumed), so "return void" is impossible; the constant-zero
-// return is already the one-instruction legal minimum and the ROP masks it (COLORWRITEENABLE=0).
-//
-// NOTE: the checked-in blob is currently compiled with `/Gis /Gpp` — /Gpp forces partial precision
-// on EVERY instruction (25 of 26 carry _pp; texkill has no _pp form), beyond what the half
-// declarations alone produce. A recompile with the tree's standard flags (/Gis only) will drop
-// back to the declaration-driven subset.
+// The return type stays float4 because D3D9 validates that a pixel shader writes all four components
+// of COLOR0 (error X4530). The constant-zero return is the legal minimum and the ROP masks it.
 float4 main(float2 vpos : VPOS) : COLOR
 {
     // VPOS is the pixel centre in pixels; +0.5 lands on the texel centre of a 1:1 target.
@@ -98,16 +61,6 @@ float4 main(float2 vpos : VPOS) : COLOR
     half depth01 = packed.r
                  + packed.g * 0.00390625f
                  + packed.b * 0.000015f;
-
-    // it. 568 — LINEAR, confirmed by a SECOND independent engine consumer.
-    //
-    // A brief NDC-z theory (the "no shadows at all" signature would fit reconstructing everything at
-    // ~z_far) is REFUTED: `weather_plate.fx:29-37` decodes this same packing and then applies an
-    // AFFINE remap, `dot(float3(decoded,1,1), per_vertex_coeffs)`. NDC -> linear is a RECIPROCAL, which
-    // an affine remap cannot express. Together with fog_atmospheric_apply.fx cubing the value and
-    // indexing a gradient linearly, two independent engine shaders treat it as linear.
-    //
-    // So the encoding is NOT the reason it. 566 drew nothing. reach_c.z carries z_far again.
     half view_depth = depth01 * reach_c.z;
 
     // Ray through this pixel, scaled so its forward component is exactly 1. `right` and `up` are
@@ -119,29 +72,23 @@ float4 main(float2 vpos : VPOS) : COLOR
 
     half3 receiver = cam_pos_c.xyz + dir * view_depth;
 
-    // Distance from the caster ALONG THE LIGHT. Signed on purpose: anything in front of the caster
-    // (negative) must always be kept, or the caster would stop shadowing surfaces nearer than itself.
-    //
-    // it. 589: a height-based bound was written here and REVERTED before shipping. It is exact for
-    // horizontal floors, but the user observed shadows landing on WALLS ("if i approach a wall the
-    // shadow starts coming back"), and a height bound would clip a wall shadow away entirely — a
-    // strictly worse trade. `along` handles any receiver orientation.
+    // Distance from the caster ALONG THE LIGHT. Signed on purpose: anything in front of the caster is
+    // negative and must always be kept, or the caster would stop shadowing surfaces nearer than itself.
+    // A height-based bound was written here and reverted before shipping - exact for horizontal floors,
+    // but it clips a wall shadow away entirely, and shadows do land on walls.
     half along = dot(receiver - caster_c.xyz, extrude_c.xyz);
 
-    // it. 590 — THE BOUND IS A LINE, NOT A CONSTANT.
-    //
-    // A receiving surface is not perpendicular to the light, so `along` VARIES across it: further along
-    // the shadow means a larger `along` even on perfectly flat ground. A constant bound must therefore
-    // either cut the shadow short (it. 587) or be padded enough to leak (it. 589) — a single per-caster
-    // scalar cannot do both, and both were observed.
-    //
-    // But that variation is a property of the RECEIVER, and it is measurable: two rays give `along` at
-    // two points, and the slope between them is d(along)/d(lateral). The bound then TRACKS the surface:
+    // THE BOUND IS A LINE, NOT A CONSTANT. A receiving surface is not perpendicular to the light, so
+    // `along` varies across it - further along the shadow means a larger `along` even on flat ground.
+    // A constant bound must therefore either cut the shadow short or be padded enough to leak, and
+    // both were observed. That variation is a property of the receiver, so the bound tracks it:
     //
     //     bound(lateral) = along_at_caster + slope * lateral + margin
     //
-    // Exact for any planar receiver at any orientation — floor, ramp or wall — which is what makes the
-    // padding unnecessary. Leak returns to the MARGIN ALONE while the shadow keeps its full extent.
+    // `slope` arrives in spread_c.w, computed on the CPU from the receiver plane the reach trace
+    // already returns. Exact for any SINGLE planar receiver at any orientation - floor, ramp or wall.
+    // A ledge is three planes and one line still fits one of them; that is the documented ceiling in
+    // docs/05, not something this bound can be tuned out of.
     half lateral = dot(receiver - caster_c.xyz, spread_c.xyz);
     half bound = cam_pos_c.w + spread_c.w * lateral;
     clip(bound - along);

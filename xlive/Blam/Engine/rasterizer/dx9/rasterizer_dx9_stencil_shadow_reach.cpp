@@ -6,39 +6,38 @@
 #include "rasterizer_dx9_stencil_shadow_tunables.h"
 #include "rasterizer_dx9_targets.h"			// _rasterizer_target_z_a8b8g8r8 + set_target_as_texture
 #include "rasterizer_dx9_shader_submit.h"	// rasterizer_dx9_set_sampler_state
-#include "physics/collisions.h"				// collision_test_vector — the per-caster receiver trace
+#include "physics/collisions.h"				// collision_test_vector - the per-caster receiver trace
 #include "render/render_cameras.h"			// render_camera::point/forward/z_far for the encode
 #include "render/render.h"					// global_window_parameters_get / s_frame
-#include "rasterizer/rasterizer_globals.h"
-#include "H2MOD/Modules/h2log/h2log.h"
+#include "networking/network_event.h"
 #include "shaders/compiled/shadow_reach_clip.h"
 
 /* globals */
 
-// it. 557 — the reach-clip ps_3_0. Shares the stencil system's SM3 vertex shader: D3D9 forbids
+// The reach-clip ps_3_0. Shares the stencil system's SM3 vertex shader: D3D9 forbids
 // mixing shader models, so this is only usable alongside it. NULL when unsupported, which disables
 // the mode rather than failing the draw.
 static IDirect3DPixelShader9* g_stencil_shadow_reach_clip_shader = NULL;
 
-// it. 566 — the constant block, rebuilt per caster. Register map is in shadow_reach_clip.fx; the
+// The constant block, rebuilt per caster. Register map is in shadow_reach_clip.fx; the
 // count and base register are in the tunables header.
 static real32 g_stencil_shadow_reach_c[k_stencil_shadow_reach_constant_count][4] = {};
 
 // set per caster; false when the mode is off, unsupported, or the camera/viewport look wrong
 static bool g_stencil_shadow_reach_active = false;
 
-// it. 581: RESET ON EVERY F6 PRESS, not once per process. At ~500 fps a per-process cap is consumed
-// by one caster in milliseconds, so it always captured the player's own object and never the
-// scene's (it. 562), and once spent it stayed silent — which made "mode selected but no telemetry"
+// RESET ON EVERY F6 PRESS, not once per process. At several hundred fps a per-process cap is
+// consumed by one caster in milliseconds, so it always captured the player's own object and never
+// the scene's, and once spent it stayed silent - which made "mode selected but no telemetry"
 // ambiguous between "not in the mode" and "cap exhausted".
 static int32 g_stencil_shadow_logged_reach = 0;
 static int32 g_stencil_shadow_logged_bind = 0;		// for `stencil reach bind:`
-static int32 g_stencil_shadow_reach_tick = 0;		// it. 585 — periodic sampler for `stencil reach:`
+static int32 g_stencil_shadow_reach_tick = 0;		// periodic sampler for the `:reach` line
 
-// it. 668-672: a per-caster scissor rect (the kill's kept-region capsule projected to pixels) lived
-// here and was REMOVED after measurement — it engaged at an average 10% of the viewport and fps did
-// not move, so the GPU is not the bottleneck this system pays. The derivation and the rect-leak
-// lesson are in td-isq-generation.md it. 668-672 should a GPU-bound scenario ever revive it.
+// A per-caster scissor rect - the kill's kept-region capsule projected to pixels - lived here and was
+// REMOVED after measurement: it engaged at an average 10% of the viewport and the frame rate did not
+// move, so the GPU is not what this system pays for. The derivation and the SetScissorRect-persistence
+// lesson are in td-isq-generation.md, should a GPU-bound scenario ever revive it.
 
 /* public code */
 
@@ -76,11 +75,6 @@ bool stencil_shadow_reach_is_active(void)
 	return g_stencil_shadow_reach_active;
 }
 
-void stencil_shadow_reach_deactivate(void)
-{
-	g_stencil_shadow_reach_active = false;
-}
-
 void stencil_shadow_reach_reset_logs(void)
 {
 	g_stencil_shadow_logged_reach = 0;
@@ -94,7 +88,7 @@ bool stencil_shadow_reach_encode(
 	real32 extrusion_override,
 	bool sm3_vertex_ready)
 {
-	// it. 557 — REACH CLIP. Needs the SM3 pair; without it the mode degrades to the stock
+	// REACH CLIP. Needs the SM3 pair; without it the mode degrades to the stock
 	// distance rather than drawing an unbounded volume, which would look like a catastrophic
 	// leak and get blamed on the idea rather than on the missing shader.
 	const bool reach_extrusion =
@@ -113,15 +107,14 @@ bool stencil_shadow_reach_encode(
 		if (cam && cam->z_far > 1.f && vw > 0.f && vh > 0.f
 			&& cam->vertical_field_of_view > 0.01f)
 		{
-			// it. 566 — FULL WORLD RECONSTRUCTION. it. 557 and it. 563 both compared VIEW DEPTHS
-			// to keep the unverified encoding semantic non-load-bearing; it. 565 measured why
-			// that cannot work at any constant (a downward light with a horizontal view puts the
-			// shadow's end at LOWER view depth than the caster, so the threshold inverts).
-			// "Within R of the caster" is a 3D distance. Reconstruct and measure it.
+			// FULL WORLD RECONSTRUCTION. Comparing view DEPTHS instead cannot work at any constant: a
+			// downward light with a horizontal view puts the shadow's end at LOWER view depth than the
+			// caster, so the threshold inverts. "Within R of the caster" is a 3D distance, so
+			// reconstruct the position and measure it.
 			const real_point3d* p = &object->object.center;
 
 			// right = cross(forward, up). Halo's convention is forward=+x, LEFT=+y, up=+z, so
-			// cross((1,0,0),(0,0,1)) = (0,-1,0) — i.e. +right, which is what the shader's
+			// cross((1,0,0),(0,0,1)) = (0,-1,0) - i.e. +right, which is what the shader's
 			// `uv.x * 2 - 1` (left-to-right) expects.
 			const real_vector3d right =
 			{
@@ -132,12 +125,11 @@ bool stencil_shadow_reach_encode(
 			const real32 tan_half_v = tanf(cam->vertical_field_of_view * 0.5f);
 			const real32 tan_half_h = tan_half_v * (vw / vh);
 
-			// it. 568: the depth target holds NDC z, not linear depth (it. 566 produced no shadows
-			// at all, which is the signature of reconstructing everything at ~z_far). Hand the
-			// shader the projection's A/B so it can invert `z_ndc = A - B/d`. These are the same
-			// quantities it. 550 measured live off the engine's wvp constants (1.0000587 /
-			// 0.0601054) — cross-check the log against those; a large divergence means z_near or
-			// z_far here is not the projection the depth target was written with.
+			// The depth target holds NDC z, not linear depth - treating it as linear reconstructs
+			// everything at ~z_far and produces no shadows at all. Hand the shader the projection's
+			// A/B so it can invert `z_ndc = A - B/d`. Measured live off the engine's wvp constants as
+			// 1.0000587 / 0.0601054; cross-check the log against those, since a large divergence means
+			// z_near or z_far here is not the projection the depth target was written with.
 			g_stencil_shadow_reach_c[0][0] = 1.f / vw;
 			g_stencil_shadow_reach_c[0][1] = 1.f / vh;
 			g_stencil_shadow_reach_c[0][2] = cam->z_far;
@@ -147,22 +139,12 @@ bool stencil_shadow_reach_encode(
 			g_stencil_shadow_reach_c[1][1] = cam->point.y;
 			g_stencil_shadow_reach_c[1][2] = cam->point.z;
 
-			// it. 578 — REACH IS PER-CASTER, NOT A CONSTANT.
-			//
-			// User's observation, and it is a real limitation rather than a tuning problem: a fixed
-			// reach encodes "the caster sits near its receiver". An airborne Banshee, a thrown
-			// grenade, a player mid-jump all have their LEGITIMATE ground shadow cut off, because
-			// their receiver is further away than the constant. That is the same truncation failure
-			// the CLIPPED experiments were rejected for, arriving by another route.
-			//
-			// So find the caster's own receiver: one ray from its centre along the light. This is the
-			// SAME probe CLIPPED uses (it. 530), but the use is different and that difference is the
-			// whole point — CLIPPED moved the FAR CAP onto the hit, putting a cap in the scene and
-			// reproducing the artefact it was meant to remove (it. 522/525). Here the volume stays
-			// INFINITE and the hit only sets a per-pixel bound. No cap, no coplanarity.
-			//
-			// `+ radius` because the ray leaves the object's CENTRE while its sections extend below
-			// it; without it a low section's shadow would be cut before reaching the floor.
+			// REACH IS PER-CASTER, NOT A CONSTANT. A fixed reach encodes "the caster sits near its
+			// receiver", so an airborne Banshee, a thrown grenade or a player mid-jump has its
+			// legitimate ground shadow cut off - the same truncation failure the finite-cap
+			// experiments were rejected for, arriving by another route. So find the caster's own
+			// receiver with one ray from its centre along the light. The hit only sets a per-pixel
+			// bound; the volume stays infinite, so there is still no cap in the scene to graze.
 			real32 caster_reach = k_stencil_shadow_reach_distance;
 			{
 				real_vector3d reach_probe;
@@ -178,50 +160,73 @@ bool stencil_shadow_reach_encode(
 				if (collision_test_vector(reach_flags, &object->object.center, &reach_probe,
 					object_index, NONE, &reach_hit))
 				{
-					// it. 586 — NO `+ radius`. That term was carried over from CLIPPED (it. 530) where
-					// it was correct: there it padded the EXTRUSION LENGTH so sections hanging below
-					// the object's centre still reached the floor.
+					// NO `+ radius` here, however tempting. `along` measures the RECEIVER's distance
+					// from the caster CENTRE along the light, and the floor beneath sits at
+					// hit_distance no matter which section casts onto it, so sections below centre
+					// project onto that same floor at the same `along`. Padding by the radius buys
+					// nothing and licenses the shadow to pass through anything thinner than the
+					// caster's own radius - 1.077 wu on a Warthog, which is most floors.
 					//
-					// Here it is wrong and it is exactly the leak the user reported. `along` measures
-					// the RECEIVER's distance from the caster CENTRE along the light, and the floor
-					// beneath sits at `hit_distance` no matter which section casts onto it — sections
-					// below centre project onto that same floor at the same `along`. So the radius
-					// bought nothing and simply licensed the shadow to pass through anything thinner
-					// than the caster's own radius (1.077 wu on a Warthog — through most floors).
-					// it. 602 - SLOPE IS ANALYTIC. The two-ray fit is REMOVED.
-					//
-					// it. 590 added a second collision ray to MEASURE d(along)/d(lateral) instead of
-					// assuming it. It was the right instinct and it worked, but three measurements
-					// retired it:
-					//   * it. 592 - the second ray MISSES ~78% of the time (47 of 60 samples);
-					//   * it. 592 - when it hits, the measured slope equals |light_xy| to three
-					//     decimals in EVERY sample (13/13), i.e. it only ever reproduced the formula;
-					//   * it. 598 - `max(measured, analytic)` was then required to reject fits that
-					//     spanned two surfaces and went NEGATIVE, which made the measurement
-					//     one-sided; it. 599/600 then observed `slope > analytic` NEVER firing.
-					//
-					// So the ray could only ever agree with the formula or be discarded. Removing it
-					// is behaviour-neutral BY MEASUREMENT and deletes a collision_test_vector per
-					// caster per frame.
-					//
-					// Keep the derivation, it is what makes the analytic value exact rather than a
-					// guess: on a receiver at depth h, a point L along the shadow has
-					//     along = L*|light_xy| + h*|light_z|   ->   d(along)/d(lateral) = |light_xy|
 					caster_reach = (reach_hit.t * k_stencil_shadow_reach_probe_length)
 						+ k_stencil_shadow_reach_margin;
 
+					// The slope is ANALYTIC - no second ray. One was tried and retired: it missed ~78%
+					// of the time, and the trace we already have carries the receiver's plane anyway.
+					//
+					// The horizontal-only form was `|light_xy|`, from
+					//     along = L*|light_xy| + h*|light_z|   ->   d(along)/d(lateral) = |light_xy|
+					// which holds only where h does not vary with L - a FLAT receiver. On a ramp the
+					// true slope is |light_xy| + (dh/dL)*|light_z|, so every tilted surface was
+					// mis-bounded, leaking or truncating depending on which way it tilted.
+					//
+					// The hit plane fixes that exactly. Project the shadow's horizontal direction onto
+					// the receiver and take the ratio the shader needs:
+					//     s_proj = s - dot(s, n) * n
+					//     slope  = dot(s_proj, e) / dot(s_proj, s)
+					// On flat ground dot(s, n) == 0, so s_proj == s and this returns dot(s, e), which
+					// is |light_xy| - the old value exactly. A strict generalisation: it cannot regress
+					// the case that already worked.
 					const real32 analytic_slope = sqrtf(
 						toward_light_world.x * toward_light_world.x
 						+ toward_light_world.y * toward_light_world.y);
-					g_stencil_shadow_reach_c[7][3] = analytic_slope;
 
 					// Horizontal direction the shadow travels; the shader projects the receiver onto
 					// it to get `lateral`. Degenerate under a near-vertical light, and correctly so -
 					// there is no lateral spread, and the slope term contributes nothing.
+					real32 slope = analytic_slope;
 					if (analytic_slope > 0.05f)
 					{
-						g_stencil_shadow_reach_c[7][0] = -toward_light_world.x / analytic_slope;
-						g_stencil_shadow_reach_c[7][1] = -toward_light_world.y / analytic_slope;
+						real_vector3d spread;
+						spread.i = -toward_light_world.x / analytic_slope;
+						spread.j = -toward_light_world.y / analytic_slope;
+						spread.k = 0.f;
+						g_stencil_shadow_reach_c[7][0] = spread.i;
+						g_stencil_shadow_reach_c[7][1] = spread.j;
+
+						// s_proj = s - dot(s, n) * n, with n the hit plane's normal. `plane` is the hit
+						// surface in WORLD space with n already facing the ray, for both the structure
+						// and instanced-geometry paths.
+						const real_vector3d* n = &reach_hit.plane.n;
+						const real32 s_dot_n = spread.i * n->i + spread.j * n->j;	// spread.k is 0
+						real_vector3d s_proj;
+						s_proj.i = spread.i - s_dot_n * n->i;
+						s_proj.j = spread.j - s_dot_n * n->j;
+						s_proj.k = -s_dot_n * n->k;
+
+						// The denominator is |s_proj| projected back onto s, and it collapses toward 0
+						// as the receiver turns edge-on to the light - where "further along the shadow"
+						// stops being a direction on that surface at all. Keep the flat-ground slope
+						// there rather than dividing into a blow-up.
+						const real32 d_lateral =
+							s_proj.i * spread.i + s_proj.j * spread.j;
+						if (d_lateral > 0.05f)
+						{
+							const real32 d_along =
+								s_proj.i * -toward_light_world.x
+								+ s_proj.j * -toward_light_world.y
+								+ s_proj.k * -toward_light_world.z;
+							slope = d_along / d_lateral;
+						}
 					}
 					else
 					{
@@ -229,14 +234,25 @@ bool stencil_shadow_reach_encode(
 						g_stencil_shadow_reach_c[7][1] = 0.f;
 					}
 					g_stencil_shadow_reach_c[7][2] = 0.f;
+					g_stencil_shadow_reach_c[7][3] = slope;
 				}
 				else
 				{
 					// Nothing within the probe: the caster is over a void or a very distant floor.
-					// FAIL OPEN — leave the reach effectively unbounded rather than truncating a
+					// FAIL OPEN - leave the reach effectively unbounded rather than truncating a
 					// shadow we simply could not measure. A leak is recoverable; a missing shadow
 					// over open ground reads as the feature being broken.
 					caster_reach = k_stencil_shadow_reach_probe_length;
+
+					// These constants are file scope and survive between casters, so the fail-open
+					// path has to write them too. It did not need to while the slope was |light_xy|,
+					// which is identical for every caster under one light - a stale copy was the same
+					// value. The slope is per-RECEIVER now, so a stale one belongs to whatever the
+					// previous caster happened to be standing on.
+					g_stencil_shadow_reach_c[7][0] = 0.f;
+					g_stencil_shadow_reach_c[7][1] = 0.f;
+					g_stencil_shadow_reach_c[7][2] = 0.f;
+					g_stencil_shadow_reach_c[7][3] = 0.f;
 				}
 			}
 			g_stencil_shadow_reach_c[1][3] = caster_reach;
@@ -266,53 +282,40 @@ bool stencil_shadow_reach_encode(
 
 			g_stencil_shadow_reach_active = true;
 		}
-		// it. 562: cap raised from 8. At ~500 fps the old cap was consumed by ONE caster in a
-		// dozen milliseconds, so every sample showed the same object and its unrepresentative
-		// depth (~0, the player's own) stood in for all casters. Also report world units and
-		// the caster position, because the encoded values alone hid that.
-		// it. 585 — SAMPLE PERIODICALLY, AND ALWAYS ON A NOTABLE REACH.
-		//
-		// A flat cap cannot capture the case under test. At ~500 fps 40 samples are consumed in well
-		// under a second, so the log only ever describes whatever was on screen the instant the mode
-		// was entered — grounded props, every time (it. 584). The airborne caster that motivated
-		// it. 578 would have to be in view at that exact instant to be seen at all.
-		//
-		// So: sample slowly in the background, but log IMMEDIATELY whenever a caster's traced reach
-		// is large, because that is precisely the airborne / distant-receiver case we cannot
-		// otherwise observe. `> 5 wu` is comfortably above the 1.1-2.1 wu grounded band measured in
-		// it. 584 and well below the 50 wu fail-open.
+		// SAMPLE PERIODICALLY, AND ALWAYS ON A NOTABLE REACH. A flat sample cap cannot capture the
+		// case under test: at several hundred fps it is consumed in well under a second, so the log
+		// only describes whatever was on screen the instant the mode was entered, which is grounded
+		// props every time. The airborne caster this per-caster reach exists for would have to be in
+		// view at that exact instant to be seen at all. So sample slowly in the background but log
+		// immediately whenever a traced reach is large. 5 wu is comfortably above the 1.1-2.1 wu
+		// grounded band measured live and well below the 50 wu fail-open.
 		const bool reach_notable = g_stencil_shadow_reach_c[1][3] > 5.f;
 		if (g_stencil_shadow_logged_reach < 60
 			&& (reach_notable || (g_stencil_shadow_reach_tick++ % 240) == 0))
 		{
 			g_stencil_shadow_logged_reach++;
-			// it. 592: slope and its expected value are the whole story for the airborne breakage,
-			// and neither was visible. For a FLAT receiver the slope must equal |light_xy| exactly
-			// (derivation in it. 590) — printing both makes a bad fit self-evident: slope 0 means the
-			// second ray missed, and slope far from |light_xy| means it hit a different surface.
+			// `expected_flat` is what the slope WAS before the receiver plane was used: |light_xy|,
+			// the flat-ground value. On a flat receiver the two must still agree exactly, which is
+			// the regression check. Where they differ, the difference is the receiver's tilt, and
+			// SLOPE is the corrected one.
 			const real32 expected_slope = sqrtf(
 				toward_light_world.x * toward_light_world.x
 				+ toward_light_world.y * toward_light_world.y);
 
 			UNREFERENCED_PARAMETER(expected_slope);
 
-
-#ifdef LOG_STENCIL
-			LOG_INFO_GAME("stencil reach: active={} caster=({:.2f},{:.2f},{:.2f}) cam=({:.2f},{:.2f},{:.2f}) SLOPE={:.3f} expected_flat={:.3f} bound_base={:.2f}wu tan_h={:.3f} tan_v={:.3f} z_far={:.1f} extrude_dir=({:.2f},{:.2f},{:.2f}) — it. 592 (slope 0 = 2nd ray missed; slope != expected = different surface)",
+			event(_event_verbose, "rasterizer:dx9:stencil:reach: active=%d caster=(%.2f,%.2f,%.2f) cam=(%.2f,%.2f,%.2f) SLOPE=%.3f expected_flat=%.3f bound_base=%.2fwu tan_h=%.3f tan_v=%.3f z_far=%.1f extrude_dir=(%.2f,%.2f,%.2f)",
 				g_stencil_shadow_reach_active ? 1 : 0,
 				object->object.center.x, object->object.center.y, object->object.center.z,
 				g_stencil_shadow_reach_c[1][0], g_stencil_shadow_reach_c[1][1], g_stencil_shadow_reach_c[1][2],
 				g_stencil_shadow_reach_c[7][3], expected_slope, g_stencil_shadow_reach_c[1][3],
 				g_stencil_shadow_reach_c[3][3], g_stencil_shadow_reach_c[4][3],
-				// it. 597: the SECOND `reach_c[1][3]` that used to sit here was a leftover from the
-				// it. 575 format, giving 17 arguments for 16 placeholders. The surplus consumed the
-				// first extrude_dir slot and shifted the vector by one, so the line printed
-				// (bound_base, extrude.x, extrude.y) while claiming to print extrude_dir. That is
-				// what made it. 596 read a ~10-degree light off a perfectly ordinary ~46-degree one.
-				// fmt does not error on surplus arguments, so nothing flagged it.
+				// Count these against the placeholders before editing. A stray argument here once shifted
+				// extrude_dir by a slot, which read as a 10-degree light off a perfectly ordinary
+				// 46-degree one - and now that this is vsprintf rather than fmt, one too FEW reads
+				// whatever is next on the stack instead of throwing.
 				g_stencil_shadow_reach_c[0][2],
 				g_stencil_shadow_reach_c[6][0], g_stencil_shadow_reach_c[6][1], g_stencil_shadow_reach_c[6][2]);
-#endif
 		}
 	}
 	return reach_extrusion;
@@ -334,11 +337,10 @@ void stencil_shadow_reach_bind(IDirect3DDevice9Ex* device)
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	// it. 568 — VERIFY THE BIND, do not infer it. Two engine shaders agree the encoding is linear,
-	// so it. 566 should have produced shadows and did not. That makes "the sample never happens" the
-	// leading candidate, and it is directly checkable: read the texture back off the device and
-	// compare its surface size against the viewport the UVs are built from. A size mismatch also
-	// invalidates the `(vpos + 0.5) * (1/viewport)` mapping even when the bind succeeds.
+	// VERIFY THE BIND, do not infer it: read the texture back off the device and compare its surface
+	// size against the viewport the UVs are built from. A silently failed bind and a size mismatch
+	// present identically as "no shadows", and a mismatch also invalidates the
+	// `(vpos + 0.5) * (1/viewport)` mapping even when the bind succeeds.
 	if (g_stencil_shadow_logged_bind < 4)
 	{
 		g_stencil_shadow_logged_bind++;
@@ -360,7 +362,7 @@ void stencil_shadow_reach_bind(IDirect3DDevice9Ex* device)
 			}
 			bound->Release();
 		}
-		LOG_INFO_GAME("stencil reach bind: hr={:#x} texture={} size={}x{} viewport={:.0f}x{:.0f} (sizes MUST match or the VPOS->UV mapping is wrong)",
+		event(_event_verbose, "rasterizer:dx9:stencil:reach: bind hr=%#x texture=%d size=%ux%u viewport=%.0fx%.0f (sizes MUST match or the VPOS->UV mapping is wrong)",
 			(uint32)hr, bound ? 1 : 0, tw, th,
 			(g_stencil_shadow_reach_c[0][0] > 0.f ? 1.f / g_stencil_shadow_reach_c[0][0] : 0.f),
 			(g_stencil_shadow_reach_c[0][1] > 0.f ? 1.f / g_stencil_shadow_reach_c[0][1] : 0.f));
@@ -369,22 +371,17 @@ void stencil_shadow_reach_bind(IDirect3DDevice9Ex* device)
 
 void stencil_shadow_reach_unbind(void)
 {
-	// it. 568 — RELEASE SAMPLER 0. The reach path binds the depth target to s0 and forces POINT
-	// filtering; leaving either in place corrupts every later draw that samples s0 without setting
-	// its own texture. The user saw exactly that: a wall decal (the "3" numeral) rendering as a flat
-	// black shape. Unbinding the texture is the part that matters — the filter is restored to LINEAR
-	// as well so a later consumer relying on the engine's default is not silently point-sampled.
+	// RELEASE SAMPLER 0. The bind above leaves the depth target on s0 with POINT filtering, and either
+	// left in place corrupts every later draw that samples s0 without setting its own texture - a wall
+	// decal rendering as a flat black shape, in the case that found this. The texture is the part that
+	// matters; the filter is restored as well so a later consumer relying on the engine's default is
+	// not silently point-sampled.
 	//
-	// it. 573 — THROUGH THE CACHED SETTER, never the raw device. it. 568 used
-	// `device->SetTexture(0, NULL)` and desynced the engine's redundancy cache: the cache still
-	// believed the depth target was bound, so the NEXT section's bind no-opped and every draw after
-	// the first sampled nothing (MEASURED: `texture=1` on sample 1, `texture=0` on 2-4), while the
-	// engine separately believed s0 was populated — which is what corrupted the wall decals.
-	//
-	// `rasterizer_dx9_device_set_texture` is the setter `rasterizer_dx9_set_target_as_texture` itself
-	// ends in (targets.cpp:353). Its body (IDB 0x66EBC7) is `if (cache[stage] != texture) {
-	// SetTexture(...); cache[stage] = texture; }` — a plain compare-and-set that handles NULL,
-	// VERIFIED by decompilation. Releasing through it keeps cache and device in step.
+	// THROUGH THE CACHED SETTER, never the raw device. `rasterizer_dx9_device_set_texture` is the
+	// setter `rasterizer_dx9_set_target_as_texture` itself ends in, a compare-and-set against the
+	// engine's redundancy cache. A raw `device->SetTexture(0, NULL)` desyncs that cache: it still
+	// believes the depth target is bound, so the next section's bind no-ops and every draw after the
+	// first samples nothing.
 	rasterizer_dx9_device_set_texture(0, NULL);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);

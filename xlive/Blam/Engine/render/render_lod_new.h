@@ -85,9 +85,9 @@ ASSERT_STRUCT_SIZE(s_render_object, 484);
 
 // Engine accessor (halo2.exe 0x596397): cached render state for an object, or NULL.
 //
-// WARNING (it. 654): this routes through the engine ALLOCATOR (object_get_cached_render_state,
-// 0x59604D) — on a miss it datum_new's, and when the pool is full it LRU-EVICTS another object's
-// entry. Never call it from a render hook; use the read-only mirrors below instead.
+// WARNING: this routes through the engine ALLOCATOR (object_get_cached_render_state,
+// halo2.exe 0x59604D) — on a miss it datum_new's, and when the pool is full it LRU-EVICTS another
+// object's entry. Never call it from a render hook; use the read-only mirrors below instead.
 s_render_cache_storage* __cdecl render_object_cache_get_render_state(datum object_index);
 
 // Engine accessor (halo2.exe 0x596364): the object's current level of detail for the
@@ -104,23 +104,32 @@ bool render_object_cache_storage_is_object_cached(s_render_cache_storage* storag
 // render_object_cache_get_render_state + is_object_cached -- to read lighting.
 render_lighting* render_object_cache_get_lighting(datum object_index);
 
+// The skinning pool block's layout: a header, then one 48-byte entry per matrix. An entry is 3
+// row-major float4 rows of `node_world x default_inverse_matrix`, scale folded into the basis --
+// already the packing a c50 palette upload wants, which is why bulk reads copy entries directly
+// rather than going through the accessor below.
+enum
+{
+    k_skinning_pool_header_size = 68,
+    k_skinning_pool_matrix_size = 48
+};
+
 // Engine accessor (halo2.exe 0x77E337): one skinning matrix from an object's pool block, indexed
-// DIRECTLY by node (entry = pool + 68 + 48*node — no region indirection). The 48-byte entry is
-// 3 row-major float4 rows of `node_world x default_inverse_matrix` with scale folded into the
-// basis; when `out_matrix` is given it is un-transposed into a real_matrix4x3 with scale = 1.0.
+// DIRECTLY by node (entry = pool + header + 48*node — no region indirection). Unlike a bulk read,
+// this un-transposes the entry into a real_matrix4x3 with scale = 1.0 when `out_matrix` is given.
 // Pass out_matrix as (real32*)&some_real_matrix4x3 — the 13 floats land exactly on that layout.
 real32* __cdecl model_skinning_get_node_matrix(void* skinning_data, int16 node_index, real32* out_matrix);
 
-// READ-ONLY mirror (it. 654): the object's skinning-matrix pool block for THIS frame in THIS
-// window, or NULL. This is the pool `render_model_build_skinning` (0x77DEBD) filled during
+// READ-ONLY mirror: the object's skinning-matrix pool block for THIS frame in THIS window, or NULL.
+// This is the pool `render_model_build_skinning` (halo2.exe 0x77DEBD) filled during
 // create_visible_render_primitives — matrices are interpolated (render_objects.cpp:56 tries the
 // interpolator first) AND render-time composed (render-only nodes + eye tracking, 0x53599B runs
 // inside the builder), with the inverse bind already multiplied in.
 //
 // Same never-allocate contract as render_object_cache_get_lighting, same guards:
-//   * owner datum (entry+4) must equal object_index — the LRU recycles entries IN PLACE (verified
-//     it. 654: eviction never datum_delete's, so stale handles keep valid salts and the owner
-//     check is the real guard);
+//   * owner datum (entry+4) must equal object_index — the LRU recycles entries IN PLACE, and since
+//     eviction never datum_delete's, stale handles keep valid salts and this owner check is the
+//     real guard;
 //   * `render_frame_allocated` must equal this frame+window's stamp — an object not submitted
 //     through the visibility walk this frame (off-screen, cinematic-lit, first-person) has a stale
 //     entry and gets NULL. Callers keep their own composition as the fallback.
