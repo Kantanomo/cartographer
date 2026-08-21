@@ -48,7 +48,10 @@ static bool stencil_shadow_environment_cluster_visible(int32 cluster_index)
 // This is the ONLY spatial gate that matters for correctness of the SELECTION — the PVS bit above is
 // a performance gate and is allowed to be wrong in the permissive direction. Getting this one wrong
 // in the RESTRICTIVE direction drops a wall that should have cast, so the comparison is inclusive.
-static bool stencil_shadow_environment_light_touches_cluster(
+//
+// cluster-impl K1: PUBLIC now (was static) — the E11 autopsy's "survives" list; the new tier's
+// stage-0 census consumes it from render_lights.cpp.
+bool stencil_shadow_environment_light_touches_cluster(
 	const real_rectangle3d* bounds,
 	const real_point3d* light_position,
 	real32 light_radius)

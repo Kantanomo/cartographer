@@ -206,6 +206,26 @@ static bool g_stencil_shadow_warned_index_overflow_volume = false;
 static bool g_stencil_shadow_warned_index_overflow_cross = false;
 static bool g_stencil_shadow_warned_cross_cap = false;
 static bool g_stencil_shadow_warned_caster_cap = false;
+
+// impl2 J13 — the mode-1 (red view) tint override. The DYNAMIC tier sets this around its draws
+// so its volumes render in a distinct colour beside this tier's red; NULL restores the default.
+// Points at CALLER-OWNED storage (a static in the caller) — not copied.
+static const real32* g_stencil_shadow_debug_tint_override = NULL;
+
+void stencil_shadow_debug_tint_override_set(const real32* rgba_or_null)
+{
+	g_stencil_shadow_debug_tint_override = rgba_or_null;
+}
+
+// impl2 J14: the colour-volume view is active when F7 says so (mode 1 — the sun tier's red
+// view) OR when a caller holds the tint override (the dynamic tier drawing in mode 3, where
+// the base mode reads as "real" to the lightmap tier's own draws). Keeps one state/shader
+// branch serving both views.
+static bool stencil_shadow_debug_color_view(void)
+{
+	return stencil_shadow_debug_draw_mode() == 1
+		|| g_stencil_shadow_debug_tint_override != NULL;
+}
 // it. 506: bounds it. 487's render-only-node / eye-tracking divergence. One-shot per map.
 static bool g_stencil_shadow_probed_render_only = false;
 // it. 477: sections dropped for classification > skinned. td casts from class 4; we do not. Latched
@@ -482,17 +502,34 @@ static void stencil_shadow_cull_facing_by_reach(
 		{
 			continue;		// already not facing — nothing to clear
 		}
+		// cluster-impl K3 — the corner test OVER-CULLS large triangles (verified live,
+		// 2026-08-20: a 0.8wu muzzle light over outdoor ground culled facing 210 -> 0 — the
+		// ground UNDER the light has all corners metres away, yet the light plainly hits it,
+		// violating this function's own "entirely further" spec). The correct-conservative
+		// test is distance from the light to the triangle's AABB (closest-point clamp — the
+		// same shape as the cluster bounds test): keeps any triangle whose surface can enter
+		// the lit sphere, still three subtractions per axis.
 		const uint16* triangle = &shadow->triangles[plane_index * 3];
-		bool within_reach = false;
-		for (int32 corner = 0; corner < 3 && !within_reach; corner++)
-		{
-			const real_point3d* position = &shadow->base_positions[triangle[corner]];
-			const real32 dx = position->x - light_position->x;
-			const real32 dy = position->y - light_position->y;
-			const real32 dz = position->z - light_position->z;
-			within_reach = (dx * dx + dy * dy + dz * dz) <= reach_squared;
-		}
-		if (!within_reach)
+		const real_point3d* p0 = &shadow->base_positions[triangle[0]];
+		const real_point3d* p1 = &shadow->base_positions[triangle[1]];
+		const real_point3d* p2 = &shadow->base_positions[triangle[2]];
+		real32 min_x = p0->x, max_x = p0->x;
+		real32 min_y = p0->y, max_y = p0->y;
+		real32 min_z = p0->z, max_z = p0->z;
+		if (p1->x < min_x) min_x = p1->x; if (p1->x > max_x) max_x = p1->x;
+		if (p1->y < min_y) min_y = p1->y; if (p1->y > max_y) max_y = p1->y;
+		if (p1->z < min_z) min_z = p1->z; if (p1->z > max_z) max_z = p1->z;
+		if (p2->x < min_x) min_x = p2->x; if (p2->x > max_x) max_x = p2->x;
+		if (p2->y < min_y) min_y = p2->y; if (p2->y > max_y) max_y = p2->y;
+		if (p2->z < min_z) min_z = p2->z; if (p2->z > max_z) max_z = p2->z;
+		real32 dx = 0.f, dy = 0.f, dz = 0.f;
+		if (light_position->x < min_x) { dx = min_x - light_position->x; }
+		else if (light_position->x > max_x) { dx = light_position->x - max_x; }
+		if (light_position->y < min_y) { dy = min_y - light_position->y; }
+		else if (light_position->y > max_y) { dy = light_position->y - max_y; }
+		if (light_position->z < min_z) { dz = min_z - light_position->z; }
+		else if (light_position->z > max_z) { dz = light_position->z - max_z; }
+		if ((dx * dx + dy * dy + dz * dz) > reach_squared)
 		{
 			bitvector[plane_index >> 5] &= ~mask;
 		}
@@ -626,17 +663,40 @@ void stencil_shadow_section_draw(
 	for (uint32 quad_index = 0; quad_index < shadow->quad_count; quad_index++)
 	{
 		const s_stencil_shadow_quad* quad = &shadow->quads[quad_index];
+		// cluster-pass E10 (P-2, the it. 664 defect-2 fix as recorded): the matched-boundary
+		// skip runs BEFORE the facing reads — tri_right == 0xFFFE would index
+		// facing_bitvector[2047] on a 1024-word array, a 4KB OOB read armed by any stitch
+		// re-enable (which the cluster tier's seams will want).
+		if (quad->tri_right == k_stencil_shadow_matched_boundary)
+		{
+			continue;	// seam bridged by the cross-quad pass
+		}
 		bool left_faces = BIT_VECTOR_TEST_FLAG(facing_bitvector, quad->tri_left);
 		bool right_faces = quad->tri_right != k_stencil_shadow_boundary_triangle && BIT_VECTOR_TEST_FLAG(facing_bitvector, quad->tri_right);
 
-		if (
-			quad->tri_right == k_stencil_shadow_matched_boundary ||
-			left_faces == right_faces									// seam bridged by the model's cross-quad pass
-		)
+		if (left_faces == right_faces)		// no silhouette crossing at this edge
 		{
-			continue;	
+			continue;
 		}
 
+
+		// cluster-pass E9 (P-1): bound the staging write BEFORE it lands — td's own discipline
+		// (the MAXIMUM_ISQ_STITCH_QUADS assert + the shared-edge soft overflow, R9/E5/E6). The
+		// model tier never gets here (~1.5T indices max, R9), but CLUSTER-scale sections can —
+		// and isq_globals is a GLOBAL, so an overrun corrupts the D3D handles behind it. Warn
+		// once, stop emitting: a partial volume, exactly td's own budget degradation.
+		if (ib_size + 6 > k_stencil_shadow_index_buffer_capacity)
+		{
+			if (!g_stencil_shadow_warned_index_overflow_volume)
+			{
+				g_stencil_shadow_warned_index_overflow_volume = true;
+#ifdef LOG_STENCIL
+				LOG_INFO_GAME("stencil WARNING: index staging FULL at silhouette quad {} (ib_size {}) — volume truncated (P-1 guard)",
+					quad_index, ib_size);
+#endif
+			}
+			break;
+		}
 
 		// order the quad so its front faces away from the lit triangle; same-winding
 		// source pairs never swap (both sides want the stored orientation)
@@ -675,6 +735,19 @@ void stencil_shadow_section_draw(
 	{
 		const uint16* triangle = &shadow->triangles[triangle_index * 3];
 		bool faces = BIT_VECTOR_TEST_FLAG(facing_bitvector, triangle_index);
+		// cluster-pass E9 (P-1): the cap loop's twin of the quad guard above.
+		if (ib_size + 3 > k_stencil_shadow_index_buffer_capacity)
+		{
+			if (!g_stencil_shadow_warned_index_overflow_volume)
+			{
+				g_stencil_shadow_warned_index_overflow_volume = true;
+#ifdef LOG_STENCIL
+				LOG_INFO_GAME("stencil WARNING: index staging FULL at cap triangle {} (ib_size {}) — volume truncated (P-1 guard)",
+					triangle_index, ib_size);
+#endif
+			}
+			break;
+		}
 		if (faces)
 		{
 			isq_globals.indices[ib_size + 0] = (triangle[0] * 2);
@@ -705,9 +778,10 @@ void stencil_shadow_section_draw(
 	// and its Apply() corrupts live state (bisected in-game). Instead: render states go
 	// through the engine-cache-aware wrapper, and after our raw binds we call
 	// stencil_shadow_release_pipeline so the engine re-binds on its next draw.
-	if (stencil_shadow_debug_draw_mode() == 1)
+	if (stencil_shadow_debug_color_view())
 	{
-		// red volume visualization: color writes on, no stencil writes
+		// colour volume visualization (mode 1, or the dynamic tier's mode-3 draws — J14):
+		// color writes on, no stencil writes
 		stencil_shadow_force_render_state(D3DRS_COLORWRITEENABLE,
 			D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 		stencil_shadow_force_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -856,14 +930,28 @@ void stencil_shadow_section_draw(
 	// same rule stencil_shadow_shaders_initialize records). It takes priority over stipple when both apply —
 	// they both want the single pixel-shader slot, and losing the stipple fade in an experimental
 	// mode is far cheaper than losing the reach bound this mode exists to test.
-	const bool reach_clip = stencil_shadow_reach_is_active()
+	//
+	// impl2 J20 — `!point_light`: reach-clip is a LIGHTMAP-tier formulation and must never bind
+	// for the dynamic tier's point-light draws (user-diagnosed live, 2026-08-20: F6 reach mode
+	// killed the dynamic shadows while the volumes stayed correct). Two independent reasons:
+	// the reach encode/constants are built by the LIGHTMAP pass for its directional light (the
+	// dynamic path never runs stencil_shadow_reach_encode), and the depth texture the ps
+	// samples is only legally unbound during THAT pass's it. 560/561 MRT-suppression window —
+	// during the lights phase it is still an MRT output, so the texkill reads undefined and the
+	// counts die silently. Point lights take the classic pair regardless of the F6 mode.
+	const bool reach_clip = stencil_shadow_reach_is_active() && !point_light
 		&& stencil_shadow_debug_draw_mode() != 1 && stencil_shadow_reach_shader_ready();
 	device->SetVertexShader((stipple || reach_clip)
 		? (gpu_skin ? g_stencil_shadow_skinned_shader_sm3 : g_stencil_shadow_vertex_shader_sm3)
 		: (gpu_skin ? g_stencil_shadow_skinned_shader : g_stencil_shadow_vertex_shader));
-	if (stencil_shadow_debug_draw_mode() == 1)
+	if (stencil_shadow_debug_color_view())
 	{
-		const real32 tint[4] = { 1.f, 0.125f, 0.125f, 0.375f };
+		// impl2 J13/J14: the tint is per-CALLER — the dynamic tier overrides it (cyan-blue,
+		// and the override alone activates the colour view for its mode-3 draws). NULL
+		// override = the classic red (mode 1, the sun tier).
+		const real32 red_tint[4] = { 1.f, 0.125f, 0.125f, 0.375f };
+		const real32* tint = g_stencil_shadow_debug_tint_override
+			? g_stencil_shadow_debug_tint_override : red_tint;
 		device->SetPixelShader(g_stencil_shadow_pixel_shader);
 		device->SetPixelShaderConstantF(k_stencil_shadow_tint_constant, tint, 1);
 	}
@@ -2460,6 +2548,224 @@ void __cdecl stencil_shadow_render_layer_hook(void)
 // lightmap-indirect and SH-PRT layers (called from the native render_scene).
 // it. 647 DIAGNOSTIC — seeded from the tunable, mutable so it can be flipped live. See the constant.
 static bool g_stencil_shadow_lightmap_tier_enabled = k_stencil_shadow_lightmap_tier_enabled;
+
+// ================= the DYNAMIC tier's shared per-object entry (impl2 J12) =================
+//
+// One object's volumes for a POINT light — the minimal RIGID subset of the lightmap caster
+// loop above (:1369-2300), reusing its exact resolve/gate/select sequences so the two tiers
+// cannot drift on selector semantics:
+//   object gates        — hidden/shadowless (:1408), same bits
+//   model resolve       — def -> hlmt -> first tag_reference (:1496)
+//   region/LOD walk     — engine selector semantics (it. 665/666), LOD via the render cache,
+//                         lowest-detail fallback with the SAME shared warn/counter globals
+//   section gates       — D13 counts, shadow_casting_triangle_count, class <= skinned (:1897)
+//   matrix              — rigid_node on the sentinel (td 0x10F0E0 rule), tick pose +
+//                         interpolated adoption (it. 617 contract), bind-compose via
+//                         default_inverse_matrix (:2212)
+// DIVERGENCES from the lightmap loop, all deliberate for stage 1: point_light=TRUE (the
+// build_facing_bitvector/section_draw point path's FIRST user — it. 421 notes it was unused;
+// stage 1's visual gate is exactly its validation), no LOD fade / lighting-cache / opacity
+// machinery (per-light REAL light — no fake-light derivation), ARTICULATED SECTIONS SKIPPED
+// and counted (the skinned path lands next unit).
+//
+// Facing is computed against the light position transformed into SECTION space (the planes'
+// space); the draw takes the WORLD position (extrusion happens after the node transform —
+// the same split as the static path's direction handling, :2236).
+static void stencil_shadow_point_to_model_space(
+	const real_matrix4x3* m, const real_point3d* world, real_point3d* out_model)
+{
+	const real32 dx = world->x - m->position.x;
+	const real32 dy = world->y - m->position.y;
+	const real32 dz = world->z - m->position.z;
+	const real32 inverse_scale = (m->scale != 0.f) ? (1.f / m->scale) : 1.f;
+	out_model->x = (dx * m->vectors.forward.i + dy * m->vectors.forward.j + dz * m->vectors.forward.k) * inverse_scale;
+	out_model->y = (dx * m->vectors.left.i + dy * m->vectors.left.j + dz * m->vectors.left.k) * inverse_scale;
+	out_model->z = (dx * m->vectors.up.i + dy * m->vectors.up.j + dz * m->vectors.up.k) * inverse_scale;
+}
+
+int32 stencil_shadow_draw_object_volume_point_light(
+	datum object_index,
+	const real_point3d* light_world_position,
+	real32 extrusion_distance,
+	int32* out_articulated_skipped,
+	real32 opacity)
+{
+	if (out_articulated_skipped)
+	{
+		*out_articulated_skipped = 0;
+	}
+	const object_datum* object = object_try_and_get(object_index);
+	if (!object || object->definition_index == NONE)
+	{
+		return 0;
+	}
+	if (object->object.flags.test(_object_hidden_bit)
+		|| object->object.flags.test(_object_shadowless_bit))
+	{
+		return 0;
+	}
+	const _object_definition* object_definition =
+		(const _object_definition*)tag_get_fast(object->definition_index);
+	if (!object_definition || object_definition->model.index == NONE)
+	{
+		return 0;
+	}
+	const tag_reference* hlmt_render_model_reference =
+		(const tag_reference*)tag_get_fast(object_definition->model.index);
+	if (!hlmt_render_model_reference || hlmt_render_model_reference->index == NONE)
+	{
+		return 0;
+	}
+	const datum render_model_index = hlmt_render_model_reference->index;
+	const render_model_definition* render_model =
+		(const render_model_definition*)tag_get_fast(render_model_index);
+	if (!render_model)
+	{
+		return 0;
+	}
+
+	int32 region_count = 0;
+	int8* region_permutation_indices = NULL;
+	object_get_region_information(object_index, &region_count,
+		&region_permutation_indices, NULL, NULL);
+	const int8 object_lod = render_object_cache_get_level_of_detail(object_index);
+
+	static uint32 facing_bitvector[k_stencil_shadow_facing_bitvector_words];
+	int32 sections_drawn = 0;
+	for (int32 region_index = 0; region_index < render_model->regions.count; region_index++)
+	{
+		const render_model_region* region = render_model->regions[region_index];
+		if (region->permutations.count <= 0)
+		{
+			continue;
+		}
+		const int32 permutation_selector = (region_permutation_indices && region_index < region_count)
+			? region_permutation_indices[region_index] : 0;
+		if (permutation_selector == NONE)
+		{
+			continue;	// region HIDDEN by the active variant / damage state (it. 665/666)
+		}
+		if (permutation_selector < 0 || permutation_selector >= region->permutations.count)
+		{
+			continue;	// not drawable this frame — the engine skips it too
+		}
+		const render_model_permutation* permutation = region->permutations[permutation_selector];
+		const int16* lod_sections = &permutation->l1_section_index;
+		int16 section_index;
+		if (object_lod >= 0 && object_lod < 6)
+		{
+			section_index = lod_sections[object_lod];
+		}
+		else
+		{
+			section_index = NONE;
+			for (int32 level = 0; level < 6 && section_index == NONE; level++)
+			{
+				section_index = lod_sections[level];
+			}
+			g_stencil_shadow_lod_fallbacks++;
+		}
+		if (section_index == NONE || section_index < 0
+			|| section_index >= render_model->sections.count)
+		{
+			continue;
+		}
+		const render_model_section* section = render_model->sections[section_index];
+		if (section->section_info.total_vertex_count == 0
+			|| section->section_info.total_triangle_count == 0
+			|| section->section_info.total_part_count == 0)
+		{
+			continue;
+		}
+		if (section->section_info.shadow_casting_triangle_count == 0)
+		{
+			continue;
+		}
+		if (section->global_geometry_classification > _geometry_classification_skinned)
+		{
+			continue;	// the class-4 drop, same as the lightmap loop (it. 188/477)
+		}
+		int16 section_node = 0;
+		if (section->rigid_node != NONE)
+		{
+			section_node = section->rigid_node;
+		}
+		s_stencil_shadow_section* shadow = stencil_shadow_section_get(render_model_index, section_index);
+		if (!shadow)
+		{
+			continue;
+		}
+		if (shadow->articulated)
+		{
+			// impl2 J15 — the articulated path, the lightmap loop's own sequence (:2033) with
+			// the POINT light: CPU-skin to world (interpolated pose adopted inside animate,
+			// it. 500), after which planes and VB are WORLD-space — so the facing input is the
+			// light's world POSITION directly, point_light=true, no model transform. GPU
+			// palette when the skinned pair is ready; palette count 0 = the it. 660 stale-pose
+			// guard (the animate skipped the dynamic-VB refresh on the same condition, so the
+			// CPU fallback would draw a stale pose — skip instead). Draw with NULL node
+			// constants. out_articulated_skipped now counts these FAILURE skips only.
+			if (!stencil_shadow_section_animate(shadow, object_index, render_model, region_index))
+			{
+				if (out_articulated_skipped)
+				{
+					(*out_articulated_skipped)++;
+				}
+				continue;
+			}
+			stencil_shadow_build_facing_bitvector(shadow, light_world_position, true, facing_bitvector);
+			static real_vector4d dyn_palette[201];
+			int32 dyn_palette_count = 0;
+			if (shadow->skinned_vb && stencil_shadow_skinned_ready())
+			{
+				dyn_palette_count = stencil_shadow_pool_build_palette(
+					object_index, render_model, region_index, shadow, dyn_palette);
+				if (dyn_palette_count == 0)
+				{
+					if (out_articulated_skipped)
+					{
+						(*out_articulated_skipped)++;
+					}
+					continue;
+				}
+			}
+			stencil_shadow_section_draw(shadow, facing_bitvector, light_world_position, true,
+				NULL, extrusion_distance, opacity, k_stencil_shadow_self_shadow_bias,
+				dyn_palette, dyn_palette_count);
+			sections_drawn++;
+			continue;
+		}
+		const real_matrix4x3* model_matrix = object_get_node_matrix(object_index, section_node);
+		if (!model_matrix)
+		{
+			continue;
+		}
+		// it. 617 contract: adopt the interpolated (render) pose when the interpolator ran;
+		// the tick pose otherwise.
+		real_matrix4x3 interpolated_matrix;
+		if (object_try_get_node_matrix_interpolated(object_index, section_node, &interpolated_matrix))
+		{
+			model_matrix = &interpolated_matrix;
+		}
+
+		real_matrix4x3 composed;
+		const real_matrix4x3* draw_matrix = model_matrix;
+		if (section_node >= 0 && (int32)section_node < render_model->nodes.count)
+		{
+			matrix4x3_multiply(model_matrix,
+				&render_model->nodes[section_node]->default_inverse_matrix, &composed);
+			draw_matrix = &composed;
+		}
+
+		real_point3d light_model;
+		stencil_shadow_point_to_model_space(draw_matrix, light_world_position, &light_model);
+		stencil_shadow_build_facing_bitvector(shadow, &light_model, true, facing_bitvector);
+		stencil_shadow_section_draw(shadow, facing_bitvector, light_world_position, true,
+			draw_matrix, extrusion_distance, opacity);
+		sections_drawn++;
+	}
+	return sections_drawn;
+}
 
 void stencil_shadow_lightmap_volumes_pass(void)
 {

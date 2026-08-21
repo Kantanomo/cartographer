@@ -109,6 +109,28 @@ void stencil_shadow_section_draw(
 	const real_vector4d* palette_rows = NULL,
 	int32 palette_matrix_count = 0);
 
+// impl2 J12/J15 — the DYNAMIC tier's per-object entry: one object's volumes for a POINT
+// light (the first user of the point_light=true path). Reuses the lightmap caster loop's
+// resolve/region/LOD/section sequences so the tiers cannot drift; J15 wired the articulated
+// path (CPU-skin to world + the GPU palette + the it. 660 stale-pose guard), so skinned
+// casters — bipeds — draw too. out_articulated_skipped (nullable) now counts only FAILED
+// articulated sections (animate/palette failure), not unsupported ones.
+// J26: `opacity` = td's stipple shadow fade (min(shadow_fade, intensity), R46's terms) —
+// below ~0.995 the volume fragments screen-door out through the shipped stipple path, so the
+// stencil counts (and therefore the mask) fade with the light. 1.f = full-strength.
+// Returns sections drawn. Caller owns per-light state (c0–c3 re-upload, scissor).
+int32 stencil_shadow_draw_object_volume_point_light(
+	datum object_index,
+	const real_point3d* light_world_position,
+	real32 extrusion_distance,
+	int32* out_articulated_skipped,
+	real32 opacity = 1.f);
+
+// impl2 J13 — mode-1 (red view) tint override for the draws that follow: pass an RGBA float4
+// in CALLER-OWNED storage to recolour, NULL to restore the default red. The dynamic tier
+// brackets its volume draws with this so both tiers stay tellable in one mode-1 frame.
+void stencil_shadow_debug_tint_override_set(const real32* rgba_or_null);
+
 // it. 660: is the GPU-skinned pair usable? Declaration + vs_2_0 shader, plus the vs_3_0 twin on
 // SM3 hardware (where stipple/reach can bind a ps_3_0 and a vs_2_0 beside it would be illegal).
 // The animate consults this to decide whether the dynamic VB refresh is still needed.

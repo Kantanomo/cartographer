@@ -145,5 +145,12 @@ int32 stencil_shadow_environment_draw_for_light(
 bool stencil_shadow_environment_enabled(void);
 void stencil_shadow_environment_toggle(void);
 
+// cluster-impl K1: the sphere-vs-cluster-bounds test, public for the new tier's stage-0 census
+// and selection (the E11 autopsy's "survives" list — closest-point-on-box, inclusive).
+bool stencil_shadow_environment_light_touches_cluster(
+	const real_rectangle3d* bounds,
+	const real_point3d* light_position,
+	real32 light_radius);
+
 // Reset this module's per-map log budgets. Called by stencil_shadow_cache_clear.
 void stencil_shadow_environment_reset_diagnostics(void);

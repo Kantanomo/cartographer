@@ -3,6 +3,7 @@
 
 #include "rasterizer_dx9_stencil_shadow_tunables.h"
 #include "rasterizer_dx9_stencil_shadow_reach.h"
+#include "render/render_lights.h"				// impl2 J17: the F5 tier toggle
 #include "render/render_stencil_shadow_dynamic.h"
 #include "render/render_stencil_shadow_environment.h"
 #include "rasterizer_dx9_stencil_shadows.h"	// stencil_shadow_sm3_vertex_shader_ready
@@ -61,11 +62,17 @@ void stencil_shadow_debug_update(void)
 
 	// F5 toggles the DYNAMIC light tier (td layer 13). Separate switch from F8 on purpose: that
 	// tier is unverified, so it must be possible to run the shipped lightmap tier without it.
+	// impl2 J17: rewired to the impl2 tier in render_lights.cpp — the parked module's toggle
+	// (a compile-gate refuse-stub since it. 652) is no longer reachable from a key.
 	static bool dyn_key_was_down = false;
 	bool dyn_key_down = (GetAsyncKeyState(VK_F5) & 0x8000) != 0;
 	if (dyn_key_down && !dyn_key_was_down)
 	{
-		stencil_shadow_dynamic_toggle();
+		// impl2 J25: Shift+F5 = force-all-lights (the testing lever); plain F5 = the tier toggle.
+		if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0)
+			render_lights_dyn_tier_force_all_toggle();
+		else
+			render_lights_dyn_tier_toggle();
 	}
 	dyn_key_was_down = dyn_key_down;
 
@@ -73,11 +80,16 @@ void stencil_shadow_debug_update(void)
 	// what td treats as one layer, because the two halves fail differently: a wrong model volume is a
 	// wrong silhouette, a wrong cluster volume darkens a whole room. Being able to remove one half
 	// while keeping the other is what makes the first bad screenshot diagnosable.
+	// cluster-impl K2: rewired to the NEW tier in render_lights.cpp (the parked module's toggle is
+	// unreachable from keys now); Shift+F4 = the reach-cull A/B (the it. 651 verification lever).
 	static bool env_key_was_down = false;
 	bool env_key_down = (GetAsyncKeyState(VK_F4) & 0x8000) != 0;
 	if (env_key_down && !env_key_was_down)
 	{
-		stencil_shadow_environment_toggle();
+		if ((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0)
+			render_lights_env_reach_cull_toggle();
+		else
+			render_lights_env_tier_toggle();
 	}
 	env_key_was_down = env_key_down;
 
@@ -86,10 +98,14 @@ void stencil_shadow_debug_update(void)
 	bool probe_key_down = (GetAsyncKeyState(VK_F7) & 0x8000) != 0;
 	if (probe_key_down && !probe_key_was_down)
 	{
-		g_draw_mode = (g_draw_mode + 1) % 3;
+		// impl2 J14: mode 3 = the DYNAMIC tier's volumes ALONE (cyan-blue; the lightmap tier
+		// falls through to its invisible stencil path and its apply is mode-0-gated, so the
+		// frame isolates the dynamic volumes). Mode 1 is now the SUN tier alone — the dynamic
+		// tier no longer draws there (user-requested split, 2026-08-20).
+		g_draw_mode = (g_draw_mode + 1) % 4;
 
 #ifdef LOG_STENCIL
-		LOG_INFO_GAME("stencil shadows: active={} mode={} (0=real 1=red 2=green)",
+		LOG_INFO_GAME("stencil shadows: active={} mode={} (0=real 1=red-sun 2=green-probe 3=blue-dyn)",
 			g_active, g_draw_mode);
 #endif
 	}
