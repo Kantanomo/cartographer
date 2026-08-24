@@ -25,12 +25,6 @@ s_game_variant* __cdecl get_default_game_variant_by_name(wchar_t const* name)
 	return INVOKE(0, 0x678E, get_default_game_variant_by_name, name);
 }
 
-bool __cdecl game_engine_variant_cleanup(s_game_variant* variant)
-{
-	return game_variant_cartographer_settings_validate(variant) 
-		&& INVOKE(0x5B720, 0x3D380, game_engine_variant_cleanup, variant);
-}
-
 bool game_variant_is_valid(s_game_variant* variant)
 {
 	s_game_variant tmp_variant;

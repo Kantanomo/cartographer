@@ -45,4 +45,6 @@ bool cinematic_in_progress(void);
 
 void __cdecl cinematic_update(void);
 
+void __cdecl draw_quad(const rectangle2d* points, pixel32 rect_color);
+
 void cinematics_apply_patches(void);

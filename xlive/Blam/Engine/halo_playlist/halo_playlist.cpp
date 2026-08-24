@@ -1065,8 +1065,8 @@ void c_halo_playlist_reader::finalize()
         }
 
         int32 map_id = NONE;
-        char* map_path{};
-        s_secure_map_id custom_map_id{};
+        char* map_path;
+        s_secure_map_id custom_map_id;
 
         bool map_found = kablam_level_cache_try_find_map(match->map, &map_id, &map_path);
 

@@ -147,6 +147,41 @@ void c_language_pack::append_strings(s_string_reference* string_references, utf8
 	//event(_event_verbose, "%s", str);
 }
 
+s_string_reference* c_language_pack::get_string_references() const
+{
+	return this->m_string_references;
+}
+
+utf8* c_language_pack::get_string_data() const
+{
+	return this->m_string_data;
+}
+
+int32 c_language_pack::get_number_of_strings() const
+{
+	return this->m_num_of_strings;
+}
+
+int32 c_language_pack::get_string_data_size() const
+{
+	return this->m_string_data_size;
+}
+
+int32 c_language_pack::get_string_reference_cache_offset() const
+{
+	return this->m_string_reference_cache_offset;
+}
+
+int32 c_language_pack::get_string_data_cache_offset() const
+{
+	return this->m_string_data_cache_offset;
+}
+
+bool c_language_pack::get_data_loaded() const
+{
+	return this->m_data_loaded;
+}
+
 void __cdecl string_list_get_normal_string(
 	datum unic_datum,
 	string_id id,

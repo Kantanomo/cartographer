@@ -848,14 +848,14 @@ void c_tag_injecting_manager::load_unicode_strings() const
 	}
 
 	// the offset packs a few bits for something and checks it when loading if it's not 0 skip it.
-	if (((uint32)donor_pack.m_string_reference_cache_offset >> 30) != 0 || ((uint32)donor_pack.m_string_data_cache_offset >> 30) != 0)
+	if (((uint32)donor_pack.get_string_reference_cache_offset() >> 30) != 0 || ((uint32)donor_pack.get_string_data_cache_offset() >> 30) != 0)
 		return;
 
-	if (donor_pack.m_num_of_strings <= 0 || donor_pack.m_string_data_size <= 0)
+	if (donor_pack.get_number_of_strings() <= 0 || donor_pack.get_string_data_size() <= 0)
 		return;
 
-	const uint32 reference_cache_offset = (uint32)donor_pack.m_string_reference_cache_offset & 0x3FFFFFFF;
-	const uint32 string_data_cache_offset = (uint32)donor_pack.m_string_data_cache_offset & 0x3FFFFFFF;
+	const uint32 reference_cache_offset = (uint32)donor_pack.get_string_reference_cache_offset() & 0x3FFFFFFF;
+	const uint32 string_data_cache_offset = (uint32)donor_pack.get_string_data_cache_offset() & 0x3FFFFFFF;
 
 	// read each unic entry and read its reference block to get the totals needed for a combined buffer
 	s_tag_injection_string_container* pending_string_item_buffer = (s_tag_injection_string_container*)calloc(unic_entry_count, sizeof(s_tag_injection_string_container));
@@ -884,17 +884,17 @@ void c_tag_injecting_manager::load_unicode_strings() const
 		if (unic_str->strings_count == 0)
 			continue;
 
-		if ((uint32)unic_str->strings_index + unic_str->strings_count > (uint32)donor_pack.m_num_of_strings)
+		if ((uint32)unic_str->strings_index + unic_str->strings_count > (uint32)donor_pack.get_number_of_strings())
 		{
 			event(_event_warning, "tags:injection: [%s] unic tag %08x string %d +%d exceeds language pack count %d skip",
-				__FUNCTION__, unic_entry->cache_index, unic_str->strings_index, unic_str->strings_count, donor_pack.m_num_of_strings);
+				__FUNCTION__, unic_entry->cache_index, unic_str->strings_index, unic_str->strings_count, donor_pack.get_number_of_strings());
 			continue;
 		}
 
 		// read the references block plus the one following it so the end of the last string is known without scanning for its terminator
 
 		// check for if the reference block being read is at the end of the table
-		const bool has_next_reference = unic_str->strings_index + unic_str->strings_count < donor_pack.m_num_of_strings;
+		const bool has_next_reference = unic_str->strings_index + unic_str->strings_count < donor_pack.get_number_of_strings();
 		const uint32 read_count = unic_str->strings_count + (has_next_reference ? 1 : 0);
 
 		const uint32 reference_offset = reference_cache_offset + unic_str->strings_index * sizeof(s_string_reference);
@@ -906,9 +906,9 @@ void c_tag_injecting_manager::load_unicode_strings() const
 		const uint32 first_string_offset = references[0].buffer_offset;
 		const uint32 end_string_offset = has_next_reference
 			? references[unic_str->strings_count].buffer_offset
-			: (uint32)donor_pack.m_string_data_size;
+			: (uint32)donor_pack.get_string_data_size();
 
-		if (end_string_offset <= first_string_offset || end_string_offset > (uint32)donor_pack.m_string_data_size)
+		if (end_string_offset <= first_string_offset || end_string_offset > (uint32)donor_pack.get_string_data_size())
 		{
 			event(_event_warning, "tags:injection: [%s] unic tag %08x invalid string range %x, %x, skipped",
 				__FUNCTION__, unic_entry->cache_index, first_string_offset, end_string_offset);

@@ -57,6 +57,15 @@ public:
 
 	void append_strings(s_string_reference* string_references, utf8* string_buffer, uint32 string_buffer_size, uint32 string_count, uint16* out_index);
 
+	s_string_reference* get_string_references() const;
+	utf8* get_string_data() const;
+	int32 get_number_of_strings() const;
+	int32 get_string_data_size() const;
+	int32 get_string_reference_cache_offset() const;
+	int32 get_string_data_cache_offset() const;
+	bool get_data_loaded() const;
+
+private:
 	s_string_reference* m_string_references;
 	utf8* m_string_data;
 	int32 m_num_of_strings;

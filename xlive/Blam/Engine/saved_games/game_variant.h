@@ -638,8 +638,6 @@ void __cdecl game_variant_build_default(s_game_variant* variant, e_game_variant_
 
 s_game_variant* __cdecl get_default_game_variant_by_name(wchar_t const* name);
 
-bool __cdecl game_engine_variant_cleanup(s_game_variant* variant);
-
 bool game_variant_is_valid(s_game_variant* variant);
 
 void game_variant_cartographer_settings_default_new(s_game_variant* variant);

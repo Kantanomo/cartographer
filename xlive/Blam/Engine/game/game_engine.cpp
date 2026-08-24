@@ -45,7 +45,6 @@ c_game_engine* get_slayer_engine()
 	return get_game_mode_engines()[_game_engine_type_slayer];
 }
 
-
 void __cdecl game_engine_apply_map_patches(void)
 {
 	INVOKE(0x6EFDB, 0x0, game_engine_apply_map_patches);
@@ -57,6 +56,11 @@ bool __cdecl game_engine_get_change_colors(s_player_appearance* player_profile, 
 	return INVOKE(0x6E5C3, 0x6D1BF, game_engine_get_change_colors, player_profile, team_index, change_colors);
 }
 
+bool __cdecl game_engine_variant_cleanup(s_game_variant* variant)
+{
+	return game_variant_cartographer_settings_validate(variant)
+		&& INVOKE(0x5B720, 0x3D380, game_engine_variant_cleanup, variant);
+}
 
 void __cdecl game_engine_player_activated(datum player_index)
 {
