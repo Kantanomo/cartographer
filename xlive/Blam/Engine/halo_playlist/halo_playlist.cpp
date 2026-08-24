@@ -652,7 +652,7 @@ void c_halo_playlist_reader::process_variant_section()
 	                }
 	                else
 	                {
-	                    wcsncpy_s(base_variant_name, k_halo_playlist_maximum_text_length, file_section->value_buffer, _TRUNCATE);
+						ustrncpy(base_variant_name, file_section->value_buffer, k_halo_playlist_maximum_text_length);
 	                    base_game_variant = get_default_game_variant_by_name(base_variant_name);
 
 	                    if (!base_game_variant)
@@ -1066,7 +1066,7 @@ void c_halo_playlist_reader::finalize()
 
         int32 map_id = NONE;
         char* map_path;
-        s_secure_map_id custom_map_id;
+        s_secure_map_id custom_map_id{};
 
         bool map_found = kablam_level_cache_try_find_map(match->map, &map_id, &map_path);
 

@@ -19,7 +19,7 @@ enum
 
 enum e_halo_playlist_loading_result
 {
-	_halo_playlist_loading_result_success,
+	_halo_playlist_loading_result_success = 0,
 	_halo_playlist_loading_result_file_not_found,
 	_halo_playlist_loading_result_invalid_data,
 	_halo_playlist_loading_result_unexpected_end_of_file,
@@ -28,7 +28,7 @@ enum e_halo_playlist_loading_result
 
 enum e_halo_playlist_error
 {
-	_halo_playlist_error_playlist_header_already_defined,
+	_halo_playlist_error_playlist_header_already_defined = 0,
 	_halo_playlist_error_duplicate_variant_found,
 	_halo_playlist_error_property_name_invalid,
 	_halo_playlist_error_header_name_invalid,
@@ -50,7 +50,7 @@ enum e_halo_playlist_error
 
 enum e_halo_playlist_reader_seek_mode
 {
-	_halo_playlist_reader_seek_mode_new_line,
+	_halo_playlist_reader_seek_mode_new_line = 0,
 	_halo_playlist_reader_seek_mode_unused,
 	_halo_playlist_reader_seek_mode_header_start,
 	_halo_playlist_reader_seek_mode_header_read,
