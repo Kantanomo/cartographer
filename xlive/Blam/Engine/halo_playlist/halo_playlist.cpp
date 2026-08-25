@@ -490,13 +490,13 @@ void c_halo_playlist_reader::process_match_property(s_halo_playlist_section_item
 	    {
 	        if (!ustrcmp(match->variant, L""))
 	        {
-	            if (!ustrcmp(section->value_buffer, L"") || !wcsncpy_s(match->variant, NUMBEROF(match->variant), section->value_buffer, _TRUNCATE))
+	            if (!ustrcmp(section->value_buffer, L"") || wcsncpy_s(match->variant, NUMBEROF(match->variant), section->value_buffer, _TRUNCATE))
 	            {
-	                match->variant_line_in_file = this->m_current_reader_line;
+					this->log_error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
 	            }
 	            else
 	            {
-	                this->log_error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+					match->variant_line_in_file = this->m_current_reader_line;
 	            }
 	        }
 	        else
@@ -510,13 +510,13 @@ void c_halo_playlist_reader::process_match_property(s_halo_playlist_section_item
 	    {
 	        if (!ustrcmp(match->map, L""))
 	        {
-	            if (!ustrcmp(section->value_buffer, L"") || !wcsncpy_s(match->map, NUMBEROF(match->map), section->value_buffer, _TRUNCATE))
+	            if (!ustrcmp(section->value_buffer, L"") || wcsncpy_s(match->map, NUMBEROF(match->map), section->value_buffer, _TRUNCATE))
 	            {
-	                match->map_line_in_file = this->m_current_reader_line;
+					this->log_error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
 	            }
 	            else
 	            {
-	                this->log_error(_halo_playlist_error_property_value_invalid, this->m_current_reader_line, section->name_buffer, section->value_buffer);
+					match->map_line_in_file = this->m_current_reader_line;
 	            }
 	        }
 	        else
@@ -1085,13 +1085,14 @@ void c_halo_playlist_reader::finalize()
 
         s_halo_playlist_match_variant* match_variant = &this->m_playlist->match_variants[this->m_playlist->match_variant_count++];
 
-        memcpy(&match_variant->variant, variant, sizeof(s_game_variant));
+
+		match_variant->variant = *variant;
 
         if (map_path)
             strncpy_s(match_variant->map_source_path, NUMBEROF(match_variant->map_source_path), map_path, _TRUNCATE);
 
-        if (map_id == NONE)
-            memcpy(&match_variant->custom_map_id, &custom_map_id, sizeof(s_secure_map_id));
+		if (map_id == NONE)
+			match_variant->custom_map_id = custom_map_id;
 
         match_variant->map_id = map_id;
         match_variant->weight = match->weight;
@@ -1106,12 +1107,12 @@ void c_halo_playlist_reader::finalize()
 
 int c_halo_playlist_reader::game_variant_sort(void* context, void const* lhs, void const* rhs)
 {
-   return _wcsicmp(((s_game_variant*)lhs)->variant_name, ((s_game_variant*)rhs)->variant_name);
+   return ustricmp(((s_game_variant*)lhs)->variant_name, ((s_game_variant*)rhs)->variant_name);
 }
 
 int c_halo_playlist_reader::game_variant_search(void* context, void const* lhs, void const* rhs)
 {
-    return _wcsicmp((wchar_t*)lhs, ((s_game_variant*)rhs)->variant_name);
+    return ustricmp((wchar_t*)lhs, ((s_game_variant*)rhs)->variant_name);
 }
 
 int c_halo_playlist_reader::playlist_error_sort(void* context, void const* lhs, void const* rhs)

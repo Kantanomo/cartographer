@@ -1,9 +1,16 @@
 #pragma once
 
+/* structures */
+
+struct s_cartographer_variant_settings_render_globals
+{
+	bool render;
+	real32 progress;
+};
+
 /* globals */
 
-extern bool g_cartographer_variant_settings_render;
-extern real32 g_cartographer_variant_settings_render_progress;
+extern s_cartographer_variant_settings_render_globals g_cartographer_variant_settings_render_globals;
 
 /* prototypes */
 

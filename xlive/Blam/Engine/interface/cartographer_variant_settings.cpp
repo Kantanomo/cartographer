@@ -13,8 +13,7 @@ constexpr real32 k_variant_ui_fade_out_seconds = 0.25f;
 
 /* globals */
 
-bool g_cartographer_variant_settings_render = false;
-real32 g_cartographer_variant_settings_render_progress = 0.0f;
+s_cartographer_variant_settings_render_globals g_cartographer_variant_settings_render_globals;
 
 /* public code */
 
@@ -24,20 +23,20 @@ void cartographer_variant_settings_interface_update(real32 dt)
 	{
 		if (input_key_msec_down(_key_f3) > 0)
 		{
-			g_cartographer_variant_settings_render_progress += dt / k_variant_ui_fade_in_seconds;
+			g_cartographer_variant_settings_render_globals.progress += dt / k_variant_ui_fade_in_seconds;
 		}
 		else
 		{
-			g_cartographer_variant_settings_render_progress += -(dt / k_variant_ui_fade_out_seconds);
+			g_cartographer_variant_settings_render_globals.progress += -(dt / k_variant_ui_fade_out_seconds);
 		}
 
-		g_cartographer_variant_settings_render_progress = PIN(g_cartographer_variant_settings_render_progress, 0.f, 1.f);
+		g_cartographer_variant_settings_render_globals.progress = PIN(g_cartographer_variant_settings_render_globals.progress, 0.f, 1.f);
 
-		g_cartographer_variant_settings_render = g_cartographer_variant_settings_render_progress > 0.0f;
+		g_cartographer_variant_settings_render_globals.render = g_cartographer_variant_settings_render_globals.progress > 0.0f;
 	}
 	else
 	{
-		g_cartographer_variant_settings_render_progress = 0.0f;
-		g_cartographer_variant_settings_render = false;
+		g_cartographer_variant_settings_render_globals.progress = 0.0f;
+		g_cartographer_variant_settings_render_globals.render = false;
 	}
 }

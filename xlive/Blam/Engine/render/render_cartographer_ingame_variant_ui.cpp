@@ -124,7 +124,7 @@ static real_argb_color g_cartographer_variant_ui_text_shadow_color;
 
 void cartographer_ingame_variant_ui_render()
 {
-	if (g_cartographer_variant_settings_render)
+	if (g_cartographer_variant_settings_render_globals.render)
 	{
 		s_game_variant* variant = get_game_variant();
 
@@ -332,7 +332,7 @@ void cartographer_ingame_variant_ui_render()
 
 static real32 cartographer_ingame_variant_ui_fade_in_scale()
 {
-	real32 inv = 1.0f - g_cartographer_variant_settings_render_progress;
+	real32 inv = 1.0f - g_cartographer_variant_settings_render_globals.progress;
 	return 1.0f - (inv * inv);
 }
 
