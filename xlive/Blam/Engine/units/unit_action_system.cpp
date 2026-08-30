@@ -113,7 +113,6 @@ static void unit_throw_grenade_move_to_hand(datum unit_index)
 
 	object_placement_data_new(&placement_data, current_grenade->projectile.index, unit_index, &damage_owner);
 
-	
 	SET_BIT(placement_data.flags, _object_placement_data_flags_bit_2, true);
 
 	unit_get_aiming_vector(unit_index, &placement_data.forward);
