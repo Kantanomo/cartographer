@@ -11,7 +11,6 @@
 #include "shell/shell_windows.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "networking/network_event.h"
 
 /* constants */
 

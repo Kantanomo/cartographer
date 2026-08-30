@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "halo_playlist_header.h"
 
+#include "halo_playlist_item_collection.h"
+
 /* globals */
 
 //PLAYLIST_ITEM_COLLECTION(g_playlist_header_collection, k_halo_playlist_header_item_count,

@@ -49,24 +49,33 @@ e_game_variant_description_index game_engine_type_get_variant_description_index(
 	e_game_variant_description_index result = k_game_variant_description_invalid;
 	switch (type)
 	{
-	case _game_engine_type_ctf:
-		result = _game_variant_description_ctf;
-	case _game_engine_type_slayer:
-		result = _game_variant_description_slayer;
-	case _game_engine_type_oddball:
-		result = _game_variant_description_oddball;
-	case _game_engine_type_koth:
-		result = _game_variant_description_king;
-	case _game_engine_type_race:
-		result = k_game_variant_description_invalid;
-	case _game_engine_type_headhunter:
-		result = k_game_variant_description_invalid;
-	case _game_engine_type_juggernaut:
-		result = _game_variant_description_juggernaut;
-	case _game_engine_type_territories:
-		result = _game_variant_description_territories;
-	case _game_engine_type_assault:
-		result = _game_variant_description_invasion;
+		case _game_engine_type_ctf:
+			result = _game_variant_description_ctf;
+			break;
+		case _game_engine_type_slayer:
+			result = _game_variant_description_slayer;
+			break;
+		case _game_engine_type_oddball:
+			result = _game_variant_description_oddball;
+			break;
+		case _game_engine_type_koth:
+			result = _game_variant_description_king;
+			break;
+		case _game_engine_type_race:
+			result = k_game_variant_description_invalid;
+			break;
+		case _game_engine_type_headhunter:
+			result = k_game_variant_description_invalid;
+			break;
+		case _game_engine_type_juggernaut:
+			result = _game_variant_description_juggernaut;
+			break;
+		case _game_engine_type_territories:
+			result = _game_variant_description_territories;
+			break;
+		case _game_engine_type_assault:
+			result = _game_variant_description_invasion;
+			break;
 	}
 
 	return result;

@@ -170,7 +170,7 @@ void network_game_definitions_encode_game_variant(c_bitstream* packet, s_game_va
 
 	// cartographer game variant settings encoding
 
-	packet->write_integer("cart-version", variant->cartographer_settings.version, 32);
+	packet->write_integer("cart-version", variant->cartographer_settings.version, k_cartographer_variant_settings_version_bits_required);
 	packet->write_integer("cart-flags", variant->cartographer_settings.flags.get_unsafe(), k_cartographer_variant_flags_bits_required);
 	packet->write_integer("cart-game-speed", variant->cartographer_settings.game_speed, k_game_speed_modifier_bits_required);
 	packet->write_integer("cart-gravity", variant->cartographer_settings.gravity, k_game_gravity_modifier_bits_required);
@@ -325,7 +325,7 @@ bool network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_va
 
 	// cartographer variant settings decoding
 
-	variant->cartographer_settings.version = (e_cartographer_variant_settings_version)packet->read_integer("cart-version", 32);
+	variant->cartographer_settings.version = (e_cartographer_variant_settings_version)packet->read_integer("cart-version", k_cartographer_variant_settings_version_bits_required);
 	variant->cartographer_settings.flags.set_unsafe(packet->read_integer("cart-flags", k_cartographer_variant_flags_bits_required));
 	variant->cartographer_settings.game_speed = (e_game_speed_modifier)packet->read_integer("cart-game-speed", k_game_speed_modifier_bits_required);
 	variant->cartographer_settings.gravity = (e_game_gravity_modifier)packet->read_integer("cart-gravity", k_game_gravity_modifier_bits_required);

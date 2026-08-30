@@ -418,7 +418,10 @@ enum e_headhunter_engine_flags : uint32
 enum e_cartographer_variant_settings_version : uint8
 {
 	_cartographer_variant_settings_version_none,
-	_cartographer_variant_settings_version_one
+	_cartographer_variant_settings_version_one,
+	k_cartographer_variant_settings_version_count,
+
+	k_cartographer_variant_settings_version_bits_required = bits_required_for(k_cartographer_variant_settings_version_count - 1)
 };
 
 enum e_cartographer_variant_flags : uint32

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "interface.h"
 
+#include "cutscene/cinematics.h"
 #include "game/game_globals.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_main.h"
@@ -161,7 +162,7 @@ static void interface_splitscreen_render(void)
 				line.left = (player_window_count == 3 ? resolution.x / 2 : 0);
 			}
 		}
-		rasterizer_dx9_draw_primitive_quad(&line, color);
+		draw_quad(&line, color);
 	}
 	return;
 }

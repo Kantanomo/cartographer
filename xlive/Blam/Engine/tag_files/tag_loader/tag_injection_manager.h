@@ -2,7 +2,6 @@
 #include "tag_injection_table.h"
 
 #include "cache/cache_files.h"
-#include "text/text_group.h"
 #include "xml/xml_agent.h"
 
 /* constants */
@@ -13,17 +12,19 @@ enum
 	k_injectable_allocation_size = (1024 * 1024 * 20)
 };
 
-/* classes */
+/* structures */
 
 struct s_tag_injection_string_container
 {
-	s_unicode_string_list_reference* unic_str;
-	s_string_reference* references;
+	struct s_unicode_string_list_reference* unic_str;
+	struct s_string_reference* references;
 	uint32 strings_count;
 	uint32 first_string_offset;
 	uint32 buffer_length;
 	uint32 base_index;
 };
+
+/* classes */
 
 class c_tag_injecting_manager
 {
