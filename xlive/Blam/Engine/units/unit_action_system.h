@@ -69,11 +69,11 @@ enum e_unit_action : int32
 
 enum e_action_state_throw_state : int8
 {
-	_throw_idle = 0x0,
-	_throw_wind_up = 0x1,
-	_throw_in_hand = 0x2,
-	_throw_ending = 0x3,
-	k_throw_state_count = 0x4,
+	_throw_idle,
+	_throw_wind_up,
+	_throw_in_hand,
+	_throw_ending,
+	k_throw_state_count,
 };
 
 /* structures */
@@ -122,6 +122,6 @@ struct s_posture_definition
 };
 ASSERT_STRUCT_SIZE(s_posture_definition, 16);
 
-/* public functions */
+/* prototypes */
 
 void unit_action_system_apply_patches();

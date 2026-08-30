@@ -134,7 +134,7 @@ static void interface_splitscreen_render(void)
 			line.left = 0;
 			line.bottom = (resolution.y / 2) + line_size;
 			line.right = resolution.x;
-			rasterizer_dx9_draw_primitive_quad(&line, color);
+			draw_quad(&line, color);
 
 			// Draw horizontal line between players
 			if (player_window_count > 2)
@@ -151,7 +151,7 @@ static void interface_splitscreen_render(void)
 			line.left = (resolution.x / 2) - line_size;
 			line.bottom = resolution.y;
 			line.right = (resolution.x / 2) + line_size;
-			rasterizer_dx9_draw_primitive_quad(&line, color);
+			draw_quad(&line, color);
 
 			// Draw vertical line between players
 			if (player_window_count > 2)

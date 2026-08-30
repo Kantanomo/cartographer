@@ -7,6 +7,19 @@
 
 #include "math/color_math.h"
 
+/* enum */
+
+enum e_object_placement_data_flags
+{
+	_object_placement_data_flags_bit_0,
+	_object_placement_data_flags_bit_1,
+	_object_placement_data_flags_bit_2,
+	_object_placement_data_flags_bit_3,
+	_object_placement_data_flags_bit_4,
+	_object_placement_data_flags_bit_5,
+	k_object_placement_data_flags_count
+};
+
 /* structures */
 
 struct object_placement_data
