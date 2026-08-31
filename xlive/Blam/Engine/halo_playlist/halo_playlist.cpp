@@ -182,6 +182,7 @@ void c_halo_playlist_reader::parse_file_section(const wchar_t* file_buffer)
 	        {
 	            if (c == L'\n')
 	            {
+					this->trim_property_value();
 	                this->process_current_property();
 	                this->m_current_reader_mode = _halo_playlist_reader_seek_mode_new_line;
 	                ++this->m_current_reader_line;
@@ -989,6 +990,23 @@ void c_halo_playlist_reader::trim_property_name()
     }
 
     //INVOKE_TYPE(0, 0xEBE2, void(__thiscall*)(c_halo_playlist_reader*), this);
+}
+
+void c_halo_playlist_reader::trim_property_value()
+{
+	this->m_section_items[this->m_section_buffer_item_count].value_buffer[this->m_current_reader_char_index] = L'\0';
+
+	for (uint32 i = this->m_current_reader_char_index - 1; i > 0; --i)
+	{
+		wchar_t c = this->m_section_items[this->m_section_buffer_item_count].value_buffer[i];
+
+		if (c != L' ' && c != L'\t')
+		{
+			break;
+		}
+
+		this->m_section_items[this->m_section_buffer_item_count].value_buffer[i] = L'\0';
+	}
 }
 
 void c_halo_playlist_reader::log_error(e_halo_playlist_error error_type, uint32 file_line, const wchar_t* property_name, const wchar_t* property_value, const wchar_t* extra)

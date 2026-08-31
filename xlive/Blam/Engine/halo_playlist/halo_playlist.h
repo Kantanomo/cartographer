@@ -179,6 +179,7 @@ public:
 	void process_match_property(s_halo_playlist_section_item* section);
 	bool property_name_is_valid(wchar_t const* property_name);
 	void trim_property_name();
+	void trim_property_value();
 	void log_error(e_halo_playlist_error error_type, uint32 file_line, const wchar_t* property_name = L"", const wchar_t* property_value = L"", const wchar_t* extra = L"");
 	void finalize();
 
