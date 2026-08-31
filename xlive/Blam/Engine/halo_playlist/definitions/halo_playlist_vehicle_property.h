@@ -1,0 +1,29 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+/* constants */
+
+enum
+{
+	k_halo_playlist_vehicle_property_item_count = 7
+};
+
+/* enums */
+
+enum e_halo_playlist_vehicle_property
+{
+	_halo_playlist_vehicle_property_respawn_time,
+	_halo_playlist_vehicle_property_primary_light_vehicle,
+	_halo_playlist_vehicle_property_secondary_light_vehicle,
+	_halo_playlist_vehicle_property_primary_heavy_vehicle,
+	_halo_playlist_vehicle_property_banshee,
+	_halo_playlist_vehicle_property_primary_turret,
+	_halo_playlist_vehicle_property_secondary_turret,
+
+	k_halo_playlist_vehicle_property_count,
+	k_halo_playlist_vehicle_property_invalid = NONE
+};
+
+/* prototypes */
+
+e_halo_playlist_vehicle_property halo_playlist_item_collection_vehicle_property_get_value(wchar_t const* value);

@@ -1,13 +1,39 @@
 #pragma once
+#include "main/game_preferences.h"
+#include "tag_files/data_reference.h"
+#include "tag_files/tag_block.h"
 
 /* constants */
 
 enum
 {
-	k_max_strings_per_language = 0x8000
+	k_max_strings_per_language = 0x8000,
+	k_maximum_multilingual_unicode_strings_per_string_list = 9216
 };
 
 /* structures */
+
+struct s_unicode_string_list_reference
+{
+	uint16 strings_index;
+	uint16 strings_count;
+};
+
+struct s_multilingual_unicode_string_reference
+{
+	string_id string_id;
+	int32 language_offsets[k_language_count];
+};
+ASSERT_STRUCT_SIZE(s_multilingual_unicode_string_reference, 40);
+
+struct s_multilingual_unicode_string_list_group_header
+{
+	// MAX: k_maximum_multilingual_unicode_strings_per_string_list
+	tag_block<s_multilingual_unicode_string_reference> string_references;
+	data_reference string_data;
+	s_unicode_string_list_reference strings[k_language_count];
+};
+ASSERT_STRUCT_SIZE(s_multilingual_unicode_string_list_group_header, 52);
 
 struct s_string_reference
 {
@@ -29,6 +55,15 @@ public:
 	void string_list_get_normal_string(string_id id, c_maximum_interface_text* out_string, int32 strings_start_index, int32 strings_count);
 	void get_string_ids(string_id* array, int32 array_size, int32 starting_index, int32 max_count);
 
+	void append_strings(s_string_reference* string_references, utf8* string_buffer, uint32 string_buffer_size, uint32 string_count, uint16* out_index);
+
+	s_string_reference* get_string_references() const;
+	utf8* get_string_data() const;
+	int32 get_number_of_strings() const;
+	int32 get_string_data_size() const;
+	int32 get_string_reference_cache_offset() const;
+	int32 get_string_data_cache_offset() const;
+	bool get_data_loaded() const;
 
 private:
 	s_string_reference* m_string_references;
@@ -45,3 +80,7 @@ ASSERT_STRUCT_SIZE(c_language_pack, 28);
 
 void __cdecl string_list_get_normal_string(datum unic_datum, string_id id, c_maximum_interface_text* out_string);
 void __cdecl string_list_get_string_id_list(datum unic_datum, string_id* out_ids, int32 out_count);
+
+c_language_pack* language_pack_get();
+
+c_language_pack* language_pack_get_language(e_language language);

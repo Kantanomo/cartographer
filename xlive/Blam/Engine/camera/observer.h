@@ -9,6 +9,8 @@ enum
 	k_observer_command_values = 6
 };
 
+constexpr real_point2d k_observer_default_cross_hair_position{ {0.f, 0.138f} };
+
 /* enums */
 
 enum e_observer_command_flags : uint8

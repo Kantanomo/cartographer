@@ -1,0 +1,31 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+/* constants */
+
+enum
+{
+	k_halo_playlist_player_property_item_count = 9
+};
+
+/* enums */
+
+enum e_halo_playlist_player_property
+{
+	_halo_playlist_player_property_max_active_players,
+	_halo_playlist_player_property_lives_per_round,
+	_halo_playlist_player_property_respawn_time,
+	_halo_playlist_player_property_suicide_penalty,
+	_halo_playlist_player_property_shield_type,
+	_halo_playlist_player_property_motion_sensor,
+	_halo_playlist_player_property_active_camo,
+	_halo_playlist_player_property_extra_damage,
+	_halo_playlist_player_property_damage_resistance,
+
+	k_halo_playlist_player_property_count,
+	k_halo_playlist_player_property_invalid = NONE
+};
+
+/* prototypes */
+
+e_halo_playlist_player_property halo_playlist_item_collection_player_property_get_value(wchar_t const* value);

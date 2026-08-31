@@ -1,4 +1,5 @@
 #pragma once
+#include "saved_games/game_variant.h"
 
 /* public code */
 
@@ -10,3 +11,5 @@ bool game_engine_has_teams(void);
 
 // ### TODO: function name
 bool __cdecl sub_4701B6(datum player_index);
+
+e_game_variant_description_index game_engine_type_get_variant_description_index(e_game_engine_type type);

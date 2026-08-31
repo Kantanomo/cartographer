@@ -4,9 +4,16 @@
 #include "camera_track_definition.h"
 #include "director.h"
 #include "observer.h"
+#include "game/game.h"
 #include "game/game_globals.h"
 #include "game/player_control.h"
+#include "saved_games/game_variant.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
+
+/* constants */
+
+constexpr real32 k_following_camera_default_field_of_view = 78.f;
+constexpr real32 k_following_camera_default_field_of_view_radians = DEGREES_TO_RADIANS(k_following_camera_default_field_of_view);
 
 //void following_camera_update_apply_camera_track(s_unit_camera* unit_camera, real32 delta, real_vector3d* forward_out, 
 //	real_point3d* position_out, bool tight_camera_track)
@@ -151,7 +158,17 @@ void __cdecl following_camera_player_control_get_camera_info(int32 user_index, s
 real32 following_camera_get_default_camera_field_of_view()
 {
 	s_saved_game_cartographer_player_profile* player_profile = cartographer_player_profile_get_by_user_index(updating_user_index);
-	return DEGREES_TO_RADIANS(player_profile->vehicle_field_of_view);
+
+	s_game_variant* variant = get_game_variant();
+
+	real32 result = DEGREES_TO_RADIANS(player_profile->vehicle_field_of_view);
+
+	if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_force_default_fov))
+	{
+		result = k_following_camera_default_field_of_view_radians;
+	}
+
+	return result;
 }
 
 void following_camera_apply_patches()

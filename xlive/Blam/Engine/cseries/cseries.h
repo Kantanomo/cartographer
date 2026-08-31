@@ -311,3 +311,16 @@ __forceinline T* assert_return_internal(T* pointer)
 	return pointer;
 }
 #endif
+
+constexpr uint32 bits_required_for(uint64 max_value)
+{
+	// minimum of 1 bit for 1 and 0
+
+	uint32 bits = 1;
+	while (max_value > 1)
+	{
+		max_value >>= 1;
+		++bits;
+	}
+	return bits;
+}

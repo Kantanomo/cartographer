@@ -59,6 +59,17 @@ uint16 c_tag_injection_table::get_entry_count(void) const
 	return m_entry_count;
 }
 
+uint16 c_tag_injection_table::get_entry_count_by_type(e_tag_group type) const
+{
+	uint16 result = 0;
+
+	for (uint16 i = 0; i < this->m_entry_count; ++i)
+		if (this->m_table[i].type.group == type)
+			++result;
+
+	return result;
+}
+
 s_tag_injecting_table_entry* c_tag_injection_table::init_entry(datum cache_index, e_tag_group type)
 {
 	if (m_entry_count >= m_table_size)
@@ -96,6 +107,19 @@ s_tag_injecting_table_entry* c_tag_injection_table::get_entry_by_cache_index(dat
 s_tag_injecting_table_entry* c_tag_injection_table::get_entry_by_injected_index(datum datum_index) const
 {
 	return get_entry(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index) - k_first_injected_datum);
+}
+
+void c_tag_injection_table::get_entries_by_type(e_tag_group type, s_tag_injecting_table_entry* out_results)
+{
+	int32 out_index = 0;
+	for (uint16 i = 0; i < this->m_entry_count; ++i)
+		if (this->m_table[i].type.group == type)
+		{	
+			s_tag_injecting_table_entry* out = &out_results[out_index++];
+			s_tag_injecting_table_entry* in = &this->m_table[i];
+
+			*out = *in;
+		}
 }
 
 bool c_tag_injection_table::has_entry_by_cache_index(datum datum_index) const

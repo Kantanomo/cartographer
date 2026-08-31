@@ -23,6 +23,7 @@
 
 #include <XLive/xbox/xbox.h>
 
+#include "cartographer_variant_settings.h"
 #include "user_interface_networking.h"
 
 /* macros */
@@ -601,6 +602,7 @@ void __cdecl user_interface_update(
 
 	// move to user_interface_networking_update when rewritten
 	user_interface_networking_update_auto_join();
+	cartographer_variant_settings_interface_update(dt);
 	return;
 }
 

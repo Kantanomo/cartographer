@@ -14,6 +14,8 @@ enum e_utf32
 
 	k_first_unicode_private_use_character = 0xE000,
 
+	_unicode_private_font_icon_lock = 0xE008,
+
 	_unicode_private_font_icon_a_button = 0xE100,
 	_unicode_private_font_icon_b_button,
 	_unicode_private_font_icon_x_button,
@@ -367,6 +369,8 @@ real64 ustrtod(const wchar_t* nptr, wchar_t** endptr);
 
 int32 utol(const wchar_t* string);
 
+bool __cdecl uniswcntrl(wchar_t const* string);
+
 void wchar_string_to_ascii_string(const wchar_t* src, char* dst, int32 count);
 
 void __cdecl ascii_string_to_wchar_string(const char* src, wchar_t* dst, int32 count);
@@ -390,6 +394,7 @@ void __cdecl ascii_string_to_utf32_string(const char* string, utf32* utf32_strin
 
 void __cdecl wchar_string_to_utf32_string(const wchar_t* string, utf32* utf32_string, int32 count);
 
+bool __cdecl validate_wchar_characters(wchar_t* string);
 
 /* public code */
 

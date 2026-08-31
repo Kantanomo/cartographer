@@ -8,7 +8,9 @@
 
 #include "shell/shell.h"
 
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+/* typedef */
+typedef void(__cdecl* t_object_apply_damage_aftermath)(datum object_index, s_damage_aftermath_data* damage_data);
+t_object_apply_damage_aftermath p_object_apply_damage_aftermath;
 
 /* public code */
 
@@ -18,10 +20,7 @@ void damage_apply_patches(void)
 	// Used to disable it in Infection only, became a bigger problem so now we have to disable it globally.....
 	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), object_cause_damage);
 
-	if (!shell_is_dedicated_server()) 
-	{
-		PatchCall(Memory::GetAddress(0x1FD293), object_apply_damage_aftermath);
-	}
+	DETOUR_ATTACH(p_object_apply_damage_aftermath, Memory::GetAddress<t_object_apply_damage_aftermath>(0x17A25D, 0x151ABD), object_apply_damage_aftermath);
 	return;
 }
 
@@ -62,6 +61,12 @@ void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index,
 
 void __cdecl object_apply_damage_aftermath(datum object_index, s_damage_aftermath_data* aftermath_data)
 {
-	SET_BIT(aftermath_data->flags, _damage_aftermath_has_explosion_physics, currentVariantSettings.explosionPhysics);
-	INVOKE(0x17A25D, 0x0, object_apply_damage_aftermath, object_index, aftermath_data);
+	const s_game_variant* variant = get_game_variant();
+
+	if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_explosion_physics))
+	{
+		SET_BIT(aftermath_data->flags, _damage_aftermath_has_explosion_physics, true);
+	}
+
+	p_object_apply_damage_aftermath(object_index, aftermath_data);
 }

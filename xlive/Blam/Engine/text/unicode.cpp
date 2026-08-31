@@ -395,6 +395,13 @@ int32 utol(const wchar_t* string)
 	return _wtol(string);
 }
 
+bool __cdecl uniswcntrl(wchar_t const* string)
+{
+	ASSERT(string);
+
+	return INVOKE(0x4C792, 0x31B72, uniswcntrl, string);
+}
+
 void wchar_string_to_ascii_string(const wchar_t* src, char* dst, int32 count)
 {
 	ASSERT(((void*)src) != ((void*)dst));
@@ -502,6 +509,11 @@ void __cdecl wchar_string_to_utf32_string(const wchar_t* string, utf32* utf32_st
 {
 	string_to_utf32_string<wchar_t>(string, utf32_string, wchar_string_to_utf32_characters, count);
 	return;
+}
+
+bool __cdecl validate_wchar_characters(wchar_t* string)
+{
+	return INVOKE(0x4C706, 0x31AE6, validate_wchar_characters, string);
 }
 
 /* private code */

@@ -1,0 +1,30 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+/* constnats */
+
+enum
+{
+	k_halo_playlist_slayer_property_item_count = 8
+};
+
+/* enums */
+
+enum e_halo_playlist_slayer_property
+{
+	_halo_playlist_slayer_property_score_to_win_round,
+	_halo_playlist_slayer_property_team_play,
+	_halo_playlist_slayer_property_team_scoring,
+	_halo_playlist_slayer_property_team_changing,
+	_halo_playlist_slayer_property_force_even_teams,
+	_halo_playlist_slayer_property_bonus_points,
+	_halo_playlist_slayer_property_suicide_point_loss,
+	_halo_playlist_slayer_property_death_point_loss,
+
+	k_halo_playlist_slayer_property_count,
+	k_halo_playlist_slayer_property_invalid = NONE
+};
+
+/* prototypes */
+
+e_halo_playlist_slayer_property halo_playlist_item_collection_slayer_property_get_value(wchar_t const* value);

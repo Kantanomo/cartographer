@@ -6,6 +6,7 @@
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_dynavobgeom.h"
+#include "rasterizer/dx9/rasterizer_dx9_primitives.h"
 #include "render/render.h"
 
 /* constants */

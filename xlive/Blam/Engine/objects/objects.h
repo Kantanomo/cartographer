@@ -69,10 +69,10 @@ enum e_object_damage_flags : uint16
 	_object_damage_bit_1,
 	_object_is_dead_bit,
 	_object_damage_bit_3,
-	_object_damage_bit_4,
+	_object_created_with_overshield,
 	_object_damage_bit_5,
 	_object_damage_bit_6,
-	_object_damage_bit_7,
+	_object_is_immune_to_damage,
 	_object_damage_bit_8,
 	_object_damage_bit_9,
 	_object_damage_bit_10,
@@ -443,6 +443,8 @@ bool __cdecl object_force_inside_bsp(datum object_index, const real_point3d* kno
 void* object_get_and_verify_type(datum object_index, int32 object_type_mask);
 
 datum object_get_ultimate_parent(datum object_index);
+
+void object_attach_to_node(datum parent_index, datum child_index, uint16 node_index);
 
 #ifdef OBJECT_DEBUG
 void objects_information_get(objects_information* information);

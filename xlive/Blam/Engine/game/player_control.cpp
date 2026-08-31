@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "player_control.h"
 
+#include "game.h"
 #include "players.h"
 
 #include "cache/cache_files.h"
@@ -11,7 +12,12 @@
 #include "units/units.h"
 #include "units/unit_definitions.h"
 
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+#include "saved_games/game_variant.h"
+
+/* constants */
+
+constexpr real32 k_player_default_field_of_view = 78.f;
+constexpr real32 k_player_default_field_of_view_radians = DEGREES_TO_RADIANS(k_player_default_field_of_view);
 
 /* globals */
 
@@ -30,16 +36,17 @@ real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 {
 	const s_player_control* player_control = player_control_get(user_index);
 
-	float result = observer_default_field_of_view();
+	real32 result = observer_default_field_of_view();
 
 	if (player_control->unit_datum_index != NONE)
 	{
-		float fov;
+		real32 fov;
 		const s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(user_index);
+		const s_game_variant* variant = get_game_variant();
 
-		if (currentVariantSettings.forced_fov != 0)
+		if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_force_default_fov))
 		{
-			fov = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
+			fov = k_player_default_field_of_view_radians;
 		}
 		else if (profile_settings)
 		{
@@ -47,7 +54,7 @@ real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 		}
 		else
 		{
-			unit_definition* unit = (unit_definition*)tag_get_fast(object_get(player_control->unit_datum_index)->definition_index);
+			unit_definition* unit = (unit_definition*)tag_get_fast(unit_get(player_control->unit_datum_index)->definition_index);
 			fov = unit->unit.camera_field_of_view;
 		}
 

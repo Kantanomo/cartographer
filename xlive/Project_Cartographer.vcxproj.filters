@@ -64,8 +64,6 @@
     <ClCompile Include="XLive\xnet\NIC.cpp" />
     <ClCompile Include="XLive\xnet\net_utils.cpp" />
     <ClCompile Include="Util\curl-interface.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
-    <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
@@ -563,6 +561,35 @@
     <ClCompile Include="Blam\Engine\networking\logic\life_cycle\life_cycle_handler_joining.cpp" />
     <ClCompile Include="Blam\Engine\math\crypto_windows.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\build_version\cartographer_build_version.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_header.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_item_collection.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\halo_playlist.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_variant_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_game_type_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_settings_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_player_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_team_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_vehicle_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_equipment_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_slayer_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_king_porperty.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_oddball_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_juggernaut_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_ctf_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_assault_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_territories_property.cpp" />
+    <ClCompile Include="Blam\Engine\kablam\kablam_level_cache.cpp" />
+    <ClCompile Include="Blam\Engine\main\map_manager.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_playlist_property.cpp" />
+    <ClCompile Include="Blam\Engine\halo_playlist\definitions\halo_playlist_cartographer_setting.cpp" />
+    <ClCompile Include="Blam\Engine\networking\network_game_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\units\unit_action_system.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_primitives.cpp" />
+    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_cartographer_ingame_variant_ui.cpp" />
+    <ClCompile Include="Blam\Engine\interface\cartographer_variant_settings.cpp" />
+    <ClCompile Include="Blam\Engine\interface\multiplayer_variant_interface_cartographer_strings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -650,8 +677,6 @@
     <ClInclude Include="XLive\xnet\NIC.h" />
     <ClInclude Include="XLive\xnet\net_utils.h" />
     <ClInclude Include="Util\curl-interface.h" />
-    <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
-    <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="Blam\Engine\physics\physics_constants.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
@@ -2105,6 +2130,32 @@
     <ClInclude Include="Blam\Engine\cseries\language.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_string\kablam_string.h" />
     <ClInclude Include="Blam\Engine\kablam\kablam_shell\kablam_shell.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\halo_playlist.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_header.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_item_collection.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_variant_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_game_type_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_match_settings_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_player_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_team_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_vehicle_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_equipment_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_slayer_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_king_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_oddball_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_juggernaut_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_ctf_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_assault_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_territories_property.h" />
+    <ClInclude Include="Blam\Engine\kablam\kablam_level_cache.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_playlist_property.h" />
+    <ClInclude Include="Blam\Engine\halo_playlist\definitions\halo_playlist_cartographer_setting.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_primitives.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_interface_cartographer_strings.h" />
+    <ClInclude Include="Blam\Engine\interface\multiplayer_variant_settings_interface_definition.h" />
+    <ClInclude Include="Blam\Engine\render\render_cartographer_ingame_variant_ui.h" />
+    <ClInclude Include="Blam\Engine\interface\cartographer_variant_settings.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

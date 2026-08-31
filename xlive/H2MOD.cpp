@@ -98,7 +98,6 @@
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #endif
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
@@ -107,14 +106,17 @@
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "halo_playlist/halo_playlist.h"
+#include "interface/multiplayer_variant_settings_interface_definition.h"
 #include "items/weapons.h"
+#include "physics/physics_constants.h"
+#include "units/unit_action_system.h"
 
 /* typedefs */
 
@@ -305,13 +307,11 @@ void H2MOD::Initialize()
 	else
 	{
 		kablam_apply_patches();
-		playlist_loader::initialize();
 	}
 
 	cartographer_player_profile_initialize();
 	tag_injection_initialize();
 	CustomVariantHandler::RegisterCustomVariants();
-	CustomVariantSettings::Initialize();
 	MapSlots::Initialize();
 	ProjectileFix::ApplyPatches();
 	H2X::ApplyPatches();
@@ -350,6 +350,19 @@ static bool __cdecl OnPlayerSpawn(datum player_index)
 	CustomVariantHandler::OnPlayerSpawn(ExecTime::_preEventExec, player_index);
 
 	bool ret = p_player_spawn(player_index);
+
+	s_game_variant* variant = get_game_variant();
+
+	if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_invincible_players))
+	{
+		player_datum* player = player_get(player_index);
+		object_datum* object = object_get(player->unit_index);
+		
+		ASSERT(player);
+		ASSERT(object);
+
+		object->object.object_damage_flags.set(_object_is_immune_to_damage, true);
+	}
 
 	// check if the spawn was successful
 	if (ret)
@@ -442,6 +455,12 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 				g_xbox_tickrate_enabled = true;
 			}
 
+			if (options->game_variant.cartographer_settings.flags.test(_cartographer_variant_engine_mode))
+			{
+				event(_event_status, "h2mod: 30 tick engine mode enabled");
+				g_xbox_tickrate_enabled = true;
+			}
+
 			toggle_xbox_tickrate(options, g_xbox_tickrate_enabled);
 			if (!g_xbox_tickrate_enabled)
 			{
@@ -455,6 +474,8 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 				// in case it is found
 				CustomVariantHandler::GameVarianEnable(variant_name);
 			}
+
+			multiplayer_variant_settings_interface_on_map_load();
 		}
 		else if (options->game_mode == _game_mode_campaign)
 		{
@@ -614,6 +635,12 @@ static void h2mod_apply_hooks(void)
 	WriteValue<int32>(Memory::GetAddress(0x1AEA75, 0x1AD61C) + 1, INFINITE);
 	network_loading_apply_patches();
 
+	network_game_definitions_apply_patches();
+	physics_constants_apply_patches();
+	game_time_apply_patches();
+	unit_action_system_apply_patches();
+	weapons_apply_patches();
+
 	// sound fix for hunter's weapons (assault cannon)
 	// might be used for other game systems
 	Codecave(Memory::GetAddress(0x15E8DC, 0x142B9C), object_function_value_adjust_primary_firing, 4);
@@ -693,7 +720,12 @@ static void h2mod_apply_hooks(void)
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
 
-		weapons_apply_patches();
+		
+	}
+
+	if (shell_is_dedicated_server())
+	{
+		halo_playlist_apply_patches();
 	}
 	return;
 }

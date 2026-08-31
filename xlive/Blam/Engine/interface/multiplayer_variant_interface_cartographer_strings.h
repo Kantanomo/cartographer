@@ -1,0 +1,16 @@
+
+#pragma once
+#include "multiplayer_variant_settings_interface_definition.h"
+#include "main/game_preferences.h"
+
+extern wchar_t* g_multiplayer_variant_interface_cartographer_title_strings[k_language_count][k_variant_setting_parameter_type_cartographer_count];
+
+extern wchar_t* g_multiplayer_variant_interface_cartographer_parameter_description_strings[k_language_count][k_variant_setting_parameter_type_cartographer_count];
+
+extern wchar_t* g_multiplayer_variant_interface_cartographer_game_speed_strings[k_language_count][k_game_speed_modifier_count];
+
+extern wchar_t* g_multiplayer_variant_interface_cartographer_gravity_strings[k_language_count][k_game_gravity_modifier_count];
+
+extern wchar_t* g_multiplayer_variant_interface_cartographer_spawn_protection_strings[k_language_count][k_player_spawn_protection_timer_count];
+
+extern wchar_t* g_multiplayer_variant_interface_cartographer_engine_mode[k_language_count][2];

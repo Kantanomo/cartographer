@@ -1,0 +1,28 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+/* constants */
+
+enum
+{
+	k_halo_playlist_territories_property_item_count = 6
+};
+
+/* enums */
+
+enum e_halo_playlist_territories_property
+{
+	_halo_playlist_territories_property_score_to_win_round,
+	_halo_playlist_territories_property_team_changing,
+	_halo_playlist_territories_property_force_even_teams,
+	_halo_playlist_territories_property_territory_count,
+	_halo_playlist_territories_property_contest_time,
+	_halo_playlist_territories_property_control_time,
+
+	k_halo_playlist_territories_property_count,
+	k_halo_playlist_territories_property_invalid = NONE
+};
+
+/* prototypes */
+
+e_halo_playlist_territories_property halo_playlist_item_collection_territories_property_get_value(wchar_t const* value);

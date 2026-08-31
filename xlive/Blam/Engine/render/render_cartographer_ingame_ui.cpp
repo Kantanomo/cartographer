@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "render_cartographer_ingame_ui.h"
 
+#include "render.h"
+#include "render_cartographer_ingame_variant_ui.h"
 #include "cartographer/build_version/cartographer_build_version.h"
 #include "cartographer/twizzler/twizzler.h"
 
@@ -22,6 +24,13 @@
 #include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/Modules/Updater/Updater.h"
 #include "version_git.h"
+#include "cache/cache_files.h"
+#include "input/input_windows.h"
+#include "interface/multiplayer_variant_settings_interface_definition.h"
+#include "rasterizer/dx9/rasterizer_dx9_dof.h"
+#include "rasterizer/dx9/rasterizer_dx9_primitives.h"
+#include "rasterizer/dx9/rasterizer_dx9_submit.h"
+#include "text/text.h"
 
 /* defines */
 
@@ -54,6 +63,7 @@ static bool render_cartographer_achievement_message(const char* achivement_messa
 static void render_cartographer_update_message(const char* update_text, int64 update_size_bytes, int64 update_downloaded_bytes);
 static void render_netdebug_text(void);
 static void render_main_game_time_debug(void);
+
 
 /* globals */
 
@@ -89,8 +99,10 @@ void render_cartographer_ingame_ui(void)
 	render_cartographer_git_build_info();
 	render_netdebug_text();
 	render_main_game_time_debug();
-	rasterizer_dx9_perf_event_end("render cartographer ingame ui");
 
+	cartographer_ingame_variant_ui_render();
+
+	rasterizer_dx9_perf_event_end("render cartographer ingame ui");
 	return;
 }
 
