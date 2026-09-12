@@ -24,12 +24,6 @@ struct s_network_message_rank_change
 	int8 rank;
 };
 
-struct s_network_message_anti_cheat
-{
-	s_network_message_session_data session_data;
-	bool enabled;
-};
-
 struct s_network_message_session_custom_variant_settings
 {
 	s_network_message_session_data session_data;

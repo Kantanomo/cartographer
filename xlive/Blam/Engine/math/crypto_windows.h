@@ -17,3 +17,5 @@ struct s_sha256_hash
 /* prototypes */
 
 bool crypto_windows_sha256_hash_data(void const *data, uint32 size, s_sha256_hash *hash);
+
+bool crypto_windows_random_bytes(void* buffer, uint32 size);
