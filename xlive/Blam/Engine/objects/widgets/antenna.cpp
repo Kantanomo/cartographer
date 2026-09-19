@@ -7,6 +7,18 @@
 #include "rasterizer/dx9/rasterizer_dx9_widgets.h"
 #include "render/render.h"
 
+/* constants */
+
+enum
+{
+	k_antenna_render_catch_up_update_threshold = 5,
+	k_antenna_render_catch_up_update_count = 3,
+};
+
+constexpr real32 k_antenna_render_catch_up_dt = 0.05f;
+
+constexpr real32 k_antenna_render_projected_pixels = 100.f;
+
 /* public code */
 
 void antenna_apply_patches(void)

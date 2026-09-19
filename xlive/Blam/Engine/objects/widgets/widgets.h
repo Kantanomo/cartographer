@@ -37,7 +37,7 @@ struct widget_type_definition
 	void(__cdecl* delete_proc)(datum type_datum_index);
 	void(__cdecl* update)(real32 dt);
 	void(__cdecl* render_debug_proc)(datum object_index, datum type_datum_index);
-	void(__cdecl* render_proc)(datum unused_shader_index, int32 unused_1, int32 unused_2, int32 unused_3, int32 unused_4, datum cloth_index, int8* unused_out_buffer);
+	void(__cdecl* render_proc)(datum unused_shader_index, int32 unused_1, int32 unused_2, int32 unused_3, int32 unused_4, datum type_datum_index, int8* unused_out_buffer);
 	void(__cdecl* transparent_render_proc)(void* payload);
 	datum(__cdecl* get_shader_proc)(datum type_datum_index);
 	void(__cdecl* render_transparent_proc)(int16 layer, datum type_datum_index);

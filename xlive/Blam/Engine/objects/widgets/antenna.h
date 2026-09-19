@@ -15,14 +15,7 @@
 enum
 {
 	k_antenna_maximum_vertex_datum_count = MAXIMUM_NUMBER_OF_ANTENNA_VERTICES + 1,
-
-	k_antenna_render_catch_up_update_threshold = 5,
-	k_antenna_render_catch_up_update_count = 3,
 };
-
-constexpr real32 k_antenna_render_catch_up_dt = 0.05f;
-
-constexpr real32 k_antenna_render_projected_pixels = 100.f;
 
 /* structures */
 
